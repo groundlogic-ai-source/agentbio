@@ -23,6 +23,7 @@ A Python drug-repurposing research pipeline that ranks rare disease / neglected 
 ## Architecture decisions
 
 - **Two scores, never blended at collection time**: `tractability_score` and `unmet_need_score` are always output separately so a human can audit the math.
+- **Ranking (Stage 1)**: top-30 is ordered by the additive sum `tractability_score + unmet_need_score`. Because `unmet_need_score` is a constant `0.35` in Stage 1 (Orphanet bulk list exposes no treatment status/prevalence), this is currently equivalent to ranking by tractability alone. Deferred decision: revisit in Stage 2 (lexicographic or Pareto) once `unmet_need_score` has real variation.
 - **InChIKey-first in PubChem**: drug name → InChIKey → all downstream properties; never match on raw name string.
 - **ChEMBL strict filtering**: only Homo sapiens targets, IC50/Ki, `confidence_score >= 8`, `pchembl_value` present. `pooled_across_multiple_targets` flag is surfaced when multiple ChEMBL IDs match a UniProt accession.
 - **Cache-first everywhere**: all six API wrappers check `cache/cache.db` before making a network call. First run is slow (15–60 min); repeat runs are near-instant.
