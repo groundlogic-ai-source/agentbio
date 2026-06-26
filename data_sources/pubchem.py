@@ -74,14 +74,15 @@ def get_compound_data(drug_name: str) -> dict[str, Any]:
 
         props_url = (
             f"{BASE_URL}/compound/inchikey/{inchikey}"
-            f"/property/CanonicalSMILES,MolecularWeight,XLogP/JSON"
+            f"/property/ConnectivitySMILES,MolecularWeight,XLogP/JSON"
         )
         props_data = _get_json(props_url)
         if props_data:
             props = props_data.get("PropertyTable", {}).get("Properties", [])
             if props:
                 p = props[0]
-                result["canonical_smiles"] = p.get("CanonicalSMILES")
+                # PubChem renamed CanonicalSMILES -> ConnectivitySMILES (2025).
+                result["canonical_smiles"] = p.get("ConnectivitySMILES") or p.get("CanonicalSMILES") or p.get("SMILES")
                 mw = p.get("MolecularWeight")
                 result["molecular_weight"] = float(mw) if mw is not None else None
                 xlogp = p.get("XLogP")
