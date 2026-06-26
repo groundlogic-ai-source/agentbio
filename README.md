@@ -1,0 +1,158 @@
+# Drug Repurposing Pipeline — Stage 1: Target Selection
+
+A Python pipeline that systematically identifies drug-repurposing candidates for rare diseases and WHO Neglected Tropical Diseases (NTDs) by integrating data from six public biomedical APIs.
+
+---
+
+## Project Structure
+
+```
+.
+├── data_sources/           # API wrapper modules (one file per source)
+│   ├── orphadata.py        # Orphanet rare disease list + static WHO NTD list
+│   ├── open_targets.py     # Open Targets Platform — target-disease associations
+│   ├── chembl.py           # ChEMBL — IC50/Ki bioactivity counts per target
+│   ├── afdb.py             # AlphaFold DB — per-residue pLDDT confidence
+│   ├── clinicaltrials.py   # ClinicalTrials.gov v2 — prior trial history
+│   └── pubchem.py          # PubChem PUG REST — chemical structure & properties
+├── cache/
+│   └── cache.py            # SQLite-backed key-value cache with TTL
+├── agents/
+│   └── target_selection.py # Core scoring agent (no LLM for scoring)
+├── output/                 # Generated output files (created at runtime)
+│   ├── top_candidates.json
+│   ├── top_candidates.csv
+│   └── narration.txt
+└── requirements.txt
+```
+
+---
+
+## Installation
+
+```bash
+pip install -r requirements.txt --break-system-packages
+```
+
+> **RDKit note:** If `pip install rdkit` fails, try:
+> ```bash
+> pip install rdkit-pypi --break-system-packages
+> ```
+> RDKit is available as a dependency but not directly called in Stage 1 scoring — it is imported for downstream chemical validation in later stages.
+
+### Environment variables
+
+The LLM narration step uses Replit AI Integrations (Anthropic). These are set automatically:
+
+| Variable | Purpose |
+|---|---|
+| `AI_INTEGRATIONS_ANTHROPIC_BASE_URL` | Replit proxy URL for Anthropic |
+| `AI_INTEGRATIONS_ANTHROPIC_API_KEY`  | Dummy key (handled by proxy) |
+
+No manual API keys required for any of the six data sources — they are all publicly accessible REST/GraphQL APIs.
+
+---
+
+## Running Stage 1
+
+```bash
+python -m agents.target_selection
+```
+
+This runs the full pipeline end-to-end. Expect it to take **15–60 minutes** on first run due to API rate limits across Orphanet (~10,000+ diseases), Open Targets, ChEMBL, AlphaFold, and ClinicalTrials. Subsequent runs are fast because all API responses are cached locally in `cache/cache.db`.
+
+### What happens step by step
+
+1. **Build candidate universe** — fetches all Orphanet rare diseases via API + appends the 20 hardcoded WHO NTDs.
+2. **EFO resolution** — for each disease, queries the Open Targets search endpoint to get its EFO ID.
+3. **Target discovery** — for each disease, pulls the top 5 associated protein targets (by Open Targets association score).
+4. **Per-pair data collection** — for each (disease, target) pair:
+   - ChEMBL: IC50/Ki count and median pChEMBL (Homo sapiens, confidence ≥ 8 only)
+   - AlphaFold DB: mean pLDDT structural confidence
+   - ClinicalTrials.gov: prior trial history for this drug+disease combination
+5. **Scoring** — two independent scores are computed (never blended):
+   - `tractability_score` — reflects how druggable the target is
+   - `unmet_need_score` — reflects disease burden and lack of existing treatments
+6. **Ranking & output** — top 30 pairs saved as JSON and CSV with all raw numbers.
+7. **LLM narration** — one Anthropic API call generates a 2-3 sentence plain-English summary of the top 5, referencing only numbers already in the table.
+
+---
+
+## Output Files
+
+All outputs are written to `output/`.
+
+### `top_candidates.json` and `top_candidates.csv`
+
+One row per (disease, target) pair. Fields:
+
+| Field | Description |
+|---|---|
+| `disease_name` | Disease name (from Orphanet or WHO NTD list) |
+| `target_symbol` | HGNC gene symbol |
+| `ensembl_id` | Ensembl gene ID |
+| `uniprot_id` | UniProt accession |
+| `ot_association_score` | Open Targets overall association score (0–1) |
+| `chembl_activity_count` | IC50/Ki records with pChEMBL present, confidence ≥ 8, Homo sapiens |
+| `median_pchembl` | Median pChEMBL value across qualifying ChEMBL records |
+| `chembl_pooled_multi_target` | True if multiple ChEMBL target IDs were pooled (interpret with caution) |
+| `afdb_has_structure` | True if AlphaFold model exists for this UniProt ID |
+| `afdb_mean_plddt` | Mean per-residue pLDDT confidence (0–100) |
+| `prior_trial_count` | Number of ClinicalTrials.gov records found for this pair |
+| `has_negative_repurposing_result` | True if any trial was TERMINATED / WITHDRAWN / SUSPENDED |
+| `has_approved_treatment` | Whether the disease has an approved treatment (null = unknown, flagged for review) |
+| `prevalence_per_million` | Orphanet prevalence per million if available |
+| `treatment_status_needs_review` | True when `has_approved_treatment` is unknown |
+| `tractability_score` | Weighted numeric score (ChEMBL log-count 40%, pLDDT 35%, failure penalty 25%) |
+| `unmet_need_score` | Weighted numeric score (no treatment 70%, prevalence 30%) |
+
+### `narration.txt`
+
+A 2-3 sentence plain-English commentary generated by `claude-sonnet-4-6`, referencing only the numbers in the table. It does not generate or modify any scores.
+
+---
+
+## Scoring Logic
+
+### tractability_score
+
+```
+tractability = 0.40 × log_scale(chembl_count, cap=500)
+             + 0.35 × (pLDDT / 100)
+             + 0.25 × (−1.0 if prior_failure else 0.0)
+```
+
+- **ChEMBL component**: log1p-scaled, capped at 500 records, normalised to [0, 1]
+- **pLDDT component**: normalised to [0, 1]; missing structure → 0
+- **Failure penalty**: −0.25 subtracted from score if any prior trial was terminated/withdrawn for this exact pair
+
+### unmet_need_score
+
+```
+unmet_need = 0.70 × treatment_component
+           + 0.30 × log_scale(prevalence_per_million, cap=1_000_000)
+```
+
+- `treatment_component`: 1.0 (no treatment), 0.5 (unknown), 0.0 (treatment exists)
+- Missing prevalence → 0 for that component
+
+Both scores are always shown separately in the output. They are ranked by their sum but reported individually so a human can audit the math.
+
+---
+
+## Caching
+
+All API responses are stored in `cache/cache.db` (SQLite). Default TTL:
+
+| Source | TTL |
+|---|---|
+| Orphanet, Open Targets, ChEMBL, AlphaFold, PubChem | 7 days |
+| ClinicalTrials.gov | 3 days |
+
+To force a fresh run, delete `cache/cache.db`.
+
+---
+
+## What's not built yet
+
+Stage 2 will add the Biologist, Chemist, and Reviewer agents. This stage intentionally ends after the ranked table and narration.
