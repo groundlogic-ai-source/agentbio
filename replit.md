@@ -38,10 +38,13 @@ _Populate as you build._
 
 ## Gotchas
 
-- `set` from `cache.cache` shadows Python's built-in `set()` — all data source files import it as `cache_set`.
-- Orphanet API structure varies; the wrapper handles multiple response shapes and logs warnings on failure without crashing.
+- `set` from `cache.cache` shadows Python's built-in `set()` — every module that imports it (all data sources AND `agents/target_selection.py`) must import it as `cache_set`.
+- **Orphanet list endpoint** is `GET /rd-cross-referencing/orphacodes?lang=en` (~11.4k diseases). The old `/en/product1` path returns 404. Cross-refs (ICD-10/OMIM/MeSH) are NOT on the bulk list — they need a per-code lookup (`get_disease_xrefs`), so the pipeline only enriches the top-30 output rows, not all 11k.
+- **ChEMBL `confidence_score` is an assay-level field**, absent from `/activity` records. The `/activity?assay_confidence_score__gte=` filter is silently ignored. The wrapper pulls activities, then batch-joins `/assay` to filter `confidence_score >= 8`. Never filter confidence on the activity record directly.
+- **PubChem renamed `CanonicalSMILES` → `ConnectivitySMILES`** (2025); the wrapper requests/reads the new key (falls back to `SMILES`).
 - AlphaFold mean pLDDT: try `pLDDT` residue URL first, fall back to `meanPlddt` / `globalMetricValue` top-level field.
-- Do NOT delete `cache/cache.db` between short test runs — the Orphanet + Open Targets calls are the slowest and benefit most from caching.
+- Do NOT delete `cache/cache.db` between short test runs — Orphanet + ChEMBL (cold ~29s/target) calls are the slowest and benefit most from caching.
+- Validate any new wrapper against a data-rich entity first (EGFR `P00533`, Marfan ORPHAcode `558`) — wrappers swallow errors and return empty, so a wrong endpoint shows up as an all-None/all-zero column, not a crash.
 
 ## Pointers
 

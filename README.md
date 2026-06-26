@@ -89,6 +89,9 @@ One row per (disease, target) pair. Fields:
 | Field | Description |
 |---|---|
 | `disease_name` | Disease name (from Orphanet or WHO NTD list) |
+| `orpha_code` | Orphanet ORPHAcode (null for WHO NTD-only entries) |
+| `disease_source` | `orphanet` or `who_ntd` |
+| `icd10` / `omim` / `mesh` | Orphanet cross-references (enriched per-code for the top 30 only) |
 | `target_symbol` | HGNC gene symbol |
 | `ensembl_id` | Ensembl gene ID |
 | `uniprot_id` | UniProt accession |

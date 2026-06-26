@@ -34,30 +34,70 @@ def _resolve_target_chembl_id(uniprot_id: str) -> list[str]:
     targets = data.get("targets", [])
     ids = []
     for t in targets:
-        organism = t.get("organism", "")
-        if "Homo sapiens" in organism or organism == "":
+        organism = (t.get("organism") or "")
+        tax_id = t.get("tax_id")
+        # Strict species match: only keep Homo sapiens (tax_id 9606).
+        # Server-side organism filter is belt; this is the suspenders.
+        if "Homo sapiens" in organism or tax_id == 9606:
             ids.append(t["target_chembl_id"])
     return ids
 
 
+def _fetch_assay_confidence(assay_ids: list[str]) -> dict[str, int]:
+    """
+    Look up confidence_score for a list of assay_chembl_ids.
+
+    NOTE: confidence_score lives on the ChEMBL *assay* resource, not on the
+    activity record. The activity endpoint's assay_confidence_score filter is
+    silently ignored by the API, so we must join against /assay here ourselves.
+    """
+    confidence: dict[str, int] = {}
+    if not assay_ids:
+        return confidence
+
+    url = f"{BASE_URL}/assay.json"
+    batch_size = 50
+    for i in range(0, len(assay_ids), batch_size):
+        batch = assay_ids[i : i + batch_size]
+        params = {
+            "assay_chembl_id__in": ",".join(batch),
+            "only": "assay_chembl_id,confidence_score",
+            "limit": 1000,
+        }
+        data = _get_json(url, params)
+        for a in data.get("assays", []):
+            aid = a.get("assay_chembl_id")
+            score = a.get("confidence_score")
+            if aid is not None and score is not None:
+                confidence[aid] = int(score)
+    return confidence
+
+
 def _fetch_activities(target_chembl_id: str) -> list[dict[str, Any]]:
     """
-    Fetch IC50/Ki activities with pchembl_value present, confidence >= 8.
-    Paginates up to 1000 records.
+    Fetch IC50/Ki activities (pchembl_value present) for a target, then keep
+    only those whose assay confidence_score >= 8. Pulls up to 1000 records.
     """
     url = f"{BASE_URL}/activity.json"
     params = {
         "target_chembl_id": target_chembl_id,
         "standard_type__in": "IC50,Ki",
         "pchembl_value__isnull": "false",
+        "only": "assay_chembl_id,pchembl_value,standard_type",
         "limit": 1000,
         "offset": 0,
     }
     data = _get_json(url, params)
     activities = data.get("activities", [])
+    if not activities:
+        return []
+
+    assay_ids = sorted({a["assay_chembl_id"] for a in activities if a.get("assay_chembl_id")})
+    confidence = _fetch_assay_confidence(assay_ids)
+
     return [
         a for a in activities
-        if a.get("confidence_score") is not None and int(a["confidence_score"]) >= 8
+        if confidence.get(a.get("assay_chembl_id"), 0) >= 8
     ]
 
 

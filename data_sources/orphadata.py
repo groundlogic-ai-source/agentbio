@@ -46,50 +46,30 @@ def get_rare_disease_list() -> list[dict[str, Any]]:
 
     diseases = []
     try:
-        url = f"{BASE_URL}/en/product1"
+        url = f"{BASE_URL}/rd-cross-referencing/orphacodes"
         headers = {"Accept": "application/json"}
-        resp = requests.get(url, headers=headers, timeout=30)
+        resp = requests.get(url, params={"lang": "en"}, headers=headers, timeout=60)
         resp.raise_for_status()
         data = resp.json()
 
-        disorder_list = []
-        if isinstance(data, dict):
-            if "data" in data:
-                payload = data["data"]
-                if isinstance(payload, dict) and "results" in payload:
-                    disorder_list = payload["results"]
-                elif isinstance(payload, list):
-                    disorder_list = payload
-            elif "results" in data:
-                disorder_list = data["results"]
+        results = data.get("data", {}).get("results", [])
+        if isinstance(results, dict):
+            results = [results]
 
-        for disorder in disorder_list:
-            orpha_code = disorder.get("OrphaCode") or disorder.get("orpha_code") or ""
-            name = disorder.get("Name", [{}])
-            if isinstance(name, list):
-                name = name[0].get("label", "") if name else ""
-            elif isinstance(name, dict):
-                name = name.get("label", "")
-
-            icd10_list, omim_list, mesh_list = [], [], []
-
-            refs = disorder.get("ExternalReferenceList", []) or disorder.get("external_references", [])
-            for ref in refs:
-                source = ref.get("Source", ref.get("source", ""))
-                ref_val = ref.get("Reference", ref.get("reference", ""))
-                if source == "ICD-10":
-                    icd10_list.append(ref_val)
-                elif source == "OMIM":
-                    omim_list.append(ref_val)
-                elif source == "MeSH":
-                    mesh_list.append(ref_val)
-
+        for disorder in results:
+            orpha_code = disorder.get("ORPHAcode") or disorder.get("OrphaCode") or ""
+            name = disorder.get("Preferred term") or disorder.get("Name") or ""
+            if not name:
+                continue
             diseases.append({
                 "orpha_code": str(orpha_code),
                 "name": name,
-                "icd10": icd10_list[0] if icd10_list else None,
-                "omim": omim_list[0] if omim_list else None,
-                "mesh": mesh_list[0] if mesh_list else None,
+                # Cross-references require a per-code lookup (see get_disease_xrefs);
+                # they are not exposed on the bulk list and are not used for EFO
+                # resolution (which matches on disease name via Open Targets).
+                "icd10": None,
+                "omim": None,
+                "mesh": None,
             })
 
     except Exception as e:
@@ -97,6 +77,50 @@ def get_rare_disease_list() -> list[dict[str, Any]]:
 
     cache_set(cache_key, diseases, ttl_days=7)
     return diseases
+
+
+def get_disease_xrefs(orpha_code: str) -> dict[str, Any]:
+    """
+    Fetch ICD-10, OMIM, MeSH, and UMLS cross-references for a single ORPHAcode.
+    Cached per code. Returns {icd10, omim, mesh, umls} (each may be None).
+
+    This is a per-code lookup, intended to enrich only the diseases that reach
+    the ranked output table — not all ~11k diseases at universe-build time.
+    """
+    cache_key = make_key("get_disease_xrefs", orpha_code)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    result: dict[str, Any] = {"icd10": None, "omim": None, "mesh": None, "umls": None}
+    try:
+        url = f"{BASE_URL}/rd-cross-referencing/orphacodes/{orpha_code}"
+        resp = requests.get(url, params={"lang": "en"}, headers={"Accept": "application/json"}, timeout=30)
+        resp.raise_for_status()
+        payload = resp.json()
+        record = payload.get("data", {}).get("results", payload)
+        if isinstance(record, list):
+            record = record[0] if record else {}
+
+        refs = record.get("ExternalReference") or []
+        for ref in refs:
+            source = (ref.get("Source") or "").upper()
+            value = ref.get("Reference")
+            if not value:
+                continue
+            if source == "ICD-10" and result["icd10"] is None:
+                result["icd10"] = value
+            elif source == "OMIM" and result["omim"] is None:
+                result["omim"] = value
+            elif source == "MESH" and result["mesh"] is None:
+                result["mesh"] = value
+            elif source == "UMLS" and result["umls"] is None:
+                result["umls"] = value
+    except Exception as e:
+        print(f"[orphadata] WARNING: xref lookup failed for ORPHAcode {orpha_code}: {e}")
+
+    cache_set(cache_key, result, ttl_days=7)
+    return result
 
 
 def get_who_ntd_list() -> list[dict[str, Any]]:

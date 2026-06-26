@@ -18,8 +18,8 @@ from typing import Any, Optional
 
 import anthropic
 
-from cache.cache import get, set, make_key
-from data_sources.orphadata import get_rare_disease_list, get_who_ntd_list
+from cache.cache import get, set as cache_set, make_key
+from data_sources.orphadata import get_rare_disease_list, get_who_ntd_list, get_disease_xrefs
 from data_sources.open_targets import search_disease_efo, get_target_disease_score
 from data_sources.chembl import get_target_bioactivity_count
 from data_sources.afdb import get_structure_confidence
@@ -184,6 +184,8 @@ def _score_pair(
     association_score: float,
     has_approved_treatment: Optional[bool],
     prevalence: Optional[float],
+    orpha_code: Optional[str] = None,
+    disease_source: str = "orphanet",
 ) -> dict[str, Any]:
     """Compute all raw numbers and both scores for one (disease, target) pair."""
 
@@ -223,6 +225,11 @@ def _score_pair(
 
     return {
         "disease_name": disease_name,
+        "orpha_code": orpha_code,
+        "disease_source": disease_source,
+        "icd10": None,
+        "omim": None,
+        "mesh": None,
         "target_symbol": target_symbol,
         "ensembl_id": target.get("ensembl_id"),
         "uniprot_id": uniprot_id,
@@ -328,6 +335,8 @@ def run() -> None:
                 association_score=target.get("association_score", 0.0),
                 has_approved_treatment=has_approved,
                 prevalence=prevalence,
+                orpha_code=disease.get("orpha_code"),
+                disease_source=disease.get("source", "orphanet"),
             )
             scored_pairs.append(pair)
 
@@ -337,6 +346,20 @@ def run() -> None:
 
     scored_pairs.sort(key=lambda x: (x["tractability_score"] + x["unmet_need_score"]), reverse=True)
     top30 = scored_pairs[:TOP_N]
+
+    # Enrich only the top-30 Orphanet diseases with ICD-10/OMIM/MeSH cross-refs
+    # (per-code lookups; cheap at this scale, not feasible across all ~11k).
+    _log("Enriching top candidates with Orphanet cross-references …")
+    xref_cache: dict[str, dict[str, Any]] = {}
+    for row in top30:
+        code = row.get("orpha_code")
+        if code and row.get("disease_source") == "orphanet":
+            if code not in xref_cache:
+                xref_cache[code] = get_disease_xrefs(code)
+            xrefs = xref_cache[code]
+            row["icd10"] = xrefs.get("icd10")
+            row["omim"] = xrefs.get("omim")
+            row["mesh"] = xrefs.get("mesh")
 
     json_path = os.path.join(OUTPUT_DIR, "top_candidates.json")
     csv_path = os.path.join(OUTPUT_DIR, "top_candidates.csv")
