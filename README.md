@@ -1,6 +1,11 @@
-# Drug Repurposing Pipeline — Stage 1: Target Selection
+# Drug Repurposing Pipeline — Stages 1 & 2
 
-A Python pipeline that systematically identifies drug-repurposing candidates for rare diseases and WHO Neglected Tropical Diseases (NTDs) by integrating data from six public biomedical APIs.
+A Python pipeline that systematically identifies drug-repurposing candidates for rare diseases and WHO Neglected Tropical Diseases (NTDs) by integrating data from public biomedical APIs.
+
+- **Stage 1 (Target Selection)** ranks the top 30 (disease, target) pairs by tractability and unmet need.
+- **Stage 2 (Candidate Review)** takes the top Stage 1 target and runs three agents — Biologist → Chemist → Reviewer — to produce a scored, fully-provenanced list of candidate compounds in `output/reviewed_candidates.json`.
+
+Auditability ethos (both stages): every LLM call is constrained to numbers already computed by code — the model never invents facts or scores. All similarity (Tanimoto) and composite scores are real computed numbers, not model guesses.
 
 ---
 
@@ -11,18 +16,26 @@ A Python pipeline that systematically identifies drug-repurposing candidates for
 ├── data_sources/           # API wrapper modules (one file per source)
 │   ├── orphadata.py        # Orphanet rare disease list + static WHO NTD list
 │   ├── open_targets.py     # Open Targets Platform — target-disease associations
-│   ├── chembl.py           # ChEMBL — IC50/Ki bioactivity counts per target
+│   ├── chembl.py           # ChEMBL — bioactivity counts (S1) + candidate compounds (S2)
 │   ├── afdb.py             # AlphaFold DB — per-residue pLDDT confidence
 │   ├── clinicaltrials.py   # ClinicalTrials.gov v2 — prior trial history
-│   └── pubchem.py          # PubChem PUG REST — chemical structure & properties
+│   ├── pubchem.py          # PubChem PUG REST — structure (S1) + drug classification (S2)
+│   ├── biogrid.py          # [S2] BioGRID — physical/genetic interaction partners
+│   ├── pubmed.py           # [S2] PubMed E-utilities — literature w/ LLM relevance gate
+│   └── openfda.py          # [S2] openFDA FAERS — drug adverse-event signal
 ├── cache/
 │   └── cache.py            # SQLite-backed key-value cache with TTL
 ├── agents/
-│   └── target_selection.py # Core scoring agent (no LLM for scoring)
+│   ├── target_selection.py # [S1] Core scoring agent (no LLM for scoring)
+│   ├── provenance.py       # [S2] Shared provenance log helper
+│   ├── biologist.py        # [S2] Target biology: interactions + literature
+│   ├── chemist.py          # [S2] Candidate compounds + Tanimoto bisociation
+│   └── reviewer.py         # [S2] Descriptors + safety + composite score
 ├── output/                 # Generated output files (created at runtime)
-│   ├── top_candidates.json
-│   ├── top_candidates.csv
-│   └── narration.txt
+│   ├── top_candidates.json / .csv / narration.txt   # Stage 1
+│   ├── biologist_output.json / chemist_output.json  # Stage 2 intermediates
+│   ├── reviewed_candidates.json                      # Stage 2 final output
+│   └── provenance_log.json                           # Stage 2 audit trail
 └── requirements.txt
 ```
 
@@ -38,18 +51,25 @@ pip install -r requirements.txt --break-system-packages
 > ```bash
 > pip install rdkit-pypi --break-system-packages
 > ```
-> RDKit is available as a dependency but not directly called in Stage 1 scoring — it is imported for downstream chemical validation in later stages.
+> RDKit is not called in Stage 1 scoring; Stage 2's Chemist and Reviewer use it for Morgan-fingerprint Tanimoto similarity and Lipinski/Veber descriptors.
 
 ### Environment variables
 
-The LLM narration step uses Replit AI Integrations (Anthropic). These are set automatically:
+The LLM steps use Replit AI Integrations (Anthropic). These are set automatically:
 
 | Variable | Purpose |
 |---|---|
 | `AI_INTEGRATIONS_ANTHROPIC_BASE_URL` | Replit proxy URL for Anthropic |
 | `AI_INTEGRATIONS_ANTHROPIC_API_KEY`  | Dummy key (handled by proxy) |
 
-No manual API keys required for any of the six data sources — they are all publicly accessible REST/GraphQL APIs.
+All Stage 1 data sources are publicly accessible — no keys required. Stage 2 adds two keys:
+
+| Variable | Required? | Purpose |
+|---|---|---|
+| `BIOGRID_API_KEY` | **Required** for BioGRID interactions | Free key from the [BioGRID REST registration](https://webservice.thebiogrid.org/). Without it the Biologist still runs but returns no interaction partners (logged as a warning). |
+| `NCBI_API_KEY` | Optional | Raises PubMed E-utilities rate limit from 3 → 10 req/s. PubMed works without it. |
+
+openFDA (FAERS) requires no key.
 
 ---
 
@@ -156,6 +176,62 @@ To force a fresh run, delete `cache/cache.db`.
 
 ---
 
-## What's not built yet
+## Running Stage 2
 
-Stage 2 will add the Biologist, Chemist, and Reviewer agents. This stage intentionally ends after the ranked table and narration.
+Stage 2 builds on Stage 1's output. Run Stage 1 first (so `output/top_candidates.json` exists), then run the three agents **in order** — each reads the previous agent's output file:
+
+```bash
+python -m agents.biologist   # reads top_candidates.json  -> biologist_output.json
+python -m agents.chemist     # reads biologist_output.json -> chemist_output.json
+python -m agents.reviewer    # reads chemist_output.json   -> reviewed_candidates.json
+```
+
+The Biologist resets `output/provenance_log.json` at the start of each fresh run; the Chemist and Reviewer append to it. All three are cache-first (same `cache/cache.db`), so re-runs are fast.
+
+### The three agents
+
+1. **Biologist** (`agents/biologist.py`) — takes the **top** Stage 1 target and gathers biological context:
+   - **BioGRID** physical/genetic interaction partners. These edges are labelled *"physical/genetic interaction, not mechanism"* — an interaction is **not** a claim that one gene activates or inhibits another.
+   - **PubMed** abstracts for the target↔disease pairing, each passed through a constrained `claude-sonnet-4-6` YES/NO relevance gate. Only abstracts where the model confirms an *asserted* relationship (not mere co-mention) are kept, with their PMIDs recorded.
+
+2. **Chemist** (`agents/chemist.py`) — turns the target into ranked candidate compounds:
+   - **ChEMBL** candidate compounds for the target (Homo sapiens, IC50/Ki, assay `confidence_score ≥ 8`), aggregated per molecule with median pChEMBL.
+   - **PubChem** InChIKey cross-reference + ATC-code classification to confirm approved/known-drug status (corroborated by ChEMBL `max_phase ≥ 4`).
+   - **RDKit Tanimoto** (Morgan fingerprints, radius 2, 2048 bits) of each candidate vs every *other* approved drug in the working set — a real computed similarity, the "bisociation" signal. *Scope note: a full download of PubChem's approved-drug subset is infeasible here, so the reference set is the approved/known drugs found among this target's own candidate pool. The numbers are fully computed; only the comparison scope is bounded.*
+   - **One** constrained LLM call per candidate writes a 2-sentence rationale that may reference **only** the affinity, Tanimoto score, and interaction network already computed — no new facts.
+
+3. **Reviewer** (`agents/reviewer.py`) — scores and finalises:
+   - **RDKit** Lipinski/Veber descriptors (MW, logP, HBD, HBA, TPSA, rotatable bonds).
+   - **openFDA** real-world adverse-event signal and **ClinicalTrials.gov** prior-trial check for the exact drug+disease pair.
+   - **Provenance de-duplication**: the same PMID or ChEMBL activity id is counted only once across the scoring pass (audit integrity).
+   - A single auditable **composite score** (formula below).
+
+### `reviewed_candidates.json` (Stage 2 final output)
+
+```jsonc
+{
+  "formula": { "composite_weights": {...}, "lipinski_penalty": 0.25, "strong_match_threshold": 0.7, ... },
+  "n_candidates": N, "n_strong_matches": M,
+  "candidates": [ { "drug_name", "composite_score", "strong_match", "score_components",
+                    "descriptors", "adverse_events", "tanimoto_score", "rationale",
+                    "provenance": { "counted_once", "collapsed_as_duplicate" }, ... } ]
+}
+```
+
+### Composite score (exact, fixed formula)
+
+Defined as named constants at the top of `agents/reviewer.py`:
+
+```
+composite = 0.30 × normalized(pchembl_value)
+          + 0.20 × (confidence_score / 9)
+          + 0.20 × normalized(open_targets_association_score)
+          + 0.15 × normalized(tanimoto_score)
+          + 0.15 × (1 if no prior failed trial else 0)
+          − 0.25   (flat, only if Lipinski violations > 1)
+```
+
+- `normalized(x)` is min-max across the candidate set. If all candidates share a value, it maps to `1.0` (when positive) or `0.0`.
+- The `−0.25` Lipinski term is a **soft developability flag**, not a hard ADME prediction — it is noted explicitly per candidate.
+- A candidate is flagged `STRONG_MATCH` when `composite_score ≥ 0.70` (`STRONG_MATCH_THRESHOLD`).
+- Provenance de-dup ensures evidence ids are not double-counted in the audit trail; the formula's inputs are independent metrics, so de-dup affects evidence accounting rather than the weighted sum.

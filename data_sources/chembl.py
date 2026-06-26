@@ -157,3 +157,164 @@ def get_target_bioactivity_count(uniprot_id: str) -> dict[str, Any]:
 
     cache_set(cache_key, result, ttl_days=7)
     return result
+
+
+def _fetch_activities_full(target_chembl_id: str) -> list[dict[str, Any]]:
+    """
+    Like _fetch_activities, but retains molecule identity and structure so callers
+    can build a candidate-compound list (not just a count). Keeps only activities
+    whose assay confidence_score >= 8 and tags each kept record with `_confidence`.
+    """
+    url = f"{BASE_URL}/activity.json"
+    params = {
+        "target_chembl_id": target_chembl_id,
+        "standard_type__in": "IC50,Ki",
+        "pchembl_value__isnull": "false",
+        "only": "activity_id,assay_chembl_id,molecule_chembl_id,canonical_smiles,pchembl_value,standard_type",
+        "limit": 1000,
+        "offset": 0,
+    }
+    data = _get_json(url, params)
+    activities = data.get("activities", [])
+    if not activities:
+        return []
+
+    assay_ids = sorted({a["assay_chembl_id"] for a in activities if a.get("assay_chembl_id")})
+    confidence = _fetch_assay_confidence(assay_ids)
+
+    kept = []
+    for a in activities:
+        c = confidence.get(a.get("assay_chembl_id"), 0)
+        if c >= 8:
+            a["_confidence"] = c
+            kept.append(a)
+    return kept
+
+
+def _fetch_molecule_meta(molecule_ids: list[str]) -> dict[str, dict[str, Any]]:
+    """
+    Batch-fetch molecule metadata. Returns {molecule_chembl_id: {max_phase,
+    pref_name, canonical_smiles}}. `max_phase == 4` denotes an approved drug.
+    """
+    meta: dict[str, dict[str, Any]] = {}
+    if not molecule_ids:
+        return meta
+    url = f"{BASE_URL}/molecule.json"
+    batch_size = 40
+    for i in range(0, len(molecule_ids), batch_size):
+        batch = molecule_ids[i : i + batch_size]
+        params = {"molecule_chembl_id__in": ",".join(batch), "limit": 1000}
+        try:
+            data = _get_json(url, params)
+        except Exception as e:
+            print(f"[chembl] WARNING: molecule meta fetch failed: {e}")
+            continue
+        for m in data.get("molecules", []):
+            mid = m.get("molecule_chembl_id")
+            if not mid:
+                continue
+            struct = m.get("molecule_structures") or {}
+            meta[mid] = {
+                "max_phase": m.get("max_phase"),
+                "pref_name": m.get("pref_name"),
+                "canonical_smiles": struct.get("canonical_smiles"),
+            }
+    return meta
+
+
+def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25) -> dict[str, Any]:
+    """
+    Return the actual candidate compounds with bioactivity against a target
+    (Homo sapiens, IC50/Ki, assay confidence_score >= 8), aggregated per molecule.
+
+    Returns:
+      {
+        compounds: [ {
+          molecule_chembl_id, pref_name, max_phase, canonical_smiles,
+          pchembl_value (median over that molecule's qualifying activities),
+          confidence_score (max assay confidence among kept activities),
+          n_activities,
+          source_activity_ids: [int],   # ChEMBL activity ids (provenance)
+          source_assay_ids: [str],
+          source_chembl_ids: [str],     # molecule + assay ids for provenance
+        } ],
+        target_chembl_ids: [str],
+        pooled_across_multiple_targets: bool,
+      }
+
+    Compounds are ranked by median pChEMBL (desc) and capped at `max_compounds`.
+    Mirrors get_target_bioactivity_count's strict filtering — this is the
+    compound-level counterpart of that count.
+    """
+    cache_key = make_key("get_target_candidate_compounds", uniprot_id, max_compounds)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    result: dict[str, Any] = {
+        "compounds": [],
+        "target_chembl_ids": [],
+        "pooled_across_multiple_targets": False,
+    }
+
+    try:
+        target_ids = _resolve_target_chembl_id(uniprot_id)
+        if not target_ids:
+            cache_set(cache_key, result, ttl_days=7)
+            return result
+
+        result["target_chembl_ids"] = target_ids
+        result["pooled_across_multiple_targets"] = len(target_ids) > 1
+
+        by_mol: dict[str, dict[str, Any]] = {}
+        for tid in target_ids:
+            for a in _fetch_activities_full(tid):
+                mid = a.get("molecule_chembl_id")
+                if not mid:
+                    continue
+                d = by_mol.setdefault(mid, {
+                    "molecule_chembl_id": mid,
+                    "pchembls": [],
+                    "confidences": [],
+                    "activity_ids": [],
+                    "assay_ids": set(),
+                    "canonical_smiles": a.get("canonical_smiles"),
+                })
+                try:
+                    d["pchembls"].append(float(a["pchembl_value"]))
+                except (TypeError, ValueError, KeyError):
+                    pass
+                d["confidences"].append(a.get("_confidence", 0))
+                if a.get("activity_id") is not None:
+                    d["activity_ids"].append(a["activity_id"])
+                if a.get("assay_chembl_id"):
+                    d["assay_ids"].add(a["assay_chembl_id"])
+
+        meta = _fetch_molecule_meta(list(by_mol.keys()))
+
+        compounds = []
+        for mid, d in by_mol.items():
+            m = meta.get(mid, {})
+            smiles = m.get("canonical_smiles") or d["canonical_smiles"]
+            assay_ids = sorted(d["assay_ids"])
+            compounds.append({
+                "molecule_chembl_id": mid,
+                "pref_name": m.get("pref_name"),
+                "max_phase": m.get("max_phase"),
+                "canonical_smiles": smiles,
+                "pchembl_value": statistics.median(d["pchembls"]) if d["pchembls"] else None,
+                "confidence_score": max(d["confidences"]) if d["confidences"] else None,
+                "n_activities": len(d["activity_ids"]),
+                "source_activity_ids": d["activity_ids"],
+                "source_assay_ids": assay_ids,
+                "source_chembl_ids": [mid] + assay_ids,
+            })
+
+        compounds.sort(key=lambda c: (c["pchembl_value"] or 0.0), reverse=True)
+        result["compounds"] = compounds[:max_compounds]
+
+    except Exception as e:
+        print(f"[chembl] WARNING: candidate compound query failed for '{uniprot_id}': {e}")
+
+    cache_set(cache_key, result, ttl_days=7)
+    return result

@@ -1,0 +1,86 @@
+Building on the existing project (data_sources/, cache/, agents/target_selection.py
+from Stage 1 — do not modify those files except to import from them), add three new
+agents in /agents: biologist.py, chemist.py, reviewer.py. Also add two new data source
+wrappers: biogrid.py, pubmed.py, and openfda.py.
+
+PART A — New data wrappers
+
+1. biogrid.py
+   - Base: https://webservice.thebiogrid.org
+   - Requires BIOGRID_API_KEY from environment (Replit Secrets)
+   - Function: get_interactions(gene_symbol) returns a list of interacting genes.
+     Label every result clearly as "physical/genetic interaction, not mechanism" —
+     do not let downstream code or prompts describe these as activating/inhibiting
+     unless BioGRID's own data explicitly says so.
+
+2. pubmed.py
+   - Base: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/
+   - Use NCBI_API_KEY from environment for the higher rate limit
+   - Function: search_literature(drug_name, target_name, disease_name) calls
+     esearch.fcgi then efetch.fcgi to get abstracts
+   - For each abstract returned, make a SEPARATE small LLM call (claude-sonnet-4-6)
+     with a constrained prompt: "Does this abstract assert a specific relationship
+     between {drug} and {target_or_disease}, or does it merely mention them in the
+     same text without asserting a connection? Answer only YES or NO and a one-
+     sentence reason." Discard abstracts that come back NO. Store the source PMID
+     with every kept abstract — this PMID is the provenance key used later.
+
+3. openfda.py
+   - Base: https://api.fda.gov/drug/event.json
+   - Function: get_adverse_events(drug_name) returns top reported adverse event
+     terms and counts for that drug from FAERS.
+
+PART B — Biologist Agent (agents/biologist.py)
+Input: the target gene/protein chosen in Stage 1.
+- Call biogrid.get_interactions and pubmed.search_literature
+- Output a structured object: {target, interacting_genes: [...], literature_hits:
+  [{pmid, summary, relationship_asserted: true}]}
+- Log every PMID and BioGRID interaction ID used — these go into a shared
+  provenance_log.json that Chemist and Reviewer will also write to.
+
+PART C — Chemist Agent (agents/chemist.py)
+Input: Biologist's output.
+- Query chembl.get_target_bioactivity_count's underlying activity list (extend
+  chembl.py with a function that returns the actual candidate compounds, not just
+  the count, still filtered to confidence_score >= 8 and species-matched)
+- For each candidate compound, cross-reference pubchem.get_compound_data via
+  InChIKey to confirm it's an approved/known drug (use PubChem's compound
+  classification fields)
+- Compute RDKit Tanimoto similarity (Morgan fingerprints, radius 2) between each
+  candidate's SMILES and the SMILES of all OTHER approved drugs in PubChem's
+  "approved drug" subset, to surface non-obvious structural analogs — this is the
+  bisociation step, and it is now a real computed number, not an LLM guess.
+- Make ONE LLM call per candidate that is GIVEN the ChEMBL affinity number, the
+  Tanimoto similarity score and which drug it's similar to, and the BioGRID network
+  context — and asked only to write a 2-sentence rationale referencing those
+  specific numbers. The LLM must not introduce any new factual claim not present
+  in the data it was given.
+- Output: ranked list of {drug_name, smiles, pchembl_value, confidence_score,
+  most_similar_approved_drug, tanimoto_score, rationale, source_chembl_ids}
+
+PART D — Reviewer Agent (agents/reviewer.py)
+Input: Chemist's ranked list.
+- For each candidate: compute RDKit Lipinski/Veber descriptors (MW, logP, HBD,
+  HBA, TPSA, rotatable bonds)
+- Call openfda.get_adverse_events for real safety signal
+- Call clinicaltrials.check_prior_trials for this exact drug+disease pair
+- Deduplicate provenance: load provenance_log.json, and if the SAME pmid or
+  chembl activity ID was already used to support a different part of the score,
+  only count it once in the composite below
+- Compute a single composite_score using this EXACT fixed formula (write it as a
+  named constant dict at the top of the file so it's easy to audit/adjust):
+    composite_score = (
+        0.30 * normalized(pchembl_value) +
+        0.20 * (confidence_score / 9) +
+        0.20 * normalized(open_targets_association_score) +
+        0.15 * normalized(tanimoto_score) +
+        0.15 * (1 if no_prior_failed_trial else 0)
+    )
+  Subtract a flat penalty of 0.25 if Lipinski violations > 1 (this is a soft flag,
+  not a hard ADME prediction — note that explicitly in the output).
+- Flag any candidate with composite_score >= 0.7 as STRONG_MATCH. This threshold
+  is a constant, not an LLM decision.
+- Output the final scored table to /output/reviewed_candidates.json, with every
+  number's source traceable via the provenance log.
+
+Update README.md to explain how to run this stage on top of Stage 1's output.
