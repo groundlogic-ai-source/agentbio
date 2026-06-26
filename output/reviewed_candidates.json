@@ -1,0 +1,1594 @@
+{
+  "formula": {
+    "composite_weights": {
+      "pchembl": 0.3,
+      "confidence": 0.2,
+      "ot_association": 0.2,
+      "tanimoto": 0.15,
+      "no_failed_trial": 0.15
+    },
+    "lipinski_penalty": 0.25,
+    "strong_match_threshold": 0.7,
+    "normalization": "min-max across the candidate set (equal values -> 1.0 if >0)"
+  },
+  "n_candidates": 25,
+  "n_strong_matches": 0,
+  "candidates": [
+    {
+      "drug_name": "CHEMBL592615",
+      "molecule_chembl_id": "CHEMBL592615",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "CN(C)CCNC(=O)c1ccc(NC(=O)Nc2ccc(-c3nc(N4CCOCC4)nc(N4CCOCC4)n3)cc2)cc1",
+      "pchembl_value": 9.4,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL592615 has a median pChEMBL affinity of 9.4 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 575.67,
+        "logp": 2.15,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 10,
+        "tpsa": 137.08,
+        "rotatable_bonds": 9,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.5714,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.6992,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3120625"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL592615"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1065055"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL592615",
+        "CHEMBL1065055"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1204015",
+      "molecule_chembl_id": "CHEMBL1204015",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "CN(C)CCN(C)C(=O)c1ccc(NC(=O)Nc2ccc(-c3nc(N4CCOCC4)nc(N4CCOCC4)n3)cc2)cc1.Cl",
+      "pchembl_value": 9.4,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1204015 has a median pChEMBL affinity of 9.4 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 626.16,
+        "logp": 2.91,
+        "h_bond_donors": 2,
+        "h_bond_acceptors": 10,
+        "tpsa": 128.29,
+        "rotatable_bonds": 9,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.5714,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.6992,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3120631"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1204015"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1065055"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1204015",
+        "CHEMBL1065055"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1083912",
+      "molecule_chembl_id": "CHEMBL1083912",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "CNC(=O)Nc1ccc2c(c1)C(=O)/C(=C\\c1c(-c3c(C)nn(C)c3C)[nH]c3ccc(OC)cc13)O2",
+      "pchembl_value": 9.4,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1083912 has a median pChEMBL affinity of 9.4 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 471.52,
+        "logp": 4.56,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 5,
+        "tpsa": 110.27,
+        "rotatable_bonds": 4,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.5714,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.6992,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3313679"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1083912"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1119657"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1083912",
+        "CHEMBL1119657"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1083305",
+      "molecule_chembl_id": "CHEMBL1083305",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "CNC(=O)Nc1ccc2c(c1)C(=O)/C(=C\\c1c(-c3c(C)nn(C)c3C)[nH]c3c(F)cc(OC)cc13)O2",
+      "pchembl_value": 9.4,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1083305 has a median pChEMBL affinity of 9.4 against PIK3CA, recorded at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors listed for the target.",
+      "descriptors": {
+        "molecular_weight": 489.51,
+        "logp": 4.7,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 5,
+        "tpsa": 110.27,
+        "rotatable_bonds": 4,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.5714,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.6992,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3313687"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1083305"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1119657"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1083305",
+        "CHEMBL1119657"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1204014",
+      "molecule_chembl_id": "CHEMBL1204014",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "CN1CCN(C(=O)c2ccc(NC(=O)Nc3ccc(-c4nc(N5CCOCC5)nc(N5CCOCC5)n4)cc3)cc2)CC1.Cl",
+      "pchembl_value": 9.3,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1204014 has a median pChEMBL affinity of 9.3 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 624.15,
+        "logp": 2.67,
+        "h_bond_donors": 2,
+        "h_bond_acceptors": 10,
+        "tpsa": 128.29,
+        "rotatable_bonds": 6,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.4286,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.6563,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3120626"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1204014"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1065055"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1204014",
+        "CHEMBL1065055"
+      ]
+    },
+    {
+      "drug_name": "GEDATOLISIB",
+      "molecule_chembl_id": "CHEMBL592445",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "CN(C)C1CCN(C(=O)c2ccc(NC(=O)Nc3ccc(-c4nc(N5CCOCC5)nc(N5CCOCC5)n4)cc3)cc2)CC1",
+      "pchembl_value": 9.22,
+      "confidence_score": 9,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "Gedatolisib has a median pChEMBL affinity of 9.22 against PIK3CA, measured at assay confidence score 9 out of 9. It is not an approved drug, has no nearest approved structural analog in the candidate set, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 615.74,
+        "logp": 3.02,
+        "h_bond_donors": 2,
+        "h_bond_acceptors": 10,
+        "tpsa": 128.29,
+        "rotatable_bonds": 7,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "HYPERGLYCAEMIA",
+          "count": 7
+        },
+        {
+          "term": "ANAEMIA",
+          "count": 5
+        },
+        {
+          "term": "DRUG INEFFECTIVE",
+          "count": 4
+        },
+        {
+          "term": "ESCHERICHIA BACTERAEMIA",
+          "count": 4
+        },
+        {
+          "term": "LEUKOPENIA",
+          "count": 4
+        },
+        {
+          "term": "PYREXIA",
+          "count": 4
+        },
+        {
+          "term": "PULMONARY EMBOLISM",
+          "count": 2
+        },
+        {
+          "term": "CELLULITIS",
+          "count": 1
+        },
+        {
+          "term": "COLITIS",
+          "count": 1
+        },
+        {
+          "term": "EMBOLISM",
+          "count": 1
+        }
+      ],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.3143,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.6443,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3120627"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3121472"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3121473"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL592445"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1065062"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1065063"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1065055"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL592445",
+        "CHEMBL1065055",
+        "CHEMBL1065062",
+        "CHEMBL1065063"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL592619",
+      "molecule_chembl_id": "CHEMBL592619",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "O=C(Nc1ccc(C(=O)N2CCC(N3CCCCC3)CC2)cc1)Nc1ccc(-c2nc(N3CCOCC3)nc(N3CCOCC3)n2)cc1",
+      "pchembl_value": 9.22,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL592619 has a median pChEMBL affinity of 9.22 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 655.8,
+        "logp": 3.95,
+        "h_bond_donors": 2,
+        "h_bond_acceptors": 10,
+        "tpsa": 128.29,
+        "rotatable_bonds": 7,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.3143,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.6221,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3120629"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL592619"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1065055"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL592619",
+        "CHEMBL1065055"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1092404",
+      "molecule_chembl_id": "CHEMBL1092404",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "CCn1ccc2c(N3CCOCC3)nc(-c3ccc(NC(=O)Nc4ccc(C(=O)N5CCNCC5)cc4)cc3)nc21",
+      "pchembl_value": 9.1,
+      "confidence_score": 9,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1092404 has a median pChEMBL affinity of 9.1 against PIK3CA, recorded at an assay confidence score of 9 out of 9. It is not an approved drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors listed for the target.",
+      "descriptors": {
+        "molecular_weight": 554.66,
+        "logp": 3.64,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 7,
+        "tpsa": 116.65,
+        "rotatable_bonds": 6,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.1429,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5929,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3252092"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1092404"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1106090"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL1092404",
+        "CHEMBL1106090"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL592461",
+      "molecule_chembl_id": "CHEMBL592461",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "O=C(Nc1ccc(C(=O)N2CCC(N3CCCC3)CC2)cc1)Nc1ccc(-c2nc(N3CCOCC3)nc(N3CCOCC3)n2)cc1",
+      "pchembl_value": 9.15,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL592461 has a median pChEMBL affinity of 9.15 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 641.78,
+        "logp": 3.56,
+        "h_bond_donors": 2,
+        "h_bond_acceptors": 10,
+        "tpsa": 128.29,
+        "rotatable_bonds": 7,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.2143,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5921,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3120628"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL592461"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1065055"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL592461",
+        "CHEMBL1065055"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1082617",
+      "molecule_chembl_id": "CHEMBL1082617",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "COc1ccc2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N6CCOCC6)cc5)cc4C3=O)c2c1",
+      "pchembl_value": 9.7,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1082617 has a median pChEMBL affinity of 9.7 against PIK3CA, measured at an assay confidence score of 8 out of 9. The compound is not an approved drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 646.7,
+        "logp": 5.93,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 7,
+        "tpsa": 139.81,
+        "rotatable_bonds": 6,
+        "lipinski_violations": 2,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": true,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 1.0,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5778,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3313695"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1082617"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1119657"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL1082617",
+        "CHEMBL1119657"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1082618",
+      "molecule_chembl_id": "CHEMBL1082618",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "COc1ccc2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N6CCN(C)CC6)cc5)cc4C3=O)c2c1",
+      "pchembl_value": 9.7,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1082618 has a median pChEMBL affinity of 9.7 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved drug, has no nearest approved structural analog in the candidate set, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 659.75,
+        "logp": 5.84,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 7,
+        "tpsa": 133.82,
+        "rotatable_bonds": 6,
+        "lipinski_violations": 2,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": true,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 1.0,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5778,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3313699"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1082618"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1119657"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1082618",
+        "CHEMBL1119657"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1082621",
+      "molecule_chembl_id": "CHEMBL1082621",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "COc1cc(F)c2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N(C)CCN(C)C)cc5)cc4C3=O)c2c1",
+      "pchembl_value": 9.7,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1082621 has a median pChEMBL affinity of 9.7 against PIK3CA, recorded at an assay confidence score of 8 out of 9. The compound is not an approved drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors listed for the target.",
+      "descriptors": {
+        "molecular_weight": 679.75,
+        "logp": 6.23,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 7,
+        "tpsa": 133.82,
+        "rotatable_bonds": 9,
+        "lipinski_violations": 2,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": true,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 1.0,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5778,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3313711"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1082621"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1119657"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1082621",
+        "CHEMBL1119657"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1092072",
+      "molecule_chembl_id": "CHEMBL1092072",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "CN(C)CCN(C)C(=O)c1ccc(NC(=O)Nc2ccc(-c3nc(N4CCOCC4)c4ccn(CC(F)(F)F)c4n3)cc2)cc1",
+      "pchembl_value": 9.05,
+      "confidence_score": 9,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1092072 has a median pChEMBL affinity of 9.05 against PIK3CA, measured at an assay confidence score of 9 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 624.67,
+        "logp": 4.77,
+        "h_bond_donors": 2,
+        "h_bond_acceptors": 7,
+        "tpsa": 107.86,
+        "rotatable_bonds": 9,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.0714,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5714,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3252086"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1092072"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1106090"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1092072",
+        "CHEMBL1106090"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL517163",
+      "molecule_chembl_id": "CHEMBL517163",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "COc1cc2c(cc1Nc1nc(Nc3cccc4c3C(=O)NC4)c3cc[nH]c3n1)N(C(=O)CN(C)C)CC2",
+      "pchembl_value": 9.1,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL517163 has a median pChEMBL affinity of 9.1 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 512.57,
+        "logp": 3.15,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 8,
+        "tpsa": 127.51,
+        "rotatable_bonds": 7,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.1429,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5706,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2600115"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL517163"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1025726"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL517163",
+        "CHEMBL1025726"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL590587",
+      "molecule_chembl_id": "CHEMBL590587",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "CCn1nnc2c(N3CCOCC3)nc(-c3ccc(NC(=O)Nc4ccc(C(=O)NCCN(C)C)cc4)cc3)nc21",
+      "pchembl_value": 9.0,
+      "confidence_score": 9,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL590587 has a median pChEMBL affinity of 9.0 against PIK3CA, recorded at an assay confidence score of 9 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors listed for the target.",
+      "descriptors": {
+        "molecular_weight": 558.65,
+        "logp": 2.68,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 9,
+        "tpsa": 142.43,
+        "rotatable_bonds": 9,
+        "lipinski_violations": 1,
+        "veber_pass": false,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.0,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.55,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3132563"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL590587"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1068071"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL590587",
+        "CHEMBL1068071"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1082622",
+      "molecule_chembl_id": "CHEMBL1082622",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "COc1ccc2[nH]cc(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N6CCN(C)CC6)cc5)cc4C3=O)c2c1",
+      "pchembl_value": 9.05,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1082622 has a median pChEMBL affinity of 9.05 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 551.6,
+        "logp": 4.82,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 6,
+        "tpsa": 116.0,
+        "rotatable_bonds": 5,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.0714,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5492,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3313715"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1082622"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1119657"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1082622",
+        "CHEMBL1119657"
+      ]
+    },
+    {
+      "drug_name": "DEMETHOXYVIRIDIN",
+      "molecule_chembl_id": "CHEMBL549959",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "C[C@@]12c3ccc4c(c3C(=O)c3occ(c31)C(=O)C[C@H]2O)CCC4=O",
+      "pchembl_value": 9.0,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "Demethoxyviridin has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 322.32,
+        "logp": 2.21,
+        "h_bond_donors": 1,
+        "h_bond_acceptors": 5,
+        "tpsa": 84.58,
+        "rotatable_bonds": 0,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.0,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5278,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2691770"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL549959"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1064071"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL549959",
+        "CHEMBL1064071"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL597004",
+      "molecule_chembl_id": "CHEMBL597004",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "O=C(Nc1ccc(CO)cc1)Nc1ccc(-c2nc(N3CCOCC3)nc(N3CCOCC3)n2)cc1",
+      "pchembl_value": 9.0,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL597004 has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 491.55,
+        "logp": 2.35,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 9,
+        "tpsa": 124.97,
+        "rotatable_bonds": 6,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.0,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5278,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3120616"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL597004"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1065055"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL597004",
+        "CHEMBL1065055"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1090598",
+      "molecule_chembl_id": "CHEMBL1090598",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "CN(Cc1cc2nc(-c3cnc(N)nc3)nc(N3CCOCC3)c2s1)S(C)(=O)=O",
+      "pchembl_value": 9.0,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1090598 has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 435.54,
+        "logp": 0.96,
+        "h_bond_donors": 1,
+        "h_bond_acceptors": 10,
+        "tpsa": 127.43,
+        "rotatable_bonds": 5,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.0,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5278,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3240850"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1090598"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1109706"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL1090598",
+        "CHEMBL1109706"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1090239",
+      "molecule_chembl_id": "CHEMBL1090239",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "CN1CCN(C(=O)c2cccc(-c3cc4nc(-c5cnc(N)nc5)nc(N5CCOCC5)c4s3)c2)CC1",
+      "pchembl_value": 9.0,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1090239 has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 516.63,
+        "logp": 2.62,
+        "h_bond_donors": 1,
+        "h_bond_acceptors": 10,
+        "tpsa": 113.6,
+        "rotatable_bonds": 4,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.0,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5278,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3240872"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1090239"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1109706"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1090239",
+        "CHEMBL1109706"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1093445",
+      "molecule_chembl_id": "CHEMBL1093445",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "COc1ccc2[nH]c(-c3cccnc3)c(/C=C3\\Oc4cc(O)cc(O)c4C3=O)c2c1",
+      "pchembl_value": 9.0,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1093445 has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 400.39,
+        "logp": 4.27,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 6,
+        "tpsa": 104.67,
+        "rotatable_bonds": 3,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.0,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5278,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3258774"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1093445"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1109867"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL1093445",
+        "CHEMBL1109867"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1082619",
+      "molecule_chembl_id": "CHEMBL1082619",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "COc1ccc2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N(C)CCN(C)C)cc5)cc4C3=O)c2c1",
+      "pchembl_value": 9.52,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1082619 has a median pChEMBL affinity of 9.52 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 661.76,
+        "logp": 6.09,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 7,
+        "tpsa": 133.82,
+        "rotatable_bonds": 9,
+        "lipinski_violations": 2,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": true,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.7429,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.5006,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3313703"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1082619"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1119657"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1082619",
+        "CHEMBL1119657"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1082986",
+      "molecule_chembl_id": "CHEMBL1082986",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "COc1ccc2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5cccnc5)cc4C3=O)c2c1",
+      "pchembl_value": 9.3,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1082986 has a median pChEMBL affinity of 9.3 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 534.58,
+        "logp": 5.85,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 6,
+        "tpsa": 123.16,
+        "rotatable_bonds": 5,
+        "lipinski_violations": 2,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": true,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.4286,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4063,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3313683"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1082986"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1119657"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1082986",
+        "CHEMBL1119657"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1082620",
+      "molecule_chembl_id": "CHEMBL1082620",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "COc1cc(F)c2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N6CCOCC6)cc5)cc4C3=O)c2c1",
+      "pchembl_value": 9.3,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1082620 has a median pChEMBL affinity of 9.3 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 664.69,
+        "logp": 6.07,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 7,
+        "tpsa": 139.81,
+        "rotatable_bonds": 6,
+        "lipinski_violations": 2,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": true,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.4286,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4063,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3313707"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1082620"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1119657"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1082620",
+        "CHEMBL1119657"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1082616",
+      "molecule_chembl_id": "CHEMBL1082616",
+      "target_symbol": "PIK3CA",
+      "disease_name": "Pompe disease",
+      "smiles": "COc1cc(F)c2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5cccnc5)cc4C3=O)c2c1",
+      "pchembl_value": 9.0,
+      "confidence_score": 8,
+      "ot_association_score": 0.2587,
+      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": null,
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1082616 has a median pChEMBL affinity of 9.0 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved or known drug. No nearest approved structural analog was identified within the candidate set, and no BioGRID physical or genetic interactors were recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 552.57,
+        "logp": 5.99,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 6,
+        "tpsa": 123.16,
+        "rotatable_bonds": 5,
+        "lipinski_violations": 2,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": true,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.0,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.2778,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3313691"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1082616"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1119657"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1082616",
+        "CHEMBL1119657"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,184 @@
+{
+  "entries": [
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3313695",
+      "used_by": "chemist",
+      "context": "CHEMBL1082617 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3313699",
+      "used_by": "chemist",
+      "context": "CHEMBL1082618 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3313711",
+      "used_by": "chemist",
+      "context": "CHEMBL1082621 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3313703",
+      "used_by": "chemist",
+      "context": "CHEMBL1082619 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3120625",
+      "used_by": "chemist",
+      "context": "CHEMBL592615 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3120631",
+      "used_by": "chemist",
+      "context": "CHEMBL1204015 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3313679",
+      "used_by": "chemist",
+      "context": "CHEMBL1083912 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3313687",
+      "used_by": "chemist",
+      "context": "CHEMBL1083305 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3120626",
+      "used_by": "chemist",
+      "context": "CHEMBL1204014 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3313683",
+      "used_by": "chemist",
+      "context": "CHEMBL1082986 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3313707",
+      "used_by": "chemist",
+      "context": "CHEMBL1082620 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3120627",
+      "used_by": "chemist",
+      "context": "GEDATOLISIB affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3121472",
+      "used_by": "chemist",
+      "context": "GEDATOLISIB affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3121473",
+      "used_by": "chemist",
+      "context": "GEDATOLISIB affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3120629",
+      "used_by": "chemist",
+      "context": "CHEMBL592619 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3120628",
+      "used_by": "chemist",
+      "context": "CHEMBL592461 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "2600115",
+      "used_by": "chemist",
+      "context": "CHEMBL517163 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3252092",
+      "used_by": "chemist",
+      "context": "CHEMBL1092404 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3252086",
+      "used_by": "chemist",
+      "context": "CHEMBL1092072 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3313715",
+      "used_by": "chemist",
+      "context": "CHEMBL1082622 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "2691770",
+      "used_by": "chemist",
+      "context": "DEMETHOXYVIRIDIN affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3120616",
+      "used_by": "chemist",
+      "context": "CHEMBL597004 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3132563",
+      "used_by": "chemist",
+      "context": "CHEMBL590587 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3240850",
+      "used_by": "chemist",
+      "context": "CHEMBL1090598 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3240872",
+      "used_by": "chemist",
+      "context": "CHEMBL1090239 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3258774",
+      "used_by": "chemist",
+      "context": "CHEMBL1093445 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "3313691",
+      "used_by": "chemist",
+      "context": "CHEMBL1082616 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HYPERGLYCAEMIA",
+      "used_by": "reviewer",
+      "context": "GEDATOLISIB adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ANAEMIA",
+      "used_by": "reviewer",
+      "context": "GEDATOLISIB adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DRUG INEFFECTIVE",
+      "used_by": "reviewer",
+      "context": "GEDATOLISIB adverse event"
+    }
+  ]
+}

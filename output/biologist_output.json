@@ -1,0 +1,14 @@
+{
+  "target": {
+    "target_symbol": "PIK3CA",
+    "uniprot_id": "P42336",
+    "ensembl_id": "ENSG00000121879",
+    "disease_name": "Pompe disease",
+    "orpha_code": "365",
+    "ot_association_score": 0.2587
+  },
+  "interacting_genes": [],
+  "interaction_records": [],
+  "literature_hits": [],
+  "interaction_note": "BioGRID edges are physical/genetic interactions, NOT activating/inhibiting mechanisms."
+}
