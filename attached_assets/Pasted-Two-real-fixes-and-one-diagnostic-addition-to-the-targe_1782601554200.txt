@@ -1,0 +1,50 @@
+Two real fixes and one diagnostic addition to the target selection pipeline. Do
+not regenerate target_candidates.json by hand — make these code changes, then
+rerun the actual sweep.
+
+FIX 1 — Real approved-treatment data via Open Targets
+The existing Open Targets disease query already runs per candidate disease. Add
+knownDrugs to that same query:
+  disease(efoId: "...") { knownDrugs { rows { drug { id name isApproved } } } } }
+Set has_approved_treatment = True if ANY row has isApproved == true, else False
+(not None — None should only remain if the Open Targets call itself failed).
+
+FIX 2 — unmet_need_score must degrade gracefully, not fall back to a constant
+Rewrite unmet_need_score so it's computed from whatever components are actually
+available: if has_approved_treatment is now reliably True/False (per Fix 1), use
+it as the dominant signal on its own. Only add a prevalence-based adjustment if
+prevalence data is actually obtained (see optional Fix 3) — its absence must not
+collapse the whole score to a constant. Print the new unmet_need_score for every
+Pompe/Gaucher/Fabry/CF/Wilson entry before and after this change so we can
+confirm has_approved_treatment is now correctly differentiating diseases that
+already have approved drugs from ones that don't.
+
+FIX 3 (optional, don't block on this) — attempt real prevalence data
+Try calling Orphadata's epidemiology product via api.orphadata.com. I'm not
+fully certain this is accessible without a data-use agreement on the free tier —
+if it returns real data, wire it in as a secondary input to unmet_need_score from
+Fix 2. If it errors, requires auth, or returns nothing usable, log that clearly
+and leave prevalence out entirely rather than guessing or blocking the pipeline.
+
+FIX 4 — gate and weight tractability_score by disease-specificity
+Right now tractability_score only reflects ChEMBL bioactivity volume and AFDB
+structure confidence, with no penalty for a weak target-disease association.
+Two changes: (a) when pulling Open Targets' top-5 targets per disease, DROP any
+target with association_score below 0.1 — too weak to be a real signal, not just
+a long tail; (b) for targets that pass, multiply tractability_score by
+association_score (normalized 0-1) before ranking, so a strong-data/weak-
+association target like PIK3CA-for-Pompe gets meaningfully discounted relative
+to a strong-data/strong-association target. Do NOT use Open Targets' separate
+per-target "tractability" field for this — that's a disease-agnostic druggability
+rating (it would actually make PIK3CA score even higher, since it's a heavily
+drugged oncology target on its own terms) and is not what we want here.
+
+DIAGNOSTIC — instrument the candidate universe sweep
+Add logging that prints: total diseases pulled from the Orphanet+NTD universe,
+how many resolved to a valid EFO id, how many had at least one target survive
+the new association_score >= 0.1 gate, and how many made it into the final
+ranked output. Print this summary once after a full sweep completes. Do not
+change the sweep's actual scope/limit logic yet — just make it visible.
+
+After all of this, rerun the full Stage 1 sweep and print the new top 15 ranked
+candidates. Then print the diagnostic summary from above.
