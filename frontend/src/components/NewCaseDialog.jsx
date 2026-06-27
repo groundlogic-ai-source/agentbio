@@ -51,15 +51,18 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
           Open a new case
         </h2>
         <p className="mt-1 text-sm" style={{ color: "rgba(42,43,46,0.75)" }}>
-          Name a disease to investigate, or leave it blank to let the pipeline
-          auto-pick the top-ranked candidate from the universe.
+          Name a rare or neglected-tropical disease to investigate it directly —
+          its targets are scored with the same formulas used by the full ranking.
+          Diseases outside that scope are rejected rather than substituted. Leave
+          the field blank to explore the ranked list: each blank run picks the
+          highest-ranked target-disease pair not yet investigated.
         </p>
 
         <label
           htmlFor="disease"
           className="mt-4 block font-mono text-[0.7rem] uppercase tracking-wider"
         >
-          Disease (optional)
+          Disease — name one, or leave blank to explore the ranking
         </label>
         <input
           id="disease"
@@ -67,7 +70,7 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
           type="text"
           value={disease}
           onChange={(e) => setDisease(e.target.value)}
-          placeholder="e.g. Pompe disease — or leave blank"
+          placeholder="e.g. Pompe disease — or leave blank to explore"
           className="mt-1 w-full rounded border bg-white/70 p-2.5 font-mono text-sm outline-none"
           style={{ borderColor: "var(--silver)", color: "var(--ink)" }}
         />

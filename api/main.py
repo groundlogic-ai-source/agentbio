@@ -94,7 +94,15 @@ def _run_graph(job_id: str, thread_id: str) -> None:
         graph = build_graph()
         config = {"configurable": {"thread_id": thread_id}}
 
-        for chunk in graph.stream({}, config=config, stream_mode="updates"):
+        # If the case was opened with a disease name, run manual mode (look it up
+        # and score it directly); otherwise pass nothing and let Stage 1 auto-pick
+        # the highest-ranked pair not yet explored.
+        job = jobs_db.get_job(job_id)
+        requested = (job or {}).get("disease_name")
+        initial_state: dict[str, Any] = (
+            {"requested_disease": requested} if requested else {})
+
+        for chunk in graph.stream(initial_state, config=config, stream_mode="updates"):
             if "__interrupt__" in chunk:
                 # human_review reached: pipeline paused for the reviewer.
                 jobs_db.update_job_status(
@@ -109,8 +117,8 @@ def _run_graph(job_id: str, thread_id: str) -> None:
                                           "current_stage": node}
                 value = value if isinstance(value, dict) else {}
 
-                # Record the disease the graph actually selected (Stage 1 always
-                # auto-picks the top-ranked candidate; see README).
+                # Record the disease the graph actually selected: in manual mode
+                # the canonical matched name; in blank mode the auto-explored pair.
                 if node == "target_selection":
                     target = value.get("target") or {}
                     if target.get("disease_name"):
