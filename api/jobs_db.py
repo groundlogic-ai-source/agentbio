@@ -119,7 +119,7 @@ def create_job(disease_name: Optional[str] = None,
             INSERT INTO jobs (job_id, thread_id, disease_name, status,
                               current_stage, created_at, updated_at,
                               error_message, total_cost_usd, report_path)
-            VALUES (?, ?, ?, 'queued', 'target_selection', ?, ?, NULL, 0.0, NULL)
+            VALUES (?, ?, ?, 'queued', NULL, ?, ?, NULL, 0.0, NULL)
             """,
             (job_id, thread_id, disease_name, now, now),
         )

@@ -90,7 +90,7 @@ export default function Stepper({ status, currentStage }) {
                   style={{
                     minHeight: "1.4rem",
                     backgroundColor:
-                      i < active ? "var(--brass)" : "rgba(42,43,46,0.2)",
+                      i < activeIndex ? "var(--brass)" : "rgba(42,43,46,0.2)",
                   }}
                   aria-hidden="true"
                 />
