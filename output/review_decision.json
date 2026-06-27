@@ -1,8 +1,8 @@
 {
   "decision": "approve",
-  "note": "api e2e approve",
+  "note": "",
   "reviewed_reports": [
     "/home/runner/workspace/agents/../output/reports/Pompe_disease_CHEMBL592615.md"
   ],
-  "decided_at": "2026-06-27T13:07:11"
+  "decided_at": "2026-06-27T13:32:30"
 }
