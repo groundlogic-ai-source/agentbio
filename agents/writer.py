@@ -141,9 +141,11 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
          f"({candidate.get('most_similar_approved_drug') or 'none in set'})"),
         ("Approved / known drug", _fmt(candidate.get("is_approved_drug"))),
         ("Lipinski/Veber (MW, logP, HBD, HBA, TPSA, rotB)",
-         f"{_fmt(desc.get('mw'),1)}, {_fmt(desc.get('logp'),2)}, "
-         f"{_fmt(desc.get('hbd'))}, {_fmt(desc.get('hba'))}, "
+         f"{_fmt(desc.get('molecular_weight'),1)}, {_fmt(desc.get('logp'),2)}, "
+         f"{_fmt(desc.get('h_bond_donors'))}, {_fmt(desc.get('h_bond_acceptors'))}, "
          f"{_fmt(desc.get('tpsa'),1)}, {_fmt(desc.get('rotatable_bonds'))}"),
+        ("Lipinski violations / Veber pass",
+         f"{_fmt(desc.get('lipinski_violations'))} / {_fmt(desc.get('veber_pass'))}"),
         ("AFDB apo structure mean pLDDT (free protein, no ligand)",
          _fmt(afdb.get("mean_plddt"), 1)),
         ("Boltz structure confidence (0-1)", _fmt(cx.get("structure_confidence"))),

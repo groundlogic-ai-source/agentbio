@@ -1,8 +1,8 @@
 {
   "decision": "approve",
-  "note": "looks good for validation",
+  "note": "validated with live Boltz prediction",
   "reviewed_reports": [
     "/home/runner/workspace/agents/../output/reports/Pompe_disease_CHEMBL592615.md"
   ],
-  "decided_at": "2026-06-27T03:45:12"
+  "decided_at": "2026-06-27T03:56:10"
 }
