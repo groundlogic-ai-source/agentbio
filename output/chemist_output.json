@@ -20,7 +20,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082617 has a median pChEMBL affinity of 9.7 against PIK3CA, measured at an assay confidence score of 8 out of 9. The compound is not an approved drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "rationale": "CHEMBL1082617 has a median pChEMBL affinity of 9.7 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1082617",
         "CHEMBL1119657"
@@ -45,7 +45,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082618 has a median pChEMBL affinity of 9.7 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved drug, has no nearest approved structural analog in the candidate set, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "rationale": "CHEMBL1082618 has a median pChEMBL affinity of 9.7 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1082618",
         "CHEMBL1119657"
@@ -70,7 +70,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082621 has a median pChEMBL affinity of 9.7 against PIK3CA, recorded at an assay confidence score of 8 out of 9. The compound is not an approved drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors listed for the target.",
+      "rationale": "CHEMBL1082621 has a median pChEMBL affinity of 9.7 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1082621",
         "CHEMBL1119657"
@@ -95,7 +95,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082619 has a median pChEMBL affinity of 9.52 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "rationale": "CHEMBL1082619 has a median pChEMBL affinity of 9.52 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014across physical and genetic interaction types.",
       "source_chembl_ids": [
         "CHEMBL1082619",
         "CHEMBL1119657"
@@ -120,7 +120,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL592615 has a median pChEMBL affinity of 9.4 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "rationale": "CHEMBL592615 has a median pChEMBL affinity of 9.4 against PIK3CA recorded at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight BioGRID-listed physical or genetic interactors: PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1.",
       "source_chembl_ids": [
         "CHEMBL592615",
         "CHEMBL1065055"
@@ -145,7 +145,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1204015 has a median pChEMBL affinity of 9.4 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "rationale": "CHEMBL1204015 has a median pChEMBL affinity of 9.4 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1204015",
         "CHEMBL1065055"
@@ -170,7 +170,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1083912 has a median pChEMBL affinity of 9.4 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "rationale": "CHEMBL1083912 has a median pChEMBL affinity of 9.4 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1083912",
         "CHEMBL1119657"
@@ -195,7 +195,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1083305 has a median pChEMBL affinity of 9.4 against PIK3CA, recorded at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors listed for the target.",
+      "rationale": "CHEMBL1083305 has a median pChEMBL affinity of 9.4 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1083305",
         "CHEMBL1119657"
@@ -220,7 +220,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1204014 has a median pChEMBL affinity of 9.3 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "rationale": "CHEMBL1204014 has a median pChEMBL affinity of 9.3 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. BioGRID records physical and genetic interactors of PIK3CA as PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1.",
       "source_chembl_ids": [
         "CHEMBL1204014",
         "CHEMBL1065055"
@@ -245,7 +245,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082986 has a median pChEMBL affinity of 9.3 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "rationale": "CHEMBL1082986 has a median pChEMBL affinity of 9.3 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1082986",
         "CHEMBL1119657"
@@ -270,7 +270,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082620 has a median pChEMBL affinity of 9.3 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "rationale": "CHEMBL1082620 has a median pChEMBL affinity of 9.3 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1082620",
         "CHEMBL1119657"
@@ -295,7 +295,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "Gedatolisib has a median pChEMBL affinity of 9.22 against PIK3CA, measured at assay confidence score 9 out of 9. It is not an approved drug, has no nearest approved structural analog in the candidate set, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "rationale": "Gedatolisib has a median pChEMBL affinity of 9.22 against PIK3CA at an assay confidence score of 9 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL592445",
         "CHEMBL1065055",
@@ -324,7 +324,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL592619 has a median pChEMBL affinity of 9.22 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "rationale": "CHEMBL592619 has a median pChEMBL affinity of 9.22 against PIK3CA, measured at an assay confidence score of 8 out of 9, and is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014classified as physical or genetic interactions.",
       "source_chembl_ids": [
         "CHEMBL592619",
         "CHEMBL1065055"
@@ -349,7 +349,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL592461 has a median pChEMBL affinity of 9.15 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "rationale": "CHEMBL592461 has a median pChEMBL affinity of 9.15 against PIK3CA recorded at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight BioGRID-listed physical or genetic interactors: PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1.",
       "source_chembl_ids": [
         "CHEMBL592461",
         "CHEMBL1065055"
@@ -374,7 +374,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL517163 has a median pChEMBL affinity of 9.1 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "rationale": "CHEMBL517163 has a median pChEMBL affinity of 9.1 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014listed as physical or genetic interactions.",
       "source_chembl_ids": [
         "CHEMBL517163",
         "CHEMBL1025726"
@@ -399,7 +399,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1092404 has a median pChEMBL affinity of 9.1 against PIK3CA, recorded at an assay confidence score of 9 out of 9. It is not an approved drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors listed for the target.",
+      "rationale": "CHEMBL1092404 has a median pChEMBL affinity of 9.1 against PIK3CA, measured at an assay confidence score of 9 out of 9, and is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors (physical or genetic): PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1.",
       "source_chembl_ids": [
         "CHEMBL1092404",
         "CHEMBL1106090"
@@ -424,7 +424,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1092072 has a median pChEMBL affinity of 9.05 against PIK3CA, measured at an assay confidence score of 9 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "rationale": "CHEMBL1092072 has a median pChEMBL affinity of 9.05 against PIK3CA measured at assay confidence score 9 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014across physical and genetic interaction types.",
       "source_chembl_ids": [
         "CHEMBL1092072",
         "CHEMBL1106090"
@@ -449,7 +449,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082622 has a median pChEMBL affinity of 9.05 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "rationale": "CHEMBL1082622 has a median pChEMBL affinity of 9.05 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1082622",
         "CHEMBL1119657"
@@ -474,7 +474,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "Demethoxyviridin has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "rationale": "Demethoxyviridin has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL549959",
         "CHEMBL1064071"
@@ -499,7 +499,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL597004 has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "rationale": "CHEMBL597004 has a median pChEMBL affinity of 9.0 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014listed as physical or genetic interactions.",
       "source_chembl_ids": [
         "CHEMBL597004",
         "CHEMBL1065055"
@@ -524,7 +524,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL590587 has a median pChEMBL affinity of 9.0 against PIK3CA, recorded at an assay confidence score of 9 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors listed for the target.",
+      "rationale": "CHEMBL590587 has a median pChEMBL affinity of 9.0 against PIK3CA, recorded at an assay confidence score of 9 out of 9. PIK3CA has physical or genetic interactors in BioGRID that include PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1.",
       "source_chembl_ids": [
         "CHEMBL590587",
         "CHEMBL1068071"
@@ -549,7 +549,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1090598 has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "rationale": "CHEMBL1090598 has a median pChEMBL affinity of 9.0 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014across physical and genetic interaction types.",
       "source_chembl_ids": [
         "CHEMBL1090598",
         "CHEMBL1109706"
@@ -574,7 +574,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1090239 has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved drug, has no nearest approved structural analog in the candidate set, and has no BioGRID interactors recorded for the target.",
+      "rationale": "CHEMBL1090239 has a median pChEMBL affinity of 9.0 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1090239",
         "CHEMBL1109706"
@@ -599,7 +599,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1093445 has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9. It is not an approved or known drug, has no nearest approved structural analog in the candidate set, and has no BioGRID physical or genetic interactors recorded for the target.",
+      "rationale": "CHEMBL1093445 has a median pChEMBL affinity of 9.0 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1093445",
         "CHEMBL1109867"
@@ -624,7 +624,7 @@
       "atc_codes": [],
       "most_similar_approved_drug": null,
       "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082616 has a median pChEMBL affinity of 9.0 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved or known drug. No nearest approved structural analog was identified within the candidate set, and no BioGRID physical or genetic interactors were recorded for the target.",
+      "rationale": "CHEMBL1082616 has a median pChEMBL affinity of 9.0 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
       "source_chembl_ids": [
         "CHEMBL1082616",
         "CHEMBL1119657"

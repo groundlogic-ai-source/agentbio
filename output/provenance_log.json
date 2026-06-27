@@ -1,6 +1,1206 @@
 {
   "entries": [
     {
+      "source_type": "biogrid_interaction",
+      "source_id": "12260",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "245137",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ATR"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "251199",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor RASGRP3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "252503",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor HRAS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "252504",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor RASD2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "253320",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor LCK"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "253323",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor NOTCH1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "255812",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ADAP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "255817",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ADAP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "255832",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor DGKZ"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "255833",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor DGKZ"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "258755",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ARHGEF1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "258756",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ARHGEF1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "259186",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor GNAQ"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "275844",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor KRAS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "275849",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor HRAS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "276511",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "282345",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IRS1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "283319",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor LCK"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "288002",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor GSN"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "288032",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor YWHAH"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "299154",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IRS4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "301857",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor HRAS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "318163",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor SGK1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "533756",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor UBTF"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "593187",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor NEDD9"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "593188",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor SQSTM1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "593295",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor AMBP"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "593296",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ATPIF1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "593297",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor VARS2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "593298",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor DDX5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "593299",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor DNAJB6"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "593300",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor FTL"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "593301",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ITIH1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "593302",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor RPS20"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "593303",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor UFD1L"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "616077",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor WDR5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "670634",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor TNFRSF1A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "674567",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "677669",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IRS1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "692161",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "696116",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CD28"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "697614",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor FASLG"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "715946",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "719245",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IRS1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "719246",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IRS2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "719357",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CBL"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "719358",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CBL"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "719365",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CBL"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "719366",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CBL"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "720091",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CD40"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "725846",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CBL"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "726245",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor GRB2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "726261",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "726424",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CRK"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "818912",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor STAT1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "832566",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor GRB2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "833015",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor Anapc7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "856579",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor SMAD2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "856581",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor SMAD3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "859011",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "859014",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IRS1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "860789",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ESR1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "935188",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor AKT1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "985599",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ESR1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1104901",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1178024",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor EFNB2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1195430",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PCBP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1257438",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor NTRK1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1416473",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1417894",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor BEX1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1417895",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor BEX2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1417896",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IL13RA2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1417897",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IL24"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1417898",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PSMC3IP"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1417899",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor THRSP"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1418114",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor TNFSF13"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1418115",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor UMPS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1446105",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor HDAC1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1446106",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1446109",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1448676",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1456402",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor TSPAN14"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1456816",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor DPY30"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1461171",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor Bub1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1504531",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor APPL1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1515675",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IRS2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1517742",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ERBB3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1534259",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor AKT1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1534260",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PDK1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1534261",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CYTH3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1534262",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CYTH2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2197812",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor TSSC1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2200060",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor KRAS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2206618",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2208347",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CHEK1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2208351",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor RRM2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2208384",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CDK9"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2208401",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor HDAC6"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2208415",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor BRAF"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2210640",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor AKT1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2210643",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor GNB1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2210646",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2222738",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2223730",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PCBP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2228480",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor GRB2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2233682",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor HAVCR2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2234092",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor FLRT1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2237407",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IL20RA"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2239586",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor SUN2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2240164",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor TMEM52B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2241422",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor MANSC1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2245017",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ZDHHC1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2257942",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor NLGN3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2263080",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor RNF19B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2264534",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor EFNB2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2269169",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor DEFA5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2297617",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor AKT1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2347179",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ERBB3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2347457",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor KIT"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2375902",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor RAC1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2375914",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PDGFRA"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2375917",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PDGFRA"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2376043",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PTTG1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2380444",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CSF1R"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2380445",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CSF1R"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2394535",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor DERL1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2394536",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor DERL1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2397083",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor NEDD4L"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2464856",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor MYO1B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2471547",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2471548",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CALM1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2471549",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CLTC"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2471550",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor MYH10"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2471551",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor SQSTM1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2471552",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IRS1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2471553",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2471554",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CTNNB1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2471555",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor EEF1A1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2473285",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor RPS3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2473286",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor GNAI3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2473287",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor MATN2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2473288",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CNOT3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2473289",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor RPS27"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2532572",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor HCVgp1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2532639",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2532888",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor EGFR"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2534192",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor SNX9"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2536196",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2536201",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2536202",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PTPN11"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2536316",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2538114",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PRKCA"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2538171",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CAMK1G"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2538375",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ERBB2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2538409",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor BSG"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2538455",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ACY1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2538484",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CD22"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2538524",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CDK5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2542490",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2542492",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2548784",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor NRAS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2549092",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2549607",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PLCG1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2549608",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor RAPGEF5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2549610",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor EGFR"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2549637",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PTPN11"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2549639",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor GRB2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2549642",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2549931",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2549932",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor RELA"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2565013",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor KIAA1429"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2570468",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor TRAF6"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2570469",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor TRAF6"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2570517",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2574790",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PTPN11"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2574794",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PTPN11"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2600646",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor RASD2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2610022",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor EGFR"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2619199",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ZDHHC18"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2619230",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ZDHHC23"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2640817",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor PIK3R1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2641213",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor ARAF"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2641214",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor CCND2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2641215",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor EGFR"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2641216",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor GLIS2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2641217",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor MYC"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2641218",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor STK11"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2821452",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor FANCC"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2821512",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor GALNT12"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2821546",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor HRAS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2821611",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor MAP2K1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2821718",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor SFRP4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2821746",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor FBP2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2821816",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor TMOD1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2861901",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor E2F4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2861909",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor IL10RB"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2861927",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor NFKB1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2861934",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor APC"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2862366",
+      "used_by": "biologist",
+      "context": "PIK3CA interactor FASN"
+    },
+    {
       "source_type": "chembl_activity",
       "source_id": "3313695",
       "used_by": "chemist",
