@@ -1,4 +1,4 @@
-# Drug Repurposing Pipeline — Stages 1, 2, 3 & 4 (Silver Bullet)
+# Drug Repurposing Pipeline — Stages 1, 2, 3, 4 & 5 (Silver Bullet)
 
 A Python pipeline that systematically identifies drug-repurposing candidates for rare diseases and WHO Neglected Tropical Diseases (NTDs) by integrating data from public biomedical APIs.
 
@@ -342,18 +342,74 @@ Job metadata lives in its **own** SQLite file, `jobs.db` — kept separate from 
 
 > **`disease_name` is a label.** Stage 1's target selection always auto-picks the *top-ranked* candidate from `top_candidates.json` (the graph is not modified to filter by disease). Whatever you pass is stored, then **overwritten with the disease the graph actually selected** once `target_selection` completes — so the record stays truthful.
 
-### Frontend (Stage 5)
+## Stage 5 — Silver Bullet web frontend
 
-A `/static` folder and a SPA-style catch-all route already exist so a future frontend build can be dropped in (`/static/index.html` is served for unmatched non-`/api` paths). The folder is intentionally empty for now. Permissive CORS for `localhost` is enabled so local frontend development isn't blocked.
+Stage 5 is a **React + Vite + Tailwind** single-page app that turns the Stage 4 API into a usable interface. It is deliberately styled as a **"case dossier"** (a detective's file folder), not a generic admin dashboard: graphite/paper palette, Fraunces / Inter / JetBrains Mono type, file-folder tabs, a vertical pipeline stepper for live runs, an inline report with a sign-off panel, and a circular wax-style **stamp** (`STRONG MATCH` / `REJECTED`) on completed cases. The voice throughout frames every result as a *hypothesis to investigate*, never a cure.
 
-### Exercising every endpoint from the browser (no frontend yet)
+The whole pipeline is presented as a chain of hypotheses: each run opens a new case, walks the six pipeline stages, pauses for a human sign-off, and is stamped closed.
 
-Open **`/docs`** (interactive Swagger UI) and work top to bottom:
+### Project layout
+
+```
+frontend/
+  src/
+    api.js                 # thin fetch wrapper around /api/*
+    App.jsx                # state + polling orchestration (no router)
+    lib/stages.js          # STAGES list, stepperProgress(), formatters
+    components/
+      Dashboard.jsx        # folder-tab list of all cases
+      CaseView.jsx         # status-routed case view
+      Stepper.jsx          # vertical pipeline stepper (live runs)
+      ReportView.jsx       # markdown report renderer
+      SignOff.jsx          # approve / reject + required note
+      Stamp.jsx            # circular STRONG MATCH / REJECTED stamp
+      ErrorPanel.jsx       # oxide failure panel
+      StatusBadge.jsx, NewCaseDialog.jsx
+  vite.config.js           # build.outDir → ../api/static, /api dev proxy
+```
+
+### Develop (hot reload)
+
+```bash
+cd frontend
+npm install          # first time only
+npm run dev          # Vite dev server on :5173, proxies /api → :8000
+```
+
+Run the backend in another terminal (`uvicorn api.main:app --port 8000`) so the dev proxy has something to talk to.
+
+### Build (production)
+
+```bash
+cd frontend
+npm run build        # emits the SPA into ../api/static/
+```
+
+Vite writes `index.html` + hashed `assets/` straight into **`api/static/`**, which FastAPI serves at `/` via its SPA catch-all (any non-`/api` path falls through to `index.html`). After a build, just (re)start the **Silver Bullet API** workflow — no separate frontend server in production; the one FastAPI process serves both the API and the UI.
+
+### How the UI talks to the API
+
+- On load and every **~4 seconds** the app polls `GET /api/runs`; opening a case also polls `GET /api/runs/{job_id}` and `GET /api/runs/{job_id}/cost`.
+- Polling is **terminal-aware**: it keeps refreshing only while a job is non-terminal and **stops automatically** once every visible job is `completed` or `error`.
+- The stepper reads `current_stage` as the **last completed node** (the backend's contract) — it checks that stage off and highlights the *next* one as "Working…".
+- A finished case shows the report read-only plus the stamp; the chosen `decision` and `review_notes` are persisted server-side, so the stamp and notes survive a page reload.
+
+### Full end-to-end flow
+
+1. **Build the frontend** (`npm run build`) and start the **Silver Bullet API** workflow. Open the webview at `/`.
+2. **Open Case** → optionally type a `disease_name` (it's only a label; Stage 1 always auto-picks the top-ranked candidate) → the case is created and the dashboard shows it as a live tab.
+3. **Watch the stepper** advance through the six real nodes (`target_selection` → `biologist` → `chemist` → `reviewer` → `structure_validation` → `writer`) as polling updates `current_stage`, with live cost shown.
+4. **Awaiting Review** → the compiled report renders inline; type a sign-off note and choose **Approve** or **Reject**.
+5. **Completed** → the case is stamped `STRONG MATCH` (approve) or `REJECTED` (reject); reload to confirm the decision, notes, and report all persist.
+
+> The first cold run is slow (Stage 1–3 populate the cache). Subsequent runs are near-instant and a repeated Boltz prediction is a **cache hit ($0 spend)**.
+
+### Driving the API directly (no UI)
+
+You can still exercise everything from **`/docs`** (interactive Swagger UI):
 
 1. **`POST /api/runs`** → *Try it out* → body `{"disease_name": "anything"}` → **Execute**. Copy the returned `job_id`.
 2. **`GET /api/runs`** → confirm the job appears with `status: running`.
 3. **`GET /api/runs/{job_id}`** → re-execute every few seconds and watch `current_stage` advance through the real nodes until `status` becomes `awaiting_review`; the response now includes the full `report` text.
 4. **`GET /api/runs/{job_id}/cost`** → confirm `total_cost_usd` (e.g. `0.025`).
 5. **`POST /api/runs/{job_id}/resume`** → body `{"action": "approve", "notes": "looks good"}` → **Execute**. The job flips to `completed` / `done`. (Resuming a job that isn't `awaiting_review` returns `409`; an invalid `action` returns `400`.)
-
-> The first cold run is slow (Stage 1–3 populate the cache). Subsequent runs are near-instant and a repeated Boltz prediction is a **cache hit ($0 spend)**.
