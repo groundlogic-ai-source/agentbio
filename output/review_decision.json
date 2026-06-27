@@ -1,8 +1,8 @@
 {
   "decision": "approve",
-  "note": "validated with live Boltz prediction",
+  "note": "checklist restart-resume test",
   "reviewed_reports": [
     "/home/runner/workspace/agents/../output/reports/Pompe_disease_CHEMBL592615.md"
   ],
-  "decided_at": "2026-06-27T03:56:10"
+  "decided_at": "2026-06-27T12:51:32"
 }
