@@ -35,7 +35,11 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.types import interrupt, Command
 
-from agents.target_selection import OUTPUT_DIR, run as run_target_selection
+from agents.target_selection import (
+    OUTPUT_DIR,
+    run as run_target_selection,
+    select_for_disease,
+)
 from agents.biologist import run_biologist
 from agents.chemist import run_chemist
 from agents.reviewer import (
@@ -64,6 +68,7 @@ BOLTZ_NUM_SAMPLES = int(os.environ.get("STAGE3_BOLTZ_SAMPLES", "1"))
 
 
 class PipelineState(TypedDict, total=False):
+    requested_disease: str
     target: dict[str, Any]
     biologist_output: dict[str, Any]
     chemist_output: dict[str, Any]
@@ -91,27 +96,118 @@ def _write_json(name: str, data: Any) -> None:
 # ----------------------------------------------------------------------------- nodes
 
 
-def target_selection_node(state: PipelineState) -> dict[str, Any]:
-    rows = None if FORCE_RECOMPUTE else _load_json("top_candidates.json")
-    if rows is None:
-        print("[graph] target_selection: running Stage 1 pipeline (this is slow on a cold cache)")
-        run_target_selection()
-        rows = _load_json("top_candidates.json")
-    else:
-        print("[graph] target_selection: reusing existing top_candidates.json")
-    if not rows:
-        raise RuntimeError("Stage 1 produced no candidates")
-    r = rows[0]
-    target = {
+# Stage 2/3 artifacts whose contents are specific to the SELECTED target. They are
+# reused across runs keyed only on file existence, so they MUST be cleared whenever
+# the selected target changes — otherwise a new target reuses the previous target's
+# biologist/chemist/reviewer/structure output and the report describes the wrong pair.
+_DOWNSTREAM_ARTIFACTS = (
+    "biologist_output.json",
+    "chemist_output.json",
+    "reviewed_candidates.json",
+    "structure_validation.json",
+)
+_ACTIVE_SELECTION = "active_selection.json"
+
+
+def _target_from_row(r: dict[str, Any]) -> dict[str, Any]:
+    """Build the graph `target` dict, carrying the real Stage 1 scores forward."""
+    return {
         "target_symbol": r["target_symbol"],
         "uniprot_id": r.get("uniprot_id"),
         "ensembl_id": r.get("ensembl_id"),
         "disease_name": r["disease_name"],
         "orpha_code": r.get("orpha_code"),
         "ot_association_score": r.get("ot_association_score", 0.0),
+        "tractability_score": r.get("tractability_score"),
+        "unmet_need_score": r.get("unmet_need_score"),
     }
+
+
+def _invalidate_downstream_if_target_changed(target: dict[str, Any]) -> None:
+    """
+    Clear Stage 2/3 artifacts when the selected (disease, target) differs from the
+    one the on-disk artifacts were built for. Resume is unaffected: it replays from
+    checkpoints.db, not these files.
+    """
+    marker = (target.get("disease_name"), target.get("target_symbol"))
+    prev = _load_json(_ACTIVE_SELECTION)
+    prev_marker = None
+    if isinstance(prev, dict):
+        prev_marker = (prev.get("disease_name"), prev.get("target_symbol"))
+    if prev_marker == marker:
+        return
+    for name in _DOWNSTREAM_ARTIFACTS:
+        path = os.path.join(OUTPUT_DIR, name)
+        if os.path.exists(path):
+            os.remove(path)
+            print(f"[graph] target_selection: cleared stale {name} (target changed)")
+
+
+def _pick_unexplored_row(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """
+    Auto-pick the highest-ranked (disease, target) pair not yet used by any prior
+    run. The pick is claimed ATOMICALLY (selected + recorded under one DB lock) so
+    two concurrent blank runs can't grab the same pair. Falls back to the top row
+    once the whole ranked list has been explored.
+    """
+    from api import jobs_db  # lazy: avoids a graph->api import cycle at module load
+
+    jobs_db.init_db()  # CLI graph runs may not have gone through the API boot path
+    candidates = [(r.get("disease_name"), r.get("target_symbol")) for r in rows]
+    claimed = jobs_db.claim_next_unexplored(candidates)
+    if claimed is None:
+        print("[graph] target_selection: every ranked pair already explored — "
+              "falling back to the top candidate")
+        return rows[0]
+
+    dkey, tkey = jobs_db._norm(claimed[0]), jobs_db._norm(claimed[1])
+    for r in rows:
+        if (jobs_db._norm(r.get("disease_name")),
+                jobs_db._norm(r.get("target_symbol"))) == (dkey, tkey):
+            return r
+    return rows[0]
+
+
+def target_selection_node(state: PipelineState) -> dict[str, Any]:
+    requested = (state.get("requested_disease") or "").strip()
+
+    if requested:
+        # Manual mode: score the requested disease directly. select_for_disease
+        # raises DiseaseNotInUniverse / RuntimeError, which surfaces to the caller
+        # as a clean job error rather than a silent auto-pick fallback.
+        print(f"[graph] target_selection: manual disease request '{requested}'")
+        rows = select_for_disease(requested)
+        r = rows[0]
+    else:
+        rows = None if FORCE_RECOMPUTE else _load_json("top_candidates.json")
+        if rows is None:
+            print("[graph] target_selection: running Stage 1 pipeline (slow on a cold cache)")
+            run_target_selection()
+            rows = _load_json("top_candidates.json")
+        else:
+            print("[graph] target_selection: reusing existing top_candidates.json")
+        if not rows:
+            raise RuntimeError("Stage 1 produced no candidates")
+        r = _pick_unexplored_row(rows)
+
+    target = _target_from_row(r)
+
+    # Clear stale downstream artifacts BEFORE recording the new selection marker.
+    _invalidate_downstream_if_target_changed(target)
+    _write_json(_ACTIVE_SELECTION, r)
+
+    # Record the pair so future blank runs explore further down the list. Recorded
+    # for both modes ("any disease+target pair already used in a prior run").
+    try:
+        from api import jobs_db
+        jobs_db.record_explored(target["disease_name"], target["target_symbol"])
+    except Exception as e:  # persistence is best-effort; never fail the run on it
+        print(f"[graph] target_selection: WARN could not record explored pair: {e}")
+
     print(f"[graph] target: {target['target_symbol']} ({target.get('uniprot_id')}) "
-          f"for {target['disease_name']}")
+          f"for {target['disease_name']} "
+          f"[tractability={target.get('tractability_score')}, "
+          f"unmet_need={target.get('unmet_need_score')}]")
     return {"target": target}
 
 
@@ -238,7 +334,8 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
         print("[graph] writer: no candidates selected — no reports written")
         return {"reports": []}
     reports = writer.run_writer(
-        reviewed, selected, structure_results, state.get("biologist_output"))
+        reviewed, selected, structure_results, state.get("biologist_output"),
+        state.get("target"))
     print(f"[graph] writer: wrote {len(reports)} report(s) to output/reports/")
     return {"reports": reports}
 

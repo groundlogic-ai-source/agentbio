@@ -95,6 +95,24 @@ def init_db() -> None:
         for col, ddl in _MIGRATIONS:
             if col not in existing:
                 conn.execute(f"ALTER TABLE jobs ADD COLUMN {ddl}")
+
+        # explored_targets: every (disease, target) pair ever selected by a run
+        # (any status). Blank-disease auto-pick consults this so repeated runs
+        # walk DOWN the ranked list instead of re-selecting the same #1 pair.
+        # Keys are stored normalized (lowercased/stripped) for stable matching.
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS explored_targets (
+                disease_key   TEXT NOT NULL,
+                target_key    TEXT NOT NULL,
+                disease_name  TEXT,
+                target_symbol TEXT,
+                job_id        TEXT,
+                created_at    TEXT NOT NULL,
+                PRIMARY KEY (disease_key, target_key)
+            )
+            """
+        )
         conn.commit()
 
 
@@ -164,3 +182,82 @@ def list_jobs() -> list[dict[str, Any]]:
             "SELECT * FROM jobs ORDER BY created_at DESC, updated_at DESC"
         ).fetchall()
     return [dict(r) for r in rows]
+
+
+def _norm(value: Optional[str]) -> str:
+    return (value or "").strip().lower()
+
+
+def record_explored(disease_name: str, target_symbol: str,
+                    job_id: Optional[str] = None) -> None:
+    """
+    Mark a (disease, target) pair as explored. Idempotent: re-recording the same
+    pair is a no-op (INSERT OR IGNORE on the normalized key).
+    """
+    disease_key = _norm(disease_name)
+    target_key = _norm(target_symbol)
+    if not disease_key or not target_key:
+        return
+    with _LOCK, _connect() as conn:
+        conn.execute(
+            """
+            INSERT OR IGNORE INTO explored_targets
+                (disease_key, target_key, disease_name, target_symbol,
+                 job_id, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (disease_key, target_key, disease_name, target_symbol, job_id, _now()),
+        )
+        conn.commit()
+
+
+def get_explored_pairs() -> set[tuple[str, str]]:
+    """
+    Every explored (disease, target) pair as a set of normalized
+    (disease_key, target_key) tuples, for fast membership checks.
+    """
+    with _connect() as conn:
+        rows = conn.execute(
+            "SELECT disease_key, target_key FROM explored_targets"
+        ).fetchall()
+    return {(r["disease_key"], r["target_key"]) for r in rows}
+
+
+def claim_next_unexplored(
+    candidates: list[tuple[Optional[str], Optional[str]]],
+    job_id: Optional[str] = None,
+) -> Optional[tuple[str, str]]:
+    """
+    Atomically pick AND record the first (disease_name, target_symbol) in
+    ranked `candidates` whose normalized pair is not yet explored.
+
+    The read of explored pairs and the insert of the chosen pair happen under one
+    lock + one connection, so two concurrent blank runs can never claim the same
+    pair (closes the pick/record TOCTOU window). Returns the chosen
+    (disease_name, target_symbol) as given, or None if every candidate is already
+    explored (the caller decides how to fall back).
+    """
+    now = _now()
+    with _LOCK, _connect() as conn:
+        explored = {
+            (r["disease_key"], r["target_key"])
+            for r in conn.execute(
+                "SELECT disease_key, target_key FROM explored_targets"
+            ).fetchall()
+        }
+        for disease_name, target_symbol in candidates:
+            dkey, tkey = _norm(disease_name), _norm(target_symbol)
+            if not dkey or not tkey or (dkey, tkey) in explored:
+                continue
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO explored_targets
+                    (disease_key, target_key, disease_name, target_symbol,
+                     job_id, created_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (dkey, tkey, disease_name, target_symbol, job_id, now),
+            )
+            conn.commit()
+            return (disease_name, target_symbol)  # type: ignore[return-value]
+    return None

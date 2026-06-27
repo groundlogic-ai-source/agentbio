@@ -38,8 +38,17 @@ TRACTABILITY_WEIGHTS = {
 CHEMBL_COUNT_CAP = 500
 
 
+class DiseaseNotInUniverse(Exception):
+    """Raised when a manually requested disease is not in the rare/NTD universe."""
+
+
 def _log(msg: str) -> None:
     print(f"[target_selection] {msg}", flush=True)
+
+
+def _norm(value: Any) -> str:
+    """Normalize a name/xref for case-insensitive matching."""
+    return str(value).strip().lower() if value is not None else ""
 
 
 def _safe_log_scale(count: int, cap: int = CHEMBL_COUNT_CAP) -> float:
@@ -176,6 +185,176 @@ def _build_candidate_universe() -> list[dict[str, Any]]:
             })
 
     return candidates
+
+
+def _load_existing_top_candidates() -> list[dict[str, Any]]:
+    """Read the prior ranking-sweep output (if any) for its enriched cross-refs."""
+    path = os.path.join(OUTPUT_DIR, "top_candidates.json")
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, list) else []
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
+def _diseases_from_top_candidates() -> list[dict[str, Any]]:
+    """
+    Disease records reconstructed from the prior ranking-sweep output. These were
+    genuinely "pulled in Stage 1" and may carry names/cross-refs that a fresh
+    Orphanet rebuild no longer surfaces, so they extend the matchable universe.
+    """
+    seen: set[str] = set()
+    out: list[dict[str, Any]] = []
+    for row in _load_existing_top_candidates():
+        name = row.get("disease_name")
+        key = _norm(name)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        out.append({
+            "name": name,
+            "orpha_code": row.get("orpha_code"),
+            "icd10": row.get("icd10"),
+            "omim": row.get("omim"),
+            "mesh": row.get("mesh"),
+            "source": row.get("disease_source", "orphanet"),
+            "has_approved_treatment": row.get("has_approved_treatment"),
+            "prevalence": row.get("prevalence_per_million"),
+        })
+    return out
+
+
+def _matchable_universe() -> list[dict[str, Any]]:
+    """
+    The full set of diseases a manual query may resolve to: the live Orphanet/WHO
+    universe PLUS any diseases already pulled into the ranking-sweep output (which
+    may use names/cross-refs the fresh rebuild no longer exposes). Deduped by name.
+    """
+    universe = _build_candidate_universe()
+    seen = {_norm(d.get("name")) for d in universe}
+    for d in _diseases_from_top_candidates():
+        if _norm(d.get("name")) not in seen:
+            universe.append(d)
+            seen.add(_norm(d.get("name")))
+    return universe
+
+
+def _match_disease(query: str, candidates: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
+    """
+    Resolve a free-text query to a disease in the rare/NTD universe.
+
+    Tries, in order:
+      1. exact case-insensitive name match
+      2. ICD-10 / OMIM / MeSH cross-ref present on a universe entry (WHO NTDs carry
+         these inline; the ranking-sweep output enriches its top-30 with them)
+      3. a UNIQUE case-insensitive substring match on the name (convenience)
+
+    Returns the matched disease dict, or None if nothing matches.
+    """
+    q = _norm(query)
+    if not q:
+        return None
+
+    by_name: dict[str, dict[str, Any]] = {}
+    for d in candidates:
+        by_name.setdefault(_norm(d.get("name")), d)
+
+    # 1. exact name
+    if q in by_name:
+        return by_name[q]
+
+    # 2. cross-ref present on an entry
+    for d in candidates:
+        for key in ("icd10", "omim", "mesh"):
+            if _norm(d.get(key)) == q:
+                return d
+
+    # 3. unique substring on name
+    substring_hits = [d for name_key, d in by_name.items() if q in name_key]
+    if len(substring_hits) == 1:
+        return substring_hits[0]
+
+    return None
+
+
+def select_for_disease(query: str) -> list[dict[str, Any]]:
+    """
+    Manual mode: look up a single disease in the rare/NTD universe and score its
+    top targets with the EXACT SAME formulas used by the ranking sweep.
+
+    Returns scored (disease, target) rows sorted best-first. Does NOT overwrite the
+    shared ranking-sweep cache (output/top_candidates.json), so a manual run never
+    forces a 15-60 min re-sweep on the next blank run.
+
+    Raises:
+        DiseaseNotInUniverse — the query is not a rare/neglected disease we cover.
+        RuntimeError         — the disease is in-universe but has no Open Targets
+                               EFO mapping or no associated targets to score.
+    """
+    candidates = _matchable_universe()
+    disease = _match_disease(query, candidates)
+    if disease is None:
+        raise DiseaseNotInUniverse(
+            f"'{query}' was not found in the rare-disease / neglected-tropical-disease "
+            f"universe this system covers (Orphanet rare diseases + WHO NTDs). Silver "
+            f"Bullet is scoped to rare and neglected diseases. Check the spelling, try "
+            f"the disease's Orphanet name, or leave the field blank to auto-explore the "
+            f"ranked candidate list."
+        )
+
+    disease_name = disease["name"]
+    _log(f"Manual selection: matched '{query}' → '{disease_name}'")
+
+    efo_id = search_disease_efo(disease_name)
+    if not efo_id:
+        raise RuntimeError(
+            f"'{disease_name}' is in the rare/NTD universe but has no Open Targets EFO "
+            f"mapping, so its targets cannot be scored."
+        )
+
+    targets = get_target_disease_score(efo_id)
+    top_targets = targets[:TOP_TARGETS_PER_DISEASE]
+    if not top_targets:
+        raise RuntimeError(
+            f"Open Targets returned no associated targets for '{disease_name}' "
+            f"(EFO {efo_id}); there is nothing to score."
+        )
+
+    has_approved = disease.get("has_approved_treatment")
+    prevalence = disease.get("prevalence")
+
+    rows: list[dict[str, Any]] = []
+    for target in top_targets:
+        rows.append(_score_pair(
+            disease_name=disease_name,
+            target=target,
+            association_score=target.get("association_score", 0.0),
+            has_approved_treatment=has_approved,
+            prevalence=prevalence,
+            orpha_code=disease.get("orpha_code"),
+            disease_source=disease.get("source", "orphanet"),
+        ))
+
+    rows.sort(key=lambda x: (x["tractability_score"] + x["unmet_need_score"]), reverse=True)
+
+    # Enrich with Orphanet cross-refs (same per-code lookup as the sweep), or carry
+    # any cross-refs already on the matched disease (WHO NTDs ship them inline).
+    for row in rows:
+        code = row.get("orpha_code")
+        if code and row.get("disease_source") == "orphanet":
+            xrefs = get_disease_xrefs(code)
+            row["icd10"] = xrefs.get("icd10")
+            row["omim"] = xrefs.get("omim")
+            row["mesh"] = xrefs.get("mesh")
+        else:
+            row["icd10"] = row.get("icd10") or disease.get("icd10")
+            row["omim"] = row.get("omim") or disease.get("omim")
+            row["mesh"] = row.get("mesh") or disease.get("mesh")
+
+    return rows
 
 
 def _score_pair(

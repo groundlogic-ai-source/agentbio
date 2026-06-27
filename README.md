@@ -3,7 +3,7 @@
 A Python pipeline that systematically identifies drug-repurposing candidates for rare diseases and WHO Neglected Tropical Diseases (NTDs) by integrating data from public biomedical APIs.
 
 - **Stage 1 (Target Selection)** ranks the top 30 (disease, target) pairs by tractability and unmet need.
-- **Stage 2 (Candidate Review)** takes the top Stage 1 target and runs three agents — Biologist → Chemist → Reviewer — to produce a scored, fully-provenanced list of candidate compounds in `output/reviewed_candidates.json`.
+- **Stage 2 (Candidate Review)** takes the selected Stage 1 target and runs three agents — Biologist → Chemist → Reviewer — to produce a scored, fully-provenanced list of candidate compounds in `output/reviewed_candidates.json`.
 - **Stage 3 (Structure Validation & Reporting)** orchestrates all stages as one checkpointed [LangGraph](https://langchain-ai.github.io/langgraph/) pipeline, predicts protein–ligand structures/affinity and ADME for the top candidates via the [Boltz API](https://api.boltz.bio), compiles a Markdown report per candidate, and **pauses for human review** before finishing.
 
 Auditability ethos (both stages): every LLM call is constrained to numbers already computed by code — the model never invents facts or scores. All similarity (Tanimoto) and composite scores are real computed numbers, not model guesses.
@@ -340,7 +340,12 @@ Job metadata lives in its **own** SQLite file, `jobs.db` — kept separate from 
 | `POST /api/runs/{job_id}/resume` | `{"action": "approve"｜"reject", "notes": "optional"}` | resumes via `resume_run()`; job becomes `completed` / `done` |
 | `GET /api/runs/{job_id}/cost` | — | `{"total_cost_usd": ...}` (summed Boltz spend) |
 
-> **`disease_name` is a label.** Stage 1's target selection always auto-picks the *top-ranked* candidate from `top_candidates.json` (the graph is not modified to filter by disease). Whatever you pass is stored, then **overwritten with the disease the graph actually selected** once `target_selection` completes — so the record stays truthful.
+> **`disease_name` drives target selection — two modes:**
+>
+> - **Named (manual mode).** Pass a `disease_name` and Stage 1 looks it up directly in the rare-disease / WHO-NTD universe (case-insensitive name match, falling back to any ICD-10 / OMIM / MeSH cross-reference already pulled). Its top targets are then scored with the **exact same `tractability_score` / `unmet_need_score` formulas** the ranking sweep uses — never faked or skipped. If the disease is **not** in that universe, the run **errors** with a clear message ("scoped to rare and neglected diseases"); it never silently substitutes a different disease. The stored `disease_name` is updated to the canonical matched name.
+> - **Blank (auto-explore mode).** Omit `disease_name` and Stage 1 picks the **highest-ranked (disease, target) pair not yet used by any prior run**. Every selected pair is recorded in an `explored_targets` table in `jobs.db`, so repeated blank runs walk *down* the ranked list instead of re-picking the same #1 candidate. Once the whole ranked list is exhausted, it falls back to the top pair.
+>
+> Both modes carry the real Stage 1 scores into the final report (a **"Stage 1 prioritization scores"** section), and selecting a new target automatically invalidates the stale Stage 2/3 artifacts so the report always describes the pair actually chosen.
 
 ## Stage 5 — Silver Bullet web frontend
 
@@ -397,7 +402,7 @@ Vite writes `index.html` + hashed `assets/` straight into **`api/static/`**, whi
 ### Full end-to-end flow
 
 1. **Build the frontend** (`npm run build`) and start the **Silver Bullet API** workflow. Open the webview at `/`.
-2. **Open Case** → optionally type a `disease_name` (it's only a label; Stage 1 always auto-picks the top-ranked candidate) → the case is created and the dashboard shows it as a live tab.
+2. **Open Case** → either type a rare/NTD `disease_name` to investigate it directly, or leave it blank to auto-explore the next-highest-ranked pair not yet investigated → the case is created and the dashboard shows it as a live tab.
 3. **Watch the stepper** advance through the six real nodes (`target_selection` → `biologist` → `chemist` → `reviewer` → `structure_validation` → `writer`) as polling updates `current_stage`, with live cost shown.
 4. **Awaiting Review** → the compiled report renders inline; type a sign-off note and choose **Approve** or **Reject**.
 5. **Completed** → the case is stamped `STRONG MATCH` (approve) or `REJECTED` (reject); reload to confirm the decision, notes, and report all persist.
@@ -408,7 +413,7 @@ Vite writes `index.html` + hashed `assets/` straight into **`api/static/`**, whi
 
 You can still exercise everything from **`/docs`** (interactive Swagger UI):
 
-1. **`POST /api/runs`** → *Try it out* → body `{"disease_name": "anything"}` → **Execute**. Copy the returned `job_id`.
+1. **`POST /api/runs`** → *Try it out* → body `{"disease_name": "Pompe disease"}` for manual mode (must be a rare/NTD disease, or the job errors), or `{}` to auto-explore the next-ranked pair → **Execute**. Copy the returned `job_id`.
 2. **`GET /api/runs`** → confirm the job appears with `status: running`.
 3. **`GET /api/runs/{job_id}`** → re-execute every few seconds and watch `current_stage` advance through the real nodes until `status` becomes `awaiting_review`; the response now includes the full `report` text.
 4. **`GET /api/runs/{job_id}/cost`** → confirm `total_cost_usd` (e.g. `0.025`).

@@ -37,6 +37,12 @@ Stage 1: Given the universe of Orphanet rare diseases + 20 WHO NTDs, ranks the t
 
 _Populate as you build._
 
+## Two-mode target selection (Stage 5)
+
+- **Manual mode** (`disease_name` given): `target_selection.select_for_disease()` looks the disease up in the rare/NTD universe (case-insensitive name, then ICD-10/OMIM/MeSH cross-refs from WHO NTDs or the prior sweep's enriched top-30) and scores its top targets with the SAME `_score_pair` formulas. Not found → `DiseaseNotInUniverse` (surfaces as a job error; never silently auto-picks). It does NOT overwrite `output/top_candidates.json` (protects the 15-60 min sweep cache).
+- **Blank mode**: the graph picks the highest-ranked pair not in the `explored_targets` table (`jobs.db`); every selection (both modes) is recorded so repeated blank runs walk down the list.
+- **Critical**: selecting a new target invalidates stale Stage 2/3 artifacts (`biologist_output.json`, `chemist_output.json`, `reviewed_candidates.json`, `structure_validation.json`) via the `output/active_selection.json` marker — otherwise the cached-by-existence reuse makes a new target reuse the previous target's downstream output. Invalidation does not affect resume (which replays from `checkpoints.db`).
+
 ## Gotchas
 
 - `set` from `cache.cache` shadows Python's built-in `set()` — every module that imports it (all data sources AND `agents/target_selection.py`) must import it as `cache_set`.

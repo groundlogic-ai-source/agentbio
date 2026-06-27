@@ -198,7 +198,8 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
 
 def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
                           formula: dict[str, Any],
-                          biologist_output: Optional[dict[str, Any]]) -> str:
+                          biologist_output: Optional[dict[str, Any]],
+                          target_meta: Optional[dict[str, Any]] = None) -> str:
     drug = candidate.get("drug_name", "Unknown drug")
     target = candidate.get("target_symbol", "?")
     disease = candidate.get("disease_name", "?")
@@ -240,6 +241,23 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     if candidate.get("rationale"):
         parts.append(f"\n_Chemist rationale:_ {candidate['rationale']}\n")
 
+    # Stage 1 prioritization scores — the SAME two-dimensional scores the ranking
+    # sweep computes, shown here whether the target was auto-ranked or hand-picked.
+    meta = target_meta or {}
+    tract = meta.get("tractability_score")
+    unmet = meta.get("unmet_need_score")
+    if tract is not None or unmet is not None:
+        parts.append("\n### Stage 1 prioritization scores\n")
+        parts.append(
+            f"- **tractability_score:** {_fmt(tract, 4)} "
+            f"(ChEMBL bioactivity + AlphaFold pLDDT − prior-trial-failure penalty)\n"
+            f"- **unmet_need_score:** {_fmt(unmet, 4)} "
+            f"(treatment availability + prevalence)\n\n"
+            f"These are computed by the same formulas used to rank the full "
+            f"rare-disease / NTD universe; a manually chosen target is scored "
+            f"identically, never faked or skipped.\n"
+        )
+
     # 2. Evidence table
     parts.append("\n## 2. Evidence table\n")
     parts.append(_evidence_table(candidate, struct) + "\n")
@@ -273,7 +291,8 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
 
 def run_writer(reviewed: dict[str, Any], selected: list[dict[str, Any]],
                structure_results: dict[str, Any],
-               biologist_output: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
+               biologist_output: Optional[dict[str, Any]] = None,
+               target: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
     """
     Write one Markdown report per selected candidate. Returns a list of
     {drug, disease, path, strong_match} descriptors.
@@ -286,7 +305,7 @@ def run_writer(reviewed: dict[str, Any], selected: list[dict[str, Any]],
         drug = cand.get("drug_name", "unknown")
         disease = cand.get("disease_name", "unknown")
         struct = (structure_results or {}).get(drug, {})
-        md = build_report_markdown(cand, struct, formula, biologist_output)
+        md = build_report_markdown(cand, struct, formula, biologist_output, target)
         fname = f"{_slug(disease)}_{_slug(drug)}.md"
         path = os.path.join(REPORTS_DIR, fname)
         with open(path, "w", encoding="utf-8") as f:
