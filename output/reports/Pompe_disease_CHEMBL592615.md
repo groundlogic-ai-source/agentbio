@@ -6,6 +6,12 @@ CHEMBL592615 is proposed as a repurposing candidate against **Pompe disease** vi
 
 _Chemist rationale:_ CHEMBL592615 has a median pChEMBL affinity of 9.4 against PIK3CA recorded at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight BioGRID-listed physical or genetic interactors: PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1.
 
+### Stage 1 prioritization scores
+- **tractability_score:** 0.7233 (ChEMBL bioactivity + AlphaFold pLDDT − prior-trial-failure penalty)
+- **unmet_need_score:** 0.3500 (treatment availability + prevalence)
+
+These are computed by the same formulas used to rank the full rare-disease / NTD universe; a manually chosen target is scored identically, never faked or skipped.
+
 ## 2. Evidence table
 | Evidence | Value |
 | --- | --- |

@@ -1,8 +1,8 @@
 {
-  "decision": "approve",
-  "note": "Reviewed - proceed to validation",
+  "decision": "reject",
+  "note": "Idk",
   "reviewed_reports": [
     "/home/runner/workspace/agents/../output/reports/Pompe_disease_CHEMBL592615.md"
   ],
-  "decided_at": "2026-06-27T18:34:29"
+  "decided_at": "2026-06-27T19:51:08"
 }

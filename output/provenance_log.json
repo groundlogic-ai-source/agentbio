@@ -1361,6 +1361,24 @@
       "source_id": "3313691",
       "used_by": "chemist",
       "context": "CHEMBL1082616 affinity vs PIK3CA"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HYPERGLYCAEMIA",
+      "used_by": "reviewer",
+      "context": "GEDATOLISIB adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ANAEMIA",
+      "used_by": "reviewer",
+      "context": "GEDATOLISIB adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DRUG INEFFECTIVE",
+      "used_by": "reviewer",
+      "context": "GEDATOLISIB adverse event"
     }
   ]
 }

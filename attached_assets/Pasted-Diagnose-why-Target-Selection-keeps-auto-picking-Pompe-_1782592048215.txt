@@ -1,0 +1,36 @@
+Diagnose why Target Selection keeps auto-picking Pompe disease on every blank-disease
+run, even after the explored_targets exclusion fix was added. Do NOT change any
+scoring logic or fix anything yet — investigate and print a clear report. This is
+read-only diagnostic work.
+
+1. Print the top 20 entries from the most recent target_candidates output (whatever
+   file/table Stage 1 writes its ranked list to), showing for each: disease name,
+   target gene symbol, tractability_score, unmet_need_score, and the individual
+   components that feed unmet_need_score (especially whatever field indicates
+   "has an approved treatment").
+
+2. Specifically pull out every Pompe disease entry in that list and print:
+   - the target gene symbol for each one
+   - whether they're all the SAME gene or different genes
+   - the exact value/logic that determined Pompe's "approved treatment" status —
+     print the raw data this came from (e.g. the Orphanet field or whatever source
+     populates it), not just the final true/false
+   - Note for the human reading this: Pompe disease has FDA-approved enzyme
+     replacement therapies (alglucosidase alfa and avalglucosidase alfa) — check
+     whether the system's data correctly reflects that or not.
+
+3. Print the full contents of the explored_targets table (or whatever it's
+   actually called/stored as) — every row, with disease, target, and timestamp.
+   Confirm: are prior Pompe (disease, target) pairs that have already been run
+   actually present in this table? Compare row count to how many cases have
+   actually been run so far.
+
+4. Compare #1 and #3: for the most recent blank-disease run that picked Pompe,
+   was that specific (disease, target) pair already in explored_targets at the
+   time the run started? If yes, the exclusion filter is not working — show the
+   exact matching/lookup code so we can see why. If no, the exclusion filter
+   correctly skipped it, which means Pompe is winning legitimately on the
+   formula's own terms.
+
+Print all of this as a clear, labeled report. Do not modify scoring.py, the
+target_selection agent, or the database schema in this pass.
