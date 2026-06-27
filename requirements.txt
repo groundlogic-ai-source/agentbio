@@ -3,3 +3,6 @@ anthropic>=0.40.0
 rdkit>=2023.9.1
 pandas>=2.1.0
 rdkit
+boltz-api
+langgraph
+langgraph-checkpoint-sqlite

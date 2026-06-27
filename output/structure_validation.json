@@ -1,0 +1,28 @@
+{
+  "CHEMBL592615": {
+    "afdb": {
+      "has_structure": true,
+      "mean_plddt": 92.38,
+      "model_url": "https://alphafold.ebi.ac.uk/files/AF-P42336-F1-model_v6.pdb"
+    },
+    "complex": {
+      "available": false,
+      "structure_confidence": null,
+      "binding_pose_confidence": null,
+      "predicted_affinity": null,
+      "pdb_or_cif_url": null,
+      "estimated_cost_usd": 0.0,
+      "raw_metrics": {},
+      "model": "boltz-2.1",
+      "error": "BOLTZ_API_KEY not set"
+    },
+    "adme": {
+      "available": false,
+      "lipophilicity": null,
+      "permeability": null,
+      "solubility": null,
+      "model": "adme-v1",
+      "error": "BOLTZ_API_KEY not set"
+    }
+  }
+}

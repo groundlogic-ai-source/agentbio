@@ -1,9 +1,10 @@
-# Drug Repurposing Pipeline — Stages 1 & 2
+# Drug Repurposing Pipeline — Stages 1, 2 & 3
 
 A Python pipeline that systematically identifies drug-repurposing candidates for rare diseases and WHO Neglected Tropical Diseases (NTDs) by integrating data from public biomedical APIs.
 
 - **Stage 1 (Target Selection)** ranks the top 30 (disease, target) pairs by tractability and unmet need.
 - **Stage 2 (Candidate Review)** takes the top Stage 1 target and runs three agents — Biologist → Chemist → Reviewer — to produce a scored, fully-provenanced list of candidate compounds in `output/reviewed_candidates.json`.
+- **Stage 3 (Structure Validation & Reporting)** orchestrates all stages as one checkpointed [LangGraph](https://langchain-ai.github.io/langgraph/) pipeline, predicts protein–ligand structures/affinity and ADME for the top candidates via the [Boltz API](https://api.boltz.bio), compiles a Markdown report per candidate, and **pauses for human review** before finishing.
 
 Auditability ethos (both stages): every LLM call is constrained to numbers already computed by code — the model never invents facts or scores. All similarity (Tanimoto) and composite scores are real computed numbers, not model guesses.
 
@@ -22,7 +23,9 @@ Auditability ethos (both stages): every LLM call is constrained to numbers alrea
 │   ├── pubchem.py          # PubChem PUG REST — structure (S1) + drug classification (S2)
 │   ├── biogrid.py          # [S2] BioGRID — physical/genetic interaction partners
 │   ├── pubmed.py           # [S2] PubMed E-utilities — literature w/ LLM relevance gate
-│   └── openfda.py          # [S2] openFDA FAERS — drug adverse-event signal
+│   ├── openfda.py          # [S2] openFDA FAERS — drug adverse-event signal
+│   ├── uniprot.py          # [S3] UniProt — canonical protein sequence (FASTA)
+│   └── boltz_api.py        # [S3] Boltz API — protein–ligand structure/affinity + ADME
 ├── cache/
 │   └── cache.py            # SQLite-backed key-value cache with TTL
 ├── agents/
@@ -30,12 +33,19 @@ Auditability ethos (both stages): every LLM call is constrained to numbers alrea
 │   ├── provenance.py       # [S2] Shared provenance log helper
 │   ├── biologist.py        # [S2] Target biology: interactions + literature
 │   ├── chemist.py          # [S2] Candidate compounds + Tanimoto bisociation
-│   └── reviewer.py         # [S2] Descriptors + safety + composite score
+│   ├── reviewer.py         # [S2] Descriptors + safety + composite score
+│   └── writer.py           # [S3] Markdown repurposing report per candidate
+├── main_graph.py           # [S3] LangGraph orchestration (all stages + human review)
+├── resume_review.py        # [S3] CLI to resume a paused run after human review
 ├── output/                 # Generated output files (created at runtime)
 │   ├── top_candidates.json / .csv / narration.txt   # Stage 1
 │   ├── biologist_output.json / chemist_output.json  # Stage 2 intermediates
 │   ├── reviewed_candidates.json                      # Stage 2 final output
-│   └── provenance_log.json                           # Stage 2 audit trail
+│   ├── provenance_log.json                           # Stage 2 audit trail
+│   ├── structure_validation.json                     # Stage 3 Boltz/AFDB results
+│   ├── review_decision.json                          # Stage 3 human-review outcome
+│   └── reports/{disease}_{drug}.md                   # Stage 3 final reports
+├── checkpoints.db          # [S3] LangGraph durable checkpoints (created at runtime)
 └── requirements.txt
 ```
 
@@ -70,6 +80,16 @@ All Stage 1 data sources are publicly accessible — no keys required. Stage 2 a
 | `NCBI_API_KEY` | Optional | Raises PubMed E-utilities rate limit from 3 → 10 req/s. PubMed works without it. |
 
 openFDA (FAERS) requires no key.
+
+Stage 3 adds one key:
+
+| Variable | Required? | Purpose |
+|---|---|---|
+| `BOLTZ_API_KEY` | **Required** for structure prediction | Key for the [Boltz API](https://api.boltz.bio) (protein–ligand structure/affinity + ADME). Without it the structure-validation node still runs and the pipeline completes, but Boltz fields are recorded as `unavailable` (logged, no spend). UniProt and AlphaFold DB require no key. |
+
+> **Cost note:** each Boltz prediction is paid (~$0.025/prediction at time of writing); the structure-validation node logs an estimated cost per call. Set `STAGE3_MAX_CANDIDATES` to cap how many candidates are predicted per run (default 3).
+>
+> Predictions are made against the **real** Boltz API at `api.boltz.bio` via the official `boltz-api` SDK. The pipeline never contacts `alphafoldserver.com`.
 
 ---
 
@@ -235,3 +255,59 @@ composite = 0.30 × normalized(pchembl_value)
 - The `−0.25` Lipinski term is a **soft developability flag**, not a hard ADME prediction — it is noted explicitly per candidate.
 - A candidate is flagged `STRONG_MATCH` when `composite_score ≥ 0.70` (`STRONG_MATCH_THRESHOLD`).
 - Provenance de-dup ensures evidence ids are not double-counted in the audit trail; the formula's inputs are independent metrics, so de-dup affects evidence accounting rather than the weighted sum.
+
+---
+
+## Running Stage 3
+
+Stage 3 wires every stage into a single, **checkpointed** [LangGraph](https://langchain-ai.github.io/langgraph/) pipeline that ends in a human-in-the-loop review gate:
+
+```
+target_selection → biologist → chemist → reviewer → structure_validation → writer → human_review
+```
+
+Start a run:
+
+```bash
+python main_graph.py                 # auto-generates a thread_id
+python main_graph.py my-run-id       # or pass your own thread_id
+```
+
+The run executes through `writer`, then **pauses** at `human_review` (a LangGraph `interrupt()`), printing the `thread_id` and the report path(s). State is persisted to `checkpoints.db`, so you can resume later from a **separate process**:
+
+```bash
+python resume_review.py <thread_id> approve
+python resume_review.py <thread_id> reject "binding pose confidence too low"
+python resume_review.py <thread_id> edit   "rerun with more samples"
+```
+
+The decision is written to `output/review_decision.json`.
+
+### Design guarantees
+
+- **Durable checkpoints** — a `SqliteSaver` backed by an on-disk `checkpoints.db` persists every node, enabling cross-process pause/resume.
+- **Single interrupt** — **only** the `human_review` node calls `interrupt()`, and it performs no API calls before the interrupt, so resuming never re-spends on Boltz.
+- **Idempotent upstream** — the Stage 1/2 nodes reuse existing `output/*.json` artifacts when present, so re-running Stage 3 does not redo the expensive Stage 1/2 work. Set `STAGE3_FORCE_RECOMPUTE=1` to force fresh upstream computation.
+
+### What `structure_validation` does
+
+For each selected candidate (STRONG_MATCH first; see the env switches below):
+
+1. **AFDB apo pre-check** (per target) — fetches the ligand-free AlphaFold model's mean pLDDT. This is informational only; **Boltz is always called regardless** because AFDB contains no ligand and cannot describe the complex.
+2. **UniProt** — resolves the target's canonical protein sequence (FASTA).
+3. **Boltz** — `predict_complex(protein_sequence, ligand_smiles)` returns `{structure_confidence, binding_pose_confidence, predicted_affinity, pdb_or_cif_url}`, and `predict_adme(smiles)` returns lipophilicity / permeability / solubility. Results are cached and an estimated cost is logged per call.
+
+> `predicted_affinity` is Boltz's **relative optimization score** (0–1), **not** a Kd or IC50. This caveat is stated in the code and in every report's Limitations section.
+
+### The `writer` node
+
+Writes one Markdown report per selected candidate to `output/reports/{disease}_{drug}.md`, each with exactly five sections: **(1)** hypothesis summary, **(2)** evidence table, **(3)** full source citations (deduplicated PMIDs, ChEMBL activity IDs, NCT numbers), **(4)** composite-score breakdown (every weighted term, reconciled against `reviewed_candidates.json`), and **(5)** limitations. The writer invents no facts — it only restates numbers already produced upstream.
+
+### Environment switches
+
+| Variable | Default | Effect |
+|---|---|---|
+| `STAGE3_FORCE_RECOMPUTE` | `0` | `1` re-runs Stage 1/2 instead of reusing `output/*.json`. |
+| `STAGE3_STRONG_ONLY` | `0` | `1` writes reports only for true STRONG_MATCH candidates. When `0` and there are none, the single highest-ranked candidate is reported, **clearly flagged as below threshold**. |
+| `STAGE3_MAX_CANDIDATES` | `3` | Caps how many candidates receive a (paid) Boltz prediction. |
+| `STAGE3_BOLTZ_SAMPLES` | `1` | Number of Boltz structure samples per prediction. |
