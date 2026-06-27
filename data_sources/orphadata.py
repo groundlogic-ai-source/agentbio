@@ -4,7 +4,7 @@ Also includes the static WHO Neglected Tropical Disease list.
 """
 
 import requests
-from typing import Any
+from typing import Any, Optional
 from cache.cache import get, set as cache_set, make_key
 
 BASE_URL = "https://api.orphadata.com"
@@ -120,6 +120,75 @@ def get_disease_xrefs(orpha_code: str) -> dict[str, Any]:
         print(f"[orphadata] WARNING: xref lookup failed for ORPHAcode {orpha_code}: {e}")
 
     cache_set(cache_key, result, ttl_days=7)
+    return result
+
+
+def get_disease_prevalence(orpha_code: str) -> Optional[float]:
+    """
+    Attempt to fetch point prevalence (per million) from Orphadata's epidemiology API.
+
+    This is optional / best-effort: if the endpoint is unreachable, requires auth,
+    or returns no numeric estimate, returns None and logs clearly. The cache TTL
+    is short on failure so the pipeline retries on the next sweep without waiting
+    weeks.
+
+    Returns: float (per million) if available, None otherwise.
+    """
+    cache_key = make_key("get_disease_prevalence_v1", orpha_code)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    result: Optional[float] = None
+    try:
+        url = f"{BASE_URL}/rd-epidemiology/orphacodes/{orpha_code}"
+        resp = requests.get(
+            url,
+            params={"lang": "en"},
+            headers={"Accept": "application/json"},
+            timeout=30,
+        )
+        if resp.status_code in (401, 403):
+            print(
+                f"[orphadata] NOTE: epidemiology API requires authentication "
+                f"(ORPHAcode {orpha_code}) — prevalence unavailable on this tier."
+            )
+            cache_set(cache_key, None, ttl_days=30)
+            return None
+        if resp.status_code == 404:
+            cache_set(cache_key, None, ttl_days=7)
+            return None
+        resp.raise_for_status()
+        data = resp.json()
+
+        results = data.get("data", {}).get("results", [])
+        if isinstance(results, dict):
+            results = [results]
+
+        best: Optional[float] = None
+        for rec in results:
+            prev_list = rec.get("Prevalence") or rec.get("prevalence") or []
+            if isinstance(prev_list, dict):
+                prev_list = [prev_list]
+            for pv in prev_list:
+                raw = pv.get("ValMoy") or pv.get("prevalence_per_million")
+                if raw is None:
+                    continue
+                try:
+                    f = float(raw)
+                    if f > 0 and (best is None or f > best):
+                        best = f
+                except (TypeError, ValueError):
+                    pass
+        result = best
+
+    except requests.HTTPError as e:
+        code = e.response.status_code if e.response is not None else "?"
+        print(f"[orphadata] NOTE: epidemiology API HTTP {code} for ORPHAcode {orpha_code}: {e}")
+    except Exception as e:
+        print(f"[orphadata] NOTE: epidemiology API unavailable for ORPHAcode {orpha_code}: {e}")
+
+    cache_set(cache_key, result, ttl_days=1 if result is None else 30)
     return result
 
 

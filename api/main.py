@@ -14,6 +14,7 @@ Run:
 """
 
 import os
+import subprocess
 import threading
 from typing import Any, Optional
 
@@ -225,6 +226,49 @@ def get_cost(job_id: str) -> dict[str, Any]:
     if job is None:
         raise HTTPException(status_code=404, detail="job not found")
     return {"job_id": job_id, "total_cost_usd": job["total_cost_usd"]}
+
+
+# --------------------------------------------------------------------------- #
+# Internal sweep trigger (development / admin only — no auth)
+# --------------------------------------------------------------------------- #
+_sweep_proc: Optional[subprocess.Popen] = None  # type: ignore[type-arg]
+_SWEEP_LOG = "/tmp/sweep_run.log"
+_WORKSPACE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+@app.post("/internal/run-sweep")
+def trigger_sweep() -> dict:
+    """
+    Start the Stage 1 sweep (python -m agents.target_selection) as a child
+    process of uvicorn so it survives shell exits and stays alive for the full
+    run.  Output is streamed to /tmp/sweep_run.log.
+    """
+    global _sweep_proc
+    if _sweep_proc is not None and _sweep_proc.poll() is None:
+        return {"status": "already_running", "pid": _sweep_proc.pid,
+                "log": _SWEEP_LOG}
+    log_fh = open(_SWEEP_LOG, "w", buffering=1)
+    _sweep_proc = subprocess.Popen(
+        ["python", "-m", "agents.target_selection"],
+        cwd=_WORKSPACE,
+        stdout=log_fh,
+        stderr=log_fh,
+    )
+    return {"status": "started", "pid": _sweep_proc.pid, "log": _SWEEP_LOG}
+
+
+@app.get("/internal/sweep-status")
+def sweep_status() -> dict:
+    """Return running / done / not_started for the sweep subprocess."""
+    if _sweep_proc is None:
+        return {"status": "not_started"}
+    rc = _sweep_proc.poll()
+    return {
+        "status": "running" if rc is None else ("ok" if rc == 0 else "error"),
+        "returncode": rc,
+        "pid": _sweep_proc.pid,
+        "log": _SWEEP_LOG,
+    }
 
 
 # --------------------------------------------------------------------------- #

@@ -19,8 +19,14 @@ from typing import Any, Optional
 import anthropic
 
 from cache.cache import get, set as cache_set, make_key
-from data_sources.orphadata import get_rare_disease_list, get_who_ntd_list, get_disease_xrefs
-from data_sources.open_targets import search_disease_efo, get_target_disease_score
+from data_sources.orphadata import (
+    get_rare_disease_list, get_who_ntd_list, get_disease_xrefs,
+    get_disease_prevalence,
+)
+from data_sources.open_targets import (
+    search_disease_efo, get_target_disease_score, get_disease_known_drugs,
+    get_disease_orphanet_code,
+)
 from data_sources.chembl import get_target_bioactivity_count
 from data_sources.afdb import get_structure_confidence
 from data_sources.clinicaltrials import check_prior_trials
@@ -96,25 +102,39 @@ def compute_unmet_need_score(
     prevalence: Optional[float],
 ) -> float:
     """
-    unmet_need_score:
-      - diseases with no approved treatments score higher
-      - higher prevalence = higher unmet need (log-scaled)
-      - unknown treatment status → 0.5 (flagged for manual review)
+    unmet_need_score — graceful degradation formula:
 
-    Returns a float in [0, 1].
+      treatment_component:
+        True  (approved treatment exists) → 0.0  (already served, low unmet need)
+        False (no approved treatment)     → 1.0  (high unmet need)
+        None  (data unavailable)          → 0.5  (flagged for manual review)
+
+      prevalence_component (secondary, 0–1, log-scaled per million):
+        Only added when real prevalence data is available. Its absence does NOT
+        collapse the score to a constant — the treatment signal is used alone.
+
+      Weighting:
+        - Both signals present:  score = 0.7 * treatment + 0.3 * prevalence
+        - Treatment only:        score = treatment_component  (prevalence absent)
+        - Neither (both None):   score = 0.5                 (flag for review)
+
+    Returns a float in [0, 1]. Never collapses to a single constant across all
+    diseases once has_approved_treatment is True/False (not None).
     """
-    if has_approved_treatment is None:
-        treatment_component = 0.5
-    elif not has_approved_treatment:
+    if has_approved_treatment is True:
+        treatment_component = 0.0
+    elif has_approved_treatment is False:
         treatment_component = 1.0
     else:
-        treatment_component = 0.0
+        treatment_component = 0.5  # unknown — flag for manual review
 
-    prevalence_component = 0.0
     if prevalence and prevalence > 0:
         prevalence_component = min(1.0, math.log1p(prevalence) / math.log1p(1_000_000))
+        score = 0.7 * treatment_component + 0.3 * prevalence_component
+    else:
+        # No prevalence data — rely entirely on the treatment signal
+        score = treatment_component
 
-    score = 0.7 * treatment_component + 0.3 * prevalence_component
     return round(score, 4)
 
 
@@ -272,8 +292,11 @@ def _match_disease(query: str, candidates: list[dict[str, Any]]) -> Optional[dic
             if _norm(d.get(key)) == q:
                 return d
 
-    # 3. unique substring on name
-    substring_hits = [d for name_key, d in by_name.items() if q in name_key]
+    # 3. unique substring on name — exclude OBSOLETE entries (high false-positive risk)
+    substring_hits = [
+        d for name_key, d in by_name.items()
+        if q in name_key and not name_key.startswith("obsolete")
+    ]
     if len(substring_hits) == 1:
         return substring_hits[0]
 
@@ -296,6 +319,22 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
     """
     candidates = _matchable_universe()
     disease = _match_disease(query, candidates)
+
+    if disease is None:
+        # EFO synonym fallback: common names like "Pompe disease" differ from
+        # Orphanet's official name ("Glycogen storage disease due to acid maltase
+        # deficiency").  Search OT directly → resolve EFO → get Orphanet xref →
+        # find matching disease in our universe by ORPHA code.
+        efo_direct = search_disease_efo(query)
+        if efo_direct:
+            orpha_code = get_disease_orphanet_code(efo_direct)
+            if orpha_code:
+                disease = next(
+                    (d for d in candidates
+                     if str(d.get("orpha_code")) == str(orpha_code)),
+                    None,
+                )
+
     if disease is None:
         raise DiseaseNotInUniverse(
             f"'{query}' was not found in the rare-disease / neglected-tropical-disease "
@@ -315,16 +354,27 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
             f"mapping, so its targets cannot be scored."
         )
 
+    # FIX 1 — real approved-treatment status from OT knownDrugs
+    drug_info = get_disease_known_drugs(efo_id)
+    has_approved: Optional[bool] = drug_info.get("has_approved_treatment")
+    approved_drug_names: list = drug_info.get("approved_drug_names", [])
+
+    # FIX 3 — best-effort prevalence from Orphadata epidemiology
+    orpha_code = disease.get("orpha_code")
+    prevalence: Optional[float] = None
+    if orpha_code:
+        prevalence = get_disease_prevalence(orpha_code)
+
     targets = get_target_disease_score(efo_id)
-    top_targets = targets[:TOP_TARGETS_PER_DISEASE]
+    # FIX 4 — gate: drop targets with association_score < 0.1
+    top_targets = [
+        t for t in targets if t.get("association_score", 0.0) >= 0.1
+    ][:TOP_TARGETS_PER_DISEASE]
     if not top_targets:
         raise RuntimeError(
             f"Open Targets returned no associated targets for '{disease_name}' "
             f"(EFO {efo_id}); there is nothing to score."
         )
-
-    has_approved = disease.get("has_approved_treatment")
-    prevalence = disease.get("prevalence")
 
     rows: list[dict[str, Any]] = []
     for target in top_targets:
@@ -336,6 +386,7 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
             prevalence=prevalence,
             orpha_code=disease.get("orpha_code"),
             disease_source=disease.get("source", "orphanet"),
+            approved_drug_names=approved_drug_names,
         ))
 
     rows.sort(key=lambda x: (x["tractability_score"] + x["unmet_need_score"]), reverse=True)
@@ -365,8 +416,19 @@ def _score_pair(
     prevalence: Optional[float],
     orpha_code: Optional[str] = None,
     disease_source: str = "orphanet",
+    approved_drug_names: Optional[list] = None,
 ) -> dict[str, Any]:
-    """Compute all raw numbers and both scores for one (disease, target) pair."""
+    """
+    Compute all raw numbers and both scores for one (disease, target) pair.
+
+    FIX 4 — tractability_score is multiplied by the OT association_score (0–1)
+    so targets with weak disease-specificity (e.g. broad oncology targets that
+    appear in a rare-disease association list with score 0.2) are discounted
+    relative to targets with strong, disease-specific evidence.
+
+    The raw ChEMBL/AFDB tractability is preserved in the output so the
+    multiplication is auditable: tractability_score = raw_tractability × assoc.
+    """
 
     target_symbol = target.get("target_symbol", "")
     uniprot_id = target.get("uniprot_id")
@@ -391,12 +453,16 @@ def _score_pair(
         except Exception as e:
             _log(f"  WARN trials {target_symbol}/{disease_name}: {e}")
 
-    tractability = compute_tractability_score(
+    raw_tractability = compute_tractability_score(
         chembl_count=chembl_data.get("count", 0),
         median_pchembl=chembl_data.get("median_pchembl"),
         plddt=afdb_data.get("mean_pLDDT"),
         has_prior_failure=trial_data.get("has_negative_repurposing_result", False),
     )
+    # Weight tractability by disease-specificity (FIX 4).
+    # assoc is already in [0,1]; gate upstream ensures >= 0.1.
+    tractability = round(raw_tractability * association_score, 4)
+
     unmet_need = compute_unmet_need_score(
         has_approved_treatment=has_approved_treatment,
         prevalence=prevalence,
@@ -421,8 +487,10 @@ def _score_pair(
         "prior_trial_count": trial_data.get("trial_count", 0),
         "has_negative_repurposing_result": trial_data.get("has_negative_repurposing_result", False),
         "has_approved_treatment": has_approved_treatment,
+        "approved_drug_names": approved_drug_names or [],
         "prevalence_per_million": prevalence,
         "treatment_status_needs_review": has_approved_treatment is None,
+        "raw_tractability_score": raw_tractability,
         "tractability_score": tractability,
         "unmet_need_score": unmet_need,
     }
@@ -475,12 +543,51 @@ def _narrate_top5(top5: list[dict[str, Any]]) -> str:
         return f"[LLM narration failed: {e}]"
 
 
+def _print_sentinel_disease_comparison(scored_pairs: list[dict[str, Any]]) -> None:
+    """
+    Print unmet_need_score for sentinel diseases so Fix 2 can be validated.
+    Before the fix all had a constant 0.35 (has_approved_treatment=None, no
+    prevalence).  After the fix True→0.0 and False→1.0 so diseases with approved
+    treatments score lower and diseases without them score higher.
+    """
+    SENTINELS = {"pompe", "gaucher", "fabry", "cystic fibrosis", "wilson"}
+    found: list[dict[str, Any]] = []
+    for row in scored_pairs:
+        name_lower = row.get("disease_name", "").lower()
+        if any(s in name_lower for s in SENTINELS):
+            found.append(row)
+
+    if not found:
+        _log("  (none of the sentinel diseases appeared in scored pairs)")
+        return
+
+    seen: set[str] = set()
+    for row in found:
+        key = (row.get("disease_name", ""), row.get("target_symbol", ""))
+        if key in seen:
+            continue
+        seen.add(key)
+        _log(
+            f"  {row['disease_name']} / {row['target_symbol']:12s} "
+            f"has_approved={str(row.get('has_approved_treatment')):5s}  "
+            f"prevalence_per_M={str(row.get('prevalence_per_million')):6s}  "
+            f"unmet_need={row['unmet_need_score']:.4f}  "
+            f"raw_tractability={row.get('raw_tractability_score', '?')}  "
+            f"tractability={row['tractability_score']:.4f}  "
+            f"assoc={row['ot_association_score']:.4f}"
+        )
+
+
 def run() -> None:
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     candidates = _build_candidate_universe()
 
-    _log(f"Total candidate diseases: {len(candidates)}")
+    n_total = len(candidates)
+    n_resolved_efo = 0
+    n_passed_gate = 0
+
+    _log(f"Total candidate diseases in universe: {n_total}")
     _log("Resolving EFO IDs and fetching Open Targets associations …")
 
     scored_pairs: list[dict[str, Any]] = []
@@ -495,17 +602,35 @@ def run() -> None:
             _log(f"    → no EFO ID found, skipping")
             continue
 
+        n_resolved_efo += 1
+
+        # FIX 1 — real approved-treatment status from OT knownDrugs
+        drug_info = get_disease_known_drugs(efo_id)
+        has_approved: Optional[bool] = drug_info.get("has_approved_treatment")
+        approved_drug_names: list = drug_info.get("approved_drug_names", [])
+
+        # FIX 3 — best-effort prevalence from Orphadata epidemiology
+        orpha_code = disease.get("orpha_code")
+        prevalence: Optional[float] = None
+        if orpha_code:
+            prevalence = get_disease_prevalence(orpha_code)
+
         targets = get_target_disease_score(efo_id)
-        top_targets = targets[:TOP_TARGETS_PER_DISEASE]
+
+        # FIX 4 — gate: drop targets with association_score < 0.1
+        top_targets = [
+            t for t in targets if t.get("association_score", 0.0) >= 0.1
+        ][:TOP_TARGETS_PER_DISEASE]
 
         if not top_targets:
-            _log(f"    → no targets found for EFO {efo_id}")
+            _log(f"    → no targets passed association_score >= 0.1 gate for EFO {efo_id}")
             continue
 
-        _log(f"    → EFO {efo_id}, {len(top_targets)} targets")
-
-        has_approved = disease.get("has_approved_treatment")
-        prevalence = disease.get("prevalence")
+        n_passed_gate += 1
+        _log(
+            f"    → EFO {efo_id}, {len(top_targets)} targets (gate passed), "
+            f"has_approved={has_approved}, prevalence_per_M={prevalence}"
+        )
 
         for target in top_targets:
             pair = _score_pair(
@@ -516,6 +641,7 @@ def run() -> None:
                 prevalence=prevalence,
                 orpha_code=disease.get("orpha_code"),
                 disease_source=disease.get("source", "orphanet"),
+                approved_drug_names=approved_drug_names,
             )
             scored_pairs.append(pair)
 
@@ -555,12 +681,28 @@ def run() -> None:
             writer.writerows(top30)
         _log(f"Saved CSV  → {csv_path}")
 
-    _log("\n=== TOP 5 CANDIDATES ===")
-    for i, row in enumerate(top30[:5], 1):
+    _log("\n=== TOP 15 CANDIDATES ===")
+    for i, row in enumerate(top30[:15], 1):
         _log(
-            f"  #{i}: {row['disease_name']} / {row['target_symbol']} "
-            f"[tractability={row['tractability_score']}, unmet_need={row['unmet_need_score']}]"
+            f"  #{i:2d}: {row['disease_name'][:40]:<40s} / {row['target_symbol']:<10s} "
+            f"tract={row['tractability_score']:.4f} "
+            f"(raw={row.get('raw_tractability_score', '?')}, "
+            f"assoc={row['ot_association_score']:.3f})  "
+            f"unmet={row['unmet_need_score']:.4f}  "
+            f"sum={row['tractability_score'] + row['unmet_need_score']:.4f}"
         )
+
+    _log("\n=== SENTINEL DISEASE COMPARISON (FIX 2 validation) ===")
+    _log("  Before fix: all had unmet_need_score=0.35 (constant, has_approved_treatment=None)")
+    _log("  After fix:")
+    _print_sentinel_disease_comparison(scored_pairs)
+
+    _log("\n=== SWEEP DIAGNOSTIC ===")
+    _log(f"  Total diseases in universe:                {n_total}")
+    _log(f"  Resolved to a valid EFO ID:                {n_resolved_efo}")
+    _log(f"  Had ≥1 target with assoc score >= 0.1:     {n_passed_gate}")
+    _log(f"  Total (disease, target) pairs scored:      {len(scored_pairs)}")
+    _log(f"  Written to output (top-{TOP_N}):               {len(top30)}")
 
     _log("\nGenerating LLM narration for top 5 …")
     narration = _narrate_top5(top30[:5])
