@@ -1,8 +1,8 @@
 {
   "decision": "approve",
-  "note": "",
+  "note": "Affinity and structure confidence justify wet-lab follow-up.",
   "reviewed_reports": [
     "/home/runner/workspace/agents/../output/reports/Pompe_disease_CHEMBL592615.md"
   ],
-  "decided_at": "2026-06-27T13:32:30"
+  "decided_at": "2026-06-27T14:56:36"
 }

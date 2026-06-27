@@ -28,8 +28,9 @@ from resume_review import resume_run
 
 from api import jobs_db
 
-_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_DIR = os.path.join(_REPO_ROOT, "static")
+# The frontend (Stage 5) builds into api/static (vite build.outDir = ../api/static),
+# and this same directory is what FastAPI serves — no manual copy step.
+STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 os.makedirs(STATIC_DIR, exist_ok=True)
 
 # Node names emitted by graph.stream(...) map 1:1 onto current_stage values.
@@ -205,7 +206,8 @@ def resume(job_id: str, req: ResumeRequest) -> dict[str, Any]:
         raise HTTPException(status_code=500, detail=str(exc))
 
     updated = jobs_db.update_job_status(
-        job_id, status="completed", current_stage="done")
+        job_id, status="completed", current_stage="done",
+        decision=action, review_notes=req.notes or "")
     return {"job_id": job_id, "action": action, "review": review, "job": updated}
 
 

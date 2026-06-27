@@ -51,6 +51,15 @@ _COLUMNS = (
     "error_message",
     "total_cost_usd",
     "report_path",
+    "decision",
+    "review_notes",
+)
+
+# Columns added after the original schema shipped; applied via ALTER TABLE on
+# existing jobs.db files (SQLite has no "ADD COLUMN IF NOT EXISTS").
+_MIGRATIONS = (
+    ("decision", "decision TEXT"),
+    ("review_notes", "review_notes TEXT"),
 )
 
 
@@ -75,10 +84,17 @@ def init_db() -> None:
                 updated_at      TEXT NOT NULL,
                 error_message   TEXT,
                 total_cost_usd  REAL NOT NULL DEFAULT 0.0,
-                report_path     TEXT
+                report_path     TEXT,
+                decision        TEXT,
+                review_notes    TEXT
             )
             """
         )
+        existing = {row["name"]
+                    for row in conn.execute("PRAGMA table_info(jobs)").fetchall()}
+        for col, ddl in _MIGRATIONS:
+            if col not in existing:
+                conn.execute(f"ALTER TABLE jobs ADD COLUMN {ddl}")
         conn.commit()
 
 
