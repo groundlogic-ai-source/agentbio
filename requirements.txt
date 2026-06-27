@@ -6,3 +6,5 @@ rdkit
 boltz-api
 langgraph
 langgraph-checkpoint-sqlite
+fastapi>=0.110
+uvicorn>=0.29

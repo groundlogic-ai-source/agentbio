@@ -1,4 +1,4 @@
-# Drug Repurposing Pipeline — Stages 1, 2 & 3
+# Drug Repurposing Pipeline — Stages 1, 2, 3 & 4 (Silver Bullet)
 
 A Python pipeline that systematically identifies drug-repurposing candidates for rare diseases and WHO Neglected Tropical Diseases (NTDs) by integrating data from public biomedical APIs.
 
@@ -311,3 +311,49 @@ Writes one Markdown report per selected candidate to `output/reports/{disease}_{
 | `STAGE3_STRONG_ONLY` | `0` | `1` writes reports only for true STRONG_MATCH candidates. When `0` and there are none, the single highest-ranked candidate is reported, **clearly flagged as below threshold**. |
 | `STAGE3_MAX_CANDIDATES` | `3` | Caps how many candidates receive a (paid) Boltz prediction. |
 | `STAGE3_BOLTZ_SAMPLES` | `1` | Number of Boltz structure samples per prediction. |
+
+## Running Stage 4 — Silver Bullet API
+
+Stage 4 wraps the exact Stage 1–3 LangGraph pipeline in a **FastAPI** backend so runs can be started, monitored, and approved over HTTP. It is a single-user hobby service: **no auth, no accounts, no Celery/Redis** — each run executes on a plain Python background thread.
+
+The API layer never reimplements pipeline logic. It imports `build_graph` from `main_graph.py` and reuses `resume_review.resume_run()` — the *same* function the CLI uses — for the approve/reject step.
+
+### Run it
+
+```bash
+uvicorn api.main:app --host 0.0.0.0 --port $PORT
+```
+
+`PORT` is provided by Replit (defaults to `8000` locally). On Replit the **Silver Bullet API** workflow runs this for you; open the webview and append `/docs`.
+
+### Job tracking
+
+Job metadata lives in its **own** SQLite file, `jobs.db` — kept separate from the LangGraph `checkpoints.db` (graph state) so the API schema never couples to LangGraph internals. The `jobs` table tracks `status` (`queued` → `running` → `awaiting_review` → `completed` / `error`) and `current_stage`, which is updated **after each graph node actually completes** (`target_selection` → `biologist` → `chemist` → `reviewer` → `structure_validation` → `writer` → `awaiting_review` → `done`) by hooking into LangGraph's `stream()` output — not a single flip from running to done.
+
+### Endpoints
+
+| Method & path | Body | Returns |
+|---|---|---|
+| `POST /api/runs` | `{"disease_name": "optional"}` | `{"job_id": "..."}` immediately; the run starts on a background thread |
+| `GET /api/runs` | — | all jobs, most recent first |
+| `GET /api/runs/{job_id}` | — | the full job record, plus the compiled `report` content when `status` is `awaiting_review` or `completed` |
+| `POST /api/runs/{job_id}/resume` | `{"action": "approve"｜"reject", "notes": "optional"}` | resumes via `resume_run()`; job becomes `completed` / `done` |
+| `GET /api/runs/{job_id}/cost` | — | `{"total_cost_usd": ...}` (summed Boltz spend) |
+
+> **`disease_name` is a label.** Stage 1's target selection always auto-picks the *top-ranked* candidate from `top_candidates.json` (the graph is not modified to filter by disease). Whatever you pass is stored, then **overwritten with the disease the graph actually selected** once `target_selection` completes — so the record stays truthful.
+
+### Frontend (Stage 5)
+
+A `/static` folder and a SPA-style catch-all route already exist so a future frontend build can be dropped in (`/static/index.html` is served for unmatched non-`/api` paths). The folder is intentionally empty for now. Permissive CORS for `localhost` is enabled so local frontend development isn't blocked.
+
+### Exercising every endpoint from the browser (no frontend yet)
+
+Open **`/docs`** (interactive Swagger UI) and work top to bottom:
+
+1. **`POST /api/runs`** → *Try it out* → body `{"disease_name": "anything"}` → **Execute**. Copy the returned `job_id`.
+2. **`GET /api/runs`** → confirm the job appears with `status: running`.
+3. **`GET /api/runs/{job_id}`** → re-execute every few seconds and watch `current_stage` advance through the real nodes until `status` becomes `awaiting_review`; the response now includes the full `report` text.
+4. **`GET /api/runs/{job_id}/cost`** → confirm `total_cost_usd` (e.g. `0.025`).
+5. **`POST /api/runs/{job_id}/resume`** → body `{"action": "approve", "notes": "looks good"}` → **Execute**. The job flips to `completed` / `done`. (Resuming a job that isn't `awaiting_review` returns `409`; an invalid `action` returns `400`.)
+
+> The first cold run is slow (Stage 1–3 populate the cache). Subsequent runs are near-instant and a repeated Boltz prediction is a **cache hit ($0 spend)**.
