@@ -51,6 +51,7 @@ app.add_middleware(
 )
 
 jobs_db.init_db()
+jobs_db.reap_orphaned_running_jobs()
 
 
 # --------------------------------------------------------------------------- #

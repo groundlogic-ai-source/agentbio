@@ -223,6 +223,24 @@ def get_explored_pairs() -> set[tuple[str, str]]:
     return {(r["disease_key"], r["target_key"]) for r in rows}
 
 
+def reap_orphaned_running_jobs() -> int:
+    """
+    On server startup, mark any jobs still in 'running' status as 'error'.
+    These are orphans from a previous process that was killed mid-run (e.g. a
+    uvicorn restart). Their background threads no longer exist, so they will
+    never self-update. Returns the number of jobs reaped.
+    """
+    msg = "Job killed: server restarted while this job was in progress."
+    with _LOCK, _connect() as conn:
+        cursor = conn.execute(
+            "UPDATE jobs SET status='error', error_message=?, updated_at=? "
+            "WHERE status='running'",
+            (msg, _now()),
+        )
+        conn.commit()
+        return cursor.rowcount
+
+
 def claim_next_unexplored(
     candidates: list[tuple[Optional[str], Optional[str]]],
     job_id: Optional[str] = None,
