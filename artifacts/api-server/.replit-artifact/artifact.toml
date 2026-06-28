@@ -1,13 +1,13 @@
 kind = "api"
-previewPath = "/"
-title = "Silver Bullet"
+previewPath = "/api/"
+title = "Silver Bullet API"
 version = "1.0.0"
 id = "3B4_FFSkEVBkAeYMFRJ2e"
 
 [[services]]
 localPort = 8000
-name = "Silver Bullet"
-paths = ["/"]
+name = "Silver Bullet API"
+paths = ["/api/", "/internal/"]
 
 [services.development]
 run = "cd /home/runner/workspace && uvicorn api.main:app --host 0.0.0.0 --port 8000"
