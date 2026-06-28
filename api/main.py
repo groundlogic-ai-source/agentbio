@@ -20,19 +20,13 @@ from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from main_graph import build_graph
 from resume_review import resume_run
 
 from api import jobs_db
-
-# The frontend (Stage 5) builds into api/static (vite build.outDir = ../api/static),
-# and this same directory is what FastAPI serves — no manual copy step.
-STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-os.makedirs(STATIC_DIR, exist_ok=True)
 
 # Node names emitted by graph.stream(...) map 1:1 onto current_stage values.
 _PIPELINE_NODES = {
@@ -271,40 +265,3 @@ def sweep_status() -> dict:
     }
 
 
-# --------------------------------------------------------------------------- #
-# Static frontend (Stage 5) — empty for now, plus a SPA-style catch-all.
-# Mounted/defined AFTER the API routes so /api/* and /docs always win.
-# --------------------------------------------------------------------------- #
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-
-
-@app.get("/{full_path:path}")
-def serve_frontend(full_path: str):
-    """Serve the Stage 5 frontend build from /static; falls back to index.html."""
-    if full_path.startswith("api"):
-        return JSONResponse({"detail": "Not Found"}, status_code=404)
-
-    if full_path:
-        candidate = os.path.join(STATIC_DIR, full_path)
-        if os.path.isfile(candidate):
-            return FileResponse(candidate)
-
-    index = os.path.join(STATIC_DIR, "index.html")
-    if os.path.isfile(index):
-        return FileResponse(index)
-
-    return JSONResponse(
-        {
-            "app": "Silver Bullet API",
-            "message": "No frontend build yet (Stage 5). Use the API directly.",
-            "docs": "/docs",
-            "endpoints": [
-                "POST /api/runs",
-                "GET /api/runs",
-                "GET /api/runs/{job_id}",
-                "POST /api/runs/{job_id}/resume",
-                "GET /api/runs/{job_id}/cost",
-            ],
-        },
-        status_code=200,
-    )
