@@ -53,6 +53,34 @@ app.add_middleware(
 jobs_db.init_db()
 jobs_db.reap_orphaned_running_jobs()
 
+_TOP_CANDIDATES = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "output", "top_candidates.json",
+)
+
+
+@app.on_event("startup")
+def _auto_start_sweep() -> None:
+    """
+    On every server startup, launch the Stage 1 sweep in the background if
+    top_candidates.json is missing. This ensures a fresh deploy never leaves
+    blank-mode jobs waiting forever for a file that no one has triggered.
+    """
+    if os.path.exists(_TOP_CANDIDATES):
+        return  # already have a ranked list; nothing to do
+    global _sweep_proc
+    if _sweep_proc is not None and _sweep_proc.poll() is None:
+        return  # already running (shouldn't happen on cold start, but be safe)
+    log_fh = open(_SWEEP_LOG, "w", buffering=1)
+    _sweep_proc = subprocess.Popen(
+        ["python", "-m", "agents.target_selection"],
+        cwd=_WORKSPACE,
+        stdout=log_fh,
+        stderr=log_fh,
+    )
+    print(f"[startup] Stage 1 sweep auto-started (pid={_sweep_proc.pid}); "
+          f"top_candidates.json missing")
+
 
 # --------------------------------------------------------------------------- #
 # Request/response models
