@@ -32,17 +32,33 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
 
   const status = job.status;
   const liveCost = typeof cost === "number" ? cost : job.total_cost_usd;
+  const canPrint = status === "completed" || status === "awaiting_review";
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <button
-        type="button"
-        onClick={onBack}
-        className="mb-6 font-mono text-xs uppercase tracking-wider"
-        style={{ color: "var(--silver)" }}
-      >
-        ← All case files
-      </button>
+      <div className="no-print mb-6 flex items-center gap-4">
+        <button
+          type="button"
+          onClick={onBack}
+          className="font-mono text-xs uppercase tracking-wider"
+          style={{ color: "var(--silver)" }}
+        >
+          ← All case files
+        </button>
+        {canPrint && (
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="ml-auto rounded px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition-opacity hover:opacity-80"
+            style={{
+              border: "1px solid var(--silver)",
+              color: "var(--silver)",
+            }}
+          >
+            Download PDF
+          </button>
+        )}
+      </div>
 
       <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
