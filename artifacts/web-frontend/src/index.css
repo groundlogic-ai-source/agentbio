@@ -185,7 +185,113 @@ textarea:focus-visible,
   border-color: var(--oxide);
 }
 
-/* The slow "in progress" pulse on the active stepper node. */
+/* ----------------------------------------------------------------------- */
+/* Print / PDF stylesheet                                                    */
+/* ----------------------------------------------------------------------- */
+@media print {
+  /* Force background fills — paper/graphite/brass tokens must not go white. */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Page geometry */
+  @page {
+    size: A4;
+    margin: 20mm 18mm 20mm 18mm;
+  }
+
+  /* Hide all UI chrome that has no place in a printed document. */
+  .no-print,
+  nav,
+  [role="alert"],
+  .stepper,
+  /* Approve / reject sign-off form */
+  form,
+  /* Status badge pulse */
+  .pulse-dot {
+    display: none !important;
+  }
+
+  /* White-on-dark graphite header reads poorly in print — keep ink on paper. */
+  body {
+    background-color: white !important;
+    color: var(--ink) !important;
+  }
+
+  /* Case title / header area — drop dark background, keep typography. */
+  header h1 {
+    color: var(--ink) !important;
+  }
+
+  /* The Paper card: white in print, no shadow. */
+  .rounded-md {
+    border: 1px solid rgba(42, 43, 46, 0.2) !important;
+    background-color: white !important;
+    box-shadow: none !important;
+  }
+
+  /* Don't break inside a table row or evidence entry mid-page. */
+  .dossier table {
+    page-break-inside: auto;
+  }
+
+  .dossier tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  /* Keep section headings with their first paragraph/table. */
+  .dossier h2,
+  .dossier h3 {
+    page-break-after: avoid;
+  }
+
+  /* Keep list items together. */
+  .dossier li {
+    page-break-inside: avoid;
+  }
+
+  /* Stamp: keep it on the same page as the top of the report. */
+  .stamp {
+    page-break-inside: avoid;
+    position: static !important;
+  }
+
+  /* Links: show the href in parentheses so it's readable on paper,
+     but suppress the 800-char S3 blob URLs — they're noise. */
+  .dossier a[href^="/api/"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75em;
+    color: var(--ink);
+    word-break: break-all;
+  }
+
+  /* Blockquote caution box: keep on same page. */
+  .dossier blockquote {
+    page-break-inside: avoid;
+  }
+
+  /* Ensure JetBrains Mono / Fraunces render in print (browsers load them
+     from the same <link> tag as the screen render, so no extra step needed,
+     but making the fallback explicit prevents a blank-font edge case). */
+  .dossier table,
+  .dossier code {
+    font-family: "JetBrains Mono", "Courier New", monospace !important;
+  }
+
+  .dossier h1,
+  .dossier h2,
+  .dossier h3 {
+    font-family: "Fraunces", Georgia, serif !important;
+  }
+}
+
+/* ----------------------------------------------------------------------- */
+/* The slow "in progress" pulse on the active stepper node.                  */
+/* ----------------------------------------------------------------------- */
 @keyframes inkpulse {
   0%,
   100% {

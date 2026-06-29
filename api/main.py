@@ -21,7 +21,7 @@ import sweep_manager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 from main_graph import build_graph
@@ -168,9 +168,13 @@ def start_run(req: RunRequest) -> dict[str, str]:
     """
     Start a pipeline run on a background thread and return its job_id immediately.
 
-    The optional disease_name is stored as a label. The underlying Stage 1 graph
-    always auto-picks the top-ranked candidate, so once target selection runs the
-    job's disease_name is overwritten with the disease actually chosen.
+    Two modes:
+    - disease_name provided → manual mode: scores that disease's targets directly
+      (same formulas as the sweep). DiseaseNotInUniverse → job error, no fallback.
+    - disease_name omitted  → blank mode: auto-picks the highest-ranked pair not
+      yet explored, walking down the ranked list across repeated blank runs.
+    In both modes the job's disease_name is overwritten with the canonical name
+    chosen/resolved by Stage 1 once target selection completes.
     """
     job = jobs_db.create_job(disease_name=req.disease_name)
     thread = threading.Thread(
@@ -235,6 +239,32 @@ def get_cost(job_id: str) -> dict[str, Any]:
     if job is None:
         raise HTTPException(status_code=404, detail="job not found")
     return {"job_id": job_id, "total_cost_usd": job["total_cost_usd"]}
+
+
+# --------------------------------------------------------------------------- #
+# Structure file download (CIF files saved by boltz_api at prediction time)
+# --------------------------------------------------------------------------- #
+_STRUCTURES_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "output", "structures",
+)
+
+
+@app.get("/api/structures/{filename}")
+def get_structure(filename: str) -> FileResponse:
+    """Serve a locally-cached Boltz CIF structure file."""
+    # Restrict to simple filenames — no path traversal.
+    if "/" in filename or ".." in filename:
+        raise HTTPException(status_code=400, detail="invalid filename")
+    path = os.path.join(_STRUCTURES_DIR, filename)
+    if not os.path.isfile(path):
+        raise HTTPException(status_code=404, detail="structure file not found")
+    return FileResponse(
+        path,
+        media_type="chemical/x-cif",
+        filename=filename,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 # --------------------------------------------------------------------------- #

@@ -37,9 +37,13 @@ Boltz-2 reports CONFIDENCE / PROBABILITY / relative optimization scores, all on 
 
 import os
 import time
+import urllib.request
 from typing import Any, Optional
 
 from cache.cache import get, set as cache_set, make_key
+
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STRUCTURES_DIR = os.path.join(_REPO_ROOT, "output", "structures")
 
 STRUCTURE_MODEL = "boltz-2.1"
 ADME_MODEL = "adme-v1"
@@ -172,9 +176,25 @@ def predict_complex(protein_sequence: str, ligand_smiles: str,
         result["structure_confidence"] = metrics.get("structure_confidence")
         result["binding_pose_confidence"] = binding.get("binding_confidence")
         result["predicted_affinity"] = binding.get("optimization_score")
-        result["pdb_or_cif_url"] = _dig(best, "structure", "url")
+        s3_url = _dig(best, "structure", "url")
+        result["pdb_or_cif_url"] = s3_url
         result["raw_metrics"] = {"structure_metrics": metrics, "binding_metrics": binding}
         result["available"] = True
+
+        # Download the CIF file immediately while the S3 pre-signed URL is still
+        # valid (30-min window). Store it locally so the report can link to our
+        # own /api/structures/ endpoint instead of the expiring S3 URL.
+        if s3_url:
+            try:
+                os.makedirs(STRUCTURES_DIR, exist_ok=True)
+                cif_filename = f"{cache_key[:32]}.cif"
+                cif_path = os.path.join(STRUCTURES_DIR, cif_filename)
+                urllib.request.urlretrieve(s3_url, cif_path)
+                result["local_cif_filename"] = cif_filename
+                print(f"[boltz] CIF saved locally → {cif_filename}")
+            except Exception as dl_err:
+                print(f"[boltz] WARN: could not download CIF for local storage: {dl_err}")
+
     except Exception as e:
         result["error"] = str(e)
         print(f"[boltz] predict_complex FAILED: {e}")

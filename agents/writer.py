@@ -122,6 +122,21 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
     return "\n".join(lines)
 
 
+def _cif_link(cx: dict[str, Any]) -> str:
+    """
+    Return a markdown link to the Boltz CIF file.
+    Prefers the locally-cached file (permanent, served by /api/structures/).
+    Falls back to the raw S3 pre-signed URL with a warning that it expires.
+    """
+    fname = cx.get("local_cif_filename")
+    if fname:
+        return f"[Download CIF](/api/structures/{fname})"
+    s3 = cx.get("pdb_or_cif_url")
+    if s3:
+        return f"[Download CIF (⚠ link may be expired)]({s3})"
+    return "n/a"
+
+
 def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
     cx = (struct or {}).get("complex") or {}
     adme = (struct or {}).get("adme") or {}
@@ -152,7 +167,7 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
         ("Boltz binding-pose confidence (0-1)", _fmt(cx.get("binding_pose_confidence"))),
         ("Boltz predicted affinity (relative optimization score, 0-1, NOT a Kd)",
          _fmt(cx.get("predicted_affinity"))),
-        ("Boltz predicted structure (CIF)", cx.get("pdb_or_cif_url") or "n/a"),
+        ("Boltz predicted structure (CIF)", _cif_link(cx)),
         ("Boltz ADME — lipophilicity (logD)", _fmt(adme.get("lipophilicity"))),
         ("Boltz ADME — permeability", _fmt(adme.get("permeability"))),
         ("Boltz ADME — solubility", _fmt(adme.get("solubility"))),
