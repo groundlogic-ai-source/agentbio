@@ -14,9 +14,10 @@ Run:
 """
 
 import os
-import subprocess
 import threading
 from typing import Any, Optional
+
+import sweep_manager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -53,33 +54,18 @@ app.add_middleware(
 jobs_db.init_db()
 jobs_db.reap_orphaned_running_jobs()
 
-_TOP_CANDIDATES = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "output", "top_candidates.json",
-)
-
 
 @app.on_event("startup")
 def _auto_start_sweep() -> None:
     """
     On every server startup, launch the Stage 1 sweep in the background if
-    top_candidates.json is missing. This ensures a fresh deploy never leaves
-    blank-mode jobs waiting forever for a file that no one has triggered.
+    top_candidates.json is missing. Uses sweep_manager so the same process
+    reference is shared with main_graph — only one sweep ever runs at a time.
     """
-    if os.path.exists(_TOP_CANDIDATES):
-        return  # already have a ranked list; nothing to do
-    global _sweep_proc
-    if _sweep_proc is not None and _sweep_proc.poll() is None:
-        return  # already running (shouldn't happen on cold start, but be safe)
-    log_fh = open(_SWEEP_LOG, "w", buffering=1)
-    _sweep_proc = subprocess.Popen(
-        ["python", "-m", "agents.target_selection"],
-        cwd=_WORKSPACE,
-        stdout=log_fh,
-        stderr=log_fh,
-    )
-    print(f"[startup] Stage 1 sweep auto-started (pid={_sweep_proc.pid}); "
-          f"top_candidates.json missing")
+    pid = sweep_manager.ensure_running()
+    if pid is not None:
+        print(f"[startup] Stage 1 sweep auto-started (pid={pid}); "
+              f"top_candidates.json missing")
 
 
 # --------------------------------------------------------------------------- #
@@ -254,43 +240,25 @@ def get_cost(job_id: str) -> dict[str, Any]:
 # --------------------------------------------------------------------------- #
 # Internal sweep trigger (development / admin only — no auth)
 # --------------------------------------------------------------------------- #
-_sweep_proc: Optional[subprocess.Popen] = None  # type: ignore[type-arg]
-_SWEEP_LOG = "/tmp/sweep_run.log"
-_WORKSPACE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 @app.post("/internal/run-sweep")
 def trigger_sweep() -> dict:
     """
-    Start the Stage 1 sweep (python -m agents.target_selection) as a child
-    process of uvicorn so it survives shell exits and stays alive for the full
-    run.  Output is streamed to /tmp/sweep_run.log.
+    Start the Stage 1 sweep as a background process. Delegates to sweep_manager
+    so the same subprocess is shared with the graph — only one sweep runs at a time.
     """
-    global _sweep_proc
-    if _sweep_proc is not None and _sweep_proc.poll() is None:
-        return {"status": "already_running", "pid": _sweep_proc.pid,
-                "log": _SWEEP_LOG}
-    log_fh = open(_SWEEP_LOG, "w", buffering=1)
-    _sweep_proc = subprocess.Popen(
-        ["python", "-m", "agents.target_selection"],
-        cwd=_WORKSPACE,
-        stdout=log_fh,
-        stderr=log_fh,
-    )
-    return {"status": "started", "pid": _sweep_proc.pid, "log": _SWEEP_LOG}
+    pid = sweep_manager.ensure_running()
+    if pid is None:
+        return {"status": "not_needed", "reason": "top_candidates.json already exists"}
+    st = sweep_manager.status()
+    if st["status"] == "running":
+        return {"status": "already_running", "pid": pid, "log": sweep_manager.SWEEP_LOG}
+    return {"status": "started", "pid": pid, "log": sweep_manager.SWEEP_LOG}
 
 
 @app.get("/internal/sweep-status")
 def sweep_status() -> dict:
-    """Return running / done / not_started for the sweep subprocess."""
-    if _sweep_proc is None:
-        return {"status": "not_started"}
-    rc = _sweep_proc.poll()
-    return {
-        "status": "running" if rc is None else ("ok" if rc == 0 else "error"),
-        "returncode": rc,
-        "pid": _sweep_proc.pid,
-        "log": _SWEEP_LOG,
-    }
+    """Return running / ok / error / not_started for the sweep subprocess."""
+    return sweep_manager.status()
 
 

@@ -27,10 +27,11 @@ Resume a paused run:  python resume_review.py <thread_id> <approve|reject|edit> 
 import json
 import os
 import sqlite3
-import subprocess
 import sys
 import time
 from typing import Any, Optional, TypedDict
+
+import sweep_manager
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.sqlite import SqliteSaver
@@ -169,60 +170,6 @@ def _pick_unexplored_row(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return rows[0]
 
 
-_SWEEP_LOG = "/tmp/sweep_run.log"
-_WORKSPACE = REPO_ROOT
-_graph_sweep_proc: Optional[subprocess.Popen] = None  # type: ignore[type-arg]
-
-
-def _ensure_sweep_running() -> None:
-    """Start the Stage 1 sweep as a background subprocess if not already running."""
-    global _graph_sweep_proc
-    if _graph_sweep_proc is not None and _graph_sweep_proc.poll() is None:
-        return  # already running
-    log_fh = open(_SWEEP_LOG, "a", buffering=1)
-    _graph_sweep_proc = subprocess.Popen(
-        ["python", "-m", "agents.target_selection"],
-        cwd=_WORKSPACE,
-        stdout=log_fh,
-        stderr=log_fh,
-    )
-    print(f"[graph] target_selection: sweep started as background process "
-          f"(pid={_graph_sweep_proc.pid})")
-
-
-def _wait_for_sweep(
-    poll_interval: int = 30,
-    max_wait_seconds: int = 4 * 3600,
-) -> Optional[list]:
-    """
-    Wait for the Stage 1 sweep to produce top_candidates.json.
-
-    Rather than running the sweep inline (which blocks this thread for 1-3 hours
-    and shows 'WORKING' forever), we ensure the sweep is running as a background
-    subprocess and poll for the output file. Progress is printed every interval so
-    the caller can see the job is alive.
-    """
-    _ensure_sweep_running()
-    deadline = time.time() + max_wait_seconds
-    waited = 0
-    while time.time() < deadline:
-        rows = _load_json("top_candidates.json")
-        if rows:
-            print(f"[graph] target_selection: sweep finished — "
-                  f"{len(rows)} candidates available (waited ~{waited}s)")
-            return rows
-        time.sleep(poll_interval)
-        waited += poll_interval
-        if waited % 300 == 0:  # log every 5 minutes
-            pct = 100 * waited / max_wait_seconds
-            print(f"[graph] target_selection: waiting for sweep "
-                  f"({waited}s elapsed, {pct:.0f}% of max wait)")
-    raise RuntimeError(
-        f"Stage 1 sweep did not produce top_candidates.json within "
-        f"{max_wait_seconds // 3600}h. Check /tmp/sweep_run.log for errors."
-    )
-
-
 def target_selection_node(state: PipelineState) -> dict[str, Any]:
     requested = (state.get("requested_disease") or "").strip()
 
@@ -236,7 +183,9 @@ def target_selection_node(state: PipelineState) -> dict[str, Any]:
     else:
         rows = None if FORCE_RECOMPUTE else _load_json("top_candidates.json")
         if rows is None:
-            rows = _wait_for_sweep()
+            print("[graph] target_selection: top_candidates.json missing — "
+                  "waiting for background sweep")
+            rows = sweep_manager.wait_for_candidates()
         else:
             print("[graph] target_selection: reusing existing top_candidates.json")
         if not rows:
