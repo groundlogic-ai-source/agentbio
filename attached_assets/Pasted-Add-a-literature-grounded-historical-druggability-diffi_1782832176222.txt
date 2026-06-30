@@ -1,0 +1,51 @@
+Add a literature-grounded "historical druggability difficulty" flag to the
+Biologist agent's output. This is informational context for human readers,
+NOT a filter or scoring input — it must never affect tractability_score,
+unmet_need_score, composite_score, or whether a candidate reaches
+STRONG_MATCH. Do not skip, deprioritize, or exclude any target based on this
+flag anywhere in the pipeline.
+
+PART A — Data source for "any approved drug exists for this target at all"
+- Extend chembl.py with a function get_approved_drugs_for_target(uniprot_id)
+  that queries ChEMBL's mechanism/drug-indication data
+  (/mechanism?target_chembl_id={id}) filtered to molecule_type=Approved Drug,
+  species-matched as already done elsewhere in this codebase. Returns a list
+  of approved drug names/IDs that have a known mechanism against this target,
+  or an empty list if none. This is a direct factual lookup, not an LLM call.
+
+PART B — Literature search for historical difficulty framing
+- In biologist.py, add a function get_druggability_literature(target_symbol)
+  that runs 2-3 targeted PubMed searches via the existing pubmed.py wrapper,
+  using query variants like "{target} undruggable", "{target} drug resistance
+  mechanism", "{target} historically difficult target". Reuse the existing
+  relevance-classification LLM call pattern already used for the main
+  literature step (constrained yes/no: does this abstract specifically discuss
+  difficulty/failure history in drugging this target, not just mention the
+  target). Keep only abstracts that pass.
+- If 2+ qualifying abstracts are found, make ONE additional LLM call
+  (claude-haiku-4-5-20251001, since this is a constrained summarization task
+  like the other Haiku-tier calls) that is given ONLY the kept abstracts and
+  the ChEMBL approved-drug-count fact from Part A, and asked to write a 2-3
+  sentence neutral summary citing the specific PMIDs. The prompt must
+  explicitly forbid introducing any claim, mechanism, or example not present
+  in the provided abstracts.
+- If fewer than 2 qualifying abstracts are found, do not call the LLM — just
+  record druggability_flag: "insufficient literature signal" with whatever
+  approved-drug-count fact is available.
+- Store the result as a new field on the Biologist's output object:
+  {has_approved_drug_for_target: bool, approved_drug_count: int,
+  difficulty_summary: string or null, supporting_pmids: list}
+
+PART C — Surface it in the report, in the Limitations section
+Update writer.py: add this as a new subsection under Limitations, titled
+"Target druggability context" — show approved_drug_count, and if present,
+the difficulty_summary with its PMIDs inline. If has_approved_drug_for_target
+is False, note that explicitly and plainly ("No approved drug currently
+exists with a known mechanism against this target") rather than silently
+omitting it.
+
+Confirm via a test run that this field populates correctly for a known
+historically-difficult target (e.g. run it against KRAS again) and shows a
+real, cited summary — and separately confirm tractability_score and
+composite_score for that same candidate are completely unchanged by this
+addition (diff the before/after score to verify).
