@@ -113,12 +113,16 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
         penalty = float(formula.get("lipinski_penalty", 0.0))
         lines.append(f"| Lipinski penalty (>1 violation) | — | — | -{penalty:.4f} |")
 
+    if candidate.get("unapproved_cap_applied"):
+        lines.append("| Unapproved-compound cap (hard gate, max 0.400) | — | — | applied |")
+
     total = candidate.get("composite_score")
-    lines.append(f"| **Composite (weighted sum − penalty)** | | | **{_fmt(total, 4)}** |")
+    lines.append(f"| **Composite (weighted sum − penalty − cap)** | | | **{_fmt(total, 4)}** |")
     lines.append("")
+    cap_note = " Unapproved-compound cap applied (capped at 0.400)." if candidate.get("unapproved_cap_applied") else ""
     lines.append(f"Weighted sum before penalty = {subtotal:.4f}; "
                  f"penalty = {penalty:.4f}; "
-                 f"reported composite_score = {_fmt(total, 4)}.")
+                 f"reported composite_score = {_fmt(total, 4)}.{cap_note}")
     return "\n".join(lines)
 
 
@@ -154,7 +158,11 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
         ("Tanimoto to nearest approved drug",
          f"{_fmt(candidate.get('tanimoto_score'), 3)} "
          f"({candidate.get('most_similar_approved_drug') or 'none in set'})"),
-        ("Approved / known drug", _fmt(candidate.get("is_approved_drug"))),
+        ("Approved / known drug", (
+            "⚠ EXPERIMENTAL COMPOUND — NOT YET APPROVED"
+            if candidate.get("is_approved_drug") is False
+            else _fmt(candidate.get("is_approved_drug"))
+        )),
         ("Lipinski/Veber (MW, logP, HBD, HBA, TPSA, rotB)",
          f"{_fmt(desc.get('molecular_weight'),1)}, {_fmt(desc.get('logp'),2)}, "
          f"{_fmt(desc.get('h_bond_donors'))}, {_fmt(desc.get('h_bond_acceptors'))}, "
@@ -180,13 +188,67 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def _limitations(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
+def _druggability_subsection(biologist_output: Optional[dict[str, Any]]) -> str:
+    """
+    Render the 'Target druggability context' subsection from the druggability_context
+    field produced by the Biologist agent.  Informational only — no scoring impact.
+    """
+    dc = (biologist_output or {}).get("druggability_context") or {}
+    if not dc:
+        return ""
+
+    lines = ["### Target druggability context\n"]
+
+    count = dc.get("approved_drug_count", 0)
+    has_approved = dc.get("has_approved_drug_for_target", False)
+    if has_approved:
+        names = [d.get("name") for d in dc.get("approved_drugs", []) if d.get("name")]
+        name_str = ", ".join(names[:5]) if names else "see ChEMBL"
+        lines.append(
+            f"- **Approved drugs with known mechanism against this target (ChEMBL):** "
+            f"{count} — {name_str}"
+        )
+    else:
+        lines.append(
+            "- **No approved drug currently exists with a known mechanism against this "
+            "target** (ChEMBL mechanism endpoint, Homo sapiens only)."
+        )
+
+    flag = dc.get("druggability_flag", "")
+    summary = dc.get("difficulty_summary")
+    pmids = dc.get("supporting_pmids", [])
+
+    if summary:
+        lines.append(f"- **Historical difficulty signal:** {summary}")
+        if pmids:
+            lines.append(
+                f"  - Supporting PMIDs: {', '.join(str(p) for p in pmids)}"
+            )
+    else:
+        if flag == "insufficient literature signal":
+            lines.append(
+                "- **Historical difficulty literature:** insufficient signal found "
+                "(fewer than 2 qualifying abstracts in targeted PubMed searches for "
+                f"undruggability / resistance / difficulty)."
+            )
+        else:
+            lines.append("- **Historical difficulty literature:** not available.")
+
+    lines.append(
+        "\n_Druggability context is informational only. It does not affect "
+        "tractability\\_score, unmet\\_need\\_score, composite\\_score, or STRONG\\_MATCH._"
+    )
+    return "\n".join(lines)
+
+
+def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
+                 biologist_output: Optional[dict[str, Any]] = None) -> str:
     cx = (struct or {}).get("complex") or {}
     afdb = (struct or {}).get("afdb") or {}
     sconf = cx.get("structure_confidence")
     plddt_complex = ((cx.get("raw_metrics") or {}).get("structure_metrics") or {}).get("complex_plddt")
     apo_plddt = afdb.get("mean_plddt")
-    return "\n".join([
+    bullets = "\n".join([
         f"- **Binding is not efficacy.** A high binding-pose confidence "
         f"({_fmt(cx.get('binding_pose_confidence'))}) or predicted affinity "
         f"({_fmt(cx.get('predicted_affinity'))}) only suggests the molecule may "
@@ -209,6 +271,10 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
         "- **This is a repurposing *hypothesis*, not a finding.** It is a prioritised "
         "starting point that requires wet-lab and, ultimately, clinical validation.",
     ])
+    druggability = _druggability_subsection(biologist_output)
+    if druggability:
+        return bullets + "\n\n" + druggability
+    return bullets
 
 
 def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
@@ -237,6 +303,20 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
 
     parts = []
     parts.append(f"# Repurposing hypothesis: {drug} → {disease}\n")
+
+    # Unapproved-compound banner — must be the very first thing a reviewer sees.
+    if candidate.get("is_approved_drug") is False:
+        parts.append(
+            "> ⚠ **EXPERIMENTAL COMPOUND — NOT YET APPROVED.**  \n"
+            "> This compound does not have regulatory approval and has no established "
+            "human safety profile from prior clinical use. It is a research-grade "
+            "binding hit, **not a repurposing candidate**. Drug repurposing requires "
+            "an approved or known drug as the starting point. Its composite score is "
+            f"hard-capped at 0.400 (threshold for STRONG_MATCH is "
+            f"{_fmt(threshold, 2)}) and it cannot reach STRONG_MATCH regardless of "
+            "its other scores.\n\n"
+        )
+
     parts.append(header_note)
 
     # 1. Hypothesis summary
@@ -299,7 +379,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
 
     # 5. Limitations
     parts.append("\n## 5. Limitations\n")
-    parts.append(_limitations(candidate, struct) + "\n")
+    parts.append(_limitations(candidate, struct, biologist_output) + "\n")
 
     return "".join(parts)
 

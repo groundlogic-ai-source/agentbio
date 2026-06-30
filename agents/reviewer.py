@@ -129,6 +129,18 @@ def run_reviewer(chemist_output: dict[str, Any],
         penalty_applied = lipinski_violations is not None and lipinski_violations > 1
         if penalty_applied:
             composite -= LIPINSKI_PENALTY
+
+        # Hard gate: unapproved/experimental compounds are capped below STRONG_MATCH.
+        # Drug repurposing requires an established human safety profile from prior
+        # regulatory approval. A research compound that merely binds the target is a
+        # fundamentally different and weaker finding — it is NOT a repurposing candidate.
+        # Cap is set at 0.40, 0.30 below the 0.70 STRONG_MATCH_THRESHOLD, so no
+        # combination of other scores can push an unapproved compound past the gate.
+        unapproved_cap_applied = False
+        if c.get("is_approved_drug") is False:
+            composite = min(composite, 0.40)
+            unapproved_cap_applied = True
+
         composite = round(composite, 4)
 
         # Provenance: collapse repeated source ids (chembl activity ids + pmids).
@@ -189,6 +201,7 @@ def run_reviewer(chemist_output: dict[str, Any],
                 "no_failed_trial": 1 if no_failed_trial else 0,
             },
             "composite_score": composite,
+            "unapproved_cap_applied": unapproved_cap_applied,
             "strong_match": composite >= STRONG_MATCH_THRESHOLD,
             "provenance": {
                 "counted_once": new_ids,

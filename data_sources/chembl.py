@@ -222,6 +222,81 @@ def _fetch_molecule_meta(molecule_ids: list[str]) -> dict[str, dict[str, Any]]:
     return meta
 
 
+def get_approved_drugs_for_target(uniprot_id: str) -> dict[str, Any]:
+    """
+    Return approved drugs (max_phase >= 4 in ChEMBL) that have a known
+    mechanism of action recorded against a Homo sapiens target identified by
+    UniProt accession.
+
+    This is a direct factual lookup (no LLM); it queries ChEMBL's mechanism
+    endpoint then cross-references molecule metadata for approved status.
+
+    Returns:
+      {
+        "approved_drugs":       [{molecule_chembl_id, name, max_phase}],
+        "approved_drug_count":  int,
+        "target_chembl_ids":    [str],
+      }
+    """
+    cache_key = make_key("get_approved_drugs_for_target", uniprot_id)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    result: dict[str, Any] = {
+        "approved_drugs": [],
+        "approved_drug_count": 0,
+        "target_chembl_ids": [],
+    }
+
+    try:
+        target_ids = _resolve_target_chembl_id(uniprot_id)
+        if not target_ids:
+            cache_set(cache_key, result, ttl_days=7)
+            return result
+
+        result["target_chembl_ids"] = target_ids
+
+        mol_ids: set[str] = set()
+        for tid in target_ids:
+            url = f"{BASE_URL}/mechanism.json"
+            params = {"target_chembl_id": tid, "limit": 1000}
+            data = _get_json(url, params)
+            for m in data.get("mechanisms", []):
+                mid = m.get("molecule_chembl_id")
+                if mid:
+                    mol_ids.add(mid)
+
+        if not mol_ids:
+            cache_set(cache_key, result, ttl_days=7)
+            return result
+
+        meta = _fetch_molecule_meta(list(mol_ids))
+        approved = []
+        for mid, info in meta.items():
+            mp = info.get("max_phase")
+            try:
+                mp_float = float(mp) if mp is not None else 0.0
+            except (TypeError, ValueError):
+                mp_float = 0.0
+            if mp_float >= 4:
+                approved.append({
+                    "molecule_chembl_id": mid,
+                    "name": info.get("pref_name") or mid,
+                    "max_phase": mp_float,
+                })
+
+        approved.sort(key=lambda x: (x.get("name") or ""))
+        result["approved_drugs"] = approved
+        result["approved_drug_count"] = len(approved)
+
+    except Exception as e:
+        print(f"[chembl] WARNING: approved-drug mechanism lookup failed for '{uniprot_id}': {e}")
+
+    cache_set(cache_key, result, ttl_days=7)
+    return result
+
+
 def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25) -> dict[str, Any]:
     """
     Return the actual candidate compounds with bioactivity against a target

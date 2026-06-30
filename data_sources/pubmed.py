@@ -108,6 +108,28 @@ def _llm_relationship(abstract: str, subject: str, obj: str,
         return False, f"[relevance check failed: {e}]"
 
 
+def fetch_raw_abstracts(term: str, retmax: int = 8) -> dict[str, str]:
+    """
+    Search PubMed with the given term and return {pmid: abstract_text} for up
+    to `retmax` results.  Results are cached; no LLM relevance gate is applied.
+    Use this when the caller wants to do its own screening logic.
+    """
+    cache_key = make_key("fetch_raw_abstracts", term, retmax)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    abstracts: dict[str, str] = {}
+    try:
+        pmids = _esearch(term, retmax)
+        abstracts = _efetch(pmids)
+    except Exception as e:
+        print(f"[pubmed] WARNING: raw abstract fetch failed for '{term}': {e}")
+
+    cache_set(cache_key, abstracts, ttl_days=7)
+    return abstracts
+
+
 def search_literature(drug_name: Optional[str], target_name: str,
                       disease_name: str, retmax: int = 8) -> dict[str, Any]:
     """

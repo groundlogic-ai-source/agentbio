@@ -221,8 +221,13 @@ def run_chemist(biologist_output: dict[str, Any]) -> dict[str, Any]:
 
     provenance.log_many(prov_entries)
 
-    # Rank by affinity, then structural novelty signal.
-    results.sort(key=lambda r: ((r["pchembl_value"] or 0.0), r["tanimoto_score"]), reverse=True)
+    # Rank: approved drugs always before unapproved (repurposing requires a prior
+    # human safety profile), then by affinity, then structural novelty signal.
+    results.sort(key=lambda r: (
+        1 if r["is_approved_drug"] else 0,
+        r["pchembl_value"] or 0.0,
+        r["tanimoto_score"],
+    ), reverse=True)
 
     return {
         "target": target,
