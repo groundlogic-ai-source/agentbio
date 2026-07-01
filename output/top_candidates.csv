@@ -1,0 +1,31 @@
+disease_name,orpha_code,disease_source,icd10,omim,mesh,target_symbol,ensembl_id,uniprot_id,ot_association_score,chembl_activity_count,median_pchembl,chembl_pooled_multi_target,afdb_has_structure,afdb_mean_plddt,prior_trial_count,has_negative_repurposing_result,has_approved_treatment,approved_drug_names,prevalence_per_million,treatment_status_needs_review,raw_tractability_score,tractability_score,unmet_need_score,target_discovery_method
+Developmental anomaly of metabolic origin,139009,orphanet,,,,ALPL,ENSG00000162551,P05186,0.8998,773,5.91,False,True,93.31,0,False,False,[],,False,0.7266,0.6538,1.0,genetic_association
+RASopathy,536391,orphanet,,,,KRAS,ENSG00000133703,P01116,0.9022,1000,6.42,True,True,91.5,1,False,False,[],,False,0.7203,0.6498,1.0,genetic_association
+Multiple congenital anomalies/dysmorphic syndrome,68341,orphanet,,,,KRAS,ENSG00000133703,P01116,0.9015,1000,6.42,True,True,91.5,0,False,False,[],,False,0.7203,0.6493,1.0,genetic_association
+Noonan syndrome and Noonan-related syndrome,98733,orphanet,,,,KRAS,ENSG00000133703,P01116,0.9014,1000,6.42,True,True,91.5,1,False,False,[],,False,0.7203,0.6493,1.0,genetic_association
+Genetic epidermal appendage anomaly,183447,orphanet,,,,KRAS,ENSG00000133703,P01116,0.8855,1000,6.42,True,True,91.5,0,False,False,[],,False,0.7203,0.6378,1.0,genetic_association
+Ectodermal dysplasia syndrome,79373,orphanet,,,D004476,KRAS,ENSG00000133703,P01116,0.8855,1000,6.42,True,True,91.5,0,False,False,[],,False,0.7203,0.6378,1.0,genetic_association
+Epidermal appendage anomaly,79362,orphanet,,,,KRAS,ENSG00000133703,P01116,0.8855,1000,6.42,True,True,91.5,0,False,False,[],,False,0.7203,0.6378,1.0,genetic_association
+Rare immune disease,98004,orphanet,,,,JAK2,ENSG00000096968,O60674,0.8992,1000,6.77,True,True,86.88,1,False,False,[],,False,0.7041,0.6331,1.0,genetic_association
+Multiple congenital anomalies/dysmorphic syndrome-intellectual disability,102283,orphanet,,,,KRAS,ENSG00000133703,P01116,0.879,1000,6.42,True,True,91.5,0,False,False,[],,False,0.7203,0.6331,1.0,genetic_association
+Myeloid hemopathy,171895,orphanet,,,,JAK2,ENSG00000096968,O60674,0.899,1000,6.77,True,True,86.88,0,False,False,[],,False,0.7041,0.633,1.0,genetic_association
+Disorder of galactose metabolism,308467,orphanet,E74.2,,,GALK1,ENSG00000108479,P51570,0.8533,593,5.29,False,True,97.19,2,False,False,[],,False,0.7402,0.6316,1.0,genetic_association
+Lysosomal storage disease with skeletal involvement,93448,orphanet,,,,GUSB,ENSG00000169919,P08236,0.8789,400,5.5,False,True,93.88,0,False,False,[],,False,0.7143,0.6278,1.0,genetic_association
+Multiple congenital anomalies/dysmorphic syndrome,68341,orphanet,,,,PTPN11,ENSG00000179295,Q06124,0.8955,1000,5.405,True,True,85.94,0,False,False,[],,False,0.7008,0.6276,1.0,genetic_association
+Noonan syndrome and Noonan-related syndrome,98733,orphanet,,,,PTPN11,ENSG00000179295,Q06124,0.8955,1000,5.405,True,True,85.94,3,False,False,[],,False,0.7008,0.6275,1.0,genetic_association
+Disorder of carbohydrate absorption and transport,309001,orphanet,,,,SLC2A1,ENSG00000117394,P11166,0.8742,813,5.36,False,True,90.25,0,False,False,[],,False,0.7159,0.6258,1.0,genetic_association
+Galactokinase deficiency,79237,orphanet,E74.2,230200,,GALK1,ENSG00000108479,P51570,0.8438,593,5.29,False,True,97.19,1,False,False,[],,False,0.7402,0.6246,1.0,genetic_association
+RASopathy,536391,orphanet,,,,MAP2K1,ENSG00000169032,Q02750,0.8963,1000,7.03,True,True,83.25,1,False,False,[],,False,0.6914,0.6197,1.0,genetic_association
+Rare coagulation disorder,98429,orphanet,,,,F9,ENSG00000101981,P00740,0.9068,974,7.72,True,True,80.31,1,False,False,[],,False,0.6811,0.6176,1.0,genetic_association
+Hereditary palmoplantar keratoderma,79357,orphanet,,,,CTSC,ENSG00000109861,P53634,0.8625,1000,7.5649999999999995,False,True,90.12,1,False,False,[],,False,0.7154,0.617,1.0,genetic_association
+Diffuse palmoplantar keratoderma,307141,orphanet,,,D015776,CTSC,ENSG00000109861,P53634,0.8618,1000,7.5649999999999995,False,True,90.12,0,False,False,[],,False,0.7154,0.6165,1.0,genetic_association
+Disorder of lysosomal-related organelles,309340,orphanet,,,,CTSC,ENSG00000109861,P53634,0.8609,1000,7.5649999999999995,False,True,90.12,0,False,False,[],,False,0.7154,0.6159,1.0,genetic_association
+Oligosaccharidosis,79215,orphanet,,,,CTSA,ENSG00000064601,P10619,0.8427,788,6.01,False,True,94.5,0,False,False,[],,False,0.7308,0.6158,1.0,genetic_association
+Acrofacial dysostosis,364574,orphanet,,,,DHODH,ENSG00000102967,Q02127,0.8323,1000,6.68,False,True,96.12,1,False,False,[],,False,0.7364,0.6129,1.0,genetic_association
+Disorder of phenylalanine metabolism,284814,orphanet,,,,SPR,ENSG00000116096,P35270,0.8296,1000,8.3,False,True,96.69,1,False,False,[],,False,0.7384,0.6126,1.0,genetic_association
+Dystonia 14,101151,orphanet,,,,SPR,ENSG00000116096,P35270,0.8296,1000,8.3,False,True,96.69,0,False,False,[],,False,0.7384,0.6126,1.0,genetic_association
+Adrenal/paraganglial tumor,100091,orphanet,,,,MEN1,ENSG00000133895,O00255,0.8784,737,6.91,True,True,84.44,0,False,False,[],,False,0.6955,0.6109,1.0,genetic_association
+Sex chromosome difference of sex development,325546,orphanet,,,D058533,SRD5A2,ENSG00000277893,P31213,0.8352,508,7.6,True,True,94.44,0,False,False,[],,False,0.7305,0.6101,1.0,genetic_association
+Difference of sex development,90771,orphanet,,,D012734,SRD5A2,ENSG00000277893,P31213,0.8352,508,7.6,True,True,94.44,1,False,False,[],,False,0.7305,0.6101,1.0,genetic_association
+Disorder of protein N-glycosylation,309347,orphanet,,,,MPI,ENSG00000178802,P34949,0.844,395,4.91,False,True,96.44,0,False,False,[],,False,0.7224,0.6097,1.0,genetic_association
+Polyendocrinopathy,101956,orphanet,,,,MEN1,ENSG00000133895,O00255,0.8766,737,6.91,True,True,84.44,0,False,False,[],,False,0.6955,0.6096,1.0,genetic_association

@@ -1,0 +1,272 @@
+{
+  "generated_at": "2026-07-01T19:11:48",
+  "limitation": "This harness tests the SCORING AND RANKING LOGIC on TODAY's live data, not the historical data available at the time of each discovery. The confirmed drug is intentionally NOT removed from ChEMBL/PubChem results \u2014 reconstructing pre-approval data availability is infeasible with current public APIs. A 'hit' means the existing scoring logic ranks the correct compound highly among real candidates for the disease's top target; it does NOT claim the pipeline would have made the discovery blind to history. The pipeline also pursues only the single top OT-associated target per disease (exactly as the live graph does), so a confirmed drug whose molecular target is not that top target cannot be surfaced \u2014 this is a real, reported limitation, not a scoring failure.",
+  "top_n": 10,
+  "strong_match_threshold": 0.7,
+  "n_cases": 5,
+  "summary": {
+    "total": 5,
+    "hits": 1,
+    "recovered_top10": 1,
+    "strong_matches": 1,
+    "out_of_scope": 1,
+    "errors": 1
+  },
+  "cases": [
+    {
+      "drug_name": "Sildenafil",
+      "disease_name": "pulmonary arterial hypertension",
+      "confirmed_year": 2005,
+      "known_target_note": "Acts on PDE5 (PDE5A) \u2014 a phosphodiesterase, not the typical top OT-associated target for PAH.",
+      "status": "hit",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "PDE5A",
+        "uniprot_id": "O76074",
+        "ot_association_score": 0.9
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "PDE5A",
+          "uniprot_id": "O76074",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "PTGIR",
+          "uniprot_id": "P43119",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "EIF2AK4",
+          "uniprot_id": "Q9P2K8",
+          "ot_association_score": 0.8096
+        },
+        {
+          "target_symbol": "KCNK3",
+          "uniprot_id": "O14649",
+          "ot_association_score": 0.7857
+        },
+        {
+          "target_symbol": "BMPR2",
+          "uniprot_id": "Q13873",
+          "ot_association_score": 0.8544
+        },
+        {
+          "target_symbol": "INHBA",
+          "uniprot_id": "P08476",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "SMAD9",
+          "uniprot_id": "O15198",
+          "ot_association_score": 0.7834
+        },
+        {
+          "target_symbol": "ATP13A3",
+          "uniprot_id": "Q9H7F0",
+          "ot_association_score": 0.7547
+        }
+      ],
+      "n_chemist_candidates": 32,
+      "n_reviewed_candidates": 32,
+      "found": true,
+      "rank": 3,
+      "recovered_top10": true,
+      "composite_score": 0.7133,
+      "strong_match": true,
+      "is_approved_drug": true,
+      "match_method": "inchikey/chembl_id",
+      "miss_reason": null,
+      "interpretation": "HIT \u2014 Sildenafil appears at rank 3/32 (composite_score=0.7133, within top 10, reached STRONG_MATCH) against target PDE5A, matched by inchikey/chembl_id."
+    },
+    {
+      "drug_name": "Thalidomide",
+      "disease_name": "multiple myeloma",
+      "confirmed_year": 2006,
+      "known_target_note": "Binds CRBN (cereblon); also anti-angiogenic / anti-TNF. Molecular target only elucidated years after clinical use.",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "FKBP1A",
+        "uniprot_id": "P62942",
+        "ot_association_score": 0.85
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "FKBP1A",
+          "uniprot_id": "P62942",
+          "ot_association_score": 0.85
+        },
+        {
+          "target_symbol": "FDPS",
+          "uniprot_id": "P14324",
+          "ot_association_score": 0.85
+        },
+        {
+          "target_symbol": "TOP2A",
+          "uniprot_id": "P11388",
+          "ot_association_score": 0.85
+        },
+        {
+          "target_symbol": "GSR",
+          "uniprot_id": "P00390",
+          "ot_association_score": 0.85
+        },
+        {
+          "target_symbol": "NR3C1",
+          "uniprot_id": "P04150",
+          "ot_association_score": 0.85
+        },
+        {
+          "target_symbol": "CD38",
+          "uniprot_id": "P28907",
+          "ot_association_score": 0.85
+        },
+        {
+          "target_symbol": "TNFSF11",
+          "uniprot_id": "O14788",
+          "ot_association_score": 0.85
+        },
+        {
+          "target_symbol": "CRBN",
+          "uniprot_id": "Q96SW2",
+          "ot_association_score": 0.6846
+        },
+        {
+          "target_symbol": "NRAS",
+          "uniprot_id": "P01111",
+          "ot_association_score": 0.642
+        },
+        {
+          "target_symbol": "CXCR4",
+          "uniprot_id": "P61073",
+          "ot_association_score": 0.6588
+        },
+        {
+          "target_symbol": "XPO1",
+          "uniprot_id": "O14980",
+          "ot_association_score": 0.6416
+        },
+        {
+          "target_symbol": "SLAMF7",
+          "uniprot_id": "Q9NQ25",
+          "ot_association_score": 0.85
+        },
+        {
+          "target_symbol": "GPRC5D",
+          "uniprot_id": "Q9NZD1",
+          "ot_association_score": 0.85
+        },
+        {
+          "target_symbol": "TNFRSF17",
+          "uniprot_id": "Q02223",
+          "ot_association_score": 0.6801
+        }
+      ],
+      "n_chemist_candidates": 25,
+      "n_reviewed_candidates": 25,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Thalidomide' did not appear among the 25 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there.",
+      "interpretation": "MISS \u2014 Thalidomide was not surfaced. 'Thalidomide' did not appear among the 25 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there."
+    },
+    {
+      "drug_name": "Metformin",
+      "disease_name": "polycystic ovary syndrome",
+      "confirmed_year": 1994,
+      "known_target_note": "Insulin-sensitizer (AMPK / mitochondrial complex I); no single clean protein target. Used OFF-LABEL for PCOS.",
+      "status": "error",
+      "in_universe": null,
+      "selected_target": null,
+      "candidate_targets_considered": [],
+      "n_chemist_candidates": null,
+      "n_reviewed_candidates": null,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "target_selection failed: 'NON RARE IN EUROPE: Polycystic ovary syndrome' is in the rare/NTD universe but has no Open Targets EFO mapping, so its targets cannot be scored.",
+      "interpretation": "The disease is in-universe but target selection raised an error (e.g. no Open Targets EFO mapping or no associated targets), so no candidates could be scored."
+    },
+    {
+      "drug_name": "Everolimus",
+      "disease_name": "tuberous sclerosis complex",
+      "confirmed_year": 2010,
+      "known_target_note": "mTOR inhibitor (MTOR); TSC1/TSC2 loss drives mTOR hyperactivation, so MTOR is a strong disease-mechanistic target.",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "FKBP1A",
+        "uniprot_id": "P62942",
+        "ot_association_score": 0.5679
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "FKBP1A",
+          "uniprot_id": "P62942",
+          "ot_association_score": 0.5679
+        },
+        {
+          "target_symbol": "VHL",
+          "uniprot_id": "P40337",
+          "ot_association_score": 0.3483
+        },
+        {
+          "target_symbol": "IFNG",
+          "uniprot_id": "P01579",
+          "ot_association_score": 0.4031
+        },
+        {
+          "target_symbol": "TSC2",
+          "uniprot_id": "P49815",
+          "ot_association_score": 0.8867
+        },
+        {
+          "target_symbol": "TSC1",
+          "uniprot_id": "Q92574",
+          "ot_association_score": 0.8682
+        }
+      ],
+      "n_chemist_candidates": 25,
+      "n_reviewed_candidates": 25,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Everolimus' did not appear among the 25 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there.",
+      "interpretation": "MISS \u2014 Everolimus was not surfaced. 'Everolimus' did not appear among the 25 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there."
+    },
+    {
+      "drug_name": "Propranolol",
+      "disease_name": "infantile hemangioma",
+      "confirmed_year": 2014,
+      "known_target_note": "Non-selective beta-blocker (ADRB1/ADRB2). Effect on hemangioma discovered serendipitously.",
+      "status": "out_of_scope",
+      "in_universe": false,
+      "selected_target": null,
+      "candidate_targets_considered": [],
+      "n_chemist_candidates": null,
+      "n_reviewed_candidates": null,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'infantile hemangioma' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.",
+      "interpretation": "'infantile hemangioma' is outside Silver Bullet's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure \u2014 the harness correctly refuses to auto-pick an unrelated disease."
+    }
+  ]
+}

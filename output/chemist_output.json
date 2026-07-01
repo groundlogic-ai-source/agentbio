@@ -1,644 +1,749 @@
 {
   "target": {
-    "target_symbol": "PIK3CA",
-    "uniprot_id": "P42336",
-    "ensembl_id": "ENSG00000121879",
-    "disease_name": "Pompe disease",
-    "orpha_code": "365",
-    "ot_association_score": 0.2587
+    "target_symbol": "ALPL",
+    "uniprot_id": "P05186",
+    "ensembl_id": "ENSG00000162551",
+    "disease_name": "Developmental anomaly of metabolic origin",
+    "orpha_code": "139009",
+    "ot_association_score": 0.8998
   },
   "candidates": [
     {
-      "drug_name": "CHEMBL1082617",
-      "molecule_chembl_id": "CHEMBL1082617",
-      "smiles": "COc1ccc2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N6CCOCC6)cc5)cc4C3=O)c2c1",
-      "inchikey": null,
-      "pchembl_value": 9.7,
-      "confidence_score": 8,
-      "max_phase": null,
-      "is_approved_drug": false,
-      "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082617 has a median pChEMBL affinity of 9.7 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014connected by physical or genetic interactions.",
+      "drug_name": "LEVAMISOLE",
+      "molecule_chembl_id": "CHEMBL1454",
+      "smiles": "c1ccc([C@H]2CN3CCSC3=N2)cc1",
+      "inchikey": "HLFSDGLLUJUHTE-SNVBAGLBSA-N",
+      "pchembl_value": 4.71,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "N02BA01",
+        "P02CE01"
+      ],
+      "most_similar_approved_drug": "LEVAMISOLE HYDROCHLORIDE",
+      "tanimoto_score": 0.9677,
+      "rationale": "Levamisole has a median pChEMBL affinity of 4.71 against ALPL, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.968 to the nearest approved drug levamisole hydrochloride. The ALPL target has eight recorded BioGRID physical or genetic interactors: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL1082617",
-        "CHEMBL1119657"
+        "CHEMBL1454",
+        "CHEMBL1014656",
+        "CHEMBL4253710",
+        "CHEMBL4269174",
+        "CHEMBL4273104"
       ],
       "source_activity_ids": [
-        3313695
+        2265442,
+        18694600,
+        18776917,
+        18792033
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1082618",
-      "molecule_chembl_id": "CHEMBL1082618",
-      "smiles": "COc1ccc2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N6CCN(C)CC6)cc5)cc4C3=O)c2c1",
-      "inchikey": null,
-      "pchembl_value": 9.7,
-      "confidence_score": 8,
-      "max_phase": null,
-      "is_approved_drug": false,
+      "drug_name": "LEVAMISOLE HYDROCHLORIDE",
+      "molecule_chembl_id": "CHEMBL1770",
+      "smiles": "Cl.c1ccc([C@H]2CN3CCSC3=N2)cc1",
+      "inchikey": "LAZPBGZRMVRFKY-HNCPQSOCSA-N",
+      "pchembl_value": 4.415,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082618 has a median pChEMBL affinity of 9.7 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014connected by physical or genetic interactions.",
+      "most_similar_approved_drug": "LEVAMISOLE",
+      "tanimoto_score": 0.9677,
+      "rationale": "Levamisole hydrochloride has a median pChEMBL affinity of 4.415 against ALPL, measured at assay confidence score 9, and has a Tanimoto similarity of 0.968 to the nearest approved drug, levamisole. The target ALPL has eight recorded BioGRID interactors\u2014FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B\u2014and levamisole hydrochloride is an approved or known drug.",
       "source_chembl_ids": [
-        "CHEMBL1082618",
-        "CHEMBL1119657"
+        "CHEMBL1770",
+        "CHEMBL1068637",
+        "CHEMBL1764031"
       ],
       "source_activity_ids": [
-        3313699
+        3064482,
+        6160436
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1082621",
-      "molecule_chembl_id": "CHEMBL1082621",
-      "smiles": "COc1cc(F)c2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N(C)CCN(C)C)cc5)cc4C3=O)c2c1",
-      "inchikey": null,
-      "pchembl_value": 9.7,
+      "drug_name": "THEOPHYLLINE",
+      "molecule_chembl_id": "CHEMBL1355736",
+      "smiles": "Cn1c(=O)c2nc[nH]c2n(C)c1=O.O",
+      "inchikey": "ZFXYFBGIUFBOJW-UHFFFAOYSA-N",
+      "pchembl_value": 4.09,
       "confidence_score": 8,
-      "max_phase": null,
-      "is_approved_drug": false,
-      "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082621 has a median pChEMBL affinity of 9.7 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "N02BA01",
+        "R03DA04"
+      ],
+      "most_similar_approved_drug": "LEVAMISOLE",
+      "tanimoto_score": 0.0962,
+      "rationale": "Theophylline has a median pChEMBL affinity of 4.09 against ALPL, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.096 to the nearest approved drug levamisole. ALPL has eight recorded BioGRID interactors\u2014FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL1082621",
-        "CHEMBL1119657"
+        "CHEMBL1355736",
+        "CHEMBL1014656"
       ],
       "source_activity_ids": [
-        3313711
+        2265441
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1082619",
-      "molecule_chembl_id": "CHEMBL1082619",
-      "smiles": "COc1ccc2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N(C)CCN(C)C)cc5)cc4C3=O)c2c1",
-      "inchikey": null,
-      "pchembl_value": 9.52,
-      "confidence_score": 8,
-      "max_phase": null,
-      "is_approved_drug": false,
-      "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082619 has a median pChEMBL affinity of 9.52 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
-      "source_chembl_ids": [
-        "CHEMBL1082619",
-        "CHEMBL1119657"
-      ],
-      "source_activity_ids": [
-        3313703
-      ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
-    },
-    {
-      "drug_name": "CHEMBL592615",
-      "molecule_chembl_id": "CHEMBL592615",
-      "smiles": "CN(C)CCNC(=O)c1ccc(NC(=O)Nc2ccc(-c3nc(N4CCOCC4)nc(N4CCOCC4)n3)cc2)cc1",
+      "drug_name": "CHEMBL6001738",
+      "molecule_chembl_id": "CHEMBL6001738",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)N1CC[C@H](O)[C@@H]1CO2",
       "inchikey": null,
       "pchembl_value": 9.4,
-      "confidence_score": 8,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL592615 has a median pChEMBL affinity of 9.4 against PIK3CA recorded at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight BioGRID-listed physical or genetic interactors: PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1111,
+      "rationale": "CHEMBL6001738 has a median pChEMBL affinity of 9.4 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.111 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the proteins FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL592615",
-        "CHEMBL1065055"
+        "CHEMBL6001738",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3120625
+        28422782
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1204015",
-      "molecule_chembl_id": "CHEMBL1204015",
-      "smiles": "CN(C)CCN(C)C(=O)c1ccc(NC(=O)Nc2ccc(-c3nc(N4CCOCC4)nc(N4CCOCC4)n3)cc2)cc1.Cl",
+      "drug_name": "CHEMBL5748322",
+      "molecule_chembl_id": "CHEMBL5748322",
+      "smiles": "O=C1c2cc(NS(=O)(=O)c3cc(Cl)ccc3OC(F)(F)F)cnc2OC[C@H]2[C@@H](O)CCN12",
       "inchikey": null,
       "pchembl_value": 9.4,
-      "confidence_score": 8,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1204015 has a median pChEMBL affinity of 9.4 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. BioGRID records physical and genetic interactions between PIK3CA and the following proteins: PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.0964,
+      "rationale": "CHEMBL5748322 has a median pChEMBL affinity of 9.4 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.096 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the proteins FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL1204015",
-        "CHEMBL1065055"
+        "CHEMBL5748322",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3120631
+        28422785
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1083912",
-      "molecule_chembl_id": "CHEMBL1083912",
-      "smiles": "CNC(=O)Nc1ccc2c(c1)C(=O)/C(=C\\c1c(-c3c(C)nn(C)c3C)[nH]c3ccc(OC)cc13)O2",
-      "inchikey": null,
-      "pchembl_value": 9.4,
-      "confidence_score": 8,
-      "max_phase": null,
-      "is_approved_drug": false,
-      "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1083912 has a median pChEMBL affinity of 9.4 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
-      "source_chembl_ids": [
-        "CHEMBL1083912",
-        "CHEMBL1119657"
-      ],
-      "source_activity_ids": [
-        3313679
-      ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
-    },
-    {
-      "drug_name": "CHEMBL1083305",
-      "molecule_chembl_id": "CHEMBL1083305",
-      "smiles": "CNC(=O)Nc1ccc2c(c1)C(=O)/C(=C\\c1c(-c3c(C)nn(C)c3C)[nH]c3c(F)cc(OC)cc13)O2",
-      "inchikey": null,
-      "pchembl_value": 9.4,
-      "confidence_score": 8,
-      "max_phase": null,
-      "is_approved_drug": false,
-      "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1083305 has a median pChEMBL affinity of 9.4 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
-      "source_chembl_ids": [
-        "CHEMBL1083305",
-        "CHEMBL1119657"
-      ],
-      "source_activity_ids": [
-        3313687
-      ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
-    },
-    {
-      "drug_name": "CHEMBL1204014",
-      "molecule_chembl_id": "CHEMBL1204014",
-      "smiles": "CN1CCN(C(=O)c2ccc(NC(=O)Nc3ccc(-c4nc(N5CCOCC5)nc(N5CCOCC5)n4)cc3)cc2)CC1.Cl",
+      "drug_name": "CHEMBL5777450",
+      "molecule_chembl_id": "CHEMBL5777450",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)N1C[C@@H](OC)C[C@@H]1CO2",
       "inchikey": null,
       "pchembl_value": 9.3,
-      "confidence_score": 8,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1204014 has a median pChEMBL affinity of 9.3 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1125,
+      "rationale": "CHEMBL5777450 has a median pChEMBL affinity of 9.3 against ALPL, measured at an assay confidence score of 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.113 to the nearest approved drug, theophylline. The ALPL target has eight recorded BioGRID physical or genetic interactors: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL1204014",
-        "CHEMBL1065055"
+        "CHEMBL5777450",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3120626
+        28422794
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1082986",
-      "molecule_chembl_id": "CHEMBL1082986",
-      "smiles": "COc1ccc2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5cccnc5)cc4C3=O)c2c1",
+      "drug_name": "CHEMBL5836952",
+      "molecule_chembl_id": "CHEMBL5836952",
+      "smiles": "COC(=O)N[C@@H]1C[C@@H]2COc3ncc(NS(=O)(=O)c4cc(Cl)ccc4OC)cc3C(=O)N2C1",
       "inchikey": null,
       "pchembl_value": 9.3,
-      "confidence_score": 8,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082986 has a median pChEMBL affinity of 9.3 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1071,
+      "rationale": "CHEMBL5836952 has a median pChEMBL affinity of 9.3 against ALPL, measured at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.107 to the nearest approved drug, theophylline. ALPL has eight recorded BioGRID interactors\u2014FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B\u2014and CHEMBL5836952 is not an approved or known drug.",
       "source_chembl_ids": [
-        "CHEMBL1082986",
-        "CHEMBL1119657"
+        "CHEMBL5836952",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3313683
+        28422803
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1082620",
-      "molecule_chembl_id": "CHEMBL1082620",
-      "smiles": "COc1cc(F)c2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N6CCOCC6)cc5)cc4C3=O)c2c1",
+      "drug_name": "CHEMBL6028619",
+      "molecule_chembl_id": "CHEMBL6028619",
+      "smiles": "CCOc1ccc(F)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)NC1(CC1)CO2",
       "inchikey": null,
-      "pchembl_value": 9.3,
-      "confidence_score": 8,
-      "max_phase": null,
-      "is_approved_drug": false,
-      "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082620 has a median pChEMBL affinity of 9.3 against PIK3CA at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
-      "source_chembl_ids": [
-        "CHEMBL1082620",
-        "CHEMBL1119657"
-      ],
-      "source_activity_ids": [
-        3313707
-      ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
-    },
-    {
-      "drug_name": "GEDATOLISIB",
-      "molecule_chembl_id": "CHEMBL592445",
-      "smiles": "CN(C)C1CCN(C(=O)c2ccc(NC(=O)Nc3ccc(-c4nc(N5CCOCC5)nc(N5CCOCC5)n4)cc3)cc2)CC1",
-      "inchikey": "DWZAEMINVBZMHQ-UHFFFAOYSA-N",
       "pchembl_value": 9.22,
       "confidence_score": 9,
-      "max_phase": "3.0",
+      "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "Gedatolisib has a median pChEMBL affinity of 9.22 against PIK3CA at an assay confidence score of 9 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1184,
+      "rationale": "CHEMBL6028619 has a median pChEMBL affinity of 9.22 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.118 to the nearest approved drug, theophylline. ALPL has eight recorded BioGRID physical or genetic interactors: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL592445",
-        "CHEMBL1065055",
-        "CHEMBL1065062",
-        "CHEMBL1065063"
+        "CHEMBL6028619",
+        "CHEMBL5731131",
+        "CHEMBL5733110"
       ],
       "source_activity_ids": [
-        3120627,
-        3121472,
-        3121473
+        26871352,
+        27425096
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL592619",
-      "molecule_chembl_id": "CHEMBL592619",
-      "smiles": "O=C(Nc1ccc(C(=O)N2CCC(N3CCCCC3)CC2)cc1)Nc1ccc(-c2nc(N3CCOCC3)nc(N3CCOCC3)n2)cc1",
+      "drug_name": "CHEMBL5862935",
+      "molecule_chembl_id": "CHEMBL5862935",
+      "smiles": "CCOc1ccc(F)cc1S(=O)(=O)Nc1cnc2c(c1)CN1CC(=O)OC[C@H]1CO2",
       "inchikey": null,
       "pchembl_value": 9.22,
-      "confidence_score": 8,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL592619 has a median pChEMBL affinity of 9.22 against PIK3CA recorded at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. The BioGRID interactors associated with PIK3CA include PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1169,
+      "rationale": "CHEMBL5862935 has a median pChEMBL affinity of 9.22 against ALPL, measured at an assay confidence score of 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.117 to the nearest approved drug, theophylline. The ALPL target has eight recorded BioGRID physical or genetic interactors: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL592619",
-        "CHEMBL1065055"
+        "CHEMBL5862935",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3120629
+        28422827
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL592461",
-      "molecule_chembl_id": "CHEMBL592461",
-      "smiles": "O=C(Nc1ccc(C(=O)N2CCC(N3CCCC3)CC2)cc1)Nc1ccc(-c2nc(N3CCOCC3)nc(N3CCOCC3)n2)cc1",
+      "drug_name": "CHEMBL5870362",
+      "molecule_chembl_id": "CHEMBL5870362",
+      "smiles": "COC(=O)N[C@H]1C[C@@H]2COc3ncc(NS(=O)(=O)c4cc(Cl)ccc4OC)cc3C(=O)N2C1",
       "inchikey": null,
-      "pchembl_value": 9.15,
-      "confidence_score": 8,
+      "pchembl_value": 9.22,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL592461 has a median pChEMBL affinity of 9.15 against PIK3CA, measured at an assay confidence score of 8 out of 9, and is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1071,
+      "rationale": "CHEMBL5870362 has a median pChEMBL affinity of 9.22 against ALPL measured at assay confidence score 9, and a Tanimoto similarity of 0.107 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the proteins FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL592461",
-        "CHEMBL1065055"
+        "CHEMBL5870362",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3120628
+        28422800
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL517163",
-      "molecule_chembl_id": "CHEMBL517163",
-      "smiles": "COc1cc2c(cc1Nc1nc(Nc3cccc4c3C(=O)NC4)c3cc[nH]c3n1)N(C(=O)CN(C)C)CC2",
-      "inchikey": null,
-      "pchembl_value": 9.1,
-      "confidence_score": 8,
-      "max_phase": null,
-      "is_approved_drug": false,
-      "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL517163 has a median pChEMBL affinity of 9.1 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
-      "source_chembl_ids": [
-        "CHEMBL517163",
-        "CHEMBL1025726"
-      ],
-      "source_activity_ids": [
-        2600115
-      ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
-    },
-    {
-      "drug_name": "CHEMBL1092404",
-      "molecule_chembl_id": "CHEMBL1092404",
-      "smiles": "CCn1ccc2c(N3CCOCC3)nc(-c3ccc(NC(=O)Nc4ccc(C(=O)N5CCNCC5)cc4)cc3)nc21",
+      "drug_name": "CHEMBL5935757",
+      "molecule_chembl_id": "CHEMBL5935757",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)N1C[C@@H](F)C[C@@H]1CO2",
       "inchikey": null,
       "pchembl_value": 9.1,
       "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1092404 has a median pChEMBL affinity of 9.1 against PIK3CA measured at an assay confidence score of 9 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1111,
+      "rationale": "CHEMBL5935757 has a median pChEMBL affinity of 9.1 against ALPL, measured at an assay confidence score of 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.111 to the nearest approved drug, theophylline. The ALPL target has eight recorded BioGRID physical or genetic interactors: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL1092404",
-        "CHEMBL1106090"
+        "CHEMBL5935757",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3252092
+        28422788
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1092072",
-      "molecule_chembl_id": "CHEMBL1092072",
-      "smiles": "CN(C)CCN(C)C(=O)c1ccc(NC(=O)Nc2ccc(-c3nc(N4CCOCC4)c4ccn(CC(F)(F)F)c4n3)cc2)cc1",
+      "drug_name": "CHEMBL5864273",
+      "molecule_chembl_id": "CHEMBL5864273",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)N1C[C@@H](O)C[C@@H]1CO2",
       "inchikey": null,
       "pchembl_value": 9.05,
       "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1092072 has a median pChEMBL affinity of 9.05 against PIK3CA at an assay confidence score of 9 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. BioGRID records physical and genetic interactions between PIK3CA and the following proteins: PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1111,
+      "rationale": "CHEMBL5864273 has a median pChEMBL affinity of 9.05 against ALPL, measured at assay confidence score 9 out of 9, and has a Tanimoto similarity of 0.111 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the proteins FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL1092072",
-        "CHEMBL1106090"
+        "CHEMBL5864273",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3252086
+        28422755
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1082622",
-      "molecule_chembl_id": "CHEMBL1082622",
-      "smiles": "COc1ccc2[nH]cc(/C=C3/Oc4ccc(NC(=O)Nc5ccc(C(=O)N6CCN(C)CC6)cc5)cc4C3=O)c2c1",
+      "drug_name": "CHEMBL6030165",
+      "molecule_chembl_id": "CHEMBL6030165",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)N1C[C@H](O)C[C@@H]1CO2",
       "inchikey": null,
       "pchembl_value": 9.05,
-      "confidence_score": 8,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082622 has a median pChEMBL affinity of 9.05 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014across physical and genetic interaction types.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1111,
+      "rationale": "CHEMBL6030165 has a median pChEMBL affinity of 9.05 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.111 to the nearest approved drug, theophylline. The ALPL target has eight recorded BioGRID physical or genetic interactors: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL1082622",
-        "CHEMBL1119657"
+        "CHEMBL6030165",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3313715
+        28422767
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "DEMETHOXYVIRIDIN",
-      "molecule_chembl_id": "CHEMBL549959",
-      "smiles": "C[C@@]12c3ccc4c(c3C(=O)c3occ(c31)C(=O)C[C@H]2O)CCC4=O",
-      "inchikey": "SWJBYJJNDIXFSA-KUHUBIRLSA-N",
-      "pchembl_value": 9.0,
-      "confidence_score": 8,
-      "max_phase": null,
-      "is_approved_drug": false,
-      "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "Demethoxyviridin has a median pChEMBL affinity of 9.0 against PIK3CA, measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014encompassing both physical and genetic interactions.",
-      "source_chembl_ids": [
-        "CHEMBL549959",
-        "CHEMBL1064071"
-      ],
-      "source_activity_ids": [
-        2691770
-      ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
-    },
-    {
-      "drug_name": "CHEMBL597004",
-      "molecule_chembl_id": "CHEMBL597004",
-      "smiles": "O=C(Nc1ccc(CO)cc1)Nc1ccc(-c2nc(N3CCOCC3)nc(N3CCOCC3)n2)cc1",
+      "drug_name": "CHEMBL6016114",
+      "molecule_chembl_id": "CHEMBL6016114",
+      "smiles": "O=C1c2cc(NS(=O)(=O)c3cc(Cl)ccc3OC(F)(F)F)cnc2OC[C@H]2C[C@H](O)CN12",
       "inchikey": null,
-      "pchembl_value": 9.0,
-      "confidence_score": 8,
+      "pchembl_value": 9.05,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL597004 has a median pChEMBL affinity of 9.0 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.0952,
+      "rationale": "CHEMBL6016114 has a median pChEMBL affinity of 9.05 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved drug, with a Tanimoto similarity of 0.095 to the nearest approved drug, theophylline. ALPL has recorded physical or genetic interactions in BioGRID with FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL597004",
-        "CHEMBL1065055"
+        "CHEMBL6016114",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3120616
+        28422761
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL590587",
-      "molecule_chembl_id": "CHEMBL590587",
-      "smiles": "CCn1nnc2c(N3CCOCC3)nc(-c3ccc(NC(=O)Nc4ccc(C(=O)NCCN(C)C)cc4)cc3)nc21",
+      "drug_name": "CHEMBL5759650",
+      "molecule_chembl_id": "CHEMBL5759650",
+      "smiles": "COc1ccc(CO)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)NC1(CC1)CO2",
       "inchikey": null,
       "pchembl_value": 9.0,
       "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL590587 has a median pChEMBL affinity of 9.0 against PIK3CA, recorded at an assay confidence score of 9 out of 9. PIK3CA has eight interactors listed in BioGRID\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014and CHEMBL590587 is not an approved drug and has no nearest approved structural analog in the candidate set.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1154,
+      "rationale": "CHEMBL5759650 has a median pChEMBL affinity of 9.0 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.115 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the proteins FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL590587",
-        "CHEMBL1068071"
+        "CHEMBL5759650",
+        "CHEMBL5731131",
+        "CHEMBL5733110"
       ],
       "source_activity_ids": [
-        3132563
+        26871355,
+        27425099
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1090598",
-      "molecule_chembl_id": "CHEMBL1090598",
-      "smiles": "CN(Cc1cc2nc(-c3cnc(N)nc3)nc(N3CCOCC3)c2s1)S(C)(=O)=O",
+      "drug_name": "CHEMBL5927332",
+      "molecule_chembl_id": "CHEMBL5927332",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)CN1C(=O)[C@@H](O)C[C@H]1CO2",
       "inchikey": null,
-      "pchembl_value": 9.0,
-      "confidence_score": 8,
+      "pchembl_value": 8.96,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1090598 has a median pChEMBL affinity of 9.0 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.125,
+      "rationale": "CHEMBL5927332 has a median pChEMBL affinity of 8.96 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved drug, with a Tanimoto similarity of 0.125 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the proteins FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL1090598",
-        "CHEMBL1109706"
+        "CHEMBL5927332",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3240850
+        28422812
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1090239",
-      "molecule_chembl_id": "CHEMBL1090239",
-      "smiles": "CN1CCN(C(=O)c2cccc(-c3cc4nc(-c5cnc(N)nc5)nc(N5CCOCC5)c4s3)c2)CC1",
+      "drug_name": "CHEMBL5799890",
+      "molecule_chembl_id": "CHEMBL5799890",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)NC1(CC1)CO2",
       "inchikey": null,
-      "pchembl_value": 9.0,
-      "confidence_score": 8,
+      "pchembl_value": 8.96,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1090239 has a median pChEMBL affinity of 9.0 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.12,
+      "rationale": "CHEMBL5799890 has a median pChEMBL affinity of 8.96 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.120 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the proteins FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL1090239",
-        "CHEMBL1109706"
+        "CHEMBL5799890",
+        "CHEMBL5731131",
+        "CHEMBL5733110"
       ],
       "source_activity_ids": [
-        3240872
+        26871331,
+        27425075,
+        27425090
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1093445",
-      "molecule_chembl_id": "CHEMBL1093445",
-      "smiles": "COc1ccc2[nH]c(-c3cccnc3)c(/C=C3\\Oc4cc(O)cc(O)c4C3=O)c2c1",
+      "drug_name": "CHEMBL5791173",
+      "molecule_chembl_id": "CHEMBL5791173",
+      "smiles": "COc1ccc(Br)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)N[C@@H](CO)CO2",
       "inchikey": null,
-      "pchembl_value": 9.0,
-      "confidence_score": 8,
+      "pchembl_value": 8.92,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1093445 has a median pChEMBL affinity of 9.0 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1169,
+      "rationale": "CHEMBL5791173 has a median pChEMBL affinity of 8.92 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, theophylline, is 0.117, and ALPL has eight recorded BioGRID physical/genetic interactors: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL1093445",
-        "CHEMBL1109867"
+        "CHEMBL5791173",
+        "CHEMBL5731131",
+        "CHEMBL5733110"
       ],
       "source_activity_ids": [
-        3258774
+        26871313,
+        27425057
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     },
     {
-      "drug_name": "CHEMBL1082616",
-      "molecule_chembl_id": "CHEMBL1082616",
-      "smiles": "COc1cc(F)c2[nH]c(-c3c(C)nn(C)c3C)c(/C=C3/Oc4ccc(NC(=O)Nc5cccnc5)cc4C3=O)c2c1",
+      "drug_name": "CHEMBL5994885",
+      "molecule_chembl_id": "CHEMBL5994885",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)N1CCC[C@@H]1CO2",
       "inchikey": null,
-      "pchembl_value": 9.0,
-      "confidence_score": 8,
+      "pchembl_value": 8.92,
+      "confidence_score": 9,
       "max_phase": null,
       "is_approved_drug": false,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
-      "rationale": "CHEMBL1082616 has a median pChEMBL affinity of 9.0 against PIK3CA measured at an assay confidence score of 8 out of 9, and it is not an approved drug with no nearest approved structural analog identified in the candidate set. PIK3CA has eight recorded BioGRID interactors\u2014PIK3R3, ATR, RASGRP3, HRAS, RASD2, LCK, NOTCH1, and ADAP1\u2014based on physical and genetic interaction data.",
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1139,
+      "rationale": "CHEMBL5994885 has a median pChEMBL affinity of 8.92 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.114 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the proteins FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
       "source_chembl_ids": [
-        "CHEMBL1082616",
-        "CHEMBL1119657"
+        "CHEMBL5994885",
+        "CHEMBL5737044"
       ],
       "source_activity_ids": [
-        3313691
+        28422749
       ],
-      "target_symbol": "PIK3CA",
-      "uniprot_id": "P42336",
-      "disease_name": "Pompe disease",
-      "ot_association_score": 0.2587
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
+    },
+    {
+      "drug_name": "CHEMBL5800442",
+      "molecule_chembl_id": "CHEMBL5800442",
+      "smiles": "COc1ccc(F)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)N1C[C@@H](O)C[C@@H]1CO2",
+      "inchikey": null,
+      "pchembl_value": 8.92,
+      "confidence_score": 9,
+      "max_phase": null,
+      "is_approved_drug": false,
+      "atc_codes": [],
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1125,
+      "rationale": "CHEMBL5800442 has a median pChEMBL affinity of 8.92 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.113 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the following proteins: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
+      "source_chembl_ids": [
+        "CHEMBL5800442",
+        "CHEMBL5737044"
+      ],
+      "source_activity_ids": [
+        28422758
+      ],
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
+    },
+    {
+      "drug_name": "CHEMBL5980335",
+      "molecule_chembl_id": "CHEMBL5980335",
+      "smiles": "COc1ccc(F)cc1S(=O)(=O)Nc1cnc2c(c1)CN1CC(=O)NC[C@H]1CO2",
+      "inchikey": null,
+      "pchembl_value": 8.85,
+      "confidence_score": 9,
+      "max_phase": null,
+      "is_approved_drug": false,
+      "atc_codes": [],
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1266,
+      "rationale": "CHEMBL5980335 has a median pChEMBL affinity of 8.85 against ALPL, measured at an assay confidence score of 9 out of 9, and has a Tanimoto similarity of 0.127 to the nearest approved drug, theophylline. The ALPL target has eight recorded BioGRID interactors\u2014FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B\u2014and CHEMBL5980335 is not itself an approved or known drug.",
+      "source_chembl_ids": [
+        "CHEMBL5980335",
+        "CHEMBL5737044"
+      ],
+      "source_activity_ids": [
+        28422830
+      ],
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
+    },
+    {
+      "drug_name": "CHEMBL5905450",
+      "molecule_chembl_id": "CHEMBL5905450",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)NCCO2",
+      "inchikey": null,
+      "pchembl_value": 8.85,
+      "confidence_score": 9,
+      "max_phase": null,
+      "is_approved_drug": false,
+      "atc_codes": [],
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.125,
+      "rationale": "CHEMBL5905450 has a median pChEMBL affinity of 8.85 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.125 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the proteins FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
+      "source_chembl_ids": [
+        "CHEMBL5905450",
+        "CHEMBL5731131",
+        "CHEMBL5733110"
+      ],
+      "source_activity_ids": [
+        26871253,
+        26871265,
+        27424997
+      ],
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
+    },
+    {
+      "drug_name": "CHEMBL5855363",
+      "molecule_chembl_id": "CHEMBL5855363",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)CN1C(=O)CCC[C@H]1CO2",
+      "inchikey": null,
+      "pchembl_value": 8.85,
+      "confidence_score": 9,
+      "max_phase": null,
+      "is_approved_drug": false,
+      "atc_codes": [],
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1111,
+      "rationale": "CHEMBL5855363 has a median pChEMBL affinity of 8.85 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.111 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the proteins FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
+      "source_chembl_ids": [
+        "CHEMBL5855363",
+        "CHEMBL5737044"
+      ],
+      "source_activity_ids": [
+        28422821
+      ],
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
+    },
+    {
+      "drug_name": "CHEMBL5761686",
+      "molecule_chembl_id": "CHEMBL5761686",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)NC(c1cccnc1)CO2",
+      "inchikey": null,
+      "pchembl_value": 8.85,
+      "confidence_score": 9,
+      "max_phase": null,
+      "is_approved_drug": false,
+      "atc_codes": [],
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1098,
+      "rationale": "CHEMBL5761686 has a median pChEMBL affinity of 8.85 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, theophylline, is 0.110, and ALPL has eight recorded BioGRID physical/genetic interactors: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
+      "source_chembl_ids": [
+        "CHEMBL5761686",
+        "CHEMBL5731131",
+        "CHEMBL5733110"
+      ],
+      "source_activity_ids": [
+        26871358,
+        27425102
+      ],
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
+    },
+    {
+      "drug_name": "CHEMBL5792861",
+      "molecule_chembl_id": "CHEMBL5792861",
+      "smiles": "O=C1[C@@H](O)C[C@H]2COc3ncc(NS(=O)(=O)c4cc(Cl)ccc4OC(F)(F)F)cc3CN12",
+      "inchikey": null,
+      "pchembl_value": 8.85,
+      "confidence_score": 9,
+      "max_phase": null,
+      "is_approved_drug": false,
+      "atc_codes": [],
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1084,
+      "rationale": "CHEMBL5792861 has a median pChEMBL affinity of 8.85 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, theophylline, is 0.108, and BioGRID records physical or genetic interactions between ALPL and FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
+      "source_chembl_ids": [
+        "CHEMBL5792861",
+        "CHEMBL5737044"
+      ],
+      "source_activity_ids": [
+        28422815
+      ],
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
+    },
+    {
+      "drug_name": "CHEMBL5935744",
+      "molecule_chembl_id": "CHEMBL5935744",
+      "smiles": "O=C1c2cc(NS(=O)(=O)c3cc(Cl)ccc3OC(F)(F)F)cnc2OC[C@H]2C[C@@H](O)CN12",
+      "inchikey": null,
+      "pchembl_value": 8.85,
+      "confidence_score": 9,
+      "max_phase": null,
+      "is_approved_drug": false,
+      "atc_codes": [],
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.0952,
+      "rationale": "CHEMBL5935744 has a median pChEMBL affinity of 8.85 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, theophylline, is 0.095, and ALPL has eight recorded BioGRID physical/genetic interactors: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
+      "source_chembl_ids": [
+        "CHEMBL5935744",
+        "CHEMBL5737044"
+      ],
+      "source_activity_ids": [
+        28422773
+      ],
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
+    },
+    {
+      "drug_name": "CHEMBL5874970",
+      "molecule_chembl_id": "CHEMBL5874970",
+      "smiles": "COc1ccc(Cl)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)N[C@@H](CO)CO2",
+      "inchikey": null,
+      "pchembl_value": 8.82,
+      "confidence_score": 9,
+      "max_phase": null,
+      "is_approved_drug": false,
+      "atc_codes": [],
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1169,
+      "rationale": "CHEMBL5874970 has a median pChEMBL affinity of 8.82 against ALPL, measured at an assay confidence score of 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.117 to the nearest approved drug, theophylline. The ALPL target has eight recorded BioGRID physical or genetic interactors: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
+      "source_chembl_ids": [
+        "CHEMBL5874970",
+        "CHEMBL5731131",
+        "CHEMBL5733110"
+      ],
+      "source_activity_ids": [
+        26871307,
+        27425051
+      ],
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
+    },
+    {
+      "drug_name": "CHEMBL5845255",
+      "molecule_chembl_id": "CHEMBL5845255",
+      "smiles": "COc1ccc(F)cc1S(=O)(=O)Nc1cnc2c(c1)C(=O)N1C[C@H](O)C[C@@H]1CO2",
+      "inchikey": null,
+      "pchembl_value": 8.82,
+      "confidence_score": 9,
+      "max_phase": null,
+      "is_approved_drug": false,
+      "atc_codes": [],
+      "most_similar_approved_drug": "THEOPHYLLINE",
+      "tanimoto_score": 0.1125,
+      "rationale": "CHEMBL5845255 has a median pChEMBL affinity of 8.82 against ALPL, measured at assay confidence score 9 out of 9, and is not an approved or known drug, with a Tanimoto similarity of 0.113 to the nearest approved drug, theophylline. BioGRID records physical or genetic interactions between ALPL and the following proteins: FBXO6, EEF1A1, SRPK2, ALOX5, SPCS2, SEC11C, MAPKAPK2, and PIK3C2B.",
+      "source_chembl_ids": [
+        "CHEMBL5845255",
+        "CHEMBL5737044"
+      ],
+      "source_activity_ids": [
+        28422770
+      ],
+      "target_symbol": "ALPL",
+      "uniprot_id": "P05186",
+      "disease_name": "Developmental anomaly of metabolic origin",
+      "ot_association_score": 0.8998
     }
   ],
-  "pooled_across_multiple_targets": true,
-  "approved_reference_set_size": 0,
+  "pooled_across_multiple_targets": false,
+  "approved_reference_set_size": 3,
   "reference_set_note": "Tanimoto computed against approved drugs found in this target's candidate pool (bounded scope)."
 }

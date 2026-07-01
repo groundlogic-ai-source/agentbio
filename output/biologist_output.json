@@ -1,1552 +1,286 @@
 {
   "target": {
-    "target_symbol": "PIK3CA",
-    "uniprot_id": "P42336",
-    "ensembl_id": "ENSG00000121879",
-    "disease_name": "Pompe disease",
-    "orpha_code": "365",
-    "ot_association_score": 0.2587
+    "target_symbol": "ALPL",
+    "uniprot_id": "P05186",
+    "ensembl_id": "ENSG00000162551",
+    "disease_name": "Developmental anomaly of metabolic origin",
+    "orpha_code": "139009",
+    "ot_association_score": 0.8998
   },
   "interacting_genes": [
-    "PIK3R3",
-    "ATR",
-    "RASGRP3",
-    "HRAS",
-    "RASD2",
-    "LCK",
-    "NOTCH1",
-    "ADAP1",
-    "DGKZ",
-    "ARHGEF1",
-    "GNAQ",
-    "KRAS",
-    "PIK3R1",
-    "IRS1",
-    "GSN",
-    "YWHAH",
-    "IRS4",
-    "SGK1",
-    "UBTF",
-    "NEDD9",
-    "SQSTM1",
-    "AMBP",
-    "ATPIF1",
-    "VARS2",
-    "DDX5",
-    "DNAJB6",
-    "FTL",
-    "ITIH1",
-    "RPS20",
-    "UFD1L",
-    "WDR5",
-    "TNFRSF1A",
-    "CD28",
-    "FASLG",
-    "IRS2",
-    "CBL",
-    "CD40",
-    "GRB2",
-    "PIK3R2",
-    "CRK",
-    "STAT1",
-    "Anapc7",
-    "SMAD2",
-    "SMAD3",
-    "ESR1",
-    "AKT1",
-    "EFNB2",
-    "PCBP1",
-    "NTRK1",
-    "BEX1",
-    "BEX2",
-    "IL13RA2",
-    "IL24",
-    "PSMC3IP",
-    "THRSP",
-    "TNFSF13",
-    "UMPS",
-    "HDAC1",
-    "TSPAN14",
-    "DPY30",
-    "Bub1",
-    "APPL1",
-    "ERBB3",
-    "PDK1",
-    "CYTH3",
-    "CYTH2",
-    "TSSC1",
-    "CHEK1",
-    "RRM2",
-    "CDK9",
-    "HDAC6",
-    "BRAF",
-    "GNB1",
-    "HAVCR2",
-    "FLRT1",
-    "IL20RA",
-    "SUN2",
-    "TMEM52B",
-    "MANSC1",
-    "ZDHHC1",
-    "NLGN3",
-    "RNF19B",
-    "DEFA5",
-    "KIT",
-    "RAC1",
-    "PDGFRA",
-    "PTTG1",
-    "CSF1R",
-    "DERL1",
-    "NEDD4L",
-    "MYO1B",
-    "CALM1",
-    "CLTC",
-    "MYH10",
-    "CTNNB1",
+    "FBXO6",
     "EEF1A1",
-    "RPS3",
-    "GNAI3",
-    "MATN2",
-    "CNOT3",
-    "RPS27",
-    "HCVgp1",
-    "EGFR",
-    "SNX9",
-    "PTPN11",
-    "PRKCA",
-    "CAMK1G",
-    "ERBB2",
-    "BSG",
-    "ACY1",
-    "CD22",
-    "CDK5",
-    "NRAS",
-    "PLCG1",
-    "RAPGEF5",
-    "RELA",
-    "KIAA1429",
-    "TRAF6",
-    "ZDHHC18",
-    "ZDHHC23",
-    "ARAF",
-    "CCND2",
-    "GLIS2",
-    "MYC",
-    "STK11",
-    "FANCC",
-    "GALNT12",
-    "MAP2K1",
-    "SFRP4",
-    "FBP2",
-    "TMOD1",
-    "E2F4",
-    "IL10RB",
-    "NFKB1",
-    "APC",
-    "FASN"
+    "SRPK2",
+    "ALOX5",
+    "SPCS2",
+    "SEC11C",
+    "MAPKAPK2",
+    "PIK3C2B",
+    "RPS6KA2",
+    "CDC25A",
+    "NDUFB1",
+    "MAP4K1",
+    "EDA",
+    "HDAC2",
+    "VMP1",
+    "BAZ1B",
+    "CECR2",
+    "SPCS1",
+    "SIK2",
+    "CDC42",
+    "RAC1",
+    "RAC2",
+    "RHOB",
+    "RHOC",
+    "RHOH",
+    "RND1",
+    "HDAC6",
+    "LCOR",
+    "HSF1",
+    "ABCF1"
   ],
   "interaction_records": [
     {
-      "biogrid_interaction_id": "12260",
-      "interactor_symbol": "PIK3R3",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "245137",
-      "interactor_symbol": "ATR",
-      "experimental_system": "Protein-peptide",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "251199",
-      "interactor_symbol": "RASGRP3",
-      "experimental_system": "Biochemical Activity",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "252503",
-      "interactor_symbol": "HRAS",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "252504",
-      "interactor_symbol": "RASD2",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "253320",
-      "interactor_symbol": "LCK",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "253323",
-      "interactor_symbol": "NOTCH1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "255812",
-      "interactor_symbol": "ADAP1",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "255817",
-      "interactor_symbol": "ADAP1",
-      "experimental_system": "Biochemical Activity",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "255832",
-      "interactor_symbol": "DGKZ",
-      "experimental_system": "Biochemical Activity",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "255833",
-      "interactor_symbol": "DGKZ",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "258755",
-      "interactor_symbol": "ARHGEF1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "258756",
-      "interactor_symbol": "ARHGEF1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "259186",
-      "interactor_symbol": "GNAQ",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "275844",
-      "interactor_symbol": "KRAS",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "275849",
-      "interactor_symbol": "HRAS",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "276511",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "282345",
-      "interactor_symbol": "IRS1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "283319",
-      "interactor_symbol": "LCK",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "288002",
-      "interactor_symbol": "GSN",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "288032",
-      "interactor_symbol": "YWHAH",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "299154",
-      "interactor_symbol": "IRS4",
+      "biogrid_interaction_id": "912637",
+      "interactor_symbol": "FBXO6",
       "experimental_system": "Affinity Capture-MS",
       "experimental_system_type": "physical",
       "label": "physical/genetic interaction, not mechanism"
     },
     {
-      "biogrid_interaction_id": "301857",
-      "interactor_symbol": "HRAS",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "318163",
-      "interactor_symbol": "SGK1",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "533756",
-      "interactor_symbol": "UBTF",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "593187",
-      "interactor_symbol": "NEDD9",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "593188",
-      "interactor_symbol": "SQSTM1",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "593295",
-      "interactor_symbol": "AMBP",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "593296",
-      "interactor_symbol": "ATPIF1",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "593297",
-      "interactor_symbol": "VARS2",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "593298",
-      "interactor_symbol": "DDX5",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "593299",
-      "interactor_symbol": "DNAJB6",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "593300",
-      "interactor_symbol": "FTL",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "593301",
-      "interactor_symbol": "ITIH1",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "593302",
-      "interactor_symbol": "RPS20",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "593303",
-      "interactor_symbol": "UFD1L",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "616077",
-      "interactor_symbol": "WDR5",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "670634",
-      "interactor_symbol": "TNFRSF1A",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "674567",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "677669",
-      "interactor_symbol": "IRS1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "692161",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "696116",
-      "interactor_symbol": "CD28",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "697614",
-      "interactor_symbol": "FASLG",
-      "experimental_system": "Protein-peptide",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "715946",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "719245",
-      "interactor_symbol": "IRS1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "719246",
-      "interactor_symbol": "IRS2",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "719357",
-      "interactor_symbol": "CBL",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "719358",
-      "interactor_symbol": "CBL",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "719365",
-      "interactor_symbol": "CBL",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "719366",
-      "interactor_symbol": "CBL",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "720091",
-      "interactor_symbol": "CD40",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "725846",
-      "interactor_symbol": "CBL",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "726245",
-      "interactor_symbol": "GRB2",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "726261",
-      "interactor_symbol": "PIK3R2",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "726424",
-      "interactor_symbol": "CRK",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "818912",
-      "interactor_symbol": "STAT1",
-      "experimental_system": "Biochemical Activity",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "832566",
-      "interactor_symbol": "GRB2",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "833015",
-      "interactor_symbol": "Anapc7",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "856579",
-      "interactor_symbol": "SMAD2",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "856581",
-      "interactor_symbol": "SMAD3",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "859011",
-      "interactor_symbol": "PIK3R2",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "859014",
-      "interactor_symbol": "IRS1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "860789",
-      "interactor_symbol": "ESR1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "935188",
-      "interactor_symbol": "AKT1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "985599",
-      "interactor_symbol": "ESR1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1104901",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1178024",
-      "interactor_symbol": "EFNB2",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1195430",
-      "interactor_symbol": "PCBP1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1257438",
-      "interactor_symbol": "NTRK1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1416473",
-      "interactor_symbol": "PIK3R3",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1417894",
-      "interactor_symbol": "BEX1",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1417895",
-      "interactor_symbol": "BEX2",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1417896",
-      "interactor_symbol": "IL13RA2",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1417897",
-      "interactor_symbol": "IL24",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1417898",
-      "interactor_symbol": "PSMC3IP",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1417899",
-      "interactor_symbol": "THRSP",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1418114",
-      "interactor_symbol": "TNFSF13",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1418115",
-      "interactor_symbol": "UMPS",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1446105",
-      "interactor_symbol": "HDAC1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1446106",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1446109",
-      "interactor_symbol": "PIK3R2",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1448676",
-      "interactor_symbol": "PIK3R3",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1456402",
-      "interactor_symbol": "TSPAN14",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1456816",
-      "interactor_symbol": "DPY30",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1461171",
-      "interactor_symbol": "Bub1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1504531",
-      "interactor_symbol": "APPL1",
-      "experimental_system": "Co-localization",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1515675",
-      "interactor_symbol": "IRS2",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1517742",
-      "interactor_symbol": "ERBB3",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1534259",
-      "interactor_symbol": "AKT1",
-      "experimental_system": "PCA",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1534260",
-      "interactor_symbol": "PDK1",
-      "experimental_system": "PCA",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1534261",
-      "interactor_symbol": "CYTH3",
-      "experimental_system": "PCA",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "1534262",
-      "interactor_symbol": "CYTH2",
-      "experimental_system": "PCA",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2197812",
-      "interactor_symbol": "TSSC1",
-      "experimental_system": "Synthetic Lethality",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2200060",
-      "interactor_symbol": "KRAS",
-      "experimental_system": "Synthetic Lethality",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2206618",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2208347",
-      "interactor_symbol": "CHEK1",
-      "experimental_system": "Negative Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2208351",
-      "interactor_symbol": "RRM2",
-      "experimental_system": "Negative Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2208384",
-      "interactor_symbol": "CDK9",
-      "experimental_system": "Negative Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2208401",
-      "interactor_symbol": "HDAC6",
-      "experimental_system": "Negative Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2208415",
-      "interactor_symbol": "BRAF",
-      "experimental_system": "Negative Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2210640",
-      "interactor_symbol": "AKT1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2210643",
-      "interactor_symbol": "GNB1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2210646",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2222738",
-      "interactor_symbol": "PIK3R3",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2223730",
-      "interactor_symbol": "PCBP1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2228480",
-      "interactor_symbol": "GRB2",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2233682",
-      "interactor_symbol": "HAVCR2",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2234092",
-      "interactor_symbol": "FLRT1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2237407",
-      "interactor_symbol": "IL20RA",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2239586",
-      "interactor_symbol": "SUN2",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2240164",
-      "interactor_symbol": "TMEM52B",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2241422",
-      "interactor_symbol": "MANSC1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2245017",
-      "interactor_symbol": "ZDHHC1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2257942",
-      "interactor_symbol": "NLGN3",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2263080",
-      "interactor_symbol": "RNF19B",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2264534",
-      "interactor_symbol": "EFNB2",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2269169",
-      "interactor_symbol": "DEFA5",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2297617",
-      "interactor_symbol": "AKT1",
-      "experimental_system": "Biochemical Activity",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2347179",
-      "interactor_symbol": "ERBB3",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2347457",
-      "interactor_symbol": "KIT",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2375902",
-      "interactor_symbol": "RAC1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2375914",
-      "interactor_symbol": "PDGFRA",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2375917",
-      "interactor_symbol": "PDGFRA",
-      "experimental_system": "Biochemical Activity",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2376043",
-      "interactor_symbol": "PTTG1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2380444",
-      "interactor_symbol": "CSF1R",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2380445",
-      "interactor_symbol": "CSF1R",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2394535",
-      "interactor_symbol": "DERL1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2394536",
-      "interactor_symbol": "DERL1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2397083",
-      "interactor_symbol": "NEDD4L",
-      "experimental_system": "Biochemical Activity",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2464856",
-      "interactor_symbol": "MYO1B",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2471547",
-      "interactor_symbol": "PIK3R2",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2471548",
-      "interactor_symbol": "CALM1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2471549",
-      "interactor_symbol": "CLTC",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2471550",
-      "interactor_symbol": "MYH10",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2471551",
-      "interactor_symbol": "SQSTM1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2471552",
-      "interactor_symbol": "IRS1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2471553",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2471554",
-      "interactor_symbol": "CTNNB1",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2471555",
+      "biogrid_interaction_id": "948375",
       "interactor_symbol": "EEF1A1",
-      "experimental_system": "Affinity Capture-MS",
+      "experimental_system": "Two-hybrid",
       "experimental_system_type": "physical",
       "label": "physical/genetic interaction, not mechanism"
     },
     {
-      "biogrid_interaction_id": "2473285",
-      "interactor_symbol": "RPS3",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2473286",
-      "interactor_symbol": "GNAI3",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2473287",
-      "interactor_symbol": "MATN2",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2473288",
-      "interactor_symbol": "CNOT3",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2473289",
-      "interactor_symbol": "RPS27",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2532572",
-      "interactor_symbol": "HCVgp1",
+      "biogrid_interaction_id": "948376",
+      "interactor_symbol": "EEF1A1",
       "experimental_system": "Affinity Capture-Western",
       "experimental_system_type": "physical",
       "label": "physical/genetic interaction, not mechanism"
     },
     {
-      "biogrid_interaction_id": "2532639",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
+      "biogrid_interaction_id": "1429263",
+      "interactor_symbol": "SRPK2",
+      "experimental_system": "Biochemical Activity",
       "experimental_system_type": "physical",
       "label": "physical/genetic interaction, not mechanism"
     },
     {
-      "biogrid_interaction_id": "2532888",
-      "interactor_symbol": "EGFR",
-      "experimental_system": "Affinity Capture-Western",
+      "biogrid_interaction_id": "2211934",
+      "interactor_symbol": "ALOX5",
+      "experimental_system": "Biochemical Activity",
       "experimental_system_type": "physical",
       "label": "physical/genetic interaction, not mechanism"
     },
     {
-      "biogrid_interaction_id": "2534192",
-      "interactor_symbol": "SNX9",
-      "experimental_system": "Reconstituted Complex",
+      "biogrid_interaction_id": "2254223",
+      "interactor_symbol": "SPCS2",
+      "experimental_system": "Affinity Capture-MS",
       "experimental_system_type": "physical",
       "label": "physical/genetic interaction, not mechanism"
     },
     {
-      "biogrid_interaction_id": "2536196",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
+      "biogrid_interaction_id": "2256467",
+      "interactor_symbol": "SEC11C",
+      "experimental_system": "Affinity Capture-MS",
       "experimental_system_type": "physical",
       "label": "physical/genetic interaction, not mechanism"
     },
     {
-      "biogrid_interaction_id": "2536201",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2536202",
-      "interactor_symbol": "PTPN11",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2536316",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2538114",
-      "interactor_symbol": "PRKCA",
+      "biogrid_interaction_id": "2537961",
+      "interactor_symbol": "MAPKAPK2",
       "experimental_system": "Negative Genetic",
       "experimental_system_type": "genetic",
       "label": "physical/genetic interaction, not mechanism"
     },
     {
-      "biogrid_interaction_id": "2538171",
-      "interactor_symbol": "CAMK1G",
+      "biogrid_interaction_id": "2538055",
+      "interactor_symbol": "PIK3C2B",
       "experimental_system": "Negative Genetic",
       "experimental_system_type": "genetic",
       "label": "physical/genetic interaction, not mechanism"
     },
     {
-      "biogrid_interaction_id": "2538375",
-      "interactor_symbol": "ERBB2",
-      "experimental_system": "Positive Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2538409",
-      "interactor_symbol": "BSG",
-      "experimental_system": "Positive Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2538455",
-      "interactor_symbol": "ACY1",
-      "experimental_system": "Positive Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2538484",
-      "interactor_symbol": "CD22",
-      "experimental_system": "Positive Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2538524",
-      "interactor_symbol": "CDK5",
-      "experimental_system": "Positive Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2542490",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2542492",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2548784",
-      "interactor_symbol": "NRAS",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2549092",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2549607",
-      "interactor_symbol": "PLCG1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2549608",
-      "interactor_symbol": "RAPGEF5",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2549610",
-      "interactor_symbol": "EGFR",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2549637",
-      "interactor_symbol": "PTPN11",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2549639",
-      "interactor_symbol": "GRB2",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2549642",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2549931",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2549932",
-      "interactor_symbol": "RELA",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2565013",
-      "interactor_symbol": "KIAA1429",
-      "experimental_system": "Affinity Capture-RNA",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2570468",
-      "interactor_symbol": "TRAF6",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2570469",
-      "interactor_symbol": "TRAF6",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2570517",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "Co-crystal Structure",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2574790",
-      "interactor_symbol": "PTPN11",
-      "experimental_system": "Affinity Capture-Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2574794",
-      "interactor_symbol": "PTPN11",
-      "experimental_system": "Far Western",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2600646",
-      "interactor_symbol": "RASD2",
-      "experimental_system": "Reconstituted Complex",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2610022",
-      "interactor_symbol": "EGFR",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2619199",
-      "interactor_symbol": "ZDHHC18",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2619230",
-      "interactor_symbol": "ZDHHC23",
-      "experimental_system": "Affinity Capture-MS",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2640817",
-      "interactor_symbol": "PIK3R1",
-      "experimental_system": "FRET",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2641213",
-      "interactor_symbol": "ARAF",
-      "experimental_system": "FRET",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2641214",
-      "interactor_symbol": "CCND2",
-      "experimental_system": "FRET",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2641215",
-      "interactor_symbol": "EGFR",
-      "experimental_system": "FRET",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2641216",
-      "interactor_symbol": "GLIS2",
-      "experimental_system": "FRET",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2641217",
-      "interactor_symbol": "MYC",
-      "experimental_system": "FRET",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2641218",
-      "interactor_symbol": "STK11",
-      "experimental_system": "FRET",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2821452",
-      "interactor_symbol": "FANCC",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2821512",
-      "interactor_symbol": "GALNT12",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2821546",
-      "interactor_symbol": "HRAS",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2821611",
-      "interactor_symbol": "MAP2K1",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2821718",
-      "interactor_symbol": "SFRP4",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2821746",
-      "interactor_symbol": "FBP2",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2821816",
-      "interactor_symbol": "TMOD1",
-      "experimental_system": "Two-hybrid",
-      "experimental_system_type": "physical",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2861901",
-      "interactor_symbol": "E2F4",
-      "experimental_system": "Positive Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2861909",
-      "interactor_symbol": "IL10RB",
-      "experimental_system": "Positive Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2861927",
-      "interactor_symbol": "NFKB1",
-      "experimental_system": "Positive Genetic",
-      "experimental_system_type": "genetic",
-      "label": "physical/genetic interaction, not mechanism"
-    },
-    {
-      "biogrid_interaction_id": "2861934",
-      "interactor_symbol": "APC",
+      "biogrid_interaction_id": "2538064",
+      "interactor_symbol": "RPS6KA2",
       "experimental_system": "Negative Genetic",
       "experimental_system_type": "genetic",
       "label": "physical/genetic interaction, not mechanism"
     },
     {
-      "biogrid_interaction_id": "2862366",
-      "interactor_symbol": "FASN",
+      "biogrid_interaction_id": "2538124",
+      "interactor_symbol": "CDC25A",
+      "experimental_system": "Negative Genetic",
+      "experimental_system_type": "genetic",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "2538439",
+      "interactor_symbol": "NDUFB1",
       "experimental_system": "Positive Genetic",
       "experimental_system_type": "genetic",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "2538447",
+      "interactor_symbol": "MAP4K1",
+      "experimental_system": "Positive Genetic",
+      "experimental_system_type": "genetic",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "2538483",
+      "interactor_symbol": "EDA",
+      "experimental_system": "Positive Genetic",
+      "experimental_system_type": "genetic",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "2614662",
+      "interactor_symbol": "HDAC2",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "2637209",
+      "interactor_symbol": "VMP1",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "2840055",
+      "interactor_symbol": "BAZ1B",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "2840965",
+      "interactor_symbol": "CECR2",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3028868",
+      "interactor_symbol": "SPCS2",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3102872",
+      "interactor_symbol": "SEC11C",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3137815",
+      "interactor_symbol": "SPCS1",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3322875",
+      "interactor_symbol": "SIK2",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3331066",
+      "interactor_symbol": "CDC42",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3332512",
+      "interactor_symbol": "RAC1",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3333026",
+      "interactor_symbol": "RAC2",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3333920",
+      "interactor_symbol": "RHOB",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3334394",
+      "interactor_symbol": "RHOC",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3336147",
+      "interactor_symbol": "RHOH",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3336351",
+      "interactor_symbol": "RND1",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3413968",
+      "interactor_symbol": "HDAC6",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3627204",
+      "interactor_symbol": "LCOR",
+      "experimental_system": "Two-hybrid",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3656764",
+      "interactor_symbol": "HSF1",
+      "experimental_system": "Affinity Capture-MS",
+      "experimental_system_type": "physical",
+      "label": "physical/genetic interaction, not mechanism"
+    },
+    {
+      "biogrid_interaction_id": "3756614",
+      "interactor_symbol": "ABCF1",
+      "experimental_system": "Cross-Linking-MS (XL-MS)",
+      "experimental_system_type": "physical",
       "label": "physical/genetic interaction, not mechanism"
     }
   ],
   "literature_hits": [],
-  "interaction_note": "BioGRID edges are physical/genetic interactions, NOT activating/inhibiting mechanisms."
+  "interaction_note": "BioGRID edges are physical/genetic interactions, NOT activating/inhibiting mechanisms.",
+  "druggability_context": {
+    "has_approved_drug_for_target": false,
+    "approved_drug_count": 0,
+    "approved_drugs": [],
+    "difficulty_summary": null,
+    "supporting_pmids": [],
+    "druggability_flag": "insufficient literature signal"
+  },
+  "druggability_note": "druggability_context is informational reader context only. It does not affect tractability_score, unmet_need_score, composite_score, STRONG_MATCH, or any pipeline filter."
 }
