@@ -132,6 +132,10 @@ def get_druggability_literature(
             msg = client.messages.create(
                 model=SCREENING_MODEL,
                 max_tokens=120,
+                # temperature=0: YES/NO classifier that gates which abstracts enter
+                # supporting_pmids. Pinned for reproducibility; non-zero temperature
+                # could produce different outcomes on borderline abstracts across runs.
+                temperature=0,
                 messages=[{"role": "user", "content": prompt}],
             )
             block = msg.content[0]

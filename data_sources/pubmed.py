@@ -96,6 +96,10 @@ def _llm_relationship(abstract: str, subject: str, obj: str,
         msg = client.messages.create(
             model=MODEL,
             max_tokens=120,
+            # temperature=0: this is a YES/NO gate that controls which abstracts
+            # enter literature_hits. Non-zero temperature could flip borderline
+            # abstracts across runs, making hit/miss outcomes non-reproducible.
+            temperature=0,
             messages=[{"role": "user", "content": prompt}],
         )
         block = msg.content[0]

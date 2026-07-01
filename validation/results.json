@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T19:11:48",
+  "generated_at": "2026-07-01T20:19:29",
   "limitation": "This harness tests the SCORING AND RANKING LOGIC on TODAY's live data, not the historical data available at the time of each discovery. The confirmed drug is intentionally NOT removed from ChEMBL/PubChem results \u2014 reconstructing pre-approval data availability is infeasible with current public APIs. A 'hit' means the existing scoring logic ranks the correct compound highly among real candidates for the disease's top target; it does NOT claim the pipeline would have made the discovery blind to history. The pipeline also pursues only the single top OT-associated target per disease (exactly as the live graph does), so a confirmed drug whose molecular target is not that top target cannot be surfaced \u2014 this is a real, reported limitation, not a scoring failure.",
   "top_n": 10,
   "strong_match_threshold": 0.7,
@@ -163,8 +163,8 @@
           "ot_association_score": 0.6801
         }
       ],
-      "n_chemist_candidates": 25,
-      "n_reviewed_candidates": 25,
+      "n_chemist_candidates": 29,
+      "n_reviewed_candidates": 29,
       "found": false,
       "rank": null,
       "recovered_top10": false,
@@ -172,8 +172,8 @@
       "strong_match": null,
       "is_approved_drug": null,
       "match_method": null,
-      "miss_reason": "'Thalidomide' did not appear among the 25 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there.",
-      "interpretation": "MISS \u2014 Thalidomide was not surfaced. 'Thalidomide' did not appear among the 25 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there."
+      "miss_reason": "'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there.",
+      "interpretation": "MISS \u2014 Thalidomide was not surfaced. 'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there."
     },
     {
       "drug_name": "Metformin",
@@ -235,8 +235,8 @@
           "ot_association_score": 0.8682
         }
       ],
-      "n_chemist_candidates": 25,
-      "n_reviewed_candidates": 25,
+      "n_chemist_candidates": 29,
+      "n_reviewed_candidates": 29,
       "found": false,
       "rank": null,
       "recovered_top10": false,
@@ -244,8 +244,8 @@
       "strong_match": null,
       "is_approved_drug": null,
       "match_method": null,
-      "miss_reason": "'Everolimus' did not appear among the 25 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there.",
-      "interpretation": "MISS \u2014 Everolimus was not surfaced. 'Everolimus' did not appear among the 25 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there."
+      "miss_reason": "'Everolimus' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there.",
+      "interpretation": "MISS \u2014 Everolimus was not surfaced. 'Everolimus' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there."
     },
     {
       "drug_name": "Propranolol",
