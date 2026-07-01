@@ -27,7 +27,7 @@ from data_sources.open_targets import (
     search_disease_efo, get_target_disease_score, get_disease_known_drugs,
     get_disease_orphanet_code,
 )
-from data_sources.chembl import get_target_bioactivity_count
+from data_sources.chembl import get_target_bioactivity_count, get_pharmacological_targets_for_disease
 from data_sources.afdb import get_structure_confidence
 from data_sources.clinicaltrials import check_prior_trials
 
@@ -366,14 +366,36 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
         prevalence = get_disease_prevalence(orpha_code)
 
     targets = get_target_disease_score(efo_id)
-    # FIX 4 — gate: drop targets with association_score < 0.1
-    top_targets = [
-        t for t in targets if t.get("association_score", 0.0) >= 0.1
+
+    # Path A — genetic associations from Open Targets (gate: association_score >= 0.1)
+    genetic_targets = [
+        {**t, "target_discovery_method": "genetic_association"}
+        for t in targets if t.get("association_score", 0.0) >= 0.1
     ][:TOP_TARGETS_PER_DISEASE]
+
+    # Path B — pharmacological precedent: approved-drug MOA targets from ChEMBL.
+    # Uses approved_drug_names already fetched from OT (avoids EFO/MONDO format issues).
+    # Only adds targets not already covered by the OT genetic pool (dedup by UniProt ID).
+    pharm_targets = get_pharmacological_targets_for_disease(
+        efo_id, approved_drug_names=approved_drug_names or None
+    )
+    seen_uniprots = {t.get("uniprot_id") for t in genetic_targets if t.get("uniprot_id")}
+    new_pharm = [
+        t for t in pharm_targets
+        if t.get("uniprot_id") and t.get("uniprot_id") not in seen_uniprots
+    ]
+    top_targets = genetic_targets + new_pharm
+
     if not top_targets:
         raise RuntimeError(
-            f"Open Targets returned no associated targets for '{disease_name}' "
-            f"(EFO {efo_id}); there is nothing to score."
+            f"Open Targets returned no genetically-associated targets for '{disease_name}' "
+            f"(EFO {efo_id}) and no approved-drug MOA targets were found in ChEMBL; "
+            f"there is nothing to score."
+        )
+    if new_pharm:
+        _log(
+            f"  Pharmacological-precedent targets added: "
+            f"{[t['target_symbol'] for t in new_pharm]}"
         )
 
     rows: list[dict[str, Any]] = []
@@ -493,6 +515,7 @@ def _score_pair(
         "raw_tractability_score": raw_tractability,
         "tractability_score": tractability,
         "unmet_need_score": unmet_need,
+        "target_discovery_method": target.get("target_discovery_method", "genetic_association"),
     }
 
 

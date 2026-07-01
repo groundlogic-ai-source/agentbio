@@ -181,6 +181,8 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
         ("Boltz ADME — solubility", _fmt(adme.get("solubility"))),
         ("openFDA adverse-event signal (FAERS)", ae_str),
         ("Prior trials for this exact drug+disease", _fmt(candidate.get("prior_trial_count"))),
+        ("Target discovery method",
+         candidate.get("target_discovery_method", "genetic_association")),
     ]
     lines = ["| Evidence | Value |", "| --- | --- |"]
     for k, v in rows:
