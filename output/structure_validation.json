@@ -1,0 +1,90 @@
+{
+  "LEVAMISOLE": {
+    "afdb": {
+      "has_structure": true,
+      "mean_plddt": 93.31,
+      "model_url": "https://alphafold.ebi.ac.uk/files/AF-P05186-F1-model_v6.pdb"
+    },
+    "complex": {
+      "available": true,
+      "structure_confidence": 0.9147903323173523,
+      "binding_pose_confidence": 0.20748910307884216,
+      "predicted_affinity": 0.09883499890565872,
+      "pdb_or_cif_url": "https://boltz-platform-prod-compute-api-storage.s3.us-east-1.amazonaws.com/org/311afb47-841a-494f-ab03-1ea7fa58b70a/workspace/ws_ai6T67fapbF5DEbF8qVZ/prediction/sab_pred_JRrmEvROMsd7cwanbsas/output/public/sample_0_predicted_structure.cif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=REDACTED&X-Amz-Date=20260701T191204Z&X-Amz-Expires=1800&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "estimated_cost_usd": 0.025,
+      "raw_metrics": {
+        "structure_metrics": {
+          "complex_ipde": 3.2672901153564453,
+          "complex_iplddt": 0.8359469175338745,
+          "complex_pde": 0.47637373208999634,
+          "complex_plddt": 0.9201647639274597,
+          "iptm": 0.8932928442955017,
+          "ligand_iptm": 0.8932928442955017,
+          "protein_iptm": 0.0,
+          "ptm": 0.9239287376403809,
+          "structure_confidence": 0.9147903323173523
+        },
+        "binding_metrics": {
+          "binding_confidence": 0.20748910307884216,
+          "optimization_score": 0.09883499890565872,
+          "type": "ligand_protein_binding_metrics"
+        }
+      },
+      "model": "boltz-2.1",
+      "error": null,
+      "local_cif_filename": "1a69eb7c97d16a1580c42b8d4f345aff.cif"
+    },
+    "adme": {
+      "available": true,
+      "lipophilicity": 0.8774569630622864,
+      "permeability": 1.1709868907928467,
+      "solubility": "medium-confidence",
+      "model": "adme-v1",
+      "error": null
+    }
+  },
+  "LEVAMISOLE HYDROCHLORIDE": {
+    "afdb": {
+      "has_structure": true,
+      "mean_plddt": 93.31,
+      "model_url": "https://alphafold.ebi.ac.uk/files/AF-P05186-F1-model_v6.pdb"
+    },
+    "complex": {
+      "available": true,
+      "structure_confidence": 0.9055866599082947,
+      "binding_pose_confidence": 0.1500747948884964,
+      "predicted_affinity": 0.048460111021995544,
+      "pdb_or_cif_url": "https://boltz-platform-prod-compute-api-storage.s3.us-east-1.amazonaws.com/org/311afb47-841a-494f-ab03-1ea7fa58b70a/workspace/ws_ai6T67fapbF5DEbF8qVZ/prediction/sab_pred_oq79NvzdTkocWailRto6/output/public/sample_0_predicted_structure.cif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=REDACTED&X-Amz-Date=20260701T191322Z&X-Amz-Expires=1800&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "estimated_cost_usd": 0.025,
+      "raw_metrics": {
+        "structure_metrics": {
+          "complex_ipde": 4.351341724395752,
+          "complex_iplddt": 0.8088520765304565,
+          "complex_pde": 0.48625192046165466,
+          "complex_plddt": 0.921446681022644,
+          "iptm": 0.8421462774276733,
+          "ligand_iptm": 0.8421462774276733,
+          "protein_iptm": 0.0,
+          "ptm": 0.9244531393051147,
+          "structure_confidence": 0.9055866599082947
+        },
+        "binding_metrics": {
+          "binding_confidence": 0.1500747948884964,
+          "optimization_score": 0.048460111021995544,
+          "type": "ligand_protein_binding_metrics"
+        }
+      },
+      "model": "boltz-2.1",
+      "error": null,
+      "local_cif_filename": "44e143f88ef50ade3aad07b902ac0c7e.cif"
+    },
+    "adme": {
+      "available": true,
+      "lipophilicity": 2.2438771724700928,
+      "permeability": 0.9470298886299133,
+      "solubility": "medium-confidence",
+      "model": "adme-v1",
+      "error": null
+    }
+  }
+}

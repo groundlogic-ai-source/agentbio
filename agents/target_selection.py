@@ -558,6 +558,9 @@ def _narrate_top5(top5: list[dict[str, Any]]) -> str:
         message = client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=512,
+            # temperature=0: narrative-only, does not affect scores or rankings,
+            # but pinned for overall run reproducibility.
+            temperature=0,
             messages=[{"role": "user", "content": prompt}],
         )
         block = message.content[0]
