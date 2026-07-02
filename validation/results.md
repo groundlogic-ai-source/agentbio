@@ -1,6 +1,6 @@
 # Silver Bullet — Retrospective Validation Results
 
-_Generated: 2026-07-01 20:19:29_
+_Generated: 2026-07-02 13:13:22_
 
 ## What this tests
 
@@ -46,8 +46,8 @@ For each confirmed real-world drug-repurposing success, we ran the existing Biol
 
 - **Status:** miss
 - **Known target (context only):** Binds CRBN (cereblon); also anti-angiogenic / anti-TNF. Molecular target only elucidated years after clinical use.
-- **Top target pursued:** FKBP1A (P62942), OT association 0.85
-- **All targets considered for the disease:** FKBP1A (0.85), FDPS (0.85), TOP2A (0.85), GSR (0.85), NR3C1 (0.85), CD38 (0.85), TNFSF11 (0.85), CRBN (0.6846), NRAS (0.642), CXCR4 (0.6588), XPO1 (0.6416), SLAMF7 (0.85), GPRC5D (0.85), TNFRSF17 (0.6801)
+- **Top target pursued:** FKBP1A (P62942), OT association 0.9
+- **All targets considered for the disease:** FKBP1A (0.9), FDPS (0.9), TOP2A (0.9), GSR (0.9), NR3C1 (0.9), CD38 (0.9), TNFSF11 (0.9), CRBN (0.6846), NRAS (0.642), CXCR4 (0.6588), XPO1 (0.6416), SLAMF7 (0.9), GPRC5D (0.9), TNFRSF17 (0.6801)
 - **Candidate pool:** 29 chemist candidates -> 29 reviewed.
 - **Reason:** 'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
 - **Interpretation:** MISS — Thalidomide was not surfaced. 'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
