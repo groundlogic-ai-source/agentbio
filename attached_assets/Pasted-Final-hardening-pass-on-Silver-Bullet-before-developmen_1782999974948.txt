@@ -1,0 +1,65 @@
+Final hardening pass on Silver Bullet before development wraps up. For every
+item below, show concrete before/after evidence (actual printed values, an
+actual rerun) — do not report "done" in prose without it. If something
+cannot be verified, say so plainly rather than asserting success.
+
+1. CACHE ARCHITECTURE FIX
+   The pharm-precedent target-discovery cache was found to store
+   association_score (a scoring constant defined in code, currently 0.90)
+   baked into the same cache payload as raw ChEMBL mechanism-lookup data.
+   This caused stale scores to persist after the constant was changed.
+   Fix: refactor so only immutable source facts (e.g. "ChEMBL mechanism
+   lookup for drug X returns target Y") are cached. association_score must
+   always be applied fresh from the current code constant at scoring time,
+   never read from a cached value. Audit whether any OTHER scoring constant
+   in the codebase (tractability weights, unmet-need weights, the STRONG_MATCH
+   threshold, the Lipinski-violation penalty, etc.) has this same risk —
+   list every one found, do not silently fix them, just report so we can
+   decide together.
+
+2. VERIFY (or implement if missing) the approved-drug composite-score gate
+   Check the current state of reviewer.py's composite_score logic. Confirm
+   whether the fix capping composite_score at 0.4 for non-approved compounds,
+   plus the "EXPERIMENTAL COMPOUND — NOT YET APPROVED" badge, was actually
+   implemented. If yes: prove it by running one case with a known unapproved
+   ChEMBL compound and showing the cap and badge both fire. If no: implement
+   it now exactly as originally specified, then prove it the same way.
+
+3. VERIFY Fix 4 (association-score gating for tractability_score)
+   Check whether target_candidates.json (or wherever the full rare-disease/
+   NTD sweep output lands) has finished regenerating since that fix was
+   applied. Once available, pull every Pompe disease entry and report,
+   plainly: does GAA now outrank PIK3CA? Print both entries' full score
+   breakdowns side by side. Do not adjust any weight to make this come out a
+   particular way — just report the true current state.
+
+4. Traceability: add job_id to record_explored()
+   record_explored() currently writes job_id=NULL on every row. Pass the
+   actual job_id through so explored_targets rows are traceable to the run
+   that created them.
+
+5. Graceful handling of disease-vocabulary resolution failures
+   The PCOS validation case failed with a raw pipeline error when no Open
+   Targets EFO mapping was found, despite PCOS being present in the Orphanet
+   universe. Fix: catch this failure explicitly, attempt fallback matching
+   via ICD-10/OMIM/MeSH cross-references already pulled in Stage 1 if the
+   direct name match fails, and if all resolution attempts fail, surface a
+   clear user-facing message ("This disease could not be matched to Open
+   Targets — try an alternate name") instead of an unhandled exception. This
+   is a general robustness fix for any future disease query, not specific to
+   PCOS.
+
+6. Confirm cross-run cache persistence
+   Confirm cache/cache.db entries persist across different job_ids and
+   across an app restart, not just within a single run — query the same
+   disease from two separate job runs and show the second is fast (cache
+   hit), to confirm a future user querying an already-explored disease
+   won't hit the ~58-minute cold-run time again.
+
+Do not modify any scoring weight, threshold, or ranking formula anywhere in
+this pass beyond what's explicitly specified above. If you notice something
+else that looks like a bug while doing this work, report it, do not fix it
+silently.
+
+Finish with a summary table: item, status (verified-already-working /
+newly-fixed / could-not-verify), and the concrete evidence for each.

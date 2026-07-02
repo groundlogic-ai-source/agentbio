@@ -202,6 +202,10 @@ def run_reviewer(chemist_output: dict[str, Any],
             },
             "composite_score": composite,
             "unapproved_cap_applied": unapproved_cap_applied,
+            "status_badge": (
+                "EXPERIMENTAL COMPOUND — NOT YET APPROVED"
+                if unapproved_cap_applied else None
+            ),
             "strong_match": composite >= STRONG_MATCH_THRESHOLD,
             "provenance": {
                 "counted_once": new_ids,
