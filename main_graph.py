@@ -70,6 +70,7 @@ BOLTZ_NUM_SAMPLES = int(os.environ.get("STAGE3_BOLTZ_SAMPLES", "1"))
 
 
 class PipelineState(TypedDict, total=False):
+    job_id: Optional[str]
     requested_disease: str
     target: dict[str, Any]
     biologist_output: dict[str, Any]
@@ -202,7 +203,11 @@ def target_selection_node(state: PipelineState) -> dict[str, Any]:
     # for both modes ("any disease+target pair already used in a prior run").
     try:
         from api import jobs_db
-        jobs_db.record_explored(target["disease_name"], target["target_symbol"])
+        jobs_db.record_explored(
+            target["disease_name"],
+            target["target_symbol"],
+            job_id=state.get("job_id"),
+        )
     except Exception as e:  # persistence is best-effort; never fail the run on it
         print(f"[graph] target_selection: WARN could not record explored pair: {e}")
 

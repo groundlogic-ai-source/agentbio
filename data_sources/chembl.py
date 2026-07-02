@@ -13,6 +13,14 @@ from cache.cache import get, set as cache_set, make_key
 BASE_URL = "https://www.ebi.ac.uk/chembl/api/data"
 UNIPROT_REST = "https://rest.uniprot.org/uniprotkb"
 
+# Scoring constant for the pharmacological-precedent target-discovery path.
+# DEFINED HERE, applied at call-time, NEVER baked into the cache payload.
+# Changing this value takes effect immediately on the next run without any
+# cache flush, because the cache stores only raw ChEMBL mechanism-lookup
+# facts (target_symbol, uniprot_id, ensembl_id) and this constant is
+# applied as a decoration step after the cache is read.
+PHARM_PRECEDENT_ASSOC_SCORE: float = 0.90
+
 
 def _get_json(url: str, params: dict | None = None) -> dict:
     resp = requests.get(url, params=params, headers={"Accept": "application/json"}, timeout=30)
@@ -506,10 +514,21 @@ def get_pharmacological_targets_for_disease(
     Returns [] gracefully on any API or format error.
     """
     names_key = tuple(sorted(approved_drug_names)) if approved_drug_names else ()
-    cache_key = make_key("get_pharmacological_targets_for_disease_v2", disease_efo_id, names_key)
+    # Cache key v3: stores ONLY raw mechanism-lookup facts (target_symbol,
+    # uniprot_id, ensembl_id). association_score and target_discovery_method
+    # are injected fresh from the current code constants at return time.
+    # Bumped from v2 which baked association_score into the cache payload —
+    # changing the constant then required a manual cache flush to take effect.
+    cache_key = make_key("get_pharmacological_targets_for_disease_v3", disease_efo_id, names_key)
     cached = get(cache_key)
     if cached is not None:
-        return cached
+        # Decorate with current-code scoring constants, not cached values.
+        return [
+            {**t,
+             "association_score": PHARM_PRECEDENT_ASSOC_SCORE,
+             "target_discovery_method": "pharmacological_precedent"}
+            for t in cached
+        ]
 
     results: list[dict[str, Any]] = []
     try:
@@ -589,27 +608,35 @@ def get_pharmacological_targets_for_disease(
                 # (e.g. "cGMP-specific 3',5'-cyclic phosphodiesterase") causes
                 # false trial-failure matches; gene symbols (e.g. "PDE5A") do not.
                 gene_sym = _get_gene_symbol(uniprot_id)
-                # Evidentiary principle (stated in advance, not tuned per case):
-                # A target reached via an FDA max_phase >= 4 approved drug's
-                # confirmed mechanism of action, for this exact disease, receives
-                # association_score = 0.90. This reflects direct regulatory and
-                # clinical confirmation — the highest level of evidence that a
-                # target is relevant to a given disease — and is treated as at
-                # least as strong as the maximum plausible genetic-association
-                # score Open Targets could return. Do not adjust this value
-                # based on how individual validation cases rank; any revision
-                # must be a separate, disclosed methodology decision.
+                # Store only raw source facts in the cache payload.
+                # association_score and target_discovery_method are NOT stored
+                # here — they are applied after the cache is read so that
+                # changing PHARM_PRECEDENT_ASSOC_SCORE (or the method label)
+                # takes effect immediately without requiring a cache flush.
                 results.append({
                     "target_symbol": gene_sym,
                     "ensembl_id": "",
                     "uniprot_id": uniprot_id,
-                    "association_score": 0.90,
-                    "target_discovery_method": "pharmacological_precedent",
                 })
 
     except Exception as e:
         print(f"[chembl] WARNING: pharmacological target lookup failed "
               f"for '{disease_efo_id}': {e}")
 
+    # Cache the raw facts only (no scoring constants).
     cache_set(cache_key, results, ttl_days=7)
-    return results
+    # Evidentiary principle (stated in advance, not tuned per case):
+    # A target reached via an FDA max_phase >= 4 approved drug's confirmed
+    # mechanism of action for this exact disease receives
+    # PHARM_PRECEDENT_ASSOC_SCORE = 0.90. This reflects direct regulatory and
+    # clinical confirmation — the highest level of evidence that a target is
+    # relevant to a given disease — and is treated as at least as strong as
+    # the maximum plausible genetic-association score Open Targets could return.
+    # Do not adjust based on individual validation case outcomes; any revision
+    # must be a separate, disclosed methodology decision.
+    return [
+        {**t,
+         "association_score": PHARM_PRECEDENT_ASSOC_SCORE,
+         "target_discovery_method": "pharmacological_precedent"}
+        for t in results
+    ]

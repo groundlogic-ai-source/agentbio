@@ -109,8 +109,9 @@ def _run_graph(job_id: str, thread_id: str) -> None:
         # the highest-ranked pair not yet explored.
         job = jobs_db.get_job(job_id)
         requested = (job or {}).get("disease_name")
-        initial_state: dict[str, Any] = (
-            {"requested_disease": requested} if requested else {})
+        initial_state: dict[str, Any] = {"job_id": job_id}
+        if requested:
+            initial_state["requested_disease"] = requested
 
         for chunk in graph.stream(initial_state, config=config, stream_mode="updates"):
             if "__interrupt__" in chunk:

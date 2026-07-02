@@ -262,6 +262,50 @@ def _matchable_universe() -> list[dict[str, Any]]:
     return universe
 
 
+import re as _re
+
+_EFO_PREFIX_RE = _re.compile(
+    r'^(NON\s+RARE\s+IN\s+EUROPE|OBSOLETE)\s*:\s*',
+    flags=_re.IGNORECASE,
+)
+
+
+def _resolve_efo_id(
+    disease_name: str,
+    orig_query: str = "",
+    orpha_code: Optional[str] = None,
+) -> Optional[str]:
+    """
+    Attempt to resolve an EFO/MONDO ID for a disease via multiple strategies:
+
+      1. Direct OT text search on the Orphanet official name.
+      2. Strip known administrative prefixes ("NON RARE IN EUROPE: ",
+         "OBSOLETE: ") that confuse OT's name-based search and retry.
+      3. If a different original user query was supplied, try that string.
+
+    Returns the first EFO ID found, or None if all attempts fail.
+    Caching is handled inside search_disease_efo; no duplicate cache writes.
+    """
+    efo_id = search_disease_efo(disease_name)
+    if efo_id:
+        return efo_id
+
+    stripped = _EFO_PREFIX_RE.sub("", disease_name).strip()
+    if stripped and stripped.lower() != disease_name.lower():
+        efo_id = search_disease_efo(stripped)
+        if efo_id:
+            return efo_id
+
+    if orig_query and orig_query.strip().lower() not in (
+        disease_name.lower(), stripped.lower()
+    ):
+        efo_id = search_disease_efo(orig_query.strip())
+        if efo_id:
+            return efo_id
+
+    return None
+
+
 def _match_disease(query: str, candidates: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
     """
     Resolve a free-text query to a disease in the rare/NTD universe.
@@ -347,11 +391,15 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
     disease_name = disease["name"]
     _log(f"Manual selection: matched '{query}' → '{disease_name}'")
 
-    efo_id = search_disease_efo(disease_name)
+    efo_id = _resolve_efo_id(disease_name, orig_query=query)
     if not efo_id:
         raise RuntimeError(
-            f"'{disease_name}' is in the rare/NTD universe but has no Open Targets EFO "
-            f"mapping, so its targets cannot be scored."
+            f"'{disease_name}' is in the rare/NTD universe but could not be matched "
+            f"to an Open Targets EFO ID (tried official name, prefix-stripped name, "
+            f"and original query '{query}'). "
+            f"Try an alternate common name for this disease — for example, use "
+            f"'polycystic ovary syndrome' rather than the Orphanet administrative "
+            f"name that may include prefixes like 'NON RARE IN EUROPE:'."
         )
 
     # FIX 1 — real approved-treatment status from OT knownDrugs
@@ -623,9 +671,9 @@ def run() -> None:
         disease_name = disease["name"]
         _log(f"  [{idx}/{total}] {disease_name}")
 
-        efo_id = search_disease_efo(disease_name)
+        efo_id = _resolve_efo_id(disease_name)
         if not efo_id:
-            _log(f"    → no EFO ID found, skipping")
+            _log(f"    → no EFO ID found (tried official name + prefix-stripped), skipping")
             continue
 
         n_resolved_efo += 1
