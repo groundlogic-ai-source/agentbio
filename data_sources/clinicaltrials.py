@@ -1,15 +1,90 @@
 """
 ClinicalTrials.gov API v2 — trial history lookup.
+
+v2 change (vs original):
+  has_negative_repurposing_result is now set ONLY when at least one stopped
+  trial is classified as an efficacy/safety failure via a Haiku LLM call on
+  the trial's whyStopped text.
+
+  Old behaviour: ANY terminated/withdrawn/suspended status → negative signal
+  regardless of why (administrative stops counted as failures — wrong).
+
+  New behaviour:
+    - whyStopped present + LLM says EFFICACY_FAILURE → TRUE negative signal
+    - whyStopped present + LLM says ADMINISTRATIVE or UNCLEAR → not negative
+    - whyStopped absent/empty → classification = NO_REASON_GIVEN, not negative
+    - LLM client unavailable → classification = UNCLASSIFIED_NO_CLIENT, not negative
+
+  why_stopped and why_stopped_classification are surfaced on every trial dict
+  for auditability.
 """
 
+import os
 import requests
-from typing import Any
+from typing import Any, Optional
 from cache.cache import get, set as cache_set, make_key
+
+import anthropic
 
 BASE_URL = "https://clinicaltrials.gov/api/v2/studies"
 
 NEGATIVE_STATUSES = {"TERMINATED", "WITHDRAWN", "SUSPENDED"}
 COMPLETED_STATUSES = {"COMPLETED"}
+
+HAIKU_MODEL = "claude-haiku-4-5-20251001"
+
+VALID_CLASSIFICATIONS = {"EFFICACY_FAILURE", "ADMINISTRATIVE", "UNCLEAR"}
+
+
+def _anthropic_client() -> Optional[anthropic.Anthropic]:
+    base_url = os.environ.get("AI_INTEGRATIONS_ANTHROPIC_BASE_URL")
+    api_key  = os.environ.get("AI_INTEGRATIONS_ANTHROPIC_API_KEY")
+    if not base_url or not api_key:
+        return None
+    return anthropic.Anthropic(base_url=base_url, api_key=api_key)
+
+
+def _classify_why_stopped(why_stopped: str, client: anthropic.Anthropic) -> str:
+    """
+    One Haiku LLM call (temperature=0) to classify a clinical trial's
+    whyStopped text.
+
+    Returns one of:
+      EFFICACY_FAILURE  — trial stopped because treatment did not work or
+                          caused harm (lack of efficacy, safety concern,
+                          adverse events, futility, DSMB recommendation).
+      ADMINISTRATIVE    — trial stopped for a non-clinical reason: funding,
+                          business/sponsor decision, low enrollment, post-
+                          marketing commitment fulfilled, protocol design
+                          change, regulatory action unrelated to outcome.
+      UNCLEAR           — text is ambiguous; cannot determine reason.
+    """
+    prompt = (
+        "A clinical trial was stopped before completion.\n\n"
+        f'Why stopped: "{why_stopped}"\n\n'
+        "Classify the reason the trial was stopped.\n\n"
+        "Reply with EXACTLY one of these three tokens and nothing else:\n"
+        "EFFICACY_FAILURE — the trial stopped because the treatment did not "
+        "work or caused harm (e.g. lack of efficacy, safety concern, adverse "
+        "events, futility, DSMB recommendation based on clinical outcome)\n"
+        "ADMINISTRATIVE — the trial stopped for a non-clinical reason "
+        "(e.g. post-marketing commitment fulfilled, funding ended, sponsor "
+        "or business decision, low enrollment, protocol design change, "
+        "study purpose already met)\n"
+        "UNCLEAR — cannot determine from the available text"
+    )
+    try:
+        resp = client.messages.create(
+            model=HAIKU_MODEL,
+            max_tokens=10,
+            temperature=0,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = resp.content[0].text.strip().split()[0].upper()
+        return raw if raw in VALID_CLASSIFICATIONS else "UNCLEAR"
+    except Exception as e:
+        print(f"[clinicaltrials] WARNING: LLM classification failed ({e})")
+        return "UNCLEAR"
 
 
 def _search_trials(drug_name: str, disease_name: str) -> list[dict]:
@@ -33,41 +108,62 @@ def _search_trials(drug_name: str, disease_name: str) -> list[dict]:
 def check_prior_trials(drug_name: str, disease_name: str) -> dict[str, Any]:
     """
     Returns:
-      - trials: list of {nct_id, title, status, why_stopped, has_results}
-      - has_negative_repurposing_result: True if any trial for this drug+disease
-        pair was terminated, withdrawn, or suspended (for this exact pair).
+      - trials: list of {nct_id, title, status, why_stopped,
+                         why_stopped_classification, has_results}
+      - has_negative_repurposing_result: True ONLY if at least one stopped
+        trial was classified EFFICACY_FAILURE by the LLM. Administrative
+        stops (PMC fulfilment, sponsor decision, enrollment issues, etc.)
+        do NOT count as negative signals.
       - trial_count: total trials found
+
+    Cache key v2 — bumped from the original because the negative-signal
+    classification logic changed. Old v1 entries are silently ignored.
     """
-    cache_key = make_key("check_prior_trials", drug_name, disease_name)
+    # v2 key: caches the LLM-classified output (not just the raw status flag)
+    cache_key = make_key("check_prior_trials_v2", drug_name, disease_name)
     cached = get(cache_key)
     if cached is not None:
         return cached
 
     raw_studies = _search_trials(drug_name, disease_name)
+    client = _anthropic_client()
 
     trials = []
     has_negative = False
 
     for study in raw_studies:
-        protocol = study.get("protocolSection", {})
-        id_module = protocol.get("identificationModule", {})
-        status_module = protocol.get("statusModule", {})
+        protocol       = study.get("protocolSection", {})
+        id_module      = protocol.get("identificationModule", {})
+        status_module  = protocol.get("statusModule", {})
         results_module = study.get("resultsSection", {})
 
-        nct_id = id_module.get("nctId", "")
-        title = id_module.get("briefTitle", "")
-        status = status_module.get("overallStatus", "UNKNOWN")
-        why_stopped = status_module.get("whyStopped", None)
+        nct_id      = id_module.get("nctId", "")
+        title       = id_module.get("briefTitle", "")
+        status      = status_module.get("overallStatus", "UNKNOWN")
+        why_stopped = (status_module.get("whyStopped") or "").strip()
         has_results = bool(results_module)
 
+        classification: Optional[str] = None
+
         if status.upper() in NEGATIVE_STATUSES:
-            has_negative = True
+            if not why_stopped:
+                # No reason text available — do not assume failure.
+                classification = "NO_REASON_GIVEN"
+            elif client is not None:
+                classification = _classify_why_stopped(why_stopped, client)
+                if classification == "EFFICACY_FAILURE":
+                    has_negative = True
+            else:
+                # LLM client unavailable (missing env vars); cannot classify.
+                # Do NOT count as negative to avoid false penalisation.
+                classification = "UNCLASSIFIED_NO_CLIENT"
 
         trials.append({
             "nct_id": nct_id,
             "title": title,
             "status": status,
-            "why_stopped": why_stopped,
+            "why_stopped": why_stopped or None,
+            "why_stopped_classification": classification,
             "has_results": has_results,
         })
 
