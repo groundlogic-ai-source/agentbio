@@ -219,7 +219,12 @@ def target_selection_node(state: PipelineState) -> dict[str, Any]:
 
 
 def biologist_node(state: PipelineState) -> dict[str, Any]:
-    existing = None if FORCE_RECOMPUTE else _load_json("biologist_output.json")
+    # Live API jobs always carry a job_id; never reuse shared output files across
+    # different jobs — two concurrent runs write to the same paths and would
+    # silently cross-contaminate. File-cache reuse is retained only for the
+    # CLI standalone path (no job_id) where a single sequential user controls it.
+    fresh = FORCE_RECOMPUTE or bool(state.get("job_id"))
+    existing = None if fresh else _load_json("biologist_output.json")
     if existing is not None:
         print("[graph] biologist: reusing existing biologist_output.json")
         return {"biologist_output": existing}
@@ -233,7 +238,8 @@ def biologist_node(state: PipelineState) -> dict[str, Any]:
 
 
 def chemist_node(state: PipelineState) -> dict[str, Any]:
-    existing = None if FORCE_RECOMPUTE else _load_json("chemist_output.json")
+    fresh = FORCE_RECOMPUTE or bool(state.get("job_id"))
+    existing = None if fresh else _load_json("chemist_output.json")
     if existing is not None:
         print("[graph] chemist: reusing existing chemist_output.json")
         return {"chemist_output": existing}
@@ -244,7 +250,8 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
 
 
 def reviewer_node(state: PipelineState) -> dict[str, Any]:
-    existing = None if FORCE_RECOMPUTE else _load_json("reviewed_candidates.json")
+    fresh = FORCE_RECOMPUTE or bool(state.get("job_id"))
+    existing = None if fresh else _load_json("reviewed_candidates.json")
     if existing is not None:
         print("[graph] reviewer: reusing existing reviewed_candidates.json")
         return {"reviewed": existing}
