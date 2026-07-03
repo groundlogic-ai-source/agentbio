@@ -1,0 +1,2285 @@
+{
+  "formula": {
+    "composite_weights": {
+      "pchembl": 0.3,
+      "confidence": 0.2,
+      "ot_association": 0.2,
+      "tanimoto": 0.15,
+      "no_failed_trial": 0.15
+    },
+    "lipinski_penalty": 0.25,
+    "strong_match_threshold": 0.7,
+    "normalization": "min-max across the candidate set (equal values -> 1.0 if >0)"
+  },
+  "n_candidates": 30,
+  "n_strong_matches": 2,
+  "candidates": [
+    {
+      "drug_name": "MIGLUSTAT",
+      "molecule_chembl_id": "CHEMBL1029",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCCN1C[C@H](O)[C@@H](O)[C@H](O)[C@H]1CO",
+      "pchembl_value": 7.0,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.6774,
+      "most_similar_approved_drug": "MIGLITOL",
+      "is_approved_drug": true,
+      "rationale": "Miglustat has a median pChEMBL affinity of 7.0 against GAA, measured at assay confidence score 9 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.677 to the nearest approved drug miglitol. No BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 219.28,
+        "logp": -1.45,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 5,
+        "tpsa": 84.16,
+        "rotatable_bonds": 4,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "DIARRHOEA",
+          "count": 31
+        },
+        {
+          "term": "PNEUMONIA",
+          "count": 24
+        },
+        {
+          "term": "SEIZURE",
+          "count": 24
+        },
+        {
+          "term": "PYREXIA",
+          "count": 14
+        },
+        {
+          "term": "DISEASE PROGRESSION",
+          "count": 13
+        },
+        {
+          "term": "VOMITING",
+          "count": 12
+        },
+        {
+          "term": "CONDITION AGGRAVATED",
+          "count": 11
+        },
+        {
+          "term": "PNEUMONIA ASPIRATION",
+          "count": 11
+        },
+        {
+          "term": "NIEMANN-PICK DISEASE",
+          "count": 10
+        },
+        {
+          "term": "OFF LABEL USE",
+          "count": 10
+        }
+      ],
+      "prior_trial_count": 1,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.6444,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.653,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.8413,
+      "unapproved_cap_applied": false,
+      "status_badge": null,
+      "strong_match": true,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2947461"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3204094"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394162"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1029"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1040324"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1099885"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL1029",
+        "CHEMBL1040324",
+        "CHEMBL1099885",
+        "CHEMBL5041858"
+      ]
+    },
+    {
+      "drug_name": "MIGLITOL",
+      "molecule_chembl_id": "CHEMBL1561",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "OCCN1C[C@H](O)[C@@H](O)[C@H](O)[C@H]1CO",
+      "pchembl_value": 6.0,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.6774,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": true,
+      "rationale": "Miglitol has a median pChEMBL affinity of 6.0 against GAA, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.677 to the nearest approved drug miglustat. No BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 207.23,
+        "logp": -3.26,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 6,
+        "tpsa": 104.39,
+        "rotatable_bonds": 3,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "HYPOGLYCAEMIA",
+          "count": 76
+        },
+        {
+          "term": "HEPATIC FUNCTION ABNORMAL",
+          "count": 75
+        },
+        {
+          "term": "LIVER DISORDER",
+          "count": 51
+        },
+        {
+          "term": "DIARRHOEA",
+          "count": 50
+        },
+        {
+          "term": "ALANINE AMINOTRANSFERASE INCREASED",
+          "count": 45
+        },
+        {
+          "term": "DECREASED APPETITE",
+          "count": 44
+        },
+        {
+          "term": "RENAL IMPAIRMENT",
+          "count": 42
+        },
+        {
+          "term": "ASPARTATE AMINOTRANSFERASE INCREASED",
+          "count": 41
+        },
+        {
+          "term": "NAUSEA",
+          "count": 37
+        },
+        {
+          "term": "DIABETES MELLITUS",
+          "count": 35
+        }
+      ],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.377,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.653,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.761,
+      "unapproved_cap_applied": false,
+      "status_badge": null,
+      "strong_match": true,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2556884"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2556929"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3204093"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1561"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1099885"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL993567"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL993579"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1561",
+        "CHEMBL1099885",
+        "CHEMBL993567",
+        "CHEMBL993579"
+      ]
+    },
+    {
+      "drug_name": "VOGLIBOSE",
+      "molecule_chembl_id": "CHEMBL476960",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "OCC(CO)N[C@H]1C[C@](O)(CO)[C@@H](O)[C@H](O)[C@H]1O",
+      "pchembl_value": 6.205,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.1667,
+      "most_similar_approved_drug": "MIGALASTAT",
+      "is_approved_drug": true,
+      "rationale": "Voglibose has a median pChEMBL affinity of 6.205 against GAA, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.167 to the nearest approved drug migalastat. No BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 267.28,
+        "logp": -4.49,
+        "h_bond_donors": 8,
+        "h_bond_acceptors": 8,
+        "tpsa": 153.64,
+        "rotatable_bonds": 5,
+        "lipinski_violations": 1,
+        "veber_pass": false,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "HYPOGLYCAEMIA",
+          "count": 156
+        },
+        {
+          "term": "PYREXIA",
+          "count": 123
+        },
+        {
+          "term": "DECREASED APPETITE",
+          "count": 120
+        },
+        {
+          "term": "RENAL IMPAIRMENT",
+          "count": 111
+        },
+        {
+          "term": "DIARRHOEA",
+          "count": 107
+        },
+        {
+          "term": "INTERSTITIAL LUNG DISEASE",
+          "count": 102
+        },
+        {
+          "term": "NAUSEA",
+          "count": 102
+        },
+        {
+          "term": "MALAISE",
+          "count": 96
+        },
+        {
+          "term": "PNEUMONIA",
+          "count": 95
+        },
+        {
+          "term": "CEREBRAL INFARCTION",
+          "count": 94
+        }
+      ],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.4318,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.1036,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.6951,
+      "unapproved_cap_applied": false,
+      "status_badge": null,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2556882"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2556928"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL476960"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL993567"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL993579"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL476960",
+        "CHEMBL993567",
+        "CHEMBL993579"
+      ]
+    },
+    {
+      "drug_name": "MIGALASTAT",
+      "molecule_chembl_id": "CHEMBL110458",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "OC[C@H]1NC[C@H](O)[C@@H](O)[C@H]1O",
+      "pchembl_value": 5.22,
+      "confidence_score": 8,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2941,
+      "most_similar_approved_drug": "MIGLITOL",
+      "is_approved_drug": true,
+      "rationale": "Migalastat has a median pChEMBL affinity of 5.22 against GAA, measured at an assay confidence score of 8 out of 9, and is an approved drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, miglitol, is 0.294, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 163.17,
+        "logp": -2.97,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 5,
+        "tpsa": 92.95,
+        "rotatable_bonds": 1,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "BRONCHOPULMONARY ASPERGILLOSIS",
+          "count": 6
+        },
+        {
+          "term": "CYTOMEGALOVIRUS INFECTION",
+          "count": 4
+        },
+        {
+          "term": "INFECTION REACTIVATION",
+          "count": 4
+        },
+        {
+          "term": "ISOSPORIASIS",
+          "count": 4
+        },
+        {
+          "term": "RENAL IMPAIRMENT",
+          "count": 3
+        },
+        {
+          "term": "COVID-19",
+          "count": 2
+        },
+        {
+          "term": "DRUG INEFFECTIVE FOR UNAPPROVED INDICATION",
+          "count": 2
+        },
+        {
+          "term": "OFF LABEL USE",
+          "count": 2
+        },
+        {
+          "term": "VENTRICULAR TACHYCARDIA",
+          "count": 2
+        },
+        {
+          "term": "ARRHYTHMIA",
+          "count": 1
+        }
+      ],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.1684,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.2406,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.6144,
+      "unapproved_cap_applied": false,
+      "status_badge": null,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3204099"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL110458"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1099885"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL110458",
+        "CHEMBL1099885"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5028005",
+      "molecule_chembl_id": "CHEMBL5028005",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCCCCC[C@]1(CO)NC[C@H](O)[C@@H](O)[C@@H]1O",
+      "pchembl_value": 8.33,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2766,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5028005 has a median pChEMBL affinity of 8.33 against GAA, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.277 to the nearest approved drug, miglustat. It is not an approved or known drug, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 261.36,
+        "logp": -0.24,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 5,
+        "tpsa": 92.95,
+        "rotatable_bonds": 7,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 1.0,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.2218,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394158"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5028005"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL5028005",
+        "CHEMBL5041858"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5028265",
+      "molecule_chembl_id": "CHEMBL5028265",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCCCC[C@]1(CO)NC[C@H](O)[C@@H](O)[C@@H]1O",
+      "pchembl_value": 8.21,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2766,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5028265 has a median pChEMBL affinity of 8.21 against GAA, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, Miglustat, is 0.277, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 247.34,
+        "logp": -0.63,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 5,
+        "tpsa": 92.95,
+        "rotatable_bonds": 6,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.9679,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.2218,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394157"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5028265"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL5028265",
+        "CHEMBL5041858"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL86772",
+      "molecule_chembl_id": "CHEMBL86772",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "OCC12OC(Nc3ccccc3)=NC1C(O)C(O)C2O",
+      "pchembl_value": 7.99,
+      "confidence_score": 8,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2037,
+      "most_similar_approved_drug": "VOGLIBOSE",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL86772 has a median pChEMBL affinity of 7.99 against GAA, measured at an assay confidence score of 8 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, VOGLIBOSE, is 0.204, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 280.28,
+        "logp": -1.32,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 7,
+        "tpsa": 114.54,
+        "rotatable_bonds": 2,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.9091,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.1434,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "355615"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL86772"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL647267"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL86772",
+        "CHEMBL647267"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5029066",
+      "molecule_chembl_id": "CHEMBL5029066",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCCC[C@]1(CO)NC[C@H](O)[C@@H](O)[C@@H]1O",
+      "pchembl_value": 7.72,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2826,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5029066 has a median pChEMBL affinity of 7.72 against GAA, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.283 to the nearest approved drug, miglustat. It is not an approved or known drug, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 233.31,
+        "logp": -1.02,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 5,
+        "tpsa": 92.95,
+        "rotatable_bonds": 5,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.8369,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.2283,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394156"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5029066"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL5029066",
+        "CHEMBL5041858"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5027974",
+      "molecule_chembl_id": "CHEMBL5027974",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCC[C@]1(CO)NC[C@H](O)[C@@H](O)[C@@H]1O",
+      "pchembl_value": 7.43,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2889,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5027974 has a median pChEMBL affinity of 7.43 against GAA, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, Miglustat, is 0.289, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 219.28,
+        "logp": -1.41,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 5,
+        "tpsa": 92.95,
+        "rotatable_bonds": 4,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.7594,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.235,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394155"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5027974"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL5027974",
+        "CHEMBL5041858"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5028138",
+      "molecule_chembl_id": "CHEMBL5028138",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCC[C@]1(CO)NC[C@H](O)[C@@H](O)[C@@H]1O",
+      "pchembl_value": 7.23,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2973,
+      "most_similar_approved_drug": "MIGALASTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5028138 has a median pChEMBL affinity of 7.23 against GAA, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, Migalastat, is 0.297, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 205.25,
+        "logp": -1.8,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 5,
+        "tpsa": 92.95,
+        "rotatable_bonds": 3,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.7059,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.2441,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394154"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5028138"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL5028138",
+        "CHEMBL5041858"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1651551",
+      "molecule_chembl_id": "CHEMBL1651551",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCCCCCN1C[C@H](O)[C@@H](O)[C@H](O)[C@H]1CO",
+      "pchembl_value": 7.02,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.871,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1651551 has a median pChEMBL affinity of 7.02 against GAA, measured at assay confidence score 9, and a Tanimoto similarity of 0.871 to the nearest approved drug MIGLUSTAT. No BioGRID physical or genetic interactors are recorded for the target, and the compound is not itself an approved or known drug.",
+      "descriptors": {
+        "molecular_weight": 261.36,
+        "logp": -0.28,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 5,
+        "tpsa": 84.16,
+        "rotatable_bonds": 7,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.6497,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.8612,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394165"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1651551"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1651551",
+        "CHEMBL5041858"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1651550",
+      "molecule_chembl_id": "CHEMBL1651550",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCCCCN1C[C@H](O)[C@@H](O)[C@H](O)[C@H]1CO",
+      "pchembl_value": 6.89,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.871,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1651550 has a median pChEMBL affinity of 6.89 against GAA, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, Miglustat, is 0.871, and no BioGRID physical or genetic interactors have been recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 247.34,
+        "logp": -0.67,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 5,
+        "tpsa": 84.16,
+        "rotatable_bonds": 6,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.615,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.8612,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394164"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1651550"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1651550",
+        "CHEMBL5041858"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL75971",
+      "molecule_chembl_id": "CHEMBL75971",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CN1C[C@H](O)[C@@H](O)[C@H](O)[C@H]1CO",
+      "pchembl_value": 6.805,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.5862,
+      "most_similar_approved_drug": "MIGLITOL",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL75971 has a median pChEMBL affinity of 6.805 against GAA, measured at an assay confidence score of 9 out of 9, and has a Tanimoto similarity of 0.586 to the nearest approved drug, miglitol. It is not an approved or known drug, and no BioGRID physical or genetic interactors have been recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 177.2,
+        "logp": -2.62,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 5,
+        "tpsa": 84.16,
+        "rotatable_bonds": 1,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.5922,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.5549,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "677239"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394159"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL75971"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL649344"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL75971",
+        "CHEMBL5041858",
+        "CHEMBL649344"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1651549",
+      "molecule_chembl_id": "CHEMBL1651549",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCCCN1C[C@H](O)[C@@H](O)[C@H](O)[C@H]1CO",
+      "pchembl_value": 6.68,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.9,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1651549 has a median pChEMBL affinity of 6.68 against GAA, measured at assay confidence score 9, and a Tanimoto similarity of 0.900 to the nearest approved drug MIGLUSTAT. No BioGRID physical or genetic interactors are recorded for the target, and CHEMBL1651549 is not itself an approved or known drug.",
+      "descriptors": {
+        "molecular_weight": 233.31,
+        "logp": -1.06,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 5,
+        "tpsa": 84.16,
+        "rotatable_bonds": 5,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.5588,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.8924,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394163"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1651549"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1651549",
+        "CHEMBL5041858"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5080975",
+      "molecule_chembl_id": "CHEMBL5080975",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCN1C[C@H](O)[C@@H](O)[C@H](O)[C@H]1CO",
+      "pchembl_value": 6.68,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.6774,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5080975 has a median pChEMBL affinity of 6.68 against GAA, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, Miglustat, is 0.677, and no BioGRID physical or genetic interactors have been recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 191.23,
+        "logp": -2.23,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 5,
+        "tpsa": 84.16,
+        "rotatable_bonds": 2,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.5588,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.653,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394160"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5080975"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL5080975",
+        "CHEMBL5041858"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5429566",
+      "molecule_chembl_id": "CHEMBL5429566",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "O=C(O)C(F)(F)F.OC[C@H]1N[C@H](CCCCCCCCCc2ccc(O)cc2)[C@H](O)[C@@H](O)[C@@H]1O",
+      "pchembl_value": 6.6,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2115,
+      "most_similar_approved_drug": "MIGALASTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5429566 has a median pChEMBL affinity of 6.6 against GAA, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.212 to the nearest approved drug, migalastat. No BioGRID physical or genetic interactors are recorded for the target, and the compound is not an approved or known drug.",
+      "descriptors": {
+        "molecular_weight": 495.54,
+        "logp": 2.1,
+        "h_bond_donors": 7,
+        "h_bond_acceptors": 7,
+        "tpsa": 150.48,
+        "rotatable_bonds": 11,
+        "lipinski_violations": 1,
+        "veber_pass": false,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.5374,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.1518,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "25458356"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5429566"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5320878"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL5429566",
+        "CHEMBL5320878"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL501355",
+      "molecule_chembl_id": "CHEMBL501355",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "OC[C@H]1N[C@H](CO)[C@@H](O)[C@H](O)[C@H]1O",
+      "pchembl_value": 6.5,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.4583,
+      "most_similar_approved_drug": "MIGALASTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL501355 has a median pChEMBL affinity of 6.5 against GAA, measured at assay confidence score 9 out of 9, and has a Tanimoto similarity of 0.458 to the nearest approved drug, migalastat. No BioGRID physical or genetic interactors are recorded for the target, and CHEMBL501355 is not an approved or known drug.",
+      "descriptors": {
+        "molecular_weight": 193.2,
+        "logp": -3.61,
+        "h_bond_donors": 6,
+        "h_bond_acceptors": 6,
+        "tpsa": 113.18,
+        "rotatable_bonds": 2,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.5107,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.4173,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2556886"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2556927"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL501355"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL993567"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL993579"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL501355",
+        "CHEMBL993567",
+        "CHEMBL993579"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5080744",
+      "molecule_chembl_id": "CHEMBL5080744",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCN1C[C@H](O)[C@@H](O)[C@H](O)[C@H]1CO",
+      "pchembl_value": 6.44,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.8,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5080744 has a median pChEMBL affinity of 6.44 against GAA, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, Miglustat, is 0.800, and no BioGRID physical or genetic interactors have been recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 205.25,
+        "logp": -1.84,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 5,
+        "tpsa": 84.16,
+        "rotatable_bonds": 3,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.4947,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.7849,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394161"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5080744"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL5080744",
+        "CHEMBL5041858"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL574645",
+      "molecule_chembl_id": "CHEMBL574645",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "OC[C@@H]1[C@@H](O)[C@H](O)[C@@H](O)CN1CCCCCOCC12CC3CC(CC(C3)C1)C2",
+      "pchembl_value": 6.4,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.5,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL574645 has a median pChEMBL affinity of 6.4 against GAA, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.500 to the nearest approved drug, Miglustat. No BioGRID physical or genetic interactors are recorded for the target, and the compound is not an approved or known drug.",
+      "descriptors": {
+        "molecular_weight": 397.56,
+        "logp": 1.15,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 6,
+        "tpsa": 93.39,
+        "rotatable_bonds": 9,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.484,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.4621,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2947465"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3204095"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL574645"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1040324"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1099885"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL574645",
+        "CHEMBL1040324",
+        "CHEMBL1099885"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1088158",
+      "molecule_chembl_id": "CHEMBL1088158",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "OC[C@@H]1[C@H](O)[C@H](O)[C@@H](O)CN1CCCCCOCC12CC3CC(CC(C3)C1)C2",
+      "pchembl_value": 6.3,
+      "confidence_score": 8,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.5,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1088158 has a median pChEMBL affinity of 6.3 against GAA, measured at an assay confidence score of 8 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, Miglustat, is 0.500, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 397.56,
+        "logp": 1.15,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 6,
+        "tpsa": 93.39,
+        "rotatable_bonds": 9,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.4572,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.4621,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3204101"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1088158"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1099885"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1088158",
+        "CHEMBL1099885"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL2177695",
+      "molecule_chembl_id": "CHEMBL2177695",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCCCCCC[C@H]1N[C@H](CO)[C@@H](O)[C@H](O)[C@H]1O",
+      "pchembl_value": 6.22,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.3143,
+      "most_similar_approved_drug": "MIGALASTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL2177695 has a median pChEMBL affinity of 6.22 against GAA, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, Migalastat, is 0.314, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 275.39,
+        "logp": 0.15,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 5,
+        "tpsa": 92.95,
+        "rotatable_bonds": 8,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.4358,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.2624,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "25458357"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL2177695"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5320878"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL2177695",
+        "CHEMBL5320878"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5593187",
+      "molecule_chembl_id": "CHEMBL5593187",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCCCCCCCC[C@H](O)[C@@H]1N[C@@H](CO)[C@H](O)[C@H]1O.Cl",
+      "pchembl_value": 6.22,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2766,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5593187 has a median pChEMBL affinity of 6.22 against GAA, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.277 to the nearest approved drug, miglustat. No BioGRID physical or genetic interactors are recorded for the target, and the compound is not an approved or known drug.",
+      "descriptors": {
+        "molecular_weight": 339.9,
+        "logp": 1.35,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 5,
+        "tpsa": 92.95,
+        "rotatable_bonds": 11,
+        "lipinski_violations": 0,
+        "veber_pass": false,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.4358,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.2218,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "26024613"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5593187"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5581219"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL5593187",
+        "CHEMBL5581219"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5189075",
+      "molecule_chembl_id": "CHEMBL5189075",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "OC[C@]1(c2ccccc2)NC[C@H](O)[C@H]1O",
+      "pchembl_value": 6.2,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2308,
+      "most_similar_approved_drug": "MIGALASTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5189075 has a median pChEMBL affinity of 6.2 against GAA, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, Migalastat, is 0.231, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 209.24,
+        "logp": -0.8,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 4,
+        "tpsa": 72.72,
+        "rotatable_bonds": 2,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.4305,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.1725,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24803498"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5189075"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5135397"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL5189075",
+        "CHEMBL5135397"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5422487",
+      "molecule_chembl_id": "CHEMBL5422487",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "OC[C@@H]1[C@@H](O)[C@H](O)CN1CCCCc1ccc(C(F)(F)F)cc1",
+      "pchembl_value": 6.14,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.4468,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5422487 has a median pChEMBL affinity of 6.14 against GAA, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.447 to the nearest approved drug, miglustat. It is not an approved or known drug, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 333.35,
+        "logp": 1.43,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 4,
+        "tpsa": 63.93,
+        "rotatable_bonds": 6,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.4144,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.4049,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "25508818"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5422487"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5334084"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL5422487",
+        "CHEMBL5334084"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL88413",
+      "molecule_chembl_id": "CHEMBL88413",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "NC1C(O)C(O)C(O)C1(O)CO",
+      "pchembl_value": 6.135,
+      "confidence_score": 8,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2895,
+      "most_similar_approved_drug": "VOGLIBOSE",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL88413 has a median pChEMBL affinity of 6.135 against GAA, measured at an assay confidence score of 8 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, VOGLIBOSE, is 0.289, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 179.17,
+        "logp": -3.87,
+        "h_bond_donors": 6,
+        "h_bond_acceptors": 6,
+        "tpsa": 127.17,
+        "rotatable_bonds": 1,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.4131,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.2357,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "379548"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "382482"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL88413"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL647606"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL647267"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL88413",
+        "CHEMBL647267",
+        "CHEMBL647606"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL1603014",
+      "molecule_chembl_id": "CHEMBL1603014",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CC(=O)c1ccc(N2CCN(S(=O)(=O)c3ccc4c(c3)CC(=O)N4)CC2)cc1",
+      "pchembl_value": 6.075,
+      "confidence_score": 8,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.0704,
+      "most_similar_approved_drug": "VOGLIBOSE",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL1603014 has a median pChEMBL affinity of 6.075 against GAA, measured at an assay confidence score of 8 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, VOGLIBOSE, is 0.070, and no BioGRID physical or genetic interactors have been recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 399.47,
+        "logp": 1.89,
+        "h_bond_donors": 1,
+        "h_bond_acceptors": 5,
+        "tpsa": 86.79,
+        "rotatable_bonds": 4,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.3971,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "12159904"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "12159921"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1603014"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL2183407"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL2183408"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL1603014",
+        "CHEMBL2183407",
+        "CHEMBL2183408"
+      ]
+    },
+    {
+      "drug_name": "DUVOGLUSTAT",
+      "molecule_chembl_id": "CHEMBL307429",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "OC[C@H]1NC[C@H](O)[C@@H](O)[C@@H]1O",
+      "pchembl_value": 6.0,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 1.0,
+      "most_similar_approved_drug": "MIGALASTAT",
+      "is_approved_drug": false,
+      "rationale": "Duvoglustat has a median pChEMBL affinity of 6.0 against GAA, measured at assay confidence score 9 out of 9, and its Tanimoto similarity to the nearest approved drug, migalastat, is 1.000. No BioGRID physical or genetic interactors are recorded for the target, and duvoglustat is not itself an approved drug.",
+      "descriptors": {
+        "molecular_weight": 163.17,
+        "logp": -2.97,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 5,
+        "tpsa": 92.95,
+        "rotatable_bonds": 1,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.377,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 1.0,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "385304"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "612482"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "685368"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2556880"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2556926"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2947471"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "3204092"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24394151"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "25508822"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL307429"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL647269"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1040324"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1099885"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5041858"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5334084"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL647267"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL649344"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL993567"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL993579"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL307429",
+        "CHEMBL1040324",
+        "CHEMBL1099885",
+        "CHEMBL5041858",
+        "CHEMBL5334084",
+        "CHEMBL647267",
+        "CHEMBL647269",
+        "CHEMBL649344",
+        "CHEMBL993567",
+        "CHEMBL993579"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL432221",
+      "molecule_chembl_id": "CHEMBL432221",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "C[Si](C)(C)/C=C/CN1C[C@H](O)[C@@H](O)[C@H](O)[C@H]1CO",
+      "pchembl_value": 6.0,
+      "confidence_score": 8,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.5135,
+      "most_similar_approved_drug": "MIGLITOL",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL432221 has a median pChEMBL affinity of 6.0 against GAA, measured at an assay confidence score of 8 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, miglitol, is 0.514, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 275.42,
+        "logp": -0.82,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 5,
+        "tpsa": 84.16,
+        "rotatable_bonds": 4,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.377,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.4767,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "707904"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL432221"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL649344"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL432221",
+        "CHEMBL649344"
+      ]
+    },
+    {
+      "drug_name": "CHEMBL5592225",
+      "molecule_chembl_id": "CHEMBL5592225",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "CCCCCCCCCCCCC[C@H](O)[C@@H]1N[C@@H](CO)[C@H](O)[C@H]1O.Cl",
+      "pchembl_value": 5.92,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.2766,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": false,
+      "rationale": "CHEMBL5592225 has a median pChEMBL affinity of 5.92 against GAA, measured at assay confidence score 9 out of 9, and is not an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, Miglustat, is 0.277, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 381.99,
+        "logp": 2.52,
+        "h_bond_donors": 5,
+        "h_bond_acceptors": 5,
+        "tpsa": 92.95,
+        "rotatable_bonds": 14,
+        "lipinski_violations": 0,
+        "veber_pass": false,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.3556,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.2218,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": true,
+      "status_badge": "EXPERIMENTAL COMPOUND \u2014 NOT YET APPROVED",
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "26024614"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5592225"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5581219"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL5592225",
+        "CHEMBL5581219"
+      ]
+    },
+    {
+      "drug_name": "ACARBOSE",
+      "molecule_chembl_id": "CHEMBL404271",
+      "target_symbol": "GAA",
+      "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+      "smiles": "C[C@H]1O[C@H](O[C@H]2[C@H](O)[C@@H](O)[C@@H](O[C@H]3[C@H](O)[C@@H](O)C(O)O[C@@H]3CO)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@@H]1N[C@H]1C=C(CO)[C@@H](O)[C@H](O)[C@H]1O",
+      "pchembl_value": 4.59,
+      "confidence_score": 9,
+      "ot_association_score": 0.8772,
+      "tanimoto_score": 0.1304,
+      "most_similar_approved_drug": "MIGLUSTAT",
+      "is_approved_drug": true,
+      "rationale": "Acarbose has a median pChEMBL affinity of 4.59 against GAA, measured at assay confidence score 9, and is an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, miglustat, is 0.130, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 645.61,
+        "logp": -8.56,
+        "h_bond_donors": 14,
+        "h_bond_acceptors": 19,
+        "tpsa": 321.17,
+        "rotatable_bonds": 9,
+        "lipinski_violations": 3,
+        "veber_pass": false,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": true,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "HYPOGLYCAEMIA",
+          "count": 279
+        },
+        {
+          "term": "NAUSEA",
+          "count": 214
+        },
+        {
+          "term": "BLOOD GLUCOSE INCREASED",
+          "count": 212
+        },
+        {
+          "term": "DIZZINESS",
+          "count": 166
+        },
+        {
+          "term": "DIARRHOEA",
+          "count": 161
+        },
+        {
+          "term": "VOMITING",
+          "count": 157
+        },
+        {
+          "term": "DRUG INTERACTION",
+          "count": 150
+        },
+        {
+          "term": "ACUTE KIDNEY INJURY",
+          "count": 143
+        },
+        {
+          "term": "DRUG INEFFECTIVE",
+          "count": 141
+        },
+        {
+          "term": "OFF LABEL USE",
+          "count": 139
+        }
+      ],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.0,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 1.0,
+        "normalized_tanimoto": 0.0645,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.3097,
+      "unapproved_cap_applied": false,
+      "status_badge": null,
+      "strong_match": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2556881"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2556930"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "29292590"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL404271"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL6178279"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL993567"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL993579"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL404271",
+        "CHEMBL6178279",
+        "CHEMBL993567",
+        "CHEMBL993579"
+      ]
+    }
+  ]
+}

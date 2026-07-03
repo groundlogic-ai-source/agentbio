@@ -1,0 +1,70 @@
+{
+  "target": {
+    "target_symbol": "GLA",
+    "uniprot_id": "P06280",
+    "ensembl_id": "ENSG00000102393",
+    "disease_name": "Fabry disease",
+    "orpha_code": "324",
+    "ot_association_score": 0.8942
+  },
+  "interacting_genes": [],
+  "interaction_records": [],
+  "literature_hits": [
+    {
+      "pmid": "33172708",
+      "summary": "YES \u2014 The abstract explicitly asserts that GLA gene analysis is a necessary diagnostic tool for Fabry disease, directly connecting GLA to the condition as the gene whose mutations underlie alpha-galactosidase A deficiency.",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "38047356",
+      "summary": "YES \u2014 The abstract explicitly asserts a connection between GLA (implicitly, through Fabry disease pathogenicity assessment criteria) and Fabry disease by reporting pooled prevalence rates of FD across multiple high-risk clinical populations based on genetic screening studies.",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "36386210",
+      "summary": "YES \u2014 The abstract explicitly asserts that Fabry disease is caused by a deficiency or loss of the GLA enzyme, directly establishing a causal relationship between GLA and the disease.",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "26564084",
+      "summary": "YES \u2014 The abstract explicitly asserts that Fabry disease is caused by mutations of the *GLA* gene, directly establishing a causal relationship between GLA and Fabry disease.",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "40159218",
+      "summary": "YES \u2014 The abstract explicitly asserts a specific relationship between the *GLA* p.A143T variant and Fabry disease by stating that individuals carrying this variant were identified through Fabry disease newborn screening and that the variant impacts GLA enzyme levels, while also discussing its uncertain clinical significance in the context of Fabry disease pathogenicity.",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "34609404",
+      "summary": "YES \u2014 The abstract explicitly asserts that more than 1000 mutations of the GLA gene are associated with Fabry disease, directly linking GLA to the disorder.",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "33489501",
+      "summary": "YES \u2014 The abstract explicitly states that Fabry disease is caused by a mutation in the *GLA* gene, directly asserting a causal relationship between GLA and Fabry disease.",
+      "relationship_asserted": true
+    }
+  ],
+  "interaction_note": "BioGRID edges are physical/genetic interactions, NOT activating/inhibiting mechanisms.",
+  "druggability_context": {
+    "has_approved_drug_for_target": true,
+    "approved_drug_count": 2,
+    "approved_drugs": [
+      {
+        "molecule_chembl_id": "CHEMBL110458",
+        "name": "MIGALASTAT",
+        "max_phase": 4.0
+      },
+      {
+        "molecule_chembl_id": "CHEMBL2107355",
+        "name": "MIGALASTAT HYDROCHLORIDE",
+        "max_phase": 4.0
+      }
+    ],
+    "difficulty_summary": null,
+    "supporting_pmids": [],
+    "druggability_flag": "insufficient literature signal"
+  },
+  "druggability_note": "druggability_context is informational reader context only. It does not affect tractability_score, unmet_need_score, composite_score, STRONG_MATCH, or any pipeline filter."
+}

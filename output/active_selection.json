@@ -1,0 +1,32 @@
+{
+  "disease_name": "Glycogen storage disease due to acid maltase deficiency",
+  "orpha_code": "365",
+  "disease_source": "orphanet",
+  "icd10": "E74.0",
+  "omim": "232300",
+  "mesh": "D006009",
+  "target_symbol": "GAA",
+  "ensembl_id": "ENSG00000171298",
+  "uniprot_id": "P10253",
+  "ot_association_score": 0.8772,
+  "chembl_activity_count": 149,
+  "median_pchembl": 5.25,
+  "chembl_pooled_multi_target": true,
+  "afdb_has_structure": true,
+  "afdb_mean_plddt": 91.88,
+  "prior_trial_count": 9,
+  "has_negative_repurposing_result": false,
+  "has_approved_treatment": true,
+  "approved_drug_names": [
+    "CIPAGLUCOSIDASE ALFA",
+    "MIGLUSTAT",
+    "ALGLUCOSIDASE ALFA",
+    "AVALGLUCOSIDASE ALFA"
+  ],
+  "prevalence_per_million": 11.5,
+  "treatment_status_needs_review": false,
+  "raw_tractability_score": 0.644,
+  "tractability_score": 0.5649,
+  "unmet_need_score": 0.0548,
+  "target_discovery_method": "genetic_association"
+}
