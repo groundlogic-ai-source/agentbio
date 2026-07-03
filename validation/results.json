@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T13:13:22",
+  "generated_at": "2026-07-03T03:14:40",
   "limitation": "This harness tests the SCORING AND RANKING LOGIC on TODAY's live data, not the historical data available at the time of each discovery. The confirmed drug is intentionally NOT removed from ChEMBL/PubChem results \u2014 reconstructing pre-approval data availability is infeasible with current public APIs. A 'hit' means the existing scoring logic ranks the correct compound highly among real candidates for the disease's top target; it does NOT claim the pipeline would have made the discovery blind to history. The pipeline also pursues only the single top OT-associated target per disease (exactly as the live graph does), so a confirmed drug whose molecular target is not that top target cannot be surfaced \u2014 this is a real, reported limitation, not a scoring failure.",
   "top_n": 10,
   "strong_match_threshold": 0.7,
@@ -10,7 +10,7 @@
     "recovered_top10": 1,
     "strong_matches": 1,
     "out_of_scope": 1,
-    "errors": 1
+    "errors": 0
   },
   "cases": [
     {
@@ -98,6 +98,11 @@
           "ot_association_score": 0.9
         },
         {
+          "target_symbol": "CD38",
+          "uniprot_id": "P28907",
+          "ot_association_score": 0.9
+        },
+        {
           "target_symbol": "FDPS",
           "uniprot_id": "P14324",
           "ot_association_score": 0.9
@@ -118,19 +123,14 @@
           "ot_association_score": 0.9
         },
         {
-          "target_symbol": "CD38",
-          "uniprot_id": "P28907",
-          "ot_association_score": 0.9
-        },
-        {
-          "target_symbol": "TNFSF11",
-          "uniprot_id": "O14788",
-          "ot_association_score": 0.9
-        },
-        {
           "target_symbol": "CRBN",
           "uniprot_id": "Q96SW2",
           "ot_association_score": 0.6846
+        },
+        {
+          "target_symbol": "CXCR4",
+          "uniprot_id": "P61073",
+          "ot_association_score": 0.6588
         },
         {
           "target_symbol": "NRAS",
@@ -138,9 +138,9 @@
           "ot_association_score": 0.642
         },
         {
-          "target_symbol": "CXCR4",
-          "uniprot_id": "P61073",
-          "ot_association_score": 0.6588
+          "target_symbol": "TNFSF11",
+          "uniprot_id": "O14788",
+          "ot_association_score": 0.9
         },
         {
           "target_symbol": "XPO1",
@@ -180,12 +180,42 @@
       "disease_name": "polycystic ovary syndrome",
       "confirmed_year": 1994,
       "known_target_note": "Insulin-sensitizer (AMPK / mitochondrial complex I); no single clean protein target. Used OFF-LABEL for PCOS.",
-      "status": "error",
-      "in_universe": null,
-      "selected_target": null,
-      "candidate_targets_considered": [],
-      "n_chemist_candidates": null,
-      "n_reviewed_candidates": null,
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "ESR1",
+        "uniprot_id": "P03372",
+        "ot_association_score": 0.5989
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "ESR1",
+          "uniprot_id": "P03372",
+          "ot_association_score": 0.5989
+        },
+        {
+          "target_symbol": "FTO",
+          "uniprot_id": "Q9C0B1",
+          "ot_association_score": 0.5206
+        },
+        {
+          "target_symbol": "ERBB4",
+          "uniprot_id": "Q15303",
+          "ot_association_score": 0.5384
+        },
+        {
+          "target_symbol": "FSHB",
+          "uniprot_id": "P01225",
+          "ot_association_score": 0.4827
+        },
+        {
+          "target_symbol": "DENND1A",
+          "uniprot_id": "Q8TEH3",
+          "ot_association_score": 0.4757
+        }
+      ],
+      "n_chemist_candidates": 34,
+      "n_reviewed_candidates": 34,
       "found": false,
       "rank": null,
       "recovered_top10": false,
@@ -193,8 +223,8 @@
       "strong_match": null,
       "is_approved_drug": null,
       "match_method": null,
-      "miss_reason": "target_selection failed: 'NON RARE IN EUROPE: Polycystic ovary syndrome' is in the rare/NTD universe but has no Open Targets EFO mapping, so its targets cannot be scored.",
-      "interpretation": "The disease is in-universe but target selection raised an error (e.g. no Open Targets EFO mapping or no associated targets), so no candidates could be scored."
+      "miss_reason": "'Metformin' did not appear among the 34 ChEMBL candidate compound(s) for the selected top target ESR1 (P03372). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not ESR1 (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there.",
+      "interpretation": "MISS \u2014 Metformin was not surfaced. 'Metformin' did not appear among the 34 ChEMBL candidate compound(s) for the selected top target ESR1 (P03372). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not ESR1 (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there."
     },
     {
       "drug_name": "Everolimus",
@@ -220,11 +250,6 @@
           "ot_association_score": 0.3483
         },
         {
-          "target_symbol": "IFNG",
-          "uniprot_id": "P01579",
-          "ot_association_score": 0.4031
-        },
-        {
           "target_symbol": "TSC2",
           "uniprot_id": "P49815",
           "ot_association_score": 0.8867
@@ -233,6 +258,11 @@
           "target_symbol": "TSC1",
           "uniprot_id": "Q92574",
           "ot_association_score": 0.8682
+        },
+        {
+          "target_symbol": "IFNG",
+          "uniprot_id": "P01579",
+          "ot_association_score": 0.4031
         }
       ],
       "n_chemist_candidates": 29,
