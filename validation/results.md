@@ -1,6 +1,6 @@
 # Silver Bullet — Retrospective Validation Results
 
-_Generated: 2026-07-02 13:13:22_
+_Generated: 2026-07-03 03:14:40_
 
 ## What this tests
 
@@ -18,7 +18,7 @@ For each confirmed real-world drug-repurposing success, we ran the existing Biol
 - **1/5** confirmed pairs reached STRONG_MATCH (composite_score >= 0.7).
 - **1/5** confirmed pairs appeared anywhere in the ranked list (any rank).
 - **1/5** diseases were outside the rare/NTD universe the system covers.
-- **1/5** cases errored before producing a ranked list.
+- **0/5** cases errored before producing a ranked list.
 
 ## Per-case results
 
@@ -26,7 +26,7 @@ For each confirmed real-world drug-repurposing success, we ran the existing Biol
 |---|---|---|---|---|---|---|---|---|
 | Sildenafil | pulmonary arterial hypertension | 2005 | hit | PDE5A | 3 | 0.7133 | ✓ | ✓ |
 | Thalidomide | multiple myeloma | 2006 | miss | FKBP1A | — | — | — | — |
-| Metformin | polycystic ovary syndrome | 1994 | error | — | — | — | — | — |
+| Metformin | polycystic ovary syndrome | 1994 | miss | ESR1 | — | — | — | — |
 | Everolimus | tuberous sclerosis complex | 2010 | miss | FKBP1A | — | — | — | — |
 | Propranolol | infantile hemangioma | 2014 | out_of_scope | — | — | — | — | — |
 
@@ -47,24 +47,27 @@ For each confirmed real-world drug-repurposing success, we ran the existing Biol
 - **Status:** miss
 - **Known target (context only):** Binds CRBN (cereblon); also anti-angiogenic / anti-TNF. Molecular target only elucidated years after clinical use.
 - **Top target pursued:** FKBP1A (P62942), OT association 0.9
-- **All targets considered for the disease:** FKBP1A (0.9), FDPS (0.9), TOP2A (0.9), GSR (0.9), NR3C1 (0.9), CD38 (0.9), TNFSF11 (0.9), CRBN (0.6846), NRAS (0.642), CXCR4 (0.6588), XPO1 (0.6416), SLAMF7 (0.9), GPRC5D (0.9), TNFRSF17 (0.6801)
+- **All targets considered for the disease:** FKBP1A (0.9), CD38 (0.9), FDPS (0.9), TOP2A (0.9), GSR (0.9), NR3C1 (0.9), CRBN (0.6846), CXCR4 (0.6588), NRAS (0.642), TNFSF11 (0.9), XPO1 (0.6416), SLAMF7 (0.9), GPRC5D (0.9), TNFRSF17 (0.6801)
 - **Candidate pool:** 29 chemist candidates -> 29 reviewed.
 - **Reason:** 'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
 - **Interpretation:** MISS — Thalidomide was not surfaced. 'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
 
 ### Metformin — polycystic ovary syndrome (confirmed 1994)
 
-- **Status:** error
+- **Status:** miss
 - **Known target (context only):** Insulin-sensitizer (AMPK / mitochondrial complex I); no single clean protein target. Used OFF-LABEL for PCOS.
-- **Reason:** target_selection failed: 'NON RARE IN EUROPE: Polycystic ovary syndrome' is in the rare/NTD universe but has no Open Targets EFO mapping, so its targets cannot be scored.
-- **Interpretation:** The disease is in-universe but target selection raised an error (e.g. no Open Targets EFO mapping or no associated targets), so no candidates could be scored.
+- **Top target pursued:** ESR1 (P03372), OT association 0.5989
+- **All targets considered for the disease:** ESR1 (0.5989), FTO (0.5206), ERBB4 (0.5384), FSHB (0.4827), DENND1A (0.4757)
+- **Candidate pool:** 34 chemist candidates -> 34 reviewed.
+- **Reason:** 'Metformin' did not appear among the 34 ChEMBL candidate compound(s) for the selected top target ESR1 (P03372). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not ESR1 (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
+- **Interpretation:** MISS — Metformin was not surfaced. 'Metformin' did not appear among the 34 ChEMBL candidate compound(s) for the selected top target ESR1 (P03372). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not ESR1 (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
 
 ### Everolimus — tuberous sclerosis complex (confirmed 2010)
 
 - **Status:** miss
 - **Known target (context only):** mTOR inhibitor (MTOR); TSC1/TSC2 loss drives mTOR hyperactivation, so MTOR is a strong disease-mechanistic target.
 - **Top target pursued:** FKBP1A (P62942), OT association 0.5679
-- **All targets considered for the disease:** FKBP1A (0.5679), VHL (0.3483), IFNG (0.4031), TSC2 (0.8867), TSC1 (0.8682)
+- **All targets considered for the disease:** FKBP1A (0.5679), VHL (0.3483), TSC2 (0.8867), TSC1 (0.8682), IFNG (0.4031)
 - **Candidate pool:** 29 chemist candidates -> 29 reviewed.
 - **Reason:** 'Everolimus' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
 - **Interpretation:** MISS — Everolimus was not surfaced. 'Everolimus' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
