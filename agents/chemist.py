@@ -32,8 +32,10 @@ import anthropic
 
 from agents.target_selection import OUTPUT_DIR
 from agents import provenance
-from data_sources.chembl import get_target_candidate_compounds
+from agents.mutation_disclosure import detect_mutation_specificity
+from data_sources.chembl import get_target_candidate_compounds, get_drug_indications
 from data_sources.pubchem import get_compound_data, get_drug_classification
+from data_sources.openfda import get_label_indications
 
 MODEL = "claude-sonnet-4-6"
 FP_RADIUS = 2
@@ -126,20 +128,35 @@ def _llm_rationale(client: Optional[anthropic.Anthropic], c: dict[str, Any],
         return _fallback_rationale(c, sim_drug, tanimoto, network)
 
 
-def run_chemist(biologist_output: dict[str, Any]) -> dict[str, Any]:
-    target = biologist_output["target"]
-    uniprot = target.get("uniprot_id")
-    symbol = target.get("target_symbol")
-    network = biologist_output.get("interacting_genes", [])
+def _mutation_disclosure_for(drug_name: str, molecule_chembl_id: str) -> dict[str, Any]:
+    """
+    Build the mutation-specificity DISCLOSURE record for one drug by scanning its
+    FDA-label indications (primary) plus ChEMBL indication terms (secondary).
+    Disclosure only — never affects scoring; see agents/mutation_disclosure.py.
+    """
+    label = get_label_indications(drug_name) if drug_name else {}
+    chembl_terms = get_drug_indications(molecule_chembl_id) if molecule_chembl_id else []
+    disc = detect_mutation_specificity(label.get("indications_text", ""), chembl_terms)
+    disc["indication_source"] = label.get("source")
+    return disc
 
-    if not uniprot:
-        print("[chemist] WARNING: target has no UniProt id; cannot query ChEMBL")
-        return {"target": target, "candidates": [], "pooled_across_multiple_targets": False}
 
-    cc = get_target_candidate_compounds(uniprot)
-    compounds = cc["compounds"]
+def _enrich_compounds(
+    compounds: list[dict[str, Any]],
+    symbol: str,
+    uniprot: str,
+    disease_name: str,
+    ot_association_score: float,
+    target_discovery_method: str,
+) -> list[dict[str, Any]]:
+    """
+    PubChem-enrich a list of raw ChEMBL compound dicts and attach target
+    metadata fields consumed by the Reviewer and Writer.
 
-    # Enrich each compound: resolve InChIKey + SMILES + approved-drug status via PubChem.
+    Sets target_discovery_method on every compound so the report makes the
+    discovery path auditable ("genetic_association", "pharmacological_precedent",
+    or "pathway_neighbor").
+    """
     enriched: list[dict[str, Any]] = []
     for c in compounds:
         smiles = c.get("canonical_smiles")
@@ -158,14 +175,81 @@ def run_chemist(biologist_output: dict[str, Any]) -> dict[str, Any]:
                 atc = cls.get("atc_codes", [])
         e = {**c, "smiles": smiles, "inchikey": inchikey,
              "pubchem_known_drug": pubchem_known, "atc_codes": atc,
-             "target_symbol": symbol}
+             "target_symbol": symbol,
+             "target_discovery_method": target_discovery_method}
         e["is_approved_drug"] = _is_approved(e)
         e["drug_name"] = name or c["molecule_chembl_id"]
+        e["ot_association_score"] = ot_association_score
+        e["disease_name"] = disease_name
+        if e["is_approved_drug"] and name:
+            e["mutation_specificity"] = _mutation_disclosure_for(
+                name, c.get("molecule_chembl_id", ""))
+        else:
+            e["mutation_specificity"] = detect_mutation_specificity("")
         enriched.append(e)
+    return enriched
 
-    # Build approved-drug reference fingerprints (the bisociation reference set).
+
+def run_chemist(biologist_output: dict[str, Any],
+                repurposing_only: bool = False) -> dict[str, Any]:
+    target = biologist_output["target"]
+    uniprot = target.get("uniprot_id")
+    symbol = target.get("target_symbol")
+    disease_name = target.get("disease_name", "")
+    ot_score = target.get("ot_association_score", 0.0)
+    network = biologist_output.get("interacting_genes", [])
+
+    if not uniprot:
+        print("[chemist] WARNING: target has no UniProt id; cannot query ChEMBL")
+        return {"target": target, "candidates": [],
+                "pooled_across_multiple_targets": False,
+                "repurposing_only": repurposing_only}
+
+    cc = get_target_candidate_compounds(uniprot, repurposing_only=repurposing_only)
+    compounds = cc["compounds"]
+    if repurposing_only:
+        print(f"[chemist] repurposing_only mode: pool restricted to "
+              f"{len(compounds)} approved compound(s) (unapproved tool "
+              f"compounds dropped at collection time)")
+
+    # Enrich primary target's compounds via the shared helper.
+    primary_disc_method = target.get("target_discovery_method", "genetic_association")
+    enriched = _enrich_compounds(
+        compounds, symbol, uniprot, disease_name, ot_score, primary_disc_method)
+
+    # Pathway-neighbor expansion: also query compounds for any pathway-neighbor
+    # targets discovered by the Biologist (those with approved drugs).
+    # Each neighbor's candidates are enriched and pooled with the primary set.
+    neighbor_enriched: list[dict[str, Any]] = []
+    for nbr in biologist_output.get("pathway_neighbor_targets") or []:
+        nbr_uid = nbr.get("uniprot_id", "")
+        nbr_sym = nbr.get("target_symbol", nbr_uid)
+        if not nbr_uid:
+            continue
+        try:
+            nbr_cc = get_target_candidate_compounds(
+                nbr_uid, repurposing_only=repurposing_only)
+            nbr_compounds = nbr_cc.get("compounds", [])
+            if nbr_compounds:
+                nbr_enriched = _enrich_compounds(
+                    nbr_compounds, nbr_sym, nbr_uid, disease_name,
+                    0.0, "pathway_neighbor")  # ot_score=0: no direct OT link
+                neighbor_enriched.extend(nbr_enriched)
+                print(f"[chemist] pathway_neighbor {nbr_sym} ({nbr_uid}): "
+                      f"{len(nbr_compounds)} compound(s) added to pool")
+        except Exception as e:
+            print(f"[chemist] WARNING: compound lookup failed for pathway "
+                  f"neighbor {nbr_sym} ({nbr_uid}): {e}")
+
+    all_enriched = enriched + neighbor_enriched
+    print(f"[chemist] pooled {len(enriched)} primary + "
+          f"{len(neighbor_enriched)} pathway-neighbor compounds "
+          f"= {len(all_enriched)} total")
+
+    # Build approved-drug reference fingerprints from the FULL pooled set —
+    # so Tanimoto similarity is computed against the combined approved reference.
     approved_fps: dict[str, tuple[dict[str, Any], Any]] = {}
-    for e in enriched:
+    for e in all_enriched:
         if e["is_approved_drug"]:
             fp = _fingerprint(e["smiles"])
             if fp is not None:
@@ -175,7 +259,9 @@ def run_chemist(biologist_output: dict[str, Any]) -> dict[str, Any]:
     prov_entries: list[dict[str, Any]] = []
     results: list[dict[str, Any]] = []
 
-    for e in enriched:
+    for e in all_enriched:
+        e_sym = e.get("target_symbol", symbol)
+        e_uid = e.get("uniprot_id", uniprot)
         cand_fp = _fingerprint(e["smiles"])
         best_drug = None
         best_score = 0.0
@@ -202,13 +288,18 @@ def run_chemist(biologist_output: dict[str, Any]) -> dict[str, Any]:
             "atc_codes": e["atc_codes"],
             "most_similar_approved_drug": best_drug,
             "tanimoto_score": round(best_score, 4),
+            "mutation_specificity": e.get("mutation_specificity")
+            or detect_mutation_specificity(""),
             "rationale": rationale,
             "source_chembl_ids": e.get("source_chembl_ids", []),
             "source_activity_ids": e.get("source_activity_ids", []),
-            "target_symbol": symbol,
-            "uniprot_id": uniprot,
-            "disease_name": target.get("disease_name"),
-            "ot_association_score": target.get("ot_association_score", 0.0),
+            "target_symbol": e_sym,
+            "target_discovery_method": e.get("target_discovery_method",
+                                             primary_disc_method),
+            "uniprot_id": e_uid,
+            "disease_name": disease_name,
+            "ot_association_score": e.get("ot_association_score",
+                                          ot_score),
         })
 
         for aid in e.get("source_activity_ids", []):
@@ -216,7 +307,7 @@ def run_chemist(biologist_output: dict[str, Any]) -> dict[str, Any]:
                 "source_type": "chembl_activity",
                 "source_id": aid,
                 "used_by": "chemist",
-                "context": f"{e['drug_name']} affinity vs {symbol}",
+                "context": f"{e['drug_name']} affinity vs {e_sym}",
             })
 
     provenance.log_many(prov_entries)
@@ -229,10 +320,17 @@ def run_chemist(biologist_output: dict[str, Any]) -> dict[str, Any]:
         r["tanimoto_score"],
     ), reverse=True)
 
+    n_mut = sum(1 for r in results
+                if (r.get("mutation_specificity") or {}).get("is_mutation_specific"))
+    if n_mut:
+        print(f"[chemist] mutation-specificity disclosure: {n_mut} candidate(s) "
+              f"have an approved indication that names a specific mutation")
+
     return {
         "target": target,
         "candidates": results,
         "pooled_across_multiple_targets": cc["pooled_across_multiple_targets"],
+        "repurposing_only": repurposing_only,
         "approved_reference_set_size": len(approved_fps),
         "reference_set_note": (
             "Tanimoto computed against approved drugs found in this target's "
@@ -249,9 +347,13 @@ def main() -> None:
     with open(path_in, "r", encoding="utf-8") as f:
         biologist_output = json.load(f)
 
-    out = run_chemist(biologist_output)
+    # CLI default is the mixed pool (repurposing_only=False); pass
+    # --repurposing-only to restrict to approved drugs, matching live API jobs.
+    repurposing_only = "--repurposing-only" in sys.argv
+    out = run_chemist(biologist_output, repurposing_only=repurposing_only)
     print(f"[chemist] {len(out['candidates'])} candidates ranked "
-          f"({out['approved_reference_set_size']} approved in reference set)")
+          f"({out['approved_reference_set_size']} approved in reference set); "
+          f"repurposing_only={out['repurposing_only']}")
 
     path_out = os.path.join(OUTPUT_DIR, "chemist_output.json")
     with open(path_out, "w", encoding="utf-8") as f:

@@ -109,7 +109,10 @@ def _run_graph(job_id: str, thread_id: str) -> None:
         # the highest-ranked pair not yet explored.
         job = jobs_db.get_job(job_id)
         requested = (job or {}).get("disease_name")
-        initial_state: dict[str, Any] = {"job_id": job_id}
+        # Live API jobs are always repurposing-only: the pool is restricted to
+        # approved drugs (existing human safety profile), never research-grade
+        # tool compounds. The CLI path keeps the mixed pool (see chemist_node).
+        initial_state: dict[str, Any] = {"job_id": job_id, "repurposing_only": True}
         if requested:
             initial_state["requested_disease"] = requested
 
@@ -134,6 +137,11 @@ def _run_graph(job_id: str, thread_id: str) -> None:
                     target = value.get("target") or {}
                     if target.get("disease_name"):
                         fields["disease_name"] = target["disease_name"]
+
+                if node == "chemist":
+                    chem = value.get("chemist_output") or {}
+                    fields["repurposing_only"] = int(
+                        bool(chem.get("repurposing_only")))
 
                 if node == "structure_validation":
                     fields["total_cost_usd"] = _sum_structure_cost(

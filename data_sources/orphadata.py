@@ -4,10 +4,22 @@ Also includes the static WHO Neglected Tropical Disease list.
 """
 
 import requests
+import xml.etree.ElementTree as ET
 from typing import Any, Optional
 from cache.cache import get, set as cache_set, make_key
 
 BASE_URL = "https://api.orphadata.com"
+
+# Bulk cross-referencing product (single ~3.4MB file). Unlike the JSON API,
+# this XML product exposes the DisorderGroup classification (Disorder /
+# Subtype of disorder / Group of disorders) for every ORPHAcode in one call,
+# so the candidate-universe umbrella filter needs a single fetch, not ~11.6k
+# per-code lookups.
+PRODUCT1_XML_URL = "https://www.orphadata.com/data/xml/en_product1.xml"
+
+# DisorderGroup value that marks an umbrella term (e.g. "RASopathy") rather
+# than a specific single disease. These are excluded from the scoring universe.
+GROUP_OF_DISORDERS = "Group of disorders"
 
 WHO_NTDS = [
     {"name": "Buruli ulcer", "icd10": "A31.1", "mesh": "D009165"},
@@ -77,6 +89,53 @@ def get_rare_disease_list() -> list[dict[str, Any]]:
 
     cache_set(cache_key, diseases, ttl_days=7)
     return diseases
+
+
+def get_disorder_metadata() -> list[dict[str, Any]]:
+    """
+    Fetch the Orphanet cross-referencing XML product (en_product1.xml) and return
+    one record per ORPHAcode: {orpha_code, name, disorder_group}.
+
+    `disorder_group` is Orphanet's DisorderGroup classification — one of
+    "Disorder", "Subtype of disorder", or "Group of disorders". The last marks
+    an umbrella term (e.g. "RASopathy") that aggregates several distinct
+    diseases; the candidate-universe filter uses it to drop umbrella entries.
+
+    A single ~3.4MB download covers the whole nomenclature, so this is far
+    cheaper than per-code lookups. Cached with a long TTL (nomenclature is
+    updated a few times a year).
+    """
+    cache_key = make_key("get_disorder_metadata")
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    records: list[dict[str, Any]] = []
+    try:
+        resp = requests.get(PRODUCT1_XML_URL, timeout=120)
+        resp.raise_for_status()
+        root = ET.fromstring(resp.content)
+        for d in root.findall(".//Disorder"):
+            code = d.findtext("OrphaCode")
+            name = d.findtext("Name")
+            dg = d.find("DisorderGroup")
+            group = dg.findtext("Name") if dg is not None else None
+            if not code or not name:
+                continue
+            records.append({
+                "orpha_code": str(code),
+                "name": name,
+                "disorder_group": group,
+            })
+    except Exception as e:
+        print(f"[orphadata] WARNING: DisorderGroup product fetch failed ({e}). "
+              f"Umbrella filtering will be skipped this run.")
+
+    # Only cache a genuinely populated result; an empty parse (network failure)
+    # should be retried, not frozen for 30 days.
+    if records:
+        cache_set(cache_key, records, ttl_days=30)
+    return records
 
 
 def get_disease_xrefs(orpha_code: str) -> dict[str, Any]:

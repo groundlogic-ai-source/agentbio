@@ -1,0 +1,74 @@
+TOP-K TARGET PURSUIT
+
+Currently target_selection produces a ranked list but only the #1
+(disease, target) pair proceeds to biologist -> chemist -> reviewer.
+Change this to pursue the top K targets (K=5 as a starting constant,
+named TOP_K_TARGETS, easy to tune later) for a chosen disease.
+
+1. For each of the K targets: run biologist_node and chemist_node
+   independently (these already work per-target, no logic change needed
+   there — just call them K times, ideally in parallel/async since this
+   multiplies API call volume by K).
+2. Pool ALL candidates from all K targets into one combined list before
+   Reviewer scores anything. Reviewer's composite_score, STRONG_MATCH
+   threshold, and normalization should operate over this combined pool,
+   not per-target silos — so the single best (target, drug) pair wins
+   regardless of which of the K targets it came from.
+3. Tag every candidate with which target it came from in the final
+   report, so this is auditable.
+4. COST GUARDRAIL: do not run Structure Validation (Boltz calls, which
+   cost real money per call) for every candidate across all K targets.
+   Only run Boltz validation on the single final top-ranked candidate
+   after Reviewer has scored the full pooled set.
+5. Auto-explore's explored_targets table should record all K explored
+   (disease, target) pairs from this run, not just the top one, so
+   future blank runs correctly skip all of them.
+
+Verify: rerun thalidomide/multiple myeloma with K=5, and separately with
+whatever K is needed to include CRBN (rank 7 in the last diagnostic) —
+report at each K whether thalidomide now enters the pool and what its
+composite_score is. Report the real cost/time increase per case (K times
+biologist+chemist calls) so we know the practical tradeoff, not just
+whether it works.
+
+PATHWAY-NEIGHBOR EXPANSION
+
+Add a new data source, data_sources/reactome.py, using Reactome's
+Content Service REST API (https://reactome.org/dev/content-service).
+Read Reactome's actual current API documentation before writing any
+endpoint code — do not guess endpoint paths or response schema.
+
+Function: get_pathway_neighbors(uniprot_id) — given a causal gene's
+UniProt ID, find the Reactome pathway(s) it participates in, then
+return other genes/proteins that participate in the SAME pathway
+(prioritize direct reaction-adjacency relationships; Reactome's own
+documentation warns that some relationship types — e.g. large multi-
+protein complex membership like a 40+ component ribosomal subunit —
+produce very broad, low-specificity neighbor sets, so prefer tighter
+"neighbouring reaction" style relationships over raw complex membership
+where the API distinguishes them). Cap the returned neighbor list at a
+reasonable size (e.g. top 10 by relevance) rather than returning
+everything.
+
+Wire this into the Biologist's existing pharmacological-precedent path:
+for the disease's causal gene (from Open Targets), also fetch its
+pathway neighbors via Reactome, and run the SAME existing "does an
+approved drug target this gene" ChEMBL lookup against each neighbor,
+not just the causal gene itself. Tag any target discovered this way
+with target_discovery_method: "pathway_neighbor" (distinct from
+"genetic_association" and "pharmacological_precedent"), so it's visible
+and auditable in the report exactly like the other two paths.
+
+Important: once a pathway-neighbor gene like MTOR becomes a candidate
+target, the Chemist's existing compound-pool step (which queries raw
+ChEMBL bioactivity/IC50-Ki records for a target directly) should find
+everolimus there on its own, independent of ChEMBL's separate
+"mechanism" annotation table which we already know is incomplete for
+this case. Confirm this is actually true rather than assuming it.
+
+Verify: rerun everolimus/TSC. Confirm MTOR now appears as a candidate
+target via the pathway_neighbor path (since TSC1/TSC2 -> MTOR is a
+well-established direct pathway relationship), and report whether
+everolimus now enters its candidate pool and what composite_score
+results. Do not adjust any scoring weight to make this come out a
+particular way — report whatever the real result is, hit or miss.

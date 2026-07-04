@@ -29,6 +29,7 @@ import os
 import sqlite3
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Optional, TypedDict
 
 import sweep_manager
@@ -67,13 +68,26 @@ STRONG_ONLY = os.environ.get("STAGE3_STRONG_ONLY", "0") == "1"
 # Cap how many candidates get a (paid) structure prediction per run.
 MAX_STRUCTURE_CANDIDATES = int(os.environ.get("STAGE3_MAX_CANDIDATES", "3"))
 BOLTZ_NUM_SAMPLES = int(os.environ.get("STAGE3_BOLTZ_SAMPLES", "1"))
+# Number of targets to pursue in parallel for each disease (Top-K pursuit).
+# When K > 1: biologist + chemist run in parallel for each target; candidates
+# are pooled before the reviewer; structure validation hard-caps at 1 Boltz
+# call as a cost guardrail.  Set TOP_K_TARGETS=1 to restore single-target mode.
+TOP_K_TARGETS = int(os.environ.get("TOP_K_TARGETS", "5"))
 
 
 class PipelineState(TypedDict, total=False):
     job_id: Optional[str]
+    repurposing_only: bool
     requested_disease: str
+    # Primary (top-ranked) target — kept for backwards compat with nodes that
+    # only need a single target (structure_validation uses its uniprot_id for
+    # AFDB; the marker/invalidation logic uses disease_name + target_symbol).
     target: dict[str, Any]
-    biologist_output: dict[str, Any]
+    # All K targets selected in this run (len >= 1).  When TOP_K_TARGETS = 1
+    # this is a one-element list equal to [target].
+    targets: list[dict[str, Any]]
+    biologist_output: dict[str, Any]   # primary target's output (compat)
+    biologist_outputs: list[dict[str, Any]]  # one per target, same order as targets
     chemist_output: dict[str, Any]
     reviewed: dict[str, Any]
     selected: list[dict[str, Any]]
@@ -179,8 +193,9 @@ def target_selection_node(state: PipelineState) -> dict[str, Any]:
         # raises DiseaseNotInUniverse / RuntimeError, which surfaces to the caller
         # as a clean job error rather than a silent auto-pick fallback.
         print(f"[graph] target_selection: manual disease request '{requested}'")
-        rows = select_for_disease(requested)
-        r = rows[0]
+        all_rows = select_for_disease(requested)
+        # Take the top K targets for this disease, ranked by Stage 1 score.
+        top_rows = all_rows[:TOP_K_TARGETS]
     else:
         rows = None if FORCE_RECOMPUTE else _load_json("top_candidates.json")
         if rows is None:
@@ -191,31 +206,56 @@ def target_selection_node(state: PipelineState) -> dict[str, Any]:
             print("[graph] target_selection: reusing existing top_candidates.json")
         if not rows:
             raise RuntimeError("Stage 1 produced no candidates")
-        r = _pick_unexplored_row(rows)
 
-    target = _target_from_row(r)
+        # Blank mode: atomically claim the primary (highest-ranked unexplored) pair,
+        # then gather the remaining top-K targets for the SAME disease from the
+        # pre-ranked list so one run explores multiple targets together.
+        primary_row = _pick_unexplored_row(rows)
+        primary_disease = primary_row.get("disease_name", "")
+        # Gather all rows for the chosen disease (the ranked list is already sorted
+        # by combined score within each disease, so slicing preserves that order).
+        disease_rows = [r for r in rows
+                        if r.get("disease_name") == primary_disease]
+        top_rows = disease_rows[:TOP_K_TARGETS]
+        # Make sure the atomically-claimed primary is always first.
+        primary_sym = primary_row.get("target_symbol", "")
+        reordered = [primary_row] + [
+            r for r in top_rows
+            if r.get("target_symbol") != primary_sym
+        ]
+        top_rows = reordered[:TOP_K_TARGETS]
+
+    # Build target dicts for all K rows.
+    targets = [_target_from_row(r) for r in top_rows]
+    target = targets[0]   # primary — used by downstream nodes that take one target
 
     # Clear stale downstream artifacts BEFORE recording the new selection marker.
+    # We use the primary target for the invalidation marker (K-pursuit stays on
+    # the same disease, so the disease+primary_target pair identifies the run).
     _invalidate_downstream_if_target_changed(target)
-    _write_json(_ACTIVE_SELECTION, r)
+    _write_json(_ACTIVE_SELECTION, top_rows[0])
 
-    # Record the pair so future blank runs explore further down the list. Recorded
-    # for both modes ("any disease+target pair already used in a prior run").
+    # Record ALL K pairs as explored so future blank runs skip past them.
+    # Recorded for both modes; INSERT OR IGNORE makes duplicate records safe.
     try:
         from api import jobs_db
-        jobs_db.record_explored(
-            target["disease_name"],
-            target["target_symbol"],
-            job_id=state.get("job_id"),
-        )
+        for t in targets:
+            jobs_db.record_explored(
+                t["disease_name"],
+                t["target_symbol"],
+                job_id=state.get("job_id"),
+            )
     except Exception as e:  # persistence is best-effort; never fail the run on it
-        print(f"[graph] target_selection: WARN could not record explored pair: {e}")
+        print(f"[graph] target_selection: WARN could not record explored pairs: {e}")
 
-    print(f"[graph] target: {target['target_symbol']} ({target.get('uniprot_id')}) "
-          f"for {target['disease_name']} "
-          f"[tractability={target.get('tractability_score')}, "
-          f"unmet_need={target.get('unmet_need_score')}]")
-    return {"target": target}
+    for t in targets:
+        print(f"[graph] target: {t['target_symbol']} ({t.get('uniprot_id')}) "
+              f"for {t['disease_name']} "
+              f"[tractability={t.get('tractability_score')}, "
+              f"unmet_need={t.get('unmet_need_score')}]")
+    print(f"[graph] target_selection: pursuing {len(targets)} target(s) in parallel "
+          f"(TOP_K_TARGETS={TOP_K_TARGETS})")
+    return {"target": target, "targets": targets}
 
 
 def biologist_node(state: PipelineState) -> dict[str, Any]:
@@ -224,29 +264,141 @@ def biologist_node(state: PipelineState) -> dict[str, Any]:
     # silently cross-contaminate. File-cache reuse is retained only for the
     # CLI standalone path (no job_id) where a single sequential user controls it.
     fresh = FORCE_RECOMPUTE or bool(state.get("job_id"))
-    existing = None if fresh else _load_json("biologist_output.json")
-    if existing is not None:
-        print("[graph] biologist: reusing existing biologist_output.json")
-        return {"biologist_output": existing}
+    targets = state.get("targets") or [state["target"]]
+
+    if len(targets) == 1 and not fresh:
+        existing = _load_json("biologist_output.json")
+        if existing is not None:
+            print("[graph] biologist: reusing existing biologist_output.json")
+            return {"biologist_output": existing, "biologist_outputs": [existing]}
+
     # A fresh Stage 2 pass starts the shared provenance log at the biologist.
+    # NOTE: for K > 1 parallel runs each thread calls provenance.log_many()
+    # concurrently; the JSON file may contain only the last-writer's entries.
+    # This is acceptable since provenance is an audit aid, not scoring-critical.
     provenance.reset()
-    out = run_biologist(state["target"])
-    _write_json("biologist_output.json", out)
-    print(f"[graph] biologist: {len(out['interacting_genes'])} interactors, "
-          f"{len(out['literature_hits'])} literature hits")
-    return {"biologist_output": out}
+
+    if len(targets) == 1:
+        out = run_biologist(targets[0])
+        _write_json("biologist_output.json", out)
+        print(f"[graph] biologist: {len(out['interacting_genes'])} interactors, "
+              f"{len(out['literature_hits'])} literature hits")
+        return {"biologist_output": out, "biologist_outputs": [out]}
+
+    # K > 1: run all biologist tasks in parallel.
+    print(f"[graph] biologist: running {len(targets)} target(s) in parallel")
+    outputs: list[Optional[dict[str, Any]]] = [None] * len(targets)
+    with ThreadPoolExecutor(max_workers=len(targets)) as exe:
+        future_to_idx = {
+            exe.submit(run_biologist, t): i for i, t in enumerate(targets)
+        }
+        for fut in as_completed(future_to_idx):
+            idx = future_to_idx[fut]
+            try:
+                outputs[idx] = fut.result()
+                t = targets[idx]
+                o = outputs[idx]
+                print(f"[graph] biologist [{t['target_symbol']}]: "
+                      f"{len(o.get('interacting_genes', []))} interactors, "
+                      f"{len(o.get('literature_hits', []))} literature hits, "
+                      f"{len(o.get('pathway_neighbor_targets', []))} pathway neighbors")
+            except Exception as e:
+                print(f"[graph] biologist [{targets[idx]['target_symbol']}] "
+                      f"FAILED: {e}")
+                outputs[idx] = {
+                    "target": targets[idx],
+                    "interacting_genes": [], "literature_hits": [],
+                    "pathway_neighbor_targets": [],
+                    "druggability_context": {},
+                    "error": str(e),
+                }
+
+    bio_outputs: list[dict[str, Any]] = [o for o in outputs if o is not None]
+    primary_bio = bio_outputs[0] if bio_outputs else {}
+    return {"biologist_output": primary_bio, "biologist_outputs": bio_outputs}
 
 
 def chemist_node(state: PipelineState) -> dict[str, Any]:
     fresh = FORCE_RECOMPUTE or bool(state.get("job_id"))
-    existing = None if fresh else _load_json("chemist_output.json")
-    if existing is not None:
-        print("[graph] chemist: reusing existing chemist_output.json")
-        return {"chemist_output": existing}
-    out = run_chemist(state["biologist_output"])
-    _write_json("chemist_output.json", out)
-    print(f"[graph] chemist: {len(out['candidates'])} candidates ranked")
-    return {"chemist_output": out}
+    targets = state.get("targets") or [state["target"]]
+    bio_outputs = state.get("biologist_outputs") or [state["biologist_output"]]
+    # Guard: align lengths (truncate to shorter of the two)
+    k = min(len(targets), len(bio_outputs))
+
+    if k == 1 and not fresh:
+        existing = _load_json("chemist_output.json")
+        if existing is not None:
+            print("[graph] chemist: reusing existing chemist_output.json")
+            return {"chemist_output": existing}
+
+    # Repurposing-only pool defaults ON for live API jobs (job_id set) and OFF
+    # for the CLI/standalone path, unless explicitly overridden in state.
+    repurposing_only = state.get("repurposing_only", bool(state.get("job_id")))
+
+    if k == 1:
+        out = run_chemist(bio_outputs[0], repurposing_only=repurposing_only)
+        _write_json("chemist_output.json", out)
+        print(f"[graph] chemist: {len(out['candidates'])} candidates ranked")
+        return {"chemist_output": out}
+
+    # K > 1: run all chemist tasks in parallel, then pool candidates.
+    print(f"[graph] chemist: running {k} target(s) in parallel")
+    chemist_results: list[Optional[dict[str, Any]]] = [None] * k
+    with ThreadPoolExecutor(max_workers=k) as exe:
+        future_to_idx = {
+            exe.submit(run_chemist, bio_outputs[i],
+                       repurposing_only=repurposing_only): i
+            for i in range(k)
+        }
+        for fut in as_completed(future_to_idx):
+            idx = future_to_idx[fut]
+            try:
+                chemist_results[idx] = fut.result()
+                sym = targets[idx]["target_symbol"] if idx < len(targets) else str(idx)
+                n = len((chemist_results[idx] or {}).get("candidates", []))
+                print(f"[graph] chemist [{sym}]: {n} candidate(s)")
+            except Exception as e:
+                sym = targets[idx]["target_symbol"] if idx < len(targets) else str(idx)
+                print(f"[graph] chemist [{sym}] FAILED: {e}")
+                chemist_results[idx] = {
+                    "target": targets[idx],
+                    "candidates": [],
+                    "error": str(e),
+                }
+
+    # Pool all candidates from all K targets into a single chemist_output.
+    all_candidates: list[dict[str, Any]] = []
+    has_any_pooled = False
+    for res in chemist_results:
+        if res:
+            cands = res.get("candidates", [])
+            all_candidates.extend(cands)
+            if res.get("pooled_across_multiple_targets"):
+                has_any_pooled = True
+
+    total_approved_fps = sum(
+        r.get("approved_reference_set_size", 0)
+        for r in chemist_results if r
+    )
+    pooled_out = {
+        "target": bio_outputs[0]["target"],
+        "targets": [bio_outputs[i]["target"] for i in range(k)],
+        "candidates": all_candidates,
+        "pooled_across_k_targets": True,
+        "k_targets": k,
+        "repurposing_only": repurposing_only,
+        "pooled_across_multiple_targets": has_any_pooled,
+        "approved_reference_set_size": total_approved_fps,
+        "reference_set_note": (
+            f"Candidates pooled from {k} targets for the same disease "
+            f"(TOP_K_TARGETS={TOP_K_TARGETS}). Pathway-neighbor candidates "
+            "tagged target_discovery_method='pathway_neighbor'."
+        ),
+    }
+    _write_json("chemist_output.json", pooled_out)
+    print(f"[graph] chemist: pooled {len(all_candidates)} total candidate(s) "
+          f"from {k} target(s)")
+    return {"chemist_output": pooled_out}
 
 
 def reviewer_node(state: PipelineState) -> dict[str, Any]:
@@ -265,6 +417,7 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
         },
         "n_candidates": len(reviewed),
         "n_strong_matches": sum(1 for r in reviewed if r["strong_match"]),
+        "repurposing_only": state["chemist_output"].get("repurposing_only", False),
         "candidates": reviewed,
     }
     _write_json("reviewed_candidates.json", payload)
@@ -286,8 +439,6 @@ def _select_candidates(reviewed: dict[str, Any]) -> list[dict[str, Any]]:
 
 def structure_validation_node(state: PipelineState) -> dict[str, Any]:
     reviewed = state["reviewed"]
-    target = state.get("target", {})
-    uniprot = target.get("uniprot_id")
     selected = _select_candidates(reviewed)
 
     if not selected:
@@ -295,29 +446,44 @@ def structure_validation_node(state: PipelineState) -> dict[str, Any]:
               "STAGE3_STRONG_ONLY=1 — nothing to validate")
         return {"selected": [], "structure_results": {}}
 
-    # AFDB apo pre-check is per-TARGET (all candidates are ligands vs the same target).
-    afdb = {"has_structure": False, "mean_plddt": None, "model_url": None}
-    if uniprot:
-        a = get_structure_confidence(uniprot)
-        afdb = {
-            "has_structure": a.get("has_structure", False),
-            "mean_plddt": a.get("mean_pLDDT"),
-            "model_url": a.get("model_url"),
-        }
-        print(f"[graph] AFDB apo pre-check {uniprot}: has_structure="
-              f"{afdb['has_structure']} mean_pLDDT={afdb['mean_plddt']} "
-              f"(apo only, no ligand — Boltz still called for the complex)")
+    # COST GUARDRAIL: when pursuing K > 1 targets, hard-cap at 1 Boltz call
+    # (the single top-ranked candidate).  With K=1 the existing MAX_STRUCTURE_CANDIDATES
+    # cap applies.  This prevents a K×MAX cost spike on every run.
+    targets = state.get("targets") or [state.get("target", {})]
+    if len(targets) > 1 and len(selected) > 1:
+        print(f"[graph] structure_validation: K={len(targets)} targets — "
+              f"applying cost guardrail: capping Boltz predictions to 1 "
+              f"(was {len(selected)} candidates)")
+        selected = selected[:1]
 
-    sequence = get_protein_sequence(uniprot) if uniprot else None
-    if not sequence:
-        print(f"[graph] WARNING: no protein sequence for {uniprot}; "
-              f"Boltz complex prediction will be skipped")
-
+    # AFDB apo pre-check: use each candidate's own uniprot_id because with K targets
+    # pooled candidates may come from different target proteins.
     structure_results: dict[str, Any] = {}
     for cand in selected:
         drug = cand.get("drug_name", "unknown")
         smiles = cand.get("smiles")
-        print(f"[graph] structure_validation: {drug} (smiles={str(smiles)[:32]})")
+        cand_uniprot = cand.get("uniprot_id") or state.get("target", {}).get("uniprot_id")
+
+        afdb: dict[str, Any] = {"has_structure": False, "mean_plddt": None, "model_url": None}
+        if cand_uniprot:
+            a = get_structure_confidence(cand_uniprot)
+            afdb = {
+                "has_structure": a.get("has_structure", False),
+                "mean_plddt": a.get("mean_pLDDT"),
+                "model_url": a.get("model_url"),
+            }
+            print(f"[graph] AFDB apo pre-check {cand_uniprot} ({cand.get('target_symbol','?')}): "
+                  f"has_structure={afdb['has_structure']} mean_pLDDT={afdb['mean_plddt']} "
+                  f"(apo only — Boltz still called for complex)")
+
+        sequence = get_protein_sequence(cand_uniprot) if cand_uniprot else None
+        if not sequence:
+            print(f"[graph] WARNING: no protein sequence for {cand_uniprot}; "
+                  f"Boltz complex prediction will be skipped for {drug}")
+
+        print(f"[graph] structure_validation: {drug} (smiles={str(smiles)[:32]}) "
+              f"[target={cand.get('target_symbol','?')}, "
+              f"disc={cand.get('target_discovery_method','?')}]")
         complex_res = boltz_api.predict_complex(sequence, smiles, num_samples=BOLTZ_NUM_SAMPLES) \
             if (sequence and smiles) else {
                 "available": False,
@@ -347,9 +513,26 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
     if not selected:
         print("[graph] writer: no candidates selected — no reports written")
         return {"reports": []}
+
+    # For K > 1 targets, pass the biologist_outputs keyed by target_symbol so
+    # build_report_markdown receives the matching biologist context per candidate.
+    # The primary biologist_output is the fallback for any candidate whose symbol
+    # is not found in the map (e.g. pathway-neighbor candidates).
+    bio_outputs_list = state.get("biologist_outputs") or []
+    bio_map: dict[str, dict[str, Any]] = {}
+    for bio in bio_outputs_list:
+        sym = (bio.get("target") or {}).get("target_symbol")
+        if sym:
+            bio_map[sym] = bio
+    primary_bio = state.get("biologist_output")
+
+    def _bio_for(cand: dict) -> Optional[dict]:
+        sym = cand.get("target_symbol")
+        return bio_map.get(sym) or primary_bio
+
     reports = writer.run_writer(
-        reviewed, selected, structure_results, state.get("biologist_output"),
-        state.get("target"))
+        reviewed, selected, structure_results, primary_bio,
+        state.get("target"), bio_for_candidate=_bio_for)
     print(f"[graph] writer: wrote {len(reports)} report(s) to output/reports/")
     return {"reports": reports}
 

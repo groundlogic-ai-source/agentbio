@@ -141,6 +141,19 @@ def _cif_link(cx: dict[str, Any]) -> str:
     return "n/a"
 
 
+def _mutation_specificity_cell(candidate: dict[str, Any]) -> str:
+    """
+    Render the mutation-specificity DISCLOSURE flag for the evidence table.
+    Disclosure only — this does not assert the repurposing target carries the
+    mutation and never affects any score.
+    """
+    ms = candidate.get("mutation_specificity") or {}
+    if not ms.get("is_mutation_specific"):
+        return "No specific mutation named in approved indication"
+    terms = ", ".join(ms.get("matched_terms", [])) or "see label"
+    return f"⚠ YES — indication names: {terms}"
+
+
 def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
     cx = (struct or {}).get("complex") or {}
     adme = (struct or {}).get("adme") or {}
@@ -163,6 +176,8 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
             if candidate.get("is_approved_drug") is False
             else _fmt(candidate.get("is_approved_drug"))
         )),
+        ("Mutation-specific approved indication (disclosure)",
+         _mutation_specificity_cell(candidate)),
         ("Lipinski/Veber (MW, logP, HBD, HBA, TPSA, rotB)",
          f"{_fmt(desc.get('molecular_weight'),1)}, {_fmt(desc.get('logp'),2)}, "
          f"{_fmt(desc.get('h_bond_donors'))}, {_fmt(desc.get('h_bond_acceptors'))}, "
@@ -282,7 +297,8 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
 def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
                           formula: dict[str, Any],
                           biologist_output: Optional[dict[str, Any]],
-                          target_meta: Optional[dict[str, Any]] = None) -> str:
+                          target_meta: Optional[dict[str, Any]] = None,
+                          repurposing_only: bool = False) -> str:
     drug = candidate.get("drug_name", "Unknown drug")
     target = candidate.get("target_symbol", "?")
     disease = candidate.get("disease_name", "?")
@@ -320,6 +336,31 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
         )
 
     parts.append(header_note)
+
+    # Repurposing-only pool disclosure — tells the reviewer the candidate pool
+    # was restricted to approved drugs at collection time.
+    if repurposing_only:
+        parts.append(
+            "> **Repurposing-only pool:** the candidate compounds for this target "
+            "were restricted to FDA-approved / known drugs (ChEMBL max_phase ≥ 4) "
+            "at collection time. Unapproved research-grade tool compounds were "
+            "excluded from the pool, not merely down-ranked.\n\n"
+        )
+
+    # Mutation-specificity DISCLOSURE caveat — surfaced whenever the drug's
+    # approved indication names a specific mutation, so the reviewer knows the
+    # precedent may not transfer to the (possibly unmutated) repurposing disease.
+    ms = candidate.get("mutation_specificity") or {}
+    if ms.get("is_mutation_specific"):
+        terms = ", ".join(ms.get("matched_terms", [])) or "a specific mutation"
+        parts.append(
+            "> ⚠ **Mutation-specific approval (disclosure).** "
+            f"{drug}'s approved / known indication explicitly names {terms}. "
+            "This is a DISCLOSURE flag only: it does NOT assert that the "
+            f"repurposing target **{target}** in **{disease}** carries that "
+            "mutation, and it does not change any score. The reviewer must judge "
+            "whether the mutation-scoped precedent transfers to this indication.\n\n"
+        )
 
     # 1. Hypothesis summary
     parts.append("## 1. Hypothesis summary\n")
@@ -389,20 +430,34 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
 def run_writer(reviewed: dict[str, Any], selected: list[dict[str, Any]],
                structure_results: dict[str, Any],
                biologist_output: Optional[dict[str, Any]] = None,
-               target: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
+               target: Optional[dict[str, Any]] = None,
+               bio_for_candidate: Optional[Any] = None) -> list[dict[str, Any]]:
     """
     Write one Markdown report per selected candidate. Returns a list of
     {drug, disease, path, strong_match} descriptors.
+
+    bio_for_candidate: optional callable(candidate) -> biologist_output dict.
+    When supplied (Top-K multi-target runs), each candidate receives its own
+    biologist context in the Limitations/druggability section.  Falls back to
+    the top-level biologist_output when the callable returns None.
     """
     os.makedirs(REPORTS_DIR, exist_ok=True)
     formula = reviewed.get("formula", {}) or {}
+    repurposing_only = bool(reviewed.get("repurposing_only", False))
     written: list[dict[str, Any]] = []
 
     for cand in selected:
         drug = cand.get("drug_name", "unknown")
         disease = cand.get("disease_name", "unknown")
         struct = (structure_results or {}).get(drug, {})
-        md = build_report_markdown(cand, struct, formula, biologist_output, target)
+        # Per-candidate biologist output (matched by target_symbol when available).
+        cand_bio = biologist_output
+        if bio_for_candidate is not None:
+            resolved = bio_for_candidate(cand)
+            if resolved is not None:
+                cand_bio = resolved
+        md = build_report_markdown(cand, struct, formula, cand_bio, target,
+                                   repurposing_only=repurposing_only)
         fname = f"{_slug(disease)}_{_slug(drug)}.md"
         path = os.path.join(REPORTS_DIR, fname)
         with open(path, "w", encoding="utf-8") as f:
