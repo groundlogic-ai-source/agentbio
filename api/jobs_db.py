@@ -53,6 +53,7 @@ _COLUMNS = (
     "report_path",
     "decision",
     "review_notes",
+    "repurposing_only",
 )
 
 # Columns added after the original schema shipped; applied via ALTER TABLE on
@@ -60,6 +61,7 @@ _COLUMNS = (
 _MIGRATIONS = (
     ("decision", "decision TEXT"),
     ("review_notes", "review_notes TEXT"),
+    ("repurposing_only", "repurposing_only INTEGER"),
 )
 
 
@@ -86,7 +88,8 @@ def init_db() -> None:
                 total_cost_usd  REAL NOT NULL DEFAULT 0.0,
                 report_path     TEXT,
                 decision        TEXT,
-                review_notes    TEXT
+                review_notes    TEXT,
+                repurposing_only INTEGER
             )
             """
         )

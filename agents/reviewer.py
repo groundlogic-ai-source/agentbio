@@ -202,6 +202,10 @@ def run_reviewer(chemist_output: dict[str, Any],
             },
             "composite_score": composite,
             "unapproved_cap_applied": unapproved_cap_applied,
+            # DISCLOSURE flag only — passed straight through from the Chemist,
+            # never used in the composite. Tells the reviewer the drug's approved
+            # indication names a specific mutation (see mutation_disclosure.py).
+            "mutation_specificity": c.get("mutation_specificity"),
             "status_badge": (
                 "EXPERIMENTAL COMPOUND — NOT YET APPROVED"
                 if unapproved_cap_applied else None

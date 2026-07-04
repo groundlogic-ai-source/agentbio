@@ -917,6 +917,1452 @@
       "source_id": "BLOOD GLUCOSE INCREASED",
       "used_by": "reviewer",
       "context": "ACARBOSE adverse event"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "566969",
+      "used_by": "chemist",
+      "context": "CHEMBL410215 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "493908",
+      "used_by": "chemist",
+      "context": "CHEMBL38735 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "556416",
+      "used_by": "chemist",
+      "context": "CHEMBL344018 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "978858",
+      "used_by": "chemist",
+      "context": "CHEMBL298295 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "298958",
+      "used_by": "chemist",
+      "context": "CHEMBL139785 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "934449",
+      "used_by": "chemist",
+      "context": "CHEMBL245317 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "934448",
+      "used_by": "chemist",
+      "context": "CHEMBL245517 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "722943",
+      "used_by": "chemist",
+      "context": "CHEMBL2112876 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "963913",
+      "used_by": "chemist",
+      "context": "CHEMBL42988 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "295236",
+      "used_by": "chemist",
+      "context": "CHEMBL1744059 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "296498",
+      "used_by": "chemist",
+      "context": "CHEMBL336815 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1279024",
+      "used_by": "chemist",
+      "context": "CHEMBL158374 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "286531",
+      "used_by": "chemist",
+      "context": "CHEMBL130721 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1297350",
+      "used_by": "chemist",
+      "context": "CHEMBL351813 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "295167",
+      "used_by": "chemist",
+      "context": "CHEMBL342159 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "919662",
+      "used_by": "chemist",
+      "context": "CHEMBL63548 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "930257",
+      "used_by": "chemist",
+      "context": "CHEMBL541468 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "295244",
+      "used_by": "chemist",
+      "context": "CHEMBL133687 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "909427",
+      "used_by": "chemist",
+      "context": "CHEMBL67064 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1307123",
+      "used_by": "chemist",
+      "context": "CHEMBL158817 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "361538",
+      "used_by": "chemist",
+      "context": "CHEMBL542166 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "385479",
+      "used_by": "chemist",
+      "context": "CHEMBL107349 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "558899",
+      "used_by": "chemist",
+      "context": "CHEMBL139998 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1520661",
+      "used_by": "chemist",
+      "context": "CHEMBL139998 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "735308",
+      "used_by": "chemist",
+      "context": "CHEMBL26396 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "943905",
+      "used_by": "chemist",
+      "context": "CHEMBL245315 affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "574531",
+      "used_by": "chemist",
+      "context": "VARDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1506645",
+      "used_by": "chemist",
+      "context": "VARDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1520505",
+      "used_by": "chemist",
+      "context": "VARDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "902360",
+      "used_by": "chemist",
+      "context": "VARDENAFIL HYDROCHLORIDE affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "353169",
+      "used_by": "chemist",
+      "context": "SILDENAFIL CITRATE affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "268223",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "280637",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "322721",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "381175",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "477010",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "584306",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "726578",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "736693",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "837348",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "837349",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "869550",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "885958",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "920974",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "924690",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "925443",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1243003",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1269964",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1434747",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1506524",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1520494",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1521901",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1523271",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1722223",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1748965",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "331695",
+      "used_by": "chemist",
+      "context": "TADALAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "556410",
+      "used_by": "chemist",
+      "context": "TADALAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1506647",
+      "used_by": "chemist",
+      "context": "TADALAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "1520620",
+      "used_by": "chemist",
+      "context": "TADALAFIL affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "383057",
+      "used_by": "chemist",
+      "context": "DIPYRIDAMOLE affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "858691",
+      "used_by": "chemist",
+      "context": "DIPYRIDAMOLE affinity vs PDE5A"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "513807",
+      "used_by": "chemist",
+      "context": "MILRINONE affinity vs PDE5A"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DRUG INEFFECTIVE",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DIZZINESS",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HEADACHE",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL adverse event"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05343637",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00718952",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05567367",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT07536880",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00705588",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06860399",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04266197",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01649739",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HYPOTENSION",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL HYDROCHLORIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ENTEROCOLITIS INFECTIOUS",
+      "used_by": "reviewer",
+      "context": "VARDENAFIL HYDROCHLORIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DYSPNOEA",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE adverse event"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04697862",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01712997",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00133679",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04898114",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT07462260",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00302211",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01319045",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00483626",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06778330",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03364244",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00352430",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01441934",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01889966",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04538976",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01548950",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04912726",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03139084",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02484807",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06562036",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01637675",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02951429",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03610217",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01409031",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06213077",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01948518",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01897740",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01179334",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04039464",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01449253",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03356353",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01726049",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04994860",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00323297",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00730067",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03185364",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00795639",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02284737",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01616381",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02435303",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00617305",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00452218",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02812433",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03431649",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01582438",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00946114",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01266265",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00878943",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00145938",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00800592",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00327080",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01383083",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02891850",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00359736",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00424021",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03724838",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00937144",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01247116",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00796510",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06715280",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03236818",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01365585",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01445873",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02304705",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01043627",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01517854",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00680654",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00796666",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01670136",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00709956",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02244528",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00334490",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00454207",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01733095",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02378649",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04052269",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00303459",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01244620",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00000623",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00352482",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05275725",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00772135",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00808912",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01481350",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00159861",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01966302",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01069861",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05546125",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01060020",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00159913",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00780728",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03763045",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00266903",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00644605",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04706546",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00742014",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00159874",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04704440",
+      "used_by": "reviewer",
+      "context": "SILDENAFIL CITRATE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05487755",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01910389",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01066845",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06968962",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01824290",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00506701",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01197469",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01960153",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05937854",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03904693",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01305252",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03309592",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01272388",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05844462",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04483115",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01042158",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00125918",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01275339",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06350773",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05179876",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02595684",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02999906",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01178073",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05039086",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04379180",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02007629",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02558231",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01324999",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01484431",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00549302",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01757808",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02565030",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01862536",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06753981",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02968901",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06317805",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02688387",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT07245680",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01302444",
+      "used_by": "reviewer",
+      "context": "TADALAFIL/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "FALL",
+      "used_by": "reviewer",
+      "context": "DIPYRIDAMOLE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "PAIN",
+      "used_by": "reviewer",
+      "context": "DIPYRIDAMOLE adverse event"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03993119",
+      "used_by": "reviewer",
+      "context": "DIPYRIDAMOLE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05081115",
+      "used_by": "reviewer",
+      "context": "DIPYRIDAMOLE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "RENAL FAILURE",
+      "used_by": "reviewer",
+      "context": "MILRINONE adverse event"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06679855",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04718350",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01621971",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02151877",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT00819377",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04282629",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01120964",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05801224",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05838846",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04278404",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04484675",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05757557",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05450328",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02951130",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06685679",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04391478",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT02595541",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT05201144",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01088997",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT07019987",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT01725776",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT03045068",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT06595264",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "clinical_trial",
+      "source_id": "NCT04328636",
+      "used_by": "reviewer",
+      "context": "MILRINONE/Pulmonary arterial hypertension trial"
     }
   ]
 }

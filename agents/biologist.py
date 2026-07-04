@@ -29,6 +29,7 @@ from agents import provenance
 from data_sources.biogrid import get_interactions
 from data_sources.pubmed import search_literature, fetch_raw_abstracts
 from data_sources.chembl import get_approved_drugs_for_target
+from data_sources.reactome import get_pathway_neighbors
 from cache.cache import get, set as cache_set, make_key
 
 SCREENING_MODEL = "claude-sonnet-4-6"
@@ -198,6 +199,68 @@ def get_druggability_literature(
     return result
 
 
+def get_pathway_neighbor_targets(
+    uniprot_id: str,
+    disease_name: str,
+) -> list[dict[str, Any]]:
+    """
+    Discover additional candidate targets by finding proteins that co-participate
+    in the same Reactome pathway(s) as the primary causal gene, then checking
+    whether those neighbors have approved drugs via ChEMBL.
+
+    Tagged with target_discovery_method = "pathway_neighbor" so reports are
+    auditable. Only returns neighbors that have at least one approved drug
+    (ChEMBL max_phase >= 4) — unapproved neighbors are not surfaced since the
+    downstream pipeline requires a prior human safety profile.
+
+    Returns:
+        List of {target_symbol, uniprot_id, approved_drug_count, approved_drugs,
+                 target_discovery_method, pathway_count}
+        Returns [] gracefully on any failure.
+    """
+    if not uniprot_id:
+        return []
+    cache_key = make_key("biologist_pathway_neighbor_targets_v1",
+                         uniprot_id, disease_name)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    neighbors = get_pathway_neighbors(uniprot_id)
+    if not neighbors:
+        cache_set(cache_key, [], ttl_days=7)
+        return []
+
+    results: list[dict[str, Any]] = []
+    for nbr in neighbors:
+        nbr_uid = nbr.get("uniprot_id", "")
+        nbr_gene = nbr.get("gene_name", nbr_uid)
+        if not nbr_uid:
+            continue
+        try:
+            drug_info = get_approved_drugs_for_target(nbr_uid)
+        except Exception as e:
+            print(f"[biologist] WARNING: approved-drug lookup failed for "
+                  f"pathway neighbor {nbr_gene} ({nbr_uid}): {e}")
+            drug_info = {"approved_drug_count": 0, "approved_drugs": []}
+
+        if drug_info.get("approved_drug_count", 0) > 0:
+            results.append({
+                "target_symbol": nbr_gene,
+                "uniprot_id": nbr_uid,
+                "approved_drug_count": drug_info["approved_drug_count"],
+                "approved_drugs": drug_info.get("approved_drugs", []),
+                "target_discovery_method": "pathway_neighbor",
+                "pathway_count": nbr.get("pathway_count", 1),
+                "disease_name": disease_name,
+            })
+
+    print(f"[biologist] pathway_neighbors: {len(neighbors)} neighbors checked, "
+          f"{len(results)} with approved drugs")
+    cache_set(cache_key, results, ttl_days=7)
+    return results
+
+
 def run_biologist(target: dict[str, Any]) -> dict[str, Any]:
     symbol = target["target_symbol"]
     disease = target.get("disease_name", "")
@@ -242,6 +305,12 @@ def run_biologist(target: dict[str, Any]) -> dict[str, Any]:
     client = _anthropic_client()
     druggability_context = get_druggability_literature(symbol, uniprot_id, client)
 
+    # Pathway-neighbor expansion: find proteins co-participating in the same
+    # Reactome pathway(s) as the primary causal gene, then check whether any
+    # of them have approved drugs — those become additional candidate targets
+    # tagged target_discovery_method="pathway_neighbor".
+    pathway_neighbor_targets = get_pathway_neighbor_targets(uniprot_id, disease)
+
     return {
         "target": {
             "target_symbol": symbol,
@@ -263,6 +332,14 @@ def run_biologist(target: dict[str, Any]) -> dict[str, Any]:
             "druggability_context is informational reader context only. It does not "
             "affect tractability_score, unmet_need_score, composite_score, "
             "STRONG_MATCH, or any pipeline filter."
+        ),
+        "pathway_neighbor_targets": pathway_neighbor_targets,
+        "pathway_neighbor_note": (
+            "Targets tagged target_discovery_method='pathway_neighbor' were "
+            "discovered via Reactome pathway co-participation of the primary "
+            "causal gene. Their compounds are pooled into the Chemist's "
+            "candidate set with ot_association_score=0 (no direct Open Targets "
+            "link to the disease) and are auditable in the report."
         ),
     }
 

@@ -348,7 +348,8 @@ def get_approved_drugs_for_target(uniprot_id: str) -> dict[str, Any]:
     return result
 
 
-def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25) -> dict[str, Any]:
+def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
+                                   repurposing_only: bool = False) -> dict[str, Any]:
     """
     Return the actual candidate compounds with bioactivity against a target
     (Homo sapiens, IC50/Ki, assay confidence_score >= 8), aggregated per molecule.
@@ -366,14 +367,26 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25) -> 
         } ],
         target_chembl_ids: [str],
         pooled_across_multiple_targets: bool,
+        repurposing_only: bool,
       }
 
-    Compounds are ranked by median pChEMBL (desc) and capped at `max_compounds`.
+    Pool construction:
+      - repurposing_only=False (default): top `max_compounds` by median pChEMBL
+        (unapproved tool compounds included), PLUS every approved drug
+        (max_phase >= 4) appended regardless of pChEMBL rank.
+      - repurposing_only=True: ONLY approved drugs (max_phase >= 4). The
+        top-N-by-pChEMBL unapproved compounds are not pulled at all. Used by
+        live API jobs, which only ever want repurposing candidates (drugs with
+        an existing human safety profile).
+
     Mirrors get_target_bioactivity_count's strict filtering — this is the
     compound-level counterpart of that count.
     """
     # v2: approved drugs (max_phase >= 4) are always included regardless of pchembl rank.
-    cache_key = make_key("get_target_candidate_compounds_v2", uniprot_id, max_compounds)
+    # repurposing_only is part of the cache key so the approved-only and mixed
+    # pools never collide in the cache.
+    cache_key = make_key("get_target_candidate_compounds_v2", uniprot_id,
+                         max_compounds, repurposing_only)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -382,6 +395,7 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25) -> 
         "compounds": [],
         "target_chembl_ids": [],
         "pooled_across_multiple_targets": False,
+        "repurposing_only": repurposing_only,
     }
 
     try:
@@ -456,12 +470,20 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25) -> 
             else:
                 non_approved_compounds.append(c)
 
-        # Fill top-N slots from non-approved, then append any approved not already included.
-        selected: list[dict[str, Any]] = non_approved_compounds[:max_compounds]
-        selected_ids = {c["molecule_chembl_id"] for c in selected}
-        for c in approved_compounds:
-            if c["molecule_chembl_id"] not in selected_ids:
-                selected.append(c)
+        if repurposing_only:
+            # Repurposing-only pool: approved drugs (max_phase >= 4) ONLY. The
+            # top-N unapproved tool compounds are dropped entirely, so the
+            # downstream stages never rank a research-grade binder that could
+            # never be a repurposing candidate.
+            selected: list[dict[str, Any]] = approved_compounds
+        else:
+            # Mixed pool: top-N by pChEMBL from non-approved, then append any
+            # approved drug not already included.
+            selected = non_approved_compounds[:max_compounds]
+            selected_ids = {c["molecule_chembl_id"] for c in selected}
+            for c in approved_compounds:
+                if c["molecule_chembl_id"] not in selected_ids:
+                    selected.append(c)
 
         result["compounds"] = selected
 
@@ -470,6 +492,40 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25) -> 
 
     cache_set(cache_key, result, ttl_days=7)
     return result
+
+
+def get_drug_indications(molecule_chembl_id: str, limit: int = 30) -> list[str]:
+    """
+    Return the approved/known-indication term strings for a ChEMBL molecule from
+    the /drug_indication endpoint (efo_term + mesh_heading).
+
+    NOTE: ChEMBL normalizes these to mutation-STRIPPED disease terms (e.g.
+    "non-small cell lung carcinoma", never "KRAS G12C-mutated NSCLC"), so they
+    are only a secondary input to the mutation-specificity DISCLOSURE scan — the
+    FDA label indications text is the primary source. Included so the scan reads
+    every indication surface ChEMBL exposes.
+    """
+    if not molecule_chembl_id:
+        return []
+    cache_key = make_key("get_drug_indications", molecule_chembl_id, limit)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    terms: list[str] = []
+    try:
+        data = _get_json(f"{BASE_URL}/drug_indication.json",
+                         {"molecule_chembl_id": molecule_chembl_id, "limit": limit})
+        for ind in data.get("drug_indications", []):
+            for k in ("efo_term", "mesh_heading"):
+                v = ind.get(k)
+                if v and v not in terms:
+                    terms.append(v)
+    except Exception as e:
+        print(f"[chembl] WARNING: drug_indication query failed for '{molecule_chembl_id}': {e}")
+
+    cache_set(cache_key, terms, ttl_days=30)
+    return terms
 
 
 def _find_molecule_chembl_id(drug_name: str) -> str | None:

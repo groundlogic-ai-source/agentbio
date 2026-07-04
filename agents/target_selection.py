@@ -21,7 +21,7 @@ import anthropic
 from cache.cache import get, set as cache_set, make_key
 from data_sources.orphadata import (
     get_rare_disease_list, get_who_ntd_list, get_disease_xrefs,
-    get_disease_prevalence,
+    get_disease_prevalence, get_disorder_metadata, GROUP_OF_DISORDERS,
 )
 from data_sources.open_targets import (
     search_disease_efo, get_target_disease_score, get_disease_known_drugs,
@@ -159,10 +159,36 @@ def _extract_orphanet_fields(disease: dict) -> dict[str, Any]:
     return {"has_approved_treatment": has_approved, "prevalence": prevalence}
 
 
-def _build_candidate_universe() -> list[dict[str, Any]]:
+def _disorder_group_maps() -> tuple[dict[str, str], set[str]]:
+    """
+    Return ({orpha_code -> DisorderGroup}, {normalized names of "Group of
+    disorders" entries}) parsed from the Orphanet cross-referencing XML product.
+
+    Used to drop umbrella "Group of disorders" terms (e.g. "RASopathy") from the
+    candidate universe and to give a specific error when a manual query names an
+    umbrella term. Falls back to empty maps if the product fetch failed, in which
+    case filtering is skipped (fail-open, never crash the sweep).
+    """
+    by_code: dict[str, str] = {}
+    group_names: set[str] = set()
+    for rec in get_disorder_metadata():
+        group = rec.get("disorder_group")
+        code = rec.get("orpha_code")
+        if code and group:
+            by_code[str(code)] = group
+        if group == GROUP_OF_DISORDERS:
+            group_names.add(_norm(rec.get("name")))
+    return by_code, group_names
+
+
+def _build_candidate_universe(exclude_groups: bool = True) -> list[dict[str, Any]]:
     """
     Returns a unified list of disease dicts from Orphanet + WHO NTDs.
     Each dict has: {name, orpha_code, icd10, omim, mesh, source}
+
+    When exclude_groups is True (default), Orphanet "Group of disorders" umbrella
+    entries are dropped: they aggregate many distinct diseases and are not a
+    single scorable (disease, target) unit. WHO NTDs are never groups.
     """
     _log("Fetching Orphanet rare disease list …")
     orphanet = get_rare_disease_list()
@@ -171,11 +197,24 @@ def _build_candidate_universe() -> list[dict[str, Any]]:
     ntds = get_who_ntd_list()
     _log(f"  WHO NTDs: {len(ntds)} diseases")
 
+    group_by_code: dict[str, str] = {}
+    if exclude_groups:
+        group_by_code, _ = _disorder_group_maps()
+        if not group_by_code:
+            _log("  WARNING: DisorderGroup metadata unavailable — "
+                 "umbrella 'Group of disorders' filtering skipped this run")
+
     candidates: list[dict[str, Any]] = []
     seen_names: set[str] = set()
+    excluded_groups = 0
 
     for d in orphanet:
         name = d.get("name", "").strip()
+        code = d.get("orpha_code")
+        if exclude_groups and code is not None and \
+                group_by_code.get(str(code)) == GROUP_OF_DISORDERS:
+            excluded_groups += 1
+            continue
         if name and name.lower() not in seen_names:
             seen_names.add(name.lower())
             candidates.append({
@@ -188,6 +227,10 @@ def _build_candidate_universe() -> list[dict[str, Any]]:
                 "has_approved_treatment": None,
                 "prevalence": None,
             })
+
+    if exclude_groups and excluded_groups:
+        _log(f"  Excluded {excluded_groups} Orphanet 'Group of disorders' "
+             f"umbrella entries from the candidate universe")
 
     for d in ntds:
         name = d.get("name", "").strip()
@@ -226,6 +269,7 @@ def _diseases_from_top_candidates() -> list[dict[str, Any]]:
     genuinely "pulled in Stage 1" and may carry names/cross-refs that a fresh
     Orphanet rebuild no longer surfaces, so they extend the matchable universe.
     """
+    group_by_code, group_names = _disorder_group_maps()
     seen: set[str] = set()
     out: list[dict[str, Any]] = []
     for row in _load_existing_top_candidates():
@@ -234,6 +278,13 @@ def _diseases_from_top_candidates() -> list[dict[str, Any]]:
         if not key or key in seen:
             continue
         seen.add(key)
+        # A stale top_candidates.json (produced before umbrella filtering) may
+        # carry "Group of disorders" rows. Drop them here too, otherwise they
+        # re-enter the matchable universe and bypass the exclusion + error path.
+        code = row.get("orpha_code")
+        if (code is not None and group_by_code.get(str(code)) == GROUP_OF_DISORDERS) \
+                or key in group_names:
+            continue
         out.append({
             "name": name,
             "orpha_code": row.get("orpha_code"),
@@ -380,12 +431,41 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
                 )
 
     if disease is None:
+        # Before the generic not-found error, check whether the query names an
+        # Orphanet "Group of disorders" umbrella term (deliberately excluded from
+        # the universe). If so, give a specific, actionable message.
+        _, group_names = _disorder_group_maps()
+        if _norm(query) in group_names:
+            raise DiseaseNotInUniverse(
+                f"'{query}' is an Orphanet 'Group of disorders' umbrella term, not a "
+                f"single scorable disease — it aggregates several distinct disorders. "
+                f"Silver Bullet scores one (disease, target) pair at a time, so please "
+                f"pick a specific constituent disease within this group (e.g. a named "
+                f"subtype) rather than the umbrella category."
+            )
         raise DiseaseNotInUniverse(
             f"'{query}' was not found in the rare-disease / neglected-tropical-disease "
             f"universe this system covers (Orphanet rare diseases + WHO NTDs). Silver "
             f"Bullet is scoped to rare and neglected diseases. Check the spelling, try "
             f"the disease's Orphanet name, or leave the field blank to auto-explore the "
             f"ranked candidate list."
+        )
+
+    # Post-match umbrella guard: a match may have come from a stale
+    # top_candidates.json or an EFO xref that resolves to an Orphanet
+    # "Group of disorders". Reject it here regardless of match source so an
+    # umbrella term can never reach scoring.
+    _group_by_code, _group_names = _disorder_group_maps()
+    _matched_code = disease.get("orpha_code")
+    if (_matched_code is not None
+            and _group_by_code.get(str(_matched_code)) == GROUP_OF_DISORDERS) \
+            or _norm(disease.get("name")) in _group_names:
+        raise DiseaseNotInUniverse(
+            f"'{query}' resolves to the Orphanet 'Group of disorders' umbrella term "
+            f"'{disease.get('name')}', not a single scorable disease — it aggregates "
+            f"several distinct disorders. Silver Bullet scores one (disease, target) "
+            f"pair at a time, so please pick a specific constituent disease within "
+            f"this group (e.g. a named subtype) rather than the umbrella category."
         )
 
     disease_name = disease["name"]
