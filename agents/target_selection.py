@@ -25,7 +25,7 @@ from data_sources.orphadata import (
 )
 from data_sources.open_targets import (
     search_disease_efo, get_target_disease_score, get_disease_known_drugs,
-    get_disease_orphanet_code,
+    get_disease_orphanet_code, get_disease_parents,
 )
 from data_sources.chembl import get_target_bioactivity_count, get_pharmacological_targets_for_disease
 from data_sources.afdb import get_structure_confidence
@@ -487,6 +487,45 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
     has_approved: Optional[bool] = drug_info.get("has_approved_treatment")
     approved_drug_names: list = drug_info.get("approved_drug_names", [])
 
+    # PARENT-UMBRELLA SUPPLEMENT for pharmacological-precedent drug-indication lookup.
+    #
+    # Approved-drug indications in Open Targets are sometimes linked only to an
+    # umbrella disease EFO (e.g. the broad "pulmonary arterial hypertension" EFO
+    # carries sildenafil/Revatio), not to the specific in-universe subtype EFO
+    # (e.g. "idiopathic pulmonary arterial hypertension" only has SELEXIPAG and
+    # EPOPROSTENOL SODIUM).  Walk up to immediate parent EFOs unconditionally and
+    # collect any ADDITIONAL approved drugs not already linked to the specific EFO.
+    # Those extra drugs are run through the same ChEMBL mechanism lookup, and any
+    # new targets found are tagged "pharmacological_precedent_via_parent_umbrella"
+    # so they are auditable and distinguishable from a direct subtype-level match.
+    #
+    # The umbrella-scoring guard (above) is untouched — umbrella terms still cannot
+    # be selected as the disease for genetic-association ranking.  This supplement is
+    # for drug-indication lookup only.
+    umbrella_approved_drug_names: list = []
+    umbrella_efo_id: Optional[str] = None
+    _specific_drug_set = {n.upper() for n in approved_drug_names}
+    for _parent in get_disease_parents(efo_id):
+        _parent_efo = _parent.get("id", "")
+        if not _parent_efo:
+            continue
+        _parent_drugs = get_disease_known_drugs(_parent_efo)
+        _parent_names = _parent_drugs.get("approved_drug_names", [])
+        # Restrict to drugs not already covered by the specific subtype's EFO list.
+        _additional = [n for n in _parent_names if n.upper() not in _specific_drug_set]
+        if _additional:
+            umbrella_approved_drug_names = _additional
+            umbrella_efo_id = _parent_efo
+            _log(
+                f"  Parent-umbrella drug supplement: EFO {efo_id} has "
+                f"{len(approved_drug_names)} approved drug(s); parent EFO "
+                f"{_parent_efo} ('{_parent.get('name', '')}') adds "
+                f"[{', '.join(_additional[:5])}"
+                f"{'…' if len(_additional) > 5 else ''}] — "
+                f"targets tagged pharmacological_precedent_via_parent_umbrella"
+            )
+            break  # take the first parent that has additional approved-drug links
+
     # FIX 3 — best-effort prevalence from Orphadata epidemiology
     orpha_code = disease.get("orpha_code")
     prevalence: Optional[float] = None
@@ -512,6 +551,28 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
         t for t in pharm_targets
         if t.get("uniprot_id") and t.get("uniprot_id") not in seen_uniprots
     ]
+
+    # Path B-ext — pharmacological precedent via parent umbrella EFO.
+    # Only runs when the specific subtype had no approved-drug links and a parent
+    # umbrella EFO did (umbrella_approved_drug_names populated above).
+    if umbrella_approved_drug_names:
+        _umbrella_pharm_raw = get_pharmacological_targets_for_disease(
+            umbrella_efo_id, approved_drug_names=umbrella_approved_drug_names
+        )
+        _seen_after_direct = seen_uniprots | {t.get("uniprot_id") for t in new_pharm
+                                              if t.get("uniprot_id")}
+        _umbrella_pharm = [
+            {**t, "target_discovery_method": "pharmacological_precedent_via_parent_umbrella"}
+            for t in _umbrella_pharm_raw
+            if t.get("uniprot_id") and t.get("uniprot_id") not in _seen_after_direct
+        ]
+        if _umbrella_pharm:
+            _log(
+                f"  Parent-umbrella precedent targets added: "
+                f"{[t['target_symbol'] for t in _umbrella_pharm]}"
+            )
+        new_pharm = new_pharm + _umbrella_pharm
+
     top_targets = genetic_targets + new_pharm
 
     if not top_targets:
