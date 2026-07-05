@@ -74,6 +74,20 @@ BOLTZ_NUM_SAMPLES = int(os.environ.get("STAGE3_BOLTZ_SAMPLES", "1"))
 # call as a cost guardrail.  Set TOP_K_TARGETS=1 to restore single-target mode.
 TOP_K_TARGETS = int(os.environ.get("TOP_K_TARGETS", "5"))
 
+# Score-decay-relative cutoff (alternative / complement to fixed TOP_K_TARGETS).
+# When TOP_K_FRACTION is set to a value in (0, 1), targets are included only if
+# their combined score (tractability + unmet_need) is >= FRACTION × top_score,
+# capped at TOP_K_MAX.  The combined score is used rather than the raw OT
+# association_score because OT association degenerates to 0 for all
+# pharmacological-precedent targets (diseases matched via the ChEMBL mechanism
+# table instead of OT EFO associations), making a fractional OT cutoff
+# mathematically undefined (0 × anything = 0, so all targets would be included
+# regardless of the fraction chosen).  The combined score is always populated.
+#
+# When TOP_K_FRACTION is unset or 0, the plain TOP_K_TARGETS integer cap applies.
+TOP_K_FRACTION = float(os.environ.get("TOP_K_FRACTION", "0.0"))
+TOP_K_MAX      = int(os.environ.get("TOP_K_MAX", "10"))
+
 
 class PipelineState(TypedDict, total=False):
     job_id: Optional[str]
@@ -186,6 +200,54 @@ def _pick_unexplored_row(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return rows[0]
 
 
+def _apply_k_cutoff(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Apply the active K-target cutoff policy to a ranked list of disease rows
+    (already sorted best-first, same disease).
+
+    Policy (in priority order):
+    1. If TOP_K_FRACTION > 0: include targets whose combined score
+       (tractability_score + unmet_need_score) is >= TOP_K_FRACTION × top_score,
+       then cap at TOP_K_MAX.  Falls back to plain TOP_K_TARGETS when all scores
+       are 0 (degenerate / pharmacological-precedent diseases where OT returns
+       no associations and tractability scores collapse to 0).
+    2. Otherwise: plain slice of TOP_K_TARGETS rows.
+
+    The combined score is used instead of the raw OT association_score because
+    OT association is 0 for pharmacological-precedent targets, making a fractional
+    OT cutoff undefined (0 × f = 0 always includes everything).
+    """
+    if not rows:
+        return []
+
+    if TOP_K_FRACTION > 0:
+        top_score = (
+            (rows[0].get("tractability_score") or 0.0)
+            + (rows[0].get("unmet_need_score") or 0.0)
+        )
+        if top_score > 0:
+            cutoff = TOP_K_FRACTION * top_score
+            kept = [
+                r for r in rows
+                if ((r.get("tractability_score") or 0.0)
+                    + (r.get("unmet_need_score") or 0.0)) >= cutoff
+            ]
+            result = kept[:TOP_K_MAX]
+            print(
+                f"[graph] target_selection: fraction-cutoff TOP_K_FRACTION={TOP_K_FRACTION} "
+                f"top_score={top_score:.3f} cutoff={cutoff:.3f} → "
+                f"{len(result)} target(s) (cap={TOP_K_MAX})"
+            )
+            return result
+        # Degenerate case: all scores 0 → fall through to integer cap below.
+        print(
+            "[graph] target_selection: TOP_K_FRACTION set but top_score=0 "
+            "(pharmacological-precedent disease) — falling back to TOP_K_TARGETS"
+        )
+
+    return rows[:TOP_K_TARGETS]
+
+
 def target_selection_node(state: PipelineState) -> dict[str, Any]:
     requested = (state.get("requested_disease") or "").strip()
 
@@ -195,8 +257,7 @@ def target_selection_node(state: PipelineState) -> dict[str, Any]:
         # as a clean job error rather than a silent auto-pick fallback.
         print(f"[graph] target_selection: manual disease request '{requested}'")
         all_rows = select_for_disease(requested)
-        # Take the top K targets for this disease, ranked by Stage 1 score.
-        top_rows = all_rows[:TOP_K_TARGETS]
+        top_rows = _apply_k_cutoff(all_rows)
     else:
         rows = None if FORCE_RECOMPUTE else _load_json("top_candidates.json")
         if rows is None:
@@ -217,14 +278,14 @@ def target_selection_node(state: PipelineState) -> dict[str, Any]:
         # by combined score within each disease, so slicing preserves that order).
         disease_rows = [r for r in rows
                         if r.get("disease_name") == primary_disease]
-        top_rows = disease_rows[:TOP_K_TARGETS]
+        top_rows = _apply_k_cutoff(disease_rows)
         # Make sure the atomically-claimed primary is always first.
         primary_sym = primary_row.get("target_symbol", "")
         reordered = [primary_row] + [
             r for r in top_rows
             if r.get("target_symbol") != primary_sym
         ]
-        top_rows = reordered[:TOP_K_TARGETS]
+        top_rows = reordered[:max(TOP_K_TARGETS, TOP_K_MAX)]
 
     # Build target dicts for all K rows.
     targets = [_target_from_row(r) for r in top_rows]
