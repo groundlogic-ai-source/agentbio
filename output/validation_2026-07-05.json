@@ -1,0 +1,311 @@
+{
+  "run_date": "2026-07-05",
+  "settings": {
+    "REPURPOSING_ONLY": true,
+    "TOP_K_TARGETS": 5,
+    "PATHWAY_NEIGHBOR_MIN_APPROVED": 3,
+    "TOP_K_FRACTION": 0.0,
+    "note": "Code frozen; no scoring/weight/threshold changes in this pass."
+  },
+  "scored_cases": [
+    {
+      "case": "SILDENAFIL / pulmonary arterial hypertension",
+      "expected_drug": "SILDENAFIL",
+      "expected_primary_target": "PDE5A",
+      "expected_target_uniprot": "O76074",
+      "status": "MISS",
+      "status_reason": "Stage 1 disease-query failure in two ways. (a) The exact query 'pulmonary arterial hypertension' is an Orphanet Group-of-disorders umbrella term; the pipeline rejects umbrella terms to prevent false-positive scoring. (b) The correct specific subtype query 'idiopathic pulmonary arterial hypertension' (Orphanet: Idiopathic pulmonary arterial hypertension) is in-universe and scoreable, but PDE5A does not appear in its ranked target list \u2014 Open Targets does not link sildenafil/Revatio to this specific EFO ID (only to the broader umbrella EFO), so the pharmacological-precedent pathway does not add PDE5A for this disease. Top-5 genetic targets for idiopathic PAH are: PTGIR (#1), EIF2AK4 (#2), BMPR2 (#3), SMAD9 (#4), PPARGC1A (#5). Stage 2 note: PDE5A's repurposing-only pool independently contains SILDENAFIL and SILDENAFIL CITRATE (7 approved drugs, no expansion needed) \u2014 the drug IS mechanistically reachable if the target were surfaced.",
+      "stage1": {
+        "umbrella_query_result": "REJECTED \u2014 'pulmonary arterial hypertension' is an Orphanet Group-of-disorders",
+        "specific_subtype_query": "idiopathic pulmonary arterial hypertension",
+        "specific_subtype_matched_disease": "Idiopathic pulmonary arterial hypertension",
+        "top5_targets_for_specific_subtype": [
+          {
+            "rank": 1,
+            "target_symbol": "PTGIR",
+            "uniprot_id": "P43119",
+            "total_score": 0.3474,
+            "method": "genetic_association"
+          },
+          {
+            "rank": 2,
+            "target_symbol": "EIF2AK4",
+            "uniprot_id": "Q9P2K8",
+            "total_score": 0.3336,
+            "method": "genetic_association"
+          },
+          {
+            "rank": 3,
+            "target_symbol": "BMPR2",
+            "uniprot_id": "Q13873",
+            "total_score": 0.3279,
+            "method": "genetic_association"
+          },
+          {
+            "rank": 4,
+            "target_symbol": "SMAD9",
+            "uniprot_id": "O15198",
+            "total_score": 0.1544,
+            "method": "genetic_association"
+          },
+          {
+            "rank": 5,
+            "target_symbol": "PPARGC1A",
+            "uniprot_id": "Q9UBK2",
+            "total_score": 0.0778,
+            "method": "genetic_association"
+          }
+        ],
+        "PDE5A_rank_in_scored_list": null,
+        "pharmacological_precedent_targets_added": []
+      },
+      "stage2_pde5a_pool": {
+        "n_primary_approved": 7,
+        "expansion_triggered": false,
+        "approved_drug_names": [
+          "DIPYRIDAMOLE",
+          "MILRINONE",
+          "SILDENAFIL",
+          "SILDENAFIL CITRATE",
+          "TADALAFIL",
+          "VARDENAFIL",
+          "VARDENAFIL HYDROCHLORIDE"
+        ],
+        "target_drug_found": true,
+        "note": "Drug IS in PDE5A pool but PDE5A is not surfaced by Stage 1 for this disease."
+      },
+      "notes": "Sildenafil (Revatio) is FDA-approved for PAH. The pipeline's EFO-specific OT lookup does not connect Revatio to the idiopathic PAH EFO, causing PDE5A to be absent from target scoring for this disease. The discovery failure is at Stage 1 (target not ranked), not Stage 2 (drug IS in pool)."
+    },
+    {
+      "case": "THALIDOMIDE / multiple myeloma",
+      "expected_drug": "THALIDOMIDE",
+      "expected_primary_target": "CRBN",
+      "expected_target_uniprot": "Q96SW2",
+      "status": "MISS",
+      "status_reason": "CRBN (cereblon, the direct thalidomide-binding E3 ligase adaptor) ranks #7 in the scored target list for Multiple myeloma \u2014 outside the K=5 window. The top-5 targets are all pharmacological-precedent targets whose compound pools do not contain thalidomide (FKBP1A\u2192rapalogs, CD38\u2192no small-molecule IC50 records, FDPS\u2192bisphosphonates, TOP2A\u2192topoisomerase inhibitors, GSR\u2192glutathione reductase ligands). At K=5 as specified, CRBN is not pursued and thalidomide is absent from the pooled candidate set. Note: expanding K to \u22657 would include CRBN, and CRBN's repurposing-only pool contains THALIDOMIDE, LENALIDOMIDE, POMALIDOMIDE, and DASABUVIR \u2014 a HIT at that rank.",
+      "stage1": {
+        "matched_disease": "Multiple myeloma",
+        "pharmacological_precedent_targets_added": [
+          "NR3C1",
+          "TOP2A",
+          "FDPS",
+          "FKBP1A",
+          "GSR",
+          "CD38",
+          "TNFSF11",
+          "SLAMF7",
+          "GPRC5D"
+        ],
+        "top5_targets": [
+          {
+            "rank": 1,
+            "target_symbol": "FKBP1A",
+            "uniprot_id": "P62942",
+            "tractability_score": 0.6632,
+            "unmet_need_score": 0.0555,
+            "total_score": 0.7187,
+            "method": "pharmacological_precedent"
+          },
+          {
+            "rank": 2,
+            "target_symbol": "CD38",
+            "uniprot_id": "P28907",
+            "tractability_score": 0.6407,
+            "unmet_need_score": 0.0555,
+            "total_score": 0.6962,
+            "method": "pharmacological_precedent"
+          },
+          {
+            "rank": 3,
+            "target_symbol": "FDPS",
+            "uniprot_id": "P14324",
+            "tractability_score": 0.6289,
+            "unmet_need_score": 0.0555,
+            "total_score": 0.6844,
+            "method": "pharmacological_precedent"
+          },
+          {
+            "rank": 4,
+            "target_symbol": "TOP2A",
+            "uniprot_id": "P11388",
+            "tractability_score": 0.5875,
+            "unmet_need_score": 0.0555,
+            "total_score": 0.643,
+            "method": "pharmacological_precedent"
+          },
+          {
+            "rank": 5,
+            "target_symbol": "GSR",
+            "uniprot_id": "P00390",
+            "tractability_score": 0.5613,
+            "unmet_need_score": 0.0555,
+            "total_score": 0.6168,
+            "method": "pharmacological_precedent"
+          }
+        ],
+        "CRBN_rank": 7,
+        "CRBN_in_top_K5": false
+      },
+      "stage2_crbn_pool": {
+        "n_primary_approved": 4,
+        "expansion_triggered": false,
+        "approved_drug_names": [
+          "DASABUVIR",
+          "LENALIDOMIDE",
+          "POMALIDOMIDE",
+          "THALIDOMIDE"
+        ],
+        "target_drug_found": true,
+        "note": "THALIDOMIDE IS in CRBN's pool but CRBN is not pursued at K=5."
+      },
+      "stage2_top5_pool_has_thalidomide": false,
+      "notes": "CRBN was added via pharmacological-precedent (thalidomide/lenalidomide/pomalidomide MOA \u2192 cereblon). It scores lower than the FKBP1A/CD38/FDPS pharmacological targets because CRBN's tractability_score is pulled down by weaker ChEMBL bioactivity evidence. K=5 is the cause of the miss, not a failure to identify CRBN or populate its pool."
+    },
+    {
+      "case": "EVEROLIMUS / tuberous sclerosis",
+      "expected_drug": "EVEROLIMUS",
+      "expected_primary_target": "TSC1",
+      "expected_target_uniprot": "Q92574",
+      "status": "MISS_MECHANISM_CLASS_MATCH",
+      "status_reason": "TSC1 is ranked #4 in K=5 for Tuberous sclerosis complex (within window). TSC1's primary approved-drug pool is empty (0 approved IC50/Ki compounds, PATHWAY_NEIGHBOR_MIN_APPROVED=3) \u2192 lazy pathway-neighbor expansion triggered. MTOR (P42345) is returned as a neighbor; its approved pool contains SIROLIMUS (pChEMBL=9.075) and TEMSIROLIMUS (pChEMBL=5.75) \u2014 the correct mechanism (mTOR inhibition via FKBP12\u2013drug complex) and drug class (rapalogs). EVEROLIMUS (CHEMBL1908360, FDA-approved for TSC) is absent from the MTOR IC50/Ki pool: ChEMBL records everolimus activity against FKBP12 (its direct binding partner), not MTOR, so it does not appear in the MTOR bioactivity query regardless of confidence filters.",
+      "stage1": {
+        "matched_disease": "Tuberous sclerosis complex",
+        "top5_targets": [
+          {
+            "rank": 1,
+            "target_symbol": "FKBP1A",
+            "uniprot_id": "P62942",
+            "tractability_score": 0.4185,
+            "unmet_need_score": 0.041,
+            "total_score": 0.4595,
+            "method": "genetic_association"
+          },
+          {
+            "rank": 2,
+            "target_symbol": "VHL",
+            "uniprot_id": "P40337",
+            "tractability_score": 0.2376,
+            "unmet_need_score": 0.041,
+            "total_score": 0.2786,
+            "method": "genetic_association"
+          },
+          {
+            "rank": 3,
+            "target_symbol": "TSC2",
+            "uniprot_id": "P49815",
+            "tractability_score": 0.2107,
+            "unmet_need_score": 0.041,
+            "total_score": 0.2517,
+            "method": "genetic_association"
+          },
+          {
+            "rank": 4,
+            "target_symbol": "TSC1",
+            "uniprot_id": "Q92574",
+            "tractability_score": 0.1886,
+            "unmet_need_score": 0.041,
+            "total_score": 0.2296,
+            "method": "genetic_association"
+          },
+          {
+            "rank": 5,
+            "target_symbol": "IFNG",
+            "uniprot_id": "P01579",
+            "tractability_score": 0.1204,
+            "unmet_need_score": 0.041,
+            "total_score": 0.1614,
+            "method": "genetic_association"
+          }
+        ],
+        "TSC1_rank": 4,
+        "TSC1_in_top_K5": true
+      },
+      "stage2_tsc1_expansion": {
+        "n_primary_approved": 0,
+        "expansion_triggered": true,
+        "pathway_neighbors_with_approved_drugs": {
+          "MTOR": {
+            "approved_drugs": [
+              "SIROLIMUS",
+              "TACROLIMUS ANHYDROUS",
+              "TEMSIROLIMUS",
+              "DASATINIB"
+            ],
+            "n": 4
+          },
+          "PRKAA1": {
+            "approved_drugs": [
+              "SUNITINIB",
+              "ENTRECTINIB",
+              "PALBOCICLIB",
+              "UPADACITINIB"
+            ],
+            "n": 4
+          },
+          "PRKAA2": {
+            "approved_drugs": [
+              "EBASTINE",
+              "SUNITINIB",
+              "BERBERINE"
+            ],
+            "n": 3
+          }
+        },
+        "all_approved_drug_names_in_pool": [
+          "BERBERINE",
+          "DASATINIB",
+          "EBASTINE",
+          "ENTRECTINIB",
+          "PALBOCICLIB",
+          "SIROLIMUS",
+          "SUNITINIB",
+          "TACROLIMUS ANHYDROUS",
+          "TEMSIROLIMUS",
+          "UPADACITINIB"
+        ],
+        "exact_hit_everolimus": false,
+        "mechanism_class_matches": [
+          "SIROLIMUS",
+          "TEMSIROLIMUS"
+        ],
+        "everolimus_absence_explanation": "Everolimus (CHEMBL1908360) is FDA-approved for TSC but ChEMBL records its IC50/Ki bioactivity against FKBP12 (direct binding partner), not MTOR. The MTOR pool therefore contains sirolimus (parent compound, same mechanism) and temsirolimus (rapalog, same class) but not everolimus by name."
+      },
+      "notes": "Correct mechanism (mTOR inhibition via FKBP12 complex) and drug class (rapalogs) are surfaced. The specific labeled compound (everolimus) is not, due to a ChEMBL data-layer constraint \u2014 not a scoring or pipeline logic failure."
+    }
+  ],
+  "excluded_cases": [
+    {
+      "case": "METFORMIN / polycystic ovary syndrome",
+      "expected_drug": "METFORMIN",
+      "status": "EXCLUDED",
+      "exclusion_reason": "Metformin has no FDA-approved indication for polycystic ovary syndrome (PCOS). Its use in PCOS is off-label. Silver Bullet's approved-drug discovery path surfaces only formally approved repurposing; off-label use is outside scope.",
+      "universe_probe": {
+        "outcome": "found_in_universe",
+        "matched_disease": "NON RARE IN EUROPE: Polycystic ovary syndrome",
+        "note": "PCOS IS in the Orphanet universe (labelled 'NON RARE IN EUROPE' by Orphanet). Exclusion is at the approved-indication level: metformin/PCOS is an off-label use and cannot form a valid scored pair under the pipeline's approved-drug constraint."
+      }
+    },
+    {
+      "case": "PROPRANOLOL / infantile hemangioma",
+      "expected_drug": "PROPRANOLOL",
+      "status": "EXCLUDED",
+      "exclusion_reason": "Infantile hemangioma is not in the pipeline's candidate universe (Orphanet rare-disease list + WHO NTDs). Hemangiomas are classified as congenital/developmental vascular anomalies in Orphanet rather than rare diseases in the scored universe, so the pipeline has no EFO entry for this disease and cannot score any (disease, target) pairs for it.",
+      "universe_probe": {
+        "outcome": "not_in_universe",
+        "error_summary": "'infantile hemangioma' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs)."
+      }
+    }
+  ],
+  "summary": {
+    "scored_total": 3,
+    "HIT": 0,
+    "MISS_MECHANISM_CLASS_MATCH": 1,
+    "MISS": 2,
+    "excluded_total": 2,
+    "notes": [
+      "PAH/sildenafil MISS: disease-query is an Orphanet umbrella group; specific subtype query exists but Open Targets does not link Revatio to the specific EFO, so PDE5A is not surfaced by Stage 1. PDE5A's compound pool independently contains sildenafil.",
+      "Myeloma/thalidomide MISS: CRBN is rank #7, one rank outside the K=5 window. Thalidomide IS in CRBN's pool; increasing K to \u22657 would produce a HIT.",
+      "TSC/everolimus MISS_MECHANISM_CLASS_MATCH: correct mechanism (mTOR/FKBP12 rapalog pathway) and class (sirolimus, temsirolimus) surfaced via lazy expansion; specific drug (everolimus) absent from MTOR IC50 pool due to ChEMBL recording its activity against FKBP12."
+    ]
+  }
+}
