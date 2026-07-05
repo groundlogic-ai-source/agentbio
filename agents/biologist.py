@@ -292,12 +292,6 @@ def run_biologist(target: dict[str, Any]) -> dict[str, Any]:
     client = _anthropic_client()
     druggability_context = get_druggability_literature(symbol, uniprot_id, client)
 
-    # Pathway-neighbor expansion: find proteins co-participating in the same
-    # Reactome pathway(s) as the primary causal gene, then check whether any
-    # of them have approved drugs — those become additional candidate targets
-    # tagged target_discovery_method="pathway_neighbor".
-    pathway_neighbor_targets = get_pathway_neighbor_targets(uniprot_id, disease)
-
     return {
         "target": {
             "target_symbol": symbol,
@@ -320,13 +314,15 @@ def run_biologist(target: dict[str, Any]) -> dict[str, Any]:
             "affect tractability_score, unmet_need_score, composite_score, "
             "STRONG_MATCH, or any pipeline filter."
         ),
-        "pathway_neighbor_targets": pathway_neighbor_targets,
+        # pathway_neighbor_targets is always empty here — the Chemist decides
+        # whether to expand based on the primary target's approved-drug pool
+        # size (lazy expansion).  The key is kept for schema compatibility.
+        "pathway_neighbor_targets": [],
         "pathway_neighbor_note": (
-            "Targets tagged target_discovery_method='pathway_neighbor' were "
-            "discovered via Reactome pathway co-participation of the primary "
-            "causal gene. Their compounds are pooled into the Chemist's "
-            "candidate set with ot_association_score=0 (no direct Open Targets "
-            "link to the disease) and are auditable in the report."
+            "Pathway-neighbor expansion is lazy: the Chemist triggers it only "
+            "when the primary target's own approved-drug pool is thin "
+            "(< PATHWAY_NEIGHBOR_MIN_APPROVED candidates).  Discovered neighbors "
+            "are tagged target_discovery_method='pathway_neighbor'."
         ),
     }
 

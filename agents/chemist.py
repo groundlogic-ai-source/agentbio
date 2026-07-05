@@ -33,6 +33,7 @@ import anthropic
 from agents.target_selection import OUTPUT_DIR
 from agents import provenance
 from agents.mutation_disclosure import detect_mutation_specificity
+from agents.biologist import get_pathway_neighbor_targets
 from data_sources.chembl import get_target_candidate_compounds, get_drug_indications
 from data_sources.pubchem import get_compound_data, get_drug_classification
 from data_sources.openfda import get_label_indications
@@ -40,6 +41,17 @@ from data_sources.openfda import get_label_indications
 MODEL = "claude-sonnet-4-6"
 FP_RADIUS = 2
 FP_BITS = 2048
+
+# Lazy pathway-neighbor expansion threshold.
+# Pathway-neighbor expansion is only triggered when the primary target's own
+# approved-drug pool (max_phase >= 4) is SMALLER than this number.  A healthy
+# pool (>= threshold) means the repurposing landscape is already well-covered
+# by approved compounds and the ~45 extra ChEMBL + Reactome API calls would
+# not materially change the candidate set.  Set to 0 to disable expansion
+# entirely; set to a large number to always expand.
+PATHWAY_NEIGHBOR_MIN_APPROVED = int(
+    os.environ.get("PATHWAY_NEIGHBOR_MIN_APPROVED", "3")
+)
 
 
 def _anthropic_client() -> Optional[anthropic.Anthropic]:
@@ -65,6 +77,15 @@ def _is_approved(compound: dict[str, Any]) -> bool:
     mp = compound.get("max_phase")
     try:
         return mp is not None and float(mp) >= 4
+    except (TypeError, ValueError):
+        return False
+
+
+def _is_max_phase_approved(max_phase: Any) -> bool:
+    """Return True when a raw max_phase value from ChEMBL represents an
+    approved drug (max_phase >= 4).  Tolerates numeric strings."""
+    try:
+        return float(max_phase) >= 4
     except (TypeError, ValueError):
         return False
 
@@ -217,29 +238,49 @@ def run_chemist(biologist_output: dict[str, Any],
     enriched = _enrich_compounds(
         compounds, symbol, uniprot, disease_name, ot_score, primary_disc_method)
 
-    # Pathway-neighbor expansion: also query compounds for any pathway-neighbor
-    # targets discovered by the Biologist (those with approved drugs).
-    # Each neighbor's candidates are enriched and pooled with the primary set.
+    # Lazy pathway-neighbor expansion.
+    # Count approved drugs (max_phase >= 4) in the PRIMARY target's pool.
+    # Expansion is skipped when the primary pool is already healthy — i.e.,
+    # it already has PATHWAY_NEIGHBOR_MIN_APPROVED or more approved compounds.
+    # This avoids ~45 extra Reactome + ChEMBL API calls for well-drugged targets.
+    n_primary_approved = sum(
+        1 for c in compounds
+        if c.get("max_phase") is not None
+        and _is_max_phase_approved(c.get("max_phase"))
+    )
     neighbor_enriched: list[dict[str, Any]] = []
-    for nbr in biologist_output.get("pathway_neighbor_targets") or []:
-        nbr_uid = nbr.get("uniprot_id", "")
-        nbr_sym = nbr.get("target_symbol", nbr_uid)
-        if not nbr_uid:
-            continue
-        try:
-            nbr_cc = get_target_candidate_compounds(
-                nbr_uid, repurposing_only=repurposing_only)
-            nbr_compounds = nbr_cc.get("compounds", [])
-            if nbr_compounds:
-                nbr_enriched = _enrich_compounds(
-                    nbr_compounds, nbr_sym, nbr_uid, disease_name,
-                    0.0, "pathway_neighbor")  # ot_score=0: no direct OT link
-                neighbor_enriched.extend(nbr_enriched)
-                print(f"[chemist] pathway_neighbor {nbr_sym} ({nbr_uid}): "
-                      f"{len(nbr_compounds)} compound(s) added to pool")
-        except Exception as e:
-            print(f"[chemist] WARNING: compound lookup failed for pathway "
-                  f"neighbor {nbr_sym} ({nbr_uid}): {e}")
+    if n_primary_approved >= PATHWAY_NEIGHBOR_MIN_APPROVED:
+        print(
+            f"[chemist] pathway-neighbor expansion SKIPPED for {symbol}: "
+            f"primary pool has {n_primary_approved} approved compound(s) "
+            f"(threshold={PATHWAY_NEIGHBOR_MIN_APPROVED})"
+        )
+    else:
+        print(
+            f"[chemist] pathway-neighbor expansion TRIGGERED for {symbol}: "
+            f"primary pool has only {n_primary_approved} approved compound(s) "
+            f"(threshold={PATHWAY_NEIGHBOR_MIN_APPROVED})"
+        )
+        neighbors = get_pathway_neighbor_targets(uniprot, disease_name)
+        for nbr in neighbors:
+            nbr_uid = nbr.get("uniprot_id", "")
+            nbr_sym = nbr.get("target_symbol", nbr_uid)
+            if not nbr_uid:
+                continue
+            try:
+                nbr_cc = get_target_candidate_compounds(
+                    nbr_uid, repurposing_only=repurposing_only)
+                nbr_compounds = nbr_cc.get("compounds", [])
+                if nbr_compounds:
+                    nbr_enriched = _enrich_compounds(
+                        nbr_compounds, nbr_sym, nbr_uid, disease_name,
+                        0.0, "pathway_neighbor")  # ot_score=0: no direct OT link
+                    neighbor_enriched.extend(nbr_enriched)
+                    print(f"[chemist] pathway_neighbor {nbr_sym} ({nbr_uid}): "
+                          f"{len(nbr_compounds)} compound(s) added to pool")
+            except Exception as e:
+                print(f"[chemist] WARNING: compound lookup failed for pathway "
+                      f"neighbor {nbr_sym} ({nbr_uid}): {e}")
 
     all_enriched = enriched + neighbor_enriched
     print(f"[chemist] pooled {len(enriched)} primary + "
