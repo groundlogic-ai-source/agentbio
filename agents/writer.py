@@ -298,7 +298,8 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
                           formula: dict[str, Any],
                           biologist_output: Optional[dict[str, Any]],
                           target_meta: Optional[dict[str, Any]] = None,
-                          repurposing_only: bool = False) -> str:
+                          repurposing_only: bool = False,
+                          k_target_summary: Optional[dict[str, Any]] = None) -> str:
     drug = candidate.get("drug_name", "Unknown drug")
     target = candidate.get("target_symbol", "?")
     disease = candidate.get("disease_name", "?")
@@ -345,6 +346,38 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             "were restricted to FDA-approved / known drugs (ChEMBL max_phase ≥ 4) "
             "at collection time. Unapproved research-grade tool compounds were "
             "excluded from the pool, not merely down-ranked.\n\n"
+        )
+
+    # K-target evaluation summary — visible count of how many of the K targets
+    # were successfully evaluated so a partial failure is not invisible.
+    if k_target_summary and k_target_summary.get("k_pursued", 1) > 1:
+        k_note = k_target_summary.get("note", "")
+        failed = k_target_summary.get("failed_targets", [])
+        if failed:
+            parts.append(
+                f"> ⚠ **Partial evaluation ({k_note})** "
+                f"Targets that failed: {', '.join(failed)}. "
+                "Compounds from those targets are absent from this run's pool. "
+                "Re-running the job will retry them.\n\n"
+            )
+        else:
+            parts.append(
+                f"> ℹ **Top-K evaluation: {k_note}**\n\n"
+            )
+
+    # Pathway-neighbor disclosure — surfaced when the candidate's target was
+    # discovered via Reactome pathway adjacency rather than a direct OT association.
+    disc_method = candidate.get("target_discovery_method", "")
+    if disc_method == "pathway_neighbor":
+        parts.append(
+            "> ℹ **Pathway-neighbor candidate.** "
+            f"The target **{target}** was not directly linked to **{disease}** "
+            "via Open Targets; it was discovered because it co-participates in "
+            "the same Reactome pathway(s) as the primary causal gene. "
+            f"Open Targets association score for this target: "
+            f"{_fmt(candidate.get('ot_association_score'))} (0 = no direct link). "
+            "The drug–target binding evidence (pChEMBL, confidence) is real; "
+            "only the disease-relevance link is inferred from pathway adjacency.\n\n"
         )
 
     # Mutation-specificity DISCLOSURE caveat — surfaced whenever the drug's
@@ -431,7 +464,8 @@ def run_writer(reviewed: dict[str, Any], selected: list[dict[str, Any]],
                structure_results: dict[str, Any],
                biologist_output: Optional[dict[str, Any]] = None,
                target: Optional[dict[str, Any]] = None,
-               bio_for_candidate: Optional[Any] = None) -> list[dict[str, Any]]:
+               bio_for_candidate: Optional[Any] = None,
+               k_target_summary: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
     """
     Write one Markdown report per selected candidate. Returns a list of
     {drug, disease, path, strong_match} descriptors.
@@ -440,6 +474,10 @@ def run_writer(reviewed: dict[str, Any], selected: list[dict[str, Any]],
     When supplied (Top-K multi-target runs), each candidate receives its own
     biologist context in the Limitations/druggability section.  Falls back to
     the top-level biologist_output when the callable returns None.
+
+    k_target_summary: when present, a visible "N of K targets evaluated" note
+    is embedded in every report.  Partial failures are flagged with a warning
+    callout; full success is noted informatively.
     """
     os.makedirs(REPORTS_DIR, exist_ok=True)
     formula = reviewed.get("formula", {}) or {}
@@ -457,7 +495,8 @@ def run_writer(reviewed: dict[str, Any], selected: list[dict[str, Any]],
             if resolved is not None:
                 cand_bio = resolved
         md = build_report_markdown(cand, struct, formula, cand_bio, target,
-                                   repurposing_only=repurposing_only)
+                                   repurposing_only=repurposing_only,
+                                   k_target_summary=k_target_summary)
         fname = f"{_slug(disease)}_{_slug(drug)}.md"
         path = os.path.join(REPORTS_DIR, fname)
         with open(path, "w", encoding="utf-8") as f:
