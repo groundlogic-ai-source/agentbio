@@ -2363,6 +2363,54 @@
       "source_id": "NCT04328636",
       "used_by": "reviewer",
       "context": "MILRINONE/Pulmonary arterial hypertension trial"
+    },
+    {
+      "source_type": "pmid",
+      "source_id": "41820375",
+      "used_by": "biologist",
+      "context": "TSC1/Tuberous sclerosis complex literature"
+    },
+    {
+      "source_type": "pmid",
+      "source_id": "21309039",
+      "used_by": "biologist",
+      "context": "TSC1/Tuberous sclerosis complex literature"
+    },
+    {
+      "source_type": "pmid",
+      "source_id": "10205261",
+      "used_by": "biologist",
+      "context": "TSC1/Tuberous sclerosis complex literature"
+    },
+    {
+      "source_type": "pmid",
+      "source_id": "36232477",
+      "used_by": "biologist",
+      "context": "TSC1/Tuberous sclerosis complex literature"
+    },
+    {
+      "source_type": "pmid",
+      "source_id": "36585068",
+      "used_by": "biologist",
+      "context": "TSC1/Tuberous sclerosis complex literature"
+    },
+    {
+      "source_type": "pmid",
+      "source_id": "29478616",
+      "used_by": "biologist",
+      "context": "TSC1/Tuberous sclerosis complex literature"
+    },
+    {
+      "source_type": "pmid",
+      "source_id": "20146692",
+      "used_by": "biologist",
+      "context": "TSC1/Tuberous sclerosis complex literature"
+    },
+    {
+      "source_type": "pmid",
+      "source_id": "18722871",
+      "used_by": "biologist",
+      "context": "TSC1/Tuberous sclerosis complex literature"
     }
   ]
 }
