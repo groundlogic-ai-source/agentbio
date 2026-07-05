@@ -183,6 +183,53 @@ def get_disease_known_drugs(disease_efo_id: str) -> dict[str, Any]:
     return result
 
 
+def get_disease_parents(efo_id: str) -> list[dict[str, Any]]:
+    """
+    Return the immediate parent EFO terms for a disease in the Open Targets
+    disease ontology.
+
+    Used to walk up from a specific in-universe subtype to its parent umbrella
+    when the subtype's own EFO has no linked approved-drug indications in OT.
+    Canonical example: sildenafil/Revatio is linked to the umbrella
+    "pulmonary arterial hypertension" EFO, not to "idiopathic pulmonary
+    arterial hypertension" — so the parent walk is needed to surface PDE5A
+    via the pharmacological-precedent path.
+
+    Returns [{id, name}] for each parent, or [] if none or on API error.
+    Cached with the same 7-day TTL as other OT lookups.
+    """
+    cache_key = make_key("get_disease_parents_v1", efo_id)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    query = """
+    query DiseaseParents($efoId: String!) {
+      disease(efoId: $efoId) {
+        parents {
+          id
+          name
+        }
+      }
+    }
+    """
+    results: list[dict[str, Any]] = []
+    try:
+        data = _graphql(query, {"efoId": efo_id})
+        disease_data = data.get("data", {}).get("disease") or {}
+        parents = disease_data.get("parents") or []
+        for p in parents:
+            pid = p.get("id")
+            pname = p.get("name") or ""
+            if pid:
+                results.append({"id": pid, "name": pname})
+    except Exception as e:
+        print(f"[open_targets] WARNING: disease parents query failed for '{efo_id}': {e}")
+
+    cache_set(cache_key, results, ttl_days=7)
+    return results
+
+
 def get_disease_orphanet_code(efo_id: str) -> Optional[str]:
     """
     Return the Orphanet code (e.g. "365") for an EFO disease ID, or None.
