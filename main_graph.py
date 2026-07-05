@@ -88,6 +88,7 @@ class PipelineState(TypedDict, total=False):
     targets: list[dict[str, Any]]
     biologist_output: dict[str, Any]   # primary target's output (compat)
     biologist_outputs: list[dict[str, Any]]  # one per target, same order as targets
+    k_bio_failed: int                  # count of biologist stubs (K>1 only)
     chemist_output: dict[str, Any]
     reviewed: dict[str, Any]
     selected: list[dict[str, Any]]
@@ -314,8 +315,16 @@ def biologist_node(state: PipelineState) -> dict[str, Any]:
                 }
 
     bio_outputs: list[dict[str, Any]] = [o for o in outputs if o is not None]
+    n_bio_failed = sum(1 for o in bio_outputs if o.get("error"))
+    n_bio_ok = len(bio_outputs) - n_bio_failed
+    print(f"[graph] biologist: {n_bio_ok}/{len(targets)} target(s) succeeded "
+          + (f"({n_bio_failed} failed with empty stubs)" if n_bio_failed else ""))
     primary_bio = bio_outputs[0] if bio_outputs else {}
-    return {"biologist_output": primary_bio, "biologist_outputs": bio_outputs}
+    return {
+        "biologist_output": primary_bio,
+        "biologist_outputs": bio_outputs,
+        "k_bio_failed": n_bio_failed,
+    }
 
 
 def chemist_node(state: PipelineState) -> dict[str, Any]:
@@ -376,6 +385,32 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
             if res.get("pooled_across_multiple_targets"):
                 has_any_pooled = True
 
+    # Track which targets succeeded (had no error AND produced a result object).
+    n_chem_failed = sum(
+        1 for r in chemist_results if r and r.get("error")
+    )
+    # Biologist failures (empty stubs injected above) also count as partial failures.
+    n_bio_failed = state.get("k_bio_failed", 0)
+    n_any_failed = max(n_chem_failed, n_bio_failed)
+    n_ok = k - n_any_failed
+    failed_syms = [
+        targets[i].get("target_symbol", str(i))
+        for i, r in enumerate(chemist_results)
+        if r and r.get("error")
+    ]
+    k_target_summary = {
+        "k_requested": TOP_K_TARGETS,
+        "k_pursued": k,
+        "k_succeeded": n_ok,
+        "k_failed": n_any_failed,
+        "failed_targets": failed_syms,
+        "note": (
+            f"{n_ok} of {k} target(s) successfully evaluated"
+            + (f"; {n_any_failed} failed: {failed_syms}." if n_any_failed else ".")
+        ),
+    }
+    print(f"[graph] chemist: {k_target_summary['note']}")
+
     total_approved_fps = sum(
         r.get("approved_reference_set_size", 0)
         for r in chemist_results if r
@@ -386,6 +421,7 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
         "candidates": all_candidates,
         "pooled_across_k_targets": True,
         "k_targets": k,
+        "k_target_summary": k_target_summary,
         "repurposing_only": repurposing_only,
         "pooled_across_multiple_targets": has_any_pooled,
         "approved_reference_set_size": total_approved_fps,
@@ -420,6 +456,11 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
         "repurposing_only": state["chemist_output"].get("repurposing_only", False),
         "candidates": reviewed,
     }
+    # Thread the K-target evaluation summary through to the writer so it can
+    # include a visible "N of K targets successfully evaluated" note in reports.
+    k_summary = state["chemist_output"].get("k_target_summary")
+    if k_summary:
+        payload["k_target_summary"] = k_summary
     _write_json("reviewed_candidates.json", payload)
     print(f"[graph] reviewer: {payload['n_strong_matches']} STRONG_MATCH of "
           f"{payload['n_candidates']}")
@@ -532,7 +573,8 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
 
     reports = writer.run_writer(
         reviewed, selected, structure_results, primary_bio,
-        state.get("target"), bio_for_candidate=_bio_for)
+        state.get("target"), bio_for_candidate=_bio_for,
+        k_target_summary=reviewed.get("k_target_summary"))
     print(f"[graph] writer: wrote {len(reports)} report(s) to output/reports/")
     return {"reports": reports}
 

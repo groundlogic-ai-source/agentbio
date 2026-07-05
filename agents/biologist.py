@@ -204,59 +204,46 @@ def get_pathway_neighbor_targets(
     disease_name: str,
 ) -> list[dict[str, Any]]:
     """
-    Discover additional candidate targets by finding proteins that co-participate
-    in the same Reactome pathway(s) as the primary causal gene, then checking
-    whether those neighbors have approved drugs via ChEMBL.
+    Return all Reactome pathway-neighbor proteins for the Chemist to query.
 
-    Tagged with target_discovery_method = "pathway_neighbor" so reports are
-    auditable. Only returns neighbors that have at least one approved drug
-    (ChEMBL max_phase >= 4) — unapproved neighbors are not surfaced since the
-    downstream pipeline requires a prior human safety profile.
+    The former approved-drug pre-filter (get_approved_drugs_for_target via the
+    sparse ChEMBL mechanism table) has been intentionally removed.  The
+    Chemist's bioactivity-based pool (IC50/Ki + max_phase from ChEMBL activity
+    records) is the correct and more complete signal.  All neighbors from
+    get_pathway_neighbors are forwarded unconditionally; if a neighbor has no
+    qualifying compounds the Chemist simply adds 0 candidates from it.
+
+    Tagged with target_discovery_method = "pathway_neighbor" so every compound
+    that originates from a neighbor is auditable in the report.
 
     Returns:
-        List of {target_symbol, uniprot_id, approved_drug_count, approved_drugs,
-                 target_discovery_method, pathway_count}
-        Returns [] gracefully on any failure.
+        List of {target_symbol, uniprot_id, target_discovery_method,
+                 pathway_count, disease_name}
+        Returns [] gracefully on any API failure.
     """
     if not uniprot_id:
         return []
-    cache_key = make_key("biologist_pathway_neighbor_targets_v1",
+    cache_key = make_key("biologist_pathway_neighbor_targets_v2",
                          uniprot_id, disease_name)
     cached = get(cache_key)
     if cached is not None:
         return cached
 
     neighbors = get_pathway_neighbors(uniprot_id)
-    if not neighbors:
-        cache_set(cache_key, [], ttl_days=7)
-        return []
+    results = [
+        {
+            "target_symbol": nbr.get("gene_name", nbr.get("uniprot_id", "")),
+            "uniprot_id": nbr.get("uniprot_id", ""),
+            "target_discovery_method": "pathway_neighbor",
+            "pathway_count": nbr.get("pathway_count", 1),
+            "disease_name": disease_name,
+        }
+        for nbr in neighbors
+        if nbr.get("uniprot_id")
+    ]
 
-    results: list[dict[str, Any]] = []
-    for nbr in neighbors:
-        nbr_uid = nbr.get("uniprot_id", "")
-        nbr_gene = nbr.get("gene_name", nbr_uid)
-        if not nbr_uid:
-            continue
-        try:
-            drug_info = get_approved_drugs_for_target(nbr_uid)
-        except Exception as e:
-            print(f"[biologist] WARNING: approved-drug lookup failed for "
-                  f"pathway neighbor {nbr_gene} ({nbr_uid}): {e}")
-            drug_info = {"approved_drug_count": 0, "approved_drugs": []}
-
-        if drug_info.get("approved_drug_count", 0) > 0:
-            results.append({
-                "target_symbol": nbr_gene,
-                "uniprot_id": nbr_uid,
-                "approved_drug_count": drug_info["approved_drug_count"],
-                "approved_drugs": drug_info.get("approved_drugs", []),
-                "target_discovery_method": "pathway_neighbor",
-                "pathway_count": nbr.get("pathway_count", 1),
-                "disease_name": disease_name,
-            })
-
-    print(f"[biologist] pathway_neighbors: {len(neighbors)} neighbors checked, "
-          f"{len(results)} with approved drugs")
+    print(f"[biologist] pathway_neighbors: {len(results)} neighbor(s) "
+          f"forwarded to Chemist (no approved-drug pre-filter)")
     cache_set(cache_key, results, ttl_days=7)
     return results
 
