@@ -25,7 +25,7 @@ from data_sources.orphadata import (
 )
 from data_sources.open_targets import (
     search_disease_efo, get_target_disease_score, get_disease_known_drugs,
-    get_disease_orphanet_code, get_disease_parents,
+    get_disease_orphanet_code, get_disease_parents, get_disease_descendant_count,
 )
 from data_sources.chembl import get_target_bioactivity_count, get_pharmacological_targets_for_disease
 from data_sources.afdb import get_structure_confidence
@@ -42,6 +42,16 @@ TRACTABILITY_WEIGHTS = {
 }
 
 CHEMBL_COUNT_CAP = 500
+
+# Breadth filter for the parent-umbrella drug supplement.
+# Parents with more than this many descendants in the OT disease ontology are
+# skipped: their approved-drug links are too disease-non-specific to be useful
+# pharmacological-precedent signals.
+# Calibrated from real descendant counts (2025-07):
+#   largest known-good parent  (acute myeloid leukemia)   = 87 descendants
+#   smallest known-bad parent  (inborn error of immunity) = 228 descendants
+# N=100 sits in the gap with 2.6× margin on both sides.
+PARENT_MAX_DESCENDANTS = 100
 
 
 class DiseaseNotInUniverse(Exception):
@@ -508,6 +518,17 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
     for _parent in get_disease_parents(efo_id):
         _parent_efo = _parent.get("id", "")
         if not _parent_efo:
+            continue
+        # Breadth filter: skip parents that aggregate too many descendant diseases
+        # to yield disease-specific pharmacological signals.  Fail-open on API
+        # error (None) — do not suppress the supplement on uncertainty.
+        _desc_count = get_disease_descendant_count(_parent_efo)
+        if _desc_count is not None and _desc_count > PARENT_MAX_DESCENDANTS:
+            _log(
+                f"  Parent-umbrella supplement: skipping EFO {_parent_efo} "
+                f"('{_parent.get('name', '')}') — too broad "
+                f"({_desc_count} descendants > {PARENT_MAX_DESCENDANTS} threshold)"
+            )
             continue
         _parent_drugs = get_disease_known_drugs(_parent_efo)
         _parent_names = _parent_drugs.get("approved_drug_names", [])
