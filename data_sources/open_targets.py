@@ -242,8 +242,8 @@ def get_disease_descendant_count(efo_id: str) -> Optional[int]:
       largest known-good parent  (acute myeloid leukemia)      = 87
       smallest known-bad parent  (inborn error of immunity)    = 228
 
-    Returns None on API error; the caller treats None as "narrow" (fail-open,
-    do not suppress the supplement on uncertainty).
+    Returns None on API error; the caller treats None as "too broad" (fail-closed:
+    suppress the supplement rather than allow an unverified parent through).
     Cached for 30 days; the disease ontology changes only a few times a year.
     """
     cache_key = make_key("get_disease_descendant_count_v1", efo_id)

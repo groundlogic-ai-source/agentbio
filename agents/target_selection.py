@@ -520,14 +520,19 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
         if not _parent_efo:
             continue
         # Breadth filter: skip parents that aggregate too many descendant diseases
-        # to yield disease-specific pharmacological signals.  Fail-open on API
-        # error (None) — do not suppress the supplement on uncertainty.
+        # to yield disease-specific pharmacological signals.  Fail-closed on API
+        # error (None) — skip the supplement rather than allow an unverified
+        # parent to contribute false-positive targets.
         _desc_count = get_disease_descendant_count(_parent_efo)
-        if _desc_count is not None and _desc_count > PARENT_MAX_DESCENDANTS:
+        if _desc_count is None or _desc_count > PARENT_MAX_DESCENDANTS:
             _log(
                 f"  Parent-umbrella supplement: skipping EFO {_parent_efo} "
-                f"('{_parent.get('name', '')}') — too broad "
-                f"({_desc_count} descendants > {PARENT_MAX_DESCENDANTS} threshold)"
+                f"('{_parent.get('name', '')}') — "
+                + (
+                    f"descendant count unavailable (API error), skipping to be safe"
+                    if _desc_count is None
+                    else f"too broad ({_desc_count} descendants > {PARENT_MAX_DESCENDANTS} threshold)"
+                )
             )
             continue
         _parent_drugs = get_disease_known_drugs(_parent_efo)
