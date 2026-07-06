@@ -230,6 +230,47 @@ def get_disease_parents(efo_id: str) -> list[dict[str, Any]]:
     return results
 
 
+def get_disease_descendant_count(efo_id: str) -> Optional[int]:
+    """
+    Return the total number of descendant diseases for a given EFO ID in the
+    Open Targets disease ontology.
+
+    Used as a breadth filter in the parent-umbrella drug supplement:
+    parents that aggregate hundreds or thousands of distinct disorders are too
+    non-specific to yield useful pharmacological-precedent signals.  N=100 is
+    the calibrated threshold — calibrated from real descendant counts:
+      largest known-good parent  (acute myeloid leukemia)      = 87
+      smallest known-bad parent  (inborn error of immunity)    = 228
+
+    Returns None on API error; the caller treats None as "narrow" (fail-open,
+    do not suppress the supplement on uncertainty).
+    Cached for 30 days; the disease ontology changes only a few times a year.
+    """
+    cache_key = make_key("get_disease_descendant_count_v1", efo_id)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    query = """
+    query DiseaseDescendants($efoId: String!) {
+      disease(efoId: $efoId) {
+        descendants
+      }
+    }
+    """
+    result: Optional[int] = None
+    try:
+        data = _graphql(query, {"efoId": efo_id})
+        disease_data = data.get("data", {}).get("disease") or {}
+        descendants = disease_data.get("descendants") or []
+        result = len(descendants)
+    except Exception as e:
+        print(f"[open_targets] WARNING: descendant count query failed for '{efo_id}': {e}")
+
+    cache_set(cache_key, result, ttl_days=30)
+    return result
+
+
 def get_disease_orphanet_code(efo_id: str) -> Optional[str]:
     """
     Return the Orphanet code (e.g. "365") for an EFO disease ID, or None.
