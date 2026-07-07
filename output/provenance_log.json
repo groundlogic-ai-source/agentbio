@@ -2411,6 +2411,48 @@
       "source_id": "18722871",
       "used_by": "biologist",
       "context": "TSC1/Tuberous sclerosis complex literature"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ERYTHEMA",
+      "used_by": "reviewer",
+      "context": "TOLRESTAT adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HYPERSENSITIVITY VASCULITIS",
+      "used_by": "reviewer",
+      "context": "TOLRESTAT adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "SKIN ULCER",
+      "used_by": "reviewer",
+      "context": "TOLRESTAT adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "FATIGUE",
+      "used_by": "reviewer",
+      "context": "SULINDAC adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DRUG HYPERSENSITIVITY",
+      "used_by": "reviewer",
+      "context": "TOLMETIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ARTHRALGIA",
+      "used_by": "reviewer",
+      "context": "INDOMETHACIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "OFF LABEL USE",
+      "used_by": "reviewer",
+      "context": "NITAZOXANIDE adverse event"
     }
   ]
 }

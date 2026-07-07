@@ -546,6 +546,139 @@ def _find_molecule_chembl_id(drug_name: str) -> str | None:
     return None
 
 
+def _fetch_molecule_safety(molecule_chembl_id: str) -> dict[str, Any]:
+    """
+    Fetch withdrawal and safety flags for a single ChEMBL molecule.
+
+    Fields checked:
+      withdrawn_flag     — True if the drug has been withdrawn from any market
+      black_box_warning  — True (non-zero) if a black-box / boxed warning exists
+      availability_type  — -2=withdrawn from market, -1=discontinued by manufacturer,
+                           0=unknown, 1=available
+
+    Cached for 30 days; regulatory status changes rarely.
+    Returns safe defaults (False/None) on any API error.
+    """
+    cache_key = make_key("_fetch_molecule_safety_v1", molecule_chembl_id)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    result: dict[str, Any] = {
+        "withdrawn_flag": False,
+        "black_box_warning": False,
+        "availability_type": None,
+    }
+    try:
+        data = _get_json(f"{BASE_URL}/molecule/{molecule_chembl_id}")
+        result = {
+            "withdrawn_flag":    bool(data.get("withdrawn_flag")),
+            "black_box_warning": bool(data.get("black_box_warning")),
+            "availability_type": data.get("availability_type"),
+        }
+    except Exception as e:
+        print(f"[chembl] WARNING: molecule safety fetch failed for "
+              f"'{molecule_chembl_id}': {e}")
+
+    cache_set(cache_key, result, ttl_days=30)
+    return result
+
+
+def get_molecule_safety_flags(
+    drug_name: str,
+    molecule_chembl_id: str | None = None,
+) -> dict[str, Any]:
+    """
+    Layer 1 structured safety check: query ChEMBL molecule record for
+    market-withdrawal and black-box-warning status.
+
+    Lookup order: use `molecule_chembl_id` if provided (saves a name→ID round
+    trip); otherwise resolves by pref_name / synonym via _find_molecule_chembl_id.
+    The pref_name lookup finds the canonical parent molecule (e.g. CHEMBL436 for
+    tolrestat) rather than a salt form, which is where ChEMBL stores the flags.
+
+    Fail-open on API error (returns confirmed=False): a network outage should
+    never produce a false-positive safety block.  Layer 2's independent web-search
+    check provides the redundant catch in that scenario.
+
+    Returns:
+        {
+          "confirmed"        : bool     — True iff withdrawn_flag OR black_box_warning
+          "layer"            : "chembl_structured"
+          "chembl_id"        : str | None
+          "flag_type"        : "withdrawn_flag" | "black_box_warning" | None
+          "availability_type": int | None   # -2 withdrawn, -1 discontinued, 1 available
+          "source_url"       : str | None   # ChEMBL compound page URL
+          "disclosure_text"  : str
+        }
+    """
+    cache_key = make_key("get_molecule_safety_flags_v1", drug_name,
+                         molecule_chembl_id or "")
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    result: dict[str, Any] = {
+        "confirmed": False,
+        "layer": "chembl_structured",
+        "chembl_id": molecule_chembl_id,
+        "flag_type": None,
+        "availability_type": None,
+        "source_url": None,
+        "disclosure_text": (
+            "No market withdrawal or black-box warning found in ChEMBL "
+            "structured data."
+        ),
+    }
+
+    try:
+        mid = molecule_chembl_id or _find_molecule_chembl_id(drug_name)
+        if not mid:
+            result["disclosure_text"] = (
+                f"'{drug_name}' not found in ChEMBL molecule dictionary — "
+                "Layer 1 structured check could not run."
+            )
+            cache_set(cache_key, result, ttl_days=30)
+            return result
+
+        result["chembl_id"] = mid
+        source_url = (
+            f"https://www.ebi.ac.uk/chembl/compound_report_card/{mid}/"
+        )
+        result["source_url"] = source_url
+
+        flags = _fetch_molecule_safety(mid)
+        result["availability_type"] = flags.get("availability_type")
+
+        if flags.get("withdrawn_flag"):
+            result["confirmed"] = True
+            result["flag_type"] = "withdrawn_flag"
+            result["disclosure_text"] = (
+                f"ChEMBL records withdrawn_flag=True for {drug_name} ({mid}): "
+                f"this compound has been withdrawn from at least one market. "
+                f"Source: {source_url}"
+            )
+        elif flags.get("black_box_warning"):
+            result["confirmed"] = True
+            result["flag_type"] = "black_box_warning"
+            result["disclosure_text"] = (
+                f"ChEMBL records black_box_warning=True for {drug_name} ({mid}): "
+                f"this compound carries a regulatory black-box warning. "
+                f"Source: {source_url}"
+            )
+
+    except Exception as e:
+        print(f"[chembl] WARNING: get_molecule_safety_flags failed for "
+              f"'{drug_name}': {e}")
+        result["disclosure_text"] = (
+            f"Layer 1 structured check encountered an error for '{drug_name}': "
+            f"{e}. Treating as unconfirmed (fail-open)."
+        )
+
+    cache_set(cache_key, result, ttl_days=30)
+    return result
+
+
 def get_pharmacological_targets_for_disease(
     disease_efo_id: str,
     approved_drug_names: list[str] | None = None,

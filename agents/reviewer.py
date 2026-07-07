@@ -28,6 +28,8 @@ from agents.target_selection import OUTPUT_DIR
 from agents import provenance
 from data_sources.openfda import get_adverse_events
 from data_sources.clinicaltrials import check_prior_trials
+from data_sources.chembl import get_molecule_safety_flags
+from data_sources.safety_check import web_safety_check
 
 # ---- Auditable scoring constants (edit here to adjust the policy) -------------
 COMPOSITE_WEIGHTS: dict[str, float] = {
@@ -39,6 +41,12 @@ COMPOSITE_WEIGHTS: dict[str, float] = {
 }
 LIPINSKI_PENALTY = 0.25       # flat, soft — subtracted if Lipinski violations > 1
 STRONG_MATCH_THRESHOLD = 0.70
+# Safety gate: withdrawn / black-box-warning compounds are capped at the same
+# ceiling as unapproved compounds so they cannot reach STRONG_MATCH.
+SAFETY_CAP = 0.40
+# Layer 2 (web-search) only runs on this many top candidates to mirror the
+# Boltz validation scope and keep LLM call costs bounded.
+MAX_SAFETY_LAYER2_CANDIDATES = 3
 # -----------------------------------------------------------------------------
 
 
@@ -206,10 +214,13 @@ def run_reviewer(chemist_output: dict[str, Any],
             # never used in the composite. Tells the reviewer the drug's approved
             # indication names a specific mutation (see mutation_disclosure.py).
             "mutation_specificity": c.get("mutation_specificity"),
-            "status_badge": (
-                "EXPERIMENTAL COMPOUND — NOT YET APPROVED"
-                if unapproved_cap_applied else None
-            ),
+            # status_badge, safety_cap_applied, safety_layer1, safety_layer2 are
+            # all set in the post-sort safety-disclosure pass below, after both
+            # layers have been evaluated.  Placeholders here:
+            "status_badge": None,
+            "safety_cap_applied": False,
+            "safety_layer1": None,
+            "safety_layer2": None,
             "strong_match": composite >= STRONG_MATCH_THRESHOLD,
             "provenance": {
                 "counted_once": new_ids,
@@ -220,6 +231,73 @@ def run_reviewer(chemist_output: dict[str, Any],
 
     provenance.log_many(prov_entries)
     reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+
+    # ── Safety-disclosure pass (Layer 1 + Layer 2) ────────────────────────────
+    # Top-K selection for Layer 2 is done BEFORE either layer applies any cap,
+    # so both layers evaluate the same pre-cap shortlist independently.
+    # Layer 1 (ChEMBL structured) runs on every candidate — cheap, 30-day cache.
+    # Layer 2 (Anthropic web search) runs only on top-K strong-match candidates
+    # to mirror Boltz validation scope and keep LLM call costs bounded.
+    top_k_names: set[str] = set()
+    _k_count = 0
+    for r in reviewed:
+        if r.get("strong_match") and _k_count < MAX_SAFETY_LAYER2_CANDIDATES:
+            top_k_names.add(r["drug_name"])
+            _k_count += 1
+
+    needs_resort = False
+    for r in reviewed:
+        drug = r["drug_name"]
+        mid = r.get("molecule_chembl_id")
+
+        # Layer 1 — ChEMBL structured withdrawal / black-box check
+        layer1 = get_molecule_safety_flags(drug, mid)
+        r["safety_layer1"] = layer1
+
+        # Layer 2 — web-search check (top-K shortlist only)
+        layer2 = web_safety_check(drug) if drug in top_k_names else None
+        r["safety_layer2"] = layer2
+
+        l1_hit = layer1.get("confirmed", False)
+        l2_hit = layer2 is not None and layer2.get("confirmed", False)
+        safety_triggered = l1_hit or l2_hit
+
+        if safety_triggered:
+            r["composite_score"] = min(r["composite_score"], SAFETY_CAP)
+            r["safety_cap_applied"] = True
+            r["strong_match"] = r["composite_score"] >= STRONG_MATCH_THRESHOLD
+
+            # Badge names every layer that independently confirmed the signal
+            layer_parts: list[str] = []
+            cite_parts: list[str] = []
+            if l1_hit:
+                layer_parts.append("ChEMBL structured data")
+                cite_parts.append(
+                    layer1.get("source_url") or layer1.get("chembl_id") or ""
+                )
+            if l2_hit:
+                layer_parts.append("web search")
+                cite_parts.append(
+                    layer2.get("citation") or "see safety_layer2.search_summary"
+                )
+            layer_str = " + ".join(layer_parts)
+            cite_str = "; ".join(c for c in cite_parts if c)
+            r["status_badge"] = (
+                f"WITHDRAWN FOR SAFETY ({layer_str}) — {cite_str}"
+            )
+            needs_resort = True
+        else:
+            r["safety_cap_applied"] = False
+            # Unapproved-compound badge (existing gate, unchanged)
+            r["status_badge"] = (
+                "EXPERIMENTAL COMPOUND — NOT YET APPROVED"
+                if r.get("unapproved_cap_applied") else None
+            )
+    # ── End safety-disclosure pass ────────────────────────────────────────────
+
+    if needs_resort:
+        reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+
     return reviewed
 
 
