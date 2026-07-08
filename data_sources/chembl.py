@@ -620,6 +620,7 @@ def get_molecule_safety_flags(
 
     result: dict[str, Any] = {
         "confirmed": False,
+        "api_error": False,   # True only when an exception prevented the check
         "layer": "chembl_structured",
         "chembl_id": molecule_chembl_id,
         "flag_type": None,
@@ -670,9 +671,11 @@ def get_molecule_safety_flags(
     except Exception as e:
         print(f"[chembl] WARNING: get_molecule_safety_flags failed for "
               f"'{drug_name}': {e}")
+        result["api_error"] = True
         result["disclosure_text"] = (
             f"Layer 1 structured check encountered an error for '{drug_name}': "
-            f"{e}. Treating as unconfirmed (fail-open)."
+            f"{e}. Treating as unconfirmed (fail-open). "
+            f"Layer 2 web-search will run as redundancy regardless of budget."
         )
 
     cache_set(cache_key, result, ttl_days=30)

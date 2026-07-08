@@ -1,32 +1,43 @@
 export default function ErrorPanel({ message }) {
   return (
     <div
-      className="rounded-md border p-5"
+      className="rounded-lg border mb-6 overflow-hidden fade-in"
       style={{
-        borderColor: "var(--oxide)",
-        backgroundColor: "rgba(155, 74, 63, 0.12)",
+        borderColor: "rgba(155, 74, 63, 0.4)",
+        backgroundColor: "var(--graphite-raised)",
       }}
     >
       <div
-        className="mb-2 font-display text-base font-semibold"
-        style={{ color: "var(--oxide)" }}
-      >
-        This case could not be completed
-      </div>
-      <p className="mb-3 text-sm" style={{ color: "var(--ink)" }}>
-        The pipeline halted before producing a hypothesis. The raw error is
-        recorded below for diagnosis.
-      </p>
-      <pre
-        className="overflow-x-auto whitespace-pre-wrap rounded border p-3 font-mono text-xs"
+        className="flex items-center gap-2 px-5 py-3 border-b"
         style={{
-          borderColor: "rgba(155, 74, 63, 0.4)",
-          backgroundColor: "rgba(155, 74, 63, 0.08)",
-          color: "var(--oxide)",
+          backgroundColor: "var(--oxide-glow)",
+          borderColor: "rgba(155,74,63,0.25)",
         }}
       >
-        {message || "No error detail was recorded."}
-      </pre>
+        <span style={{ color: "var(--oxide)", fontSize: "0.7rem" }}>▸</span>
+        <div
+          className="font-mono text-[0.62rem] uppercase tracking-[0.2em]"
+          style={{ color: "var(--oxide)" }}
+        >
+          Pipeline error
+        </div>
+      </div>
+      <div className="px-5 py-4">
+        <p className="mb-3 text-sm leading-relaxed" style={{ color: "var(--silver)" }}>
+          The pipeline halted before producing a hypothesis. The raw error is
+          recorded below for diagnosis.
+        </p>
+        <pre
+          className="overflow-x-auto whitespace-pre-wrap rounded border p-3 font-mono text-xs leading-relaxed"
+          style={{
+            borderColor: "rgba(155, 74, 63, 0.25)",
+            backgroundColor: "rgba(155, 74, 63, 0.06)",
+            color: "var(--oxide)",
+          }}
+        >
+          {message || "No error detail was recorded."}
+        </pre>
+      </div>
     </div>
   );
 }
