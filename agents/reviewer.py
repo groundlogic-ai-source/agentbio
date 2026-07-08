@@ -254,8 +254,13 @@ def run_reviewer(chemist_output: dict[str, Any],
         layer1 = get_molecule_safety_flags(drug, mid)
         r["safety_layer1"] = layer1
 
-        # Layer 2 — web-search check (top-K shortlist only)
-        layer2 = web_safety_check(drug) if drug in top_k_names else None
+        # Layer 2 — web-search check:
+        #   (a) Budget path: drug is in the pre-cap top-K strong-match shortlist.
+        #   (b) Redundancy path: Layer 1 had an API error and cannot be trusted —
+        #       Layer 2 always runs in this case regardless of the budget cap,
+        #       so an L1 outage can never silently skip safety screening.
+        l1_error = layer1.get("api_error", False)
+        layer2 = web_safety_check(drug) if (drug in top_k_names or l1_error) else None
         r["safety_layer2"] = layer2
 
         l1_hit = layer1.get("confirmed", False)
