@@ -170,6 +170,21 @@ def _read_report(path: Optional[str]) -> Optional[str]:
 
 
 # --------------------------------------------------------------------------- #
+# Health / root paths (Replit deployment liveness probes hit these)
+# --------------------------------------------------------------------------- #
+@app.get("/api/")
+@app.get("/api")
+def api_health() -> dict:
+    return {"status": "ok"}
+
+
+@app.get("/internal/")
+@app.get("/internal")
+def internal_health() -> dict:
+    return {"status": "ok"}
+
+
+# --------------------------------------------------------------------------- #
 # API endpoints
 # --------------------------------------------------------------------------- #
 @app.post("/api/runs")
