@@ -46,10 +46,7 @@ function CaseHeader({ job, cost }) {
           </div>
           <h1
             className="text-3xl font-semibold leading-tight tracking-tight"
-            style={{
-              fontFamily: "'Fraunces', Georgia, serif",
-              color: "var(--paper)",
-            }}
+            style={{ color: "var(--paper)" }}
           >
             {diseaseLabel(job)}
           </h1>
@@ -142,10 +139,7 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
       {(status === "queued" || status === "running") && (
         <Paper>
           <div className="p-6">
-            <div
-              className="text-lg font-semibold"
-              style={{ fontFamily: "'Fraunces', Georgia, serif" }}
-            >
+            <div className="text-lg font-semibold">
               Pipeline in progress
             </div>
             <p
@@ -164,10 +158,7 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
         <div className="flex flex-col gap-5">
           <Paper>
             <div className="p-6">
-              <div
-                className="text-lg font-semibold"
-                style={{ fontFamily: "'Fraunces', Georgia, serif" }}
-              >
+              <div className="text-lg font-semibold">
                 Pipeline complete — awaiting your sign-off
               </div>
               <div className="mt-5">
@@ -204,11 +195,7 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
                 </div>
                 <p
                   className="text-sm leading-relaxed"
-                  style={{
-                    color: "var(--ink)",
-                    fontStyle: "italic",
-                    fontFamily: "'Fraunces', Georgia, serif",
-                  }}
+                  style={{ color: "var(--ink)", fontStyle: "italic" }}
                 >
                   "{job.review_notes}"
                 </p>

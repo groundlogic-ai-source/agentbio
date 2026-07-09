@@ -26,32 +26,25 @@ export default function SignOff({ onResume, busy }) {
     >
       {/* Header strip */}
       <div
-        className="flex items-center gap-3 px-6 py-3 border-b"
-        style={{ borderColor: "rgba(199,202,209,0.15)" }}
+        className="px-6 py-3 border-b"
+        style={{
+          borderColor: "rgba(199,202,209,0.15)",
+          borderLeft: "3px solid var(--brass)",
+          borderRadius: "8px 8px 0 0",
+        }}
       >
-        <span style={{ color: "var(--brass)", fontSize: "0.55rem" }}>▸</span>
         <span
           className="font-mono text-[0.62rem] uppercase tracking-[0.22em]"
           style={{ color: "var(--brass)" }}
         >
           Human Review Checkpoint
         </span>
-        <div
-          style={{
-            flex: 1,
-            height: "1px",
-            backgroundColor: "rgba(192,138,53,0.2)",
-          }}
-        />
       </div>
 
       <div className="px-6 py-5">
         <p
           className="text-base font-semibold leading-snug"
-          style={{
-            fontFamily: "'Fraunces', Georgia, serif",
-            color: "var(--paper)",
-          }}
+          style={{ color: "var(--paper)" }}
         >
           This is a falsifiable hypothesis, not a finding.
         </p>
