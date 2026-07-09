@@ -81,7 +81,7 @@ export default function Dashboard({ runs, onOpenCase, onNewCase }) {
               color: "var(--paper)",
             }}
           >
-            Silver Bullet
+            AgentBio
           </h1>
           <div
             className="mt-3 flex items-center gap-3"

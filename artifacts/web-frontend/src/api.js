@@ -1,4 +1,4 @@
-// Thin wrapper over the Silver Bullet FastAPI backend. All paths are relative,
+// Thin wrapper over the AgentBio FastAPI backend. All paths are relative,
 // so the same code works whether served by FastAPI (production) or behind the
 // Vite dev proxy (development).
 
