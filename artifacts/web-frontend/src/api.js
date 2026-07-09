@@ -17,8 +17,13 @@ async function request(path, options) {
   return res.json();
 }
 
-export function listRuns() {
-  return request("/api/runs");
+export function listRuns({ includeArchived = false } = {}) {
+  const qs = includeArchived ? "?include_archived=true" : "";
+  return request(`/api/runs${qs}`);
+}
+
+export function archiveCase(jobId) {
+  return request(`/api/runs/${jobId}/archive`, { method: "PATCH" });
 }
 
 export function getRun(jobId) {

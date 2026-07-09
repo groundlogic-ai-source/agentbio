@@ -54,6 +54,7 @@ _COLUMNS = (
     "decision",
     "review_notes",
     "repurposing_only",
+    "archived",
 )
 
 # Columns added after the original schema shipped; applied via ALTER TABLE on
@@ -62,6 +63,7 @@ _MIGRATIONS = (
     ("decision", "decision TEXT"),
     ("review_notes", "review_notes TEXT"),
     ("repurposing_only", "repurposing_only INTEGER"),
+    ("archived", "archived INTEGER NOT NULL DEFAULT 0"),
 )
 
 
@@ -178,13 +180,35 @@ def get_job(job_id: str) -> Optional[dict[str, Any]]:
     return dict(row) if row else None
 
 
-def list_jobs() -> list[dict[str, Any]]:
-    """All jobs, most recent first."""
+def list_jobs(include_archived: bool = False) -> list[dict[str, Any]]:
+    """All jobs, most recent first. Excludes archived rows by default."""
     with _connect() as conn:
-        rows = conn.execute(
-            "SELECT * FROM jobs ORDER BY created_at DESC, updated_at DESC"
-        ).fetchall()
+        if include_archived:
+            rows = conn.execute(
+                "SELECT * FROM jobs ORDER BY created_at DESC, updated_at DESC"
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM jobs WHERE archived = 0 "
+                "ORDER BY created_at DESC, updated_at DESC"
+            ).fetchall()
     return [dict(r) for r in rows]
+
+
+def archive_job(job_id: str) -> Optional[dict[str, Any]]:
+    """
+    Soft-archive a job (sets archived=1). The job record, its report, and any
+    explored_targets rows are left completely intact — archiving never removes
+    data and never prevents auto-explore from correctly skipping already-tried
+    (disease, target) pairs.
+    """
+    with _LOCK, _connect() as conn:
+        conn.execute(
+            "UPDATE jobs SET archived = 1, updated_at = ? WHERE job_id = ?",
+            (_now(), job_id),
+        )
+        conn.commit()
+    return get_job(job_id)
 
 
 def _norm(value: Optional[str]) -> str:

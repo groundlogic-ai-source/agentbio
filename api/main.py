@@ -211,8 +211,21 @@ def start_run(req: RunRequest) -> dict[str, str]:
 
 
 @app.get("/api/runs")
-def get_runs() -> list[dict[str, Any]]:
-    return jobs_db.list_jobs()
+def get_runs(include_archived: bool = False) -> list[dict[str, Any]]:
+    return jobs_db.list_jobs(include_archived=include_archived)
+
+
+@app.patch("/api/runs/{job_id}/archive")
+def archive_run(job_id: str) -> dict[str, Any]:
+    """
+    Soft-archive a case. The record, report, and explored_targets rows are
+    preserved — archiving only hides the case from the default list view.
+    """
+    job = jobs_db.get_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="job not found")
+    updated = jobs_db.archive_job(job_id)
+    return updated
 
 
 @app.get("/api/runs/{job_id}")
