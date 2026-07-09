@@ -41,10 +41,7 @@ function FolderTab({ job, onOpen }) {
       <div className="mt-2">
         <span
           className="text-sm font-semibold leading-snug"
-          style={{
-            fontFamily: "'Fraunces', Georgia, serif",
-            color: "var(--ink)",
-          }}
+          style={{ color: "var(--ink)" }}
         >
           {diseaseLabel(job)}
         </span>
@@ -74,23 +71,14 @@ export default function Dashboard({ runs, onOpenCase, onNewCase }) {
             Drug Repurposing Research System
           </div>
           <h1
-            className="text-5xl font-semibold tracking-tight leading-none"
+            className="text-5xl font-bold tracking-tight leading-none"
             style={{
-              fontFamily: "'Fraunces', Georgia, serif",
-              fontStyle: "italic",
+              fontFamily: "Inter, system-ui, sans-serif",
               color: "var(--paper)",
             }}
           >
             AgentBio
           </h1>
-          <div
-            className="mt-3 flex items-center gap-3"
-            aria-hidden="true"
-          >
-            <div style={{ height: "1px", flex: 1, backgroundColor: "var(--brass)", opacity: 0.4 }} />
-            <span style={{ color: "var(--brass)", fontSize: "0.5rem", opacity: 0.7 }}>◆</span>
-            <div style={{ height: "1px", flex: 1, backgroundColor: "var(--brass)", opacity: 0.4 }} />
-          </div>
           <p
             className="mt-3 max-w-lg text-sm leading-relaxed"
             style={{ color: "var(--silver)" }}
@@ -140,19 +128,9 @@ export default function Dashboard({ runs, onOpenCase, onNewCase }) {
             className="rounded-lg border border-dashed p-12 text-center fade-in"
             style={{ borderColor: "rgba(199,202,209,0.3)" }}
           >
-            <div
-              className="font-mono text-[0.6rem] uppercase tracking-[0.2em] mb-3"
-              style={{ color: "var(--brass)", opacity: 0.6 }}
-            >
-              ◆ Empty dossier ◆
-            </div>
             <p
-              className="text-base"
-              style={{
-                fontFamily: "'Fraunces', Georgia, serif",
-                color: "var(--paper)",
-                fontStyle: "italic",
-              }}
+              className="text-base font-medium"
+              style={{ color: "var(--paper)" }}
             >
               No cases yet — open one to start.
             </p>
