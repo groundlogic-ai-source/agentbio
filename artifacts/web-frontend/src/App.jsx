@@ -8,6 +8,7 @@ import {
   getCost,
   openCase,
   resumeCase,
+  archiveCase,
 } from "./api.js";
 import { isTerminal } from "./lib/stages.js";
 
@@ -33,8 +34,12 @@ export default function App() {
   detailRef.current = detail;
   runsRef.current = runs;
 
+  const [showArchived, setShowArchived] = useState(false);
+  const showArchivedRef = useRef(false);
+  showArchivedRef.current = showArchived;
+
   const refreshList = useCallback(async () => {
-    const list = await listRuns();
+    const list = await listRuns({ includeArchived: showArchivedRef.current });
     setRuns(list);
     return list;
   }, []);
@@ -118,6 +123,30 @@ export default function App() {
     [refreshList, handleOpenCase],
   );
 
+  const handleArchive = useCallback(
+    async (jobId) => {
+      setError(null);
+      try {
+        await archiveCase(jobId);
+        await refreshList();
+      } catch (e) {
+        setError(e.message);
+      }
+    },
+    [refreshList],
+  );
+
+  const handleToggleArchived = useCallback(async () => {
+    const next = !showArchivedRef.current;
+    setShowArchived(next);
+    try {
+      const list = await listRuns({ includeArchived: next });
+      setRuns(list);
+    } catch (e) {
+      setError(e.message);
+    }
+  }, []);
+
   const handleResume = useCallback(
     async (action, notes) => {
       if (!selectedRef.current) return;
@@ -154,8 +183,11 @@ export default function App() {
       {view === "dashboard" ? (
         <Dashboard
           runs={runs}
+          showArchived={showArchived}
           onOpenCase={handleOpenCase}
           onNewCase={() => setDialogOpen(true)}
+          onArchive={handleArchive}
+          onToggleArchived={handleToggleArchived}
         />
       ) : (
         <CaseView
