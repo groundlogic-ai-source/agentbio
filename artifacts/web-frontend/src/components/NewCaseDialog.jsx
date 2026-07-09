@@ -54,7 +54,7 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
               className="font-mono text-[0.58rem] uppercase tracking-[0.22em]"
               style={{ color: "var(--brass)" }}
             >
-              ◆ New case
+              New case
             </span>
           </div>
           {!busy && (
@@ -74,10 +74,7 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
           <h2
             id="newcase-title"
             className="text-xl font-semibold leading-snug"
-            style={{
-              fontFamily: "'Fraunces', Georgia, serif",
-              color: "var(--ink)",
-            }}
+            style={{ color: "var(--ink)" }}
           >
             Open a new case
           </h2>
