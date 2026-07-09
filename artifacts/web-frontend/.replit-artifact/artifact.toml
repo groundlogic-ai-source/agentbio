@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Silver Bullet"
+title = "AgentBio"
 version = "1.0.0"
 id = "artifacts/web-frontend"
 router = "path"

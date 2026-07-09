@@ -1,4 +1,4 @@
-# Drug Repurposing Pipeline — Stage 1
+# AgentBio — Drug Repurposing Pipeline
 
 A Python drug-repurposing research pipeline that ranks rare disease / neglected tropical disease targets by tractability and unmet need, using six public biomedical APIs and a local SQLite cache.
 
