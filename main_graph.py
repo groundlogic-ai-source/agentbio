@@ -152,6 +152,11 @@ def _target_from_row(r: dict[str, Any]) -> dict[str, Any]:
         "ot_association_score": r.get("ot_association_score", 0.0),
         "tractability_score": r.get("tractability_score"),
         "unmet_need_score": r.get("unmet_need_score"),
+        # Carry the real discovery path so chemist.py:237 never silently
+        # defaults to "genetic_association" for pharm-precedent / pathway-
+        # neighbor primary targets.  Falls back only when the source row
+        # genuinely has no method recorded (should not happen in practice).
+        "target_discovery_method": r.get("target_discovery_method", "genetic_association"),
     }
 
 
