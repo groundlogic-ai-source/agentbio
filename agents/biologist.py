@@ -300,6 +300,12 @@ def run_biologist(target: dict[str, Any]) -> dict[str, Any]:
             "disease_name": disease,
             "orpha_code": target.get("orpha_code"),
             "ot_association_score": target.get("ot_association_score", 0.0),
+            # Thread the real discovery path through so chemist.py:237
+            # never silently defaults to "genetic_association" for primary
+            # targets that arrived via pharmacological_precedent or
+            # pharmacological_precedent_via_parent_umbrella.
+            "target_discovery_method": target.get("target_discovery_method",
+                                                   "genetic_association"),
         },
         "interacting_genes": interacting_genes,
         "interaction_records": interactions,
