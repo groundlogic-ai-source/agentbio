@@ -183,6 +183,22 @@ for query, drug, class_set, expected_excluded in CASES:
         for i, t in enumerate(top_k)
     ]
 
+    # Record all K targets as explored so canonical-validation runs are
+    # visible in the explored_targets accounting, preventing blank auto-explore
+    # from silently re-selecting pairs that have already been substantively run.
+    # Uses disease_name from the row (canonical form) not the query string.
+    try:
+        from api import jobs_db as _jdb
+        _jdb.init_db()
+        for t in top_k:
+            _jdb.record_explored(
+                t.get("disease_name", query),
+                t.get("target_symbol", "?"),
+            )
+        log(f"  explored_targets: recorded {len(top_k)} pairs")
+    except Exception as _e:
+        log(f"  WARN: could not record explored pairs: {_e}")
+
     # For myeloma: also record where CRBN sits in the FULL list
     if "myeloma" in query:
         crbn_rank = None
