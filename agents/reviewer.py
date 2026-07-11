@@ -214,6 +214,12 @@ def run_reviewer(chemist_output: dict[str, Any],
             # never used in the composite. Tells the reviewer the drug's approved
             # indication names a specific mutation (see mutation_disclosure.py).
             "mutation_specificity": c.get("mutation_specificity"),
+            # Carry the discovery method (genetic_association,
+            # pharmacological_precedent, pharmacological_precedent_via_parent_umbrella,
+            # pathway_neighbor) so report writer and validation scripts can record
+            # HOW each primary target was surfaced. Without this the field drops here
+            # and shows as None in every downstream artifact.
+            "target_discovery_method": c.get("target_discovery_method"),
             # status_badge, safety_cap_applied, safety_layer1, safety_layer2 are
             # all set in the post-sort safety-disclosure pass below, after both
             # layers have been evaluated.  Placeholders here:

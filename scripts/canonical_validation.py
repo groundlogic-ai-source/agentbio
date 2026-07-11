@@ -12,8 +12,15 @@ sys.path.insert(0, "/home/runner/workspace")
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-LOG  = "/tmp/canonical_validation.log"
-JOUT = "/tmp/canonical_validation.json"
+# Outputs land in the repo's validation/ directory (not /tmp) so results
+# survive restarts and can be committed.  Filename is date-stamped so each
+# run produces a distinct, citable file.
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_VALDIR    = os.path.join(_REPO_ROOT, "validation")
+os.makedirs(_VALDIR, exist_ok=True)
+_DATE = time.strftime("%Y-%m-%d")
+LOG  = os.path.join(_VALDIR, f"canonical_validation_{_DATE}.log")
+JOUT = os.path.join(_VALDIR, f"canonical_validation_{_DATE}.json")
 
 # Wipe old log at startup
 with open(LOG, "w") as _f:
