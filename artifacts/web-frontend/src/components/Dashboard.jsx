@@ -39,12 +39,50 @@ function FolderTab({ job, onOpen, onArchive }) {
       }}
     >
       <div className="flex items-start justify-between gap-2">
-        <span
-          className="font-mono text-[0.58rem] uppercase tracking-[0.2em]"
-          style={{ color: isArchived ? "var(--silver-dim)" : "var(--brass)" }}
-        >
-          Case #{caseId}
-        </span>
+        <div className="flex items-center gap-1.5">
+          {!isArchived && (
+            <button
+              type="button"
+              aria-label="Archive this case"
+              onClick={(e) => {
+                e.stopPropagation();
+                onArchive(job.job_id);
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "var(--oxide)";
+                e.currentTarget.style.borderColor = "var(--oxide)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "var(--silver-dim)";
+                e.currentTarget.style.borderColor = "rgba(199,202,209,0.3)";
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "1.1rem",
+                height: "1.1rem",
+                borderRadius: "3px",
+                border: "1px solid rgba(199,202,209,0.3)",
+                background: "transparent",
+                color: "var(--silver-dim)",
+                fontSize: "0.65rem",
+                lineHeight: 1,
+                cursor: "pointer",
+                flexShrink: 0,
+                transition: "color 0.15s ease, border-color 0.15s ease",
+              }}
+            >
+              ✕
+            </button>
+          )}
+          <span
+            className="font-mono text-[0.58rem] uppercase tracking-[0.2em]"
+            style={{ color: isArchived ? "var(--silver-dim)" : "var(--brass)" }}
+          >
+            Case #{caseId}
+          </span>
+        </div>
         <StatusBadge status={job.status} decision={job.decision} />
       </div>
 
@@ -67,34 +105,6 @@ function FolderTab({ job, onOpen, onArchive }) {
         </span>
       </div>
 
-      {/* Archive / unarchive button — appears on hover */}
-      {!isArchived && (
-        <button
-          type="button"
-          className="absolute bottom-3 right-3 rounded px-2 py-0.5 font-mono text-[0.55rem] uppercase tracking-[0.12em] opacity-0 group-hover:opacity-100"
-          style={{
-            color: "var(--ink-muted)",
-            border: "1px solid rgba(199,202,209,0.3)",
-            backgroundColor: "rgba(28,29,33,0.06)",
-            transition: "opacity 0.15s ease, color 0.15s ease",
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onArchive(job.job_id);
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = "var(--oxide)";
-            e.currentTarget.style.borderColor = "var(--oxide)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = "var(--ink-muted)";
-            e.currentTarget.style.borderColor = "rgba(199,202,209,0.3)";
-          }}
-          aria-label="Archive this case"
-        >
-          Archive
-        </button>
-      )}
     </div>
   );
 }
@@ -183,11 +193,11 @@ export default function Dashboard({
               onClick={onToggleArchived}
               className="font-mono text-[0.58rem] uppercase tracking-[0.15em] rounded px-2.5 py-1"
               style={{
-                color: showArchived ? "var(--brass)" : "var(--ink-muted)",
-                border: `1px solid ${showArchived ? "rgba(192,138,53,0.4)" : "rgba(199,202,209,0.25)"}`,
+                color: showArchived ? "var(--brass)" : "var(--silver)",
+                border: `1px solid ${showArchived ? "rgba(192,138,53,0.55)" : "rgba(199,202,209,0.5)"}`,
                 backgroundColor: showArchived
-                  ? "rgba(192,138,53,0.08)"
-                  : "transparent",
+                  ? "rgba(192,138,53,0.12)"
+                  : "rgba(199,202,209,0.07)",
                 transition: "all 0.15s ease",
               }}
             >
