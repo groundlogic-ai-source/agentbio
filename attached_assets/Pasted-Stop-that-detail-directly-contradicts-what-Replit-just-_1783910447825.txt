@@ -1,0 +1,28 @@
+Stop — that detail directly contradicts what Replit just told you, and I don't think "no bug, legitimate" survives it.
+You archived, you didn't delete. That means the Jul 6 (tolrestat) and Jul 10 (#F5278830, epalrestat) jobs should still exist in the database, just hidden from the default view. But Replit's diagnostic flatly states "there is no Jul 10 Galactokinase job in production or local — it does not exist," and "zero Galactokinase entries" across the whole history. Those two facts cannot both be true. Either the archive feature isn't doing what it was specified to do (a reversible flag, never a deletion), or Replit's diagnostic queried through a path that silently excludes archived rows and mistook "hidden from this query" for "never existed." I don't think this got investigated at all — nothing in the report mentions checking an archived flag, or querying with it included.
+There's a second, real possibility sitting right in the trace itself, worth taking seriously: the report repeatedly stumbles over "local vs. production" confusion — checking local first, finding nothing, then discovering production has one more job than local, guessing the new job "must have landed on the shared filesystem." That's not confident, verified reasoning; that's genuine uncertainty about which database is authoritative, admitted mid-diagnostic and then not resolved before concluding "no bug." And you just redeployed the frontend for the domain redirect right before this case ran. If a redeploy can reset or fork the database that jobs actually persist to, that's a real, serious problem, independent of this one case — it would mean nothing in this system is durable across a deploy, which matters enormously for a tool you're about to hand to outside organizations.
+Do not conclude anything yet. Two things need direct, raw verification,
+not another query through the app's normal API layer:
+
+1. Query the actual jobs table directly (raw SQL against the real .db
+   file, not through any endpoint or ORM method that might filter by
+   archived status) for ANY row, at any time, where disease_name contains
+   "Galactokinase" or where the recorded drug is "tolrestat" or
+   "epalrestat" -- explicitly including archived=true rows. If the
+   archive feature soft-deletes by setting a flag, this must show them.
+   If they still don't appear, check whether the archive feature actually
+   performs a hard delete instead of a soft flag, contrary to how it was
+   specified -- read the actual archive endpoint's code directly and
+   confirm what it does to the row.
+
+2. Determine definitively whether local and production are using the
+   same persistent database file, or two different ones that can
+   diverge. Check the actual file path jobs.db resolves to in each
+   environment, and check that file's own creation timestamp -- if it
+   was recreated recently (e.g. around the time of the last redeploy),
+   that would mean job history is being silently reset on deploy, which
+   is a serious problem on its own, separate from this one case.
+
+Report the raw findings plainly. Do not reassert "no bug" until both of
+these are actually checked, not inferred.
+This needs a real answer before I'd trust anything else this system reports going forward, including the canonical validation file itself — if deploys can reset persistent data, that file's safety depends entirely on it never having been touched by a redeploy since it was written, which is exactly the kind of assumption we've been burned by twice already tonight.
