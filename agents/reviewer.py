@@ -28,8 +28,9 @@ from agents.target_selection import OUTPUT_DIR
 from agents import provenance
 from data_sources.openfda import get_adverse_events
 from data_sources.clinicaltrials import check_prior_trials
-from data_sources.chembl import get_molecule_safety_flags
+from data_sources.chembl import get_molecule_safety_flags, get_drug_action_type
 from data_sources.safety_check import web_safety_check
+from data_sources.mechanism_direction import check_mechanism_direction
 
 # ---- Auditable scoring constants (edit here to adjust the policy) -------------
 COMPOSITE_WEIGHTS: dict[str, float] = {
@@ -44,6 +45,13 @@ STRONG_MATCH_THRESHOLD = 0.70
 # Safety gate: withdrawn / black-box-warning compounds are capped at the same
 # ceiling as unapproved compounds so they cannot reach STRONG_MATCH.
 SAFETY_CAP = 0.40
+# Mechanism-direction gate uses the same cap as the safety gate:
+# a DIRECTIONALLY_INCOMPATIBLE verdict prevents STRONG_MATCH just as a
+# safety flag does. COMPATIBLE and INSUFFICIENT_INFO never trigger the cap.
+MECHANISM_DIRECTION_CAP = SAFETY_CAP
+# Mechanism-direction check runs on the single top-ranked candidate only,
+# matching the Boltz structure-validation scope.
+MAX_MECHANISM_DIRECTION_CANDIDATES = 1
 # Layer 2 (web-search) only runs on this many top candidates to mirror the
 # Boltz validation scope and keep LLM call costs bounded.
 MAX_SAFETY_LAYER2_CANDIDATES = 3
@@ -228,6 +236,10 @@ def run_reviewer(chemist_output: dict[str, Any],
             "safety_layer1": None,
             "safety_layer2": None,
             "strong_match": composite >= STRONG_MATCH_THRESHOLD,
+            # mechanism_direction and mechanism_cap_applied are set in the
+            # post-sort mechanism-direction pass below (top-1 only).
+            "mechanism_direction": None,
+            "mechanism_cap_applied": False,
             "provenance": {
                 "counted_once": new_ids,
                 "collapsed_as_duplicate": collapsed_ids,
@@ -237,6 +249,33 @@ def run_reviewer(chemist_output: dict[str, Any],
 
     provenance.log_many(prov_entries)
     reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+
+    # ── Mechanism-direction check (top-1 only, same scope as Boltz) ───────────
+    # Runs AFTER initial composite-score sort so the top candidate is stable.
+    # Only DIRECTIONALLY_INCOMPATIBLE triggers a cap; COMPATIBLE and
+    # INSUFFICIENT_INFO leave the score unchanged (fail-open, same philosophy
+    # as safety Layer 2's NO/UNCLEAR outcomes).
+    if reviewed:
+        top = reviewed[0]
+        _target_sym = top.get("target_symbol") or ""
+        _at_info    = get_drug_action_type(top["drug_name"], _target_sym)
+        _action_t   = _at_info.get("action_type")
+        _moa        = _at_info.get("mechanism_of_action")
+        _direction  = check_mechanism_direction(
+            top["drug_name"], _target_sym, _action_t, _moa, disease
+        )
+        top["mechanism_direction"] = _direction
+        if _direction.get("incompatible"):
+            top["composite_score"]      = min(top["composite_score"], MECHANISM_DIRECTION_CAP)
+            top["mechanism_cap_applied"] = True
+            top["strong_match"]          = top["composite_score"] >= STRONG_MATCH_THRESHOLD
+            reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+        print(
+            f"[reviewer] mechanism-direction: {top['drug_name']} / {disease} "
+            f"→ {_direction.get('verdict')} "
+            f"(action_type={_action_t!r}, cap={'YES' if _direction.get('incompatible') else 'no'})"
+        )
+    # ── End mechanism-direction pass ──────────────────────────────────────────
 
     # ── Safety-disclosure pass (Layer 1 + Layer 2) ────────────────────────────
     # Top-K selection for Layer 2 is done BEFORE either layer applies any cap,
