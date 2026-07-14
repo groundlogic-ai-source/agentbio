@@ -1,0 +1,42 @@
+Add a mechanism-direction compatibility check that CAPS composite_score,
+using the same treatment as the existing safety-layer cap, not a pure
+disclosure. Scope to only the single top-ranked candidate per case (same
+cost scoping as Boltz and the safety layer's Layer 2).
+
+1. First verify ChEMBL mechanism records expose a real, populated
+   action_type field (inhibitor, agonist, antagonist, reuptake inhibitor,
+   etc.) for the candidate drug against its target. Report this before
+   building anything on it.
+
+2. Disease-side: one GPT-5.5 call with web search enabled: "What is the
+   core pathophysiological mechanism of [disease] — is it best
+   characterized as a deficiency, an excess, or overactivity of a
+   specific signaling pathway or molecule? Cite sources." Then a
+   separate, constrained GPT-5.5 classification call (temperature=0):
+   given the retrieved disease mechanism and the drug's action_type,
+   classify DIRECTIONALLY_COMPATIBLE / DIRECTIONALLY_INCOMPATIBLE /
+   INSUFFICIENT_INFO, with a cited one-sentence reason. Never let this
+   introduce a claim not present in what was retrieved.
+
+3. Only a DIRECTIONALLY_INCOMPATIBLE verdict caps composite_score (same
+   cap value and STRONG_MATCH exclusion as the existing safety gate).
+   COMPATIBLE and INSUFFICIENT_INFO do not cap — absence of a flagged
+   mismatch is not proof of compatibility, same philosophy already used
+   for the safety layer's NO/UNCLEAR outcomes. Show full reasoning and
+   citations in the report regardless of verdict.
+
+4. MANDATORY verification before this is done: 
+   a. Manually run this check against the mazindol / Dystonia 14 (GCH1
+      dopa-responsive dystonia) pairing and confirm it now correctly
+      classifies DIRECTIONALLY_INCOMPATIBLE with a real, cited reason.
+   b. Rerun this check against sildenafil/PDE5A (idiopathic PAH) and
+      sirolimus/FKBP1A (tuberous sclerosis complex) from the current
+      locked canonical validation — confirm BOTH classify as
+      DIRECTIONALLY_COMPATIBLE or INSUFFICIENT_INFO, i.e. neither gets
+      wrongly capped. This is a real, scoring-relevant change, so it must
+      not silently alter the paper's already-locked results.
+   c. Report all three outcomes plainly, including full citations, before
+      declaring this complete.
+
+Do not touch Stage 1, EFO resolution, or the unmet-need sweep in this
+pass — that work continues independently in the background.

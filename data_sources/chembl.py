@@ -832,3 +832,96 @@ def get_pharmacological_targets_for_disease(
          "target_discovery_method": "pharmacological_precedent"}
         for t in results
     ]
+
+
+def get_drug_action_type(
+    drug_name: str,
+    target_symbol: str | None = None,
+) -> dict[str, Any]:
+    """
+    Look up the ChEMBL mechanism action_type for a drug, optionally preferring
+    a mechanism record that matches a given target gene symbol in its moa text.
+
+    Resolution order:
+      1. Resolve drug_name → molecule_chembl_id via pref_name / synonym.
+      2. Fetch mechanism records for that mol_id directly.
+      3. If empty, try parent_molecule_chembl_id fallback — ChEMBL stores some
+         mechanism records on salt forms (e.g. sildenafil citrate CHEMBL1737)
+         rather than the free-base parent (CHEMBL192), so querying by
+         parent_molecule_chembl_id catches them.
+      4. Among records found, prefer one whose mechanism_of_action field
+         contains target_symbol (if given); else use the first record.
+
+    Returns:
+      {
+        "action_type"         : str | None,   # e.g. "INHIBITOR", "AGONIST"
+        "mechanism_of_action" : str | None,   # e.g. "Phosphodiesterase 5A inhibitor"
+        "molecule_chembl_id"  : str | None,
+        "target_chembl_id"    : str | None,
+        "source": "exact_target_match" | "any_mechanism" | "not_found",
+      }
+    Cached 30 days.
+    """
+    cache_key = make_key("get_drug_action_type_v1", drug_name, target_symbol or "")
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    result: dict[str, Any] = {
+        "action_type": None,
+        "mechanism_of_action": None,
+        "molecule_chembl_id": None,
+        "target_chembl_id": None,
+        "source": "not_found",
+    }
+
+    try:
+        mol_id = _find_molecule_chembl_id(drug_name)
+        if not mol_id:
+            cache_set(cache_key, result, ttl_days=30)
+            return result
+
+        result["molecule_chembl_id"] = mol_id
+
+        # Step 2a: mechanism records by molecule_chembl_id
+        data = _get_json(f"{BASE_URL}/mechanism.json",
+                         {"molecule_chembl_id": mol_id, "limit": 100})
+        mechs = data.get("mechanisms", [])
+
+        # Step 2b: fallback — query by parent_molecule_chembl_id.
+        # This catches cases where ChEMBL only records mechanism on a
+        # salt/specific form while our mol_id lookup returned the free-base
+        # parent (e.g. sildenafil CHEMBL192 → citrate CHEMBL1737 has the MoA).
+        if not mechs:
+            data2 = _get_json(f"{BASE_URL}/mechanism.json",
+                              {"parent_molecule_chembl_id": mol_id, "limit": 100})
+            mechs = data2.get("mechanisms", [])
+
+        if not mechs:
+            cache_set(cache_key, result, ttl_days=30)
+            return result
+
+        # Prefer mechanism record whose moa string mentions target_symbol
+        best: dict[str, Any] | None = None
+        if target_symbol:
+            sym_up = target_symbol.upper()
+            for m in mechs:
+                moa = (m.get("mechanism_of_action") or "").upper()
+                if sym_up in moa:
+                    best = m
+                    result["source"] = "exact_target_match"
+                    break
+
+        if best is None:
+            best = mechs[0]
+            result["source"] = "any_mechanism"
+
+        result["action_type"] = best.get("action_type")
+        result["mechanism_of_action"] = best.get("mechanism_of_action")
+        result["target_chembl_id"] = best.get("target_chembl_id")
+
+    except Exception as e:
+        print(f"[chembl] WARNING: get_drug_action_type failed for '{drug_name}': {e}")
+
+    cache_set(cache_key, result, ttl_days=30)
+    return result
