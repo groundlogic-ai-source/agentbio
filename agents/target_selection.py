@@ -330,6 +330,20 @@ _EFO_PREFIX_RE = _re.compile(
     flags=_re.IGNORECASE,
 )
 
+# Heuristic for disease names that carry a legacy numbered or DYT-style
+# classification that Open Targets may not recognise under that exact string,
+# raising the risk of an EFO mismatch or a drug-indication data gap.
+#
+# Uses whitespace delimiters (\s\d+(?:\s|$)) so chemical compound numbers
+# like the "6" in "glucose-6-phosphate" or the "3" in "3-phosphoglycerate"
+# are NOT matched (those are always surrounded by hyphens, not spaces).
+# Matches: "Dystonia 14", "Torsion dystonia 7", "BRIC type 2",
+#          "DYT14", "DYT-14", "DYT 7".
+_LEGACY_NAME_RE = _re.compile(
+    r'\s\d+(?:\s|$)|DYT[-\s]?\d+',
+    flags=_re.IGNORECASE,
+)
+
 
 def _resolve_efo_id(
     disease_name: str,
@@ -552,6 +566,35 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
             )
             break  # take the first parent that has additional approved-drug links
 
+    # Update has_approved_treatment when the parent-umbrella walk found approved drugs.
+    # Previously this data only fed pharmacological target discovery (Path B-ext);
+    # now it also corrects unmet_need_score for diseases where OT links the approved
+    # drug to a parent-category EFO rather than the specific subtype EFO.
+    if umbrella_approved_drug_names and has_approved is not True:
+        has_approved = True
+        approved_drug_names = approved_drug_names + umbrella_approved_drug_names
+        _log(
+            f"  has_approved_treatment updated → True via parent-umbrella "
+            f"EFO {umbrella_efo_id} (drugs: {umbrella_approved_drug_names[:5]})"
+        )
+
+    # ot_treatment_unconfirmed: True when has_approved is still False after both
+    # the specific-EFO and parent-umbrella checks, AND the disease name carries a
+    # legacy numbered or DYT-style designation — a common signal that OT may be
+    # using a different/newer name and the drug link is simply absent from its data.
+    ot_treatment_unconfirmed = (
+        has_approved is False
+        and not umbrella_approved_drug_names
+        and bool(_LEGACY_NAME_RE.search(disease_name))
+    )
+    if ot_treatment_unconfirmed:
+        _log(
+            f"  ot_treatment_unconfirmed=True for '{disease_name}': "
+            f"no approved-drug links in OT at specific or parent-umbrella level, "
+            f"and name suggests a legacy numbered/DYT classification — "
+            f"verify treatment status independently."
+        )
+
     # FIX 3 — best-effort prevalence from Orphadata epidemiology
     orpha_code = disease.get("orpha_code")
     prevalence: Optional[float] = None
@@ -624,6 +667,7 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
             orpha_code=disease.get("orpha_code"),
             disease_source=disease.get("source", "orphanet"),
             approved_drug_names=approved_drug_names,
+            ot_treatment_unconfirmed=ot_treatment_unconfirmed,
         ))
 
     rows.sort(key=lambda x: (x["tractability_score"] + x["unmet_need_score"]), reverse=True)
@@ -645,6 +689,58 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
     return rows
 
 
+def _enrich_approved_via_parents(
+    efo_id: str,
+    has_approved: Optional[bool],
+    approved_drug_names: list,
+) -> tuple:
+    """
+    Walk up to immediate parent EFOs and look for approved drugs not already
+    linked to the specific subtype EFO.  If any are found, flip has_approved
+    to True and append the parent drugs to approved_drug_names.
+
+    Uses the same PARENT_MAX_DESCENDANTS breadth filter as the manual-mode
+    parent-umbrella supplement so the two paths stay consistent.
+
+    Called by both the sweep (run()) and manual-mode (select_for_disease) paths
+    to ensure has_approved_treatment — and therefore unmet_need_score — reflects
+    parent-level drug-indication data, not just the specific-subtype EFO.
+
+    Returns:
+        (updated_has_approved, updated_approved_drug_names,
+         umbrella_efo_id | None, umbrella_drug_names)
+    """
+    if has_approved is True:
+        return has_approved, approved_drug_names, None, []
+
+    specific_drug_set = {n.upper() for n in approved_drug_names}
+    umbrella_efo_id: Optional[str] = None
+    umbrella_drug_names: list = []
+
+    for parent in get_disease_parents(efo_id):
+        parent_efo = parent.get("id", "")
+        if not parent_efo:
+            continue
+        desc_count = get_disease_descendant_count(parent_efo)
+        if desc_count is None or desc_count > PARENT_MAX_DESCENDANTS:
+            continue
+        parent_drugs = get_disease_known_drugs(parent_efo)
+        additional = [
+            n for n in parent_drugs.get("approved_drug_names", [])
+            if n.upper() not in specific_drug_set
+        ]
+        if additional:
+            umbrella_efo_id = parent_efo
+            umbrella_drug_names = additional
+            break
+
+    if umbrella_drug_names:
+        has_approved = True
+        approved_drug_names = approved_drug_names + umbrella_drug_names
+
+    return has_approved, approved_drug_names, umbrella_efo_id, umbrella_drug_names
+
+
 def _score_pair(
     disease_name: str,
     target: dict[str, Any],
@@ -654,6 +750,7 @@ def _score_pair(
     orpha_code: Optional[str] = None,
     disease_source: str = "orphanet",
     approved_drug_names: Optional[list] = None,
+    ot_treatment_unconfirmed: bool = False,
 ) -> dict[str, Any]:
     """
     Compute all raw numbers and both scores for one (disease, target) pair.
@@ -727,6 +824,7 @@ def _score_pair(
         "approved_drug_names": approved_drug_names or [],
         "prevalence_per_million": prevalence,
         "treatment_status_needs_review": has_approved_treatment is None,
+        "ot_treatment_unconfirmed": ot_treatment_unconfirmed,
         "raw_tractability_score": raw_tractability,
         "tractability_score": tractability,
         "unmet_need_score": unmet_need,
@@ -827,6 +925,8 @@ def run() -> None:
     n_total = len(candidates)
     n_resolved_efo = 0
     n_passed_gate = 0
+    n_has_approved_flipped = 0
+    n_treatment_unconfirmed = 0
 
     _log(f"Total candidate diseases in universe: {n_total}")
     _log("Resolving EFO IDs and fetching Open Targets associations …")
@@ -849,6 +949,33 @@ def run() -> None:
         drug_info = get_disease_known_drugs(efo_id)
         has_approved: Optional[bool] = drug_info.get("has_approved_treatment")
         approved_drug_names: list = drug_info.get("approved_drug_names", [])
+
+        # Supplement has_approved via parent-umbrella walk.  Fixes diseases where OT
+        # links an approved drug to a parent-category EFO rather than the specific
+        # subtype EFO, which would otherwise leave has_approved=False and push
+        # unmet_need_score to 1.0 (falsely implying no treatment exists).
+        has_approved, approved_drug_names, _umbrella_efo, _umbrella_drugs = \
+            _enrich_approved_via_parents(efo_id, has_approved, approved_drug_names)
+        if _umbrella_drugs:
+            n_has_approved_flipped += 1
+            _log(
+                f"    → has_approved_treatment updated → True via parent EFO "
+                f"{_umbrella_efo} (drugs: {_umbrella_drugs[:5]})"
+            )
+
+        # Flag diseases where treatment status is still unresolved after all fallbacks
+        # and the name suggests a legacy numbered / DYT-style classification.
+        ot_treatment_unconfirmed = (
+            has_approved is False
+            and not _umbrella_drugs
+            and bool(_LEGACY_NAME_RE.search(disease_name))
+        )
+        if ot_treatment_unconfirmed:
+            n_treatment_unconfirmed += 1
+            _log(
+                f"    → ot_treatment_unconfirmed: '{disease_name}' — name suggests "
+                f"legacy numbered classification; verify treatment status independently."
+            )
 
         # FIX 3 — best-effort prevalence from Orphadata epidemiology
         orpha_code = disease.get("orpha_code")
@@ -883,6 +1010,7 @@ def run() -> None:
                 orpha_code=disease.get("orpha_code"),
                 disease_source=disease.get("source", "orphanet"),
                 approved_drug_names=approved_drug_names,
+                ot_treatment_unconfirmed=ot_treatment_unconfirmed,
             )
             scored_pairs.append(pair)
 
@@ -944,6 +1072,9 @@ def run() -> None:
     _log(f"  Had ≥1 target with assoc score >= 0.1:     {n_passed_gate}")
     _log(f"  Total (disease, target) pairs scored:      {len(scored_pairs)}")
     _log(f"  Written to output (top-{TOP_N}):               {len(top30)}")
+    _log(f"  EFO specificity overrides (rank-1 swapped): see '[open_targets] EFO specificity override' lines above")
+    _log(f"  has_approved flipped via parent-umbrella:  {n_has_approved_flipped}")
+    _log(f"  ot_treatment_unconfirmed flagged:          {n_treatment_unconfirmed}")
 
     _log("\nGenerating LLM narration for top 5 …")
     narration = _narrate_top5(top30[:5])
