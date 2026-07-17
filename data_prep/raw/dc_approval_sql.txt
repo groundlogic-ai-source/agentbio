@@ -1,0 +1,4 @@
+SELECT structures.id, structures.name FROM structures
+JOIN approval a ON structures.id = a.struct_id AND a.type = 'FDA'
+JOIN approval b ON structures.id = b.struct_id AND b.type = 'EMA'
+JOIN approval c ON structures.id = c.struct_id AND c.type = 'PMDA';
