@@ -436,7 +436,10 @@ def _run_research_job(job_id: str, hypothesis_text: str) -> None:
         spec = parsed.get("feature_spec")
         hyp_clean = parsed.get("hypothesis_text", hypothesis_text)
         mech = parsed.get("mechanistic_justification", "")
-        kind = parsed.get("predictor_kind") or (_F.predictor_kind(spec) if spec else None)
+        # Derive predictor kind STRICTLY from the feature spec, never from the
+        # LLM's self-reported predictor_kind — a mislabel would route to the
+        # wrong statistical test (Fisher vs logistic).
+        kind = _F.predictor_kind(spec) if spec else None
 
         if tag != "READY" or not spec:
             research_db.update_job(job_id, status="completed", result_json=_json.dumps(
@@ -556,6 +559,20 @@ def get_research_hypotheses() -> list[dict]:
     # join methodology fields from log onto history (same test_id key)
     meth = log.set_index("test_id")[["significance_threshold", "correction_method", "locked_at"]]
     hist = hist.merge(meth, on="test_id", how="left")
+
+    # Serve AUTHORITATIVE cumulative FDR: recompute BH q-values over the entire
+    # log at read time and override each tested row's stored (per-run, possibly
+    # stale) discovery_fdr_p / discovery_pass. This is what makes the UI claim
+    # "adding a hypothesis updates the q-values for all prior entries" true —
+    # older CSV rows are never rewritten, so read-time recompute is required.
+    fdr = _R.cumulative_fdr()
+    qmap = {row["test_id"]: row["fdr_q"] for _, row in fdr.iterrows()}
+    if qmap:
+        for i, tid in hist["test_id"].items():
+            if tid in qmap:
+                q = qmap[tid]
+                hist.at[i, "discovery_fdr_p"] = q
+                hist.at[i, "discovery_pass"] = bool(q < _R.SIGNIFICANCE_THRESHOLD)
 
     # return as records, coercing NaN → None for JSON-serialisability
     records = hist.where(hist.notna(), other=None).to_dict("records")

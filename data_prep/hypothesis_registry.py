@@ -104,11 +104,16 @@ def _load(path: str, cols: list[str]) -> pd.DataFrame:
 
 
 def load_log() -> pd.DataFrame:
-    return _load(LOG_CSV, LOG_COLS)
+    # Lock the read so we never observe a half-written CSV during a concurrent
+    # append/rewrite. Uses a fresh lock fd; must NOT be called from inside an
+    # already-held _registry_lock() (flock is not reentrant across fds → deadlock).
+    with _registry_lock():
+        return _load(LOG_CSV, LOG_COLS)
 
 
 def load_history() -> pd.DataFrame:
-    return _load(HIST_CSV, HIST_COLS)
+    with _registry_lock():
+        return _load(HIST_CSV, HIST_COLS)
 
 
 def migrate_registries() -> None:
@@ -183,7 +188,7 @@ def update_history_row(test_id: str, **fields) -> None:
 
 def append_log_rows(rows: list[dict]) -> pd.DataFrame:
     with _registry_lock():
-        df = load_log()
+        df = _load(LOG_CSV, LOG_COLS)  # lock-free read; we already hold the lock
         add = pd.DataFrame(rows, columns=LOG_COLS)
         out = pd.concat([df, add], ignore_index=True)
         out.to_csv(LOG_CSV, index=False)
@@ -192,7 +197,7 @@ def append_log_rows(rows: list[dict]) -> pd.DataFrame:
 
 def append_history_rows(rows: list[dict]) -> pd.DataFrame:
     with _registry_lock():
-        df = load_history()
+        df = _load(HIST_CSV, HIST_COLS)  # lock-free read; we already hold the lock
         add = pd.DataFrame(rows, columns=HIST_COLS)
         out = pd.concat([df, add], ignore_index=True)
         out.to_csv(HIST_CSV, index=False)
@@ -225,7 +230,8 @@ def cumulative_fdr() -> pd.DataFrame:
     with an added `fdr_q` column. This is the correction that step 6 must report
     against — every test ever recorded, not just the current run.
     """
-    df = load_log().copy()
+    with _registry_lock():
+        df = _load(LOG_CSV, LOG_COLS).copy()  # lock-free read under the held lock
     if df.empty:
         df["fdr_q"] = []
         return df
