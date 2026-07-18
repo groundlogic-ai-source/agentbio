@@ -1,0 +1,53 @@
+=== discovery run run-a036dde3 @ 2026-07-18T04:17:19.597675+00:00 ===
+discovery rows: 4529 (of 9057 total)
+[gen] LLM A (Opus 4.8) proposing domains...
+[gen]   A proposed 5 domains: ['keystone species in trophic cascades', 'exaptation in evolutionary biology', 'phase transitions and percolation thresholds in materials', 'antigenic drift and strain reuse in influenza surveillance', 'modular reuse of code libraries in software dependency graphs']
+[gen] LLM B (GPT-5.6 Sol) proposing domains...
+[gen]   B proposed 5 domains: ['evolutionary exaptation during host shifts', 'preferential attachment in citation networks', 'standardized module reuse in software dependency ecosystems', 'surge-driven asset redeployment during epidemic emergencies', 'short-step local search on rugged nk fitness landscapes']
+[review] Lead (Opus 4.8) consolidating...
+[review]   23 hypotheses: {'READY': 11, 'NEEDS_ENRICHMENT': 8, 'DISCARDED': 4}
+
+==========================================================================
+DISCOVERY RESULTS — run-a036dde3
+==========================================================================
+temperature note: requested 0.7 could not be applied — claude-opus-4-8 rejects temperature and gpt-5.6-sol forces 1; model defaults used.
+
+READY hypotheses tested this run: 9 (17 tests across framings)
+
+test_id   framing test           raw_p      cum_q  pass  hypothesis
+run-a036dde3-T0008 broad   fisher_exact          0          0  YES   Oncology-targeting indications, where cross-mechanism co-opt
+run-a036dde3-T0012 broad   fisher_exact  4.519e-77  3.841e-76  YES   Drug names containing antimicrobial stems (-vir, -cillin, -m
+run-a036dde3-T0016 broad   fisher_exact  2.027e-55  1.148e-54  YES   Drugs whose names contain the kinase-inhibitor stem 'nib' po
+run-a036dde3-T0010 broad   fisher_exact    1.2e-47  5.099e-47  YES   Drugs indicated for infectious/viral conditions are repurpos
+run-a036dde3-T0014 broad   fisher_exact  7.675e-25   2.61e-24  YES   Drugs whose names contain the monoclonal-antibody stem 'mab'
+run-a036dde3-T0007 narrow  fisher_exact  9.965e-14  2.824e-13  YES   Oncology-targeting indications, where cross-mechanism co-opt
+run-a036dde3-T0015 narrow  fisher_exact   6.15e-10  1.494e-09  YES   Drugs whose names contain the kinase-inhibitor stem 'nib' po
+run-a036dde3-T0004 broad   fisher_exact  2.708e-07  5.754e-07  YES   Established products (widely-integrated 'keystone' agents) a
+run-a036dde3-T0018 broad   fisher_exact   0.002277   0.004301  YES   General-purpose 'utility' indications (pain, nausea, symptom
+run-a036dde3-T0009 narrow  fisher_exact   0.002976   0.005059  YES   Drugs indicated for infectious/viral conditions are repurpos
+run-a036dde3-T0005 narrow  fisher_exact    0.03379    0.05222  no    Drugs originally developed for common chronic conditions (me
+run-a036dde3-T0001 narrow  fisher_exact    0.09042     0.1281  no    Drugs targeting broadly-acting immune/inflammatory processes
+run-a036dde3-T0013 narrow  fisher_exact      0.136     0.1778  no    Drugs whose names contain the monoclonal-antibody stem 'mab'
+run-a036dde3-T0003 narrow  fisher_exact     0.1788     0.2172  no    Established products (widely-integrated 'keystone' agents) a
+run-a036dde3-T0006 broad   fisher_exact     0.2722     0.3085  no    Drugs originally developed for common chronic conditions (me
+run-a036dde3-T0002 broad   fisher_exact     0.8614     0.9152  no    Drugs targeting broadly-acting immune/inflammatory processes
+run-a036dde3-T0017 narrow  fisher_exact          1          1  no    General-purpose 'utility' indications (pain, nausea, symptom
+
+-- NEEDS_ENRICHMENT (future-work appendix): 8 --
+  * [keystone species in trophic cascades] Drugs whose number of measured molecular targets exceeds a threshold r -> needs: Requires per-drug count of distinct molecular targets / protein interactions, not in dataset.
+  * [phase transitions / percolation thresholds] Late-stage clinical phase reflects crossing the developmental percolat -> needs: Requires ordinal numeric encoding of the phase column; no phase op exists in the DSL.
+  * [modular reuse (prescribing breadth)] Number of downstream clinical contexts depending on a drug (prescribin -> needs: Requires count of distinct clinical contexts / prescribing breadth per drug; not in dataset (and must exclude repurposing count to avoid confounding).
+  * [preferential attachment in citation networks] The number of pre-cutoff repurposing investigations positively predict -> needs: Requires time-stamped drug-indication trial records and a prediction cutoff date to compute prior investigation degree WITHOUT reusing prior_repurposing_count (which would be label-confounded).
+  * [preferential attachment in citation networks] Recent growth (burst) in a drug's investigation count positively predi -> needs: Requires trial/study start dates linked to drug identifiers to compute pre-outcome investigation-count growth.
+  * [preferential attachment in citation networks] A larger number of independent sponsors investigating a drug positivel -> needs: Requires sponsor identifiers for each time-stamped drug-indication trial or study.
+  * [surge-driven asset redeployment (temporal burst)] Trials initiated shortly after an official outbreak declaration are mo -> needs: Requires trial initiation dates, pathogen identity, and dated official outbreak/emergency declarations.
+  * [exaptation / NK landscape (target-pathway conservation)] Greater conservation/mechanistic similarity of a drug's target pathway -> needs: Merged Sol's two near-identical entries (host-shift conservation and NK short-move similarity). Requires original approved indication, drug-target annotations, disease-pathway annotations with normalized ontology IDs, and a computable target/pathway similarity metric. Note: overlaps with what standard cheminformatics pipelines already approximate, but a pathway-level (not structural) similarity score is distinct enough to retain if enrichment is feasible.
+
+-- DISCARDED by lead review: 4 --
+  * [exaptation in evolutionary biology] Prior repurposing count reflects accumulated exaptation pote -> Label-confounded: built on prior_repurposing_count (prc_threshold k=1), which defines the outcome label.
+  * [phase transitions / percolation thresholds] Drugs at or beyond a critical prior-repurposing threshold (k -> Label-confounded: built on prc_threshold over prior_repurposing_count, which defines the outcome label.
+  * [modular reuse / preferential attachment] Drugs already imported into multiple contexts (high prior_re -> Label-confounded: built on prc_raw (prior_repurposing_count), which defines the outcome label.
+  * [antigenic drift / target similarity] Sequence/antigenic distance between original and new indicat -> Redundant with the retained target/pathway-conservation NEEDS_ENRICHMENT hypothesis above (same underlying similarity-metric requirement and mechanism).
+
+cumulative hypothesis_log now holds 17 tests (FDR computed over all).
+registry: data_prep/registry/hypothesis_log.csv + bisociation_history.csv
