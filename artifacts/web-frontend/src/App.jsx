@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Dashboard from "./components/Dashboard.jsx";
 import CaseView from "./components/CaseView.jsx";
 import NewCaseDialog from "./components/NewCaseDialog.jsx";
+import ResearchTab from "./components/ResearchTab.jsx";
 import {
   listRuns,
   getRun,
@@ -165,6 +166,8 @@ export default function App() {
     [loadDetail, refreshList],
   );
 
+  const isTopLevel = view === "dashboard" || view === "research";
+
   return (
     <div className="min-h-full">
       {error && (
@@ -180,7 +183,49 @@ export default function App() {
         </div>
       )}
 
-      {view === "dashboard" ? (
+      {/* ── Tab navigation: only visible on top-level views ── */}
+      {isTopLevel && (
+        <nav style={{
+          display: "flex", alignItems: "center", gap: "0",
+          borderBottom: "1px solid rgba(199,202,209,0.18)",
+          backgroundColor: "var(--graphite)",
+          padding: "0 1.5rem",
+        }}>
+          {[
+            { id: "dashboard", label: "Case Files" },
+            { id: "research", label: "Research" },
+          ].map(({ id, label }) => {
+            const active = view === id;
+            return (
+              <button
+                key={id}
+                onClick={() => setView(id)}
+                style={{
+                  padding: "0.7rem 1.1rem",
+                  fontFamily: "monospace",
+                  fontSize: "0.65rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.18em",
+                  fontWeight: active ? 600 : 400,
+                  color: active ? "var(--brass)" : "var(--silver)",
+                  background: "transparent",
+                  border: "none",
+                  borderBottom: active ? "2px solid var(--brass)" : "2px solid transparent",
+                  marginBottom: "-1px",
+                  cursor: "pointer",
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = "var(--paper)"; }}
+                onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = "var(--silver)"; }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </nav>
+      )}
+
+      {view === "dashboard" && (
         <Dashboard
           runs={runs}
           showArchived={showArchived}
@@ -189,7 +234,13 @@ export default function App() {
           onArchive={handleArchive}
           onToggleArchived={handleToggleArchived}
         />
-      ) : (
+      )}
+
+      {view === "research" && (
+        <ResearchTab />
+      )}
+
+      {view === "case" && (
         <CaseView
           job={detail}
           cost={cost}
