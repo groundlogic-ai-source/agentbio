@@ -52,3 +52,21 @@ export function resumeCase(jobId, action, notes) {
 }
 
 export const TERMINAL_STATUSES = new Set(["completed", "error"]);
+
+// ── Research hypothesis registry (Feature 3) ──────────────────────────────────
+
+export function getResearchHypotheses() {
+  return request("/api/research/hypotheses");
+}
+
+export function submitResearchHypothesis(hypothesisText) {
+  return request("/api/research/hypotheses", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ hypothesis_text: hypothesisText }),
+  });
+}
+
+export function getResearchJob(jobId) {
+  return request(`/api/research/jobs/${jobId}`);
+}

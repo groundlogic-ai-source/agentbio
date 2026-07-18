@@ -61,6 +61,10 @@ LOG_COLS = [
     "test_type",
     "outcome_framing",
     "raw_p",
+    # ── Feature 4: methodology locked before any result is computed ──────────
+    "significance_threshold",  # always 0.05; recorded so future changes are auditable
+    "correction_method",       # always "benjamini_hochberg"
+    "locked_at",               # ISO timestamp set BEFORE the test runs
 ]
 
 HIST_COLS = [
@@ -77,8 +81,16 @@ HIST_COLS = [
     "discovery_fdr_p",
     "discovery_pass",
     "confirmation_pass",
+    "confirmation_raw_p",       # raw p on the holdout half (empty if not confirmed)
+    "confound_check_summary",   # JSON: Opus-proposed confounders + adjusted OR results
     "outcome_note",
 ]
+
+# Methodology constants — recorded per-log-entry so every row is self-describing.
+# If either ever changes, ALL downstream re-tests must create NEW rows, never
+# overwrite existing ones (enforced by the append-only design of append_log_rows).
+SIGNIFICANCE_THRESHOLD: float = 0.05
+CORRECTION_METHOD: str = "benjamini_hochberg"
 
 
 def _load(path: str, cols: list[str]) -> pd.DataFrame:
@@ -97,6 +109,76 @@ def load_log() -> pd.DataFrame:
 
 def load_history() -> pd.DataFrame:
     return _load(HIST_CSV, HIST_COLS)
+
+
+def migrate_registries() -> None:
+    """
+    One-time, idempotent migration: back-fill new methodology columns that were
+    added after the first run so existing CSV rows remain fully self-describing.
+    Safe to call on every startup; exits immediately if nothing needs updating.
+    Uses the same fcntl lock as all other writes.
+    """
+    with _registry_lock():
+        # -- hypothesis_log.csv ------------------------------------------------
+        if os.path.exists(LOG_CSV):
+            df = pd.read_csv(LOG_CSV)
+            dirty = False
+            if "significance_threshold" not in df.columns:
+                df["significance_threshold"] = SIGNIFICANCE_THRESHOLD
+                dirty = True
+            if "correction_method" not in df.columns:
+                df["correction_method"] = CORRECTION_METHOD
+                dirty = True
+            if "locked_at" not in df.columns:
+                # Best approximation: use run_timestamp if present, else empty
+                if "run_timestamp" in df.columns:
+                    df["locked_at"] = df["run_timestamp"]
+                else:
+                    df["locked_at"] = ""
+                dirty = True
+            if dirty:
+                # Reorder to canonical column order (adds any still-missing cols)
+                for c in LOG_COLS:
+                    if c not in df.columns:
+                        df[c] = pd.NA
+                df[LOG_COLS].to_csv(LOG_CSV, index=False)
+
+        # -- bisociation_history.csv -------------------------------------------
+        if os.path.exists(HIST_CSV):
+            df = pd.read_csv(HIST_CSV)
+            dirty = False
+            for new_col in ("confirmation_raw_p", "confound_check_summary"):
+                if new_col not in df.columns:
+                    df[new_col] = ""
+                    dirty = True
+            if dirty:
+                for c in HIST_COLS:
+                    if c not in df.columns:
+                        df[c] = pd.NA
+                df[HIST_COLS].to_csv(HIST_CSV, index=False)
+
+
+def update_history_row(test_id: str, **fields) -> None:
+    """
+    Update specific fields of an existing bisociation_history row in-place.
+    Allowed fields: confirmation_pass, confirmation_raw_p, confound_check_summary.
+    Used by the confirmation and confound steps to fill in results after discovery.
+    Protected by the same registry lock as all other writes.
+    """
+    allowed = {"confirmation_pass", "confirmation_raw_p", "confound_check_summary"}
+    bad = set(fields) - allowed
+    if bad:
+        raise ValueError(f"update_history_row: unknown fields {sorted(bad)}")
+    with _registry_lock():
+        if not os.path.exists(HIST_CSV):
+            return
+        df = pd.read_csv(HIST_CSV)
+        mask = df["test_id"] == test_id
+        for col, val in fields.items():
+            if col not in df.columns:
+                df[col] = ""
+            df.loc[mask, col] = val
+        df.to_csv(HIST_CSV, index=False)
 
 
 def append_log_rows(rows: list[dict]) -> pd.DataFrame:

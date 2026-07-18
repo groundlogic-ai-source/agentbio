@@ -30,6 +30,7 @@ from main_graph import build_graph
 from resume_review import resume_run
 
 from api import jobs_db
+from api import research_db
 
 # Node names emitted by graph.stream(...) map 1:1 onto current_stage values.
 _PIPELINE_NODES = {
@@ -55,6 +56,7 @@ app.add_middleware(
 
 jobs_db.init_db()
 jobs_db.reap_orphaned_running_jobs()
+research_db.init_db()
 
 
 @app.on_event("startup")
@@ -352,5 +354,240 @@ def trigger_sweep() -> dict:
 def sweep_status() -> dict:
     """Return running / ok / error / not_started for the sweep subprocess."""
     return sweep_manager.status()
+
+
+# --------------------------------------------------------------------------- #
+# Research hypothesis registry (Feature 3)
+# --------------------------------------------------------------------------- #
+
+import sys as _sys
+_DATA_PREP = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data_prep")
+if _DATA_PREP not in _sys.path:
+    _sys.path.insert(0, _DATA_PREP)
+
+import json as _json
+import datetime as _dt
+import pandas as _pd
+
+# Lazy holders — populated on first background job execution to avoid import-
+# time failures when data_prep modules aren't needed (e.g. health probes).
+_RESEARCH_MODULES: dict = {}
+
+
+def _ensure_research_modules() -> None:
+    if _RESEARCH_MODULES:
+        return
+    import hypothesis_registry as _R
+    import features as _F
+    import stats_tests as _S
+    import llm_clients as _L
+    _RESEARCH_MODULES.update({"R": _R, "F": _F, "S": _S, "L": _L})
+
+
+_LABELED_CSV = os.path.join(_DATA_PREP, "output", "labeled_dataset.csv")
+
+_PARSE_PROMPT_TPL = """You are the LEAD reviewer. A researcher submitted a hypothesis for testing.
+Parse it into the feature DSL, or return NEEDS_ENRICHMENT / DISCARDED.
+
+Hypothesis: "{hyp}"
+
+Dataset columns: drug_name, ind_name, prior_repurposing_count, established_product, phase, status.
+
+DSL ops (only these):
+  {{"op":"prc_raw"}}                                        continuous
+  {{"op":"prc_threshold","params":{{"k":N}}}}               binary
+  {{"op":"established"}}                                   binary
+  {{"op":"ind_keyword","params":{{"keywords":[...]}}}}      binary
+  {{"op":"drug_keyword","params":{{"keywords":[...]}}}}     binary
+
+DISCARD if: trivially redundant or built on prior_repurposing_count (label-confounded).
+
+Return ONLY a JSON object:
+{{
+  "hypothesis_text": "<cleaned reformulation>",
+  "mechanistic_justification": "<1-sentence causal argument>",
+  "feature_spec": {{"op":"...", "params":{{...}}}} | null,
+  "predictor_kind": "binary"|"continuous"|null,
+  "tag": "READY"|"NEEDS_ENRICHMENT"|"DISCARDED",
+  "needs_or_reason": "<if not READY: explanation>"
+}}"""
+
+
+def _run_research_job(job_id: str, hypothesis_text: str) -> None:
+    """
+    Background thread: parse → test on discovery split → append to SAME
+    cumulative hypothesis log (FDR over everything) → update research_job.
+    """
+    try:
+        research_db.update_job(job_id, status="running")
+        _ensure_research_modules()
+        _R = _RESEARCH_MODULES["R"]
+        _F = _RESEARCH_MODULES["F"]
+        _S = _RESEARCH_MODULES["S"]
+        _L = _RESEARCH_MODULES["L"]
+
+        # 1. Parse hypothesis via Opus lead review
+        raw = _L.opus(_PARSE_PROMPT_TPL.format(hyp=hypothesis_text), max_tokens=2000)
+        parsed = _L.extract_json(raw)
+        if isinstance(parsed, list):
+            parsed = parsed[0] if parsed else {}
+
+        tag = parsed.get("tag", "NEEDS_ENRICHMENT")
+        spec = parsed.get("feature_spec")
+        hyp_clean = parsed.get("hypothesis_text", hypothesis_text)
+        mech = parsed.get("mechanistic_justification", "")
+        kind = parsed.get("predictor_kind") or (_F.predictor_kind(spec) if spec else None)
+
+        if tag != "READY" or not spec:
+            research_db.update_job(job_id, status="completed", result_json=_json.dumps(
+                {"tag": tag, "parsed": parsed,
+                 "message": "hypothesis cannot be tested with current dataset DSL"}))
+            return
+
+        if _F.is_confounded(spec):
+            research_db.update_job(job_id, status="completed", result_json=_json.dumps(
+                {"tag": "DISCARDED", "parsed": parsed,
+                 "message": "label-confounded: built on prior_repurposing_count"}))
+            return
+
+        # 2. Test on discovery split (methodology locked at job creation time)
+        if not os.path.exists(_LABELED_CSV):
+            raise FileNotFoundError(f"labeled_dataset.csv not found at {_LABELED_CSV}")
+
+        df = _pd.read_csv(_LABELED_CSV)
+        disc = df[df["split"] == "discovery"].copy()
+        ts = _dt.datetime.now(_dt.timezone.utc).isoformat()
+        run_id = f"research-{job_id[:8]}"
+        hid, tc = f"{run_id}-H01", [0]
+        log_rows: list[dict] = []
+        hist_rows: list[dict] = []
+
+        for framing in ("narrow", "broad"):
+            pos = disc["label"] == "repurposed-success"
+            neg = (disc["label"] == "genuine-failure") if framing == "narrow" else \
+                  disc["label"].isin(["genuine-failure", "administrative-exclude"])
+            sub = disc[pos | neg].copy()
+            sub["y"] = (sub["label"] == "repurposed-success").astype(int)
+
+            feat = _F.compute(sub, spec)
+            ok, why = _F.separation_ok(feat, sub["y"])
+            tc[0] += 1
+            tid = f"{run_id}-T{tc[0]:04d}"
+
+            if not ok:
+                hist_rows.append({
+                    "test_id": tid, "hypothesis_id": hid, "run_id": run_id,
+                    "session_timestamp": ts, "domain_description": "user-submitted",
+                    "proposing_llm": "user+opus-parse", "resulting_hypothesis_text": hyp_clean,
+                    "discovery_test_type": kind, "outcome_framing": framing,
+                    "discovery_raw_p": "", "discovery_fdr_p": "", "discovery_pass": "",
+                    "confirmation_pass": "", "confirmation_raw_p": "",
+                    "confound_check_summary": "", "outcome_note": f"not tested: {why}",
+                })
+                continue
+
+            # methodology locked before result (Feature 4)
+            locked_at = _dt.datetime.now(_dt.timezone.utc).isoformat()
+            res = _S.fisher_binary(feat, sub["y"]) if kind == "binary" \
+                else _S.logistic_continuous(feat, sub["y"])
+
+            log_rows.append({
+                "test_id": tid, "hypothesis_id": hid, "run_id": run_id,
+                "run_timestamp": ts, "hypothesis_text": hyp_clean,
+                "test_type": res.test_type, "outcome_framing": framing,
+                "raw_p": res.p_value,
+                "significance_threshold": _R.SIGNIFICANCE_THRESHOLD,
+                "correction_method": _R.CORRECTION_METHOD,
+                "locked_at": locked_at,
+            })
+            hist_rows.append({
+                "test_id": tid, "hypothesis_id": hid, "run_id": run_id,
+                "session_timestamp": ts, "domain_description": "user-submitted",
+                "proposing_llm": "user+opus-parse", "resulting_hypothesis_text": hyp_clean,
+                "discovery_test_type": res.test_type, "outcome_framing": framing,
+                "discovery_raw_p": res.p_value, "discovery_fdr_p": "",
+                "discovery_pass": "", "confirmation_pass": "", "confirmation_raw_p": "",
+                "confound_check_summary": "",
+                "outcome_note": f"OR={res.odds_ratio:.3g} CI[{res.ci_low:.3g},{res.ci_high:.3g}] n={res.n} mech: {mech}",
+            })
+
+        # 3. Append to SAME cumulative log — FDR over everything
+        if log_rows:
+            _R.append_log_rows(log_rows)
+        fdr = _R.cumulative_fdr()
+        qmap = {row["test_id"]: row["fdr_q"] for _, row in fdr.iterrows()}
+        for hr in hist_rows:
+            t = hr.get("test_id")
+            if t and t in qmap and hr.get("discovery_raw_p") != "":
+                q = qmap[t]
+                hr["discovery_fdr_p"] = q
+                hr["discovery_pass"] = bool(q < _R.SIGNIFICANCE_THRESHOLD)
+        if hist_rows:
+            _R.append_history_rows(hist_rows)
+
+        research_db.update_job(job_id, status="completed", result_json=_json.dumps({
+            "tag": tag,
+            "parsed": parsed,
+            "fdr_results": [
+                {"test_id": lr["test_id"], "framing": lr["outcome_framing"],
+                 "raw_p": lr["raw_p"], "fdr_q": qmap.get(lr["test_id"]),
+                 "discovery_pass": hr.get("discovery_pass")}
+                for lr, hr in zip(log_rows, [h for h in hist_rows if h.get("test_id") in qmap])
+            ],
+        }))
+
+    except Exception as exc:  # noqa: BLE001
+        research_db.update_job(job_id, status="error", error_message=str(exc))
+
+
+class ResearchHypothesisRequest(BaseModel):
+    hypothesis_text: str
+
+
+@app.get("/api/research/hypotheses")
+def get_research_hypotheses() -> list[dict]:
+    """Return the full bisociation_history joined with log methodology fields."""
+    _ensure_research_modules()
+    _R = _RESEARCH_MODULES["R"]
+    _R.migrate_registries()
+    hist = _R.load_history()
+    log = _R.load_log()
+
+    # join methodology fields from log onto history (same test_id key)
+    meth = log.set_index("test_id")[["significance_threshold", "correction_method", "locked_at"]]
+    hist = hist.merge(meth, on="test_id", how="left")
+
+    # return as records, coercing NaN → None for JSON-serialisability
+    records = hist.where(hist.notna(), other=None).to_dict("records")
+    return records
+
+
+@app.post("/api/research/hypotheses")
+def submit_research_hypothesis(req: ResearchHypothesisRequest) -> dict:
+    """
+    Accept a free-text hypothesis, lock the methodology immediately (before
+    any result is computed — Feature 4), create an async job, and start
+    testing on the same discovery split as pipeline runs.
+    Writes to the SAME cumulative FDR log — no separate accounting path.
+    """
+    if not req.hypothesis_text.strip():
+        raise HTTPException(status_code=400, detail="hypothesis_text must not be empty")
+    job_id = research_db.create_job(req.hypothesis_text.strip())
+    t = threading.Thread(
+        target=_run_research_job,
+        args=(job_id, req.hypothesis_text.strip()),
+        daemon=True,
+    )
+    t.start()
+    return {"job_id": job_id}
+
+
+@app.get("/api/research/jobs/{job_id}")
+def get_research_job(job_id: str) -> dict:
+    """Poll status of a user-submitted research hypothesis job."""
+    job = research_db.get_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="research job not found")
+    return job
 
 

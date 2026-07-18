@@ -48,6 +48,33 @@ def fisher_binary(feature: pd.Series, outcome: pd.Series) -> TestResult:
     return TestResult("fisher_exact", float(orr), ci_low, ci_high, float(p), int(len(df)))
 
 
+def logistic_binary_adjusted(
+    feature: pd.Series, covariate: pd.Series, outcome: pd.Series
+) -> TestResult:
+    """
+    Logistic regression for a binary primary predictor with one binary/continuous
+    covariate.  Returns OR/CI/p for the primary feature after adjustment.
+    Used by confound-investigation to test whether a confirmed effect survives
+    covariate control.
+    """
+    df = pd.DataFrame({
+        "f": feature.astype(float), "c": covariate.astype(float),
+        "y": outcome.astype(int),
+    }).dropna()
+    X = sm.add_constant(df[["f", "c"]])
+    model = sm.Logit(df["y"], X)
+    res = model.fit(disp=0, method="bfgs", maxiter=200)
+    coef = res.params["f"]
+    ci = res.conf_int().loc["f"]
+    p = res.pvalues["f"]
+    return TestResult(
+        "logistic_adjusted",
+        float(np.exp(coef)), float(np.exp(ci[0])), float(np.exp(ci[1])),
+        float(p), int(len(df)),
+        note="OR adjusted for one covariate",
+    )
+
+
 def logistic_continuous(feature: pd.Series, outcome: pd.Series) -> TestResult:
     df = pd.DataFrame({"f": feature.astype(float), "y": outcome.astype(int)}).dropna()
     X = sm.add_constant(df[["f"]])

@@ -37,6 +37,7 @@ import features as F
 import hypothesis_registry as R
 import llm_clients as L
 import stats_tests as S
+import confound_check as C
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_CSV = os.path.join(HERE, "output", "labeled_dataset.csv")
@@ -235,8 +236,14 @@ def _framed(df: pd.DataFrame, framing: str) -> pd.DataFrame:
 
 
 def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
-    """Run every READY hypothesis on the discovery half, both framings."""
+    """Run every READY hypothesis on the discovery half, both framings.
+
+    Returns (log_rows, hist_rows, test_meta).
+    test_meta maps hypothesis_id → {spec, kind, mech} so confirm_surviving()
+    and confound_check_surviving() can replay the same test on the holdout half.
+    """
     log_rows, hist_rows = [], []
+    test_meta: dict = {}
     # IDs are prefixed with the run_id (a uuid4-derived unique string), so they are
     # globally collision-free WITHOUT reading the shared CSV — two concurrent runs
     # can never allocate the same id. Counters are local to this run.
@@ -269,7 +276,8 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
                 "proposing_llm": llm, "resulting_hypothesis_text": htext,
                 "discovery_test_type": "", "outcome_framing": "",
                 "discovery_raw_p": "", "discovery_fdr_p": "", "discovery_pass": "",
-                "confirmation_pass": "", "outcome_note": f"{tag}: {note}",
+                "confirmation_pass": "", "confirmation_raw_p": "",
+                "confound_check_summary": "", "outcome_note": f"{tag}: {note}",
             })
             continue
 
@@ -281,7 +289,8 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
                 "proposing_llm": llm, "resulting_hypothesis_text": htext,
                 "discovery_test_type": "", "outcome_framing": "",
                 "discovery_raw_p": "", "discovery_fdr_p": "", "discovery_pass": "",
-                "confirmation_pass": "",
+                "confirmation_pass": "", "confirmation_raw_p": "",
+                "confound_check_summary": "",
                 "outcome_note": "auto-demoted to NEEDS_ENRICHMENT: feature not computable from schema",
             })
             continue
@@ -298,13 +307,17 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
                 "proposing_llm": llm, "resulting_hypothesis_text": htext,
                 "discovery_test_type": "", "outcome_framing": "",
                 "discovery_raw_p": "", "discovery_fdr_p": "", "discovery_pass": "",
-                "confirmation_pass": "",
+                "confirmation_pass": "", "confirmation_raw_p": "",
+                "confound_check_summary": "",
                 "outcome_note": "hard-blocked: label-confounded (prior_repurposing_count defines the outcome label)",
             })
             continue
 
         hid = new_hid()
         kind = F.predictor_kind(spec)
+        # Store spec/kind/mech so the confirmation and confound steps can replay
+        # the exact same test on the holdout half after FDR correction.
+        test_meta[hid] = {"spec": spec, "kind": kind, "mech": mech}
 
         for framing in ("narrow", "broad"):
             sub = _framed(disc, framing)
@@ -318,9 +331,13 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
                     "proposing_llm": llm, "resulting_hypothesis_text": htext,
                     "discovery_test_type": kind, "outcome_framing": framing,
                     "discovery_raw_p": "", "discovery_fdr_p": "", "discovery_pass": "",
-                    "confirmation_pass": "", "outcome_note": f"not tested: {why}",
+                    "confirmation_pass": "", "confirmation_raw_p": "",
+                    "confound_check_summary": "", "outcome_note": f"not tested: {why}",
                 })
                 continue
+
+            # ── Feature 4: lock methodology BEFORE the result is computed ──────
+            locked_at = dt.datetime.now(dt.timezone.utc).isoformat()
 
             if kind == "binary":
                 res = S.fisher_binary(feat, sub["y"])
@@ -332,6 +349,10 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
                 "run_timestamp": ts, "hypothesis_text": htext,
                 "test_type": res.test_type, "outcome_framing": framing,
                 "raw_p": res.p_value,
+                # methodology locked before result:
+                "significance_threshold": R.SIGNIFICANCE_THRESHOLD,
+                "correction_method": R.CORRECTION_METHOD,
+                "locked_at": locked_at,
             })
             hist_rows.append({
                 "test_id": tid, "hypothesis_id": hid, "run_id": run_id,
@@ -339,13 +360,101 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
                 "proposing_llm": llm, "resulting_hypothesis_text": htext,
                 "discovery_test_type": res.test_type, "outcome_framing": framing,
                 "discovery_raw_p": res.p_value, "discovery_fdr_p": "",
-                "discovery_pass": "", "confirmation_pass": "",
+                "discovery_pass": "", "confirmation_pass": "", "confirmation_raw_p": "",
+                "confound_check_summary": "",
                 "outcome_note": (
                     f"OR={res.odds_ratio:.3g} CI[{res.ci_low:.3g},{res.ci_high:.3g}] "
                     f"n={res.n} mech: {mech}"
                 ),
             })
-    return log_rows, hist_rows
+    return log_rows, hist_rows, test_meta
+
+
+def confirm_surviving(hist_rows: list[dict], conf: pd.DataFrame, test_meta: dict) -> None:
+    """
+    For each hist_row where discovery_pass is True, replay the same test on the
+    holdout confirmation half and fill confirmation_pass / confirmation_raw_p in-place.
+
+    Uses a simple uncorrected p < 0.05 threshold (one pre-specified follow-up test
+    per confirmed hypothesis; no additional multiple-comparison correction needed).
+    """
+    for hr in hist_rows:
+        disc_pass = hr.get("discovery_pass")
+        if disc_pass is not True and str(disc_pass).lower() != "true":
+            continue
+        hid = str(hr.get("hypothesis_id", ""))
+        meta = test_meta.get(hid)
+        if not meta:
+            continue
+        framing = str(hr.get("outcome_framing", "narrow"))
+        spec, kind = meta["spec"], meta["kind"]
+        sub = _framed(conf, framing)
+        try:
+            feat = F.compute(sub, spec)
+            ok, _ = F.separation_ok(feat, sub["y"])
+            if not ok:
+                hr["confirmation_pass"] = False
+                hr["confirmation_raw_p"] = ""
+                continue
+            if kind == "binary":
+                res = S.fisher_binary(feat, sub["y"])
+            else:
+                res = S.logistic_continuous(feat, sub["y"])
+            hr["confirmation_raw_p"] = res.p_value
+            hr["confirmation_pass"] = bool(res.p_value < 0.05)
+            verdict = "PASS" if res.p_value < 0.05 else "fail"
+            print(f"[confirm] {hr.get('test_id','')} {framing}: p={res.p_value:.4g} {verdict}", flush=True)
+        except Exception as e:  # noqa: BLE001
+            hr["confirmation_pass"] = False
+            hr["confirmation_raw_p"] = ""
+            print(f"[confirm] ERROR on {hr.get('test_id', '')}: {e}", flush=True)
+
+
+def confound_check_surviving(
+    hist_rows: list[dict], disc: pd.DataFrame, test_meta: dict
+) -> None:
+    """
+    For hypotheses that passed BOTH discovery FDR and holdout confirmation,
+    propose 1-3 confounders via Opus (separate call from the lead review),
+    then run multivariate logistic adjustment for each computable confound.
+    Results stored as JSON in confound_check_summary in-place.
+
+    Each hypothesis_id is investigated only once; both framings' rows receive
+    the same summary string.
+    """
+    results_by_hid: dict[str, str] = {}
+
+    for hr in hist_rows:
+        confirmed = hr.get("confirmation_pass")
+        if confirmed is not True and str(confirmed).lower() != "true":
+            continue
+        hid = str(hr.get("hypothesis_id", ""))
+        # reuse result if already computed (narrow + broad share one investigation)
+        if hid in results_by_hid:
+            hr["confound_check_summary"] = results_by_hid[hid]
+            continue
+        meta = test_meta.get(hid)
+        if not meta:
+            continue
+        framing = str(hr.get("outcome_framing", "narrow"))
+        print(f"[confound] investigating {hid} ({framing})...", flush=True)
+        try:
+            result = C.investigate(
+                data_discovery=disc,
+                hypothesis_text=str(hr.get("resulting_hypothesis_text", "")),
+                feature_spec=meta["spec"],
+                predictor_kind=meta["kind"],
+                mechanistic_justification=meta["mech"],
+                discovery_p=float(hr.get("discovery_raw_p") or 1.0),
+                fdr_q=float(hr.get("discovery_fdr_p") or 1.0),
+                confirmation_p=float(hr.get("confirmation_raw_p") or 1.0),
+                framing=framing,
+            )
+            summary = json.dumps(result)
+        except Exception as e:  # noqa: BLE001
+            summary = json.dumps({"status": "error", "error": str(e)})
+        results_by_hid[hid] = summary
+        hr["confound_check_summary"] = summary
 
 
 class _Tee:
@@ -367,17 +476,20 @@ def main() -> None:
     os.makedirs(os.path.join(HERE, "output"), exist_ok=True)
     _fh = open(os.path.join(HERE, "output", "discovery_report.txt"), "w")
     sys.stdout = _Tee(sys.__stdout__, _fh)
+    R.migrate_registries()  # idempotent: back-fills new methodology columns in existing CSVs
+
     df = pd.read_csv(DATA_CSV)
     disc = df[df["split"] == "discovery"].copy()
+    conf = df[df["split"] == "confirmation"].copy()
     run_id = "run-" + uuid.uuid4().hex[:8]
     ts = dt.datetime.now(dt.timezone.utc).isoformat()
     print(f"=== discovery run {run_id} @ {ts} ===")
-    print(f"discovery rows: {len(disc)} (of {len(df)} total)")
+    print(f"discovery rows: {len(disc)} | confirmation rows: {len(conf)} (of {len(df)} total)")
 
     a, b = generate()
     reviewed = lead_review(a, b)
 
-    log_rows, hist_rows = test_ready(disc, reviewed, run_id, ts)
+    log_rows, hist_rows, test_meta = test_ready(disc, reviewed, run_id, ts)
 
     # append this run's tests to the cumulative log FIRST, then FDR over everything
     if log_rows:
@@ -392,6 +504,22 @@ def main() -> None:
             q = qmap[tid]
             hr["discovery_fdr_p"] = q
             hr["discovery_pass"] = bool(q < FDR_Q)
+
+    # confirmation step: run surviving hypotheses on the holdout half
+    surviving_count = sum(1 for hr in hist_rows if hr.get("discovery_pass") is True)
+    if surviving_count:
+        print(f"\n[confirm] {surviving_count} test(s) passed FDR — running on confirmation half...",
+              flush=True)
+        confirm_surviving(hist_rows, conf, test_meta)
+        double_pass = sum(1 for hr in hist_rows if hr.get("confirmation_pass") is True)
+        print(f"[confirm] {double_pass} test(s) also passed confirmation.", flush=True)
+
+        if double_pass:
+            print(f"[confound] {double_pass} doubly-confirmed — investigating confounders...",
+                  flush=True)
+            confound_check_surviving(hist_rows, disc, test_meta)
+
+    # single history append: all fill-back (FDR, confirmation, confound) is done in-memory first
     R.append_history_rows(hist_rows)
 
     _report(run_id, reviewed, log_rows, qmap)
