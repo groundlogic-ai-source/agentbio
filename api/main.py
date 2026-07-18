@@ -19,10 +19,12 @@ from typing import Any, Optional
 
 import sweep_manager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
+
+import api.guardrails as _guardrails
 
 from main_graph import build_graph
 from resume_review import resume_run
@@ -187,8 +189,21 @@ def internal_health() -> dict:
 # --------------------------------------------------------------------------- #
 # API endpoints
 # --------------------------------------------------------------------------- #
+@app.get("/api/limits")
+def get_limits() -> dict:
+    """
+    Document the current cost-safety guardrails in force on this API.
+
+    Returns both the configured limits and today's usage so they can be
+    referenced without digging into the source.  See api/guardrails.py for
+    the full design rationale, environment-variable overrides, and alert
+    delivery options.
+    """
+    return _guardrails.limits_summary(jobs_db.count_jobs_today)
+
+
 @app.post("/api/runs")
-def start_run(req: RunRequest) -> dict[str, str]:
+def start_run(request: Request, req: RunRequest) -> dict[str, str]:
     """
     Start a pipeline run on a background thread and return its job_id immediately.
 
@@ -199,7 +214,17 @@ def start_run(req: RunRequest) -> dict[str, str]:
       yet explored, walking down the ranked list across repeated blank runs.
     In both modes the job's disease_name is overwritten with the canonical name
     chosen/resolved by Stage 1 once target selection completes.
+
+    Cost-safety guardrails (both enforced before the job is created):
+    - Per-IP rate limit: at most RATE_LIMIT_PER_HOUR (default 3) new cases
+      per IP per rolling 60-minute window → HTTP 429 + Retry-After.
+    - Global daily cap: at most DAILY_RUN_CAP (default 50) new cases per UTC
+      day across all IPs → HTTP 503 + Retry-After.
+    See GET /api/limits for current usage and full documentation.
     """
+    _guardrails.check_ip_rate_limit(request)
+    _guardrails.check_daily_cap(jobs_db.count_jobs_today)
+
     job = jobs_db.create_job(disease_name=req.disease_name)
     thread = threading.Thread(
         target=_run_graph,

@@ -305,6 +305,21 @@ def get_explored_pairs() -> set[tuple[str, str]]:
     return {(r[0], r[1]) for r in rows}
 
 
+def count_jobs_today() -> int:
+    """
+    Count jobs created in the current UTC calendar day.
+    Used by the daily-cap guardrail (api/guardrails.py) to enforce DAILY_RUN_CAP.
+    """
+    today_prefix = time.strftime("%Y-%m-%d", time.gmtime())
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT COUNT(*) FROM jobs WHERE created_at LIKE %s",
+            (today_prefix + "%",),
+        )
+        (count,) = cur.fetchone()
+    return count
+
+
 def reap_orphaned_running_jobs() -> int:
     """
     On server startup, mark any jobs still in 'running' status as 'error'.
