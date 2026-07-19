@@ -131,3 +131,27 @@ def extract_json(text: str):
             j += 1
 
     raise ValueError(f"no valid JSON found in LLM reply: {text[:200]!r}")
+
+
+def extract_json_list(text: str) -> list:
+    """
+    Like extract_json(), but guarantees a list of dict elements.
+
+    Handles the common LLM deviation of wrapping the requested array in an object
+    (e.g. {"hypotheses": [...]} or {"domains": [...]}) instead of returning a bare
+    array. If the parsed result is such a dict, the first list-valued field is
+    unwrapped. A single dict is wrapped into a one-element list. Non-dict elements
+    are dropped, so downstream code can safely call .get() on every element.
+    """
+    parsed = extract_json(text)
+
+    if isinstance(parsed, dict):
+        # Unwrap the first list-valued field (the wrapped array); otherwise treat
+        # the dict itself as a single element.
+        wrapped = next((v for v in parsed.values() if isinstance(v, list)), None)
+        parsed = wrapped if wrapped is not None else [parsed]
+
+    if not isinstance(parsed, list):
+        raise ValueError(f"expected a JSON array in LLM reply: {text[:200]!r}")
+
+    return [el for el in parsed if isinstance(el, dict)]

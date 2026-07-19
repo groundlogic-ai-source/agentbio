@@ -156,12 +156,12 @@ def generate() -> tuple[list[dict], list[dict]]:
 
     print("[gen] LLM A (Opus 4.8) proposing domains...", flush=True)
     a_raw = L.opus(base)
-    a = L.extract_json(a_raw)
+    a = L.extract_json_list(a_raw)
     print(f"[gen]   A proposed {len(a)} domains: {_domain_names(a)}", flush=True)
 
     print("[gen] LLM B (GPT-5.6 Sol) proposing domains...", flush=True)
     b_raw = L.sol(base)
-    b = L.extract_json(b_raw)
+    b = L.extract_json_list(b_raw)
     print(f"[gen]   B proposed {len(b)} domains: {_domain_names(b)}", flush=True)
 
     dupes = _overlap(a, b)
@@ -174,7 +174,7 @@ def generate() -> tuple[list[dict], list[dict]]:
             f"taken by the other model): {excl}. Propose genuinely different phenomena."
         )
         b_raw = L.sol(reprompt)
-        b = L.extract_json(b_raw)
+        b = L.extract_json_list(b_raw)
         print(f"[gen]   B re-proposed: {_domain_names(b)}", flush=True)
     return a, b
 
@@ -216,7 +216,7 @@ Input:
 {json.dumps(payload, indent=2)}
 """.strip()
     print("[review] Lead (Opus 4.8) consolidating...", flush=True)
-    out = L.extract_json(L.opus(prompt, max_tokens=8000))
+    out = L.extract_json_list(L.opus(prompt, max_tokens=8000))
     tags = {}
     for h in out:
         tags[h.get("tag", "?")] = tags.get(h.get("tag", "?"), 0) + 1
