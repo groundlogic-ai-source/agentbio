@@ -1,37 +1,191 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   getResearchHypotheses,
   archiveHypothesis,
   submitResearchHypothesis,
   getResearchJob,
   runDiscoveryBatch,
+  generateHypothesisReport,
 } from "../api.js";
 
 const POLL_MS = 3000;
 
+function isTrue(value) {
+  const v = String(value ?? "").toLowerCase();
+  return v === "true" || v === "1";
+}
+
+function fmtP(v) {
+  if (v == null || v === "") return "—";
+  return Number(v).toExponential(2);
+}
+
+// Full auditable write-up for a doubly-passing hypothesis. Renders the audit
+// numbers straight from the registry `facts` (never the LLM) alongside the
+// Opus 4.8 narrative, which is grounded strictly in those same numbers.
+function ReportPanel({ hypothesisId }) {
+  const [state, setState] = useState({ loading: true, error: null, data: null });
+
+  useEffect(() => {
+    let cancelled = false;
+    setState({ loading: true, error: null, data: null });
+    generateHypothesisReport(hypothesisId)
+      .then((data) => { if (!cancelled) setState({ loading: false, error: null, data }); })
+      .catch((err) => { if (!cancelled) setState({ loading: false, error: err.message, data: null }); });
+    return () => { cancelled = true; };
+  }, [hypothesisId]);
+
+  if (state.loading)
+    return (
+      <div style={{ padding: "1rem 1.25rem", fontSize: "0.75rem", color: "var(--silver)", fontFamily: "monospace" }}>
+        ⟳ Opus 4.8 is writing the full report from the stored statistics…
+      </div>
+    );
+  if (state.error)
+    return (
+      <div style={{ padding: "1rem 1.25rem", fontSize: "0.75rem", color: "var(--oxide)" }}>
+        Could not generate report: {state.error}
+      </div>
+    );
+
+  const { facts, report_markdown, generated_at } = state.data;
+  const checks = facts?.confound_check?.checks ?? [];
+
+  const cell = { padding: "4px 8px", fontFamily: "monospace", fontSize: "0.62rem", whiteSpace: "nowrap" };
+  const hcell = { ...cell, color: "var(--silver-dim)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.55rem", textAlign: "left" };
+
+  return (
+    <div style={{ padding: "1.25rem 1.5rem", backgroundColor: "rgba(199,202,209,0.03)" }}>
+      {/* ── Audit numbers, rendered directly from the registry facts ── */}
+      <div style={{
+        fontFamily: "monospace", fontSize: "0.55rem", textTransform: "uppercase",
+        letterSpacing: "0.2em", color: "var(--brass)", marginBottom: "0.6rem",
+      }}>
+        Audit numbers — from the registry
+      </div>
+
+      <div style={{ overflowX: "auto", marginBottom: "1rem" }}>
+        <table style={{ borderCollapse: "collapse", color: "var(--ink)" }}>
+          <thead>
+            <tr>
+              {["Frame", "Test", "OR", "95% CI", "n", "Discovery raw p", "FDR q", "Disc.", "Confirm raw p", "Conf."].map((h, i) => (
+                <th key={i} style={hcell}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {(facts?.framings ?? []).map((f, i) => (
+              <tr key={i} style={{ borderTop: "1px solid rgba(199,202,209,0.1)" }}>
+                <td style={{ ...cell, color: "var(--silver)" }}>{f.framing ?? "—"}</td>
+                <td style={{ ...cell, color: "var(--silver)" }}>{f.test_type ?? "—"}</td>
+                <td style={{ ...cell, color: "var(--paper)" }}>{f.effect_size ? f.effect_size.odds_ratio : "—"}</td>
+                <td style={{ ...cell, color: "var(--silver)" }}>
+                  {f.effect_size ? `[${f.effect_size.ci_low}, ${f.effect_size.ci_high}]` : "—"}
+                </td>
+                <td style={cell}>{f.effect_size ? f.effect_size.n : "—"}</td>
+                <td style={cell}>{fmtP(f.discovery_raw_p)}</td>
+                <td style={cell}>{fmtP(f.discovery_fdr_q)}</td>
+                <td style={cell}><PassBadge value={f.discovery_pass} /></td>
+                <td style={cell}>{fmtP(f.confirmation_raw_p)}</td>
+                <td style={cell}><PassBadge value={f.confirmation_pass} /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {checks.length > 0 && (
+        <div style={{ overflowX: "auto", marginBottom: "1.25rem" }}>
+          <div style={{
+            fontFamily: "monospace", fontSize: "0.55rem", textTransform: "uppercase",
+            letterSpacing: "0.2em", color: "var(--brass)", marginBottom: "0.5rem",
+          }}>
+            Confound checks
+          </div>
+          <table style={{ borderCollapse: "collapse", color: "var(--ink)" }}>
+            <thead>
+              <tr>
+                {["Confound", "Unadj. OR", "Adj. OR", "Adj. 95% CI", "Adj. p", "Survives?"].map((h, i) => (
+                  <th key={i} style={hcell}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {checks.map((c, i) => {
+                const a = c.adjustment_result;
+                const survives = a == null ? null : a.survives_adjustment;
+                return (
+                  <tr key={i} style={{ borderTop: "1px solid rgba(199,202,209,0.1)" }}>
+                    <td style={{ ...cell, whiteSpace: "normal", maxWidth: "16rem", color: "var(--silver)" }}>{c.confound_name}</td>
+                    <td style={cell}>{a?.or_unadjusted != null ? Number(a.or_unadjusted).toPrecision(3) : "—"}</td>
+                    <td style={{ ...cell, color: "var(--paper)" }}>{a?.or_adjusted != null ? Number(a.or_adjusted).toPrecision(3) : "—"}</td>
+                    <td style={cell}>
+                      {a?.ci_low_adjusted != null ? `[${a.ci_low_adjusted}, ${a.ci_high_adjusted}]` : "—"}
+                    </td>
+                    <td style={cell}>{a?.p_adjusted != null ? Number(a.p_adjusted).toExponential(2) : "—"}</td>
+                    <td style={cell}>
+                      {survives === true
+                        ? <span style={{ color: "#7ec97e" }}>survives</span>
+                        : survives === false
+                          ? <span style={{ color: "var(--oxide)" }}>DOES NOT survive</span>
+                          : <span style={{ color: "var(--silver-dim)" }} title={a?.note || "not testable"}>not testable</span>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ── Opus narrative, grounded strictly in the numbers above ── */}
+      <div style={{
+        fontFamily: "monospace", fontSize: "0.55rem", textTransform: "uppercase",
+        letterSpacing: "0.2em", color: "var(--brass)", marginBottom: "0.5rem",
+      }}>
+        Narrative — Claude Opus 4.8
+      </div>
+      <div className="report-markdown" style={{ fontSize: "0.8rem", color: "var(--ink)", lineHeight: 1.6 }}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{report_markdown}</ReactMarkdown>
+      </div>
+      {generated_at && (
+        <div style={{ marginTop: "0.75rem", fontSize: "0.55rem", fontFamily: "monospace", color: "var(--silver-dim)" }}>
+          generated {new Date(generated_at).toLocaleString()} · numbers read directly from the registry
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PassBadge({ value }) {
   const v = String(value ?? "");
   if (v === "True" || v === "true" || v === "1")
-    return (
-      <span style={{
-        background: "rgba(76,175,80,0.13)", color: "#7ec97e",
-        borderRadius: "3px", padding: "1px 7px",
-        fontSize: "0.62rem", fontFamily: "monospace", letterSpacing: "0.05em",
-      }}>PASS</span>
-    );
+    return badgePass;
   if (v === "False" || v === "false" || v === "0")
-    return (
-      <span style={{
-        background: "rgba(155,74,63,0.13)", color: "var(--oxide)",
-        borderRadius: "3px", padding: "1px 7px",
-        fontSize: "0.62rem", fontFamily: "monospace",
-      }}>fail</span>
-    );
+    return badgeFail;
   return <span style={{ color: "var(--silver-dim)", fontSize: "0.62rem" }}>—</span>;
 }
 
+const badgePass = (
+  <span style={{
+    background: "rgba(76,175,80,0.13)", color: "#7ec97e",
+    borderRadius: "3px", padding: "1px 7px",
+    fontSize: "0.62rem", fontFamily: "monospace", letterSpacing: "0.05em",
+  }}>PASS</span>
+);
+const badgeFail = (
+  <span style={{
+    background: "rgba(155,74,63,0.13)", color: "var(--oxide)",
+    borderRadius: "3px", padding: "1px 7px",
+    fontSize: "0.62rem", fontFamily: "monospace",
+  }}>fail</span>
+);
+
 function HypothesisTable({ hypotheses, loading, onArchive }) {
   const [archiving, setArchiving] = useState(null); // hypothesis_id being toggled
+  const [expanded, setExpanded] = useState(null); // hypothesis_id whose report is open
 
   if (loading)
     return <p style={{ color: "var(--silver)", fontSize: "0.8rem", padding: "1.5rem 0" }}>Loading registry…</p>;
@@ -61,7 +215,7 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
           <tr style={{ backgroundColor: "rgba(199,202,209,0.05)", borderBottom: "1px solid rgba(199,202,209,0.18)" }}>
             {[
               "Hypothesis", "Test", "Frame", "Raw p", "FDR q",
-              "Discovery", "Confirm", "Confound", "Domain", "",
+              "Discovery", "Confirm", "Confound", "Domain", "Report", "",
             ].map((h, i) => (
               <th key={i} style={{
                 padding: "6px 10px", textAlign: "left", whiteSpace: "nowrap",
@@ -82,10 +236,13 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
             })();
             const hasConfound = confoundSummary?.status === "completed";
             const busy = archiving === h.hypothesis_id;
+            const passesBoth = isTrue(h.discovery_pass) && isTrue(h.confirmation_pass);
+            const isOpen = expanded === h.hypothesis_id;
             return (
-              <tr key={i}
+              <Fragment key={i}>
+              <tr
                 style={{
-                  borderBottom: "1px solid rgba(199,202,209,0.09)",
+                  borderBottom: isOpen ? "none" : "1px solid rgba(199,202,209,0.09)",
                   opacity: isArchived ? 0.45 : 1,
                   transition: "opacity 0.15s ease",
                 }}
@@ -132,6 +289,26 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
                   </span>
                 </td>
                 <td style={{ padding: "7px 8px", whiteSpace: "nowrap" }}>
+                  {passesBoth ? (
+                    <button
+                      onClick={() => setExpanded(isOpen ? null : h.hypothesis_id)}
+                      title="Full auditable write-up (Opus 4.8, grounded in the stored numbers)"
+                      style={{
+                        fontSize: "0.58rem", fontFamily: "monospace",
+                        color: isOpen ? "var(--paper)" : "var(--brass)",
+                        background: isOpen ? "var(--brass)" : "transparent",
+                        border: "1px solid rgba(184,151,90,0.45)",
+                        borderRadius: "3px", padding: "2px 8px", cursor: "pointer",
+                        transition: "color 0.15s, background-color 0.15s",
+                      }}
+                    >
+                      {isOpen ? "hide report" : "full report"}
+                    </button>
+                  ) : (
+                    <span style={{ color: "var(--silver-dim)", fontSize: "0.58rem" }}>—</span>
+                  )}
+                </td>
+                <td style={{ padding: "7px 8px", whiteSpace: "nowrap" }}>
                   <button
                     onClick={() => handleArchive(h)}
                     disabled={busy}
@@ -151,6 +328,14 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
                   </button>
                 </td>
               </tr>
+              {isOpen && (
+                <tr style={{ borderBottom: "1px solid rgba(199,202,209,0.09)" }}>
+                  <td colSpan={11} style={{ padding: 0 }}>
+                    <ReportPanel hypothesisId={h.hypothesis_id} />
+                  </td>
+                </tr>
+              )}
+              </Fragment>
             );
           })}
         </tbody>
