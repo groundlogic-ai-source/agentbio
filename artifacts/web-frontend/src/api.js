@@ -66,6 +66,13 @@ export function archiveHypothesis(hypothesisId, archived = true) {
   );
 }
 
+export function archiveAllHypotheses(archived = true) {
+  return request(
+    `/api/research/hypotheses/archive-all?archived=${archived}`,
+    { method: "PATCH" },
+  );
+}
+
 export function submitResearchHypothesis(hypothesisText) {
   return request("/api/research/hypotheses", {
     method: "POST",
