@@ -13,6 +13,7 @@ Run:
     uvicorn api.main:app --host 0.0.0.0 --port $PORT
 """
 
+import hashlib
 import os
 import threading
 from typing import Any, Optional
@@ -381,7 +382,13 @@ def _ensure_research_modules() -> None:
     import features as _F
     import stats_tests as _S
     import llm_clients as _L
-    _RESEARCH_MODULES.update({"R": _R, "F": _F, "S": _S, "L": _L})
+    import hypothesis_report as _HR
+    _RESEARCH_MODULES.update({"R": _R, "F": _F, "S": _S, "L": _L, "HR": _HR})
+
+
+# In-memory cache of generated write-ups keyed by hypothesis_id. Generation is a
+# single (expensive) Opus call, so we memoise it; ?refresh=true forces a rebuild.
+_REPORT_CACHE: dict = {}
 
 
 _LABELED_CSV = os.path.join(_DATA_PREP, "output", "labeled_dataset.csv")
@@ -701,5 +708,57 @@ def get_research_job(job_id: str) -> dict:
     if job is None:
         raise HTTPException(status_code=404, detail="research job not found")
     return job
+
+
+@app.post("/api/research/hypotheses/{hypothesis_id}/report")
+def generate_hypothesis_report(hypothesis_id: str, refresh: bool = False) -> dict:
+    """
+    Generate a full, auditable write-up for a hypothesis that passed BOTH
+    cumulative-FDR discovery AND holdout confirmation.
+
+    The numbers are assembled deterministically from the registry (with read-time
+    cumulative FDR, matching /api/research/hypotheses); Opus 4.8 only narrates them
+    and is instructed to introduce no statistic not already present. The response
+    returns both the raw `facts` (so the UI can render the audit numbers directly)
+    and the narrated `report_markdown`.
+
+    404 if the hypothesis_id is unknown; 409 if it has not passed both stages.
+    Results are cached in memory; pass ?refresh=true to force regeneration.
+    """
+    _ensure_research_modules()
+    _HR = _RESEARCH_MODULES["HR"]
+
+    # Always recompute facts FIRST (read-time cumulative FDR), so eligibility and
+    # every number match /api/research/hypotheses. The cache is served only when
+    # the freshly-computed facts are byte-identical to what was cached — otherwise
+    # a hypothesis whose FDR status changed (new tests appended) could be served a
+    # stale report, or a no-longer-passing hypothesis could bypass the 409 gate.
+    facts = _HR.collect_facts(hypothesis_id)
+    if facts is None:
+        raise HTTPException(status_code=404, detail=f"hypothesis_id {hypothesis_id!r} not found")
+    if not facts["passed_both"]:
+        raise HTTPException(
+            status_code=409,
+            detail="hypothesis has not passed both discovery and confirmation; no report available",
+        )
+
+    fingerprint = hashlib.sha256(
+        _json.dumps(facts, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()
+
+    cached = _REPORT_CACHE.get(hypothesis_id)
+    if not refresh and cached is not None and cached.get("fingerprint") == fingerprint:
+        return {k: v for k, v in cached.items() if k != "fingerprint"} | {"cached": True}
+
+    report_markdown = _HR.generate_report(facts)
+    entry = {
+        "hypothesis_id": hypothesis_id,
+        "facts": facts,
+        "report_markdown": report_markdown,
+        "generated_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
+        "fingerprint": fingerprint,
+    }
+    _REPORT_CACHE[hypothesis_id] = entry
+    return {k: v for k, v in entry.items() if k != "fingerprint"} | {"cached": False}
 
 

@@ -1,0 +1,195 @@
+"""
+Full write-up generation for doubly-surviving hypotheses (discovery + confirmation).
+
+For a hypothesis that passed BOTH cumulative-FDR discovery AND holdout confirmation,
+this module assembles every already-computed number from the registry into a
+structured `facts` dict, then asks Claude Opus 4.8 to narrate a full report that is
+grounded STRICTLY in those numbers — it introduces no new statistics and makes no
+claims the audit trail does not already support.
+
+Nothing here recomputes a statistic. Every number in the report originates from
+hypothesis_log.csv / bisociation_history.csv (the same rows the Research tab shows),
+so the narrative is auditable line-by-line against the registry.
+"""
+from __future__ import annotations
+
+import json
+import re
+
+import hypothesis_registry as R
+import llm_clients as L
+
+# outcome_note format written by run_discovery / api:
+#   "OR=0.461 CI[0.339,0.634] n=4203 mech: <one-sentence justification>"
+_EFFECT_RE = re.compile(
+    r"OR=([-\d.eE+]+)\s+CI\[([-\d.eE+]+)\s*,\s*([-\d.eE+]+)\]\s+n=(\d+)"
+)
+
+
+def _to_float(v):
+    if v is None or v == "":
+        return None
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def _truthy(v) -> bool:
+    return str(v).strip().lower() == "true"
+
+
+def _parse_effect(note: str) -> dict | None:
+    m = _EFFECT_RE.search(str(note or ""))
+    if not m:
+        return None
+    return {
+        "odds_ratio": float(m.group(1)),
+        "ci_low": float(m.group(2)),
+        "ci_high": float(m.group(3)),
+        "n": int(m.group(4)),
+    }
+
+
+def _parse_mech(note: str) -> str:
+    s = str(note or "")
+    i = s.find("mech:")
+    return s[i + len("mech:"):].strip() if i >= 0 else ""
+
+
+def collect_facts(hypothesis_id: str) -> dict | None:
+    """
+    Gather every already-computed number for one hypothesis_id from the registry.
+
+    Discovery FDR q-values are recomputed cumulatively at read time (exactly as the
+    /api/research/hypotheses endpoint does), because stored per-run q-values go stale
+    as new tests are appended. Nothing else is computed — effect sizes, confirmation
+    p-values, and the full confound-check detail are read verbatim from the CSVs.
+
+    Returns None if the hypothesis_id is unknown.
+    """
+    R.migrate_registries()
+    hist = R.load_history()
+    fdr = R.cumulative_fdr()
+    qmap = {row["test_id"]: row["fdr_q"] for _, row in fdr.iterrows()}
+
+    rows = hist[hist["hypothesis_id"] == hypothesis_id]
+    if rows.empty:
+        return None
+
+    framings: list[dict] = []
+    confound_check: dict | None = None
+    passed_both = False
+
+    for _, r in rows.iterrows():
+        tid = r.get("test_id")
+        q = qmap.get(tid)
+        disc_pass = q is not None and float(q) < R.SIGNIFICANCE_THRESHOLD
+        conf_pass = _truthy(r.get("confirmation_pass"))
+        if disc_pass and conf_pass:
+            passed_both = True
+
+        # confound_check_summary is investigated once per hypothesis and copied to
+        # both framing rows; keep the first completed one we see.
+        raw_cs = r.get("confound_check_summary")
+        if confound_check is None and isinstance(raw_cs, str) and raw_cs.strip():
+            try:
+                parsed = json.loads(raw_cs)
+                if isinstance(parsed, dict) and parsed.get("status") == "completed":
+                    confound_check = parsed
+            except (ValueError, TypeError):
+                pass
+
+        framings.append({
+            "framing": r.get("outcome_framing"),
+            "test_type": r.get("discovery_test_type"),
+            "discovery_raw_p": _to_float(r.get("discovery_raw_p")),
+            "discovery_fdr_q": _to_float(q),
+            "discovery_pass": disc_pass,
+            "confirmation_raw_p": _to_float(r.get("confirmation_raw_p")),
+            "confirmation_pass": conf_pass,
+            "effect_size": _parse_effect(r.get("outcome_note")),
+        })
+
+    first = rows.iloc[0]
+    return {
+        "hypothesis_id": hypothesis_id,
+        "hypothesis_text": str(first.get("resulting_hypothesis_text", "")),
+        "domain": str(first.get("domain_description", "")),
+        "proposing_llm": str(first.get("proposing_llm", "")),
+        "mechanistic_justification": _parse_mech(first.get("outcome_note")),
+        "significance_threshold": R.SIGNIFICANCE_THRESHOLD,
+        "correction_method": R.CORRECTION_METHOD,
+        "passed_both": passed_both,
+        "framings": framings,
+        "confound_check": confound_check,
+    }
+
+
+_PROMPT_TEMPLATE = """You are a scientific writer producing a rigorous, auditable \
+write-up for a drug-repurposing statistical finding that survived BOTH cumulative \
+false-discovery-rate (FDR) correction on the discovery split AND an independent \
+holdout confirmation test.
+
+CRITICAL GROUNDING RULES — read carefully:
+- Use ONLY the numbers in the FACTS JSON below. Do NOT invent, estimate, round \
+differently, or introduce any statistic that is not present in FACTS.
+- Do NOT claim causation, biological truth, or clinical relevance. This is a \
+statistical association in a curated dataset, nothing more.
+- If a number is null/missing in FACTS, say so explicitly rather than guessing.
+- Every quantitative claim you make must be traceable to a field in FACTS.
+
+Write the report in Markdown with these sections, in this order:
+
+## Hypothesis
+State the full hypothesis text verbatim, plus the source domain and which model \
+proposed it. One short paragraph.
+
+## Statistical evidence underneath the p-value
+For EACH outcome framing present in FACTS, report the regression/effect summary \
+that sits underneath the p-value — not just the p-value. Give the odds ratio, its \
+95% confidence interval, the sample size n, the test type, the raw discovery \
+p-value, and the cumulative FDR q-value. Present this as a compact Markdown table \
+with one row per framing. Then, in one sentence per framing, state the effect size \
+in plain terms (e.g. what an odds ratio below 1 vs above 1 means for the odds of \
+repurposing success, and roughly how large the effect is).
+
+## Discovery vs. confirmation
+Put the discovery result and the holdout-confirmation result side by side (a small \
+Markdown table with columns: framing, discovery raw p, FDR q, discovery pass, \
+confirmation raw p, confirmation pass). State clearly that passing confirmation \
+means the effect reproduced on data never used during discovery.
+
+## Confound checks
+This is the most important section. The FACTS.confound_check object lists the \
+specific alternative explanations that were tested. Name EACH confound checked. \
+For each one, report:
+- its name and the one-to-two-sentence rationale for why it might explain the \
+correlation spuriously,
+- whether it was computable from the dataset,
+- if computable: the unadjusted odds ratio and p-value for the primary effect, the \
+odds ratio and 95% CI and p-value AFTER adjusting for that confound, and whether \
+the original effect SURVIVED adjustment (survives_adjustment).
+- if it was NOT computable or hit an untestable condition (adjustment_result null \
+or containing a "note" about not being testable), say so explicitly and do not \
+fabricate adjusted numbers.
+Then write a one-paragraph verdict: did the effect survive adjustment for every \
+computable confound, or did it fail (not survive) any? If it failed to survive any \
+single confound, you MUST state that explicitly and name which confound.
+
+## Bottom line
+Two-to-three sentences. What the finding is, what it is not (no causal/clinical \
+claim), and the strongest remaining caveat given the confound results.
+
+FACTS:
+{facts_json}
+"""
+
+
+def build_prompt(facts: dict) -> str:
+    return _PROMPT_TEMPLATE.format(facts_json=json.dumps(facts, indent=2))
+
+
+def generate_report(facts: dict, max_tokens: int = 4000) -> str:
+    """Call Opus 4.8 to narrate the report, grounded strictly in `facts`."""
+    return L.opus(build_prompt(facts), max_tokens=max_tokens)

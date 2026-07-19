@@ -83,3 +83,15 @@ export function getResearchJob(jobId) {
 export function runDiscoveryBatch() {
   return request("/api/research/discovery-batch", { method: "POST" });
 }
+
+// Generate (or fetch cached) the full auditable write-up for a hypothesis that
+// passed BOTH discovery and confirmation. Triggers a single Opus 4.8 call the
+// first time, so expect a few seconds. Returns { hypothesis_id, facts,
+// report_markdown, generated_at, cached }.
+export function generateHypothesisReport(hypothesisId, { refresh = false } = {}) {
+  const qs = refresh ? "?refresh=true" : "";
+  return request(
+    `/api/research/hypotheses/${encodeURIComponent(hypothesisId)}/report${qs}`,
+    { method: "POST" },
+  );
+}
