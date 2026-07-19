@@ -349,6 +349,20 @@ def set_hypothesis_archived(hypothesis_id: str, archived: bool) -> bool:
     return updated > 0
 
 
+def archive_all_hypotheses(archived: bool = True) -> int:
+    """
+    Bulk set the archived flag on every row in bisociation_history.
+    Returns the number of rows updated.
+    Never touches hypothesis_log — archiving is UI-only.
+    """
+    with _conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE bisociation_history SET archived = %s", (bool(archived),))
+            updated = cur.rowcount
+        conn.commit()
+    return updated
+
+
 def set_feature_spec(test_id: str, feature_spec) -> None:
     """Persist the literal computable proxy for a test row (JSON-encoded)."""
     payload = None

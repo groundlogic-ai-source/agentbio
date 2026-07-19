@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import {
   getResearchHypotheses,
   archiveHypothesis,
+  archiveAllHypotheses,
   submitResearchHypothesis,
   getResearchJob,
   runDiscoveryBatch,
@@ -634,6 +635,7 @@ export default function ResearchTab({ onRefresh }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [bulkArchiving, setBulkArchiving] = useState(false);
 
   const fetchHypotheses = useCallback(async () => {
     try {
@@ -647,6 +649,17 @@ export default function ResearchTab({ onRefresh }) {
   }, []);
 
   useEffect(() => { fetchHypotheses(); }, [fetchHypotheses]);
+
+  const handleArchiveAll = useCallback(async () => {
+    if (!window.confirm(`Archive all ${allHypotheses.length} hypotheses? You can restore them individually or use "Restore all".`)) return;
+    setBulkArchiving(true);
+    try {
+      await archiveAllHypotheses(true);
+      await fetchHypotheses();
+    } finally {
+      setBulkArchiving(false);
+    }
+  }, [allHypotheses.length, fetchHypotheses]);
 
   const archivedCount = allHypotheses.filter((h) => h.archived === true).length;
   const visibleHypotheses = showArchived
@@ -690,7 +703,26 @@ export default function ResearchTab({ onRefresh }) {
         }}>
           {loading ? "…" : `${visibleHypotheses.length} of ${allHypotheses.length} test${allHypotheses.length !== 1 ? "s" : ""} shown`}
         </span>
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+          {visibleHypotheses.length > 0 && (
+            <button
+              onClick={handleArchiveAll}
+              disabled={bulkArchiving}
+              title="Archive all hypotheses at once — none are deleted, use 'show archived' to restore individually"
+              style={{
+                fontSize: "0.62rem", fontFamily: "monospace",
+                color: "var(--silver-dim)",
+                background: "transparent",
+                border: "1px solid rgba(199,202,209,0.22)",
+                borderRadius: "3px", padding: "3px 10px",
+                cursor: bulkArchiving ? "default" : "pointer",
+                opacity: bulkArchiving ? 0.5 : 1,
+                transition: "color 0.15s, border-color 0.15s",
+              }}
+            >
+              {bulkArchiving ? "archiving…" : "Archive all"}
+            </button>
+          )}
           {archivedCount > 0 && (
             <button
               onClick={() => setShowArchived((v) => !v)}
