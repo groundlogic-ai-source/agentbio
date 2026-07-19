@@ -3,6 +3,7 @@ import Dashboard from "./components/Dashboard.jsx";
 import CaseView from "./components/CaseView.jsx";
 import NewCaseDialog from "./components/NewCaseDialog.jsx";
 import ResearchTab from "./components/ResearchTab.jsx";
+import SavedReportsTab from "./components/SavedReportsTab.jsx";
 import {
   listRuns,
   getRun,
@@ -166,7 +167,7 @@ export default function App() {
     [loadDetail, refreshList],
   );
 
-  const isTopLevel = view === "dashboard" || view === "research";
+  const isTopLevel = view === "dashboard" || view === "research" || view === "saved";
 
   return (
     <div className="min-h-full">
@@ -194,6 +195,7 @@ export default function App() {
           {[
             { id: "dashboard", label: "Case Files" },
             { id: "research", label: "Research" },
+            { id: "saved", label: "Saved Reports" },
           ].map(({ id, label }) => {
             const active = view === id;
             return (
@@ -238,6 +240,10 @@ export default function App() {
 
       {view === "research" && (
         <ResearchTab />
+      )}
+
+      {view === "saved" && (
+        <SavedReportsTab />
       )}
 
       {view === "case" && (

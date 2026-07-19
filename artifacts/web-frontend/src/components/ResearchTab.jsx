@@ -8,6 +8,7 @@ import {
   getResearchJob,
   runDiscoveryBatch,
   generateHypothesisReport,
+  saveReport,
 } from "../api.js";
 
 const POLL_MS = 3000;
@@ -25,17 +26,37 @@ function fmtP(v) {
 // Full auditable write-up for a doubly-passing hypothesis. Renders the audit
 // numbers straight from the registry `facts` (never the LLM) alongside the
 // Opus 4.8 narrative, which is grounded strictly in those same numbers.
-function ReportPanel({ hypothesisId }) {
+function ReportPanel({ hypothesisId, onSaved }) {
   const [state, setState] = useState({ loading: true, error: null, data: null });
+  const [saveState, setSaveState] = useState({ busy: false, saved: false, error: null });
 
   useEffect(() => {
     let cancelled = false;
     setState({ loading: true, error: null, data: null });
+    setSaveState({ busy: false, saved: false, error: null });
     generateHypothesisReport(hypothesisId)
       .then((data) => { if (!cancelled) setState({ loading: false, error: null, data }); })
       .catch((err) => { if (!cancelled) setState({ loading: false, error: err.message, data: null }); });
     return () => { cancelled = true; };
   }, [hypothesisId]);
+
+  const handleSave = async () => {
+    if (!state.data) return;
+    setSaveState({ busy: true, saved: false, error: null });
+    try {
+      await saveReport({
+        hypothesis_id: hypothesisId,
+        hypothesis_text: state.data.facts?.hypothesis_text ?? null,
+        report_markdown: state.data.report_markdown,
+        facts: state.data.facts ?? null,
+        generated_at: state.data.generated_at ?? null,
+      });
+      setSaveState({ busy: false, saved: true, error: null });
+      onSaved?.();
+    } catch (err) {
+      setSaveState({ busy: false, saved: false, error: err.message });
+    }
+  };
 
   if (state.loading)
     return (
@@ -67,7 +88,7 @@ function ReportPanel({ hypothesisId }) {
       </div>
 
       <div style={{ overflowX: "auto", marginBottom: "1rem" }}>
-        <table style={{ borderCollapse: "collapse", color: "var(--ink)" }}>
+        <table style={{ borderCollapse: "collapse", color: "var(--silver)" }}>
           <thead>
             <tr>
               {["Frame", "Test", "OR", "95% CI", "n", "Discovery raw p", "FDR q", "Disc.", "Confirm raw p", "Conf."].map((h, i) => (
@@ -104,7 +125,7 @@ function ReportPanel({ hypothesisId }) {
           }}>
             Confound checks
           </div>
-          <table style={{ borderCollapse: "collapse", color: "var(--ink)" }}>
+          <table style={{ borderCollapse: "collapse", color: "var(--silver)" }}>
             <thead>
               <tr>
                 {["Confound", "Unadj. OR", "Adj. OR", "Adj. 95% CI", "Adj. p", "Survives?"].map((h, i) => (
@@ -147,9 +168,35 @@ function ReportPanel({ hypothesisId }) {
       }}>
         Narrative — Claude Opus 4.8
       </div>
-      <div className="report-markdown" style={{ fontSize: "0.8rem", color: "var(--ink)", lineHeight: 1.6 }}>
+      <div className="report-markdown" style={{ fontSize: "0.8rem", color: "var(--paper)", lineHeight: 1.6 }}>
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{report_markdown}</ReactMarkdown>
       </div>
+
+      <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+        <button
+          onClick={handleSave}
+          disabled={saveState.busy || saveState.saved}
+          title="Save a permanent snapshot of this report to the Saved Reports tab"
+          style={{
+            fontSize: "0.62rem", fontFamily: "monospace",
+            color: saveState.saved ? "#7ec97e" : "var(--paper)",
+            background: saveState.saved ? "transparent" : "var(--brass)",
+            border: "1px solid " + (saveState.saved ? "rgba(126,201,126,0.5)" : "var(--brass)"),
+            borderRadius: "3px", padding: "4px 12px",
+            cursor: saveState.busy || saveState.saved ? "default" : "pointer",
+            opacity: saveState.busy ? 0.6 : 1,
+            transition: "color 0.15s, background-color 0.15s",
+          }}
+        >
+          {saveState.busy ? "saving…" : saveState.saved ? "✓ saved to Saved Reports" : "Save report"}
+        </button>
+        {saveState.error && (
+          <span style={{ fontSize: "0.62rem", color: "var(--oxide)", fontFamily: "monospace" }}>
+            {saveState.error}
+          </span>
+        )}
+      </div>
+
       {generated_at && (
         <div style={{ marginTop: "0.75rem", fontSize: "0.55rem", fontFamily: "monospace", color: "var(--silver-dim)" }}>
           generated {new Date(generated_at).toLocaleString()} · numbers read directly from the registry

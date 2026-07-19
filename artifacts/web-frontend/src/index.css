@@ -334,4 +334,39 @@ textarea:focus-visible,
   .dossier h3 {
     font-family: "Fraunces", Georgia, serif !important;
   }
+
+  /* ── Saved-report print view: isolate the report, force legible dark-on-white ── */
+  .no-print {
+    display: none !important;
+  }
+
+  body:has(.printable-report) * {
+    visibility: hidden;
+  }
+
+  body:has(.printable-report) .printable-report,
+  body:has(.printable-report) .printable-report * {
+    visibility: visible;
+  }
+
+  .printable-report {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: white !important;
+    border: none !important;
+    padding: 0 !important;
+    color: var(--ink) !important;
+  }
+
+  .printable-report h2,
+  .printable-report .report-markdown,
+  .printable-report .report-markdown * {
+    color: var(--ink) !important;
+  }
+
+  .printable-report table {
+    color: var(--ink) !important;
+  }
 }

@@ -32,6 +32,7 @@ from resume_review import resume_run
 
 from api import jobs_db
 from api import research_db
+from api import saved_reports_db
 
 # Node names emitted by graph.stream(...) map 1:1 onto current_stage values.
 _PIPELINE_NODES = {
@@ -58,6 +59,7 @@ app.add_middleware(
 jobs_db.init_db()
 jobs_db.reap_orphaned_running_jobs()
 research_db.init_db()
+saved_reports_db.init_db()
 
 
 @app.on_event("startup")
@@ -760,5 +762,46 @@ def generate_hypothesis_report(hypothesis_id: str, refresh: bool = False) -> dic
     }
     _REPORT_CACHE[hypothesis_id] = entry
     return {k: v for k, v in entry.items() if k != "fingerprint"} | {"cached": False}
+
+
+class SaveReportRequest(BaseModel):
+    hypothesis_id: str
+    hypothesis_text: Optional[str] = None
+    report_markdown: str
+    facts: Optional[dict] = None
+    generated_at: Optional[str] = None
+
+
+@app.post("/api/reports")
+def create_saved_report(req: SaveReportRequest) -> dict:
+    """Freeze a generated report as a permanent snapshot in the saved_reports store."""
+    return saved_reports_db.save_report(
+        hypothesis_id=req.hypothesis_id,
+        hypothesis_text=req.hypothesis_text,
+        report_markdown=req.report_markdown,
+        facts=req.facts,
+        generated_at=req.generated_at,
+    )
+
+
+@app.get("/api/reports")
+def list_saved_reports() -> list[dict]:
+    """List all saved reports, most recently saved first."""
+    return saved_reports_db.list_reports()
+
+
+@app.get("/api/reports/{report_id}")
+def get_saved_report(report_id: str) -> dict:
+    report = saved_reports_db.get_report(report_id)
+    if report is None:
+        raise HTTPException(status_code=404, detail=f"report {report_id!r} not found")
+    return report
+
+
+@app.delete("/api/reports/{report_id}")
+def delete_saved_report(report_id: str) -> dict:
+    if not saved_reports_db.delete_report(report_id):
+        raise HTTPException(status_code=404, detail=f"report {report_id!r} not found")
+    return {"deleted": True, "id": report_id}
 
 
