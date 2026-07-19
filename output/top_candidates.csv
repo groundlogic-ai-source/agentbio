@@ -1,0 +1,31 @@
+disease_name,orpha_code,disease_source,icd10,omim,mesh,target_symbol,ensembl_id,uniprot_id,ot_association_score,chembl_activity_count,median_pchembl,chembl_pooled_multi_target,afdb_has_structure,afdb_mean_plddt,prior_trial_count,has_negative_repurposing_result,has_approved_treatment,approved_drug_names,prevalence_per_million,treatment_status_needs_review,ot_treatment_unconfirmed,raw_tractability_score,tractability_score,unmet_need_score,target_discovery_method
+Galactokinase deficiency,79237,orphanet,E74.2,230200,,GALK1,ENSG00000108479,P51570,0.8438,593,5.29,False,True,97.19,1,False,False,[],,False,False,0.7402,0.6246,1.0,genetic_association
+Glycogen storage disease type 1c,79260,orphanet,,,,PYGL,ENSG00000100504,P06737,0.8211,710,6.515,False,True,92.69,0,False,False,[],,False,False,0.7244,0.5948,1.0,genetic_association
+Benign recurrent intrahepatic cholestasis type 2,99961,orphanet,K83.1,605479,,ABCB11,ENSG00000073734,O95342,0.8582,481,4.64,False,True,83.12,0,False,False,[],,False,True,0.6884,0.5908,1.0,genetic_association
+Class I glucose-6-phosphate dehydrogenase deficiency,466026,orphanet,D55.0,300908,,G6PD,ENSG00000160211,P11413,0.851,280,4.51,False,True,94.38,1,False,False,[],,False,False,0.6931,0.5898,1.0,genetic_association
+OBSOLETE: Renal cell carcinoma associated with neuroblastoma,319314,orphanet,,,,MET,ENSG00000105976,P08581,0.8654,1000,7.015,True,True,79.25,0,False,False,[],,False,False,0.6774,0.5862,1.0,genetic_association
+Hereditary butyrylcholinesterase deficiency,132,orphanet,E88.0,617936,C537417,BCHE,ENSG00000114200,P06276,0.8054,1000,6.045,True,True,93.38,1,False,False,[],,False,False,0.7268,0.5854,1.0,genetic_association
+Congenital supravalvular mitral ring,99059,orphanet,Q23.2,,,ENPP1,ENSG00000197594,P22413,0.8142,661,6.33,False,True,90.69,0,False,False,[],,False,False,0.7174,0.5841,1.0,genetic_association
+NON RARE IN EUROPE: Recurrent acute pancreatitis,64740,orphanet,,,,PRSS1,ENSG00000204983,P07477,0.8071,1000,6.27,True,True,92.06,0,False,False,[],,False,False,0.7222,0.5829,1.0,genetic_association
+Autosomal recessive hereditary chronic pancreatitis,700124,orphanet,K86.1,167800,,PRSS1,ENSG00000204983,P07477,0.8071,1000,6.27,True,True,92.06,0,False,False,[],,False,False,0.7222,0.5829,1.0,genetic_association
+Multiple endocrine neoplasia type 2A,247698,orphanet,D44.8,171400,D018813,RET,ENSG00000165731,P07949,0.86,1000,6.66,True,True,78.81,11,False,False,[],,False,False,0.6758,0.5812,1.0,genetic_association
+Isolated familial medullary thyroid carcinoma,99361,orphanet,C73,155240,C536911,RET,ENSG00000165731,P07949,0.86,1000,6.66,True,True,78.81,1,False,False,[],,False,False,0.6758,0.5812,1.0,genetic_association
+Neu-Laxova syndrome due to 3-phosphoglycerate dehydrogenase deficiency,583607,orphanet,Q87.8,256520,,PHGDH,ENSG00000092621,O43175,0.7961,998,5.84,False,True,92.94,0,False,False,[],,False,False,0.7253,0.5774,1.0,genetic_association
+Furlong syndrome,97295,orphanet,,,C538192,TGFBR1,ENSG00000106799,P36897,0.8267,1000,7.14,False,True,84.19,0,False,False,[],,False,False,0.6947,0.5743,1.0,genetic_association
+Autosomal recessive non-syndromic intellectual disability,88616,orphanet,F70,249500,,ADK,ENSG00000156110,P55263,0.7834,610,6.92,False,True,93.31,0,False,False,[],,False,False,0.7266,0.5692,1.0,genetic_association
+OBSOLETE: Hemochromatosis type 4,139491,orphanet,,,,SLC40A1,ENSG00000138449,Q9NP59,0.8441,436,5.68,False,True,80.25,0,False,False,[],,False,True,0.6721,0.5674,1.0,genetic_association
+Ferroportin disease,648562,orphanet,E83.1,606069,,SLC40A1,ENSG00000138449,Q9NP59,0.8441,436,5.68,False,True,80.25,0,False,False,[],,False,False,0.6721,0.5674,1.0,genetic_association
+Insulin-resistance syndrome type A,2297,orphanet,E34.8,610549,,INSR,ENSG00000171105,P06213,0.8442,1000,6.32,False,True,77.62,3,False,False,[],,False,False,0.6717,0.5671,1.0,genetic_association
+Hypocalcemic vitamin D-resistant rickets,93160,orphanet,E83.3,277440,,VDR,ENSG00000111424,P11473,0.8202,478,6.145,True,True,83.56,0,False,False,[],,False,False,0.6896,0.5656,1.0,genetic_association
+Hypermethioninemia encephalopathy due to adenosine kinase deficiency,289290,orphanet,E72.1,614300,,ADK,ENSG00000156110,P55263,0.7776,610,6.92,False,True,93.31,0,False,False,[],,False,False,0.7266,0.565,1.0,genetic_association
+Ghosal hematodiaphyseal dysplasia,1802,orphanet,Q78.8,231095,C565551,TBXAS1,ENSG00000059377,P24557,0.7828,963,7.22,False,True,91.31,0,False,False,[],,False,False,0.7196,0.5633,1.0,genetic_association
+Xanthoma disseminatum,158003,orphanet,E78.2,,,SMPD1,ENSG00000166311,P17405,0.8859,157,5.05,False,True,88.0,0,False,False,[],,False,False,0.6337,0.5614,1.0,genetic_association
+Ligneous conjunctivitis,97231,orphanet,,,,PLG,ENSG00000122194,P00747,0.8125,1000,5.55,False,True,82.81,4,False,False,[],,False,False,0.6898,0.5605,1.0,genetic_association
+Multiple endocrine neoplasia type 2B,247709,orphanet,D44.8,162300,D018814,RET,ENSG00000165731,P07949,0.8267,1000,6.66,True,True,78.81,3,False,False,[],,False,False,0.6758,0.5587,1.0,genetic_association
+Weaver-like syndrome,3446,orphanet,,,,EZH2,ENSG00000106462,Q15910,0.8371,1000,7.62,True,True,76.25,0,False,False,[],,False,False,0.6669,0.5583,1.0,genetic_association
+Torg-Winchester syndrome,3460,orphanet,,,,MMP2,ENSG00000087245,P08253,0.7792,1000,7.62,True,True,89.75,1,False,False,[],,False,False,0.7141,0.5565,1.0,genetic_association
+Isolated focal cortical dysplasia type II,268994,orphanet,Q04.8,607341,,MTOR,ENSG00000198793,P42345,0.8241,1000,7.335,True,True,78.0,0,False,False,[],,False,False,0.673,0.5546,1.0,genetic_association
+Isolated focal cortical dysplasia,65683,orphanet,Q04.8,607341,,MTOR,ENSG00000198793,P42345,0.8241,1000,7.335,True,True,78.0,1,False,False,[],,False,False,0.673,0.5546,1.0,genetic_association
+Glycogen storage disease due to lactate dehydrogenase M-subunit deficiency,284426,orphanet,E74.0,612933,C538133,LDHA,ENSG00000134333,P00338,0.7527,982,6.3,True,True,96.19,0,False,False,[],,False,False,0.7367,0.5545,1.0,genetic_association
+Antley-Bixler syndrome,83,orphanet,Q87.8,207410,D054882,FGFR2,ENSG00000066468,P21802,0.8411,1000,8.08,True,True,73.94,0,False,False,[],,False,False,0.6588,0.5541,1.0,genetic_association
+Hypnic headache,276429,orphanet,G44.8,,,SCN1A,ENSG00000144285,P35498,0.8654,970,5.01,True,True,68.5,0,False,False,[],,False,False,0.6398,0.5537,1.0,genetic_association
