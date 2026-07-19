@@ -627,6 +627,20 @@ def get_research_hypotheses() -> list[dict]:
     return records
 
 
+@app.patch("/api/research/hypotheses/archive-all")
+def archive_all_research_hypotheses(archived: bool = True) -> dict:
+    """
+    Bulk set the archived flag on every hypothesis in the registry.
+    archived=true  hides them all from the default view.
+    archived=false restores them all.
+    Never affects the FDR log — only bisociation_history.archived.
+    """
+    _ensure_research_modules()
+    _R = _RESEARCH_MODULES["R"]
+    count = _R.archive_all_hypotheses(archived)
+    return {"archived": archived, "count": count}
+
+
 @app.patch("/api/research/hypotheses/{hypothesis_id}/archive")
 def archive_research_hypothesis(hypothesis_id: str, archived: bool = True) -> dict:
     """
