@@ -70,3 +70,9 @@ export function submitResearchHypothesis(hypothesisText) {
 export function getResearchJob(jobId) {
   return request(`/api/research/jobs/${jobId}`);
 }
+
+// Start a full autonomous discovery batch (two generators + lead review, no
+// user-provided hypothesis). Returns { job_id }; poll with getResearchJob.
+export function runDiscoveryBatch() {
+  return request("/api/research/discovery-batch", { method: "POST" });
+}

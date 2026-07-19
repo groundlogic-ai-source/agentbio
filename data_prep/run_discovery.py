@@ -471,20 +471,25 @@ class _Tee:
             st.flush()
 
 
-def main() -> None:
-    import sys
-    os.makedirs(os.path.join(HERE, "output"), exist_ok=True)
-    _fh = open(os.path.join(HERE, "output", "discovery_report.txt"), "w")
-    sys.stdout = _Tee(sys.__stdout__, _fh)
+def run_batch(run_id: str | None = None) -> dict:
+    """
+    Run ONE full autonomous discovery batch (generation → lead review → discovery
+    testing → cumulative FDR → confirmation → confound check → persist) and return
+    a machine-readable summary. Does NOT touch sys.stdout, so it is safe to call
+    from a long-running server process (e.g. the FastAPI background thread that
+    backs the "Run new discovery batch" button). main() wraps this with a stdout
+    tee for CLI use.
+    """
     R.migrate_registries()  # idempotent: back-fills new methodology columns in existing CSVs
 
     df = pd.read_csv(DATA_CSV)
     disc = df[df["split"] == "discovery"].copy()
     conf = df[df["split"] == "confirmation"].copy()
-    run_id = "run-" + uuid.uuid4().hex[:8]
+    run_id = run_id or ("run-" + uuid.uuid4().hex[:8])
     ts = dt.datetime.now(dt.timezone.utc).isoformat()
-    print(f"=== discovery run {run_id} @ {ts} ===")
-    print(f"discovery rows: {len(disc)} | confirmation rows: {len(conf)} (of {len(df)} total)")
+    print(f"=== discovery run {run_id} @ {ts} ===", flush=True)
+    print(f"discovery rows: {len(disc)} | confirmation rows: {len(conf)} (of {len(df)} total)",
+          flush=True)
 
     a, b = generate()
     reviewed = lead_review(a, b)
@@ -507,6 +512,7 @@ def main() -> None:
 
     # confirmation step: run surviving hypotheses on the holdout half
     surviving_count = sum(1 for hr in hist_rows if hr.get("discovery_pass") is True)
+    double_pass = 0
     if surviving_count:
         print(f"\n[confirm] {surviving_count} test(s) passed FDR — running on confirmation half...",
               flush=True)
@@ -523,6 +529,25 @@ def main() -> None:
     R.append_history_rows(hist_rows)
 
     _report(run_id, reviewed, log_rows, qmap)
+
+    return {
+        "run_id": run_id,
+        "domains": sorted({str(h.get("domain", "")).strip()
+                           for h in reviewed if str(h.get("domain", "")).strip()}),
+        "hypotheses_reviewed": len(reviewed),
+        "tests_run": len(log_rows),
+        "hypotheses_recorded": len({hr.get("hypothesis_id") for hr in hist_rows}),
+        "surviving_discovery": surviving_count,
+        "confirmed": double_pass,
+    }
+
+
+def main() -> None:
+    import sys
+    os.makedirs(os.path.join(HERE, "output"), exist_ok=True)
+    _fh = open(os.path.join(HERE, "output", "discovery_report.txt"), "w")
+    sys.stdout = _Tee(sys.__stdout__, _fh)
+    run_batch()
 
 
 def _report(run_id: str, reviewed: list[dict], log_rows: list[dict], qmap: dict) -> None:

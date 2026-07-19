@@ -3,6 +3,7 @@ import {
   getResearchHypotheses,
   submitResearchHypothesis,
   getResearchJob,
+  runDiscoveryBatch,
 } from "../api.js";
 
 const POLL_MS = 3000;
@@ -244,6 +245,118 @@ function SubmitHypothesis({ onSubmitted }) {
   );
 }
 
+function DiscoveryBatch({ onCompleted }) {
+  const [busy, setBusy] = useState(false);
+  const [jobState, setJobState] = useState(null);
+  const [error, setError] = useState(null);
+  const pollRef = useRef(null);
+
+  const stopPoll = useCallback(() => {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+  }, []);
+
+  useEffect(() => stopPoll, [stopPoll]);
+
+  const handleRun = useCallback(async () => {
+    setBusy(true);
+    setJobState(null);
+    setError(null);
+    stopPoll();
+    try {
+      const { job_id } = await runDiscoveryBatch();
+      setJobState({ job_id, status: "pending" });
+      pollRef.current = setInterval(async () => {
+        try {
+          const job = await getResearchJob(job_id);
+          setJobState(job);
+          if (job.status === "completed" || job.status === "error") {
+            stopPoll();
+            setBusy(false);
+            if (job.status === "completed") onCompleted?.();
+          }
+        } catch (err) {
+          setError(err.message);
+          stopPoll();
+          setBusy(false);
+        }
+      }, POLL_MS);
+    } catch (err) {
+      setError(err.message);
+      setBusy(false);
+    }
+  }, [onCompleted, stopPoll]);
+
+  const statusMsg = (() => {
+    if (!jobState) return null;
+    if (jobState.status === "pending") return "⟳ Queued…";
+    if (jobState.status === "running")
+      return "⟳ Opus 4.8 + GPT-5.6 Sol generating domains → lead review → testing…";
+    if (jobState.status === "completed") {
+      const s = jobState.result?.summary;
+      if (s)
+        return `✓ Done — ${s.tests_run} test(s) across ${s.domains?.length ?? 0} domain(s); `
+          + `${s.surviving_discovery} passed discovery, ${s.confirmed} confirmed`;
+      return "✓ Done — results in table above";
+    }
+    if (jobState.status === "error") return `✕ ${jobState.error_message}`;
+    return null;
+  })();
+
+  const statusColor = jobState?.status === "error" ? "var(--oxide)"
+    : jobState?.status === "completed" ? "var(--brass)"
+    : "var(--silver)";
+
+  return (
+    <div style={{
+      marginBottom: "2rem", padding: "1.5rem 1.75rem",
+      border: "1px solid rgba(184,151,90,0.35)", borderRadius: "8px",
+      backgroundColor: "rgba(184,151,90,0.05)",
+    }}>
+      <div style={{
+        fontFamily: "monospace", fontSize: "0.58rem", textTransform: "uppercase",
+        letterSpacing: "0.22em", color: "var(--brass)", marginBottom: "0.5rem",
+      }}>
+        Autonomous discovery
+      </div>
+      <p style={{ fontSize: "0.75rem", color: "var(--silver)", lineHeight: 1.6, marginBottom: "1rem", maxWidth: "52rem" }}>
+        Runs the full three-model pipeline with <strong style={{ color: "var(--paper)" }}>no hypothesis from you</strong>:
+        two generators (<strong style={{ color: "var(--paper)" }}>Claude Opus 4.8</strong> and{" "}
+        <strong style={{ color: "var(--paper)" }}>GPT-5.6 Sol</strong>) each propose their own bisociative domains, a lead
+        reviewer consolidates them, and every ready hypothesis is tested on the discovery split, FDR-corrected over the
+        whole cumulative log, then confirmed on the holdout half and confound-checked. Results append to the same registry
+        below. This takes several minutes and makes many model calls.
+      </p>
+      {error && (
+        <p style={{ color: "var(--oxide)", fontSize: "0.72rem", marginBottom: "0.5rem" }}>{error}</p>
+      )}
+      <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
+        <button
+          type="button"
+          onClick={handleRun}
+          disabled={busy}
+          style={{
+            padding: "0.55rem 1.5rem", borderRadius: "4px", border: "none",
+            backgroundColor: busy ? "rgba(199,202,209,0.2)" : "var(--brass)",
+            color: busy ? "var(--silver)" : "var(--paper)",
+            fontSize: "0.82rem", fontWeight: 600,
+            cursor: busy ? "default" : "pointer",
+            transition: "background-color 0.15s ease",
+          }}
+          onMouseEnter={(e) => { if (!busy) e.currentTarget.style.backgroundColor = "var(--brass-deep)"; }}
+          onMouseLeave={(e) => { if (!busy) e.currentTarget.style.backgroundColor = "var(--brass)"; }}
+        >
+          {busy ? "Discovery batch running…" : "Run new discovery batch"}
+        </button>
+        {statusMsg && (
+          <span style={{ fontSize: "0.72rem", fontFamily: "monospace", color: statusColor }}>
+            {statusMsg}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ResearchTab({ onRefresh }) {
   const [hypotheses, setHypotheses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -311,6 +424,7 @@ export default function ResearchTab({ onRefresh }) {
         </button>
       </div>
 
+      <DiscoveryBatch onCompleted={fetchHypotheses} />
       <HypothesisTable hypotheses={hypotheses} loading={loading} />
       <SubmitHypothesis onSubmitted={fetchHypotheses} />
     </div>
