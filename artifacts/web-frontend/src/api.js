@@ -95,3 +95,25 @@ export function generateHypothesisReport(hypothesisId, { refresh = false } = {})
     { method: "POST" },
   );
 }
+
+// ── Saved reports ──────────────────────────────────────────────────────────
+// Freeze a generated report as a permanent snapshot. Returns the stored row.
+export function saveReport(payload) {
+  return request("/api/reports", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function listSavedReports() {
+  return request("/api/reports");
+}
+
+export function getSavedReport(reportId) {
+  return request(`/api/reports/${encodeURIComponent(reportId)}`);
+}
+
+export function deleteSavedReport(reportId) {
+  return request(`/api/reports/${encodeURIComponent(reportId)}`, { method: "DELETE" });
+}
