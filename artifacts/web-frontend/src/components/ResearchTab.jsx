@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getResearchHypotheses,
+  archiveHypothesis,
   submitResearchHypothesis,
   getResearchJob,
   runDiscoveryBatch,
@@ -29,7 +30,9 @@ function PassBadge({ value }) {
   return <span style={{ color: "var(--silver-dim)", fontSize: "0.62rem" }}>—</span>;
 }
 
-function HypothesisTable({ hypotheses, loading }) {
+function HypothesisTable({ hypotheses, loading, onArchive }) {
+  const [archiving, setArchiving] = useState(null); // hypothesis_id being toggled
+
   if (loading)
     return <p style={{ color: "var(--silver)", fontSize: "0.8rem", padding: "1.5rem 0" }}>Loading registry…</p>;
   if (!hypotheses.length)
@@ -40,6 +43,17 @@ function HypothesisTable({ hypotheses, loading }) {
       </p>
     );
 
+  const handleArchive = async (h) => {
+    const newVal = h.archived !== true;
+    setArchiving(h.hypothesis_id);
+    try {
+      await archiveHypothesis(h.hypothesis_id, newVal);
+      onArchive?.();
+    } finally {
+      setArchiving(null);
+    }
+  };
+
   return (
     <div style={{ overflowX: "auto", borderRadius: "6px", border: "1px solid rgba(199,202,209,0.14)" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.72rem", color: "var(--ink)" }}>
@@ -47,9 +61,9 @@ function HypothesisTable({ hypotheses, loading }) {
           <tr style={{ backgroundColor: "rgba(199,202,209,0.05)", borderBottom: "1px solid rgba(199,202,209,0.18)" }}>
             {[
               "Hypothesis", "Test", "Frame", "Raw p", "FDR q",
-              "Discovery", "Confirm", "Confound", "Domain",
-            ].map((h) => (
-              <th key={h} style={{
+              "Discovery", "Confirm", "Confound", "Domain", "",
+            ].map((h, i) => (
+              <th key={i} style={{
                 padding: "6px 10px", textAlign: "left", whiteSpace: "nowrap",
                 fontFamily: "monospace", fontSize: "0.58rem", textTransform: "uppercase",
                 letterSpacing: "0.15em", fontWeight: 400, color: "var(--silver-dim)",
@@ -60,14 +74,21 @@ function HypothesisTable({ hypotheses, loading }) {
         <tbody>
           {hypotheses.map((h, i) => {
             const txt = h.resulting_hypothesis_text || "";
+            const isArchived = h.archived === true;
             const confoundSummary = (() => {
               if (!h.confound_check_summary) return null;
               try { return JSON.parse(h.confound_check_summary); }
               catch { return null; }
             })();
             const hasConfound = confoundSummary?.status === "completed";
+            const busy = archiving === h.hypothesis_id;
             return (
-              <tr key={i} style={{ borderBottom: "1px solid rgba(199,202,209,0.09)" }}
+              <tr key={i}
+                style={{
+                  borderBottom: "1px solid rgba(199,202,209,0.09)",
+                  opacity: isArchived ? 0.45 : 1,
+                  transition: "opacity 0.15s ease",
+                }}
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(199,202,209,0.04)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}>
                 <td style={{ padding: "7px 10px", maxWidth: "22rem", color: "var(--paper)" }}>
@@ -109,6 +130,25 @@ function HypothesisTable({ hypotheses, loading }) {
                       ? h.domain_description.slice(0, 45) + "…"
                       : h.domain_description || "—"}
                   </span>
+                </td>
+                <td style={{ padding: "7px 8px", whiteSpace: "nowrap" }}>
+                  <button
+                    onClick={() => handleArchive(h)}
+                    disabled={busy}
+                    title={isArchived ? "Restore to active view" : "Archive this entry"}
+                    style={{
+                      fontSize: "0.58rem", fontFamily: "monospace",
+                      color: isArchived ? "var(--brass)" : "var(--silver-dim)",
+                      background: "transparent",
+                      border: "1px solid " + (isArchived ? "rgba(184,151,90,0.35)" : "rgba(199,202,209,0.18)"),
+                      borderRadius: "3px", padding: "2px 7px",
+                      cursor: busy ? "default" : "pointer",
+                      opacity: busy ? 0.5 : 1,
+                      transition: "color 0.15s, border-color 0.15s",
+                    }}
+                  >
+                    {busy ? "…" : isArchived ? "restore" : "archive"}
+                  </button>
                 </td>
               </tr>
             );
@@ -358,14 +398,15 @@ function DiscoveryBatch({ onCompleted }) {
 }
 
 export default function ResearchTab({ onRefresh }) {
-  const [hypotheses, setHypotheses] = useState([]);
+  const [allHypotheses, setAllHypotheses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showArchived, setShowArchived] = useState(false);
 
   const fetchHypotheses = useCallback(async () => {
     try {
       const data = await getResearchHypotheses();
-      setHypotheses(Array.isArray(data) ? data : []);
+      setAllHypotheses(Array.isArray(data) ? data : []);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -374,6 +415,11 @@ export default function ResearchTab({ onRefresh }) {
   }, []);
 
   useEffect(() => { fetchHypotheses(); }, [fetchHypotheses]);
+
+  const archivedCount = allHypotheses.filter((h) => h.archived === true).length;
+  const visibleHypotheses = showArchived
+    ? allHypotheses
+    : allHypotheses.filter((h) => h.archived !== true);
 
   return (
     <div style={{ maxWidth: "1180px", margin: "0 auto", padding: "2.5rem 1.5rem" }}>
@@ -405,27 +451,44 @@ export default function ResearchTab({ onRefresh }) {
         </div>
       )}
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem", gap: "0.75rem", flexWrap: "wrap" }}>
         <span style={{
           fontFamily: "monospace", fontSize: "0.58rem", textTransform: "uppercase",
           letterSpacing: "0.16em", color: "var(--silver-dim)",
         }}>
-          {loading ? "…" : `${hypotheses.length} test${hypotheses.length !== 1 ? "s" : ""} in cumulative log`}
+          {loading ? "…" : `${visibleHypotheses.length} of ${allHypotheses.length} test${allHypotheses.length !== 1 ? "s" : ""} shown`}
         </span>
-        <button
-          onClick={fetchHypotheses}
-          style={{
-            fontSize: "0.65rem", fontFamily: "monospace", color: "var(--silver)",
-            background: "transparent", border: "1px solid rgba(199,202,209,0.22)",
-            borderRadius: "3px", padding: "3px 10px", cursor: "pointer",
-          }}
-        >
-          Refresh
-        </button>
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          {archivedCount > 0 && (
+            <button
+              onClick={() => setShowArchived((v) => !v)}
+              style={{
+                fontSize: "0.62rem", fontFamily: "monospace",
+                color: showArchived ? "var(--brass)" : "var(--silver-dim)",
+                background: "transparent",
+                border: "1px solid " + (showArchived ? "rgba(184,151,90,0.45)" : "rgba(199,202,209,0.22)"),
+                borderRadius: "3px", padding: "3px 10px", cursor: "pointer",
+                transition: "color 0.15s, border-color 0.15s",
+              }}
+            >
+              {showArchived ? `hide archived (${archivedCount})` : `show archived (${archivedCount})`}
+            </button>
+          )}
+          <button
+            onClick={fetchHypotheses}
+            style={{
+              fontSize: "0.65rem", fontFamily: "monospace", color: "var(--silver)",
+              background: "transparent", border: "1px solid rgba(199,202,209,0.22)",
+              borderRadius: "3px", padding: "3px 10px", cursor: "pointer",
+            }}
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       <DiscoveryBatch onCompleted={fetchHypotheses} />
-      <HypothesisTable hypotheses={hypotheses} loading={loading} />
+      <HypothesisTable hypotheses={visibleHypotheses} loading={loading} onArchive={fetchHypotheses} />
       <SubmitHypothesis onSubmitted={fetchHypotheses} />
     </div>
   );

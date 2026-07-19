@@ -59,6 +59,13 @@ export function getResearchHypotheses() {
   return request("/api/research/hypotheses");
 }
 
+export function archiveHypothesis(hypothesisId, archived = true) {
+  return request(
+    `/api/research/hypotheses/${encodeURIComponent(hypothesisId)}/archive?archived=${archived}`,
+    { method: "PATCH" },
+  );
+}
+
 export function submitResearchHypothesis(hypothesisText) {
   return request("/api/research/hypotheses", {
     method: "POST",
