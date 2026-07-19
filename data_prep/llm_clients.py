@@ -70,6 +70,10 @@ def extract_json(text: str):
     """
     Pull the first top-level JSON array or object out of an LLM reply. Tolerates
     ```json fences and leading/trailing prose.
+
+    Uses balanced bracket + in-string tracking to find the correct matching close
+    bracket, so trailing prose (even prose containing { or } characters) does not
+    corrupt the slice.
     """
     t = text.strip()
     if "```" in t:
@@ -82,10 +86,48 @@ def extract_json(text: str):
             if p.startswith("[") or p.startswith("{"):
                 t = p
                 break
-    # find the widest bracketed span
-    starts = [i for i, c in enumerate(t) if c in "[{"]
-    ends = [i for i, c in enumerate(t) if c in "]}"]
-    if not starts or not ends:
-        raise ValueError(f"no JSON found in LLM reply: {text[:200]!r}")
-    s, e = starts[0], ends[-1]
-    return json.loads(t[s : e + 1])
+
+    _openers = {"[", "{"}
+    _closers = {"]": "[", "}": "{"}
+
+    for i, start_ch in enumerate(t):
+        if start_ch not in _openers:
+            continue
+        # Walk forward tracking string context and bracket depth.
+        in_string = False
+        escape = False
+        stack: list[str] = []
+        j = i
+        while j < len(t):
+            ch = t[j]
+            if escape:
+                escape = False
+                j += 1
+                continue
+            if ch == "\\" and in_string:
+                escape = True
+                j += 1
+                continue
+            if ch == '"':
+                in_string = not in_string
+                j += 1
+                continue
+            if in_string:
+                j += 1
+                continue
+            if ch in _openers:
+                stack.append(ch)
+            elif ch in _closers:
+                if not stack or stack[-1] != _closers[ch]:
+                    break  # mismatched bracket — not valid JSON from here
+                stack.pop()
+                if not stack:
+                    # found the matching close — try to parse
+                    candidate = t[i : j + 1]
+                    try:
+                        return json.loads(candidate)
+                    except json.JSONDecodeError:
+                        break  # try the next opener position
+            j += 1
+
+    raise ValueError(f"no valid JSON found in LLM reply: {text[:200]!r}")
