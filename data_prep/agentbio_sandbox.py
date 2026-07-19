@@ -27,14 +27,13 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 WORKSPACE = os.path.join(HERE, "..")
 DATA_CSV = os.path.join(HERE, "output", "labeled_dataset.csv")
-HIST_CSV = os.path.join(HERE, "registry", "bisociation_history.csv")
-LOG_CSV = os.path.join(HERE, "registry", "hypothesis_log.csv")
 TOP_JSON = os.path.join(WORKSPACE, "output", "top_candidates.json")
 OUT_TXT = os.path.join(HERE, "output", "sandbox_note.txt")
 
-# features.py lives in data_prep/
+# features.py + hypothesis_registry live in data_prep/
 sys.path.insert(0, HERE)
 import features as F  # noqa: E402
+import hypothesis_registry as R  # noqa: E402
 
 
 def _load_fdr_passing_hypotheses() -> list[dict]:
@@ -43,10 +42,8 @@ def _load_fdr_passing_hypotheses() -> list[dict]:
     We use history rather than log so we have feature_spec-adjacent data like
     domain_description and the mechanistic note (outcome_note).
     """
-    if not os.path.exists(HIST_CSV):
-        return []
-    hist = pd.read_csv(HIST_CSV)
-    if "discovery_pass" not in hist.columns:
+    hist = R.load_history()
+    if hist.empty or "discovery_pass" not in hist.columns:
         return []
     passing = hist[hist["discovery_pass"].astype(str).str.lower() == "true"]
     return passing.to_dict("records")
@@ -60,9 +57,9 @@ def _load_log_specs() -> dict[str, dict]:
     up the features module's computed series. Since we can't recover the original
     DSL op from the log alone, we record what we know.
     """
-    if not os.path.exists(LOG_CSV):
+    log = R.load_log()
+    if log.empty:
         return {}
-    log = pd.read_csv(LOG_CSV)
     specs: dict[str, dict] = {}
     for _, row in log.iterrows():
         hid = str(row.get("hypothesis_id", ""))
@@ -200,8 +197,8 @@ def run_sandbox() -> None:
     ╚══════════════════════════════════════════════════════════════════════════╝
 
     Source files:
-      hypothesis_log:     {LOG_CSV}
-      bisociation_history:{HIST_CSV}
+      hypothesis_log:     (Postgres table hypothesis_log)
+      bisociation_history:(Postgres table bisociation_history)
       top_candidates:     {TOP_JSON}
       labeled_dataset:    {DATA_CSV}
 

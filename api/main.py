@@ -385,6 +385,9 @@ def _ensure_research_modules() -> None:
     import stats_tests as _S
     import llm_clients as _L
     import hypothesis_report as _HR
+    # One-time, idempotent seed of the historical registry into an empty
+    # Postgres store (no-op once populated). Replaces the old CSV back-fill.
+    _R.seed_if_empty()
     _RESEARCH_MODULES.update({"R": _R, "F": _F, "S": _S, "L": _L, "HR": _HR})
 
 
