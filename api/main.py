@@ -543,6 +543,42 @@ def _run_research_job(job_id: str, hypothesis_text: str) -> None:
         research_db.update_job(job_id, status="error", error_message=str(exc))
 
 
+# --------------------------------------------------------------------------- #
+# Autonomous discovery batch (two generators + lead review, no user hypothesis)
+# --------------------------------------------------------------------------- #
+
+# In-process guard: at most one autonomous discovery batch runs at a time. Each
+# batch fires many LLM calls (Opus + Sol generation, lead review, per-hypothesis
+# tests, confirmation, confound), so overlapping runs would be wasteful and would
+# race on the shared registry. The lock only guards the "start" decision; the
+# batch itself runs in a daemon thread tracked via the research_jobs table.
+_discovery_lock = threading.Lock()
+_discovery_active_job: dict = {"job_id": None}
+
+
+def _run_discovery_batch_job(job_id: str) -> None:
+    """
+    Background thread: run ONE full autonomous discovery batch via
+    run_discovery.run_batch() and record the summary on the research job.
+    Mirrors exactly what the build-time discovery workflow ran, as a real
+    production endpoint. Writes to the SAME cumulative FDR registry.
+    """
+    try:
+        research_db.update_job(job_id, status="running")
+        _ensure_research_modules()
+        import run_discovery as _RD
+        summary = _RD.run_batch(run_id=f"run-{job_id[:8]}")
+        research_db.update_job(job_id, status="completed",
+                               result_json=_json.dumps({"mode": "autonomous_discovery",
+                                                         "summary": summary}))
+    except Exception as exc:  # noqa: BLE001
+        research_db.update_job(job_id, status="error", error_message=str(exc))
+    finally:
+        with _discovery_lock:
+            if _discovery_active_job["job_id"] == job_id:
+                _discovery_active_job["job_id"] = None
+
+
 class ResearchHypothesisRequest(BaseModel):
     hypothesis_text: str
 
@@ -599,9 +635,52 @@ def submit_research_hypothesis(req: ResearchHypothesisRequest) -> dict:
     return {"job_id": job_id}
 
 
+@app.post("/api/research/discovery-batch")
+def run_discovery_batch(request: Request) -> dict:
+    """
+    Start a full AUTONOMOUS discovery batch: two independent generators
+    (Claude Opus 4.8 + GPT-5.6 Sol) each propose their own bisociative domains,
+    a lead reviewer (Opus) consolidates them, and every READY hypothesis is
+    tested on the discovery split, FDR-corrected over the whole cumulative log,
+    then confirmed on the holdout half and confound-checked. NO user hypothesis
+    is provided — the models pick their own domains.
+
+    Runs in a background daemon thread; poll GET /api/research/jobs/{job_id}.
+    Guardrails (this batch is expensive — many LLM calls):
+    - at most one batch runs at a time (409 if one is already in flight);
+    - the same per-IP hourly rate limit as POST /api/runs (429 when exceeded).
+    """
+    # Per-IP hourly limit first, so an abusive caller is bounded even between
+    # batches (the 409 single-run guard only bounds concurrent overlap).
+    _guardrails.check_ip_rate_limit(request)
+
+    with _discovery_lock:
+        if _discovery_active_job["job_id"] is not None:
+            raise HTTPException(
+                status_code=409,
+                detail="a discovery batch is already running",
+            )
+        job_id = research_db.create_job("(autonomous discovery batch — no user hypothesis)")
+        _discovery_active_job["job_id"] = job_id
+
+    # If the thread fails to start, release the single-run slot so the endpoint
+    # doesn't get wedged in a permanently-"busy" state.
+    try:
+        t = threading.Thread(target=_run_discovery_batch_job, args=(job_id,), daemon=True)
+        t.start()
+    except Exception as exc:  # noqa: BLE001
+        with _discovery_lock:
+            if _discovery_active_job["job_id"] == job_id:
+                _discovery_active_job["job_id"] = None
+        research_db.update_job(job_id, status="error", error_message=f"failed to start: {exc}")
+        raise HTTPException(status_code=500, detail="failed to start discovery batch") from exc
+
+    return {"job_id": job_id}
+
+
 @app.get("/api/research/jobs/{job_id}")
 def get_research_job(job_id: str) -> dict:
-    """Poll status of a user-submitted research hypothesis job."""
+    """Poll status of a research job (user hypothesis OR autonomous discovery batch)."""
     job = research_db.get_job(job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="research job not found")
