@@ -84,6 +84,7 @@ HIST_COLS = [
     "confirmation_raw_p",       # raw p on the holdout half (empty if not confirmed)
     "confound_check_summary",   # JSON: Opus-proposed confounders + adjusted OR results
     "outcome_note",
+    "archived",                 # "True" / "False" — UI-only flag; never affects FDR log
 ]
 
 # Methodology constants — recorded per-log-entry so every row is self-describing.
@@ -156,6 +157,9 @@ def migrate_registries() -> None:
                 if new_col not in df.columns:
                     df[new_col] = ""
                     dirty = True
+            if "archived" not in df.columns:
+                df["archived"] = False
+                dirty = True
             if dirty:
                 for c in HIST_COLS:
                     if c not in df.columns:
@@ -184,6 +188,23 @@ def update_history_row(test_id: str, **fields) -> None:
                 df[col] = ""
             df.loc[mask, col] = val
         df.to_csv(HIST_CSV, index=False)
+
+
+def set_hypothesis_archived(hypothesis_id: str, archived: bool) -> bool:
+    """
+    Set the archived flag on all history rows matching hypothesis_id.
+    Archiving is UI-only — it never touches hypothesis_log.csv or affects FDR.
+    Returns True if at least one row was updated, False if hypothesis_id not found.
+    Protected by the same registry lock as all other writes.
+    """
+    with _registry_lock():
+        df = _load(HIST_CSV, HIST_COLS)  # lock-free read; we already hold the lock
+        mask = df["hypothesis_id"] == hypothesis_id
+        if not mask.any():
+            return False
+        df.loc[mask, "archived"] = archived
+        df[HIST_COLS].to_csv(HIST_CSV, index=False)
+        return True
 
 
 def append_log_rows(rows: list[dict]) -> pd.DataFrame:

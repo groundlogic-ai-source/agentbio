@@ -615,6 +615,22 @@ def get_research_hypotheses() -> list[dict]:
     return records
 
 
+@app.patch("/api/research/hypotheses/{hypothesis_id}/archive")
+def archive_research_hypothesis(hypothesis_id: str, archived: bool = True) -> dict:
+    """
+    Set or clear the archived flag on a hypothesis (UI-only — never affects FDR log).
+    archived=true  hides it from the default view.
+    archived=false restores it.
+    Returns 404 if hypothesis_id is not in the registry.
+    """
+    _ensure_research_modules()
+    _R = _RESEARCH_MODULES["R"]
+    found = _R.set_hypothesis_archived(hypothesis_id, archived)
+    if not found:
+        raise HTTPException(status_code=404, detail=f"hypothesis_id {hypothesis_id!r} not found")
+    return {"hypothesis_id": hypothesis_id, "archived": archived}
+
+
 @app.post("/api/research/hypotheses")
 def submit_research_hypothesis(req: ResearchHypothesisRequest) -> dict:
     """
