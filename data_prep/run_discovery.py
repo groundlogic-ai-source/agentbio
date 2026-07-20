@@ -295,6 +295,24 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
             })
             continue
 
+        if not mech.strip():
+            # HARD GUARDRAIL: every READY hypothesis must supply a mechanistic
+            # justification. The review prompt requires it but LLM output is
+            # imperfect — enforce in code so empty-mech hypotheses never enter
+            # the cumulative FDR log regardless of the reviewer tag.
+            hid = new_hid()
+            hist_rows.append({
+                "test_id": "", "hypothesis_id": hid, "run_id": run_id,
+                "session_timestamp": ts, "domain_description": domain,
+                "proposing_llm": llm, "resulting_hypothesis_text": htext,
+                "discovery_test_type": "", "outcome_framing": "",
+                "discovery_raw_p": "", "discovery_fdr_p": "", "discovery_pass": "",
+                "confirmation_pass": "", "confirmation_raw_p": "",
+                "confound_check_summary": "",
+                "outcome_note": "hard-blocked: no mechanistic justification supplied",
+            })
+            continue
+
         if F.is_confounded(spec):
             # HARD GUARDRAIL: a feature built on prior_repurposing_count can never be
             # tested, because the outcome label is defined using that count. This is
@@ -310,6 +328,26 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
                 "confirmation_pass": "", "confirmation_raw_p": "",
                 "confound_check_summary": "",
                 "outcome_note": "hard-blocked: label-confounded (prior_repurposing_count defines the outcome label)",
+            })
+            continue
+
+        if F.is_indication_stage_proxy(spec):
+            # HARD GUARDRAIL: ind_keyword features using disease-stage terminology
+            # (refractory, resistant, relapsed, salvage) are near-tautological proxies
+            # for administrative-exclude label assignment. Refractory/resistant
+            # indications presuppose an existing approved first-line product by
+            # definition, so the keyword co-varies with the label by construction, not
+            # by biology. Cannot produce a valid test.
+            hid = new_hid()
+            hist_rows.append({
+                "test_id": "", "hypothesis_id": hid, "run_id": run_id,
+                "session_timestamp": ts, "domain_description": domain,
+                "proposing_llm": llm, "resulting_hypothesis_text": htext,
+                "discovery_test_type": "", "outcome_framing": "",
+                "discovery_raw_p": "", "discovery_fdr_p": "", "discovery_pass": "",
+                "confirmation_pass": "", "confirmation_raw_p": "",
+                "confound_check_summary": "",
+                "outcome_note": "hard-blocked: label-confounded (indication-stage keyword proxies administrative-exclude label assignment)",
             })
             continue
 
