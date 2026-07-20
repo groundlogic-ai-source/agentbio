@@ -649,12 +649,15 @@ class ResearchHypothesisRequest(BaseModel):
 
 
 @app.get("/api/research/hypotheses")
-def get_research_hypotheses() -> list[dict]:
-    """Return the full bisociation_history joined with log methodology fields."""
+def get_research_hypotheses(include_archived: bool = False) -> list[dict]:
+    """Return the full bisociation_history joined with log methodology fields.
+    Archived entries are excluded by default; pass include_archived=true to see them."""
     _ensure_research_modules()
     _R = _RESEARCH_MODULES["R"]
     _R.migrate_registries()
     hist = _R.load_history()
+    if not include_archived:
+        hist = hist[~hist["archived"].fillna(False).astype(bool)].reset_index(drop=True)
     log = _R.load_log()
 
     # join methodology fields from log onto history (same test_id key)
