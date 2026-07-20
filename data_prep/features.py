@@ -133,10 +133,22 @@ def is_indication_stage_proxy(spec: dict) -> bool:
     return any(stem in kw for kw in kws for stem in _STAGE_PROXY_STEMS)
 
 
+def _require_col(df: pd.DataFrame, col: str, op: str) -> pd.Series:
+    """Return df[col] or raise FeatureError if the column is missing (enriched dataset not generated)."""
+    if col not in df.columns:
+        raise FeatureError(
+            f"op '{op}' requires column '{col}' which is absent — "
+            f"run enrich_dataset.py first to generate enriched_dataset.csv"
+        )
+    return df[col]
+
+
 def compute(df: pd.DataFrame, spec: dict) -> pd.Series:
     """Return a numeric Series (binary 0/1 or continuous) aligned to df.index."""
     op = spec.get("op")
     params = spec.get("params", {}) or {}
+
+    # ---- base dataset ops ----
     if op == "prc_raw":
         return df["prior_repurposing_count"].astype(float)
     if op == "prc_threshold":
@@ -156,6 +168,33 @@ def compute(df: pd.DataFrame, spec: dict) -> pd.Series:
             raise FeatureError("drug_keyword requires non-empty 'keywords'")
         low = df["drug_name"].fillna("").str.lower()
         return low.apply(lambda s: int(any(k in s for k in kws)))
+
+    # ---- enriched ops (require enriched_dataset.csv columns) ----
+    if op == "mw_raw":
+        return _require_col(df, "pubchem_mw", op).astype(float)
+    if op == "xlogp_raw":
+        return _require_col(df, "pubchem_xlogp", op).astype(float)
+    if op == "mw_threshold":
+        k = float(params["k"])
+        col = _require_col(df, "pubchem_mw", op).astype(float)
+        return (col >= k).astype(int)
+    if op == "xlogp_threshold":
+        k = float(params["k"])
+        col = _require_col(df, "pubchem_xlogp", op).astype(float)
+        return (col >= k).astype(int)
+    if op == "is_small_molecule":
+        col = _require_col(df, "chembl_molecule_type", op)
+        return (col == "Small molecule").astype(int)
+    if op == "is_oral":
+        col = _require_col(df, "chembl_oral", op).astype(float)
+        return (col == 1.0).astype(int)
+    if op == "global_max_phase_raw":
+        return _require_col(df, "chembl_max_phase", op).astype(float)
+    if op == "global_max_phase_threshold":
+        k = float(params["k"])
+        col = _require_col(df, "chembl_max_phase", op).astype(float)
+        return (col >= k).astype(int)
+
     if op == "interaction":
         raise FeatureError("interaction specs must be evaluated via compute_interaction")
     raise FeatureError(f"unsupported op: {op!r}")

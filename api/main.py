@@ -15,6 +15,8 @@ Run:
 
 import hashlib
 import os
+import subprocess
+import sys
 import threading
 from typing import Any, Optional
 
@@ -357,6 +359,57 @@ def trigger_sweep() -> dict:
 def sweep_status() -> dict:
     """Return running / ok / error / not_started for the sweep subprocess."""
     return sweep_manager.status()
+
+
+# --------------------------------------------------------------------------- #
+# Dataset enrichment (MEGA 2 — PubChem + ChEMBL free-API batch)
+# --------------------------------------------------------------------------- #
+
+_ENRICH_LOG = "/tmp/enrich_log.txt"
+_enrich_proc: subprocess.Popen | None = None
+
+
+@app.post("/internal/run-enrichment")
+def trigger_enrichment(concurrency: int = 4) -> dict:
+    """
+    Start data_prep/enrich_dataset.py as a background subprocess.
+    Only one enrichment run at a time; returns immediately.
+    """
+    global _enrich_proc
+    if _enrich_proc is not None and _enrich_proc.poll() is None:
+        return {"status": "already_running", "pid": _enrich_proc.pid, "log": _ENRICH_LOG}
+
+    script = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "..", "data_prep", "enrich_dataset.py"
+    )
+    _enrich_proc = subprocess.Popen(
+        [sys.executable, script, "--concurrency", str(concurrency)],
+        stdout=open(_ENRICH_LOG, "w"),
+        stderr=subprocess.STDOUT,
+        cwd=os.path.dirname(os.path.abspath(__file__)),
+    )
+    return {"status": "started", "pid": _enrich_proc.pid, "log": _ENRICH_LOG}
+
+
+@app.get("/internal/enrichment-status")
+def enrichment_status() -> dict:
+    """Return running / done / error / not_started for the enrichment subprocess."""
+    global _enrich_proc
+    if _enrich_proc is None:
+        return {"status": "not_started"}
+    rc = _enrich_proc.poll()
+    if rc is None:
+        tail = ""
+        try:
+            with open(_ENRICH_LOG) as f:
+                lines = f.read().splitlines()
+                tail = "\n".join(lines[-5:]) if lines else ""
+        except OSError:
+            pass
+        return {"status": "running", "pid": _enrich_proc.pid, "tail": tail}
+    if rc == 0:
+        return {"status": "done", "returncode": rc, "log": _ENRICH_LOG}
+    return {"status": "error", "returncode": rc, "log": _ENRICH_LOG}
 
 
 # --------------------------------------------------------------------------- #
