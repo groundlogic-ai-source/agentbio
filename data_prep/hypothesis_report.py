@@ -30,7 +30,13 @@ def _to_float(v):
     if v is None or v == "":
         return None
     try:
-        return float(v)
+        f = float(v)
+        # Guard: nan/inf cannot be serialized to valid JSON. Treat them as
+        # missing so the report correctly shows "no result" rather than NaN.
+        import math
+        if math.isnan(f) or math.isinf(f):
+            return None
+        return f
     except (TypeError, ValueError):
         return None
 

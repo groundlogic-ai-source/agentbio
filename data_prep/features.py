@@ -29,6 +29,12 @@ import pandas as pd
 SUPPORTED_OPS = {"prc_raw", "prc_threshold", "established", "ind_keyword", "drug_keyword"}
 CONFOUNDED_OPS = {"prc_raw", "prc_threshold"}
 
+# Disease-stage terminology stems that near-tautologically proxy administrative-exclude
+# label assignment. Refractory/resistant/relapsed indications presuppose an existing
+# approved first-line product by definition, so they co-vary with the label by
+# construction rather than by biology.
+_STAGE_PROXY_STEMS = frozenset({"refract", "resist", "relaps", "salvage"})
+
 
 class FeatureError(ValueError):
     pass
@@ -40,6 +46,20 @@ def is_supported(spec: dict) -> bool:
 
 def is_confounded(spec: dict) -> bool:
     return spec.get("op") in CONFOUNDED_OPS
+
+
+def is_indication_stage_proxy(spec: dict) -> bool:
+    """
+    True if this ind_keyword feature uses disease-stage terminology that
+    near-tautologically proxies the administrative-exclude label.
+    Refractory/resistant/relapsed indications presuppose an existing approved
+    first-line drug, so the keyword co-varies with label assignment by
+    construction, not by biology.
+    """
+    if spec.get("op") != "ind_keyword":
+        return False
+    kws = [str(k).lower() for k in spec.get("params", {}).get("keywords", [])]
+    return any(stem in kw for kw in kws for stem in _STAGE_PROXY_STEMS)
 
 
 def compute(df: pd.DataFrame, spec: dict) -> pd.Series:
