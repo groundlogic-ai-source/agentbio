@@ -925,3 +925,55 @@ def get_drug_action_type(
 
     cache_set(cache_key, result, ttl_days=30)
     return result
+
+
+def get_molecule_data(drug_name: str) -> dict[str, Any]:
+    """
+    Drug-level ChEMBL lookup: molecule_type, max_phase (global), oral flag.
+
+    Returns:
+      {
+        chembl_id: str | None,
+        molecule_type: str | None,   # "Small molecule", "Antibody", "Enzyme", etc.
+        max_phase: int | None,        # 0-4 (highest phase globally in ChEMBL)
+        oral: bool | None,
+        resolved: bool,
+      }
+
+    Cached 30 days (7 on miss). Returns resolved=False on any API error or not-found.
+    molecule_type distinguishes small-molecule vs biologic; max_phase captures how
+    far a compound has progressed across all indications in ChEMBL.
+    """
+    cache_key = make_key("get_molecule_data_v1", drug_name)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    result: dict[str, Any] = {
+        "chembl_id": None,
+        "molecule_type": None,
+        "max_phase": None,
+        "oral": None,
+        "resolved": False,
+    }
+
+    try:
+        chembl_id = _find_molecule_chembl_id(drug_name)
+        if not chembl_id:
+            cache_set(cache_key, result, ttl_days=7)
+            return result
+
+        result["chembl_id"] = chembl_id
+        mol = _get_json(f"{BASE_URL}/molecule/{chembl_id}")
+        if mol:
+            result["molecule_type"] = mol.get("molecule_type")
+            mp = mol.get("max_phase")
+            result["max_phase"] = int(mp) if mp is not None else None
+            result["oral"] = bool(mol.get("oral")) if mol.get("oral") is not None else None
+            result["resolved"] = True
+
+    except Exception as e:
+        print(f"[chembl] WARNING: get_molecule_data failed for '{drug_name}': {e}")
+
+    cache_set(cache_key, result, ttl_days=30)
+    return result

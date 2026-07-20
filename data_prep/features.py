@@ -2,16 +2,34 @@
 Feature DSL — turns an LLM-proposed feature spec into a computable column over the
 real dataset schema, or refuses it.
 
-Available real columns (nothing else exists; anything requiring more is
-NEEDS_ENRICHMENT, never a faked proxy):
+Available real columns (base dataset):
   drug_name, ind_name, prior_repurposing_count, established_product, phase, status
 
+Available enriched columns (present when enriched_dataset.csv has been generated):
+  pubchem_mw            float | NaN — molecular weight from PubChem
+  pubchem_xlogp         float | NaN — XLogP lipophilicity from PubChem
+  chembl_molecule_type  str   | NaN — "Small molecule", "Antibody", "Enzyme", etc.
+  chembl_max_phase      float | NaN — highest global development phase (0–4) in ChEMBL
+  chembl_oral           float | NaN — 1.0 = oral drug, 0.0 = non-oral (from ChEMBL)
+
 Supported ops (fixed vocabulary):
-  - prc_raw            continuous = prior_repurposing_count
-  - prc_threshold      binary     = prior_repurposing_count >= params["k"]
-  - established        binary     = established_product
-  - ind_keyword        binary     = ind_name (lowercased) contains ANY params["keywords"]
-  - drug_keyword       binary     = drug_name (lowercased) contains ANY params["keywords"]
+
+  Base dataset ops:
+  - prc_raw              continuous = prior_repurposing_count
+  - prc_threshold        binary     = prior_repurposing_count >= params["k"]
+  - established          binary     = established_product
+  - ind_keyword          binary     = ind_name (lowercased) contains ANY params["keywords"]
+  - drug_keyword         binary     = drug_name (lowercased) contains ANY params["keywords"]
+
+  Enriched ops (require enriched_dataset.csv — raise FeatureError if columns absent):
+  - mw_raw               continuous = pubchem_mw (molecular weight, Da)
+  - xlogp_raw            continuous = pubchem_xlogp (lipophilicity)
+  - mw_threshold         binary     = pubchem_mw >= params["k"]
+  - xlogp_threshold      binary     = pubchem_xlogp >= params["k"]
+  - is_small_molecule    binary     = chembl_molecule_type == "Small molecule"
+  - is_oral              binary     = chembl_oral == 1.0
+  - global_max_phase_raw continuous = chembl_max_phase
+  - global_max_phase_threshold binary = chembl_max_phase >= params["k"]
 
 Any spec whose op is not in this set cannot be computed from the schema and is
 rejected (caller marks it NEEDS_ENRICHMENT).
@@ -26,12 +44,25 @@ from __future__ import annotations
 
 import pandas as pd
 
-SUPPORTED_OPS = {"prc_raw", "prc_threshold", "established", "ind_keyword", "drug_keyword"}
+SUPPORTED_OPS = {
+    "prc_raw", "prc_threshold", "established", "ind_keyword", "drug_keyword",
+    "mw_raw", "xlogp_raw", "mw_threshold", "xlogp_threshold",
+    "is_small_molecule", "is_oral", "global_max_phase_raw", "global_max_phase_threshold",
+}
 CONFOUNDED_OPS = {"prc_raw", "prc_threshold"}
+# Enriched ops that require pubchem/chembl columns — graceful error if absent.
+ENRICHED_OPS = {
+    "mw_raw", "xlogp_raw", "mw_threshold", "xlogp_threshold",
+    "is_small_molecule", "is_oral", "global_max_phase_raw", "global_max_phase_threshold",
+}
 # Ops that produce a single 0/1 column and can therefore serve as a moderator or a
-# base term inside an interaction. prc_raw is continuous, so it may be a base but is
-# never a binary moderator.
-_BINARY_OPS = {"prc_threshold", "established", "ind_keyword", "drug_keyword"}
+# base term inside an interaction. prc_raw / mw_raw / xlogp_raw / global_max_phase_raw
+# are continuous — they may be a base but are never binary moderators.
+_BINARY_OPS = {
+    "prc_threshold", "established", "ind_keyword", "drug_keyword",
+    "mw_threshold", "xlogp_threshold", "is_small_molecule", "is_oral",
+    "global_max_phase_threshold",
+}
 
 # Disease-stage terminology stems that near-tautologically proxy administrative-exclude
 # label assignment. Refractory/resistant/relapsed indications presuppose an existing
