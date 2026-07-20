@@ -41,35 +41,69 @@ import stats_tests as S
 import confound_check as C
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA_CSV = os.path.join(HERE, "output", "labeled_dataset.csv")
+_BASE_CSV = os.path.join(HERE, "output", "labeled_dataset.csv")
+_ENRICHED_CSV = os.path.join(HERE, "output", "enriched_dataset.csv")
+DATA_CSV = _ENRICHED_CSV if os.path.exists(_ENRICHED_CSV) else _BASE_CSV
 FDR_Q = 0.05
+
+_ENRICHED_AVAILABLE = os.path.exists(_ENRICHED_CSV)
 
 DSL_DOC = """
 You may only propose features that reduce to ONE of these computable ops over the
-real dataset columns (drug_name, ind_name, prior_repurposing_count,
-established_product, phase, status). No other data exists — if a good idea needs
-anything else, do NOT invent a proxy: set "feature_spec": null and
-"tag": "NEEDS_ENRICHMENT" with a "needs" string naming the exact missing data.
+real dataset columns. No other data exists — if a good idea needs anything else,
+do NOT invent a proxy: set "feature_spec": null and "tag": "NEEDS_ENRICHMENT"
+with a "needs" string naming the exact missing data.
 
-Ops:
-  {"op": "prc_raw"}                                  continuous = prior_repurposing_count
-  {"op": "prc_threshold", "params": {"k": <int>}}    binary = prior_repurposing_count >= k
-  {"op": "established"}                               binary = established_product (bool)
-  {"op": "ind_keyword", "params": {"keywords": [..]}} binary = ind_name contains any keyword
-  {"op": "drug_keyword", "params": {"keywords": [..]}} binary = drug_name contains any keyword
-  {"op": "interaction", "params": {"base": <op above>, "moderator": <BINARY op above>}}
-      interaction = tests whether the `base` predictor's effect on repurposing success
-      DIFFERS across the two levels of the binary `moderator`. Fits
+=== BASE DATASET OPS (always available) ===
+  {"op": "prc_raw"}
+      continuous = prior_repurposing_count (how many OTHER approved uses this drug has)
+  {"op": "prc_threshold", "params": {"k": <int>}}
+      binary = prior_repurposing_count >= k
+  {"op": "established"}
+      binary = drug is an established product (DrugCentral-confirmed)
+  {"op": "ind_keyword", "params": {"keywords": [<str>, ...]}}
+      binary = ind_name (lowercased) contains ANY of the keywords
+  {"op": "drug_keyword", "params": {"keywords": [<str>, ...]}}
+      binary = drug_name (lowercased) contains ANY of the keywords
+
+=== ENRICHED OPS (chemical/biological data from PubChem + ChEMBL) ==={enriched_status}
+  {"op": "mw_raw"}
+      continuous = molecular weight in Da (from PubChem)
+  {"op": "mw_threshold", "params": {"k": <float>}}
+      binary = molecular_weight >= k  (e.g. k=500 for Lipinski Rule-of-Five)
+  {"op": "xlogp_raw"}
+      continuous = XLogP lipophilicity (from PubChem)
+  {"op": "xlogp_threshold", "params": {"k": <float>}}
+      binary = XLogP >= k  (e.g. k=5 for Lipinski, k=0 to split hydrophilic vs lipophilic)
+  {"op": "is_small_molecule"}
+      binary = ChEMBL molecule_type == "Small molecule" (vs. Antibody/Protein/Enzyme/etc.)
+  {"op": "is_oral"}
+      binary = ChEMBL oral flag == True
+  {"op": "global_max_phase_raw"}
+      continuous = highest global clinical phase (0–4) this drug has reached in ChEMBL
+                   across ALL indications (not just this one)
+  {"op": "global_max_phase_threshold", "params": {"k": <float>}}
+      binary = global_max_phase >= k  (e.g. k=4 = ever-approved, k=3 = Phase 3+)
+
+=== INTERACTION OP ===
+  {"op": "interaction", "params": {"base": <any op above>, "moderator": <BINARY op above>}}
+      Tests whether the `base` predictor's effect on repurposing success DIFFERS across
+      the two levels of the binary `moderator`. Fits
       y ~ base + moderator + base:moderator and reports the interaction term's OR/CI/p.
-      The moderator MUST be a binary op (prc_threshold, established, ind_keyword,
-      drug_keyword); the base may be any op above. Use this for "the effect of X is
-      stronger/weaker among Y" hypotheses.
+      The moderator MUST be a binary op; the base may be any op. Use for
+      "the effect of X is stronger/weaker among Y" hypotheses.
 
 WARNING: prior_repurposing_count is definitionally tied to the outcome label
 (a repurposing success requires prior_repurposing_count >= 1). Features built on
 prc_raw / prc_threshold are label-confounded and will likely be discarded by review.
-Prefer features on ind_name / drug_name text or established_product.
-""".strip()
+Prefer enriched chemical/biological features (mw, xlogp, molecule type, max phase,
+oral flag) or indication-text features.
+""".strip().replace(
+    "{enriched_status}",
+    " [AVAILABLE — enriched_dataset.csv loaded]"
+    if _ENRICHED_AVAILABLE
+    else " [NOT YET AVAILABLE — run enrich_dataset.py; use NEEDS_ENRICHMENT tag for now]",
+)
 
 GEN_INSTRUCTIONS = """
 You are proposing BISOCIATIVE hypotheses: narrow scientific / systems phenomena from

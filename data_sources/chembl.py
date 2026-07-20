@@ -944,7 +944,7 @@ def get_molecule_data(drug_name: str) -> dict[str, Any]:
     molecule_type distinguishes small-molecule vs biologic; max_phase captures how
     far a compound has progressed across all indications in ChEMBL.
     """
-    cache_key = make_key("get_molecule_data_v1", drug_name)
+    cache_key = make_key("get_molecule_data_v2", drug_name)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -968,7 +968,7 @@ def get_molecule_data(drug_name: str) -> dict[str, Any]:
         if mol:
             result["molecule_type"] = mol.get("molecule_type")
             mp = mol.get("max_phase")
-            result["max_phase"] = int(mp) if mp is not None else None
+            result["max_phase"] = int(float(mp)) if mp is not None else None
             result["oral"] = bool(mol.get("oral")) if mol.get("oral") is not None else None
             result["resolved"] = True
 
