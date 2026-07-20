@@ -246,6 +246,15 @@ def investigate(
         framed = data_discovery[pos | neg].copy()
         framed["y"] = (framed["label"] == "repurposed-success").astype(int)
 
+    if F.is_interaction(feature_spec):
+        # Interaction hypotheses already ARE the moderator analysis (base effect
+        # conditioned on the moderator). Single-covariate logistic adjustment does
+        # not map cleanly onto an interaction term, so we skip the confound sweep
+        # rather than report a misleading adjusted OR.
+        return {"status": "skipped",
+                "note": "interaction hypothesis — confound sweep not applicable to an "
+                        "interaction term; the moderator is itself the conditioning variable"}
+
     primary_feat = F.compute(framed, feature_spec)
     ok, _ = F.separation_ok(primary_feat, framed["y"])
     if not ok:

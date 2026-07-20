@@ -75,6 +75,38 @@ def logistic_binary_adjusted(
     )
 
 
+def logistic_interaction(
+    base: pd.Series, moderator: pd.Series, outcome: pd.Series
+) -> TestResult:
+    """
+    Test whether the effect of `base` on the outcome DIFFERS across the levels of a
+    binary `moderator`. Fits y ~ base + moderator + base:moderator and reports the
+    OR/CI/p of the INTERACTION term (base:moderator). An interaction OR far from 1
+    with a small p means the base predictor's effect is moderated.
+
+    The returned odds_ratio is the multiplicative change in the base effect's odds
+    ratio when the moderator flips from 0 to 1 (not the base main effect itself).
+    """
+    df = pd.DataFrame({
+        "b": base.astype(float),
+        "m": moderator.astype(float),
+        "y": outcome.astype(int),
+    }).dropna()
+    df["bm"] = df["b"] * df["m"]
+    X = sm.add_constant(df[["b", "m", "bm"]])
+    model = sm.Logit(df["y"], X)
+    res = model.fit(disp=0, method="bfgs", maxiter=200)
+    coef = res.params["bm"]
+    ci = res.conf_int().loc["bm"]
+    p = res.pvalues["bm"]
+    return TestResult(
+        "logistic_interaction",
+        float(np.exp(coef)), float(np.exp(ci[0])), float(np.exp(ci[1])),
+        float(p), int(len(df)),
+        note="OR of the interaction term (base effect ratio when moderator=1 vs 0)",
+    )
+
+
 def logistic_continuous(feature: pd.Series, outcome: pd.Series) -> TestResult:
     df = pd.DataFrame({"f": feature.astype(float), "y": outcome.astype(int)}).dropna()
     X = sm.add_constant(df[["f"]])

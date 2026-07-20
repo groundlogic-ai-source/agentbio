@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import math
 import os
 import uuid
 
@@ -56,6 +57,13 @@ Ops:
   {"op": "established"}                               binary = established_product (bool)
   {"op": "ind_keyword", "params": {"keywords": [..]}} binary = ind_name contains any keyword
   {"op": "drug_keyword", "params": {"keywords": [..]}} binary = drug_name contains any keyword
+  {"op": "interaction", "params": {"base": <op above>, "moderator": <BINARY op above>}}
+      interaction = tests whether the `base` predictor's effect on repurposing success
+      DIFFERS across the two levels of the binary `moderator`. Fits
+      y ~ base + moderator + base:moderator and reports the interaction term's OR/CI/p.
+      The moderator MUST be a binary op (prc_threshold, established, ind_keyword,
+      drug_keyword); the base may be any op above. Use this for "the effect of X is
+      stronger/weaker among Y" hypotheses.
 
 WARNING: prior_repurposing_count is definitionally tied to the outcome label
 (a repurposing success requires prior_repurposing_count >= 1). Features built on
@@ -193,6 +201,24 @@ Rules:
   score).
 - DISCARD label-confounded features (those built on prior_repurposing_count), since the
   outcome label is defined using that count.
+- TAUTOLOGY / PROXY-FOR-THE-LABEL CHECK (critical — apply to EVERY candidate): ask
+  whether the feature is a near-tautological restatement of the outcome label rather
+  than an independent predictor of it. A feature fails this check if membership in the
+  feature set PRESUPPOSES the label by construction. The canonical failure is an
+  indication-stage keyword ("refractory", "resistant", "relapsed", "salvage",
+  "second-line", "treatment-experienced"): such indications definitionally require an
+  already-approved prior therapy, so the keyword co-varies with the administrative /
+  repurposing label by definition, not by biology. This is a GENERAL principle, not a
+  fixed word list — DISCARD any feature (indication OR drug keyword) whose defining
+  terms could only apply to cases that already satisfy (or already exclude) the outcome.
+  State the tautology reasoning in needs_or_discard_reason when you discard on this basis.
+- ACTIVELY PROPOSE INTERACTION-EFFECT HYPOTHESES: do not restrict yourself to
+  single-variable main effects. Where two computable features plausibly interact,
+  propose a hypothesis that a base feature's effect DIFFERS across the levels of a
+  binary moderator (e.g. "the effect of an indication keyword on repurposing success
+  is stronger among established products than non-established products"). Encode these
+  with the "interaction" op (base + binary moderator) defined in the DSL below. Add at
+  least one well-motivated interaction hypothesis if any plausible one exists.
 - Re-tag each surviving hypothesis READY (testable now via the feature DSL) or
   NEEDS_ENRICHMENT (name the exact missing data).
 - Keep feature_spec exactly as an op/params object for READY items (or null for NE).
@@ -233,6 +259,45 @@ def _framed(df: pd.DataFrame, framing: str) -> pd.DataFrame:
     sub = df[pos | neg].copy()
     sub["y"] = (sub["label"] == "repurposed-success").astype(int)
     return sub
+
+
+def _run_single_test(sub: pd.DataFrame, spec: dict, kind: str):
+    """
+    Compute the feature(s) and run the pre-registered test for a spec on one framed
+    subset. Returns (TestResult | None, why). `None` means the test was not run
+    because of degenerate separation; `why` explains it.
+
+    Handles all three predictor kinds: binary (Fisher), continuous (logistic), and
+    interaction (logistic with a base:moderator term, reporting the interaction OR).
+    """
+    if kind == "interaction":
+        base, mod = F.compute_interaction(sub, spec)
+        chk = pd.DataFrame({"b": base, "m": mod, "y": sub["y"]}).dropna()
+        if chk["y"].nunique() < 2:
+            return None, "outcome has <2 classes in this subset"
+        if chk["m"].nunique() < 2:
+            return None, "moderator is constant in this subset"
+        if chk["b"].nunique() < 2:
+            return None, "base is constant in this subset"
+        for _, g in chk.groupby("m"):
+            if g["y"].nunique() < 2:
+                return None, "perfect separation within a moderator level"
+            if g["b"].nunique() < 2:
+                return None, "base is constant within a moderator level"
+        res = S.logistic_interaction(base, mod, sub["y"])
+        # A singular / non-converged interaction fit yields NaN statistics that
+        # would poison the cumulative FDR pass — treat it as not tested.
+        if not all(math.isfinite(v) for v in
+                   (res.odds_ratio, res.ci_low, res.ci_high, res.p_value)):
+            return None, "interaction fit did not converge (non-finite statistics)"
+        return res, ""
+    feat = F.compute(sub, spec)
+    ok, why = F.separation_ok(feat, sub["y"])
+    if not ok:
+        return None, why
+    if kind == "binary":
+        return S.fisher_binary(feat, sub["y"]), ""
+    return S.logistic_continuous(feat, sub["y"]), ""
 
 
 def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
@@ -359,10 +424,11 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
 
         for framing in ("narrow", "broad"):
             sub = _framed(disc, framing)
-            feat = F.compute(sub, spec)
-            ok, why = F.separation_ok(feat, sub["y"])
+            # ── Feature 4: lock methodology BEFORE the result is computed ──────
+            locked_at = dt.datetime.now(dt.timezone.utc).isoformat()
+            res, why = _run_single_test(sub, spec, kind)
             tid = new_tid()
-            if not ok:
+            if res is None:
                 hist_rows.append({
                     "test_id": tid, "hypothesis_id": hid, "run_id": run_id,
                     "session_timestamp": ts, "domain_description": domain,
@@ -371,16 +437,9 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
                     "discovery_raw_p": "", "discovery_fdr_p": "", "discovery_pass": "",
                     "confirmation_pass": "", "confirmation_raw_p": "",
                     "confound_check_summary": "", "outcome_note": f"not tested: {why}",
+                    "feature_spec": json.dumps(spec),
                 })
                 continue
-
-            # ── Feature 4: lock methodology BEFORE the result is computed ──────
-            locked_at = dt.datetime.now(dt.timezone.utc).isoformat()
-
-            if kind == "binary":
-                res = S.fisher_binary(feat, sub["y"])
-            else:
-                res = S.logistic_continuous(feat, sub["y"])
 
             log_rows.append({
                 "test_id": tid, "hypothesis_id": hid, "run_id": run_id,
@@ -404,6 +463,7 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
                     f"OR={res.odds_ratio:.3g} CI[{res.ci_low:.3g},{res.ci_high:.3g}] "
                     f"n={res.n} mech: {mech}"
                 ),
+                "feature_spec": json.dumps(spec),
             })
     return log_rows, hist_rows, test_meta
 
@@ -428,16 +488,11 @@ def confirm_surviving(hist_rows: list[dict], conf: pd.DataFrame, test_meta: dict
         spec, kind = meta["spec"], meta["kind"]
         sub = _framed(conf, framing)
         try:
-            feat = F.compute(sub, spec)
-            ok, _ = F.separation_ok(feat, sub["y"])
-            if not ok:
+            res, _ = _run_single_test(sub, spec, kind)
+            if res is None:
                 hr["confirmation_pass"] = False
                 hr["confirmation_raw_p"] = ""
                 continue
-            if kind == "binary":
-                res = S.fisher_binary(feat, sub["y"])
-            else:
-                res = S.logistic_continuous(feat, sub["y"])
             hr["confirmation_raw_p"] = res.p_value
             hr["confirmation_pass"] = bool(res.p_value < 0.05)
             verdict = "PASS" if res.p_value < 0.05 else "fail"

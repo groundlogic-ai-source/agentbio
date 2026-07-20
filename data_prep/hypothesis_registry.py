@@ -38,6 +38,8 @@ from __future__ import annotations
 import json
 import os
 
+import math
+
 import pandas as pd
 import psycopg2
 import psycopg2.extras
@@ -429,6 +431,14 @@ def cumulative_fdr() -> pd.DataFrame:
     if df.empty:
         df["fdr_q"] = []
         return df
-    pvals = [float(p) for p in df["raw_p"]]
-    df["fdr_q"] = benjamini_hochberg(pvals)
+    # A single malformed / non-finite raw_p (e.g. a non-converged fit that slipped
+    # through) must never crash the global FDR recomputation. Correct only over the
+    # finite p-values; rows with an unusable raw_p get fdr_q = NaN.
+    raw = pd.to_numeric(df["raw_p"], errors="coerce")
+    valid = raw.apply(lambda v: pd.notna(v) and math.isfinite(v))
+    qvals = pd.Series(float("nan"), index=df.index)
+    if valid.any():
+        corrected = benjamini_hochberg([float(p) for p in raw[valid]])
+        qvals.loc[valid] = corrected
+    df["fdr_q"] = qvals.values
     return df

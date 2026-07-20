@@ -1,0 +1,74 @@
+MEGA PROMPT 1 — Report completeness, provenance, and reproducibility
+
+1. Print the full current NEEDS_ENRICHMENT backlog: every hypothesis so
+   tagged, with the specific missing data each one names.
+
+2. Persist feature_spec (literal keyword list, or regression formula) for
+   every hypothesis at generation time, going forward -- currently only
+   lives in memory during the run and is unrecoverable after.
+
+3. Add a "How this was actually tested" section to the report generator,
+   stated plainly and separately from the hypothesis's mechanistic
+   narrative -- the literal computable proxy used (e.g. "indication name
+   contains any of: [list]"), not the biological story.
+
+4. Complete the bisociative provenance section: which domains BOTH
+   generators proposed (not just the one used), and the lead model's full
+   reasoning for what it selected, combined, or discarded and why.
+
+5. Update the lead-review prompt to explicitly check every candidate
+   hypothesis for whether it risks being a near-tautological proxy for
+   the outcome label itself (generalizing the H21 "refractory" lesson
+   beyond the fixed keyword patch already applied), and to actively
+   propose interaction-effect hypotheses (e.g. does an existing feature's
+   effect differ across established vs. non-established products),
+   not only single-variable main effects.
+
+Regenerate reports for all 4 currently-passing hypotheses with the
+completed sections once built.
+
+MEGA PROMPT 2 — Real biological/chemical enrichment + AgentBio as a tool
+
+1. Build a bounded, explicit enrichment batch process (not autonomous
+   unlimited spend) that reuses AgentBio's EXISTING wrapper functions --
+   ChEMBL bioactivity/action_type, PubChem/RDKit descriptors and
+   similarity, BioGRID, Reactome, Open Targets, and Boltz structure/
+   binding-pose prediction -- to compute real chemical/biological
+   features for drugs in the repoDB-derived dataset. Do not build new
+   data-source integrations; call the exact functions the main pipeline
+   already uses.
+
+2. This enrichment tool must NEVER write to the production jobs table or
+   explored_targets, and must never be presented as "AgentBio confirmed
+   this" -- its only output is new, real, computed feature columns that
+   then go through the exact same discovery/FDR/confirmation/confound
+   pipeline as every other feature.
+
+3. Cap and log real spend per enrichment batch (especially Boltz calls)
+   and report total cost alongside the batch's results.
+
+4. Run one new full discovery batch using the enriched dataset and report
+   whether the resulting hypotheses look qualitatively different from
+   the indication-name-keyword pattern seen in every batch so far.
+
+MEGA PROMPT 3 — Cleanup, print styling, UI polish
+
+1. Hard-delete (not archive) the confirmed dev-verification-run entries
+   (the original ~36 from run-a036dde3 and any confirmed test/debug
+   entries since) -- these were never real research questions. Keep
+   archive-only as the standing policy for any genuine future hypothesis
+   result.
+
+2. Fix print/PDF table rendering: real <table> markup with border-collapse
+   and explicit column widths, monospace tabular-nums for all numeric
+   columns, reusing the exact print-stylesheet pattern already built and
+   working for the case-dossier PDF export -- do not leave this as
+   flex/grid divs, which is almost certainly why it mangles on print.
+
+3. UI polish pass across Case Files, Research, and Saved Reports tabs:
+   keep the existing paper/brass/graphite case-dossier design language
+   entirely -- do not replace it with a generic sidebar-nav SaaS template.
+   Audit and fix consistency specifically: button padding/sizing/hover/
+   active states, spacing scale, alignment -- the things that read as
+   "unpolished" are almost certainly inconsistent execution accumulated
+   across many feature additions, not a flawed design direction.

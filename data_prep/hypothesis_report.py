@@ -63,6 +63,53 @@ def _parse_mech(note: str) -> str:
     return s[i + len("mech:"):].strip() if i >= 0 else ""
 
 
+def _parse_spec(raw):
+    """Parse a persisted feature_spec cell (JSON string) into a dict, or None."""
+    if raw is None or (isinstance(raw, float) and pd.isna(raw)) or raw == "":
+        return None
+    if isinstance(raw, dict):
+        return raw
+    try:
+        parsed = json.loads(raw)
+        return parsed if isinstance(parsed, dict) else None
+    except (ValueError, TypeError):
+        return None
+
+
+def render_spec(spec: dict | None) -> str:
+    """
+    Render a feature_spec into the LITERAL computable proxy in plain English —
+    the mechanical test that was actually run, deliberately stated separately
+    from the hypothesis's biological/mechanistic story.
+    """
+    if not spec:
+        return ""
+    op = spec.get("op")
+    params = spec.get("params", {}) or {}
+    if op == "established":
+        return ("drug is flagged as an established product "
+                "(established_product == true)")
+    if op == "prc_raw":
+        return "prior_repurposing_count, used as a continuous predictor"
+    if op == "prc_threshold":
+        return f"prior_repurposing_count >= {params.get('k')}"
+    if op == "ind_keyword":
+        kws = [str(k) for k in params.get("keywords", [])]
+        return "indication name (lowercased) contains any of: [" + ", ".join(kws) + "]"
+    if op == "drug_keyword":
+        kws = [str(k) for k in params.get("keywords", [])]
+        return "drug name (lowercased) contains any of: [" + ", ".join(kws) + "]"
+    if op == "interaction":
+        base = render_spec(params.get("base")) or "(unspecified base)"
+        mod = render_spec(params.get("moderator")) or "(unspecified moderator)"
+        return (
+            f"interaction: whether the effect of [{base}] on repurposing success "
+            f"DIFFERS across the two groups defined by [{mod}] "
+            "(logistic base:moderator term)"
+        )
+    return f"unrecognized op: {op!r}"
+
+
 def collect_facts(hypothesis_id: str) -> dict | None:
     """
     Gather every already-computed number for one hypothesis_id from the registry.
@@ -75,7 +122,7 @@ def collect_facts(hypothesis_id: str) -> dict | None:
     Returns None if the hypothesis_id is unknown.
     """
     R.migrate_registries()
-    hist = R.load_history()
+    hist = R.load_history_full()
     fdr = R.cumulative_fdr()
     qmap = {row["test_id"]: row["fdr_q"] for _, row in fdr.iterrows()}
 
@@ -86,8 +133,11 @@ def collect_facts(hypothesis_id: str) -> dict | None:
     framings: list[dict] = []
     confound_check: dict | None = None
     passed_both = False
+    feature_spec: dict | None = None
 
     for _, r in rows.iterrows():
+        if feature_spec is None:
+            feature_spec = _parse_spec(r.get("feature_spec"))
         tid = r.get("test_id")
         q = qmap.get(tid)
         disc_pass = q is not None and float(q) < R.SIGNIFICANCE_THRESHOLD
@@ -124,6 +174,8 @@ def collect_facts(hypothesis_id: str) -> dict | None:
         "domain": str(first.get("domain_description", "")),
         "proposing_llm": str(first.get("proposing_llm", "")),
         "mechanistic_justification": _parse_mech(first.get("outcome_note")),
+        "feature_spec": feature_spec,
+        "how_tested": render_spec(feature_spec),
         "significance_threshold": R.SIGNIFICANCE_THRESHOLD,
         "correction_method": R.CORRECTION_METHOD,
         "passed_both": passed_both,
@@ -150,6 +202,16 @@ Write the report in Markdown with these sections, in this order:
 ## Hypothesis
 State the full hypothesis text verbatim, plus the source domain and which model \
 proposed it. One short paragraph.
+
+## How this was actually tested
+State the LITERAL computable proxy from FACTS.how_tested — the exact mechanical \
+rule applied to the dataset columns (e.g. "indication name contains any of: \
+[...]"). This is deliberately separate from the biological/mechanistic story: \
+report the mechanical test verbatim, then in ONE sentence note that this proxy — \
+not the broader biological claim — is what the statistics below actually measured. \
+If FACTS.how_tested is empty/null, state plainly that the literal feature proxy \
+was not persisted for this run and therefore cannot be shown (do NOT invent it). \
+Do NOT restate the mechanistic justification here.
 
 ## Statistical evidence underneath the p-value
 For EACH outcome framing present in FACTS, report the regression/effect summary \
