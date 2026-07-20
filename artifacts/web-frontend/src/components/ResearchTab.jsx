@@ -21,7 +21,9 @@ function isTrue(value) {
 
 function fmtP(v) {
   if (v == null || v === "") return "—";
-  return Number(v).toExponential(2);
+  const n = Number(v);
+  if (Number.isNaN(n)) return "—";
+  return n.toExponential(2);
 }
 
 // Full auditable write-up for a doubly-passing hypothesis. Renders the audit

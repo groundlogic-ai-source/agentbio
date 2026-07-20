@@ -1,0 +1,39 @@
+Let me actually do what you asked first — interrogate the report — because what I found there changes how urgently the other things need fixing.
+This report has a real flaw, and it's not just the "opposite direction" thing again — it may be a hypothesis that should never have passed review at all.
+Look at the very first line under "Hypothesis": "No mechanistic justification was supplied in FACTS (the field is empty)." Go back to how this whole pipeline was designed: the lead reviewer's entire job was to require a real, one-sentence causal argument for every hypothesis and discard anything that couldn't produce one. This one has none recorded. That's not a stylistic gap — it means either the enforcement isn't actually running for every hypothesis, or it silently failed to populate for this one. Either way, a hypothesis with zero mechanistic justification getting all the way to a saved, presentable report is exactly the failure mode that step existed to prevent.
+And once you look past the fancy-sounding origin domain, the actual test reveals something worse: this may be a near-tautological finding, not a real one. The hypothesis is framed around "collateral sensitivity in resistance rotation" — a real, specific pharmacology concept about a drug sequencing strategy. But what actually got tested is just: does the indication name contain the word "refractory" or "resistant." Think about what that word almost definitionally means: an indication described as "refractory" is, by construction, a later-line treatment setting — you cannot be refractory to a first-line drug that hasn't been tried yet. So "indication name contains 'refractory'" is close to a linguistic proxy for "this is not this drug's original approval" — which is uncomfortably close to the exact same label-confounding problem the architect's hard-block was built to catch a few sessions ago ("measured mechanistic connectivity predicts success" got correctly discarded for this reason). The three confounds tested — oncology concentration, prior repurposing momentum, established-product incumbency — are all real and properly checked, but none of them directly test this specific concern: that the word itself may partially encode the outcome by definition, not by biology.
+One more concrete anomaly, worth diagnosing rather than dismissing as "the narrow framing just failed": the narrow framing didn't return a null result — it returned NaN across the board (p-value, OR, everything). A real, properly-run statistical test doesn't produce NaN even when a result is unremarkable; it produces a real, if boring, number. NaN specifically points to something like a zero-count cell breaking a naive formula, which is a code problem, not a finding.
+On the archive-reset bug — I want to be direct: I don't think this is fixed, and I don't think it should get patched again without knowing why. "It also unarchives when a new case is created" is the detail that matters most here — Case Files and the Research registry are supposed to be entirely separate systems, so anything that couples them points to a shared initialization path with a real bug in it, not a one-off seed-data mistake. This is the third time in this project a "durable" storage fix has turned out not to be durable (SQLite→ephemeral disk, the registry CSV→ephemeral disk, now Postgres apparently resetting too) — that pattern is worth taking seriously as a systemic issue, not three unrelated coincidences.
+Two blocking diagnostics before any more building.
+
+1. Trace the exact mechanism behind seed_if_empty (or whatever function
+   re-populates hypothesis_log/bisociation_history): is the "is this table
+   empty" check a real row-count query against the actual production
+   Postgres table, or a cached/in-memory flag that could reset per
+   process? Is _ensure_research_modules (or wherever this fires) guarded
+   to run exactly once per deployment, or could it fire again on any cold
+   start / new instance? Confirm directly whether creating a new case
+   (POST /api/runs) shares any code path, connection pool init, or shared
+   startup routine with the research module's seed logic -- this is the
+   detail that most needs a real answer, not a guess.
+
+2. Check the exact SQL used to write archived status during seeding --
+   is it INSERT ... ON CONFLICT DO NOTHING (safe, never overwrites an
+   existing row) or does it use DO UPDATE / an unconditional write that
+   could stomp a real archived=true value that was already there? This
+   alone could fully explain the symptom.
+
+Report the root cause with evidence, not another patch layered on top
+until the actual mechanism is understood.
+
+Separately, diagnose the NaN result for the "resistance/refractory"
+hypothesis's narrow framing: is this a genuine zero-cell-count case that
+should be reported as "untestable: insufficient data in this framing"
+rather than bare null, or is a computation silently erroring? And check
+whether this hypothesis's feature (indication name containing
+refractory/resistant terms) should have been caught by the existing
+label-confounding hard-block, given that "refractory" indications are
+close to definitionally non-original approvals -- if the hard-block's
+definition is too narrow to catch this category of near-tautological
+proxy, that's worth fixing before trusting any hypothesis derived from
+disease-stage terminology.
