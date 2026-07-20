@@ -412,6 +412,26 @@ def enrichment_status() -> dict:
     return {"status": "error", "returncode": rc, "log": _ENRICH_LOG}
 
 
+@app.post("/internal/clear-registry")
+def clear_registry() -> dict:
+    """Delete ALL rows from bisociation_history, hypothesis_log, and research_jobs.
+    Used once after deploy to wipe seed data from the production database."""
+    import psycopg2
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        raise HTTPException(status_code=500, detail="DATABASE_URL not set")
+    with psycopg2.connect(database_url) as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM bisociation_history")
+            bh = cur.rowcount
+            cur.execute("DELETE FROM hypothesis_log")
+            hl = cur.rowcount
+            cur.execute("DELETE FROM research_jobs")
+            rj = cur.rowcount
+        conn.commit()
+    return {"deleted": {"bisociation_history": bh, "hypothesis_log": hl, "research_jobs": rj}}
+
+
 # --------------------------------------------------------------------------- #
 # Research hypothesis registry (Feature 3)
 # --------------------------------------------------------------------------- #
