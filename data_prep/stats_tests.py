@@ -31,7 +31,10 @@ class TestResult:
 
 
 def fisher_binary(feature: pd.Series, outcome: pd.Series) -> TestResult:
-    df = pd.DataFrame({"f": feature.astype(int), "y": outcome.astype(int)}).dropna()
+    df = pd.DataFrame({"f": feature, "y": outcome}).dropna()
+    df = df.copy()
+    df["f"] = df["f"].astype(int)
+    df["y"] = df["y"].astype(int)
     # 2x2: rows feature 0/1, cols outcome 0/1
     ct = pd.crosstab(df["f"], df["y"]).reindex(index=[0, 1], columns=[0, 1], fill_value=0)
     a = ct.loc[1, 1]  # feature=1, success
@@ -59,8 +62,10 @@ def logistic_binary_adjusted(
     """
     df = pd.DataFrame({
         "f": feature.astype(float), "c": covariate.astype(float),
-        "y": outcome.astype(int),
+        "y": outcome,
     }).dropna()
+    df = df.copy()
+    df["y"] = df["y"].astype(int)
     X = sm.add_constant(df[["f", "c"]])
     model = sm.Logit(df["y"], X)
     res = model.fit(disp=0, method="bfgs", maxiter=200)
@@ -90,8 +95,10 @@ def logistic_interaction(
     df = pd.DataFrame({
         "b": base.astype(float),
         "m": moderator.astype(float),
-        "y": outcome.astype(int),
+        "y": outcome,
     }).dropna()
+    df = df.copy()
+    df["y"] = df["y"].astype(int)
     df["bm"] = df["b"] * df["m"]
     X = sm.add_constant(df[["b", "m", "bm"]])
     model = sm.Logit(df["y"], X)
@@ -108,7 +115,9 @@ def logistic_interaction(
 
 
 def logistic_continuous(feature: pd.Series, outcome: pd.Series) -> TestResult:
-    df = pd.DataFrame({"f": feature.astype(float), "y": outcome.astype(int)}).dropna()
+    df = pd.DataFrame({"f": feature.astype(float), "y": outcome}).dropna()
+    df = df.copy()
+    df["y"] = df["y"].astype(int)
     X = sm.add_constant(df[["f"]])
     model = sm.Logit(df["y"], X)
     res = model.fit(disp=0, method="bfgs", maxiter=200)

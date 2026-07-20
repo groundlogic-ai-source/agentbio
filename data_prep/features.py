@@ -155,7 +155,7 @@ def compute(df: pd.DataFrame, spec: dict) -> pd.Series:
         k = int(params["k"])
         return (df["prior_repurposing_count"] >= k).astype(int)
     if op == "established":
-        return df["established_product"].astype(bool).astype(int)
+        return df["established_product"].fillna(False).astype(bool).astype(int)
     if op == "ind_keyword":
         kws = [str(k).lower() for k in params.get("keywords", [])]
         if not kws:
