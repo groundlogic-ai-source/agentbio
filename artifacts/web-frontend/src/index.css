@@ -368,5 +368,36 @@ textarea:focus-visible,
 
   .printable-report table {
     color: var(--ink) !important;
+    border-collapse: collapse !important;
+    width: 100% !important;
+    table-layout: auto !important;
+    margin-bottom: 1rem !important;
+    page-break-inside: auto !important;
+    font-size: 0.72rem !important;
+    font-family: "JetBrains Mono", "Courier New", monospace !important;
+  }
+
+  .printable-report table th,
+  .printable-report table td {
+    border: 1px solid #666 !important;
+    padding: 7px 10px !important;
+    color: var(--ink) !important;
+    background: white !important;
+    white-space: nowrap !important;
+    text-align: left !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+
+  .printable-report table th {
+    background: #f2f2f2 !important;
+    font-weight: 700 !important;
+    font-size: 0.62rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .printable-report table tr {
+    border: none !important;
+    page-break-inside: avoid !important;
   }
 }
