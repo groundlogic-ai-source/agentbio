@@ -32,11 +32,15 @@ function fmtP(v) {
 function ReportPanel({ hypothesisId, onSaved }) {
   const [state, setState] = useState({ loading: true, error: null, data: null });
   const [saveState, setSaveState] = useState({ busy: false, saved: false, error: null });
+  // Ref guard: prevents double-submission even if state update hasn't flushed yet
+  // (e.g. double-click before React re-renders the disabled button).
+  const saveInFlight = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
     setState({ loading: true, error: null, data: null });
     setSaveState({ busy: false, saved: false, error: null });
+    saveInFlight.current = false;
     generateHypothesisReport(hypothesisId)
       .then((data) => { if (!cancelled) setState({ loading: false, error: null, data }); })
       .catch((err) => { if (!cancelled) setState({ loading: false, error: err.message, data: null }); });
@@ -44,7 +48,8 @@ function ReportPanel({ hypothesisId, onSaved }) {
   }, [hypothesisId]);
 
   const handleSave = async () => {
-    if (!state.data) return;
+    if (!state.data || saveInFlight.current) return;
+    saveInFlight.current = true;
     setSaveState({ busy: true, saved: false, error: null });
     try {
       await saveReport({
@@ -57,6 +62,7 @@ function ReportPanel({ hypothesisId, onSaved }) {
       setSaveState({ busy: false, saved: true, error: null });
       onSaved?.();
     } catch (err) {
+      saveInFlight.current = false;
       setSaveState({ busy: false, saved: false, error: err.message });
     }
   };

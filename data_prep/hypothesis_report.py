@@ -99,6 +99,22 @@ def render_spec(spec: dict | None) -> str:
     if op == "drug_keyword":
         kws = [str(k) for k in params.get("keywords", [])]
         return "drug name (lowercased) contains any of: [" + ", ".join(kws) + "]"
+    if op == "mw_raw":
+        return "molecular weight (pubchem_mw), used as a continuous predictor"
+    if op == "xlogp_raw":
+        return "XLogP lipophilicity (pubchem_xlogp), used as a continuous predictor"
+    if op == "mw_threshold":
+        return f"molecular weight (pubchem_mw) >= {params.get('k')} Da"
+    if op == "xlogp_threshold":
+        return f"XLogP lipophilicity (pubchem_xlogp) >= {params.get('k')} (binary split)"
+    if op == "is_small_molecule":
+        return "drug is a small molecule (chembl_molecule_type == 'Small molecule')"
+    if op == "is_oral":
+        return "drug is orally administered (chembl_oral == true)"
+    if op == "global_max_phase_raw":
+        return "maximum clinical phase reached globally (chembl_max_phase), continuous"
+    if op == "global_max_phase_threshold":
+        return f"maximum clinical phase reached globally (chembl_max_phase) >= {params.get('k')}"
     if op == "interaction":
         base = render_spec(params.get("base")) or "(unspecified base)"
         mod = render_spec(params.get("moderator")) or "(unspecified moderator)"
