@@ -68,6 +68,9 @@ def _row_to_dict(row: dict) -> dict:
     return d
 
 
+_IDEMPOTENCY_WINDOW_SECONDS = 60
+
+
 def save_report(
     *,
     hypothesis_id: str,
@@ -76,11 +79,32 @@ def save_report(
     facts: dict | None,
     generated_at: str | None,
 ) -> dict:
-    """Insert a new saved report snapshot and return the stored row."""
-    report_id = str(uuid.uuid4())
+    """Insert a new saved report snapshot and return the stored row.
+
+    Idempotent within a 60-second window: if a report for the same
+    hypothesis_id was saved in the last 60 seconds, return that existing
+    row instead of inserting a duplicate.
+    """
     now = datetime.now(timezone.utc)
     facts_json = json.dumps(facts) if facts is not None else None
+
     with _conn() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(
+                """
+                SELECT * FROM saved_reports
+                WHERE hypothesis_id = %s
+                  AND saved_at >= %s - interval '%s seconds'
+                ORDER BY saved_at DESC
+                LIMIT 1
+                """,
+                (hypothesis_id, now, _IDEMPOTENCY_WINDOW_SECONDS),
+            )
+            existing = cur.fetchone()
+        if existing:
+            return _row_to_dict(existing)
+
+        report_id = str(uuid.uuid4())
         with conn.cursor() as cur:
             cur.execute(
                 """
