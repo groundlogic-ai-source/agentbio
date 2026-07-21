@@ -1,2290 +1,334 @@
 {
   "entries": [
     {
-      "source_type": "chembl_activity",
-      "source_id": "18883394",
-      "used_by": "chemist",
-      "context": "BELZUTIFAN affinity vs EPAS1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "27929765",
-      "used_by": "chemist",
-      "context": "BELZUTIFAN affinity vs EPAS1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "29055483",
-      "used_by": "chemist",
-      "context": "BELZUTIFAN affinity vs EPAS1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "3527980",
-      "used_by": "chemist",
-      "context": "TOPOTECAN affinity vs HIF1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "64601",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "719989",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "937964",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "992867",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1605332",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18721917",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18721920",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "22899252",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26657327",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "724502",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1007850",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1086804",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1288526",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18083828",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "22921747",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "25848558",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26657330",
-      "used_by": "chemist",
-      "context": "TACROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1023148",
-      "used_by": "chemist",
-      "context": "CYCLOSPORINE affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12662126",
-      "used_by": "chemist",
-      "context": "CAPIVASERTIB affinity vs AKT2"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12662098",
-      "used_by": "chemist",
-      "context": "CAPIVASERTIB affinity vs AKT3"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "22784730",
-      "used_by": "chemist",
-      "context": "CAPIVASERTIB affinity vs AKT3"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "25872915",
-      "used_by": "chemist",
-      "context": "CAPIVASERTIB affinity vs AKT3"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "25905437",
-      "used_by": "chemist",
-      "context": "CAPIVASERTIB affinity vs AKT3"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26214238",
-      "used_by": "chemist",
-      "context": "CAPIVASERTIB affinity vs AKT3"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "29055324",
-      "used_by": "chemist",
-      "context": "CAPIVASERTIB affinity vs AKT3"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "881846",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs MTOR"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1615020",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs MTOR"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1659907",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs MTOR"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "2200407",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs MTOR"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "873240",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs MTOR"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1468060",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs MTOR"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "6188454",
-      "used_by": "chemist",
-      "context": "TEMSIROLIMUS affinity vs MTOR"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "3444675",
-      "used_by": "chemist",
-      "context": "DASATINIB affinity vs MTOR"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "23168546",
-      "used_by": "chemist",
-      "context": "VENETOCLAX affinity vs BAD"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "28703621",
-      "used_by": "chemist",
-      "context": "VENETOCLAX affinity vs BAD"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "22964270",
-      "used_by": "chemist",
-      "context": "SUNITINIB affinity vs PRKAA1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9540949",
-      "used_by": "chemist",
-      "context": "ENTRECTINIB affinity vs PRKAA1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9545170",
-      "used_by": "chemist",
-      "context": "PALBOCICLIB affinity vs PRKAA1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "25785150",
-      "used_by": "chemist",
-      "context": "UPADACITINIB affinity vs PRKAA1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "25872880",
-      "used_by": "chemist",
-      "context": "EBASTINE affinity vs PRKAA2"
+      "source_type": "pmid",
+      "source_id": "17517531",
+      "used_by": "biologist",
+      "context": "GALK1/Galactokinase deficiency literature"
     },
     {
-      "source_type": "chembl_activity",
-      "source_id": "22964296",
-      "used_by": "chemist",
-      "context": "SUNITINIB affinity vs PRKAA2"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "25872883",
-      "used_by": "chemist",
-      "context": "BERBERINE affinity vs PRKAA2"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "3605012",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12062099",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12069217",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12138162",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "13282600",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "13317342",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "13902022",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "14545505",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "14751952",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15112084",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15116687",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "2595778",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "2613239",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "5109075",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "5109171",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "5146659",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "8009742",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "8009864",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12062095",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12062103",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12649690",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "13282601",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "13284807",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "13317436",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "13331595",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "13882553",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "13902023",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "14751948",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "14751957",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15082455",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15112083",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
+      "source_type": "pmid",
+      "source_id": "15024738",
+      "used_by": "biologist",
+      "context": "GALK1/Galactokinase deficiency literature"
     },
     {
-      "source_type": "chembl_activity",
-      "source_id": "15116686",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15648409",
-      "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15747172",
-      "used_by": "chemist",
-      "context": "PEFICITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "14751949",
-      "used_by": "chemist",
-      "context": "BARICITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15747175",
-      "used_by": "chemist",
-      "context": "BARICITINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12063026",
-      "used_by": "chemist",
-      "context": "RUXOLITINIB PHOSPHATE affinity vs JAK1"
+      "source_type": "pmid",
+      "source_id": "11139256",
+      "used_by": "biologist",
+      "context": "GALK1/Galactokinase deficiency literature"
     },
     {
-      "source_type": "chembl_activity",
-      "source_id": "3227873",
-      "used_by": "chemist",
-      "context": "MOMELOTINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "14545506",
-      "used_by": "chemist",
-      "context": "MOMELOTINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "14751995",
-      "used_by": "chemist",
-      "context": "FILGOTINIB affinity vs JAK1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15112128",
-      "used_by": "chemist",
-      "context": "FILGOTINIB affinity vs JAK1"
+      "source_type": "pmid",
+      "source_id": "33977035",
+      "used_by": "biologist",
+      "context": "GALK1/Galactokinase deficiency literature"
     },
     {
-      "source_type": "chembl_activity",
-      "source_id": "15116692",
-      "used_by": "chemist",
-      "context": "FILGOTINIB affinity vs JAK1"
+      "source_type": "pmid",
+      "source_id": "32807972",
+      "used_by": "biologist",
+      "context": "GALK1/Galactokinase deficiency literature"
     },
     {
-      "source_type": "chembl_activity",
-      "source_id": "15747173",
-      "used_by": "chemist",
-      "context": "FILGOTINIB affinity vs JAK1"
+      "source_type": "pmid",
+      "source_id": "11978884",
+      "used_by": "biologist",
+      "context": "GALK1/Galactokinase deficiency literature"
     },
     {
-      "source_type": "chembl_activity",
-      "source_id": "16260032",
-      "used_by": "chemist",
-      "context": "FILGOTINIB affinity vs JAK1"
+      "source_type": "pmid",
+      "source_id": "8908517",
+      "used_by": "biologist",
+      "context": "GALK1/Galactokinase deficiency literature"
     },
     {
-      "source_type": "chembl_activity",
-      "source_id": "16272805",
-      "used_by": "chemist",
-      "context": "FILGOTINIB affinity vs JAK1"
+      "source_type": "pmid",
+      "source_id": "29893426",
+      "used_by": "biologist",
+      "context": "GALK1/Galactokinase deficiency literature"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "3605011",
+      "source_id": "166000",
       "used_by": "chemist",
-      "context": "FEDRATINIB affinity vs JAK1"
+      "context": "TOLRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "12153205",
+      "source_id": "308983",
       "used_by": "chemist",
-      "context": "PACRITINIB affinity vs JAK1"
+      "context": "TOLRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "13367190",
+      "source_id": "619775",
       "used_by": "chemist",
-      "context": "CERITINIB affinity vs JAK1"
+      "context": "TOLRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "3605029",
+      "source_id": "1060906",
       "used_by": "chemist",
-      "context": "FEDRATINIB affinity vs JAK2"
+      "context": "TOLRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "3605030",
+      "source_id": "1505638",
       "used_by": "chemist",
-      "context": "RUXOLITINIB affinity vs JAK2"
+      "context": "TOLRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "3227693",
+      "source_id": "2139918",
       "used_by": "chemist",
-      "context": "MOMELOTINIB affinity vs JAK2"
+      "context": "TOLRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "3227864",
+      "source_id": "3357322",
       "used_by": "chemist",
-      "context": "MOMELOTINIB affinity vs JAK2"
+      "context": "TOLRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "1807585",
+      "source_id": "18093249",
       "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK2"
+      "context": "TOLRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "1964037",
+      "source_id": "1035306",
       "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "2595777",
+      "source_id": "3357323",
       "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "2613238",
+      "source_id": "3501367",
       "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "3227709",
+      "source_id": "8023957",
       "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "5109059",
+      "source_id": "16851280",
       "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "5146667",
+      "source_id": "18212152",
       "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "8009722",
+      "source_id": "18934373",
       "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "8009852",
+      "source_id": "19184532",
       "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "8010824",
+      "source_id": "20599888",
       "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "8010842",
+      "source_id": "20599898",
       "used_by": "chemist",
-      "context": "TOFACITINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "9524212",
+      "source_id": "20599903",
       "used_by": "chemist",
-      "context": "ENTRECTINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "9524317",
+      "source_id": "22836866",
       "used_by": "chemist",
-      "context": "DASATINIB affinity vs JAK2"
+      "context": "EPALRESTAT affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "6387490",
+      "source_id": "12595749",
       "used_by": "chemist",
-      "context": "INFIGRATINIB PHOSPHATE affinity vs JAK2"
+      "context": "SULINDAC affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "2197970",
+      "source_id": "12595748",
       "used_by": "chemist",
-      "context": "ERLOTINIB affinity vs JAK2"
+      "context": "TOLMETIN affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "4811512",
+      "source_id": "1256398",
       "used_by": "chemist",
-      "context": "TRIAMTERENE affinity vs JAK2"
+      "context": "INDOMETHACIN affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "5293921",
+      "source_id": "15210810",
       "used_by": "chemist",
-      "context": "NICLOSAMIDE affinity vs JAK2"
+      "context": "NITAZOXANIDE affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "29132577",
+      "source_id": "22836867",
       "used_by": "chemist",
-      "context": "DEUCRAVACITINIB affinity vs STAT1"
+      "context": "FOLIC ACID affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "29132581",
+      "source_id": "15210813",
       "used_by": "chemist",
-      "context": "DEUCRAVACITINIB affinity vs STAT1"
+      "context": "MEFENAMIC ACID affinity vs AKR1B1"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "29132585",
+      "source_id": "1809343",
       "used_by": "chemist",
-      "context": "DEUCRAVACITINIB affinity vs STAT1"
+      "context": "HALOPROGIN affinity vs GALE"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "29132580",
+      "source_id": "1809335",
       "used_by": "chemist",
-      "context": "FILGOTINIB affinity vs STAT1"
+      "context": "ETHACRYNIC ACID affinity vs GALE"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "29132584",
+      "source_id": "1809346",
       "used_by": "chemist",
-      "context": "FILGOTINIB affinity vs STAT1"
+      "context": "DIETHYLSTILBESTROL affinity vs GALE"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "OFF LABEL USE",
+      "source_id": "ERYTHEMA",
       "used_by": "reviewer",
-      "context": "SIROLIMUS adverse event"
+      "context": "TOLRESTAT adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HYPERSENSITIVITY VASCULITIS",
+      "used_by": "reviewer",
+      "context": "TOLRESTAT adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "SKIN ULCER",
+      "used_by": "reviewer",
+      "context": "TOLRESTAT adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HYPOGLYCAEMIA",
+      "used_by": "reviewer",
+      "context": "EPALRESTAT adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HEPATIC FUNCTION ABNORMAL",
+      "used_by": "reviewer",
+      "context": "EPALRESTAT adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "PYREXIA",
+      "used_by": "reviewer",
+      "context": "EPALRESTAT adverse event"
     },
     {
       "source_type": "openfda_event",
       "source_id": "DRUG INEFFECTIVE",
       "used_by": "reviewer",
-      "context": "SIROLIMUS adverse event"
+      "context": "SULINDAC adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "PRODUCT USE IN UNAPPROVED INDICATION",
+      "source_id": "PAIN",
       "used_by": "reviewer",
-      "context": "SIROLIMUS adverse event"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01713946",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00126672",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00789828",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07680322",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01031901",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00457808",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02451696",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05467397",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02635789",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01853423",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07327164",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03525834",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03363763",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07369505",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05104983",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02962414",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03356769",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04595513",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02104011",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01217125",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02188550",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00792766",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07477548",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00411619",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05534672",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01954693",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02325505",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00457964",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04388371",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04987463",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02061397",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03140449",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02860494",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01070316",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01730209",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT06160310",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02338609",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05252585",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03826628",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT06065852",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03972592",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02294006",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02634931",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01929642",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05342519",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02201212",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07304856",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01690871",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00790400",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00490789",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01289912",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07218575",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01526356",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05103358",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03047213",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04128722",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05495425",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "SEPSIS",
-      "used_by": "reviewer",
-      "context": "TACROLIMUS ANHYDROUS adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ABSCESS",
-      "used_by": "reviewer",
-      "context": "TACROLIMUS ANHYDROUS adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ACUTE KIDNEY INJURY",
-      "used_by": "reviewer",
-      "context": "TACROLIMUS ANHYDROUS adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ANAEMIA",
-      "used_by": "reviewer",
-      "context": "BELZUTIFAN adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "HYPOXIA",
-      "used_by": "reviewer",
-      "context": "BELZUTIFAN adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DIARRHOEA",
-      "used_by": "reviewer",
-      "context": "BELZUTIFAN adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "FEBRILE NEUTROPENIA",
-      "used_by": "reviewer",
-      "context": "TOPOTECAN adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "NEUTROPENIA",
-      "used_by": "reviewer",
-      "context": "TOPOTECAN adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DEATH",
-      "used_by": "reviewer",
-      "context": "CAPIVASERTIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "RASH",
-      "used_by": "reviewer",
-      "context": "CAPIVASERTIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DISEASE PROGRESSION",
-      "used_by": "reviewer",
-      "context": "TEMSIROLIMUS adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "PNEUMONIA",
-      "used_by": "reviewer",
-      "context": "TEMSIROLIMUS adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "PLEURAL EFFUSION",
-      "used_by": "reviewer",
-      "context": "DASATINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DRUG INTOLERANCE",
-      "used_by": "reviewer",
-      "context": "DASATINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "URTICARIA",
-      "used_by": "reviewer",
-      "context": "EBASTINE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "PRURITUS",
-      "used_by": "reviewer",
-      "context": "EBASTINE adverse event"
+      "context": "SULINDAC adverse event"
     },
     {
       "source_type": "openfda_event",
       "source_id": "FATIGUE",
       "used_by": "reviewer",
-      "context": "EBASTINE adverse event"
+      "context": "SULINDAC adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "NEOPLASM PROGRESSION",
+      "source_id": "NEUROLEPTIC MALIGNANT SYNDROME",
       "used_by": "reviewer",
-      "context": "PALBOCICLIB adverse event"
+      "context": "HALOPROGIN adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "CROHN^S DISEASE",
+      "source_id": "DRUG HYPERSENSITIVITY",
       "used_by": "reviewer",
-      "context": "UPADACITINIB adverse event"
+      "context": "TOLMETIN adverse event"
     },
     {
       "source_type": "openfda_event",
       "source_id": "NAUSEA",
       "used_by": "reviewer",
-      "context": "BERBERINE adverse event"
+      "context": "TOLMETIN adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "VITAMIN B1 DECREASED",
+      "source_id": "ARTHRALGIA",
       "used_by": "reviewer",
-      "context": "FEDRATINIB adverse event"
+      "context": "INDOMETHACIN adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "VITAMIN B1 DEFICIENCY",
+      "source_id": "DIARRHOEA",
       "used_by": "reviewer",
-      "context": "FEDRATINIB adverse event"
+      "context": "NITAZOXANIDE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "SPLENOMEGALY",
+      "source_id": "OFF LABEL USE",
       "used_by": "reviewer",
-      "context": "FEDRATINIB adverse event"
+      "context": "NITAZOXANIDE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "RHEUMATOID ARTHRITIS",
+      "source_id": "DRUG REACTION WITH EOSINOPHILIA AND SYSTEMIC SYMPTOMS",
       "used_by": "reviewer",
-      "context": "TOFACITINIB adverse event"
+      "context": "ETHACRYNIC ACID adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "BREAST CANCER",
+      "source_id": "DYSPNOEA",
       "used_by": "reviewer",
-      "context": "PEFICITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "COLON CANCER",
-      "used_by": "reviewer",
-      "context": "PEFICITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "INTERSTITIAL LUNG DISEASE",
-      "used_by": "reviewer",
-      "context": "PEFICITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "COVID-19",
-      "used_by": "reviewer",
-      "context": "BARICITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "TREATMENT FAILURE",
-      "used_by": "reviewer",
-      "context": "RUXOLITINIB PHOSPHATE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ACUTE GRAFT VERSUS HOST DISEASE",
-      "used_by": "reviewer",
-      "context": "RUXOLITINIB PHOSPHATE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "THROMBOCYTOPENIA",
-      "used_by": "reviewer",
-      "context": "MOMELOTINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "MYELOFIBROSIS",
-      "used_by": "reviewer",
-      "context": "MOMELOTINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "COLITIS ULCERATIVE",
-      "used_by": "reviewer",
-      "context": "FILGOTINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DRUG INTERACTION",
-      "used_by": "reviewer",
-      "context": "PACRITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "MALIGNANT NEOPLASM PROGRESSION",
-      "used_by": "reviewer",
-      "context": "CERITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ABDOMINAL PAIN",
-      "used_by": "reviewer",
-      "context": "NICLOSAMIDE adverse event"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24989146",
-      "used_by": "chemist",
-      "context": "DEMECLOCYCLINE affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24989162",
-      "used_by": "chemist",
-      "context": "TACRINE affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24989172",
-      "used_by": "chemist",
-      "context": "FLUORESCEIN affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "19330646",
-      "used_by": "chemist",
-      "context": "ENTACAPONE affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24989185",
-      "used_by": "chemist",
-      "context": "ENTACAPONE affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26037654",
-      "used_by": "chemist",
-      "context": "ENTACAPONE affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "29181992",
-      "used_by": "chemist",
-      "context": "ENTACAPONE affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "29277830",
-      "used_by": "chemist",
-      "context": "ENTACAPONE affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24989153",
-      "used_by": "chemist",
-      "context": "AMILORIDE affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24989147",
-      "used_by": "chemist",
-      "context": "MECLOFENAMIC ACID affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24989166",
-      "used_by": "chemist",
-      "context": "MECLOFENAMIC ACID affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "25044897",
-      "used_by": "chemist",
-      "context": "MECLOFENAMIC ACID affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "29277833",
-      "used_by": "chemist",
-      "context": "MECLOFENAMIC ACID affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12700016",
-      "used_by": "chemist",
-      "context": "ROXADUSTAT affinity vs FTO"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "820735",
-      "used_by": "chemist",
-      "context": "DIETHYLSTILBESTROL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1001016",
-      "used_by": "chemist",
-      "context": "DIETHYLSTILBESTROL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1176579",
-      "used_by": "chemist",
-      "context": "DIETHYLSTILBESTROL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "281422",
-      "used_by": "chemist",
-      "context": "FULVESTRANT affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "281424",
-      "used_by": "chemist",
-      "context": "FULVESTRANT affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1152801",
-      "used_by": "chemist",
-      "context": "FULVESTRANT affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "103915",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "148587",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "285977",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "519293",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "993611",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "993613",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1117002",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1118594",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1154855",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1157541",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1282968",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1425879",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1437049",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1442224",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1443508",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1514355",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1514358",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1523959",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1608726",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1654139",
-      "used_by": "chemist",
-      "context": "RALOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1432220",
-      "used_by": "chemist",
-      "context": "LASOFOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1514236",
-      "used_by": "chemist",
-      "context": "LASOFOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1514341",
-      "used_by": "chemist",
-      "context": "LASOFOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1654175",
-      "used_by": "chemist",
-      "context": "LASOFOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "180038",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "279013",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "289808",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "309687",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "584345",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "799742",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1110959",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1112573",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1138930",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1142201",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1157504",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1216120",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1272807",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1428493",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1432225",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1437055",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1442230",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1443946",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1459712",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1469973",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1482804",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1512921",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1514230",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1518860",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1615234",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1661211",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1680688",
-      "used_by": "chemist",
-      "context": "ESTRADIOL affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "302327",
-      "used_by": "chemist",
-      "context": "RALOXIFENE HYDROCHLORIDE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "302329",
-      "used_by": "chemist",
-      "context": "RALOXIFENE HYDROCHLORIDE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1125255",
-      "used_by": "chemist",
-      "context": "RALOXIFENE HYDROCHLORIDE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1125257",
-      "used_by": "chemist",
-      "context": "RALOXIFENE HYDROCHLORIDE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1001019",
-      "used_by": "chemist",
-      "context": "BAZEDOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1001021",
-      "used_by": "chemist",
-      "context": "BAZEDOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1654157",
-      "used_by": "chemist",
-      "context": "BAZEDOXIFENE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1123282",
-      "used_by": "chemist",
-      "context": "ESTRONE affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "602058",
-      "used_by": "chemist",
-      "context": "TAMOXIFEN affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "796232",
-      "used_by": "chemist",
-      "context": "TAMOXIFEN affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1131232",
-      "used_by": "chemist",
-      "context": "TAMOXIFEN affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1196237",
-      "used_by": "chemist",
-      "context": "TAMOXIFEN affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1514350",
-      "used_by": "chemist",
-      "context": "TAMOXIFEN affinity vs ESR1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "20689467",
-      "used_by": "chemist",
-      "context": "AFATINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24902288",
-      "used_by": "chemist",
-      "context": "AFATINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26023228",
-      "used_by": "chemist",
-      "context": "AFATINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "19306066",
-      "used_by": "chemist",
-      "context": "ZANUBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24953774",
-      "used_by": "chemist",
-      "context": "ZANUBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24954237",
-      "used_by": "chemist",
-      "context": "ZANUBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "17719998",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "17758420",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "17758421",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18502757",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "19018992",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "19306067",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "20654616",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "22395658",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "22877450",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24773300",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "25588797",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26315219",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26609827",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26622308",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26622311",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "22877451",
-      "used_by": "chemist",
-      "context": "ACALABRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24956646",
-      "used_by": "chemist",
-      "context": "ACALABRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26315218",
-      "used_by": "chemist",
-      "context": "ACALABRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "25001914",
-      "used_by": "chemist",
-      "context": "NERATINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26307858",
-      "used_by": "chemist",
-      "context": "BRIGATINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9691005",
-      "used_by": "chemist",
-      "context": "DASATINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12205225",
-      "used_by": "chemist",
-      "context": "DACOMITINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "16356681",
-      "used_by": "chemist",
-      "context": "DACOMITINIB ANHYDROUS affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "16668372",
-      "used_by": "chemist",
-      "context": "DACOMITINIB ANHYDROUS affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24862046",
-      "used_by": "chemist",
-      "context": "DACOMITINIB ANHYDROUS affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26239133",
-      "used_by": "chemist",
-      "context": "DACOMITINIB ANHYDROUS affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24953727",
-      "used_by": "chemist",
-      "context": "AFATINIB DIMALEATE affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24957795",
-      "used_by": "chemist",
-      "context": "AFATINIB DIMALEATE affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9691122",
-      "used_by": "chemist",
-      "context": "LAPATINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9695244",
-      "used_by": "chemist",
-      "context": "LAPATINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "20689346",
-      "used_by": "chemist",
-      "context": "LAPATINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "23256949",
-      "used_by": "chemist",
-      "context": "LAPATINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "25790359",
-      "used_by": "chemist",
-      "context": "LAPATINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9691056",
-      "used_by": "chemist",
-      "context": "GEFITINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9695194",
-      "used_by": "chemist",
-      "context": "GEFITINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "16668401",
-      "used_by": "chemist",
-      "context": "GEFITINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26239134",
-      "used_by": "chemist",
-      "context": "GEFITINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "24773303",
-      "used_by": "chemist",
-      "context": "TIRABRUTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "2206759",
-      "used_by": "chemist",
-      "context": "ERLOTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9686727",
-      "used_by": "chemist",
-      "context": "ERLOTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "19279703",
-      "used_by": "chemist",
-      "context": "ERLOTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26239135",
-      "used_by": "chemist",
-      "context": "ERLOTINIB affinity vs ERBB4"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18020403",
-      "used_by": "chemist",
-      "context": "RITLECITINIB affinity vs ERBB4"
+      "context": "ETHACRYNIC ACID adverse event"
     },
     {
       "source_type": "openfda_event",
       "source_id": "AGITATION",
       "used_by": "reviewer",
       "context": "DIETHYLSTILBESTROL adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "HYPOGLYCAEMIA",
-      "used_by": "reviewer",
-      "context": "LASOFOXIFENE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "LOSS OF CONSCIOUSNESS",
-      "used_by": "reviewer",
-      "context": "LASOFOXIFENE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "MYOCARDIAL INFARCTION",
-      "used_by": "reviewer",
-      "context": "LASOFOXIFENE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "FALL",
-      "used_by": "reviewer",
-      "context": "RALOXIFENE HYDROCHLORIDE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ARTHRALGIA",
-      "used_by": "reviewer",
-      "context": "RALOXIFENE HYDROCHLORIDE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "PRODUCT ADHESION ISSUE",
-      "used_by": "reviewer",
-      "context": "ESTRADIOL adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "PAIN",
-      "used_by": "reviewer",
-      "context": "ESTRADIOL adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "HEADACHE",
-      "used_by": "reviewer",
-      "context": "BAZEDOXIFENE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ABDOMINAL PAIN UPPER",
-      "used_by": "reviewer",
-      "context": "BAZEDOXIFENE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "HOT FLUSH",
-      "used_by": "reviewer",
-      "context": "BAZEDOXIFENE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "CHOLECYSTITIS",
-      "used_by": "reviewer",
-      "context": "ESTRONE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ALOPECIA",
-      "used_by": "reviewer",
-      "context": "TAMOXIFEN adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "HYPONATRAEMIA",
-      "used_by": "reviewer",
-      "context": "DEMECLOCYCLINE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ASTHENIA",
-      "used_by": "reviewer",
-      "context": "DEMECLOCYCLINE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "NO ADVERSE EVENT",
-      "used_by": "reviewer",
-      "context": "TACRINE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "VISUAL ACUITY REDUCED",
-      "used_by": "reviewer",
-      "context": "FLUORESCEIN adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "HALLUCINATION",
-      "used_by": "reviewer",
-      "context": "ENTACAPONE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DYSKINESIA",
-      "used_by": "reviewer",
-      "context": "ENTACAPONE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DYSPEPSIA",
-      "used_by": "reviewer",
-      "context": "MECLOFENAMIC ACID adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "GASTRODUODENAL HAEMORRHAGE",
-      "used_by": "reviewer",
-      "context": "MECLOFENAMIC ACID adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "GASTRODUODENAL ULCER",
-      "used_by": "reviewer",
-      "context": "MECLOFENAMIC ACID adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "PRODUCT USE ISSUE",
-      "used_by": "reviewer",
-      "context": "ROXADUSTAT adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "WHITE BLOOD CELL COUNT DECREASED",
-      "used_by": "reviewer",
-      "context": "ZANUBRUTINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ATRIAL FIBRILLATION",
-      "used_by": "reviewer",
-      "context": "IBRUTINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "PRODUCT DOSE OMISSION ISSUE",
-      "used_by": "reviewer",
-      "context": "ACALABRUTINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "NON-SMALL CELL LUNG CANCER",
-      "used_by": "reviewer",
-      "context": "BRIGATINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "VOMITING",
-      "used_by": "reviewer",
-      "context": "LAPATINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DRUG RESISTANCE",
-      "used_by": "reviewer",
-      "context": "GEFITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ACQUIRED GENE MUTATION",
-      "used_by": "reviewer",
-      "context": "GEFITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "LEUKOENCEPHALOPATHY",
-      "used_by": "reviewer",
-      "context": "TIRABRUTINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "THERAPEUTIC PRODUCT EFFECT INCOMPLETE",
-      "used_by": "reviewer",
-      "context": "RITLECITINIB adverse event"
     }
   ]
 }

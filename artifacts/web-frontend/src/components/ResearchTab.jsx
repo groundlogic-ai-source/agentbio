@@ -686,6 +686,21 @@ export default function ResearchTab({ onRefresh }) {
           Methodology (test type, threshold, correction method) is locked at submission time, before any
           result is computed. Re-testing under different methodology creates a new log entry, never an overwrite.
         </p>
+        <div style={{
+          marginTop: "0.75rem", padding: "0.6rem 0.85rem",
+          borderLeft: "2px solid var(--brass)", backgroundColor: "rgba(180,140,60,0.07)",
+          borderRadius: "0 4px 4px 0", maxWidth: "52rem",
+        }}>
+          <span style={{ fontFamily: "monospace", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brass)", display: "block", marginBottom: "0.25rem" }}>
+            Registry reset notice
+          </span>
+          <span style={{ fontSize: "0.75rem", color: "var(--silver)", lineHeight: 1.55 }}>
+            Cumulative testing history reset on July 21, 2026. 79 hypothesis-test pairs recorded prior to
+            this date used indication/drug-name keyword matching only — before real molecular and
+            bioactivity features (PubChem, ChEMBL) were added — and are excluded from the current
+            cumulative FDR count.
+          </span>
+        </div>
       </header>
 
       {error && (
