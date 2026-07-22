@@ -88,6 +88,7 @@ HIST_COLS = [
     "outcome_note",
     "archived",                 # bool — UI-only flag; never affects FDR log
     "feature_spec",             # JSON: the literal computable proxy that was tested
+    "novelty_tag",              # NOVEL | ALREADY_ESTABLISHED | UNCLEAR (web-search tag, informational only)
 ]
 
 # Boolean columns in bisociation_history (nullable where the step has not run).
@@ -207,14 +208,14 @@ def _insert_history_row(cur, row: dict) -> None:
              discovery_test_type, outcome_framing, discovery_raw_p,
              discovery_fdr_p, discovery_pass, confirmation_pass,
              confirmation_raw_p, confound_check_summary, outcome_note,
-             archived, feature_spec)
+             archived, feature_spec, novelty_tag)
         VALUES (%(test_id)s, %(hypothesis_id)s, %(run_id)s, %(session_timestamp)s,
                 %(domain_description)s, %(proposing_llm)s,
                 %(resulting_hypothesis_text)s, %(discovery_test_type)s,
                 %(outcome_framing)s, %(discovery_raw_p)s, %(discovery_fdr_p)s,
                 %(discovery_pass)s, %(confirmation_pass)s, %(confirmation_raw_p)s,
                 %(confound_check_summary)s, %(outcome_note)s, %(archived)s,
-                %(feature_spec)s)
+                %(feature_spec)s, %(novelty_tag)s)
         ON CONFLICT (hypothesis_id, (COALESCE(outcome_framing, ''))) DO NOTHING
         """,
         {
@@ -236,6 +237,7 @@ def _insert_history_row(cur, row: dict) -> None:
             "outcome_note": _clean_str(row.get("outcome_note")),
             "archived": _to_bool(row.get("archived")) or False,
             "feature_spec": _clean_str(row.get("feature_spec")),
+            "novelty_tag": _clean_str(row.get("novelty_tag")),
         },
     )
 

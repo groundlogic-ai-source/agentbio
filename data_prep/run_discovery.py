@@ -110,6 +110,17 @@ You are proposing BISOCIATIVE hypotheses: narrow scientific / systems phenomena 
 OTHER fields that could plausibly share STRUCTURE with drug-repurposing success
 dynamics, then reducing each to a testable predictor over an existing dataset.
 
+BOLDNESS REQUIREMENT: The strongest hypothesis is one that is surprising,
+counter-intuitive, or high-risk — not a safe, expected finding. Bold, unconventional
+hypotheses are EXPLICITLY DESIRED. The deterministic statistical pipeline (Fisher's
+exact or logistic regression, Benjamini-Hochberg FDR correction, independent holdout
+confirmation, confound adjustment) is solely responsible for determining validity.
+Generation should NEVER self-censor a hypothesis simply because it sounds unlikely,
+strange, or goes against received wisdom. The only legitimate reasons to skip a
+hypothesis: (1) it cannot be reduced to a computable statistic from this dataset,
+or (2) it has no real one-sentence mechanistic justification (a genuine causal or
+structural argument, not "this sounds plausible").
+
 Task:
 1. Propose 4-5 SPECIFIC, NARROW phenomena (not broad category names like "ecology"
    or "economics" — name a concrete mechanism, e.g. "preferential attachment in
@@ -120,6 +131,12 @@ Task:
    success, each reduced to the feature DSL below (or NEEDS_ENRICHMENT).
 
 %s
+
+PARSIMONY NOTE (technical, not a creativity constraint): every hypothesis tested
+adds one count to the cumulative Benjamini-Hochberg FDR denominator. Prefer a
+smaller number of genuinely distinct, sharp ideas per domain over many near-duplicate
+variations of the same underlying concept — five well-separated hypotheses outperform
+fifteen minor reframings of the same claim.
 
 Return ONLY a JSON array. Each element:
 {
@@ -235,17 +252,21 @@ Rules:
   score).
 - DISCARD label-confounded features (those built on prior_repurposing_count), since the
   outcome label is defined using that count.
-- TAUTOLOGY / PROXY-FOR-THE-LABEL CHECK (critical — apply to EVERY candidate): ask
-  whether the feature is a near-tautological restatement of the outcome label rather
-  than an independent predictor of it. A feature fails this check if membership in the
-  feature set PRESUPPOSES the label by construction. The canonical failure is an
-  indication-stage keyword ("refractory", "resistant", "relapsed", "salvage",
-  "second-line", "treatment-experienced"): such indications definitionally require an
-  already-approved prior therapy, so the keyword co-varies with the administrative /
-  repurposing label by definition, not by biology. This is a GENERAL principle, not a
-  fixed word list — DISCARD any feature (indication OR drug keyword) whose defining
-  terms could only apply to cases that already satisfy (or already exclude) the outcome.
-  State the tautology reasoning in needs_or_discard_reason when you discard on this basis.
+- LABEL-ENTANGLEMENT STRUCTURAL CHECK (mandatory for EVERY candidate — show your
+  reasoning even for hypotheses you keep): reason explicitly about whether the proposed
+  feature's defining terms could be definitionally or structurally entangled with how
+  the outcome label itself was constructed. The core test is: "If I know this feature
+  value, does that already tell me something about whether the label was assigned — not
+  by biology, but by the logic of how the label is defined?" DISCARD anything where the
+  answer is yes. Record your one-sentence structural reasoning (not just the conclusion)
+  in needs_or_discard_reason for EVERY candidate, including ones you keep (write "not
+  entangled: [why]" for passing items). The canonical illustration is an indication-stage
+  keyword ("refractory", "relapsed", "salvage"): such indications definitionally
+  presuppose an existing approved first-line therapy, so the keyword co-varies with the
+  administrative label by construction. But this is an ILLUSTRATION, not a complete
+  list — new tautological patterns will not resemble old ones. Evaluate each feature's
+  structural relationship to label construction independently; never rely on keyword
+  pattern-matching alone.
 - ACTIVELY PROPOSE INTERACTION-EFFECT HYPOTHESES: do not restrict yourself to
   single-variable main effects. Where two computable features plausibly interact,
   propose a hypothesis that a base feature's effect DIFFERS across the levels of a
@@ -282,6 +303,69 @@ Input:
         tags[h.get("tag", "?")] = tags.get(h.get("tag", "?"), 0) + 1
     print(f"[review]   {len(out)} hypotheses: {tags}", flush=True)
     return out
+
+
+def tag_novelty(reviewed: list[dict]) -> list[dict]:
+    """
+    ONE Opus 4.8 + web-search call per candidate hypothesis that survived lead
+    review (READY and NEEDS_ENRICHMENT; DISCARDED are skipped as they will not
+    be tested or reported).
+
+    Tags each hypothesis as:
+      NOVEL              — this specific relationship is not established in the
+                           drug-repurposing / pharmacology literature
+      ALREADY_ESTABLISHED— documented or considered standard knowledge
+      UNCLEAR            — evidence is mixed, literature is sparse, or web search
+                           returned no useful signal
+
+    This tag is METADATA ONLY. It is recorded in bisociation_history and shown
+    in the final report, but it NEVER blocks, deprioritizes, or gates any
+    hypothesis in testing, confirmation, or confound-checking. An
+    ALREADY_ESTABLISHED hypothesis is still tested and reported as normal.
+    """
+    to_tag = [
+        h for h in reviewed
+        if h.get("tag") != "DISCARDED" and h.get("hypothesis_text")
+    ]
+    if not to_tag:
+        return reviewed
+    print(
+        f"[novelty] Tagging {len(to_tag)} hypotheses via web-search (informational only)...",
+        flush=True,
+    )
+    for h in to_tag:
+        htext = h.get("hypothesis_text", "")
+        print(f"[novelty]   {htext[:90]}", flush=True)
+        prompt = (
+            "Search whether the following relationship is already established or "
+            "textbook knowledge in pharmacology or drug-repurposing literature.\n\n"
+            f"HYPOTHESIS: {htext}\n\n"
+            "Cite specific sources (papers, reviews, databases) if you find them. "
+            "Then classify as exactly one of:\n"
+            "  NOVEL — this specific quantitative or structural relationship is NOT "
+            "established (even if related concepts exist)\n"
+            "  ALREADY_ESTABLISHED — documented or considered textbook in pharmacology "
+            "or drug repurposing\n"
+            "  UNCLEAR — evidence is mixed, literature is sparse, or novelty cannot "
+            "be determined from available sources\n\n"
+            'Return ONLY a JSON object:\n'
+            '{"tag": "NOVEL" | "ALREADY_ESTABLISHED" | "UNCLEAR",\n'
+            ' "reasoning": "<one sentence>",\n'
+            ' "sources": ["<citation 1>", ...]}\n'
+            "No prose outside the JSON."
+        )
+        try:
+            raw = L.opus_with_search(prompt, max_tokens=2000)
+            result = L.extract_json(raw)
+            tag = result.get("tag") if isinstance(result, dict) else None
+            if tag not in ("NOVEL", "ALREADY_ESTABLISHED", "UNCLEAR"):
+                tag = "UNCLEAR"
+            h["novelty_tag"] = tag
+        except Exception as exc:  # noqa: BLE001
+            h["novelty_tag"] = "UNCLEAR"
+            print(f"[novelty]   parse error: {exc}", flush=True)
+        print(f"[novelty]   → {h.get('novelty_tag', 'UNCLEAR')}", flush=True)
+    return reviewed
 
 
 def _framed(df: pd.DataFrame, framing: str) -> pd.DataFrame:
@@ -620,8 +704,21 @@ def run_batch(run_id: str | None = None) -> dict:
 
     a, b = generate()
     reviewed = lead_review(a, b)
+    reviewed = tag_novelty(reviewed)
 
     log_rows, hist_rows, test_meta = test_ready(disc, reviewed, run_id, ts)
+
+    # carry novelty_tag from reviewed into history rows (matched by hypothesis text)
+    _novelty_map = {
+        h.get("hypothesis_text", ""): h.get("novelty_tag", "")
+        for h in reviewed
+        if h.get("novelty_tag")
+    }
+    if _novelty_map:
+        for hr in hist_rows:
+            nt = _novelty_map.get(hr.get("resulting_hypothesis_text", ""))
+            if nt:
+                hr["novelty_tag"] = nt
 
     # append this run's tests to the cumulative log FIRST, then FDR over everything
     if log_rows:
@@ -686,12 +783,18 @@ def _report(run_id: str, reviewed: list[dict], log_rows: list[dict], qmap: dict)
     tested = [r for r in log_rows]
     print(f"\nREADY hypotheses tested this run: {len({r['hypothesis_id'] for r in tested})} "
           f"({len(tested)} tests across framings)")
-    print(f"\n{'test_id':<9} {'framing':<7} {'test':<9} {'raw_p':>10} {'cum_q':>10}  pass  hypothesis")
+    # build novelty lookup from reviewed list (hypothesis_text → tag)
+    _novelty_lookup = {
+        h.get("hypothesis_text", ""): h.get("novelty_tag", "")
+        for h in reviewed if h.get("novelty_tag")
+    }
+    print(f"\n{'test_id':<9} {'framing':<7} {'test':<9} {'raw_p':>10} {'cum_q':>10}  pass  {'novelty':<21}  hypothesis")
     for r in sorted(tested, key=lambda x: float(x["raw_p"])):
         q = qmap.get(r["test_id"], float("nan"))
         passed = "YES" if q < FDR_Q else "no"
+        nov = _novelty_lookup.get(r["hypothesis_text"], "")
         print(f"{r['test_id']:<9} {r['outcome_framing']:<7} {r['test_type']:<9} "
-              f"{float(r['raw_p']):>10.4g} {q:>10.4g}  {passed:<4}  {r['hypothesis_text'][:60]}")
+              f"{float(r['raw_p']):>10.4g} {q:>10.4g}  {passed:<4}  {nov or '—':<21}  {r['hypothesis_text'][:60]}")
 
     ne = [h for h in reviewed if h.get("tag") == "NEEDS_ENRICHMENT"]
     disc_ = [h for h in reviewed if h.get("tag") == "DISCARDED"]
