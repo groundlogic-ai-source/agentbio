@@ -766,6 +766,99 @@ def run_batch(run_id: str | None = None) -> dict:
     }
 
 
+def run_continuous_batch(
+    stop_flag: dict,
+    max_domains: int = 20,
+    max_hypotheses: int = 50,
+    progress_callback=None,
+) -> dict:
+    """
+    Chain autonomous discovery batches until EITHER:
+      (a) at least one hypothesis achieves BOTH discovery_pass AND
+          confirmation_pass (a double-pass hit), OR
+      (b) the cumulative domain count across all batches >= max_domains, OR
+      (c) the cumulative hypothesis count >= max_hypotheses, OR
+      (d) stop_flag["stop"] is set True by the caller (manual stop).
+
+    Every single test in every batch is logged to the cumulative FDR registry
+    exactly as a single-batch run — no change to logging discipline.
+
+    After each batch, calls progress_callback(progress_dict) if provided so
+    the caller can persist live status (e.g. to the research_jobs table).
+
+    Returns a summary dict suitable for storing in the research_job result_json.
+    """
+    total_domains: set[str] = set()
+    total_hypotheses = 0
+    total_tests = 0
+    total_confirmed = 0
+    batch_num = 0
+    run_ids: list[str] = []
+
+    while not stop_flag.get("stop"):
+        batch_num += 1
+        run_id = "run-" + uuid.uuid4().hex[:8]
+        run_ids.append(run_id)
+        print(
+            f"\n=== CONTINUOUS batch {batch_num} ({run_id}) — "
+            f"{len(total_domains)} domain(s), {total_hypotheses} hypothesis(es) so far ===",
+            flush=True,
+        )
+
+        try:
+            summary = run_batch(run_id=run_id)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[continuous] batch {batch_num} failed: {exc}", flush=True)
+            break
+
+        total_domains.update(summary.get("domains") or [])
+        total_hypotheses += summary.get("hypotheses_reviewed", 0)
+        total_tests += summary.get("tests_run", 0)
+        total_confirmed += summary.get("confirmed", 0)
+
+        progress = {
+            "batch_num": batch_num,
+            "domains_explored": len(total_domains),
+            "hypotheses_reviewed": total_hypotheses,
+            "tests_run": total_tests,
+            "confirmed": total_confirmed,
+            "mode": "continuous",
+            "run_ids": run_ids,
+        }
+        if progress_callback is not None:
+            try:
+                progress_callback(progress)
+            except Exception:  # noqa: BLE001
+                pass
+
+        if total_confirmed > 0:
+            print(
+                f"[continuous] double-pass found after {batch_num} batch(es), "
+                f"{len(total_domains)} domain(s), {total_hypotheses} hypothesis(es). Stopping.",
+                flush=True,
+            )
+            break
+
+        if len(total_domains) >= max_domains:
+            print(f"[continuous] domain cap ({max_domains}) reached. Stopping.", flush=True)
+            break
+
+        if total_hypotheses >= max_hypotheses:
+            print(f"[continuous] hypothesis cap ({max_hypotheses}) reached. Stopping.", flush=True)
+            break
+
+    return {
+        "mode": "continuous",
+        "batches_run": batch_num,
+        "domains_explored": len(total_domains),
+        "hypotheses_reviewed": total_hypotheses,
+        "tests_run": total_tests,
+        "confirmed": total_confirmed,
+        "stopped_by_user": bool(stop_flag.get("stop")),
+        "run_ids": run_ids,
+    }
+
+
 def main() -> None:
     import sys
     os.makedirs(os.path.join(HERE, "output"), exist_ok=True)

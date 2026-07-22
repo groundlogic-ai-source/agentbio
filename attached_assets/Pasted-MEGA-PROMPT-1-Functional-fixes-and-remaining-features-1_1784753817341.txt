@@ -1,0 +1,47 @@
+MEGA PROMPT 1 — Functional fixes and remaining features
+
+1. Fix the Saved Reports duplicate-save bug for real this time: disable
+   the Save button immediately on click, before the network response
+   returns, and make the save endpoint idempotent (reject or silently
+   no-op a duplicate save of the same hypothesis within a short window).
+   Clean up existing duplicate pairs in the database, keeping the
+   earlier timestamp of each pair and deleting the later one.
+
+2. Add a continuous discovery mode: instead of stopping after one
+   generation+test batch, automatically chain new batches (new domain
+   proposals, new hypotheses, tested) without requiring a manual re-click,
+   until EITHER at least one hypothesis achieves a double pass (both
+   discovery AND confirmation pass) OR a safety cap is reached (default:
+   20 domains or 50 hypotheses, whichever comes first). Every single
+   hypothesis tested along the way, pass or fail, must still be logged
+   into the cumulative registry exactly as today -- continuous mode
+   changes nothing about logging discipline. When a double-pass is found,
+   prominently display, in both the UI and the eventual report, the total
+   number of domains and hypotheses tested in this continuous run before
+   the hit. Show live progress (a running counter) and provide a manual
+   stop control. Keep the option for a single fixed-size batch available
+   too, not just continuous mode.
+
+3. Confirm plainly: are the ~40 unarchived rows users see after a
+   republish genuinely new hypotheses from real discovery batches run
+   since the last "Archive all" click, or is there any remaining
+   reseed-on-restart artifact? Report the real mechanism, not an
+   assumption.
+
+4. Complete the bisociative provenance section in every report: show
+   not just the domain and model that produced the winning hypothesis,
+   but the FULL list of domains BOTH generators (Opus and Sol) proposed
+   in that run, and the Lead LLM's actual reasoning for what it selected,
+   combined, or discarded and why.
+
+5. Confirm feature_spec now persists correctly for every new hypothesis
+   going forward, and confirm no "unrecognized op" errors can still
+   appear in a "how this was actually tested" section -- if any
+   operation types used by the DSL are still unregistered in the
+   description generator, register them properly now.
+
+6. Confirm directly: across any recent real Case Files runs, has the
+   Chemist stage's candidate pool ever surfaced a biologic
+   (chembl_molecule_type != 'Small molecule') at all, or do biologics
+   effectively never appear due to ChEMBL bioactivity-data sparsity?
+   Report plainly.

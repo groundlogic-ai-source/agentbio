@@ -68,9 +68,6 @@ def _row_to_dict(row: dict) -> dict:
     return d
 
 
-_IDEMPOTENCY_WINDOW_SECONDS = 60
-
-
 def save_report(
     *,
     hypothesis_id: str,
@@ -81,9 +78,10 @@ def save_report(
 ) -> dict:
     """Insert a new saved report snapshot and return the stored row.
 
-    Idempotent within a 60-second window: if a report for the same
-    hypothesis_id was saved in the last 60 seconds, return that existing
-    row instead of inserting a duplicate.
+    Permanently idempotent on hypothesis_id: if ANY saved report for this
+    hypothesis_id already exists, the oldest one is returned and no new row
+    is inserted. This prevents duplicate saves regardless of timing — even
+    if the user navigates away and back, or the component remounts.
     """
     now = datetime.now(timezone.utc)
     facts_json = json.dumps(facts) if facts is not None else None
@@ -94,11 +92,10 @@ def save_report(
                 """
                 SELECT * FROM saved_reports
                 WHERE hypothesis_id = %s
-                  AND saved_at >= %s - interval '%s seconds'
-                ORDER BY saved_at DESC
+                ORDER BY saved_at ASC
                 LIMIT 1
                 """,
-                (hypothesis_id, now, _IDEMPOTENCY_WINDOW_SECONDS),
+                (hypothesis_id,),
             )
             existing = cur.fetchone()
         if existing:

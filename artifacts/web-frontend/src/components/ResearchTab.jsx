@@ -8,6 +8,8 @@ import {
   submitResearchHypothesis,
   getResearchJob,
   runDiscoveryBatch,
+  runContinuousDiscovery,
+  stopContinuousDiscovery,
   generateHypothesisReport,
   saveReport,
 } from "../api.js";
@@ -530,6 +532,8 @@ function DiscoveryBatch({ onCompleted }) {
   const [busy, setBusy] = useState(false);
   const [jobState, setJobState] = useState(null);
   const [error, setError] = useState(null);
+  const [mode, setMode] = useState("single"); // "single" | "continuous"
+  const [activeJobId, setActiveJobId] = useState(null);
   const pollRef = useRef(null);
 
   const stopPoll = useCallback(() => {
@@ -542,9 +546,12 @@ function DiscoveryBatch({ onCompleted }) {
     setBusy(true);
     setJobState(null);
     setError(null);
+    setActiveJobId(null);
     stopPoll();
     try {
-      const { job_id } = await runDiscoveryBatch();
+      const starter = mode === "continuous" ? runContinuousDiscovery : runDiscoveryBatch;
+      const { job_id } = await starter();
+      setActiveJobId(job_id);
       setJobState({ job_id, status: "pending" });
       pollRef.current = setInterval(async () => {
         try {
@@ -552,12 +559,14 @@ function DiscoveryBatch({ onCompleted }) {
           setJobState(job);
           if (job.status === "completed" || job.status === "error") {
             stopPoll();
+            setActiveJobId(null);
             setBusy(false);
             if (job.status === "completed") onCompleted?.();
           }
         } catch (err) {
           setError(err.message);
           stopPoll();
+          setActiveJobId(null);
           setBusy(false);
         }
       }, POLL_MS);
@@ -565,15 +574,31 @@ function DiscoveryBatch({ onCompleted }) {
       setError(err.message);
       setBusy(false);
     }
-  }, [onCompleted, stopPoll]);
+  }, [mode, onCompleted, stopPoll]);
+
+  const handleStop = useCallback(async () => {
+    if (!activeJobId) return;
+    try {
+      await stopContinuousDiscovery(activeJobId);
+    } catch (err) {
+      setError(`Stop request failed: ${err.message}`);
+    }
+  }, [activeJobId]);
 
   const statusMsg = (() => {
     if (!jobState) return null;
     if (jobState.status === "pending") return "⟳ Queued…";
-    if (jobState.status === "running")
+    if (jobState.status === "running") {
+      const prog = jobState.result?.progress;
+      if (prog)
+        return `⟳ Batch ${prog.batch_num} — ${prog.domains_explored} domain(s), ${prog.hypotheses_reviewed} hypothesis(es) reviewed…`;
       return "⟳ Opus 4.8 + GPT-5.6 Sol generating domains → lead review → testing…";
+    }
     if (jobState.status === "completed") {
       const s = jobState.result?.summary;
+      if (s?.mode === "continuous")
+        return `✓ Done — ${s.batches_run} batch(es), ${s.domains_explored} domain(s), `
+          + `${s.hypotheses_reviewed} hypothesis(es)${s.confirmed ? `; ${s.confirmed} confirmed` : ""}`;
       if (s)
         return `✓ Done — ${s.tests_run} test(s) across ${s.domains?.length ?? 0} domain(s); `
           + `${s.surviving_discovery} passed discovery, ${s.confirmed} confirmed`;
@@ -607,6 +632,33 @@ function DiscoveryBatch({ onCompleted }) {
         whole cumulative log, then confirmed on the holdout half and confound-checked. Results append to the same registry
         below. This takes several minutes and makes many model calls.
       </p>
+
+      {/* Mode selector */}
+      <div style={{ display: "flex", gap: "2rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+        {[
+          { value: "single", label: "Single batch" },
+          { value: "continuous", label: "Continuous — run until double-pass (max 20 domains / 50 hypotheses)" },
+        ].map(({ value, label }) => (
+          <label key={value} style={{
+            display: "flex", alignItems: "center", gap: "0.45rem",
+            fontSize: "0.75rem", color: "var(--silver)",
+            cursor: busy ? "default" : "pointer",
+            opacity: busy && mode !== value ? 0.5 : 1,
+          }}>
+            <input
+              type="radio"
+              name="discovery-mode"
+              value={value}
+              checked={mode === value}
+              disabled={busy}
+              onChange={() => setMode(value)}
+              style={{ accentColor: "var(--brass)", cursor: busy ? "default" : "pointer" }}
+            />
+            {label}
+          </label>
+        ))}
+      </div>
+
       {error && (
         <p style={{ color: "var(--oxide)", fontSize: "0.72rem", marginBottom: "0.5rem" }}>{error}</p>
       )}
@@ -626,8 +678,38 @@ function DiscoveryBatch({ onCompleted }) {
           onMouseEnter={(e) => { if (!busy) e.currentTarget.style.backgroundColor = "var(--brass-deep)"; }}
           onMouseLeave={(e) => { if (!busy) e.currentTarget.style.backgroundColor = "var(--brass)"; }}
         >
-          {busy ? "Discovery batch running…" : "Run new discovery batch"}
+          {busy
+            ? (mode === "continuous" ? "Continuous discovery running…" : "Discovery batch running…")
+            : (mode === "continuous" ? "Run until found" : "Run new discovery batch")}
         </button>
+
+        {/* Stop button — only shown during a continuous run */}
+        {busy && mode === "continuous" && activeJobId && (
+          <button
+            type="button"
+            onClick={handleStop}
+            style={{
+              padding: "0.55rem 1.1rem", borderRadius: "4px",
+              border: "1px solid rgba(199,202,209,0.35)",
+              backgroundColor: "transparent",
+              color: "var(--silver)",
+              fontSize: "0.78rem", fontWeight: 500,
+              cursor: "pointer",
+              transition: "border-color 0.15s, color 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "var(--oxide)";
+              e.currentTarget.style.color = "var(--oxide)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "rgba(199,202,209,0.35)";
+              e.currentTarget.style.color = "var(--silver)";
+            }}
+          >
+            Stop after this batch
+          </button>
+        )}
+
         {statusMsg && (
           <span style={{ fontSize: "0.72rem", fontFamily: "monospace", color: statusColor }}>
             {statusMsg}

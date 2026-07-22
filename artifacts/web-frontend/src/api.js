@@ -91,6 +91,22 @@ export function runDiscoveryBatch() {
   return request("/api/research/discovery-batch", { method: "POST" });
 }
 
+// Start continuous autonomous discovery: chains batches until a double-pass is
+// found, the safety cap is reached (20 domains / 50 hypotheses), or the run is
+// stopped. Returns { job_id }; poll with getResearchJob for live progress.
+export function runContinuousDiscovery() {
+  return request("/api/research/discovery-continuous", { method: "POST" });
+}
+
+// Signal a running continuous discovery job to stop after its current batch.
+// Returns immediately; the job finishes the in-flight batch before stopping.
+export function stopContinuousDiscovery(jobId) {
+  return request(
+    `/api/research/discovery-continuous/${encodeURIComponent(jobId)}/stop`,
+    { method: "POST" },
+  );
+}
+
 // Generate (or fetch cached) the full auditable write-up for a hypothesis that
 // passed BOTH discovery and confirmation. Triggers a single Opus 4.8 call the
 // first time, so expect a few seconds. Returns { hypothesis_id, facts,

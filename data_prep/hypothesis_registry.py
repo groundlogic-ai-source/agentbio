@@ -384,6 +384,27 @@ def set_feature_spec(test_id: str, feature_spec) -> None:
         conn.commit()
 
 
+def load_run_context(run_id: str) -> list[dict]:
+    """
+    Return every bisociation_history row for a given run_id — both tested
+    hypotheses and untested/discarded ones. Used by hypothesis_report to
+    reconstruct the full bisociative provenance (all proposed domains from
+    both generators, and the lead LLM's reasoning per hypothesis).
+    """
+    with _conn() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(
+                """
+                SELECT domain_description, proposing_llm, outcome_note,
+                       resulting_hypothesis_text, discovery_test_type
+                FROM bisociation_history
+                WHERE run_id = %s
+                """,
+                (run_id,),
+            )
+            return [dict(r) for r in cur.fetchall()]
+
+
 def append_log_rows(rows: list[dict]) -> pd.DataFrame:
     with _conn() as conn:
         with conn.cursor() as cur:
