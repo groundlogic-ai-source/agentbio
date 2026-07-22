@@ -66,6 +66,36 @@ def sol(prompt: str, max_output_tokens: int = 8000) -> str:
     return resp.output_text
 
 
+def opus_with_search(prompt: str, max_tokens: int = 2000) -> str:
+    """Call Claude Opus 4.8 with built-in web search enabled (for novelty tagging).
+
+    Falls back gracefully: if the web-search tool is unavailable via the proxy
+    (quota, unsupported tool type, or API error), returns a JSON string that
+    triggers UNCLEAR tagging downstream — the pipeline continues unaffected.
+    """
+    try:
+        resp = _ac().messages.create(
+            model=OPUS_MODEL,
+            max_tokens=max_tokens,
+            tools=[{"type": "web_search_20250305", "name": "web_search"}],
+            messages=[{"role": "user", "content": prompt}],
+        )
+        # The response may contain server_tool_use, web_search_tool_result, and
+        # text blocks. Extract only the final text block(s).
+        text_parts = [
+            block.text
+            for block in resp.content
+            if getattr(block, "type", None) == "text"
+        ]
+        return "\n".join(text_parts) if text_parts else ""
+    except Exception as exc:  # noqa: BLE001
+        # Fallback: return a JSON fragment that parses to UNCLEAR.
+        return (
+            f'{{"tag": "UNCLEAR", "reasoning": "Web search unavailable: {exc}", '
+            f'"sources": []}}'
+        )
+
+
 def extract_json(text: str):
     """
     Pull the first top-level JSON array or object out of an LLM reply. Tolerates

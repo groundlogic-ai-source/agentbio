@@ -184,6 +184,12 @@ def collect_facts(hypothesis_id: str) -> dict | None:
         })
 
     first = rows.iloc[0]
+    raw_novelty = first.get("novelty_tag")
+    novelty_tag = (
+        str(raw_novelty).strip()
+        if raw_novelty is not None and str(raw_novelty).strip()
+        else None
+    )
     return {
         "hypothesis_id": hypothesis_id,
         "hypothesis_text": str(first.get("resulting_hypothesis_text", "")),
@@ -192,6 +198,7 @@ def collect_facts(hypothesis_id: str) -> dict | None:
         "mechanistic_justification": _parse_mech(first.get("outcome_note")),
         "feature_spec": feature_spec,
         "how_tested": render_spec(feature_spec),
+        "novelty_tag": novelty_tag,
         "significance_threshold": R.SIGNIFICANCE_THRESHOLD,
         "correction_method": R.CORRECTION_METHOD,
         "passed_both": passed_both,
@@ -217,7 +224,10 @@ Write the report in Markdown with these sections, in this order:
 
 ## Hypothesis
 State the full hypothesis text verbatim, plus the source domain and which model \
-proposed it. One short paragraph.
+proposed it. One short paragraph. If FACTS.novelty_tag is not null, add one sentence: \
+"Prior-literature tag (web-search, informational): [tag]" — where tag is NOVEL, \
+ALREADY_ESTABLISHED, or UNCLEAR. A tag of ALREADY_ESTABLISHED does NOT weaken this \
+report; the statistical finding stands on its own regardless of prior knowledge.
 
 ## How this was actually tested
 State the LITERAL computable proxy from FACTS.how_tested — the exact mechanical \
