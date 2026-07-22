@@ -640,6 +640,10 @@ def _run_research_job(job_id: str, hypothesis_text: str) -> None:
 _discovery_lock = threading.Lock()
 _discovery_active_job: dict = {"job_id": None}
 
+# Per-job stop flags for continuous discovery. Keyed by job_id.
+# The background thread checks stop_flag["stop"] between batch iterations.
+_continuous_stop_flags: dict[str, dict] = {}
+
 
 def _run_discovery_batch_job(job_id: str) -> None:
     """
@@ -659,6 +663,45 @@ def _run_discovery_batch_job(job_id: str) -> None:
     except Exception as exc:  # noqa: BLE001
         research_db.update_job(job_id, status="error", error_message=str(exc))
     finally:
+        with _discovery_lock:
+            if _discovery_active_job["job_id"] == job_id:
+                _discovery_active_job["job_id"] = None
+
+
+def _run_continuous_discovery_job(job_id: str) -> None:
+    """
+    Background thread: chain autonomous discovery batches continuously until
+    a double-pass is found, a safety cap is hit, or the user requests a stop.
+
+    Progress is written to the job's result_json after each batch so the
+    frontend can display a live counter while polling.
+    """
+    stop_flag = _continuous_stop_flags.setdefault(job_id, {"stop": False})
+    try:
+        research_db.update_job(job_id, status="running")
+        _ensure_research_modules()
+        import run_discovery as _RD
+
+        def _progress(progress: dict) -> None:
+            research_db.update_job(
+                job_id,
+                status="running",
+                result_json=_json.dumps({"mode": "continuous", "progress": progress}),
+            )
+
+        summary = _RD.run_continuous_batch(
+            stop_flag=stop_flag,
+            progress_callback=_progress,
+        )
+        research_db.update_job(
+            job_id,
+            status="completed",
+            result_json=_json.dumps({"mode": "continuous", "summary": summary}),
+        )
+    except Exception as exc:  # noqa: BLE001
+        research_db.update_job(job_id, status="error", error_message=str(exc))
+    finally:
+        _continuous_stop_flags.pop(job_id, None)
         with _discovery_lock:
             if _discovery_active_job["job_id"] == job_id:
                 _discovery_active_job["job_id"] = None
@@ -794,6 +837,68 @@ def run_discovery_batch(request: Request) -> dict:
         raise HTTPException(status_code=500, detail="failed to start discovery batch") from exc
 
     return {"job_id": job_id}
+
+
+@app.post("/api/research/discovery-continuous")
+def run_continuous_discovery(request: Request) -> dict:
+    """
+    Start continuous autonomous discovery batches, chaining until EITHER:
+      - at least one hypothesis achieves a double-pass (discovery AND confirmation), OR
+      - a safety cap is reached (default: 20 domains or 50 hypotheses), OR
+      - the caller stops the run via POST .../stop.
+
+    Uses the same _discovery_lock as single-batch runs so at most one
+    autonomous job (single or continuous) can run at a time.
+    Poll GET /api/research/jobs/{job_id} for live per-batch progress.
+    """
+    _guardrails.check_ip_rate_limit(request)
+
+    with _discovery_lock:
+        if _discovery_active_job["job_id"] is not None:
+            raise HTTPException(
+                status_code=409,
+                detail="a discovery batch is already running",
+            )
+        job_id = research_db.create_job(
+            "(continuous discovery — runs until double-pass or cap)"
+        )
+        _discovery_active_job["job_id"] = job_id
+
+    try:
+        t = threading.Thread(
+            target=_run_continuous_discovery_job, args=(job_id,), daemon=True
+        )
+        t.start()
+    except Exception as exc:  # noqa: BLE001
+        with _discovery_lock:
+            if _discovery_active_job["job_id"] == job_id:
+                _discovery_active_job["job_id"] = None
+        research_db.update_job(
+            job_id, status="error", error_message=f"failed to start: {exc}"
+        )
+        raise HTTPException(
+            status_code=500, detail="failed to start continuous discovery"
+        ) from exc
+
+    return {"job_id": job_id}
+
+
+@app.post("/api/research/discovery-continuous/{job_id}/stop")
+def stop_continuous_discovery(job_id: str) -> dict:
+    """
+    Signal a running continuous discovery job to stop after the current
+    batch completes. Returns immediately; the job may run for several more
+    minutes while the in-flight batch finishes before honouring the stop.
+    Returns 404 if no continuous discovery with that job_id is currently active.
+    """
+    flag = _continuous_stop_flags.get(job_id)
+    if flag is None:
+        raise HTTPException(
+            status_code=404,
+            detail="no active continuous discovery job with that job_id",
+        )
+    flag["stop"] = True
+    return {"status": "stop_requested", "job_id": job_id}
 
 
 @app.get("/api/research/jobs/{job_id}")

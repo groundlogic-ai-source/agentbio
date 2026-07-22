@@ -190,6 +190,52 @@ def collect_facts(hypothesis_id: str) -> dict | None:
         if raw_novelty is not None and str(raw_novelty).strip()
         else None
     )
+
+    # Bisociative provenance: reconstruct what BOTH generators proposed in this
+    # run, and the lead reviewer's per-hypothesis decision.  This works because
+    # test_ready() always persists a history row even for DISCARDED hypotheses,
+    # so every domain ever proposed in the run is present in bisociation_history.
+    provenance: dict | None = None
+    run_id = str(first.get("run_id", "") or "")
+    if run_id:
+        try:
+            siblings = R.load_run_context(run_id)
+            _opus_kws = {"opus", "a", "llm_a_opus", "llm_a", "claude", "claude opus"}
+            _sol_kws  = {"sol", "b", "llm_b_sol", "llm_b", "gpt", "chatgpt", "gpt-5.6"}
+            opus_domains = sorted({
+                str(r["domain_description"])
+                for r in siblings
+                if r.get("proposing_llm", "").lower().strip() in _opus_kws
+                   and r.get("domain_description")
+            })
+            sol_domains = sorted({
+                str(r["domain_description"])
+                for r in siblings
+                if r.get("proposing_llm", "").lower().strip() in _sol_kws
+                   and r.get("domain_description")
+            })
+            lead_decisions = []
+            for r in siblings:
+                note = str(r.get("outcome_note", "") or "")
+                dom  = str(r.get("domain_description", "") or "")
+                htext = str(r.get("resulting_hypothesis_text", "") or "")
+                llm  = str(r.get("proposing_llm", "") or "")
+                if dom:
+                    lead_decisions.append({
+                        "domain": dom,
+                        "hypothesis": htext[:120],
+                        "proposing_llm": llm,
+                        "lead_decision": note[:300],
+                    })
+            provenance = {
+                "run_id": run_id,
+                "opus_domains": opus_domains,
+                "sol_domains": sol_domains,
+                "lead_decisions": lead_decisions,
+            }
+        except Exception:  # noqa: BLE001
+            provenance = None
+
     return {
         "hypothesis_id": hypothesis_id,
         "hypothesis_text": str(first.get("resulting_hypothesis_text", "")),
@@ -204,6 +250,7 @@ def collect_facts(hypothesis_id: str) -> dict | None:
         "passed_both": passed_both,
         "framings": framings,
         "confound_check": confound_check,
+        "provenance": provenance,
     }
 
 
@@ -228,6 +275,15 @@ proposed it. One short paragraph. If FACTS.novelty_tag is not null, add one sent
 "Prior-literature tag (web-search, informational): [tag]" — where tag is NOVEL, \
 ALREADY_ESTABLISHED, or UNCLEAR. A tag of ALREADY_ESTABLISHED does NOT weaken this \
 report; the statistical finding stands on its own regardless of prior knowledge.
+
+## Bisociative provenance
+Using FACTS.provenance, show what BOTH generators actually proposed in this run. \
+List ALL domains proposed by Opus under a "Opus proposed:" bullet list, and ALL \
+domains proposed by Sol under a "Sol proposed:" bullet list. Then describe, from \
+FACTS.provenance.lead_decisions, the lead reviewer's consolidation: for each \
+hypothesis, state whether it was marked READY, NEEDS_ENRICHMENT, or DISCARDED, \
+and give its lead_decision rationale in one sentence. If FACTS.provenance is null, \
+state plainly that run-level context was not available for this seeded entry.
 
 ## How this was actually tested
 State the LITERAL computable proxy from FACTS.how_tested — the exact mechanical \
