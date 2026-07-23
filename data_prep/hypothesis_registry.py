@@ -286,6 +286,74 @@ def load_history_full() -> pd.DataFrame:
     )
 
 
+def spec_canonical(spec: dict) -> str:
+    """
+    Return a deterministic canonical JSON string for a feature_spec dict.
+    Keys are sorted recursively. String values are stripped and lowercased.
+    List-of-string values (keyword arrays) are sorted alphabetically so that
+    {"keywords": ["cancer", "tumor"]} == {"keywords": ["tumor", "cancer"]}.
+    Used for cross-run feature-level deduplication in test_ready().
+    """
+    def _norm(obj):
+        if isinstance(obj, dict):
+            return {k: _norm(v) for k, v in sorted(obj.items())}
+        if isinstance(obj, list):
+            normed = [_norm(v) for v in obj]
+            if all(isinstance(v, str) for v in normed):
+                return sorted(v.lower().strip() for v in normed)
+            return normed
+        if isinstance(obj, str):
+            return obj.lower().strip()
+        return obj
+    return json.dumps(_norm(spec), sort_keys=True, ensure_ascii=False)
+
+
+def load_existing_feature_specs() -> dict[str, dict]:
+    """
+    Return {canonical_spec_json: {test_id, hypothesis_id, run_id}} for every
+    hypothesis row that has a non-empty feature_spec AND was actually submitted
+    to statistical testing (discovery_test_type is non-empty). The earliest
+    occurrence of each canonical spec is kept as the canonical reference.
+
+    Called once at the top of test_ready() to enable cross-run deduplication:
+    if a new READY hypothesis maps to a canonical spec that was already tested,
+    it is recorded as SKIPPED (duplicate) with a reference to the original result
+    rather than being re-tested as if it were a fresh finding.
+    """
+    with _conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT test_id, hypothesis_id, run_id, feature_spec
+                FROM bisociation_history
+                WHERE feature_spec IS NOT NULL
+                  AND feature_spec != ''
+                  AND discovery_test_type IS NOT NULL
+                  AND discovery_test_type != ''
+                ORDER BY session_timestamp ASC NULLS LAST, test_id ASC
+                """
+            )
+            rows = cur.fetchall()
+    result: dict[str, dict] = {}
+    for test_id, hypothesis_id, run_id, spec_raw in rows:
+        if not spec_raw:
+            continue
+        try:
+            spec = json.loads(spec_raw) if isinstance(spec_raw, str) else spec_raw
+            if not isinstance(spec, dict):
+                continue
+            canonical = spec_canonical(spec)
+            if canonical not in result:  # keep earliest (most authoritative) occurrence
+                result[canonical] = {
+                    "test_id": test_id or "",
+                    "hypothesis_id": hypothesis_id or "",
+                    "run_id": run_id or "",
+                }
+        except (TypeError, ValueError):
+            pass
+    return result
+
+
 def get_feature_spec(test_id: str):
     """Return the persisted feature_spec (parsed JSON) for a test_id, or None."""
     with _conn() as conn:
