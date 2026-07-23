@@ -154,25 +154,7 @@ export default function Dashboard({
         <button
           type="button"
           onClick={onNewCase}
-          className="shrink-0 rounded px-5 py-2.5 text-sm font-semibold"
-          style={{
-            backgroundColor: "var(--brass)",
-            color: "var(--paper)",
-            boxShadow: "0 2px 8px rgba(192,138,53,0.3)",
-            transition: "background-color 0.15s ease, transform 0.12s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "var(--brass-deep)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "var(--brass)";
-          }}
-          onMouseDown={(e) => {
-            e.currentTarget.style.transform = "scale(0.97)";
-          }}
-          onMouseUp={(e) => {
-            e.currentTarget.style.transform = "scale(1)";
-          }}
+          className="btn btn-primary shrink-0"
         >
           Open new case
         </button>
@@ -191,15 +173,7 @@ export default function Dashboard({
             <button
               type="button"
               onClick={onToggleArchived}
-              className="font-mono text-[0.58rem] uppercase tracking-[0.15em] rounded px-2.5 py-1"
-              style={{
-                color: showArchived ? "var(--brass)" : "var(--silver)",
-                border: `1px solid ${showArchived ? "rgba(192,138,53,0.55)" : "rgba(199,202,209,0.5)"}`,
-                backgroundColor: showArchived
-                  ? "rgba(192,138,53,0.12)"
-                  : "rgba(199,202,209,0.07)",
-                transition: "all 0.15s ease",
-              }}
+              className={`btn btn-xs ${showArchived ? "btn-ghost-brass" : "btn-ghost"}`}
             >
               {showArchived
                 ? `Hide archived (${archivedCount})`
@@ -223,18 +197,7 @@ export default function Dashboard({
             <button
               type="button"
               onClick={onNewCase}
-              className="mt-5 rounded px-4 py-2 text-sm font-semibold"
-              style={{
-                backgroundColor: "var(--brass)",
-                color: "var(--paper)",
-                transition: "background-color 0.15s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--brass-deep)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--brass)";
-              }}
+              className="btn btn-primary mt-5"
             >
               Open new case
             </button>

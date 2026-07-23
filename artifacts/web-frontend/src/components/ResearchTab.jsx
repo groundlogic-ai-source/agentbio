@@ -173,12 +173,7 @@ function ReportPanel({ hypothesisId, onSaved }) {
       )}
 
       {/* ── Opus narrative, grounded strictly in the numbers above ── */}
-      <div style={{
-        fontFamily: "monospace", fontSize: "0.55rem", textTransform: "uppercase",
-        letterSpacing: "0.2em", color: "var(--brass)", marginBottom: "0.5rem",
-      }}>
-        Narrative — Claude Opus 4.8
-      </div>
+      <div className="eyebrow" style={{ marginBottom: "0.5rem" }}>Narrative — Claude Opus 4.8</div>
       <div className="report-markdown" style={{ fontSize: "0.8rem", color: "var(--paper)", lineHeight: 1.6 }}>
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{report_markdown}</ReactMarkdown>
       </div>
@@ -188,16 +183,7 @@ function ReportPanel({ hypothesisId, onSaved }) {
           onClick={handleSave}
           disabled={saveState.busy || saveState.saved}
           title="Save a permanent snapshot of this report to the Saved Reports tab"
-          style={{
-            fontSize: "0.62rem", fontFamily: "monospace",
-            color: saveState.saved ? "#7ec97e" : "var(--paper)",
-            background: saveState.saved ? "transparent" : "var(--brass)",
-            border: "1px solid " + (saveState.saved ? "rgba(126,201,126,0.5)" : "var(--brass)"),
-            borderRadius: "3px", padding: "4px 12px",
-            cursor: saveState.busy || saveState.saved ? "default" : "pointer",
-            opacity: saveState.busy ? 0.6 : 1,
-            transition: "color 0.15s, background-color 0.15s",
-          }}
+          className={`btn btn-sm ${saveState.saved ? "btn-saved" : "btn-ghost-brass"}`}
         >
           {saveState.busy ? "saving…" : saveState.saved ? "✓ saved to Saved Reports" : "Save report"}
         </button>
@@ -237,8 +223,8 @@ const badgeFail = (
   <span style={{
     background: "rgba(155,74,63,0.13)", color: "var(--oxide)",
     borderRadius: "3px", padding: "1px 7px",
-    fontSize: "0.62rem", fontFamily: "monospace",
-  }}>fail</span>
+    fontSize: "0.62rem", fontFamily: "monospace", letterSpacing: "0.05em",
+  }}>FAIL</span>
 );
 
 function HypothesisTable({ hypotheses, loading, onArchive }) {
@@ -351,14 +337,7 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
                     <button
                       onClick={() => setExpanded(isOpen ? null : h.hypothesis_id)}
                       title="Full auditable write-up (Opus 4.8, grounded in the stored numbers)"
-                      style={{
-                        fontSize: "0.58rem", fontFamily: "monospace",
-                        color: isOpen ? "var(--paper)" : "var(--brass)",
-                        background: isOpen ? "var(--brass)" : "transparent",
-                        border: "1px solid rgba(184,151,90,0.45)",
-                        borderRadius: "3px", padding: "2px 8px", cursor: "pointer",
-                        transition: "color 0.15s, background-color 0.15s",
-                      }}
+                      className={`btn btn-xs btn-ghost-brass${isOpen ? " active" : ""}`}
                     >
                       {isOpen ? "hide report" : "full report"}
                     </button>
@@ -371,16 +350,7 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
                     onClick={() => handleArchive(h)}
                     disabled={busy}
                     title={isArchived ? "Restore to active view" : "Archive this entry"}
-                    style={{
-                      fontSize: "0.58rem", fontFamily: "monospace",
-                      color: isArchived ? "var(--brass)" : "var(--silver-dim)",
-                      background: "transparent",
-                      border: "1px solid " + (isArchived ? "rgba(184,151,90,0.35)" : "rgba(199,202,209,0.18)"),
-                      borderRadius: "3px", padding: "2px 7px",
-                      cursor: busy ? "default" : "pointer",
-                      opacity: busy ? 0.5 : 1,
-                      transition: "color 0.15s, border-color 0.15s",
-                    }}
+                    className={`btn btn-xs ${isArchived ? "btn-ghost-brass" : "btn-ghost"}`}
                   >
                     {busy ? "…" : isArchived ? "restore" : "archive"}
                   </button>
@@ -470,12 +440,7 @@ function SubmitHypothesis({ onSubmitted }) {
       border: "1px solid rgba(199,202,209,0.2)", borderRadius: "8px",
       backgroundColor: "rgba(199,202,209,0.03)",
     }}>
-      <div style={{
-        fontFamily: "monospace", fontSize: "0.58rem", textTransform: "uppercase",
-        letterSpacing: "0.22em", color: "var(--brass)", marginBottom: "0.5rem",
-      }}>
-        Submit your own hypothesis
-      </div>
+      <div className="eyebrow" style={{ marginBottom: "0.5rem" }}>Submit your own hypothesis</div>
       <p style={{ fontSize: "0.75rem", color: "var(--silver)", lineHeight: 1.6, marginBottom: "1rem" }}>
         Write a testable claim in plain English. Claude Opus will parse it into the dataset DSL and test it on
         the <strong style={{ color: "var(--paper)" }}>same discovery split</strong> as pipeline runs, appending to
@@ -504,16 +469,7 @@ function SubmitHypothesis({ onSubmitted }) {
           <button
             type="submit"
             disabled={busy || !text.trim()}
-            style={{
-              padding: "0.5rem 1.4rem", borderRadius: "4px", border: "none",
-              backgroundColor: busy || !text.trim() ? "rgba(199,202,209,0.2)" : "var(--brass)",
-              color: busy || !text.trim() ? "var(--silver)" : "var(--paper)",
-              fontSize: "0.8rem", fontWeight: 600,
-              cursor: busy || !text.trim() ? "default" : "pointer",
-              transition: "background-color 0.15s ease",
-            }}
-            onMouseEnter={(e) => { if (!busy && text.trim()) e.currentTarget.style.backgroundColor = "var(--brass-deep)"; }}
-            onMouseLeave={(e) => { if (!busy && text.trim()) e.currentTarget.style.backgroundColor = "var(--brass)"; }}
+            className="btn btn-primary btn-sm"
           >
             {busy ? "Processing…" : "Submit hypothesis"}
           </button>
@@ -618,12 +574,7 @@ function DiscoveryBatch({ onCompleted }) {
       border: "1px solid rgba(184,151,90,0.35)", borderRadius: "8px",
       backgroundColor: "rgba(184,151,90,0.05)",
     }}>
-      <div style={{
-        fontFamily: "monospace", fontSize: "0.58rem", textTransform: "uppercase",
-        letterSpacing: "0.22em", color: "var(--brass)", marginBottom: "0.5rem",
-      }}>
-        Autonomous discovery
-      </div>
+      <div className="eyebrow" style={{ marginBottom: "0.5rem" }}>Autonomous discovery</div>
       <p style={{ fontSize: "0.75rem", color: "var(--silver)", lineHeight: 1.6, marginBottom: "1rem", maxWidth: "52rem" }}>
         Runs the full three-model pipeline with <strong style={{ color: "var(--paper)" }}>no hypothesis from you</strong>:
         two generators (<strong style={{ color: "var(--paper)" }}>Claude Opus 4.8</strong> and{" "}
@@ -634,28 +585,19 @@ function DiscoveryBatch({ onCompleted }) {
       </p>
 
       {/* Mode selector */}
-      <div style={{ display: "flex", gap: "2rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+      <div className="mode-selector">
         {[
           { value: "single", label: "Single batch" },
-          { value: "continuous", label: "Continuous — run until double-pass (max 20 domains / 50 hypotheses)" },
+          { value: "continuous", label: "Continuous — until double-pass" },
         ].map(({ value, label }) => (
-          <label key={value} style={{
-            display: "flex", alignItems: "center", gap: "0.45rem",
-            fontSize: "0.75rem", color: "var(--silver)",
-            cursor: busy ? "default" : "pointer",
-            opacity: busy && mode !== value ? 0.5 : 1,
-          }}>
-            <input
-              type="radio"
-              name="discovery-mode"
-              value={value}
-              checked={mode === value}
-              disabled={busy}
-              onChange={() => setMode(value)}
-              style={{ accentColor: "var(--brass)", cursor: busy ? "default" : "pointer" }}
-            />
+          <button
+            key={value}
+            type="button"
+            onClick={() => !busy && setMode(value)}
+            className={`mode-option${mode === value ? " mode-option--active" : ""}${busy ? " mode-option--disabled" : ""}`}
+          >
             {label}
-          </label>
+          </button>
         ))}
       </div>
 
@@ -667,16 +609,7 @@ function DiscoveryBatch({ onCompleted }) {
           type="button"
           onClick={handleRun}
           disabled={busy}
-          style={{
-            padding: "0.55rem 1.5rem", borderRadius: "4px", border: "none",
-            backgroundColor: busy ? "rgba(199,202,209,0.2)" : "var(--brass)",
-            color: busy ? "var(--silver)" : "var(--paper)",
-            fontSize: "0.82rem", fontWeight: 600,
-            cursor: busy ? "default" : "pointer",
-            transition: "background-color 0.15s ease",
-          }}
-          onMouseEnter={(e) => { if (!busy) e.currentTarget.style.backgroundColor = "var(--brass-deep)"; }}
-          onMouseLeave={(e) => { if (!busy) e.currentTarget.style.backgroundColor = "var(--brass)"; }}
+          className="btn btn-primary"
         >
           {busy
             ? (mode === "continuous" ? "Continuous discovery running…" : "Discovery batch running…")
@@ -688,23 +621,7 @@ function DiscoveryBatch({ onCompleted }) {
           <button
             type="button"
             onClick={handleStop}
-            style={{
-              padding: "0.55rem 1.1rem", borderRadius: "4px",
-              border: "1px solid rgba(199,202,209,0.35)",
-              backgroundColor: "transparent",
-              color: "var(--silver)",
-              fontSize: "0.78rem", fontWeight: 500,
-              cursor: "pointer",
-              transition: "border-color 0.15s, color 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "var(--oxide)";
-              e.currentTarget.style.color = "var(--oxide)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "rgba(199,202,209,0.35)";
-              e.currentTarget.style.color = "var(--silver)";
-            }}
+            className="btn btn-danger btn-sm"
           >
             Stop after this batch
           </button>
@@ -759,12 +676,7 @@ export default function ResearchTab({ onRefresh }) {
   return (
     <div style={{ maxWidth: "1180px", margin: "0 auto", padding: "2.5rem 1.5rem" }}>
       <header style={{ marginBottom: "2rem" }}>
-        <div style={{
-          fontFamily: "monospace", fontSize: "0.58rem", textTransform: "uppercase",
-          letterSpacing: "0.26em", color: "var(--brass)", marginBottom: "0.35rem",
-        }}>
-          Bisociation Registry
-        </div>
+        <div className="eyebrow" style={{ marginBottom: "0.35rem" }}>Bisociation Registry</div>
         <h2 style={{ fontSize: "2rem", fontWeight: 700, color: "var(--paper)", margin: 0, lineHeight: 1.1 }}>
           Research Hypotheses
         </h2>
@@ -814,16 +726,7 @@ export default function ResearchTab({ onRefresh }) {
               onClick={handleArchiveAll}
               disabled={bulkArchiving}
               title="Archive all hypotheses at once — none are deleted, use 'show archived' to restore individually"
-              style={{
-                fontSize: "0.62rem", fontFamily: "monospace",
-                color: "var(--silver-dim)",
-                background: "transparent",
-                border: "1px solid rgba(199,202,209,0.22)",
-                borderRadius: "3px", padding: "3px 10px",
-                cursor: bulkArchiving ? "default" : "pointer",
-                opacity: bulkArchiving ? 0.5 : 1,
-                transition: "color 0.15s, border-color 0.15s",
-              }}
+              className="btn btn-xs btn-ghost"
             >
               {bulkArchiving ? "archiving…" : "Archive all"}
             </button>
@@ -831,25 +734,14 @@ export default function ResearchTab({ onRefresh }) {
           {archivedCount > 0 && (
             <button
               onClick={() => setShowArchived((v) => !v)}
-              style={{
-                fontSize: "0.62rem", fontFamily: "monospace",
-                color: showArchived ? "var(--brass)" : "var(--silver-dim)",
-                background: "transparent",
-                border: "1px solid " + (showArchived ? "rgba(184,151,90,0.45)" : "rgba(199,202,209,0.22)"),
-                borderRadius: "3px", padding: "3px 10px", cursor: "pointer",
-                transition: "color 0.15s, border-color 0.15s",
-              }}
+              className={`btn btn-xs ${showArchived ? "btn-ghost-brass" : "btn-ghost"}`}
             >
               {showArchived ? `hide archived (${archivedCount})` : `show archived (${archivedCount})`}
             </button>
           )}
           <button
             onClick={fetchHypotheses}
-            style={{
-              fontSize: "0.65rem", fontFamily: "monospace", color: "var(--silver)",
-              background: "transparent", border: "1px solid rgba(199,202,209,0.22)",
-              borderRadius: "3px", padding: "3px 10px", cursor: "pointer",
-            }}
+            className="btn btn-xs btn-ghost"
           >
             Refresh
           </button>
