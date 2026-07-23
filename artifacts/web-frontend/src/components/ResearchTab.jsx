@@ -252,6 +252,21 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
     }
   };
 
+  // Group the flat rows by hypothesis_id, preserving first-appearance order.
+  // Narrow and broad framings of the same hypothesis share a single group so that
+  // the "full report" and "archive" controls appear exactly once per hypothesis.
+  const groups = [];
+  const _groupMap = new Map();
+  for (const h of hypotheses) {
+    const hid = h.hypothesis_id;
+    if (!_groupMap.has(hid)) {
+      const g = { hypothesis_id: hid, rows: [] };
+      _groupMap.set(hid, g);
+      groups.push(g);
+    }
+    _groupMap.get(hid).rows.push(h);
+  }
+
   return (
     <div style={{ overflowX: "auto", borderRadius: "6px", border: "1px solid rgba(199,202,209,0.14)" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.72rem", color: "var(--ink)" }}>
@@ -270,99 +285,117 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
           </tr>
         </thead>
         <tbody>
-          {hypotheses.map((h, i) => {
-            const txt = h.resulting_hypothesis_text || "";
-            const isArchived = h.archived === true;
-            const confoundSummary = (() => {
-              if (!h.confound_check_summary) return null;
-              try { return JSON.parse(h.confound_check_summary); }
-              catch { return null; }
-            })();
-            const hasConfound = confoundSummary?.status === "completed";
-            const busy = archiving === h.hypothesis_id;
-            const passesBoth = isTrue(h.discovery_pass) && isTrue(h.confirmation_pass);
-            const isOpen = expanded === h.hypothesis_id;
+          {groups.map((group) => {
+            const { hypothesis_id: hid, rows } = group;
+            const firstRow = rows[0];
+            const rowCount = rows.length;
+            // Report button appears if ANY framing of the hypothesis passed both stages.
+            const passesBothGroup = rows.some(r => isTrue(r.discovery_pass) && isTrue(r.confirmation_pass));
+            const isOpen = expanded === hid;
+            const isArchived = firstRow.archived === true;
+            const busy = archiving === hid;
+
             return (
-              <Fragment key={i}>
-              <tr
-                style={{
-                  borderBottom: isOpen ? "none" : "1px solid rgba(199,202,209,0.09)",
-                  opacity: isArchived ? 0.45 : 1,
-                  transition: "opacity 0.15s ease",
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(199,202,209,0.04)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}>
-                <td style={{ padding: "7px 10px", maxWidth: "22rem", color: "var(--paper)" }}>
-                  <span title={txt}>{txt.length > 90 ? txt.slice(0, 90) + "…" : txt}</span>
-                </td>
-                <td style={{ padding: "7px 10px", fontFamily: "monospace", color: "var(--silver)", whiteSpace: "nowrap" }}>
-                  {h.discovery_test_type || "—"}
-                </td>
-                <td style={{ padding: "7px 10px", fontFamily: "monospace", color: "var(--silver-dim)", whiteSpace: "nowrap" }}>
-                  {h.outcome_framing || "—"}
-                </td>
-                <td style={{ padding: "7px 10px", fontFamily: "monospace", whiteSpace: "nowrap" }}>
-                  {h.discovery_raw_p != null && h.discovery_raw_p !== ""
-                    ? Number(h.discovery_raw_p).toExponential(2) : "—"}
-                </td>
-                <td style={{ padding: "7px 10px", fontFamily: "monospace", whiteSpace: "nowrap" }}>
-                  {h.discovery_fdr_p != null && h.discovery_fdr_p !== ""
-                    ? Number(h.discovery_fdr_p).toExponential(2) : "—"}
-                </td>
-                <td style={{ padding: "7px 10px", whiteSpace: "nowrap" }}>
-                  <PassBadge value={h.discovery_pass} />
-                </td>
-                <td style={{ padding: "7px 10px", whiteSpace: "nowrap" }}>
-                  {h.confirmation_pass != null && h.confirmation_pass !== ""
-                    ? <PassBadge value={h.confirmation_pass} />
-                    : <span style={{ color: "var(--silver-dim)", fontSize: "0.62rem" }}>—</span>}
-                </td>
-                <td style={{ padding: "7px 10px", whiteSpace: "nowrap" }}>
-                  {hasConfound
-                    ? <span style={{ color: "var(--silver)", fontSize: "0.62rem", fontFamily: "monospace" }}
-                        title={JSON.stringify(confoundSummary?.checks, null, 2)}>
-                        {confoundSummary.checks?.length ?? 0} checked
-                      </span>
-                    : <span style={{ color: "var(--silver-dim)", fontSize: "0.62rem" }}>—</span>}
-                </td>
-                <td style={{ padding: "7px 10px", color: "var(--silver-dim)", maxWidth: "14rem" }}>
-                  <span title={h.domain_description}>
-                    {(h.domain_description || "").length > 45
-                      ? h.domain_description.slice(0, 45) + "…"
-                      : h.domain_description || "—"}
-                  </span>
-                </td>
-                <td style={{ padding: "7px 8px", whiteSpace: "nowrap" }}>
-                  {passesBoth ? (
-                    <button
-                      onClick={() => setExpanded(isOpen ? null : h.hypothesis_id)}
-                      title="Full auditable write-up (Opus 4.8, grounded in the stored numbers)"
-                      className={`btn btn-xs btn-ghost-brass${isOpen ? " active" : ""}`}
+              <Fragment key={hid}>
+                {rows.map((h, rowIdx) => {
+                  const txt = h.resulting_hypothesis_text || "";
+                  const confoundSummary = (() => {
+                    if (!h.confound_check_summary) return null;
+                    try { return JSON.parse(h.confound_check_summary); }
+                    catch { return null; }
+                  })();
+                  const hasConfound = confoundSummary?.status === "completed";
+                  const isLastRow = rowIdx === rowCount - 1;
+                  return (
+                    <tr
+                      key={h.test_id || rowIdx}
+                      style={{
+                        borderBottom: (isOpen && isLastRow) ? "none" : "1px solid rgba(199,202,209,0.09)",
+                        opacity: isArchived ? 0.45 : 1,
+                        transition: "opacity 0.15s ease",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(199,202,209,0.04)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
                     >
-                      {isOpen ? "hide report" : "full report"}
-                    </button>
-                  ) : (
-                    <span style={{ color: "var(--silver-dim)", fontSize: "0.58rem" }}>—</span>
-                  )}
-                </td>
-                <td style={{ padding: "7px 8px", whiteSpace: "nowrap" }}>
-                  <button
-                    onClick={() => handleArchive(h)}
-                    disabled={busy}
-                    title={isArchived ? "Restore to active view" : "Archive this entry"}
-                    className={`btn btn-xs ${isArchived ? "btn-ghost-brass" : "btn-ghost"}`}
-                  >
-                    {busy ? "…" : isArchived ? "restore" : "archive"}
-                  </button>
-                </td>
-              </tr>
-              {isOpen && (
-                <tr style={{ borderBottom: "1px solid rgba(199,202,209,0.09)" }}>
-                  <td colSpan={11} style={{ padding: 0 }}>
-                    <ReportPanel hypothesisId={h.hypothesis_id} />
-                  </td>
-                </tr>
-              )}
+                      <td style={{ padding: "7px 10px", maxWidth: "22rem", color: "var(--paper)" }}>
+                        <span title={txt}>{txt.length > 90 ? txt.slice(0, 90) + "…" : txt}</span>
+                      </td>
+                      <td style={{ padding: "7px 10px", fontFamily: "monospace", color: "var(--silver)", whiteSpace: "nowrap" }}>
+                        {h.discovery_test_type || "—"}
+                      </td>
+                      <td style={{ padding: "7px 10px", fontFamily: "monospace", color: "var(--silver-dim)", whiteSpace: "nowrap" }}>
+                        {h.outcome_framing || "—"}
+                      </td>
+                      <td style={{ padding: "7px 10px", fontFamily: "monospace", whiteSpace: "nowrap" }}>
+                        {h.discovery_raw_p != null && h.discovery_raw_p !== ""
+                          ? Number(h.discovery_raw_p).toExponential(2) : "—"}
+                      </td>
+                      <td style={{ padding: "7px 10px", fontFamily: "monospace", whiteSpace: "nowrap" }}>
+                        {h.discovery_fdr_p != null && h.discovery_fdr_p !== ""
+                          ? Number(h.discovery_fdr_p).toExponential(2) : "—"}
+                      </td>
+                      <td style={{ padding: "7px 10px", whiteSpace: "nowrap" }}>
+                        <PassBadge value={h.discovery_pass} />
+                      </td>
+                      <td style={{ padding: "7px 10px", whiteSpace: "nowrap" }}>
+                        {h.confirmation_pass != null && h.confirmation_pass !== ""
+                          ? <PassBadge value={h.confirmation_pass} />
+                          : <span style={{ color: "var(--silver-dim)", fontSize: "0.62rem" }}>—</span>}
+                      </td>
+                      <td style={{ padding: "7px 10px", whiteSpace: "nowrap" }}>
+                        {hasConfound
+                          ? <span style={{ color: "var(--silver)", fontSize: "0.62rem", fontFamily: "monospace" }}
+                              title={JSON.stringify(confoundSummary?.checks, null, 2)}>
+                              {confoundSummary.checks?.length ?? 0} checked
+                            </span>
+                          : <span style={{ color: "var(--silver-dim)", fontSize: "0.62rem" }}>—</span>}
+                      </td>
+                      <td style={{ padding: "7px 10px", color: "var(--silver-dim)", maxWidth: "14rem" }}>
+                        {rowIdx === 0 && (
+                          <span title={h.domain_description}>
+                            {(h.domain_description || "").length > 45
+                              ? h.domain_description.slice(0, 45) + "…"
+                              : h.domain_description || "—"}
+                          </span>
+                        )}
+                      </td>
+                      {rowIdx === 0 && (
+                        <td style={{ padding: "7px 8px", whiteSpace: "nowrap", verticalAlign: "middle" }} rowSpan={rowCount}>
+                          {passesBothGroup ? (
+                            <button
+                              onClick={() => setExpanded(isOpen ? null : hid)}
+                              title="Full auditable write-up (Opus 4.8, grounded in the stored numbers)"
+                              className={`btn btn-xs btn-ghost-brass${isOpen ? " active" : ""}`}
+                            >
+                              {isOpen ? "hide report" : "full report"}
+                            </button>
+                          ) : (
+                            <span style={{ color: "var(--silver-dim)", fontSize: "0.58rem" }}>—</span>
+                          )}
+                        </td>
+                      )}
+                      {rowIdx === 0 && (
+                        <td style={{ padding: "7px 8px", whiteSpace: "nowrap", verticalAlign: "middle" }} rowSpan={rowCount}>
+                          <button
+                            onClick={() => handleArchive(firstRow)}
+                            disabled={busy}
+                            title={isArchived ? "Restore to active view" : "Archive this hypothesis"}
+                            className={`btn btn-xs ${isArchived ? "btn-ghost-brass" : "btn-ghost"}`}
+                          >
+                            {busy ? "…" : isArchived ? "restore" : "archive"}
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+                {isOpen && (
+                  <tr style={{ borderBottom: "1px solid rgba(199,202,209,0.09)" }}>
+                    <td colSpan={11} style={{ padding: 0 }}>
+                      <ReportPanel hypothesisId={hid} />
+                    </td>
+                  </tr>
+                )}
               </Fragment>
             );
           })}
