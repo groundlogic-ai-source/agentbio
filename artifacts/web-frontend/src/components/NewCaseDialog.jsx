@@ -121,45 +121,15 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
               type="button"
               onClick={onClose}
               disabled={busy}
-              className="rounded px-4 py-2 text-sm font-semibold disabled:opacity-50"
-              style={{
-                border: "1px solid rgba(42,43,46,0.22)",
-                color: "var(--ink)",
-                transition: "border-color 0.15s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "rgba(42,43,46,0.5)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "rgba(42,43,46,0.22)";
-              }}
+              className="btn btn-ghost btn-sm"
+              style={{ color: "var(--ink)", borderColor: "rgba(42,43,46,0.25)" }}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={busy}
-              className="rounded px-4 py-2 text-sm font-semibold disabled:opacity-50"
-              style={{
-                backgroundColor: "var(--brass)",
-                color: "var(--paper)",
-                boxShadow: "0 2px 8px rgba(192,138,53,0.2)",
-                transition:
-                  "background-color 0.15s ease, transform 0.1s ease",
-              }}
-              onMouseEnter={(e) => {
-                if (!busy)
-                  e.currentTarget.style.backgroundColor = "var(--brass-deep)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--brass)";
-              }}
-              onMouseDown={(e) => {
-                e.currentTarget.style.transform = "scale(0.97)";
-              }}
-              onMouseUp={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-              }}
+              className="btn btn-primary btn-sm"
             >
               {busy ? "Opening…" : "Open new case"}
             </button>

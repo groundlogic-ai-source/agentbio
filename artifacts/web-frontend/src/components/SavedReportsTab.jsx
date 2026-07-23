@@ -104,28 +104,14 @@ function ReportDetail({ report, onBack, onDeleted }) {
     }
   };
 
-  const btn = {
-    fontSize: "0.65rem", fontFamily: "monospace", cursor: "pointer",
-    borderRadius: "3px", padding: "5px 12px",
-    background: "transparent", color: "var(--silver)",
-    border: "1px solid rgba(199,202,209,0.22)",
-  };
-
   return (
     <div>
       <div className="no-print" style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
-        <button onClick={onBack} style={btn}>← back to saved</button>
-        <button
-          onClick={() => window.print()}
-          style={{ ...btn, color: "var(--paper)", background: "var(--brass)", border: "1px solid var(--brass)" }}
-        >
+        <button onClick={onBack} className="btn btn-ghost btn-sm">← back to saved</button>
+        <button onClick={() => window.print()} className="btn btn-primary btn-sm">
           Print / Save as PDF
         </button>
-        <button
-          onClick={handleDelete}
-          disabled={deleting}
-          style={{ ...btn, color: "var(--oxide)", border: "1px solid rgba(155,74,63,0.4)" }}
-        >
+        <button onClick={handleDelete} disabled={deleting} className="btn btn-danger btn-sm">
           {deleting ? "deleting…" : "delete"}
         </button>
       </div>
@@ -190,12 +176,7 @@ export default function SavedReportsTab() {
   return (
     <div style={{ maxWidth: "1180px", margin: "0 auto", padding: "2.5rem 1.5rem" }}>
       <header className="no-print" style={{ marginBottom: "2rem" }}>
-        <div style={{
-          fontFamily: "monospace", fontSize: "0.58rem", textTransform: "uppercase",
-          letterSpacing: "0.26em", color: "var(--brass)", marginBottom: "0.35rem",
-        }}>
-          Saved Reports
-        </div>
+        <div className="eyebrow" style={{ marginBottom: "0.35rem" }}>Hypothesis archive</div>
         <h2 style={{ fontSize: "2rem", fontWeight: 700, color: "var(--paper)", margin: 0, lineHeight: 1.1 }}>
           Saved Reports
         </h2>
@@ -235,15 +216,7 @@ export default function SavedReportsTab() {
             <button
               key={r.id}
               onClick={() => openReport(r.id)}
-              style={{
-                textAlign: "left", cursor: "pointer",
-                background: "rgba(199,202,209,0.03)",
-                border: "1px solid rgba(199,202,209,0.14)", borderRadius: "6px",
-                padding: "1rem 1.25rem", color: "var(--paper)",
-                transition: "border-color 0.15s, background-color 0.15s",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(184,151,90,0.45)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(199,202,209,0.14)"; }}
+              className="report-card"
             >
               <div style={{ fontSize: "0.85rem", lineHeight: 1.4, marginBottom: "0.4rem" }}>
                 {r.hypothesis_text || r.hypothesis_id}

@@ -202,23 +202,7 @@ export default function App() {
               <button
                 key={id}
                 onClick={() => setView(id)}
-                style={{
-                  padding: "0.7rem 1.1rem",
-                  fontFamily: "monospace",
-                  fontSize: "0.65rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.18em",
-                  fontWeight: active ? 600 : 400,
-                  color: active ? "var(--brass)" : "var(--silver)",
-                  background: "transparent",
-                  border: "none",
-                  borderBottom: active ? "2px solid var(--brass)" : "2px solid transparent",
-                  marginBottom: "-1px",
-                  cursor: "pointer",
-                  transition: "color 0.15s",
-                }}
-                onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = "var(--paper)"; }}
-                onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = "var(--silver)"; }}
+                className={`nav-tab${active ? " nav-tab--active" : ""}`}
               >
                 {label}
               </button>

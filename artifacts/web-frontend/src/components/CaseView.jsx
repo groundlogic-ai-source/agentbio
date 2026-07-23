@@ -94,17 +94,7 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
         <button
           type="button"
           onClick={onBack}
-          className="font-mono text-[0.68rem] uppercase tracking-wider"
-          style={{
-            color: "var(--silver)",
-            transition: "color 0.15s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = "var(--brass)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = "var(--silver)";
-          }}
+          className="btn btn-ghost btn-sm"
         >
           ← All case files
         </button>
@@ -112,20 +102,7 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
           <button
             type="button"
             onClick={() => window.print()}
-            className="ml-auto rounded px-3 py-1.5 font-mono text-[0.68rem] uppercase tracking-wider"
-            style={{
-              border: "1px solid rgba(199,202,209,0.4)",
-              color: "var(--silver)",
-              transition: "border-color 0.15s ease, color 0.15s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "var(--brass)";
-              e.currentTarget.style.color = "var(--brass)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "rgba(199,202,209,0.4)";
-              e.currentTarget.style.color = "var(--silver)";
-            }}
+            className="btn btn-ghost btn-sm ml-auto"
           >
             Download PDF
           </button>
