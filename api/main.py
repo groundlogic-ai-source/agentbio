@@ -743,6 +743,36 @@ def get_research_hypotheses(include_archived: bool = False) -> list[dict]:
 
     # return as records, coercing NaN → None for JSON-serialisability
     records = hist.where(hist.notna(), other=None).to_dict("records")
+
+    # Parse reviewer_tag from outcome_note at read time.
+    # The lead reviewer's READY / NEEDS_ENRICHMENT / DISCARDED tag is persisted
+    # embedded in outcome_note as "TAG: reason" rather than a standalone column.
+    # Extracting it here makes it a first-class field in every API response so the
+    # UI and callers can filter/display it without string-parsing outcome_note.
+    for rec in records:
+        note = str(rec.get("outcome_note") or "")
+        dt = str(rec.get("discovery_test_type") or "").strip()
+        dp = rec.get("discovery_raw_p")
+        # A row was actually tested if it has a test_type AND a raw p-value.
+        # Rows with a test_type but no raw_p are degenerate (separation/non-convergence).
+        has_result = bool(dt and dp is not None and dp != "")
+        if note.startswith("SKIPPED (duplicate):"):
+            rtag = "SKIPPED_DUPLICATE"
+        elif note.startswith("hard-blocked:"):
+            rtag = "HARD_BLOCKED"
+        elif note.startswith("auto-demoted"):
+            rtag = "NEEDS_ENRICHMENT"
+        elif note.startswith("not tested:"):
+            rtag = "NOT_TESTED"
+        elif note.startswith("DISCARDED:") or note.startswith("DISCARDED "):
+            rtag = "DISCARDED"
+        elif note.startswith("NEEDS_ENRICHMENT:") or note.startswith("NEEDS_ENRICHMENT "):
+            rtag = "NEEDS_ENRICHMENT"
+        elif has_result:
+            rtag = "READY"
+        else:
+            rtag = ""
+        rec["reviewer_tag"] = rtag
     return records
 
 

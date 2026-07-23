@@ -219,9 +219,33 @@ def generate() -> tuple[list[dict], list[dict]]:
     print(f"[gen]   A proposed {len(a)} domains: {_domain_names(a)}", flush=True)
 
     print("[gen] LLM B (GPT-5.6 Sol) proposing domains...", flush=True)
-    b_raw = L.sol(base)
-    b = L.extract_json_list(b_raw)
-    print(f"[gen]   B proposed {len(b)} domains: {_domain_names(b)}", flush=True)
+    try:
+        b_raw = L.sol(base)
+        b = L.extract_json_list(b_raw)
+        if not b:
+            # Parseable JSON but empty — Sol returned [] or all elements were filtered.
+            # This is a genuine zero-domain response, NOT an API error. Log it clearly
+            # so it is distinguishable from a crash in the run log.
+            print(
+                "[gen]   WARNING: Sol returned 0 domains — empty JSON array or all "
+                "parsed elements were non-dict. Check whether Sol's response exceeded "
+                "context or hit a content filter. Continuing with Opus proposals only.",
+                flush=True,
+            )
+        else:
+            print(f"[gen]   B proposed {len(b)} domains: {_domain_names(b)}", flush=True)
+    except Exception as _sol_err:
+        # API failure (timeout, auth error, non-JSON output, etc.). This is a SILENT
+        # ERROR at the API level — not a zero-domain response. Without this catch the
+        # ValueError from extract_json_list() propagates through run_batch() and aborts
+        # the entire run before any DB writes occur, producing a run_id with zero rows.
+        print(
+            f"[gen]   ERROR: Sol call failed with {type(_sol_err).__name__}: {_sol_err!r}. "
+            "This is a silent API error — NOT a zero-domain deliberate choice. "
+            "Continuing with Opus proposals only.",
+            flush=True,
+        )
+        b = []
 
     dupes = _overlap(a, b)
     if dupes:
@@ -232,9 +256,16 @@ def generate() -> tuple[list[dict], list[dict]]:
             + f"\n\nADDITIONAL EXCLUSION: do NOT propose any of these domains (already "
             f"taken by the other model): {excl}. Propose genuinely different phenomena."
         )
-        b_raw = L.sol(reprompt)
-        b = L.extract_json_list(b_raw)
-        print(f"[gen]   B re-proposed: {_domain_names(b)}", flush=True)
+        try:
+            b_raw = L.sol(reprompt)
+            b = L.extract_json_list(b_raw)
+            print(f"[gen]   B re-proposed: {_domain_names(b)}", flush=True)
+        except Exception as _sol_err2:
+            print(
+                f"[gen]   ERROR on Sol reprompt ({type(_sol_err2).__name__}: {_sol_err2!r}). "
+                "Keeping first Sol pass.",
+                flush=True,
+            )
     return a, b
 
 
@@ -432,6 +463,11 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
     # can never allocate the same id. Counters are local to this run.
     _hc = [0]
     _tc = [0]
+    # Load all previously-tested feature_specs once for deduplication. A second dict
+    # tracks specs that pass the dedup check within THIS batch so two generators
+    # proposing the same computable proxy in the same run don't both get tested.
+    _existing_specs = R.load_existing_feature_specs()
+    _this_run_specs: dict[str, str] = {}  # canonical_json → hypothesis_id
 
     def new_hid() -> str:
         _hc[0] += 1
@@ -534,8 +570,45 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
             })
             continue
 
+        # ── Feature-level deduplication ────────────────────────────────────────
+        # Compare the normalized computable proxy (op + params, keys sorted, keywords
+        # alphabetized) against every prior test in the persistent registry AND every
+        # other hypothesis already claimed in this batch. Identical computable tests
+        # re-appearing under a different domain name or narrative framing are NOT new
+        # findings — they inflate the FDR denominator and present stale results as if
+        # fresh. Skip and reference the original result instead of re-testing.
+        canonical = R.spec_canonical(spec)
+        _prior = _existing_specs.get(canonical) or (
+            {"hypothesis_id": _this_run_specs[canonical], "run_id": run_id, "test_id": ""}
+            if canonical in _this_run_specs else None
+        )
+        if _prior:
+            ref_hid = _prior.get("hypothesis_id", "unknown")
+            hid = new_hid()
+            hist_rows.append({
+                "test_id": "", "hypothesis_id": hid, "run_id": run_id,
+                "session_timestamp": ts, "domain_description": domain,
+                "proposing_llm": llm, "resulting_hypothesis_text": htext,
+                "discovery_test_type": "", "outcome_framing": "",
+                "discovery_raw_p": "", "discovery_fdr_p": "", "discovery_pass": "",
+                "confirmation_pass": "", "confirmation_raw_p": "",
+                "confound_check_summary": "",
+                "outcome_note": (
+                    f"SKIPPED (duplicate): identical feature_spec already tested as "
+                    f"{ref_hid} — see that hypothesis for the statistical result"
+                ),
+                "feature_spec": json.dumps(spec),
+            })
+            print(
+                f"[dedup] '{htext[:70]}' → identical feature_spec already in registry "
+                f"as {ref_hid}; skipping re-test.",
+                flush=True,
+            )
+            continue
+
         hid = new_hid()
         kind = F.predictor_kind(spec)
+        _this_run_specs[canonical] = hid  # register for within-batch dedup
         # Store spec/kind/mech so the confirmation and confound steps can replay
         # the exact same test on the holdout half after FDR correction.
         test_meta[hid] = {"spec": spec, "kind": kind, "mech": mech}
