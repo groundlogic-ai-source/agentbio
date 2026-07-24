@@ -11,6 +11,8 @@ import {
   openCase,
   resumeCase,
   archiveCase,
+  startBatch,
+  getBatch,
 } from "./api.js";
 import { isTerminal } from "./lib/stages.js";
 
@@ -39,6 +41,9 @@ export default function App() {
   const [showArchived, setShowArchived] = useState(false);
   const showArchivedRef = useRef(false);
   showArchivedRef.current = showArchived;
+
+  const [batchState, setBatchState] = useState(null);
+  const batchPollRef = useRef(null);
 
   const refreshList = useCallback(async () => {
     const list = await listRuns({ includeArchived: showArchivedRef.current });
@@ -167,6 +172,38 @@ export default function App() {
     [loadDetail, refreshList],
   );
 
+  const handleBatchScan = useCallback(
+    async (n) => {
+      setError(null);
+      try {
+        const result = await startBatch(n);
+        setBatchState(result);
+        await refreshList();
+
+        // Poll batch progress until done, refreshing the case list each tick
+        // so new cases appear as they complete.
+        if (batchPollRef.current) clearInterval(batchPollRef.current);
+        batchPollRef.current = setInterval(async () => {
+          try {
+            const progress = await getBatch(result.batch_id);
+            setBatchState(progress);
+            await refreshList();
+            if (progress.status === "done") {
+              clearInterval(batchPollRef.current);
+              batchPollRef.current = null;
+            }
+          } catch {
+            clearInterval(batchPollRef.current);
+            batchPollRef.current = null;
+          }
+        }, POLL_MS);
+      } catch (e) {
+        setError(e.message);
+      }
+    },
+    [refreshList],
+  );
+
   const isTopLevel = view === "dashboard" || view === "research" || view === "saved";
 
   return (
@@ -219,6 +256,8 @@ export default function App() {
           onNewCase={() => setDialogOpen(true)}
           onArchive={handleArchive}
           onToggleArchived={handleToggleArchived}
+          onBatchScan={handleBatchScan}
+          batchState={batchState}
         />
       )}
 

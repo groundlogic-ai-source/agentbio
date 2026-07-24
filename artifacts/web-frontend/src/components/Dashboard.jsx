@@ -1,3 +1,4 @@
+import { useState } from "react";
 import StatusBadge from "./StatusBadge.jsx";
 import { diseaseLabel, formatCost, formatDate } from "../lib/stages.js";
 
@@ -116,12 +117,30 @@ export default function Dashboard({
   onNewCase,
   onArchive,
   onToggleArchived,
+  onBatchScan,
+  batchState,
 }) {
+  const [batchN, setBatchN] = useState(3);
+  const [batchBusy, setBatchBusy] = useState(false);
+
   const archivedCount = runs.filter((j) => j.archived).length;
-  const activeCount = runs.filter((j) => !j.archived).length;
   const hasAny = runs.length > 0;
   const noneVisible =
     !showArchived && runs.length > 0 && runs.every((j) => j.archived);
+
+  const reviewQueue = runs.filter((j) => !j.archived && j.status === "awaiting_review");
+  const batchRunning = batchState && batchState.status === "running";
+  const batchDone = batchState && batchState.status === "done";
+
+  async function handleBatch() {
+    if (batchBusy || batchRunning) return;
+    setBatchBusy(true);
+    try {
+      await onBatchScan(batchN);
+    } finally {
+      setBatchBusy(false);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
@@ -151,14 +170,118 @@ export default function Dashboard({
             requires wet-lab validation; nothing here is a cure.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onNewCase}
-          className="btn btn-primary shrink-0"
-        >
-          Open new case
-        </button>
+
+        {/* Action buttons */}
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          {/* Batch scan controls */}
+          <div className="flex items-center gap-2">
+            <select
+              value={batchN}
+              onChange={(e) => setBatchN(Number(e.target.value))}
+              disabled={batchBusy || batchRunning}
+              style={{
+                background: "var(--graphite-raised)",
+                border: "1px solid rgba(199,202,209,0.35)",
+                borderRadius: "6px",
+                color: "var(--silver)",
+                fontFamily: "var(--font-mono, monospace)",
+                fontSize: "0.72rem",
+                padding: "0.3rem 0.5rem",
+                cursor: batchBusy || batchRunning ? "not-allowed" : "pointer",
+                opacity: batchBusy || batchRunning ? 0.55 : 1,
+              }}
+            >
+              {[3, 5, 10].map((n) => (
+                <option key={n} value={n}>{n} cases</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={handleBatch}
+              disabled={batchBusy || batchRunning}
+              className="btn btn-ghost"
+            >
+              {batchRunning
+                ? `Scanning ${batchState.completed}/${batchState.n}…`
+                : "Batch scan"}
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={onNewCase}
+            className="btn btn-primary"
+          >
+            Open new case
+          </button>
+        </div>
       </header>
+
+      {/* Batch progress banner */}
+      {batchRunning && (
+        <div
+          className="mt-6 rounded-lg border px-4 py-3 font-mono text-xs fade-in"
+          style={{
+            borderColor: "rgba(199,202,209,0.35)",
+            background: "var(--graphite-raised)",
+            color: "var(--ink-muted)",
+          }}
+        >
+          <span style={{ color: "var(--silver)" }}>Batch scan in progress — </span>
+          {batchState.completed} of {batchState.n} cases explored.
+          New cases appear below as they complete.
+        </div>
+      )}
+      {batchDone && (
+        <div
+          className="mt-6 rounded-lg border px-4 py-3 font-mono text-xs fade-in"
+          style={{
+            borderColor: "rgba(180,139,80,0.4)",
+            background: "rgba(180,139,80,0.06)",
+            color: "var(--brass)",
+          }}
+        >
+          Batch scan complete — {batchState.n} case{batchState.n !== 1 ? "s" : ""} explored.
+        </div>
+      )}
+
+      {/* Review queue — prominent band when cases need human sign-off */}
+      {reviewQueue.length > 0 && (
+        <section
+          className="mt-8 rounded-lg border p-5 fade-in"
+          style={{
+            borderColor: "rgba(180,139,80,0.55)",
+            background: "rgba(180,139,80,0.07)",
+          }}
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <span
+              className="font-mono text-[0.6rem] uppercase tracking-[0.22em]"
+              style={{ color: "var(--brass)" }}
+            >
+              Review queue
+            </span>
+            <span
+              className="font-mono text-[0.62rem]"
+              style={{ color: "var(--ink-muted)" }}
+            >
+              {reviewQueue.length} case{reviewQueue.length !== 1 ? "s" : ""} awaiting sign-off
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {reviewQueue.map((job) => (
+              <button
+                key={job.job_id}
+                type="button"
+                onClick={() => onOpenCase(job.job_id)}
+                className="btn btn-sm btn-ghost-brass"
+              >
+                {diseaseLabel(job)}&nbsp;→
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="mt-10">
         {/* Section header row */}
