@@ -89,6 +89,15 @@ class ResumeRequest(BaseModel):
     notes: Optional[str] = None
 
 
+class BatchRequest(BaseModel):
+    n: int = 3  # number of blank-mode cases to run sequentially (clamped to 1-10)
+
+
+# In-memory batch progress registry.  Survives for the lifetime of the server
+# process; not persisted across restarts (job records survive in jobs.db).
+_batch_progress: dict[str, dict[str, Any]] = {}
+
+
 # --------------------------------------------------------------------------- #
 # Background graph execution
 # --------------------------------------------------------------------------- #
@@ -245,6 +254,69 @@ def start_run(request: Request, req: RunRequest) -> dict[str, str]:
 @app.get("/api/runs")
 def get_runs(include_archived: bool = False) -> list[dict[str, Any]]:
     return jobs_db.list_jobs(include_archived=include_archived)
+
+
+@app.post("/api/runs/batch")
+def start_batch(request: Request, req: BatchRequest) -> dict[str, Any]:
+    """
+    Queue N blank-mode auto-explore cases and run them sequentially on a
+    background thread.  Returns immediately with batch_id + all pre-created
+    job_ids so the UI can poll individual job progress via GET /api/runs/{job_id}.
+
+    Cases run in order; each case waits for the previous one to finish (including
+    the human-review pause) before the next case's graph starts.  This keeps
+    API call load predictable and avoids the race condition where two cases
+    simultaneously claim the same auto-picked target.
+
+    Rate limiting:
+      - IP rate limit and daily cap are checked once for the full batch (not N
+        times), so a batch of 5 counts as 1 request against the IP limit.
+      - The N new jobs ARE counted against today's daily usage (each creates one
+        jobs.db row, so the daily cap is honoured across restarts).
+
+    Clamped: n is clamped server-side to [1, 10] regardless of the request value.
+    """
+    n = max(1, min(10, req.n))
+    _guardrails.check_ip_rate_limit(request)
+    _guardrails.check_daily_cap(jobs_db.count_jobs_today)
+
+    # Pre-create all N jobs so their IDs are known before the background thread
+    # starts — the caller can begin polling immediately.
+    job_rows = [jobs_db.create_job(disease_name=None) for _ in range(n)]
+    job_ids  = [j["job_id"]  for j in job_rows]
+    thread_ids = [j["thread_id"] for j in job_rows]
+
+    # Derive a stable batch_id from the first job_id (both are SHA-256 hex).
+    batch_id = hashlib.sha256(job_ids[0].encode()).hexdigest()[:20]
+    _batch_progress[batch_id] = {
+        "batch_id": batch_id,
+        "n": n,
+        "job_ids": job_ids,
+        "completed": 0,
+        "status": "running",
+    }
+
+    def _run_batch() -> None:
+        for job_id, thread_id in zip(job_ids, thread_ids):
+            try:
+                _run_graph(job_id, thread_id)
+            except Exception as exc:
+                print(f"[batch] job {job_id} failed with {type(exc).__name__}: {exc}")
+            _batch_progress[batch_id]["completed"] += 1
+        _batch_progress[batch_id]["status"] = "done"
+        print(f"[batch] {batch_id} complete: {n} case(s) explored")
+
+    threading.Thread(target=_run_batch, daemon=True).start()
+    return _batch_progress[batch_id]
+
+
+@app.get("/api/runs/batch/{batch_id}")
+def get_batch(batch_id: str) -> dict[str, Any]:
+    """Poll batch progress.  Returns {batch_id, n, job_ids, completed, status}."""
+    progress = _batch_progress.get(batch_id)
+    if progress is None:
+        raise HTTPException(status_code=404, detail="batch not found")
+    return progress
 
 
 @app.patch("/api/runs/{job_id}/archive")

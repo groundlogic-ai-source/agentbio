@@ -223,7 +223,7 @@ def get_pathway_neighbor_targets(
     """
     if not uniprot_id:
         return []
-    cache_key = make_key("biologist_pathway_neighbor_targets_v2",
+    cache_key = make_key("biologist_pathway_neighbor_targets_v3",
                          uniprot_id, disease_name)
     cached = get(cache_key)
     if cached is not None:
@@ -237,13 +237,35 @@ def get_pathway_neighbor_targets(
             "target_discovery_method": "pathway_neighbor",
             "pathway_count": nbr.get("pathway_count", 1),
             "disease_name": disease_name,
+            # Reactome specificity metadata (see data_sources/reactome.py for calibration).
+            # "broad_metabolic" means ALL shared pathways have metabolic-process keywords
+            # in their name — enzymes grouped by shared substrate, not direct interaction.
+            # Reviewer must verify cellular compartment and mechanism independently.
+            "specificity_tier": nbr.get("specificity_tier", "moderate"),
+            "shared_pathway_names": nbr.get("shared_pathway_names", []),
+            "min_shared_participants": nbr.get("min_shared_participants"),
         }
         for nbr in neighbors
         if nbr.get("uniprot_id")
     ]
 
-    print(f"[biologist] pathway_neighbors: {len(results)} neighbor(s) "
-          f"forwarded to Chemist (no approved-drug pre-filter)")
+    broad = [r for r in results if r.get("specificity_tier") == "broad_metabolic"]
+    if broad:
+        for r in broad:
+            print(
+                f"[biologist] WARNING: pathway_neighbor {r['target_symbol']} "
+                f"({r['uniprot_id']}) is connected ONLY via broad metabolic "
+                f"pathway(s): {r.get('shared_pathway_names', [])}. "
+                f"This is a metabolic-process grouping (enzymes sharing a substrate), "
+                f"NOT a direct signaling/regulatory interaction. "
+                f"Compounds from this neighbor should be reviewed for cellular compartment "
+                f"and mechanism compatibility before trusting the repurposing hypothesis.",
+                flush=True,
+            )
+
+    print(f"[biologist] pathway_neighbors: {len(results)} neighbor(s) forwarded to Chemist "
+          f"(no approved-drug pre-filter; "
+          f"{len(broad)} broad_metabolic, {len(results)-len(broad)} direct/moderate)")
     cache_set(cache_key, results, ttl_days=7)
     return results
 

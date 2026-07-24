@@ -1,0 +1,41 @@
+Four fixes.
+
+1. Root-cause Sol's zero-output problem, not just its crash. Log the raw,
+   unparsed API response from every Sol call in the next several
+   discovery runs (before any JSON extraction/parsing is attempted).
+   Determine precisely why extraction fails: empty response, malformed
+   JSON, a refusal, a truncated response, or a genuine schema mismatch.
+   Report the actual raw text, not a summary. Fix the real cause; do not
+   just widen the try/except.
+
+2. Add pathway-neighbor specificity discipline, mirroring the disease-
+   breadth fix already built (PARENT_MAX_DESCENDANTS). When Reactome
+   returns a pathway-neighbor candidate, check whether the connection is
+   a tight, direct reaction/signaling relationship (e.g. TSC1->MTOR) or a
+   broad shared-superpathway membership only (e.g. GAA and SLC37A4 both
+   loosely under "glycogen metabolism" despite operating in different
+   cellular compartments via unrelated mechanisms). Use Reactome's own
+   pathway hierarchy depth/specificity data to distinguish these,
+   calibrated against real examples the same way the disease-breadth
+   threshold was calibrated -- not an arbitrary guess. Flag or exclude
+   low-specificity pathway-neighbor candidates, or at minimum surface
+   this distinction plainly in the report so a reviewer can see it
+   immediately rather than have to independently verify it.
+
+3. Reject/flag the current Glycogen storage disease type 1c / MIGLITOL
+   case explicitly, with the reasoning above recorded, since GAA is not
+   a real pathway-neighbor of this disease's actual causal mechanism
+   (SLC37A4/G6PC, endoplasmic reticulum-based glucose-6-phosphate
+   transport) -- GAA-targeted therapy exists for Pompe disease, a
+   mechanistically unrelated lysosomal disorder that only shares the
+   "glycogen storage disease" name family.
+
+4. Add a batch-scan feature to Case Files: run N diseases (auto-explore,
+   sequential, respecting existing explored_targets memory) in one
+   triggered batch, logging every result -- pass or sub-threshold --
+   exactly as today, with nothing hidden or retried. Surface only the
+   cases that cleared STRONG_MATCH in a highlighted review queue, while
+   every case, successful or not, remains fully accessible in the normal
+   case list. This must never silently discard or hide a sub-threshold
+   result -- it only changes how many cases you can review per batch,
+   not what gets recorded.

@@ -51,6 +51,18 @@ export function resumeCase(jobId, action, notes) {
   });
 }
 
+export function startBatch(n) {
+  return request("/api/runs/batch", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ n }),
+  });
+}
+
+export function getBatch(batchId) {
+  return request(`/api/runs/batch/${encodeURIComponent(batchId)}`);
+}
+
 export const TERMINAL_STATUSES = new Set(["completed", "error"]);
 
 // ── Research hypothesis registry (Feature 3) ──────────────────────────────────

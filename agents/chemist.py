@@ -275,6 +275,46 @@ def run_chemist(biologist_output: dict[str, Any],
                     nbr_enriched = _enrich_compounds(
                         nbr_compounds, nbr_sym, nbr_uid, disease_name,
                         0.0, "pathway_neighbor")  # ot_score=0: no direct OT link
+
+                    # Stamp pathway specificity note on broad_metabolic neighbors so
+                    # the Reviewer and Writer can surface this clearly.  A "broad_metabolic"
+                    # tier (calibrated in data_sources/reactome.py) means the two proteins
+                    # were grouped by shared substrate in a metabolic process pathway, NOT
+                    # because they directly interact.  Reviewer must check cellular
+                    # compartment and mechanism before trusting the repurposing hypothesis.
+                    #
+                    # KNOWN ARCHETYPE (recorded 2026-07):
+                    #   GSD1c (glucose-6-phosphate transport, SLC37A4 in ER membrane) →
+                    #   GAA discovered as pathway_neighbor via "Glycogen breakdown
+                    #   (glycogenolysis)" [R-HSA-70221, 15 participants] →
+                    #   MIGLITOL (intestinal alpha-glucosidase inhibitor) appears as
+                    #   GAA-targeting candidate.
+                    #   REJECTION REASONING: GAA operates in lysosomes and is the Pompe
+                    #   disease target (GSD type II), unrelated to GSD1c's ER transport
+                    #   defect.  MIGLITOL acts on MGA/MGAM (brush-border), not lysosomal
+                    #   GAA.  The shared glycogen pathway is a metabolic process grouping,
+                    #   NOT evidence of direct molecular interaction.
+                    #   The mechanism_direction check (Step 1 GPT-5 web search) must catch
+                    #   this; pathway_specificity_note surfaces it for human reviewers.
+                    if nbr.get("specificity_tier") == "broad_metabolic":
+                        pw_names = nbr.get("shared_pathway_names", [])
+                        note = (
+                            f"PATHWAY SPECIFICITY WARNING: {nbr_sym} is connected to the "
+                            f"primary target ONLY via broad metabolic pathway(s): "
+                            f"{', '.join(pw_names) if pw_names else 'unknown'}. "
+                            f"These enzymes share a substrate but may operate in different "
+                            f"cellular compartments and have unrelated mechanisms. "
+                            f"Independent verification of compartment and mechanism "
+                            f"compatibility is required before trusting this hypothesis."
+                        )
+                        for c in nbr_enriched:
+                            c["pathway_specificity_note"] = note
+                        print(
+                            f"[chemist] WARNING: pathway_neighbor {nbr_sym} "
+                            f"is broad_metabolic ({pw_names}); "
+                            f"note stamped on {len(nbr_enriched)} compound(s)"
+                        )
+
                     neighbor_enriched.extend(nbr_enriched)
                     print(f"[chemist] pathway_neighbor {nbr_sym} ({nbr_uid}): "
                           f"{len(nbr_compounds)} compound(s) added to pool")
@@ -341,6 +381,10 @@ def run_chemist(biologist_output: dict[str, Any],
             "disease_name": disease_name,
             "ot_association_score": e.get("ot_association_score",
                                           ot_score),
+            # Populated for pathway_neighbor candidates discovered via broad metabolic
+            # pathways (specificity_tier == "broad_metabolic").  Surfaces in the report
+            # so reviewers can judge compartment/mechanism compatibility independently.
+            "pathway_specificity_note": e.get("pathway_specificity_note"),
         })
 
         for aid in e.get("source_activity_ids", []):

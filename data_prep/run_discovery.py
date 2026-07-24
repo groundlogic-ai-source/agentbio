@@ -215,12 +215,28 @@ def generate() -> tuple[list[dict], list[dict]]:
 
     print("[gen] LLM A (Opus 4.8) proposing domains...", flush=True)
     a_raw = L.opus(base)
+    # Log raw text BEFORE extraction so the actual model output is visible in the
+    # run log even if JSON extraction succeeds or fails. Critical for diagnosing
+    # empty responses (content filter, truncation, refusal, wrong format, etc.).
+    print(
+        f"[gen] Opus raw response (chars={len(a_raw) if a_raw else 0}, "
+        f"first 500 chars):\n{(a_raw or '')[:500]!r}",
+        flush=True,
+    )
     a = L.extract_json_list(a_raw)
     print(f"[gen]   A proposed {len(a)} domains: {_domain_names(a)}", flush=True)
 
     print("[gen] LLM B (GPT-5.6 Sol) proposing domains...", flush=True)
     try:
         b_raw = L.sol(base)
+        # Log raw text BEFORE extraction — the primary diagnostic tool for
+        # zero-output Sol runs. Shows the literal bytes returned by the API,
+        # including any refusal text, malformed JSON, or truncation artifact.
+        print(
+            f"[gen] Sol raw response (chars={len(b_raw) if b_raw else 0}, "
+            f"first 3000 chars):\n{(b_raw or '')[:3000]!r}",
+            flush=True,
+        )
         b = L.extract_json_list(b_raw)
         if not b:
             # Parseable JSON but empty — Sol returned [] or all elements were filtered.
@@ -258,6 +274,11 @@ def generate() -> tuple[list[dict], list[dict]]:
         )
         try:
             b_raw = L.sol(reprompt)
+            print(
+                f"[gen] Sol reprompt raw response (chars={len(b_raw) if b_raw else 0}, "
+                f"first 3000 chars):\n{(b_raw or '')[:3000]!r}",
+                flush=True,
+            )
             b = L.extract_json_list(b_raw)
             print(f"[gen]   B re-proposed: {_domain_names(b)}", flush=True)
         except Exception as _sol_err2:

@@ -49,9 +49,29 @@ SAFETY_CAP = 0.40
 # a DIRECTIONALLY_INCOMPATIBLE verdict prevents STRONG_MATCH just as a
 # safety flag does. COMPATIBLE and INSUFFICIENT_INFO never trigger the cap.
 MECHANISM_DIRECTION_CAP = SAFETY_CAP
-# Mechanism-direction check runs on the single top-ranked candidate only,
-# matching the Boltz structure-validation scope.
-MAX_MECHANISM_DIRECTION_CANDIDATES = 1
+# Mechanism-direction check now runs on the top-3 candidates (up from 1) to
+# increase coverage without a prohibitive LLM cost increase.  The check is
+# the primary gate for the class of errors where a target is shared between
+# two diseases that LOOK related but operate via completely unrelated mechanisms.
+#
+# KNOWN ARCHETYPE — recorded 2026-07 for future reference:
+#   GSD1c (glucose-6-phosphate transport, SLC37A4 in ER) scored with GAA as
+#   primary target (OT gave a non-zero association score).  Chemist found MIGLITOL
+#   (intestinal alpha-glucosidase inhibitor) via ChEMBL GAA activity records.
+#   REJECTION REASONING:
+#     • GAA is the Pompe disease target (GSD type II, lysosomal glycogen storage).
+#       It is NOT the causal gene for GSD1c, which is caused by SLC37A4 deficiency.
+#     • MIGLITOL acts on brush-border alpha-glucosidases (MGA/MGAM), not lysosomal GAA.
+#     • The Stage 1 scoring ranked (GSD1c, GAA) because: GSD1c has high unmet need
+#       (no approved treatment) + GAA has high tractability (many ChEMBL compounds,
+#       good pLDDT).  The OT association score for (GSD1c, GAA) was non-zero because
+#       both diseases carry "glycogen storage" pathway annotations.
+#     • The mechanism_direction check must return DIRECTIONALLY_INCOMPATIBLE for
+#       MIGLITOL vs. GSD1c (an intestinal carbohydrate absorption inhibitor does not
+#       address a glucose-6-phosphate transporter defect in the ER membrane).
+#     • pathway_specificity_note is also set if GAA is discovered as a pathway_neighbor
+#       via "Glycogen breakdown (glycogenolysis)" [broad_metabolic tier].
+MAX_MECHANISM_DIRECTION_CANDIDATES = 3
 # Layer 2 (web-search) only runs on this many top candidates to mirror the
 # Boltz validation scope and keep LLM call costs bounded.
 MAX_SAFETY_LAYER2_CANDIDATES = 3
