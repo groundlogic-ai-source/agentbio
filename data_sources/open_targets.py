@@ -323,6 +323,40 @@ def get_disease_descendant_count(efo_id: str) -> Optional[int]:
     return result
 
 
+def get_ot_canonical_disease_name(efo_id: str) -> Optional[str]:
+    """
+    Return Open Targets' own canonical name for an EFO/MONDO ID, or None.
+
+    Used as a post-resolution sanity check: if the OT canonical name for the
+    resolved EFO shares little token overlap with the originally queried disease
+    name, the resolution may have landed on the wrong ontology node.
+
+    Cached with a 30-day TTL (ontology names change very rarely).
+    Sentinel "" is stored when OT has no name for the ID, to avoid repeat calls.
+    """
+    cache_key = make_key("get_ot_canonical_disease_name_v1", efo_id)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached if cached else None  # "" sentinel → None
+
+    query = """
+    query DiseaseCanonicalName($efoId: String!) {
+        disease(efoId: $efoId) {
+            name
+        }
+    }
+    """
+    name: Optional[str] = None
+    try:
+        data = _graphql(query, {"efoId": efo_id})
+        name = (data.get("data", {}).get("disease") or {}).get("name")
+    except Exception as e:
+        print(f"[open_targets] WARNING: canonical name lookup failed for '{efo_id}': {e}")
+
+    cache_set(cache_key, name if name is not None else "", ttl_days=30)
+    return name
+
+
 def get_disease_orphanet_code(efo_id: str) -> Optional[str]:
     """
     Return the Orphanet code (e.g. "365") for an EFO disease ID, or None.
