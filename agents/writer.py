@@ -265,7 +265,14 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
     sconf = cx.get("structure_confidence")
     plddt_complex = ((cx.get("raw_metrics") or {}).get("structure_metrics") or {}).get("complex_plddt")
     apo_plddt = afdb.get("mean_plddt")
-    bullets = "\n".join([
+
+    # EFO resolution mismatch warning: check the candidate first (manual mode),
+    # then fall back to biologist_output["target"] (both modes propagate it there).
+    efo_warn = candidate.get("efo_name_mismatch_warning") or (
+        (biologist_output or {}).get("target", {}).get("efo_name_mismatch_warning")
+    )
+
+    bullet_list = [
         f"- **Binding is not efficacy.** A high binding-pose confidence "
         f"({_fmt(cx.get('binding_pose_confidence'))}) or predicted affinity "
         f"({_fmt(cx.get('predicted_affinity'))}) only suggests the molecule may "
@@ -287,7 +294,11 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
         "been studied, not that it is safe or untried.",
         "- **This is a repurposing *hypothesis*, not a finding.** It is a prioritised "
         "starting point that requires wet-lab and, ultimately, clinical validation.",
-    ])
+    ]
+    if efo_warn:
+        # Prepend so the mismatch is the first thing a reviewer reads.
+        bullet_list.insert(0, f"- ⚠ {efo_warn}")
+    bullets = "\n".join(bullet_list)
     druggability = _druggability_subsection(biologist_output)
     if druggability:
         return bullets + "\n\n" + druggability
