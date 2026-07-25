@@ -1,26 +1,26 @@
 {
   "target": {
-    "target_symbol": "G6PD",
-    "uniprot_id": "P11413",
-    "ensembl_id": "ENSG00000160211",
-    "disease_name": "Class I glucose-6-phosphate dehydrogenase deficiency",
-    "orpha_code": "466026",
-    "ot_association_score": 0.851,
+    "target_symbol": "RET",
+    "uniprot_id": "P07949",
+    "ensembl_id": "ENSG00000165731",
+    "disease_name": "Isolated familial medullary thyroid carcinoma",
+    "orpha_code": "99361",
+    "ot_association_score": 0.86,
     "target_discovery_method": "genetic_association"
   },
   "candidates": [
     {
-      "drug_name": "PRASTERONE",
-      "molecule_chembl_id": "CHEMBL90593",
-      "smiles": "C[C@]12CC[C@H](O)CC1=CC[C@@H]1[C@@H]2CC[C@]2(C)C(=O)CC[C@@H]12",
+      "drug_name": "LENVATINIB",
+      "molecule_chembl_id": "CHEMBL1289601",
+      "smiles": "COc1cc2nccc(Oc3ccc(NC(=O)NC4CC4)c(Cl)c3)c2cc1C(N)=O",
       "inchikey": null,
-      "pchembl_value": 4.95,
+      "pchembl_value": 8.82,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [],
-      "most_similar_approved_drug": "BREXANOLONE",
-      "tanimoto_score": 0.2586,
+      "most_similar_approved_drug": "CABOZANTINIB",
+      "tanimoto_score": 0.4286,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -28,43 +28,329 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Prasterone has a median pChEMBL affinity of 4.95 against G6PD, measured at assay confidence score 9 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.259 to the nearest approved drug brexanolone. No physical or genetic interactors for the target are recorded in BioGRID.",
+      "rationale": "Lenvatinib has a median pChEMBL affinity of 8.82 against RET at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.429 to the nearest approved drug cabozantinib. No BioGRID physical or genetic interactors are recorded for the target.",
       "source_chembl_ids": [
-        "CHEMBL90593",
-        "CHEMBL1011499",
-        "CHEMBL1011500",
-        "CHEMBL2061901",
-        "CHEMBL2061902",
-        "CHEMBL4816199",
-        "CHEMBL5121892"
+        "CHEMBL1289601",
+        "CHEMBL3428795"
       ],
       "source_activity_ids": [
-        2609797,
-        2609798,
-        10959800,
-        10959859,
-        23179892,
-        24753593
+        15247904
       ],
-      "target_symbol": "G6PD",
+      "target_symbol": "RET",
       "target_discovery_method": "genetic_association",
-      "uniprot_id": "P11413",
-      "disease_name": "Class I glucose-6-phosphate dehydrogenase deficiency",
-      "ot_association_score": 0.851,
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "APOMORPHINE HYDROCHLORIDE",
-      "molecule_chembl_id": "CHEMBL3187985",
-      "smiles": "CN1CCc2cccc3c2[C@H]1Cc1ccc(O)c(O)c1-3.CN1CCc2cccc3c2[C@H]1Cc1ccc(O)c(O)c1-3.Cl.Cl.O",
+      "drug_name": "GILTERITINIB",
+      "molecule_chembl_id": "CHEMBL3301622",
+      "smiles": "CCc1nc(C(N)=O)c(Nc2ccc(N3CCC(N4CCN(C)CC4)CC3)c(OC)c2)nc1NC1CCOCC1",
       "inchikey": null,
-      "pchembl_value": 4.46,
+      "pchembl_value": 8.47,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "ENTRECTINIB",
+      "tanimoto_score": 0.2963,
+      "mutation_specificity": {
+        "is_mutation_specific": true,
+        "matched_terms": [
+          "FLT3 mutation"
+        ],
+        "source_excerpt": "\u2026relapsed or refractory acute myeloid leukemia (AML) with a FLT3 mutation as detected by an FDA-approved test. ( 1.1 ) 1.1 Relapsed o\u2026",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Gilteritinib has a median pChEMBL affinity of 8.47 against RET, measured at assay confidence score 9 out of 9, and is an approved drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, entrectinib, is 0.296, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "source_chembl_ids": [
+        "CHEMBL3301622",
+        "CHEMBL3706336"
+      ],
+      "source_activity_ids": [
+        17662979
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "PONATINIB",
+      "molecule_chembl_id": "CHEMBL1171837",
+      "smiles": "Cc1ccc(C(=O)Nc2ccc(CN3CCN(C)CC3)c(C(F)(F)F)c2)cc1C#Cc1cnc2cccnn12",
+      "inchikey": null,
+      "pchembl_value": 8.32,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "SORAFENIB",
+      "tanimoto_score": 0.2424,
+      "mutation_specificity": {
+        "is_mutation_specific": true,
+        "matched_terms": [
+          "T315I",
+          "T315I-positive",
+          "CP-CML",
+          "BCR-ABL",
+          "BCR-ABL1"
+        ],
+        "source_excerpt": "\u2026h+ ALL for whom no other kinase inhibitors are indicated or T315I-positive Ph+ ALL. Chronic Myeloid Leukemia (CML) Chronic ph\u2026",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Ponatinib has a median pChEMBL affinity of 8.32 against RET, measured at assay confidence score 9 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.242 to the nearest approved drug sorafenib. No BioGRID physical or genetic interactors are recorded for the target.",
+      "source_chembl_ids": [
+        "CHEMBL1171837",
+        "CHEMBL3428795",
+        "CHEMBL3428927",
+        "CHEMBL3868194",
+        "CHEMBL4002769"
+      ],
+      "source_activity_ids": [
+        15247906,
+        15247911,
+        16797833,
+        18002375
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "SORAFENIB",
+      "molecule_chembl_id": "CHEMBL1336",
+      "smiles": "CNC(=O)c1cc(Oc2ccc(NC(=O)Nc3ccc(Cl)c(C(F)(F)F)c3)cc2)ccn1",
+      "inchikey": null,
+      "pchembl_value": 8.05,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "CABOZANTINIB",
+      "tanimoto_score": 0.2911,
+      "mutation_specificity": {
+        "is_mutation_specific": true,
+        "matched_terms": [
+          "BCR-ABL"
+        ],
+        "source_excerpt": "\u2026ronic myelogenous leukemia  Leukemia, Myelogenous, Chronic, BCR-ABL Positive  glioblastoma multiforme  Glioblastoma  mesothelio\u2026",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Sorafenib has a median pChEMBL affinity of 8.05 against RET, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.291 to the nearest approved drug cabozantinib. No BioGRID physical or genetic interactors are recorded for the RET target.",
+      "source_chembl_ids": [
+        "CHEMBL1336",
+        "CHEMBL1244315",
+        "CHEMBL1963706",
+        "CHEMBL3428795"
+      ],
+      "source_activity_ids": [
+        3446178,
+        9533009,
+        15247902
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "CABOZANTINIB",
+      "molecule_chembl_id": "CHEMBL2105717",
+      "smiles": "COc1cc2nccc(Oc3ccc(NC(=O)C4(C(=O)Nc5ccc(F)cc5)CC4)cc3)c2cc1OC",
+      "inchikey": null,
+      "pchembl_value": 8.0,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "LENVATINIB",
+      "tanimoto_score": 0.4286,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Cabozantinib has a median pChEMBL affinity of 8.0 against RET, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.429 to the nearest approved drug lenvatinib. No physical or genetic interactors for the target are recorded in BioGRID.",
+      "source_chembl_ids": [
+        "CHEMBL2105717",
+        "CHEMBL3372652",
+        "CHEMBL3428795",
+        "CHEMBL3756068",
+        "CHEMBL3756072",
+        "CHEMBL3756073",
+        "CHEMBL3756074",
+        "CHEMBL3756075",
+        "CHEMBL3756076",
+        "CHEMBL3766479",
+        "CHEMBL3778237",
+        "CHEMBL3830907",
+        "CHEMBL3831010",
+        "CHEMBL3857910",
+        "CHEMBL4021260",
+        "CHEMBL4054281",
+        "CHEMBL4131858",
+        "CHEMBL4147640"
+      ],
+      "source_activity_ids": [
+        15019877,
+        15247901,
+        16446699,
+        16446702,
+        16446705,
+        16446708,
+        16446711,
+        16446806,
+        16465573,
+        16498898,
+        16655178,
+        16655179,
+        16742601,
+        18096405,
+        18250464,
+        18309586,
+        18390491
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "ALECTINIB",
+      "molecule_chembl_id": "CHEMBL1738797",
+      "smiles": "CCc1cc2c(cc1N1CCC(N3CCOCC3)CC1)C(C)(C)c1[nH]c3cc(C#N)ccc3c1C2=O",
+      "inchikey": null,
+      "pchembl_value": 7.86,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "GILTERITINIB",
+      "tanimoto_score": 0.2617,
+      "mutation_specificity": {
+        "is_mutation_specific": true,
+        "matched_terms": [
+          "ALK-positive"
+        ],
+        "source_excerpt": "\u2026FDA-approved test. ( 1.1 ) treatment of adult patients with ALK-positive metastatic NSCLC as detected by an FDA-approved test. ( 1.2\u2026",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Alectinib is an approved drug with a median pChEMBL affinity of 7.86 against RET, measured at an assay confidence score of 9 out of 9. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, gilteritinib, is 0.262, and RET has no recorded BioGRID physical or genetic interactors.",
+      "source_chembl_ids": [
+        "CHEMBL1738797",
+        "CHEMBL3831011",
+        "CHEMBL3831012"
+      ],
+      "source_activity_ids": [
+        16655171,
+        16655172
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "IBRUTINIB",
+      "molecule_chembl_id": "CHEMBL1873475",
+      "smiles": "C=CC(=O)N1CCC[C@@H](n2nc(-c3ccc(Oc4ccccc4)cc3)c3c(N)ncnc32)C1",
+      "inchikey": null,
+      "pchembl_value": 7.8549999999999995,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "PALBOCICLIB",
+      "tanimoto_score": 0.1604,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Ibrutinib has a median pChEMBL affinity of 7.855 against RET, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.160 to the nearest approved drug palbociclib. No BioGRID physical or genetic interactors are recorded for the target.",
+      "source_chembl_ids": [
+        "CHEMBL1873475",
+        "CHEMBL2060517",
+        "CHEMBL4189696"
+      ],
+      "source_activity_ids": [
+        10952729,
+        18502853
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "FEDRATINIB",
+      "molecule_chembl_id": "CHEMBL1287853",
+      "smiles": "Cc1cnc(Nc2ccc(OCCN3CCCC3)cc2)nc1Nc1cccc(S(=O)(=O)NC(C)(C)C)c1",
+      "inchikey": null,
+      "pchembl_value": 7.32,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "PAZOPANIB",
+      "tanimoto_score": 0.25,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Fedratinib has a median pChEMBL affinity of 7.32 against RET, measured at assay confidence score 9 out of 9, and is an approved drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, pazopanib, is 0.250, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "source_chembl_ids": [
+        "CHEMBL1287853",
+        "CHEMBL3877191"
+      ],
+      "source_activity_ids": [
+        16844154
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "PAZOPANIB",
+      "molecule_chembl_id": "CHEMBL477772",
+      "smiles": "Cc1ccc(Nc2nccc(N(C)c3ccc4c(C)n(C)nc4c3)n2)cc1S(N)(=O)=O",
+      "inchikey": null,
+      "pchembl_value": 7.1,
       "confidence_score": 8,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [],
-      "most_similar_approved_drug": "PRASTERONE",
-      "tanimoto_score": 0.1143,
+      "most_similar_approved_drug": "FEDRATINIB",
+      "tanimoto_score": 0.25,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -72,33 +358,477 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Apomorphine hydrochloride has a median pChEMBL affinity of 4.46 against G6PD, measured at an assay confidence score of 8 out of 9, and is an approved or known drug with no BioGRID physical or genetic interactors recorded for the target. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, prasterone, is 0.114.",
+      "rationale": "Pazopanib has a median pChEMBL affinity of 7.1 against RET, measured at an assay confidence score of 8 out of 9, and is an approved drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, fedratinib, is 0.250, and no BioGRID physical or genetic interactors are recorded for the target.",
       "source_chembl_ids": [
-        "CHEMBL3187985",
-        "CHEMBL1737961"
+        "CHEMBL477772",
+        "CHEMBL1963706"
       ],
       "source_activity_ids": [
-        6765690
+        9532958
       ],
-      "target_symbol": "G6PD",
+      "target_symbol": "RET",
       "target_discovery_method": "genetic_association",
-      "uniprot_id": "P11413",
-      "disease_name": "Class I glucose-6-phosphate dehydrogenase deficiency",
-      "ot_association_score": 0.851,
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "BREXANOLONE",
-      "molecule_chembl_id": "CHEMBL207538",
-      "smiles": "CC(=O)[C@H]1CC[C@H]2[C@@H]3CC[C@H]4C[C@H](O)CC[C@]4(C)[C@H]3CC[C@]12C",
+      "drug_name": "VANDETANIB",
+      "molecule_chembl_id": "CHEMBL24828",
+      "smiles": "COc1cc2/c(=N/c3ccc(Br)cc3F)nc[nH]c2cc1OCC1CCN(C)CC1",
       "inchikey": null,
-      "pchembl_value": 4.18,
+      "pchembl_value": 7.005,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [],
-      "most_similar_approved_drug": "PRASTERONE",
-      "tanimoto_score": 0.2586,
+      "most_similar_approved_drug": "GEFITINIB",
+      "tanimoto_score": 0.2632,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Vandetanib has a median pChEMBL affinity of 7.005 against RET, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.263 to the nearest approved drug gefitinib. No BioGRID physical or genetic interactors are recorded for the target.",
+      "source_chembl_ids": [
+        "CHEMBL24828",
+        "CHEMBL1173924",
+        "CHEMBL1963706",
+        "CHEMBL3378365",
+        "CHEMBL3428795",
+        "CHEMBL3778237",
+        "CHEMBL4231188"
+      ],
+      "source_activity_ids": [
+        3345948,
+        9532955,
+        15138131,
+        15247900,
+        16498899,
+        18656419
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "ENTRECTINIB",
+      "molecule_chembl_id": "CHEMBL1983268",
+      "smiles": "CN1CCN(c2ccc(C(=O)Nc3n[nH]c4ccc(Cc5cc(F)cc(F)c5)cc34)c(NC3CCOCC3)c2)CC1",
+      "inchikey": null,
+      "pchembl_value": 6.905,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "GILTERITINIB",
+      "tanimoto_score": 0.2963,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Entrectinib has a median pChEMBL affinity of 6.905 against RET, measured at assay confidence score 9 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.296 to the nearest approved drug gilteritinib. No BioGRID physical or genetic interactors are recorded for the target.",
+      "source_chembl_ids": [
+        "CHEMBL1983268",
+        "CHEMBL1963706",
+        "CHEMBL3807421"
+      ],
+      "source_activity_ids": [
+        9537074,
+        16587009
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "SUNITINIB",
+      "molecule_chembl_id": "CHEMBL535",
+      "smiles": "CCN(CC)CCNC(=O)c1c(C)[nH]c(/C=C2\\C(=O)Nc3ccc(F)cc32)c1C",
+      "inchikey": null,
+      "pchembl_value": 6.65,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "CABOZANTINIB",
+      "tanimoto_score": 0.1489,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Sunitinib has a median pChEMBL affinity of 6.65 against RET, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.149 to the nearest approved drug cabozantinib. No BioGRID physical or genetic interactors are recorded for the RET target.",
+      "source_chembl_ids": [
+        "CHEMBL535",
+        "CHEMBL1071417",
+        "CHEMBL3428795",
+        "CHEMBL3428926"
+      ],
+      "source_activity_ids": [
+        3101516,
+        15247903,
+        15247910
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "CYCLOBENZAPRINE",
+      "molecule_chembl_id": "CHEMBL669",
+      "smiles": "CN(C)CCC=C1c2ccccc2C=Cc2ccccc21",
+      "inchikey": null,
+      "pchembl_value": 6.52,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "AMITRIPTYLINE",
+      "tanimoto_score": 0.6286,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Cyclobenzaprine has a median pChEMBL affinity of 6.52 against RET, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.629 to the nearest approved drug amitriptyline. No BioGRID physical or genetic interactors are recorded for the RET target.",
+      "source_chembl_ids": [
+        "CHEMBL669",
+        "CHEMBL3706031"
+      ],
+      "source_activity_ids": [
+        17622012
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "DASATINIB",
+      "molecule_chembl_id": "CHEMBL5416410",
+      "smiles": "Cc1nc(Nc2ncc(C(=O)Nc3c(C)cccc3Cl)s2)cc(N2CCN(CCO)CC2)n1.O",
+      "inchikey": null,
+      "pchembl_value": 6.02,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "INFIGRATINIB PHOSPHATE",
+      "tanimoto_score": 0.2453,
+      "mutation_specificity": {
+        "is_mutation_specific": true,
+        "matched_terms": [
+          "BCR-ABL1",
+          "BCR-ABL"
+        ],
+        "source_excerpt": "\u2026eukemia-Lymphoma  Blast Phase Chronic Myelogenous Leukemia, BCR-ABL1 Positive  Leukemia, Myelogenous, Chronic, BCR-ABL Positive\u2026",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Dasatinib has a median pChEMBL affinity of 6.02 against RET, measured at assay confidence score 9 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.245 to the nearest approved drug, infigratinib phosphate. No BioGRID physical or genetic interactors are recorded for the target.",
+      "source_chembl_ids": [
+        "CHEMBL5416410",
+        "CHEMBL1244315",
+        "CHEMBL3826743"
+      ],
+      "source_activity_ids": [
+        3446143,
+        16640022
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "CERITINIB",
+      "molecule_chembl_id": "CHEMBL2403108",
+      "smiles": "Cc1cc(Nc2ncc(Cl)c(Nc3ccccc3S(=O)(=O)C(C)C)n2)c(OC(C)C)cc1C1CCNCC1",
+      "inchikey": null,
+      "pchembl_value": 6.02,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "PALBOCICLIB",
+      "tanimoto_score": 0.2427,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Ceritinib is an approved drug with a median pChEMBL affinity of 6.02 against RET, measured at assay confidence score 9 out of 9. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, palbociclib, is 0.243, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "source_chembl_ids": [
+        "CHEMBL2403108",
+        "CHEMBL2405537",
+        "CHEMBL2406325"
+      ],
+      "source_activity_ids": [
+        13365833,
+        13367220
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "AMITRIPTYLINE",
+      "molecule_chembl_id": "CHEMBL629",
+      "smiles": "CN(C)CCC=C1c2ccccc2CCc2ccccc21",
+      "inchikey": null,
+      "pchembl_value": 6.0,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "CYCLOBENZAPRINE",
+      "tanimoto_score": 0.6286,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Amitriptyline has a median pChEMBL affinity of 6.0 against RET, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.629 to the nearest approved drug cyclobenzaprine. No BioGRID physical or genetic interactors are recorded for the RET target.",
+      "source_chembl_ids": [
+        "CHEMBL629",
+        "CHEMBL3706031"
+      ],
+      "source_activity_ids": [
+        17622013
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "LAPATINIB",
+      "molecule_chembl_id": "CHEMBL554",
+      "smiles": "CS(=O)(=O)CCNCc1ccc(-c2ccc3ncnc(Nc4ccc(OCc5cccc(F)c5)c(Cl)c4)c3c2)o1",
+      "inchikey": null,
+      "pchembl_value": 5.9,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "GEFITINIB",
+      "tanimoto_score": 0.3168,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Lapatinib has a median pChEMBL affinity of 5.9 against RET, measured at an assay confidence score of 8 out of 9, and is an approved drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, gefitinib, is 0.317, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "source_chembl_ids": [
+        "CHEMBL554",
+        "CHEMBL1963706"
+      ],
+      "source_activity_ids": [
+        9545299
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "ERLOTINIB",
+      "molecule_chembl_id": "CHEMBL553",
+      "smiles": "C#Cc1cccc(Nc2ncnc3cc(OCCOC)c(OCCOC)cc23)c1",
+      "inchikey": null,
+      "pchembl_value": 5.8,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "GEFITINIB",
+      "tanimoto_score": 0.4079,
+      "mutation_specificity": {
+        "is_mutation_specific": true,
+        "matched_terms": [
+          "L858R",
+          "exon 19 deletion",
+          "exon 21 (L858R"
+        ],
+        "source_excerpt": "\u2026growth factor receptor (EGFR) exon 19 deletions or exon 21 (L858R) substitution mutations as detected by an FDA-approved test\u2026",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Erlotinib has a median pChEMBL affinity of 5.8 against RET, measured at an assay confidence score of 8 out of 9, and is an approved drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, gefitinib, is 0.408, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "source_chembl_ids": [
+        "CHEMBL553",
+        "CHEMBL1963706"
+      ],
+      "source_activity_ids": [
+        9532925
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "GEFITINIB",
+      "molecule_chembl_id": "CHEMBL939",
+      "smiles": "COc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2cc1OCCCN1CCOCC1",
+      "inchikey": null,
+      "pchembl_value": 5.77,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "ERLOTINIB",
+      "tanimoto_score": 0.4079,
+      "mutation_specificity": {
+        "is_mutation_specific": true,
+        "matched_terms": [
+          "L858R",
+          "exon 19 deletion",
+          "exon 21 (L858R"
+        ],
+        "source_excerpt": "\u2026growth factor receptor (EGFR) exon 19 deletions or exon 21 (L858R) substitution mutations as detected by an FDA-approved test\u2026",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Gefitinib has a median pChEMBL affinity of 5.77 against RET, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.408 to the nearest approved drug erlotinib. No BioGRID physical or genetic interactors are recorded for the target.",
+      "source_chembl_ids": [
+        "CHEMBL939",
+        "CHEMBL1244315"
+      ],
+      "source_activity_ids": [
+        3446139
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "PALBOCICLIB",
+      "molecule_chembl_id": "CHEMBL189963",
+      "smiles": "CC(=O)c1c(C)c2cnc(Nc3ccc(N4CCNCC4)cn3)nc2n(C2CCCC2)c1=O",
+      "inchikey": null,
+      "pchembl_value": 5.6,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "CERITINIB",
+      "tanimoto_score": 0.2427,
+      "mutation_specificity": {
+        "is_mutation_specific": true,
+        "matched_terms": [
+          "HR-positive",
+          "HER2 positive",
+          "HER2-positive"
+        ],
+        "source_excerpt": "\u2026f adult patients with endocrine-resistant, PIK3CA -mutated, HR-positive, HER2-negative, locally advanced or metastatic breast cance\u2026",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Palbociclib has a median pChEMBL affinity of 5.6 against RET, measured at an assay confidence score of 8 out of 9, and is an approved drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, ceritinib, is 0.243, and no physical or genetic interactors for the target are recorded in BioGRID.",
+      "source_chembl_ids": [
+        "CHEMBL189963",
+        "CHEMBL1963706"
+      ],
+      "source_activity_ids": [
+        9541246
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "NORTRIPTYLINE",
+      "molecule_chembl_id": "CHEMBL445",
+      "smiles": "CNCCC=C1c2ccccc2CCc2ccccc21",
+      "inchikey": null,
+      "pchembl_value": 5.5600000000000005,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "AMITRIPTYLINE",
+      "tanimoto_score": 0.6111,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Nortriptyline is an approved drug with a median pChEMBL affinity of 5.56 against RET, measured at assay confidence score 9 out of 9, and its Morgan r2 Tanimoto similarity to the nearest approved drug, amitriptyline, is 0.611. No BioGRID physical or genetic interactors are recorded for the RET target.",
+      "source_chembl_ids": [
+        "CHEMBL445",
+        "CHEMBL3706031"
+      ],
+      "source_activity_ids": [
+        17622014,
+        17622018
+      ],
+      "target_symbol": "RET",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "INFIGRATINIB PHOSPHATE",
+      "molecule_chembl_id": "CHEMBL1834657",
+      "smiles": "CCN1CCN(c2ccc(Nc3cc(N(C)C(=O)Nc4c(Cl)c(OC)cc(OC)c4Cl)ncn3)cc2)CC1.O=P(O)(O)O",
+      "inchikey": null,
+      "pchembl_value": 5.47,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "GEFITINIB",
+      "tanimoto_score": 0.26,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -106,24 +836,24 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": null
       },
-      "rationale": "Brexanolone has a median pChEMBL affinity of 4.18 against G6PD, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.259 to the nearest approved drug prasterone. No BioGRID physical or genetic interactors are recorded for the target.",
+      "rationale": "Infigratinib phosphate has a median pChEMBL affinity of 5.47 against RET, measured at an assay confidence score of 8 out of 9, and is an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, gefitinib, is 0.260, and no physical or genetic interactors for the target are recorded in BioGRID.",
       "source_chembl_ids": [
-        "CHEMBL207538",
-        "CHEMBL2061901"
+        "CHEMBL1834657",
+        "CHEMBL1839935"
       ],
       "source_activity_ids": [
-        10959852
+        6387485
       ],
-      "target_symbol": "G6PD",
+      "target_symbol": "RET",
       "target_discovery_method": "genetic_association",
-      "uniprot_id": "P11413",
-      "disease_name": "Class I glucose-6-phosphate dehydrogenase deficiency",
-      "ot_association_score": 0.851,
+      "uniprot_id": "P07949",
+      "disease_name": "Isolated familial medullary thyroid carcinoma",
+      "ot_association_score": 0.86,
       "pathway_specificity_note": null
     }
   ],
-  "pooled_across_multiple_targets": false,
+  "pooled_across_multiple_targets": true,
   "repurposing_only": true,
-  "approved_reference_set_size": 3,
+  "approved_reference_set_size": 22,
   "reference_set_note": "Tanimoto computed against approved drugs found in this target's candidate pool (bounded scope)."
 }

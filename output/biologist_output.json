@@ -1,21 +1,103 @@
 {
   "target": {
-    "target_symbol": "G6PD",
-    "uniprot_id": "P11413",
-    "ensembl_id": "ENSG00000160211",
-    "disease_name": "Class I glucose-6-phosphate dehydrogenase deficiency",
-    "orpha_code": "466026",
-    "ot_association_score": 0.851,
+    "target_symbol": "RET",
+    "uniprot_id": "P07949",
+    "ensembl_id": "ENSG00000165731",
+    "disease_name": "Multiple endocrine neoplasia type 2A",
+    "orpha_code": "247698",
+    "ot_association_score": 0.86,
     "target_discovery_method": "genetic_association"
   },
   "interacting_genes": [],
   "interaction_records": [],
-  "literature_hits": [],
+  "literature_hits": [
+    {
+      "pmid": "39067973",
+      "summary": "YES \u2014 The abstract explicitly states that MEN2A is caused by a germline variant in the RET proto-oncogene, directly asserting a causal relationship between the two.",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "33812987",
+      "summary": "YES \u2014 The abstract explicitly states that Multiple endocrine neoplasia type 2A (MEN 2A) is caused by germline variants in the RET proto-oncogene, directly asserting a causal genetic relationship between RET and MEN 2A.",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "29175871",
+      "summary": "YES \u2014 The abstract explicitly asserts that oncogenic germline RET mutations are the cause of multiple endocrine neoplasia type 2 (MEN2), including MEN2A, establishing a direct causal relationship between RET and the syndrome.",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "24699901",
+      "summary": "YES \u2014 The abstract explicitly asserts a direct causal and clinical relationship between mutations in the RET proto-oncogene and multiple endocrine neoplasia type 2 (MEN2), stating that RET mutations result in variable onset and severity of MEN2 and that understanding RET has improved detection and management of MEN2 patients.",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "29348307",
+      "summary": "YES \u2014 The abstract explicitly states that RET was identified as the \"primary driver\" of multiple endocrine neoplasia type 2 (MEN2) syndrome, directly asserting a causal relationship between RET and MEN2A (a subtype of MEN2).",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "16343738",
+      "summary": "YES \u2014 The abstract explicitly asserts that germline mutations in the RET gene underlie Multiple Endocrine Neoplasia type 2A, directly linking RET as the causative genetic factor for the MEN-2 associated phenotypes.",
+      "relationship_asserted": true
+    },
+    {
+      "pmid": "28931560",
+      "summary": "YES \u2013 The abstract explicitly asserts that activating point mutations of the RET proto-oncogene are causally linked to MEN2A (and other hereditary MTC syndromes) by stating they occur in virtually all inherited cases, including MEN2A.",
+      "relationship_asserted": true
+    }
+  ],
   "interaction_note": "BioGRID edges are physical/genetic interactions, NOT activating/inhibiting mechanisms.",
   "druggability_context": {
-    "has_approved_drug_for_target": false,
-    "approved_drug_count": 0,
-    "approved_drugs": [],
+    "has_approved_drug_for_target": true,
+    "approved_drug_count": 9,
+    "approved_drugs": [
+      {
+        "molecule_chembl_id": "CHEMBL3707320",
+        "name": "ALECTINIB HYDROCHLORIDE",
+        "max_phase": 4.0
+      },
+      {
+        "molecule_chembl_id": "CHEMBL4582651",
+        "name": "PRALSETINIB",
+        "max_phase": 4.0
+      },
+      {
+        "molecule_chembl_id": "CHEMBL576982",
+        "name": "QUIZARTINIB",
+        "max_phase": 4.0
+      },
+      {
+        "molecule_chembl_id": "CHEMBL1946170",
+        "name": "REGORAFENIB",
+        "max_phase": 4.0
+      },
+      {
+        "molecule_chembl_id": "CHEMBL4559134",
+        "name": "SELPERCATINIB",
+        "max_phase": 4.0
+      },
+      {
+        "molecule_chembl_id": "CHEMBL1200485",
+        "name": "SORAFENIB TOSYLATE",
+        "max_phase": 4.0
+      },
+      {
+        "molecule_chembl_id": "CHEMBL535",
+        "name": "SUNITINIB",
+        "max_phase": 4.0
+      },
+      {
+        "molecule_chembl_id": "CHEMBL1567",
+        "name": "SUNITINIB MALATE",
+        "max_phase": 4.0
+      },
+      {
+        "molecule_chembl_id": "CHEMBL24828",
+        "name": "VANDETANIB",
+        "max_phase": 4.0
+      }
+    ],
     "difficulty_summary": null,
     "supporting_pmids": [],
     "druggability_flag": "insufficient literature signal"
