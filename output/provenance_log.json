@@ -1,334 +1,106 @@
 {
   "entries": [
     {
-      "source_type": "pmid",
-      "source_id": "17517531",
-      "used_by": "biologist",
-      "context": "GALK1/Galactokinase deficiency literature"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "15024738",
-      "used_by": "biologist",
-      "context": "GALK1/Galactokinase deficiency literature"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "11139256",
-      "used_by": "biologist",
-      "context": "GALK1/Galactokinase deficiency literature"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "33977035",
-      "used_by": "biologist",
-      "context": "GALK1/Galactokinase deficiency literature"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "32807972",
-      "used_by": "biologist",
-      "context": "GALK1/Galactokinase deficiency literature"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "11978884",
-      "used_by": "biologist",
-      "context": "GALK1/Galactokinase deficiency literature"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "8908517",
-      "used_by": "biologist",
-      "context": "GALK1/Galactokinase deficiency literature"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "29893426",
-      "used_by": "biologist",
-      "context": "GALK1/Galactokinase deficiency literature"
+      "source_type": "chembl_activity",
+      "source_id": "2609797",
+      "used_by": "chemist",
+      "context": "PRASTERONE affinity vs G6PD"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "166000",
+      "source_id": "2609798",
       "used_by": "chemist",
-      "context": "TOLRESTAT affinity vs AKR1B1"
+      "context": "PRASTERONE affinity vs G6PD"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "308983",
+      "source_id": "10959800",
       "used_by": "chemist",
-      "context": "TOLRESTAT affinity vs AKR1B1"
+      "context": "PRASTERONE affinity vs G6PD"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "619775",
+      "source_id": "10959859",
       "used_by": "chemist",
-      "context": "TOLRESTAT affinity vs AKR1B1"
+      "context": "PRASTERONE affinity vs G6PD"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "1060906",
+      "source_id": "23179892",
       "used_by": "chemist",
-      "context": "TOLRESTAT affinity vs AKR1B1"
+      "context": "PRASTERONE affinity vs G6PD"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "1505638",
+      "source_id": "24753593",
       "used_by": "chemist",
-      "context": "TOLRESTAT affinity vs AKR1B1"
+      "context": "PRASTERONE affinity vs G6PD"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "2139918",
+      "source_id": "6765690",
       "used_by": "chemist",
-      "context": "TOLRESTAT affinity vs AKR1B1"
+      "context": "APOMORPHINE HYDROCHLORIDE affinity vs G6PD"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "3357322",
+      "source_id": "10959852",
       "used_by": "chemist",
-      "context": "TOLRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18093249",
-      "used_by": "chemist",
-      "context": "TOLRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1035306",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "3357323",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "3501367",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "8023957",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "16851280",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18212152",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18934373",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "19184532",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "20599888",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "20599898",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "20599903",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "22836866",
-      "used_by": "chemist",
-      "context": "EPALRESTAT affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12595749",
-      "used_by": "chemist",
-      "context": "SULINDAC affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "12595748",
-      "used_by": "chemist",
-      "context": "TOLMETIN affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1256398",
-      "used_by": "chemist",
-      "context": "INDOMETHACIN affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15210810",
-      "used_by": "chemist",
-      "context": "NITAZOXANIDE affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "22836867",
-      "used_by": "chemist",
-      "context": "FOLIC ACID affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15210813",
-      "used_by": "chemist",
-      "context": "MEFENAMIC ACID affinity vs AKR1B1"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1809343",
-      "used_by": "chemist",
-      "context": "HALOPROGIN affinity vs GALE"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1809335",
-      "used_by": "chemist",
-      "context": "ETHACRYNIC ACID affinity vs GALE"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1809346",
-      "used_by": "chemist",
-      "context": "DIETHYLSTILBESTROL affinity vs GALE"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ERYTHEMA",
-      "used_by": "reviewer",
-      "context": "TOLRESTAT adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "HYPERSENSITIVITY VASCULITIS",
-      "used_by": "reviewer",
-      "context": "TOLRESTAT adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "SKIN ULCER",
-      "used_by": "reviewer",
-      "context": "TOLRESTAT adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "HYPOGLYCAEMIA",
-      "used_by": "reviewer",
-      "context": "EPALRESTAT adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "HEPATIC FUNCTION ABNORMAL",
-      "used_by": "reviewer",
-      "context": "EPALRESTAT adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "PYREXIA",
-      "used_by": "reviewer",
-      "context": "EPALRESTAT adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DRUG INEFFECTIVE",
-      "used_by": "reviewer",
-      "context": "SULINDAC adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "PAIN",
-      "used_by": "reviewer",
-      "context": "SULINDAC adverse event"
+      "context": "BREXANOLONE affinity vs G6PD"
     },
     {
       "source_type": "openfda_event",
       "source_id": "FATIGUE",
       "used_by": "reviewer",
-      "context": "SULINDAC adverse event"
+      "context": "PRASTERONE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "NEUROLEPTIC MALIGNANT SYNDROME",
+      "source_id": "HEADACHE",
       "used_by": "reviewer",
-      "context": "HALOPROGIN adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DRUG HYPERSENSITIVITY",
-      "used_by": "reviewer",
-      "context": "TOLMETIN adverse event"
+      "context": "PRASTERONE adverse event"
     },
     {
       "source_type": "openfda_event",
       "source_id": "NAUSEA",
       "used_by": "reviewer",
-      "context": "TOLMETIN adverse event"
+      "context": "PRASTERONE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "ARTHRALGIA",
+      "source_id": "DEATH",
       "used_by": "reviewer",
-      "context": "INDOMETHACIN adverse event"
+      "context": "APOMORPHINE HYDROCHLORIDE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "DIARRHOEA",
+      "source_id": "HYPOTENSION",
       "used_by": "reviewer",
-      "context": "NITAZOXANIDE adverse event"
+      "context": "APOMORPHINE HYDROCHLORIDE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "OFF LABEL USE",
+      "source_id": "FALL",
       "used_by": "reviewer",
-      "context": "NITAZOXANIDE adverse event"
+      "context": "APOMORPHINE HYDROCHLORIDE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "DRUG REACTION WITH EOSINOPHILIA AND SYSTEMIC SYMPTOMS",
+      "source_id": "ACUTE LUNG INJURY",
       "used_by": "reviewer",
-      "context": "ETHACRYNIC ACID adverse event"
+      "context": "BREXANOLONE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "DYSPNOEA",
+      "source_id": "BRADYCARDIA",
       "used_by": "reviewer",
-      "context": "ETHACRYNIC ACID adverse event"
+      "context": "BREXANOLONE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "AGITATION",
+      "source_id": "DIZZINESS",
       "used_by": "reviewer",
-      "context": "DIETHYLSTILBESTROL adverse event"
+      "context": "BREXANOLONE adverse event"
     }
   ]
 }

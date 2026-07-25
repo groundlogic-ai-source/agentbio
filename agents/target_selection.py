@@ -26,6 +26,7 @@ from data_sources.orphadata import (
 from data_sources.open_targets import (
     search_disease_efo, get_target_disease_score, get_disease_known_drugs,
     get_disease_orphanet_code, get_disease_parents, get_disease_descendant_count,
+    get_ot_canonical_disease_name,
 )
 from data_sources.chembl import get_target_bioactivity_count, get_pharmacological_targets_for_disease
 from data_sources.afdb import get_structure_confidence
@@ -343,6 +344,52 @@ _LEGACY_NAME_RE = _re.compile(
     r'\s\d+(?:\s|$)|DYT[-\s]?\d+',
     flags=_re.IGNORECASE,
 )
+
+
+def _efo_name_mismatch_warning(queried: str, efo_id: str) -> Optional[str]:
+    """
+    Post-resolution sanity check: compare OT's canonical name for efo_id against
+    the originally queried disease name using token overlap.
+
+    Returns a warning string when fewer than half the meaningful query tokens
+    appear in OT's canonical name (overlap < 0.5), which reliably distinguishes
+    clear mismatches (e.g. "Glycogen storage disease type 1c" → OT calls the
+    resolved node "glycogen storage disease VI") from harmless name-format
+    differences (capitalisation, synonym expansions, abbreviations).
+
+    Returns None when names are sufficiently aligned or the OT name is unavailable.
+
+    The warning is surfaced in the report Limitations section so a reviewer can
+    independently verify the disease mapping before acting on the hypothesis.
+    """
+    ot_name = get_ot_canonical_disease_name(efo_id)
+    if not ot_name:
+        return None
+    stop = {"", "the", "of", "due", "to", "and", "a", "an", "with",
+            "disease", "type", "syndrome", "deficiency", "in", "by", "disorder"}
+    q_tok = set(_re.split(r"\W+", queried.lower())) - stop
+    n_tok = set(_re.split(r"\W+", ot_name.lower())) - stop
+    if not q_tok:
+        return None
+    overlap = len(q_tok & n_tok) / len(q_tok)
+    if overlap >= 0.5:
+        return None
+    msg = (
+        f"**EFO RESOLUTION MISMATCH — verify disease mapping independently.** "
+        f"The queried disease '{queried}' was resolved to EFO/MONDO ID `{efo_id}`, "
+        f"but Open Targets' own canonical name for that node is "
+        f"*'{ot_name}'* (token overlap {overlap:.0%} with the queried name). "
+        f"These names may describe different diseases. "
+        f"The association scores, approved-drug status, and target rankings in this "
+        f"report reflect '{ot_name}', NOT necessarily '{queried}'. "
+        f"Cross-check the Orphanet ORPHA code and the OT disease page before "
+        f"treating this result as disease-specific evidence."
+    )
+    print(
+        f"[target_selection] WARNING: EFO name mismatch for '{queried}' → "
+        f"{efo_id} ('{ot_name}', overlap={overlap:.0%}). Warning attached to report."
+    )
+    return msg
 
 
 def _resolve_efo_id(
@@ -672,6 +719,14 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
 
     rows.sort(key=lambda x: (x["tractability_score"] + x["unmet_need_score"]), reverse=True)
 
+    # Post-resolution sanity check: compare OT's canonical name for the chosen EFO
+    # against the originally queried name.  Attaches a warning to every row when
+    # the names differ materially so it surfaces in the report Limitations section.
+    _mismatch_warn = _efo_name_mismatch_warning(query, efo_id)
+    if _mismatch_warn:
+        for row in rows:
+            row["efo_name_mismatch_warning"] = _mismatch_warn
+
     # Enrich with Orphanet cross-refs (same per-code lookup as the sweep), or carry
     # any cross-refs already on the matched disease (WHO NTDs ship them inline).
     for row in rows:
@@ -945,6 +1000,10 @@ def run() -> None:
 
         n_resolved_efo += 1
 
+        # Post-resolution EFO name sanity check (sweep mode).
+        # Computed once per disease; cached via get_ot_canonical_disease_name.
+        _sweep_mismatch_warn = _efo_name_mismatch_warning(disease_name, efo_id)
+
         # FIX 1 — real approved-treatment status from OT knownDrugs
         drug_info = get_disease_known_drugs(efo_id)
         has_approved: Optional[bool] = drug_info.get("has_approved_treatment")
@@ -1012,6 +1071,8 @@ def run() -> None:
                 approved_drug_names=approved_drug_names,
                 ot_treatment_unconfirmed=ot_treatment_unconfirmed,
             )
+            if _sweep_mismatch_warn:
+                pair["efo_name_mismatch_warning"] = _sweep_mismatch_warn
             scored_pairs.append(pair)
 
     if not scored_pairs:

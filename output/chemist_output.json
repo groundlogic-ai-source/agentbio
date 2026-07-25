@@ -1,138 +1,26 @@
 {
   "target": {
-    "target_symbol": "GALK1",
-    "uniprot_id": "P51570",
-    "ensembl_id": "ENSG00000108479",
-    "disease_name": "Galactokinase deficiency",
-    "orpha_code": "79237",
-    "ot_association_score": 0.8438,
+    "target_symbol": "G6PD",
+    "uniprot_id": "P11413",
+    "ensembl_id": "ENSG00000160211",
+    "disease_name": "Class I glucose-6-phosphate dehydrogenase deficiency",
+    "orpha_code": "466026",
+    "ot_association_score": 0.851,
     "target_discovery_method": "genetic_association"
   },
   "candidates": [
     {
-      "drug_name": "TOLRESTAT",
-      "molecule_chembl_id": "CHEMBL436",
-      "smiles": "COc1ccc2c(C(=S)N(C)CC(=O)O)cccc2c1C(F)(F)F",
-      "inchikey": "LUBHDINQXIHVLS-UHFFFAOYSA-N",
-      "pchembl_value": 7.54,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [
-        "A01AD05",
-        "A10XA01",
-        "B01AC06",
-        "N02BA01"
-      ],
-      "most_similar_approved_drug": "ETHACRYNIC ACID",
-      "tanimoto_score": 0.2273,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": null
-      },
-      "rationale": "Tolrestat is an approved drug with a median pChEMBL affinity of 7.54 against AKR1B1, measured at an assay confidence score of 9 out of 9, and its nearest approved drug comparator, ethacrynic acid, has a Tanimoto similarity (Morgan r2) of 0.227 to tolrestat. No physical or genetic interactors for AKR1B1 are recorded in BioGRID.",
-      "source_chembl_ids": [
-        "CHEMBL436",
-        "CHEMBL1174254",
-        "CHEMBL4020461",
-        "CHEMBL641360",
-        "CHEMBL644883",
-        "CHEMBL645284",
-        "CHEMBL645594",
-        "CHEMBL832655",
-        "CHEMBL936594"
-      ],
-      "source_activity_ids": [
-        166000,
-        308983,
-        619775,
-        1060906,
-        1505638,
-        2139918,
-        3357322,
-        18093249
-      ],
-      "target_symbol": "AKR1B1",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P51570",
-      "disease_name": "Galactokinase deficiency",
-      "ot_association_score": 0.0
-    },
-    {
-      "drug_name": "EPALRESTAT",
-      "molecule_chembl_id": "CHEMBL56337",
-      "smiles": "CC(/C=C1\\SC(=S)N(CC(=O)O)C1=O)=C\\c1ccccc1",
-      "inchikey": "CHNUOJQWGUIOLD-NFZZJPOKSA-N",
-      "pchembl_value": 6.995,
+      "drug_name": "PRASTERONE",
+      "molecule_chembl_id": "CHEMBL90593",
+      "smiles": "C[C@]12CC[C@H](O)CC1=CC[C@@H]1[C@@H]2CC[C@]2(C)C(=O)CC[C@@H]12",
+      "inchikey": null,
+      "pchembl_value": 4.95,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [],
-      "most_similar_approved_drug": "TOLMETIN",
-      "tanimoto_score": 0.1774,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": null
-      },
-      "rationale": "Epalrestat has a median pChEMBL affinity of 6.995 against AKR1B1, measured at assay confidence score 9 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.177 to the nearest approved drug, tolmetin. No physical or genetic interactors for the target are recorded in BioGRID.",
-      "source_chembl_ids": [
-        "CHEMBL56337",
-        "CHEMBL1174254",
-        "CHEMBL1260797",
-        "CHEMBL1948100",
-        "CHEMBL3878417",
-        "CHEMBL4046171",
-        "CHEMBL4326712",
-        "CHEMBL4388081",
-        "CHEMBL4603182",
-        "CHEMBL4603185",
-        "CHEMBL4603186",
-        "CHEMBL4718956",
-        "CHEMBL645594"
-      ],
-      "source_activity_ids": [
-        1035306,
-        3357323,
-        3501367,
-        8023957,
-        16851280,
-        18212152,
-        18934373,
-        19184532,
-        20599888,
-        20599898,
-        20599903,
-        22836866
-      ],
-      "target_symbol": "AKR1B1",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P51570",
-      "disease_name": "Galactokinase deficiency",
-      "ot_association_score": 0.0
-    },
-    {
-      "drug_name": "SULINDAC",
-      "molecule_chembl_id": "CHEMBL15770",
-      "smiles": "CC1=C(CC(=O)O)c2cc(F)ccc2/C1=C\\c1ccc([S+](C)[O-])cc1",
-      "inchikey": "MLKXDPUZXIRXEP-MFOYZWKCSA-N",
-      "pchembl_value": 6.43,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [
-        "A01AD05",
-        "B01AC06",
-        "M01AB02",
-        "N02BA01"
-      ],
-      "most_similar_approved_drug": "TOLMETIN",
-      "tanimoto_score": 0.2031,
+      "most_similar_approved_drug": "BREXANOLONE",
+      "tanimoto_score": 0.2586,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -140,117 +28,43 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Sulindac has a median pChEMBL affinity of 6.43 against AKR1B1, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.203 to the nearest approved drug, tolmetin. No BioGRID physical or genetic interactors are recorded for the target.",
+      "rationale": "Prasterone has a median pChEMBL affinity of 4.95 against G6PD, measured at assay confidence score 9 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.259 to the nearest approved drug brexanolone. No physical or genetic interactors for the target are recorded in BioGRID.",
       "source_chembl_ids": [
-        "CHEMBL15770",
-        "CHEMBL3075342"
+        "CHEMBL90593",
+        "CHEMBL1011499",
+        "CHEMBL1011500",
+        "CHEMBL2061901",
+        "CHEMBL2061902",
+        "CHEMBL4816199",
+        "CHEMBL5121892"
       ],
       "source_activity_ids": [
-        12595749
+        2609797,
+        2609798,
+        10959800,
+        10959859,
+        23179892,
+        24753593
       ],
-      "target_symbol": "AKR1B1",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P51570",
-      "disease_name": "Galactokinase deficiency",
-      "ot_association_score": 0.0
+      "target_symbol": "G6PD",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P11413",
+      "disease_name": "Class I glucose-6-phosphate dehydrogenase deficiency",
+      "ot_association_score": 0.851,
+      "pathway_specificity_note": null
     },
     {
-      "drug_name": "HALOPROGIN",
-      "molecule_chembl_id": "CHEMBL1289",
-      "smiles": "Clc1cc(Cl)c(OCC#CI)cc1Cl",
-      "inchikey": "CTETYYAZBPJBHE-UHFFFAOYSA-N",
-      "pchembl_value": 6.3,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [
-        "A01AD05",
-        "B01AC06",
-        "D01AE11",
-        "N02BA01"
-      ],
-      "most_similar_approved_drug": "ETHACRYNIC ACID",
-      "tanimoto_score": 0.1509,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": null
-      },
-      "rationale": "Haloprogin, an approved drug, has a median pChEMBL affinity of 6.3 against GALE measured at assay confidence score 9 out of 9, and its Tanimoto similarity (Morgan r2) to the nearest approved drug, ethacrynic acid, is 0.151. No physical or genetic interactors for the target are recorded in BioGRID.",
-      "source_chembl_ids": [
-        "CHEMBL1289",
-        "CHEMBL911909"
-      ],
-      "source_activity_ids": [
-        1809343
-      ],
-      "target_symbol": "GALE",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P51570",
-      "disease_name": "Galactokinase deficiency",
-      "ot_association_score": 0.0
-    },
-    {
-      "drug_name": "TOLMETIN",
-      "molecule_chembl_id": "CHEMBL1020",
-      "smiles": "Cc1ccc(C(=O)c2ccc(CC(=O)O)n2C)cc1",
-      "inchikey": "UPSPUYADGBWSHF-UHFFFAOYSA-N",
-      "pchembl_value": 5.62,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [
-        "A01AD05",
-        "B01AC06",
-        "M01AB03",
-        "M02AA21",
-        "N02BA01"
-      ],
-      "most_similar_approved_drug": "INDOMETHACIN",
-      "tanimoto_score": 0.2623,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Tolmetin is an approved drug with a median pChEMBL affinity of 5.62 against AKR1B1, measured at an assay confidence score of 9 out of 9. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, indomethacin, is 0.262, and AKR1B1 has no recorded BioGRID physical or genetic interactors.",
-      "source_chembl_ids": [
-        "CHEMBL1020",
-        "CHEMBL3075342"
-      ],
-      "source_activity_ids": [
-        12595748
-      ],
-      "target_symbol": "AKR1B1",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P51570",
-      "disease_name": "Galactokinase deficiency",
-      "ot_association_score": 0.0
-    },
-    {
-      "drug_name": "INDOMETHACIN",
-      "molecule_chembl_id": "CHEMBL6",
-      "smiles": "COc1ccc2c(c1)c(CC(=O)O)c(C)n2C(=O)c1ccc(Cl)cc1",
-      "inchikey": "CGIGDMFJXJATDK-UHFFFAOYSA-N",
-      "pchembl_value": 5.22,
+      "drug_name": "APOMORPHINE HYDROCHLORIDE",
+      "molecule_chembl_id": "CHEMBL3187985",
+      "smiles": "CN1CCc2cccc3c2[C@H]1Cc1ccc(O)c(O)c1-3.CN1CCc2cccc3c2[C@H]1Cc1ccc(O)c(O)c1-3.Cl.Cl.O",
+      "inchikey": null,
+      "pchembl_value": 4.46,
       "confidence_score": 8,
       "max_phase": "4.0",
       "is_approved_drug": true,
-      "atc_codes": [
-        "A01AD05",
-        "B01AC06",
-        "C01EB03",
-        "M01AB01",
-        "M02AA23",
-        "N02BA01",
-        "S01BC01"
-      ],
-      "most_similar_approved_drug": "TOLMETIN",
-      "tanimoto_score": 0.2623,
+      "atc_codes": [],
+      "most_similar_approved_drug": "PRASTERONE",
+      "tanimoto_score": 0.1143,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -258,210 +72,58 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Indomethacin has a median pChEMBL affinity of 5.22 against AKR1B1, measured at an assay confidence score of 8 out of 9, and is an approved drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, tolmetin, is 0.262, and AKR1B1 has no recorded BioGRID physical or genetic interactors.",
+      "rationale": "Apomorphine hydrochloride has a median pChEMBL affinity of 4.46 against G6PD, measured at an assay confidence score of 8 out of 9, and is an approved or known drug with no BioGRID physical or genetic interactors recorded for the target. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, prasterone, is 0.114.",
       "source_chembl_ids": [
-        "CHEMBL6",
-        "CHEMBL642955"
+        "CHEMBL3187985",
+        "CHEMBL1737961"
       ],
       "source_activity_ids": [
-        1256398
+        6765690
       ],
-      "target_symbol": "AKR1B1",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P51570",
-      "disease_name": "Galactokinase deficiency",
-      "ot_association_score": 0.0
+      "target_symbol": "G6PD",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P11413",
+      "disease_name": "Class I glucose-6-phosphate dehydrogenase deficiency",
+      "ot_association_score": 0.851,
+      "pathway_specificity_note": null
     },
     {
-      "drug_name": "NITAZOXANIDE",
-      "molecule_chembl_id": "CHEMBL1401",
-      "smiles": "CC(=O)Oc1ccccc1C(=O)Nc1ncc([N+](=O)[O-])s1",
-      "inchikey": "YQNQNVDNTFHQSW-UHFFFAOYSA-N",
-      "pchembl_value": 5.08,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [
-        "A01AD05",
-        "B01AC06",
-        "N02BA01",
-        "P01AX11"
-      ],
-      "most_similar_approved_drug": "MEFENAMIC ACID",
-      "tanimoto_score": 0.1967,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Nitazoxanide has a median pChEMBL affinity of 5.08 against AKR1B1, measured at assay confidence score 9 out of 9, and it is an approved or known drug with no BioGRID physical or genetic interactors recorded for the target. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, mefenamic acid, is 0.197.",
-      "source_chembl_ids": [
-        "CHEMBL1401",
-        "CHEMBL3421436"
-      ],
-      "source_activity_ids": [
-        15210810
-      ],
-      "target_symbol": "AKR1B1",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P51570",
-      "disease_name": "Galactokinase deficiency",
-      "ot_association_score": 0.0
-    },
-    {
-      "drug_name": "ETHACRYNIC ACID",
-      "molecule_chembl_id": "CHEMBL456",
-      "smiles": "C=C(CC)C(=O)c1ccc(OCC(=O)O)c(Cl)c1Cl",
-      "inchikey": "AVOLMBLBETYQHX-UHFFFAOYSA-N",
-      "pchembl_value": 4.85,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [
-        "A01AD05",
-        "B01AC06",
-        "C03CC01",
-        "N02BA01"
-      ],
-      "most_similar_approved_drug": "TOLRESTAT",
-      "tanimoto_score": 0.2273,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Ethacrynic acid has a median pChEMBL affinity of 4.85 against GALE, measured at assay confidence score 9, and is an approved or known drug with a Tanimoto similarity of 0.227 to the nearest approved drug tolrestat. No BioGRID physical or genetic interactors are recorded for the target.",
-      "source_chembl_ids": [
-        "CHEMBL456",
-        "CHEMBL911909"
-      ],
-      "source_activity_ids": [
-        1809335
-      ],
-      "target_symbol": "GALE",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P51570",
-      "disease_name": "Galactokinase deficiency",
-      "ot_association_score": 0.0
-    },
-    {
-      "drug_name": "FOLIC ACID",
-      "molecule_chembl_id": "CHEMBL1622",
-      "smiles": "Nc1nc(=O)c2nc(CNc3ccc(C(=O)N[C@@H](CCC(=O)O)C(=O)O)cc3)cnc2[nH]1",
-      "inchikey": "OVBPIULPVIDEAO-LBPRGKRZSA-N",
-      "pchembl_value": 4.28,
+      "drug_name": "BREXANOLONE",
+      "molecule_chembl_id": "CHEMBL207538",
+      "smiles": "CC(=O)[C@H]1CC[C@H]2[C@@H]3CC[C@H]4C[C@H](O)CC[C@]4(C)[C@H]3CC[C@]12C",
+      "inchikey": null,
+      "pchembl_value": 4.18,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [],
-      "most_similar_approved_drug": "TOLMETIN",
-      "tanimoto_score": 0.1429,
+      "most_similar_approved_drug": "PRASTERONE",
+      "tanimoto_score": 0.2586,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
         "source_excerpt": "",
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
+        "indication_source": null
       },
-      "rationale": "Folic acid has a median pChEMBL affinity of 4.28 against AKR1B1, measured at assay confidence score 9 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.143 to the nearest approved drug, tolmetin. No BioGRID physical or genetic interactors are recorded for the target.",
+      "rationale": "Brexanolone has a median pChEMBL affinity of 4.18 against G6PD, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.259 to the nearest approved drug prasterone. No BioGRID physical or genetic interactors are recorded for the target.",
       "source_chembl_ids": [
-        "CHEMBL1622",
-        "CHEMBL4718956"
+        "CHEMBL207538",
+        "CHEMBL2061901"
       ],
       "source_activity_ids": [
-        22836867
+        10959852
       ],
-      "target_symbol": "AKR1B1",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P51570",
-      "disease_name": "Galactokinase deficiency",
-      "ot_association_score": 0.0
-    },
-    {
-      "drug_name": "DIETHYLSTILBESTROL",
-      "molecule_chembl_id": "CHEMBL411",
-      "smiles": "CC/C(=C(/CC)c1ccc(O)cc1)c1ccc(O)cc1",
-      "inchikey": "RGLYKWWBQGJZGM-ISLYRVAYSA-N",
-      "pchembl_value": 4.12,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [
-        "A01AD05",
-        "B01AC06",
-        "G03CB02",
-        "G03CC05",
-        "L02AA01",
-        "N02BA01"
-      ],
-      "most_similar_approved_drug": "TOLMETIN",
-      "tanimoto_score": 0.1905,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Diethylstilbestrol has a median pChEMBL affinity of 4.12 against GALE at an assay confidence score of 9 out of 9, and it is an approved or known drug with a Tanimoto similarity of 0.190 to the nearest approved drug, tolmetin. No BioGRID physical or genetic interactors are recorded for the target.",
-      "source_chembl_ids": [
-        "CHEMBL411",
-        "CHEMBL911909"
-      ],
-      "source_activity_ids": [
-        1809346
-      ],
-      "target_symbol": "GALE",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P51570",
-      "disease_name": "Galactokinase deficiency",
-      "ot_association_score": 0.0
-    },
-    {
-      "drug_name": "MEFENAMIC ACID",
-      "molecule_chembl_id": "CHEMBL686",
-      "smiles": "Cc1cccc(Nc2ccccc2C(=O)O)c1C",
-      "inchikey": "HYYBABOKPJLUIN-UHFFFAOYSA-N",
-      "pchembl_value": 4.11,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [
-        "A01AD05",
-        "B01AC06",
-        "M01AG01",
-        "N02BA01"
-      ],
-      "most_similar_approved_drug": "TOLRESTAT",
-      "tanimoto_score": 0.2131,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Mefenamic acid has a median pChEMBL affinity of 4.11 against AKR1B1, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.213 to the nearest approved drug tolrestat. No BioGRID physical or genetic interactors are recorded for the target.",
-      "source_chembl_ids": [
-        "CHEMBL686",
-        "CHEMBL3421435"
-      ],
-      "source_activity_ids": [
-        15210813
-      ],
-      "target_symbol": "AKR1B1",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P51570",
-      "disease_name": "Galactokinase deficiency",
-      "ot_association_score": 0.0
+      "target_symbol": "G6PD",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P11413",
+      "disease_name": "Class I glucose-6-phosphate dehydrogenase deficiency",
+      "ot_association_score": 0.851,
+      "pathway_specificity_note": null
     }
   ],
   "pooled_across_multiple_targets": false,
   "repurposing_only": true,
-  "approved_reference_set_size": 11,
+  "approved_reference_set_size": 3,
   "reference_set_note": "Tanimoto computed against approved drugs found in this target's candidate pool (bounded scope)."
 }

@@ -1,57 +1,16 @@
 {
   "target": {
-    "target_symbol": "GALK1",
-    "uniprot_id": "P51570",
-    "ensembl_id": "ENSG00000108479",
-    "disease_name": "Galactokinase deficiency",
-    "orpha_code": "79237",
-    "ot_association_score": 0.8438,
+    "target_symbol": "G6PD",
+    "uniprot_id": "P11413",
+    "ensembl_id": "ENSG00000160211",
+    "disease_name": "Class I glucose-6-phosphate dehydrogenase deficiency",
+    "orpha_code": "466026",
+    "ot_association_score": 0.851,
     "target_discovery_method": "genetic_association"
   },
   "interacting_genes": [],
   "interaction_records": [],
-  "literature_hits": [
-    {
-      "pmid": "17517531",
-      "summary": "YES \u2014 The abstract explicitly asserts that specific mutations in the *GALK1* gene cause Galactokinase deficiency, directly linking the gene to the disorder through both patient sequencing data and functional expression analysis.",
-      "relationship_asserted": true
-    },
-    {
-      "pmid": "15024738",
-      "summary": "YES \u2014 The abstract explicitly asserts that GALK1 mutations directly cause Galactokinase deficiency, supported by biochemical evidence demonstrating drastically reduced GALK activity in expressed mutant cDNAs.",
-      "relationship_asserted": true
-    },
-    {
-      "pmid": "11139256",
-      "summary": "YES \u2014 The abstract explicitly asserts that four novel mutations in *GALK1* were identified in patients diagnosed with galactokinase deficiency, directly linking the gene to the disease.",
-      "relationship_asserted": true
-    },
-    {
-      "pmid": "33977035",
-      "summary": "YES, the abstract asserts a specific relationship between GALK1 and Galactokinase deficiency, as it directly describes Galactokinase deficiency as resulting from a metabolic block in galactose processing, implying the enzymatic (GALK1) basis of the condition.",
-      "relationship_asserted": true
-    },
-    {
-      "pmid": "32807972",
-      "summary": "YES \u2014 The abstract explicitly asserts that GALK1 deficiency (caused by galactokinase/GALK1 deficiency) is associated with a specific phenotypic spectrum including cataract, elevated transaminases, bleeding diathesis, and encephalopathy, directly linking the gene/enzyme to the disorder and its clinical manifestations.",
-      "relationship_asserted": true
-    },
-    {
-      "pmid": "11978884",
-      "summary": "YES \u2014 The abstract explicitly asserts that the P28T mutation in the GALK1 gene (galactokinase) is a primary cause of galactokinase deficiency, particularly among the Roma population across Europe.",
-      "relationship_asserted": true
-    },
-    {
-      "pmid": "8908517",
-      "summary": "YES \u2014 The abstract explicitly asserts that defects in the GALK1 gene **cause** galactokinase deficiency and cataract formation, establishing a direct causal relationship rather than merely mentioning them together.",
-      "relationship_asserted": true
-    },
-    {
-      "pmid": "29893426",
-      "summary": "YES \u2014 The abstract explicitly asserts that Galactosemia type 2 (Galactokinase deficiency) is directly caused by missense mutations in the *GALK1* gene, which result in deficiency of the GALK enzyme.",
-      "relationship_asserted": true
-    }
-  ],
+  "literature_hits": [],
   "interaction_note": "BioGRID edges are physical/genetic interactions, NOT activating/inhibiting mechanisms.",
   "druggability_context": {
     "has_approved_drug_for_target": false,
