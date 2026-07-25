@@ -33,12 +33,19 @@ def search_disease_efo(disease_name: str) -> Optional[str]:
     ranking is by text relevance, not ontology depth.  A leaf-level EFO gives
     more accurate has_approved_treatment and association-score data.
 
-    Logs an auditable override line when the chosen EFO differs from rank-1.
-    Cache key v3 — bumped from v1 to bust stale broad-EFO entries.
+    Tie-breaking rule (cache key v4, replacing v3):
+      Within the 70%-score floor, collect ALL candidates with a verified
+      descendant count.  Select the candidate with the *fewest* descendants;
+      break ties (same descendant count) by the *highest* OT relevance score.
+      This is strictly better than the old first-encountered rule, which
+      relied on OT returning hits in strict score order and broke early on the
+      first 0-descendant node — missing a higher-scoring sibling if OT's order
+      was not perfectly monotone or if two 0-descendant candidates existed.
 
+    Logs an auditable override line when the chosen EFO differs from rank-0.
     Returns None if not found.
     """
-    cache_key = make_key("search_disease_efo_v3", disease_name)
+    cache_key = make_key("search_disease_efo_v4", disease_name)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -63,11 +70,6 @@ def search_disease_efo(disease_name: str) -> Optional[str]:
             cache_set(cache_key, None, ttl_days=7)
             return None
 
-        # Prefer the most specific (fewest descendants) hit among the top results
-        # so that a leaf-level EFO is preferred over a broad umbrella that happens
-        # to score higher on text relevance.  get_disease_descendant_count is cached
-        # with a 30-day TTL so the overhead is a one-time cost per unique EFO node.
-        #
         # Score-ratio guard: only consider a more-specific candidate if its OT
         # relevance score is at least 70% of the top hit's score.  This prevents
         # a far-less-relevant leaf node (unrelated disease that shares a word) from
@@ -75,34 +77,43 @@ def search_disease_efo(disease_name: str) -> Optional[str]:
         top_score = disease_hits[0].get("score") or 0.0
         score_floor = top_score * 0.70
 
-        best_idx = 0
-        best_desc = get_disease_descendant_count(disease_hits[0]["id"])
-        if best_desc is None:
-            best_desc = float("inf")  # unknown breadth — keep as candidate but prefer anything known
+        # Phase 1 — collect all within-floor candidates that have a verified
+        # descendant count.  We iterate in the order OT returns hits (typically
+        # descending score) and break on the first below-floor entry, but we do
+        # NOT break early on the first 0-descendant hit.  Collecting all allows
+        # the tie-break to be the globally-highest score rather than an accident
+        # of iteration order.
+        #
+        # Tuple layout: (desc, score, idx) stored so that min() with key
+        # (desc, -score) gives fewest-descendants then highest-score.
+        candidates: list[tuple[int, float, int]] = []
+        for i, h in enumerate(disease_hits):
+            c_score = h.get("score") or 0.0
+            if c_score < score_floor:
+                break  # OT returns hits roughly score-descending; safe to break
+            desc = get_disease_descendant_count(h["id"])
+            if desc is None:
+                continue  # breadth unverifiable — exclude from selection
+            candidates.append((desc, c_score, i))
 
-        if best_desc > 0:  # short-circuit: a leaf (0 descendants) can't be beaten
-            for i, candidate in enumerate(disease_hits[1:], 1):
-                c_score = candidate.get("score") or 0.0
-                if c_score < score_floor:
-                    break  # hits are ordered by score — everything after is also below floor
-                desc = get_disease_descendant_count(candidate["id"])
-                if desc is None:
-                    continue  # skip candidates whose breadth can't be verified
-                if desc < best_desc:
-                    best_idx = i
-                    best_desc = desc
-                    if best_desc == 0:
-                        break  # leaf node — can't do better
-
-        efo_id = disease_hits[best_idx]["id"]
-        if best_idx != 0:
-            raw_top = disease_hits[0]
-            raw_desc = get_disease_descendant_count(raw_top["id"])
-            print(
-                f"[open_targets] EFO specificity override for '{disease_name}': "
-                f"rank-1={raw_top['id']} ('{raw_top['name']}', {raw_desc} desc) "
-                f"-> chose {efo_id} ('{disease_hits[best_idx]['name']}', {best_desc} desc)"
-            )
+        if not candidates:
+            # No candidate had a verifiable descendant count; fall back to rank-0.
+            efo_id = disease_hits[0]["id"]
+            best_idx = 0
+            best_desc = None
+        else:
+            # Fewest descendants wins; ties broken by highest OT relevance score.
+            best_desc_val, _, best_idx = min(candidates, key=lambda c: (c[0], -c[1]))
+            best_desc = best_desc_val
+            efo_id = disease_hits[best_idx]["id"]
+            if best_idx != 0:
+                raw_top = disease_hits[0]
+                raw_desc = get_disease_descendant_count(raw_top["id"])
+                print(
+                    f"[open_targets] EFO specificity override for '{disease_name}': "
+                    f"rank-0={raw_top['id']} ('{raw_top['name']}', {raw_desc} desc) "
+                    f"-> chose {efo_id} ('{disease_hits[best_idx]['name']}', {best_desc} desc)"
+                )
 
         cache_set(cache_key, efo_id, ttl_days=7)
         return efo_id

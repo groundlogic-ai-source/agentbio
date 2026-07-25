@@ -346,34 +346,70 @@ _LEGACY_NAME_RE = _re.compile(
 )
 
 
-def _efo_name_mismatch_warning(queried: str, efo_id: str) -> Optional[str]:
+# Stop-words stripped before computing token overlap between a queried disease
+# name and OT's canonical name for the resolved EFO node.  Generic disease
+# words would artificially inflate overlap scores between unrelated diseases.
+_EFO_NAME_STOP = frozenset({
+    "", "the", "of", "due", "to", "and", "a", "an", "with",
+    "disease", "type", "syndrome", "deficiency", "in", "by", "disorder",
+    "autosomal", "dominant", "recessive", "familial", "congenital",
+})
+
+# Below this overlap the EFO resolution is a hard mismatch: the system
+# found no meaningful connection between the queried name and OT's canonical
+# name for the resolved node.  In manual mode → raise; in sweep → skip.
+_EFO_HARD_STOP_THRESHOLD = 0.0   # exclusive: overlap must be > this to proceed
+
+# Below this overlap (but above the hard-stop) the EFO resolution is a
+# partial mismatch: proceed but stamp a Limitations warning on the report.
+_EFO_WARN_THRESHOLD = 0.5        # exclusive: overlap must be >= this to suppress warning
+
+
+def _efo_name_overlap(queried: str, efo_id: str) -> Optional[float]:
     """
-    Post-resolution sanity check: compare OT's canonical name for efo_id against
-    the originally queried disease name using token overlap.
+    Compute the token overlap between the queried disease name and OT's own
+    canonical name for the resolved EFO node.
 
-    Returns a warning string when fewer than half the meaningful query tokens
-    appear in OT's canonical name (overlap < 0.5), which reliably distinguishes
-    clear mismatches (e.g. "Glycogen storage disease type 1c" → OT calls the
-    resolved node "glycogen storage disease VI") from harmless name-format
-    differences (capitalisation, synonym expansions, abbreviations).
+    Returns a float in [0, 1] — the fraction of meaningful query tokens that
+    appear in the OT canonical name — or None if the OT name is unavailable
+    (API failure or unknown EFO).
 
-    Returns None when names are sufficiently aligned or the OT name is unavailable.
-
-    The warning is surfaced in the report Limitations section so a reviewer can
-    independently verify the disease mapping before acting on the hypothesis.
+    Cached indirectly: get_ot_canonical_disease_name has a 30-day cache so
+    repeated calls for the same EFO within a pipeline run are free.
     """
     ot_name = get_ot_canonical_disease_name(efo_id)
     if not ot_name:
         return None
-    stop = {"", "the", "of", "due", "to", "and", "a", "an", "with",
-            "disease", "type", "syndrome", "deficiency", "in", "by", "disorder"}
-    q_tok = set(_re.split(r"\W+", queried.lower())) - stop
-    n_tok = set(_re.split(r"\W+", ot_name.lower())) - stop
+    q_tok = set(_re.split(r"\W+", queried.lower())) - _EFO_NAME_STOP
+    n_tok = set(_re.split(r"\W+", ot_name.lower())) - _EFO_NAME_STOP
     if not q_tok:
         return None
-    overlap = len(q_tok & n_tok) / len(q_tok)
-    if overlap >= 0.5:
+    return len(q_tok & n_tok) / len(q_tok)
+
+
+def _efo_name_mismatch_warning(queried: str, efo_id: str) -> Optional[str]:
+    """
+    Post-resolution sanity check: returns a Limitations-section warning string
+    when the overlap is in the partial-mismatch band (0 < overlap < 0.5).
+
+    Returns None when:
+      - overlap >= 0.5      (names sufficiently aligned — no warning needed)
+      - overlap == 0.0      (hard mismatch — caller must raise / skip, not warn)
+      - OT name unavailable (can't evaluate)
+
+    The split between hard-stop (0%) and warn (0–50%) is intentional:
+      0%   overlap → resolved node shares no meaningful tokens with the query;
+                     the EFO is almost certainly the wrong disease entirely.
+                     Proceeding silently would produce a report about a
+                     different disease.  Callers raise (manual) or skip (sweep).
+      1–49% overlap → partial naming mismatch; may be a synonym, abbreviation,
+                     or subtype renaming.  Proceeding is defensible if the
+                     user is warned.
+    """
+    overlap = _efo_name_overlap(queried, efo_id)
+    if overlap is None or overlap >= _EFO_WARN_THRESHOLD or overlap <= _EFO_HARD_STOP_THRESHOLD:
         return None
+    ot_name = get_ot_canonical_disease_name(efo_id)  # cached — free second call
     msg = (
         f"**EFO RESOLUTION MISMATCH — verify disease mapping independently.** "
         f"The queried disease '{queried}' was resolved to EFO/MONDO ID `{efo_id}`, "
@@ -386,7 +422,7 @@ def _efo_name_mismatch_warning(queried: str, efo_id: str) -> Optional[str]:
         f"treating this result as disease-specific evidence."
     )
     print(
-        f"[target_selection] WARNING: EFO name mismatch for '{queried}' → "
+        f"[target_selection] WARNING: EFO partial mismatch for '{queried}' → "
         f"{efo_id} ('{ot_name}', overlap={overlap:.0%}). Warning attached to report."
     )
     return msg
@@ -551,6 +587,45 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
             f"Try an alternate common name for this disease — for example, use "
             f"'polycystic ovary syndrome' rather than the Orphanet administrative "
             f"name that may include prefixes like 'NON RARE IN EUROPE:'."
+        )
+
+    # Hard-stop check: if OT's own canonical name for the resolved EFO shares
+    # zero tokens with the Orphanet official name (disease_name), the EFO lookup
+    # landed on the wrong disease entirely.  A Limitations bullet is not enough —
+    # proceeding would produce a report about a different disease.
+    #
+    # WHY disease_name, not query: the Orphanet official name is what was actually
+    # sent to OT's search API.  User queries are aliases (e.g. "Pompe disease"),
+    # and their common names often differ from OT's canonical name even when the
+    # disease is correct — zero token overlap between an alias and the OT name is
+    # expected and is NOT a mismatch.  Comparing the Orphanet official name
+    # against the OT canonical name is the right fidelity check.
+    #
+    # Hard-stop threshold: overlap == 0.0 (strictly no meaningful tokens in common
+    # after stop-word removal).  Partial mismatches (0 < overlap < 0.5) still
+    # proceed but receive a prominent Limitations warning.
+    _efo_overlap = _efo_name_overlap(disease_name, efo_id)
+    if _efo_overlap is not None and _efo_overlap <= _EFO_HARD_STOP_THRESHOLD:
+        _ot_canonical = get_ot_canonical_disease_name(efo_id) or efo_id
+        raise RuntimeError(
+            f"EFO RESOLUTION MISMATCH — cannot proceed.\n"
+            f"\n"
+            f"  User query:          '{query}'\n"
+            f"  Orphanet name:       '{disease_name}'\n"
+            f"  Resolved EFO ID:     {efo_id}\n"
+            f"  OT canonical name:   '{_ot_canonical}'\n"
+            f"  Token overlap:       0%  (Orphanet name shares no meaningful tokens\n"
+            f"                        with OT's canonical name for this EFO node)\n"
+            f"\n"
+            f"Open Targets mapped '{disease_name}' to a node ({efo_id}) whose own "
+            f"canonical name is '{_ot_canonical}'. These appear to be different "
+            f"diseases — proceeding would generate a report about '{_ot_canonical}', "
+            f"not '{query}'.\n"
+            f"\n"
+            f"To fix: try rephrasing with the disease's most common synonym, its "
+            f"Orphanet ORPHA-code-based name (found at orphadata.com), or its OMIM "
+            f"preferred title. If the disease genuinely has no OT representation, "
+            f"it cannot be processed by this pipeline."
         )
 
     # FIX 1 — real approved-treatment status from OT knownDrugs
@@ -720,9 +795,10 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
     rows.sort(key=lambda x: (x["tractability_score"] + x["unmet_need_score"]), reverse=True)
 
     # Post-resolution sanity check: compare OT's canonical name for the chosen EFO
-    # against the originally queried name.  Attaches a warning to every row when
-    # the names differ materially so it surfaces in the report Limitations section.
-    _mismatch_warn = _efo_name_mismatch_warning(query, efo_id)
+    # against the Orphanet official name (disease_name).  Attaches a Limitations
+    # warning to every row when the names are in the partial-mismatch band
+    # (0 < overlap < 0.5).  Hard-stop (overlap == 0) already raised above.
+    _mismatch_warn = _efo_name_mismatch_warning(disease_name, efo_id)
     if _mismatch_warn:
         for row in rows:
             row["efo_name_mismatch_warning"] = _mismatch_warn
@@ -1001,7 +1077,18 @@ def run() -> None:
         n_resolved_efo += 1
 
         # Post-resolution EFO name sanity check (sweep mode).
-        # Computed once per disease; cached via get_ot_canonical_disease_name.
+        # Compute overlap once; skip the entire disease on a 0% hard mismatch
+        # (wrong OT node — scoring would reflect the wrong biology).
+        # Attach a Limitations warning for partial mismatches (0 < overlap < 0.5).
+        _sweep_overlap = _efo_name_overlap(disease_name, efo_id)
+        if _sweep_overlap is not None and _sweep_overlap <= _EFO_HARD_STOP_THRESHOLD:
+            _ot_canonical = get_ot_canonical_disease_name(efo_id) or efo_id
+            _log(
+                f"    → EFO HARD MISMATCH: '{disease_name}' resolved to {efo_id} "
+                f"(OT canonical: '{_ot_canonical}', 0% token overlap). "
+                f"Skipping — scoring this EFO would reflect the wrong disease."
+            )
+            continue
         _sweep_mismatch_warn = _efo_name_mismatch_warning(disease_name, efo_id)
 
         # FIX 1 — real approved-treatment status from OT knownDrugs
