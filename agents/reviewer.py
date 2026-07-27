@@ -21,8 +21,31 @@ import os
 import sys
 from typing import Any, Optional
 
-from rdkit import Chem
+from rdkit import Chem, DataStructs
 from rdkit.Chem import Crippen, Descriptors, Lipinski, rdMolDescriptors
+from rdkit.Chem.SaltRemover import SaltRemover
+
+# Singleton salt remover shared with chemist.py logic — used here to deduplicate
+# the direction-check candidate shortlist so salt-form duplicates (e.g. VARDENAFIL
+# and VARDENAFIL HCl) don't occupy two of the MAX_MECHANISM_DIRECTION_CANDIDATES
+# slots, displacing a genuinely distinct third compound from review.
+_MDC_SALT_REMOVER = SaltRemover()
+
+
+def _mdc_desalted_fp(smiles: Optional[str]):
+    """Return Morgan desalted fingerprint for direction-check dedup, or None."""
+    if not smiles:
+        return None
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return None
+        stripped = _MDC_SALT_REMOVER.StripMol(mol, dontRemoveEverything=True)
+        if stripped is None or stripped.GetNumAtoms() == 0:
+            stripped = mol
+        return rdMolDescriptors.GetMorganFingerprintAsBitVect(stripped, radius=2, nBits=2048)
+    except Exception:
+        return None
 
 from agents.target_selection import OUTPUT_DIR
 from agents import provenance
@@ -301,6 +324,63 @@ def run_reviewer(chemist_output: dict[str, Any],
     provenance.log_many(prov_entries)
     reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
 
+    # ── DILI-target whole-pool pre-cap pass ───────────────────────────────────
+    # For ABCB11/BSEP and KCNH2/hERG — the two pharmaceutical safety-profiling
+    # targets where ANY inhibition is a hepatotoxicity / QT-prolongation liability
+    # rather than a therapeutic action — ALL candidates whose ChEMBL mechanism is
+    # for a DIFFERENT protein (source="any_mechanism") are pre-capped without an
+    # LLM call.  This handles the structural problem where the ENTIRE approved-drug
+    # pool for these targets comes from BSEP/hERG safety screens (e.g. BRIC2 with
+    # 199 compounds), and the direction-check N-at-a-time window cannot cover all of
+    # them.  The shortcut is safe because:
+    #   • ABCB11/BSEP inhibition CAUSES cholestatic liver injury — it can never treat
+    #     a disease caused by deficient BSEP function.
+    #   • KCNH2/hERG blockade CAUSES long-QT arrhythmia — no approved cardiac drug
+    #     works by hERG blockade therapeutically.
+    # Drugs that genuinely target ABCB11 or KCNH2 (none exist in the current approved
+    # pool) would have source="target_specific" or similar and are passed through.
+    _AUTO_INCOMPATIBLE_TARGETS: frozenset[str] = frozenset({
+        "ABCB11", "BSEP",   # bile salt export pump — BSEP inhibition = cholestasis
+        "KCNH2", "HERG",    # hERG K⁺ channel — blockade = QT prolongation / torsades
+    })
+    _pre_cap_resort = False
+    for _cand in reviewed:
+        _ts = (_cand.get("target_symbol") or "").upper()
+        if _ts not in _AUTO_INCOMPATIBLE_TARGETS:
+            continue
+        if _cand.get("mechanism_direction") is not None:
+            continue  # already checked (shouldn't happen at this stage, but guard)
+        _at_pre = get_drug_action_type(_cand["drug_name"], _ts) or {}
+        if _at_pre.get("source") != "any_mechanism":
+            continue  # has a target-specific mechanism record — let LLM decide
+        # Apply automatic INCOMPATIBLE cap (no LLM call)
+        _cand["mechanism_direction"] = {
+            "verdict": "DIRECTIONALLY_INCOMPATIBLE",
+            "incompatible": True,
+            "compatible": False,
+            "reason": (
+                f"{_ts} is a pharmaceutical safety-profiling endpoint: inhibition of "
+                f"{_ts} causes DILI/cardiac toxicity (not a therapeutic action). "
+                f"This drug's ChEMBL mechanism record is for a different protein "
+                f"(source=any_mechanism), confirming it was assayed here for safety "
+                f"screening, not therapeutic intent against {_ts}."
+            ),
+            "action_type_used": _at_pre.get("action_type"),
+            "target_symbol_used": _ts,
+            "auto_precap": True,
+        }
+        _cand["composite_score"]       = min(_cand["composite_score"], MECHANISM_DIRECTION_CAP)
+        _cand["mechanism_cap_applied"] = True
+        _cand["strong_match"]          = _cand["composite_score"] >= STRONG_MATCH_THRESHOLD
+        _pre_cap_resort = True
+
+    if _pre_cap_resort:
+        reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+        n_precap = sum(1 for c in reviewed if (c.get("mechanism_direction") or {}).get("auto_precap"))
+        print(f"[reviewer] DILI-target pre-cap: {n_precap} candidate(s) auto-capped "
+              f"(source=any_mechanism on safety-screen target)")
+    # ── End DILI-target pre-cap pass ──────────────────────────────────────────
+
     # ── Mechanism-direction check (top-MAX_MECHANISM_DIRECTION_CANDIDATES) ──────
     # Runs AFTER initial composite-score sort so the top candidates are stable.
     # Only DIRECTIONALLY_INCOMPATIBLE triggers a cap; COMPATIBLE and
@@ -310,7 +390,26 @@ def run_reviewer(chemist_output: dict[str, Any],
     # Checks the top-K candidates (not just top-1) because a DILI-screening
     # assay artifact or salt-form-inflated score may place the real dangerous
     # candidate at position #2 or #3.
-    _mdc_candidates  = reviewed[:MAX_MECHANISM_DIRECTION_CANDIDATES]
+    # Build direction-check shortlist: up to MAX_MECHANISM_DIRECTION_CANDIDATES
+    # chemically DISTINCT candidates (by desalted Morgan fingerprint).
+    # Without this, salt-form pairs like VARDENAFIL / VARDENAFIL HCl occupy two
+    # of the three slots, displacing a genuinely different third compound.
+    _mdc_candidates: list[dict] = []
+    _mdc_seen_fps: list = []
+    for _cand in reviewed:
+        if len(_mdc_candidates) >= MAX_MECHANISM_DIRECTION_CANDIDATES:
+            break
+        _cand_fp = _mdc_desalted_fp(_cand.get("smiles"))
+        _is_dup = False
+        if _cand_fp is not None:
+            for _seen_fp in _mdc_seen_fps:
+                if _seen_fp is not None and DataStructs.TanimotoSimilarity(_cand_fp, _seen_fp) >= 0.99:
+                    _is_dup = True
+                    break
+        if not _is_dup:
+            _mdc_candidates.append(_cand)
+            _mdc_seen_fps.append(_cand_fp)
+
     _mdc_needs_resort = False
     for _top in _mdc_candidates:
         _target_sym = _top.get("target_symbol") or ""
@@ -361,6 +460,77 @@ def run_reviewer(chemist_output: dict[str, Any],
         )
 
     if _mdc_needs_resort:
+        reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+
+    # ── Post-cap direction-check pass ─────────────────────────────────────────
+    # Problem: if the initial top-K candidates ALL get capped (e.g. three
+    # BSEP-inhibitor drugs in a BRIC2 run), the list re-sorts and previously
+    # lower-ranked candidates rise to the top — but they were never direction-
+    # checked.  Those newly promoted candidates may also be DIRECTIONALLY_
+    # INCOMPATIBLE (e.g. calcium-channel blockers that are also BSEP safety-
+    # screen compounds) and would reach STRONG_MATCH without any gate.
+    #
+    # Fix: after the re-sort, collect the new top-MAX_MECHANISM_DIRECTION_CANDIDATES
+    # STRONG_MATCH candidates that were NOT in the original shortlist and run
+    # direction checks on them.  Total LLM calls are bounded at 2×MAX (= 6).
+    _mdc_checked_names: set[str] = {c["drug_name"] for c in _mdc_candidates}
+    _mdc_second_pass: list[dict] = []
+    _mdc_second_fps: list = []
+    for _cand in reviewed:
+        if len(_mdc_second_pass) >= MAX_MECHANISM_DIRECTION_CANDIDATES:
+            break
+        if not _cand.get("strong_match"):
+            break  # below threshold — no point checking further
+        if _cand["drug_name"] in _mdc_checked_names:
+            continue  # already checked in first pass
+        _cand_fp = _mdc_desalted_fp(_cand.get("smiles"))
+        _is_dup = False
+        if _cand_fp is not None:
+            for _seen_fp in _mdc_seen_fps + _mdc_second_fps:
+                if _seen_fp is not None and DataStructs.TanimotoSimilarity(_cand_fp, _seen_fp) >= 0.99:
+                    _is_dup = True
+                    break
+        if not _is_dup:
+            _mdc_second_pass.append(_cand)
+            _mdc_second_fps.append(_cand_fp)
+
+    _mdc_second_resort = False
+    for _top in _mdc_second_pass:
+        _target_sym = _top.get("target_symbol") or ""
+        _at_info    = get_drug_action_type(_top["drug_name"], _target_sym)
+        _action_t   = _at_info.get("action_type")
+        _moa        = _at_info.get("mechanism_of_action")
+        if _at_info.get("source") == "any_mechanism" and _action_t:
+            _action_t = (
+                f"INHIBITOR (inferred from IC50/Ki bioactivity assay data; "
+                f"ChEMBL primary registered mechanism is '{_action_t} / {_moa}' "
+                f"which is for a DIFFERENT protein target — do NOT use this as "
+                f"the drug's action on {_target_sym}; instead reason from the "
+                f"fact that this drug has IC50/Ki binding activity against "
+                f"{_target_sym} in ChEMBL assays, which implies inhibitory interaction)"
+            )
+        elif _at_info.get("source") == "not_found":
+            _action_t = (
+                f"INHIBITOR (inferred: no ChEMBL mechanism record found; "
+                f"drug has IC50/Ki binding activity against {_target_sym})"
+            )
+        _direction = check_mechanism_direction(
+            _top["drug_name"], _target_sym, _action_t, _moa, disease
+        )
+        _top["mechanism_direction"] = _direction
+        if _direction.get("incompatible"):
+            _top["composite_score"]       = min(_top["composite_score"], MECHANISM_DIRECTION_CAP)
+            _top["mechanism_cap_applied"] = True
+            _top["strong_match"]          = _top["composite_score"] >= STRONG_MATCH_THRESHOLD
+            _mdc_second_resort = True
+        print(
+            f"[reviewer] mechanism-direction (post-cap): {_top['drug_name']} / {disease} "
+            f"→ {_direction.get('verdict')} "
+            f"(action_src={_at_info.get('source')!r}, "
+            f"cap={'YES' if _direction.get('incompatible') else 'no'})"
+        )
+
+    if _mdc_second_resort:
         reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
     # ── End mechanism-direction pass ──────────────────────────────────────────
 

@@ -1,90 +1,28 @@
 {
-  "FORODESINE": {
+  "DEOXYCHOLIC ACID": {
     "afdb": {
       "has_structure": true,
-      "mean_plddt": 93.81,
-      "model_url": "https://alphafold.ebi.ac.uk/files/AF-P00491-F1-model_v6.pdb"
+      "mean_plddt": 82.69,
+      "model_url": "https://alphafold.ebi.ac.uk/files/AF-Q12908-F1-model_v6.pdb"
     },
     "complex": {
-      "available": true,
-      "structure_confidence": 0.9192360043525696,
-      "binding_pose_confidence": 0.7201025485992432,
-      "predicted_affinity": 0.18140025436878204,
-      "pdb_or_cif_url": "https://boltz-platform-prod-compute-api-storage.s3.us-east-1.amazonaws.com/org/311afb47-841a-494f-ab03-1ea7fa58b70a/workspace/ws_ai6T67fapbF5DEbF8qVZ/prediction/sab_pred_x3XhsKXiy7EmdKoe7flR/output/public/sample_0_predicted_structure.cif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=REDACTED&X-Amz-Date=20260726T173638Z&X-Amz-Expires=1800&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "available": false,
+      "structure_confidence": null,
+      "binding_pose_confidence": null,
+      "predicted_affinity": null,
+      "pdb_or_cif_url": null,
       "estimated_cost_usd": 0.025,
-      "raw_metrics": {
-        "structure_metrics": {
-          "complex_ipde": 0.670070469379425,
-          "complex_iplddt": 0.8872414827346802,
-          "complex_pde": 0.371193528175354,
-          "complex_plddt": 0.9019808173179626,
-          "iptm": 0.988256573677063,
-          "ligand_iptm": 0.988256573677063,
-          "protein_iptm": 0.0,
-          "ptm": 0.9693443179130554,
-          "structure_confidence": 0.9192360043525696
-        },
-        "binding_metrics": {
-          "binding_confidence": 0.7201025485992432,
-          "optimization_score": 0.18140025436878204,
-          "type": "ligand_protein_binding_metrics"
-        }
-      },
+      "raw_metrics": {},
       "model": "boltz-2.1",
-      "error": null,
-      "local_cif_filename": "d9cff3efdb1d3e7cf7f8ae94a87b0aa4.cif"
+      "error": "Error code: 402 - {'code': 'payment_required', 'message': 'All credits depleted. Purchase prepaid credits or enable on-demand billing to continue running jobs.'}"
     },
     "adme": {
-      "available": true,
-      "lipophilicity": -1.1113759279251099,
-      "permeability": -0.12595972418785095,
-      "solubility": "high-confidence",
+      "available": false,
+      "lipophilicity": null,
+      "permeability": null,
+      "solubility": null,
       "model": "adme-v1",
-      "error": null
-    }
-  },
-  "FORODESINE HYDROCHLORIDE": {
-    "afdb": {
-      "has_structure": true,
-      "mean_plddt": 93.81,
-      "model_url": "https://alphafold.ebi.ac.uk/files/AF-P00491-F1-model_v6.pdb"
-    },
-    "complex": {
-      "available": true,
-      "structure_confidence": 0.9227995872497559,
-      "binding_pose_confidence": 0.7199087142944336,
-      "predicted_affinity": 0.18191446363925934,
-      "pdb_or_cif_url": "https://boltz-platform-prod-compute-api-storage.s3.us-east-1.amazonaws.com/org/311afb47-841a-494f-ab03-1ea7fa58b70a/workspace/ws_ai6T67fapbF5DEbF8qVZ/prediction/sab_pred_dzJ5X4RBRLXQhJXabdPs/output/public/sample_0_predicted_structure.cif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=REDACTED&X-Amz-Date=20260726T173746Z&X-Amz-Expires=1800&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "estimated_cost_usd": 0.025,
-      "raw_metrics": {
-        "structure_metrics": {
-          "complex_ipde": 0.6774880290031433,
-          "complex_iplddt": 0.8887829184532166,
-          "complex_pde": 0.3700208067893982,
-          "complex_plddt": 0.9062308073043823,
-          "iptm": 0.9890748262405396,
-          "ligand_iptm": 0.9890748262405396,
-          "protein_iptm": 0.0,
-          "ptm": 0.9702531099319458,
-          "structure_confidence": 0.9227995872497559
-        },
-        "binding_metrics": {
-          "binding_confidence": 0.7199087142944336,
-          "optimization_score": 0.18191446363925934,
-          "type": "ligand_protein_binding_metrics"
-        }
-      },
-      "model": "boltz-2.1",
-      "error": null,
-      "local_cif_filename": "25ffb5a81ff9bdc96b41cab706ef7105.cif"
-    },
-    "adme": {
-      "available": true,
-      "lipophilicity": -0.7993779182434082,
-      "permeability": -0.11419686675071716,
-      "solubility": "high-confidence",
-      "model": "adme-v1",
-      "error": null
+      "error": "Error code: 402 - {'code': 'payment_required', 'message': 'All credits depleted. Purchase prepaid credits or enable on-demand billing to continue running jobs.'}"
     }
   }
 }

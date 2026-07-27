@@ -1,1564 +1,3328 @@
 {
   "entries": [
     {
-      "source_type": "pmid",
-      "source_id": "33309011",
+      "source_type": "biogrid_interaction",
+      "source_id": "241696",
       "used_by": "biologist",
-      "context": "ADK/Hypermethioninemia encephalopathy due to adenosine kinase deficiency literature"
+      "context": "TJP2 interactor YWHAG"
     },
     {
-      "source_type": "pmid",
-      "source_id": "21963049",
+      "source_type": "biogrid_interaction",
+      "source_id": "241947",
       "used_by": "biologist",
-      "context": "ADK/Hypermethioninemia encephalopathy due to adenosine kinase deficiency literature"
+      "context": "TJP2 interactor YWHAQ"
     },
     {
-      "source_type": "pmid",
-      "source_id": "27903722",
+      "source_type": "biogrid_interaction",
+      "source_id": "241974",
       "used_by": "biologist",
-      "context": "ADK/Hypermethioninemia encephalopathy due to adenosine kinase deficiency literature"
+      "context": "TJP2 interactor YWHAB"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "242352",
+      "used_by": "biologist",
+      "context": "TJP2 interactor YWHAZ"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "243112",
+      "used_by": "biologist",
+      "context": "TJP2 interactor TRAF6"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "244975",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SFN"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "253787",
+      "used_by": "biologist",
+      "context": "TJP2 interactor OCLN"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "256472",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SH3KBP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "278373",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CTNNA1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "278375",
+      "used_by": "biologist",
+      "context": "TJP2 interactor TJP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "283402",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CGN"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "287151",
+      "used_by": "biologist",
+      "context": "TJP2 interactor EPB41"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "301239",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CLDN1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "320478",
+      "used_by": "biologist",
+      "context": "TJP2 interactor HGS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "423629",
+      "used_by": "biologist",
+      "context": "TJP2 interactor RAE1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "446259",
+      "used_by": "biologist",
+      "context": "TJP2 interactor KBTBD7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "483189",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SRRM2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "616721",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SSTR3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "667536",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SIRT7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "678921",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CLDN2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "750964",
+      "used_by": "biologist",
+      "context": "TJP2 interactor UBN1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "752665",
+      "used_by": "biologist",
+      "context": "TJP2 interactor THOC5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "753256",
+      "used_by": "biologist",
+      "context": "TJP2 interactor ZMYM3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "830653",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CDK6"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "906639",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SRPK2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "907180",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SRPK1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "913482",
+      "used_by": "biologist",
+      "context": "TJP2 interactor LATS1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "913603",
+      "used_by": "biologist",
+      "context": "TJP2 interactor LATS2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "913964",
+      "used_by": "biologist",
+      "context": "TJP2 interactor KIAA1671"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "913965",
+      "used_by": "biologist",
+      "context": "TJP2 interactor KIF14"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "913966",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PGAM5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "913967",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PLOD1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "914000",
+      "used_by": "biologist",
+      "context": "TJP2 interactor YAP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "926008",
+      "used_by": "biologist",
+      "context": "TJP2 interactor KCMF1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "956989",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SNAI2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1058688",
+      "used_by": "biologist",
+      "context": "TJP2 interactor OBSL1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1107835",
+      "used_by": "biologist",
+      "context": "TJP2 interactor LUZP4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1183567",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SNAI3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1188238",
+      "used_by": "biologist",
+      "context": "TJP2 interactor MAGIX"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1191834",
+      "used_by": "biologist",
+      "context": "TJP2 interactor DCAF15"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1196177",
+      "used_by": "biologist",
+      "context": "TJP2 interactor NUDT12"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1198694",
+      "used_by": "biologist",
+      "context": "TJP2 interactor IFI30"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1255465",
+      "used_by": "biologist",
+      "context": "TJP2 interactor HSPB1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1264180",
+      "used_by": "biologist",
+      "context": "TJP2 interactor LRRC47"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1273312",
+      "used_by": "biologist",
+      "context": "TJP2 interactor EIF1B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1273313",
+      "used_by": "biologist",
+      "context": "TJP2 interactor MCM3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1273314",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PUS7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1429639",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CLK1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1432105",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CEP128"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1432265",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CEP135"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1432633",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CNTRL"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1432750",
+      "used_by": "biologist",
+      "context": "TJP2 interactor FBF1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1433209",
+      "used_by": "biologist",
+      "context": "TJP2 interactor ODF2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1439647",
+      "used_by": "biologist",
+      "context": "TJP2 interactor XPO1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1449364",
+      "used_by": "biologist",
+      "context": "TJP2 interactor MYO1C"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1449365",
+      "used_by": "biologist",
+      "context": "TJP2 interactor MAPK8"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1449366",
+      "used_by": "biologist",
+      "context": "TJP2 interactor IQGAP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1449367",
+      "used_by": "biologist",
+      "context": "TJP2 interactor EXOSC5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1449368",
+      "used_by": "biologist",
+      "context": "TJP2 interactor MYO19"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1449369",
+      "used_by": "biologist",
+      "context": "TJP2 interactor MYO18A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1518105",
+      "used_by": "biologist",
+      "context": "TJP2 interactor FBXW7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2211400",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CDH1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2241678",
+      "used_by": "biologist",
+      "context": "TJP2 interactor JPH4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2250544",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CDK15"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2251849",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CAPN13"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2381514",
+      "used_by": "biologist",
+      "context": "TJP2 interactor UBE2A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2446385",
+      "used_by": "biologist",
+      "context": "TJP2 interactor ZUFSP"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2497776",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SPDL1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2533001",
+      "used_by": "biologist",
+      "context": "TJP2 interactor HABP4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2533114",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SERBP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2535668",
+      "used_by": "biologist",
+      "context": "TJP2 interactor TNRC6A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2564744",
+      "used_by": "biologist",
+      "context": "TJP2 interactor KIAA1429"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2606487",
+      "used_by": "biologist",
+      "context": "TJP2 interactor DISC1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2608306",
+      "used_by": "biologist",
+      "context": "TJP2 interactor NR2C2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2620643",
+      "used_by": "biologist",
+      "context": "TJP2 interactor BICD2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2620967",
+      "used_by": "biologist",
+      "context": "TJP2 interactor BICD1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2621326",
+      "used_by": "biologist",
+      "context": "TJP2 interactor HOOK1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2621380",
+      "used_by": "biologist",
+      "context": "TJP2 interactor HOOK3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2624182",
+      "used_by": "biologist",
+      "context": "TJP2 interactor VRK1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2635050",
+      "used_by": "biologist",
+      "context": "TJP2 interactor DYRK1A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2635520",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CD74"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2643512",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PTPN3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2650533",
+      "used_by": "biologist",
+      "context": "TJP2 interactor HMGB1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2749455",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PLEKHA4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2752285",
+      "used_by": "biologist",
+      "context": "TJP2 interactor EPB41L5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2757555",
+      "used_by": "biologist",
+      "context": "TJP2 interactor ENG"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2778079",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CSK"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2780215",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PRKD1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2784058",
+      "used_by": "biologist",
+      "context": "TJP2 interactor RPL18"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2823879",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CIT"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2824814",
+      "used_by": "biologist",
+      "context": "TJP2 interactor ANLN"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2825832",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CHMP4B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2828639",
+      "used_by": "biologist",
+      "context": "TJP2 interactor ECT2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2831838",
+      "used_by": "biologist",
+      "context": "TJP2 interactor KIF20A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2832210",
+      "used_by": "biologist",
+      "context": "TJP2 interactor KIF23"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2842983",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PRNP"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2844073",
+      "used_by": "biologist",
+      "context": "TJP2 interactor ARHGAP12"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2877450",
+      "used_by": "biologist",
+      "context": "TJP2 interactor INS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2905144",
+      "used_by": "biologist",
+      "context": "TJP2 interactor RBM39"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2975743",
+      "used_by": "biologist",
+      "context": "TJP2 interactor DDRGK1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2978895",
+      "used_by": "biologist",
+      "context": "TJP2 interactor AMOT"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2984818",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CTNNB1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2985038",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CXADR"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2989096",
+      "used_by": "biologist",
+      "context": "TJP2 interactor GJA1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2991143",
+      "used_by": "biologist",
+      "context": "TJP2 interactor IMPDH2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2991651",
+      "used_by": "biologist",
+      "context": "TJP2 interactor KRAS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2996816",
+      "used_by": "biologist",
+      "context": "TJP2 interactor MLLT4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2998473",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PARD3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2999862",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PFN1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3004399",
+      "used_by": "biologist",
+      "context": "TJP2 interactor RHOB"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009433",
+      "used_by": "biologist",
+      "context": "TJP2 interactor ARHGAP21"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009434",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CBL"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009435",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CC2D1A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009436",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CCNB1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009437",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CCNB2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009438",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CENPJ"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009439",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CFAP97"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009441",
+      "used_by": "biologist",
+      "context": "TJP2 interactor CPNE8"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009443",
+      "used_by": "biologist",
+      "context": "TJP2 interactor DIP2A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009444",
+      "used_by": "biologist",
+      "context": "TJP2 interactor DNMBP"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009445",
+      "used_by": "biologist",
+      "context": "TJP2 interactor EFHD1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009447",
+      "used_by": "biologist",
+      "context": "TJP2 interactor FAM107B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009448",
+      "used_by": "biologist",
+      "context": "TJP2 interactor FNBP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009449",
+      "used_by": "biologist",
+      "context": "TJP2 interactor FNBP1L"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009450",
+      "used_by": "biologist",
+      "context": "TJP2 interactor IFT57"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009451",
+      "used_by": "biologist",
+      "context": "TJP2 interactor KIAA1462"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009454",
+      "used_by": "biologist",
+      "context": "TJP2 interactor KNTC1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009455",
+      "used_by": "biologist",
+      "context": "TJP2 interactor LASP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009456",
+      "used_by": "biologist",
+      "context": "TJP2 interactor LMO7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009457",
+      "used_by": "biologist",
+      "context": "TJP2 interactor LPP"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009458",
+      "used_by": "biologist",
+      "context": "TJP2 interactor LUZP1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009459",
+      "used_by": "biologist",
+      "context": "TJP2 interactor MAGI1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009460",
+      "used_by": "biologist",
+      "context": "TJP2 interactor MTMR1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009461",
+      "used_by": "biologist",
+      "context": "TJP2 interactor NCK2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009462",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PVRL2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009463",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PAK4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009464",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PEAK1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009465",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PGK1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009466",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PPP1R13B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009467",
+      "used_by": "biologist",
+      "context": "TJP2 interactor PPP1R9B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009468",
+      "used_by": "biologist",
+      "context": "TJP2 interactor RASSF8"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009469",
+      "used_by": "biologist",
+      "context": "TJP2 interactor RPAP2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009470",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SCRIB"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009471",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SDCCAG3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009472",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SH3D19"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009474",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SIPA1L1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009475",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SIPA1L3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009476",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SMG7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009477",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SORBS1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009480",
+      "used_by": "biologist",
+      "context": "TJP2 interactor STRN4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009481",
+      "used_by": "biologist",
+      "context": "TJP2 interactor SVIL"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009482",
+      "used_by": "biologist",
+      "context": "TJP2 interactor TCHP"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009483",
+      "used_by": "biologist",
+      "context": "TJP2 interactor TDRD3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009485",
+      "used_by": "biologist",
+      "context": "TJP2 interactor TP53BP2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009486",
+      "used_by": "biologist",
+      "context": "TJP2 interactor TRIP6"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009487",
+      "used_by": "biologist",
+      "context": "TJP2 interactor USP53"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009488",
+      "used_by": "biologist",
+      "context": "TJP2 interactor USP54"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009490",
+      "used_by": "biologist",
+      "context": "TJP2 interactor AKAP2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009491",
+      "used_by": "biologist",
+      "context": "TJP2 interactor ALMS1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009492",
+      "used_by": "biologist",
+      "context": "TJP2 interactor APC"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009493",
+      "used_by": "biologist",
+      "context": "TJP2 interactor KIAA1244"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "205842",
+      "source_id": "1606399",
       "used_by": "chemist",
-      "context": "PENTOSTATIN affinity vs ADA"
+      "context": "MARALIXIBAT affinity vs SLC10A2"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "372606",
+      "source_id": "25091984",
       "used_by": "chemist",
-      "context": "PENTOSTATIN affinity vs ADA"
+      "context": "MARALIXIBAT affinity vs SLC10A2"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "19143399",
+      "source_id": "68073",
       "used_by": "chemist",
-      "context": "PENTOSTATIN affinity vs ADA"
+      "context": "MARALIXIBAT CHLORIDE affinity vs SLC10A2"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "19143402",
+      "source_id": "11002859",
       "used_by": "chemist",
-      "context": "PENTOSTATIN affinity vs ADA"
+      "context": "CHENODIOL affinity vs SLC10A2"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "1294499",
+      "source_id": "11003216",
       "used_by": "chemist",
-      "context": "AFAMELANOTIDE affinity vs ADA"
+      "context": "DEOXYCHOLIC ACID affinity vs SLC10A2"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "356244",
+      "source_id": "11003217",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "DEOXYCHOLIC ACID affinity vs SLC10A2"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "458579",
+      "source_id": "11002815",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "CYCLOSPORINE affinity vs SLC10A2"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "458580",
+      "source_id": "11002845",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "TAURURSODIOL affinity vs SLC10A2"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "1077891",
+      "source_id": "11003264",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "URSODIOL affinity vs SLC10A2"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "1077892",
+      "source_id": "15460422",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "PIOGLITAZONE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "1089174",
+      "source_id": "18051778",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "PIOGLITAZONE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "1772056",
+      "source_id": "18052009",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "PIOGLITAZONE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "1772057",
+      "source_id": "18081092",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "PIOGLITAZONE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "2391442",
+      "source_id": "18129078",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "PIOGLITAZONE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "2587836",
+      "source_id": "22396449",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "PIOGLITAZONE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "2587846",
+      "source_id": "11000502",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "CYCLOSPORINE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "2587870",
+      "source_id": "11000503",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "CYCLOSPORINE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "2667365",
+      "source_id": "11003316",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "CYCLOSPORINE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "19103821",
+      "source_id": "15460441",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "CYCLOSPORINE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "24999857",
+      "source_id": "16306125",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "CYCLOSPORINE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "25532889",
+      "source_id": "18051777",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "CYCLOSPORINE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "25995008",
+      "source_id": "18051958",
       "used_by": "chemist",
-      "context": "FORODESINE affinity vs PNP"
+      "context": "CYCLOSPORINE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "26191710",
+      "source_id": "18129069",
       "used_by": "chemist",
-      "context": "FORODESINE HYDROCHLORIDE affinity vs PNP"
+      "context": "CYCLOSPORINE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "25994948",
+      "source_id": "22396450",
       "used_by": "chemist",
-      "context": "CLADRIBINE affinity vs PNP"
+      "context": "CYCLOSPORINE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "19103834",
+      "source_id": "18129021",
       "used_by": "chemist",
-      "context": "ACYCLOVIR affinity vs PNP"
+      "context": "CETRORELIX ACETATE affinity vs ABCB11"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "25995000",
+      "source_id": "18129022",
       "used_by": "chemist",
-      "context": "ACYCLOVIR affinity vs PNP"
+      "context": "EVEROLIMUS affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129080",
+      "used_by": "chemist",
+      "context": "MIFEPRISTONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051775",
+      "used_by": "chemist",
+      "context": "RITONAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052018",
+      "used_by": "chemist",
+      "context": "RITONAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129083",
+      "used_by": "chemist",
+      "context": "RITONAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396451",
+      "used_by": "chemist",
+      "context": "RITONAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129036",
+      "used_by": "chemist",
+      "context": "TEMSIROLIMUS affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129052",
+      "used_by": "chemist",
+      "context": "PRANLUKAST affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000499",
+      "used_by": "chemist",
+      "context": "KETOCONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460428",
+      "used_by": "chemist",
+      "context": "KETOCONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051774",
+      "used_by": "chemist",
+      "context": "KETOCONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052001",
+      "used_by": "chemist",
+      "context": "KETOCONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080656",
+      "used_by": "chemist",
+      "context": "KETOCONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129065",
+      "used_by": "chemist",
+      "context": "KETOCONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396453",
+      "used_by": "chemist",
+      "context": "KETOCONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051770",
+      "used_by": "chemist",
+      "context": "SAQUINAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051980",
+      "used_by": "chemist",
+      "context": "SAQUINAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129058",
+      "used_by": "chemist",
+      "context": "SAQUINAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396452",
+      "used_by": "chemist",
+      "context": "SAQUINAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129063",
+      "used_by": "chemist",
+      "context": "DIPYRIDAMOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460418",
+      "used_by": "chemist",
+      "context": "ROSIGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051771",
+      "used_by": "chemist",
+      "context": "ROSIGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052019",
+      "used_by": "chemist",
+      "context": "ROSIGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081130",
+      "used_by": "chemist",
+      "context": "ROSIGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129051",
+      "used_by": "chemist",
+      "context": "ROSIGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396454",
+      "used_by": "chemist",
+      "context": "ROSIGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129045",
+      "used_by": "chemist",
+      "context": "OLMESARTAN MEDOXOMIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051772",
+      "used_by": "chemist",
+      "context": "TELITHROMYCIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051988",
+      "used_by": "chemist",
+      "context": "TELITHROMYCIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129057",
+      "used_by": "chemist",
+      "context": "TELITHROMYCIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11002828",
+      "used_by": "chemist",
+      "context": "GLYBURIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460431",
+      "used_by": "chemist",
+      "context": "GLYBURIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051768",
+      "used_by": "chemist",
+      "context": "GLYBURIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051959",
+      "used_by": "chemist",
+      "context": "GLYBURIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129027",
+      "used_by": "chemist",
+      "context": "GLYBURIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396455",
+      "used_by": "chemist",
+      "context": "GLYBURIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000500",
+      "used_by": "chemist",
+      "context": "TROGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460413",
+      "used_by": "chemist",
+      "context": "TROGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051769",
+      "used_by": "chemist",
+      "context": "TROGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052021",
+      "used_by": "chemist",
+      "context": "TROGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081195",
+      "used_by": "chemist",
+      "context": "TROGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129064",
+      "used_by": "chemist",
+      "context": "TROGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396456",
+      "used_by": "chemist",
+      "context": "TROGLITAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460426",
+      "used_by": "chemist",
+      "context": "NEFAZODONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051767",
+      "used_by": "chemist",
+      "context": "NEFAZODONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051961",
+      "used_by": "chemist",
+      "context": "NEFAZODONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129049",
+      "used_by": "chemist",
+      "context": "NEFAZODONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396458",
+      "used_by": "chemist",
+      "context": "NEFAZODONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051766",
+      "used_by": "chemist",
+      "context": "LAPATINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052016",
+      "used_by": "chemist",
+      "context": "LAPATINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396457",
+      "used_by": "chemist",
+      "context": "LAPATINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052024",
+      "used_by": "chemist",
+      "context": "IRBESARTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129062",
+      "used_by": "chemist",
+      "context": "IRBESARTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396459",
+      "used_by": "chemist",
+      "context": "IRBESARTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129002",
+      "used_by": "chemist",
+      "context": "TACROLIMUS ANHYDROUS affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051764",
+      "used_by": "chemist",
+      "context": "SORAFENIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052020",
+      "used_by": "chemist",
+      "context": "SORAFENIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051765",
+      "used_by": "chemist",
+      "context": "NICARDIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052008",
+      "used_by": "chemist",
+      "context": "NICARDIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129012",
+      "used_by": "chemist",
+      "context": "NICARDIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396460",
+      "used_by": "chemist",
+      "context": "NICARDIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129072",
+      "used_by": "chemist",
+      "context": "POSACONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000480",
+      "used_by": "chemist",
+      "context": "RESERPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051763",
+      "used_by": "chemist",
+      "context": "RESERPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128986",
+      "used_by": "chemist",
+      "context": "RESERPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396461",
+      "used_by": "chemist",
+      "context": "RESERPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460386",
+      "used_by": "chemist",
+      "context": "CLOBETASOL PROPIONATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051997",
+      "used_by": "chemist",
+      "context": "CLOBETASOL PROPIONATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052025",
+      "used_by": "chemist",
+      "context": "LOSARTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396462",
+      "used_by": "chemist",
+      "context": "LOSARTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129023",
+      "used_by": "chemist",
+      "context": "LOSARTAN POTASSIUM affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460409",
+      "used_by": "chemist",
+      "context": "ALPIDEM affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052000",
+      "used_by": "chemist",
+      "context": "ALPIDEM affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081046",
+      "used_by": "chemist",
+      "context": "ALPIDEM affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "22396463",
+      "used_by": "chemist",
+      "context": "ALPIDEM affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129074",
+      "used_by": "chemist",
+      "context": "OCTREOTIDE ACETATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460432",
+      "used_by": "chemist",
+      "context": "FUSIDIC ACID affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051762",
+      "used_by": "chemist",
+      "context": "FUSIDIC ACID affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129084",
+      "used_by": "chemist",
+      "context": "FUSIDIC ACID affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051972",
+      "used_by": "chemist",
+      "context": "NIMODIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128991",
+      "used_by": "chemist",
+      "context": "PIMECROLIMUS affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129043",
+      "used_by": "chemist",
+      "context": "TOLVAPTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129070",
+      "used_by": "chemist",
+      "context": "RIFAPENTINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129082",
+      "used_by": "chemist",
+      "context": "PAZOPANIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051975",
+      "used_by": "chemist",
+      "context": "CHENODIOL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000482",
+      "used_by": "chemist",
+      "context": "RIFAMYCIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11002884",
+      "used_by": "chemist",
+      "context": "RIFAMYCIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460419",
+      "used_by": "chemist",
+      "context": "RIFAMYCIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051960",
+      "used_by": "chemist",
+      "context": "RIFAMYCIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051760",
+      "used_by": "chemist",
+      "context": "GEFITINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052007",
+      "used_by": "chemist",
+      "context": "GEFITINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129026",
+      "used_by": "chemist",
+      "context": "GEFITINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051974",
+      "used_by": "chemist",
+      "context": "SULFINPYRAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052030",
+      "used_by": "chemist",
+      "context": "ZAFIRLUKAST affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129034",
+      "used_by": "chemist",
+      "context": "ZAFIRLUKAST affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051991",
+      "used_by": "chemist",
+      "context": "LIOTHYRONINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051759",
+      "used_by": "chemist",
+      "context": "NELFINAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052027",
+      "used_by": "chemist",
+      "context": "NELFINAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129073",
+      "used_by": "chemist",
+      "context": "NELFINAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128987",
+      "used_by": "chemist",
+      "context": "LORATADINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129054",
+      "used_by": "chemist",
+      "context": "SITAXENTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000494",
+      "used_by": "chemist",
+      "context": "CLOFAZIMINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051758",
+      "used_by": "chemist",
+      "context": "CLOFAZIMINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052005",
+      "used_by": "chemist",
+      "context": "CLOFAZIMINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129019",
+      "used_by": "chemist",
+      "context": "CLOFAZIMINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460437",
+      "used_by": "chemist",
+      "context": "ERYTHROMYCIN ESTOLATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051757",
+      "used_by": "chemist",
+      "context": "ERYTHROMYCIN ESTOLATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052013",
+      "used_by": "chemist",
+      "context": "ERYTHROMYCIN ESTOLATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128989",
+      "used_by": "chemist",
+      "context": "LATANOPROST affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129001",
+      "used_by": "chemist",
+      "context": "ATORVASTATIN CALCIUM affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129013",
+      "used_by": "chemist",
+      "context": "DASATINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051968",
+      "used_by": "chemist",
+      "context": "ECONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129089",
+      "used_by": "chemist",
+      "context": "ETHINYL ESTRADIOL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081079",
+      "used_by": "chemist",
+      "context": "PERHEXILINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051753",
+      "used_by": "chemist",
+      "context": "FENOFIBRATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051977",
+      "used_by": "chemist",
+      "context": "FENOFIBRATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129077",
+      "used_by": "chemist",
+      "context": "FENOFIBRATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080776",
+      "used_by": "chemist",
+      "context": "CYCLANDELATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051751",
+      "used_by": "chemist",
+      "context": "GLIMEPIRIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051978",
+      "used_by": "chemist",
+      "context": "GLIMEPIRIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129020",
+      "used_by": "chemist",
+      "context": "GLIMEPIRIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051752",
+      "used_by": "chemist",
+      "context": "CINNARIZINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129091",
+      "used_by": "chemist",
+      "context": "CINNARIZINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081039",
+      "used_by": "chemist",
+      "context": "AMLODIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128983",
+      "used_by": "chemist",
+      "context": "MEDROXYPROGESTERONE ACETATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051750",
+      "used_by": "chemist",
+      "context": "TELMISARTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052012",
+      "used_by": "chemist",
+      "context": "TELMISARTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129010",
+      "used_by": "chemist",
+      "context": "TELMISARTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081217",
+      "used_by": "chemist",
+      "context": "DESOXIMETASONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129017",
+      "used_by": "chemist",
+      "context": "DROSPIRENONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081140",
+      "used_by": "chemist",
+      "context": "SILDENAFIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000485",
+      "used_by": "chemist",
+      "context": "PROGESTERONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051748",
+      "used_by": "chemist",
+      "context": "BENZBROMARONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051981",
+      "used_by": "chemist",
+      "context": "BENZBROMARONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129050",
+      "used_by": "chemist",
+      "context": "BENZBROMARONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051749",
+      "used_by": "chemist",
+      "context": "LOPINAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129067",
+      "used_by": "chemist",
+      "context": "LOPINAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051747",
+      "used_by": "chemist",
+      "context": "ITRACONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129025",
+      "used_by": "chemist",
+      "context": "ITRACONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129046",
+      "used_by": "chemist",
+      "context": "MEGESTROL ACETATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052029",
+      "used_by": "chemist",
+      "context": "DANAZOL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129032",
+      "used_by": "chemist",
+      "context": "DANAZOL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000484",
+      "used_by": "chemist",
+      "context": "TAMOXIFEN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000491",
+      "used_by": "chemist",
+      "context": "TAMOXIFEN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052026",
+      "used_by": "chemist",
+      "context": "LOVASTATIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128997",
+      "used_by": "chemist",
+      "context": "LOVASTATIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081187",
+      "used_by": "chemist",
+      "context": "TRIFLUPERIDOL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080804",
+      "used_by": "chemist",
+      "context": "BROMHEXINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081202",
+      "used_by": "chemist",
+      "context": "VERAPAMIL HYDROCHLORIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129103",
+      "used_by": "chemist",
+      "context": "RACECADOTRIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460420",
+      "used_by": "chemist",
+      "context": "RIFAMPIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051741",
+      "used_by": "chemist",
+      "context": "RIFAMPIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051987",
+      "used_by": "chemist",
+      "context": "RIFAMPIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129053",
+      "used_by": "chemist",
+      "context": "RIFAMPIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129000",
+      "used_by": "chemist",
+      "context": "REPAGLINIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129041",
+      "used_by": "chemist",
+      "context": "CISAPRIDE MONOHYDRATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460402",
+      "used_by": "chemist",
+      "context": "GLAFENINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080680",
+      "used_by": "chemist",
+      "context": "HALOPERIDOL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128995",
+      "used_by": "chemist",
+      "context": "ILOPERIDONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129016",
+      "used_by": "chemist",
+      "context": "VALRUBICIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000492",
+      "used_by": "chemist",
+      "context": "PACLITAXEL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000495",
+      "used_by": "chemist",
+      "context": "PACLITAXEL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051754",
+      "used_by": "chemist",
+      "context": "PACLITAXEL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052017",
+      "used_by": "chemist",
+      "context": "PACLITAXEL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129075",
+      "used_by": "chemist",
+      "context": "PACLITAXEL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051743",
+      "used_by": "chemist",
+      "context": "SIMVASTATIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052011",
+      "used_by": "chemist",
+      "context": "SIMVASTATIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128993",
+      "used_by": "chemist",
+      "context": "SIMVASTATIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081172",
+      "used_by": "chemist",
+      "context": "THIORIDAZINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051742",
+      "used_by": "chemist",
+      "context": "IMATINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052014",
+      "used_by": "chemist",
+      "context": "IMATINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129056",
+      "used_by": "chemist",
+      "context": "IMATINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051788",
+      "used_by": "chemist",
+      "context": "MIBEFRADIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129093",
+      "used_by": "chemist",
+      "context": "NERATINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129105",
+      "used_by": "chemist",
+      "context": "RIMONABANT affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15461938",
+      "used_by": "chemist",
+      "context": "BOSENTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051744",
+      "used_by": "chemist",
+      "context": "BOSENTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051983",
+      "used_by": "chemist",
+      "context": "BOSENTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129044",
+      "used_by": "chemist",
+      "context": "BOSENTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080699",
+      "used_by": "chemist",
+      "context": "FLUPHENAZINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15461942",
+      "used_by": "chemist",
+      "context": "ACITRETIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129018",
+      "used_by": "chemist",
+      "context": "ACITRETIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051740",
+      "used_by": "chemist",
+      "context": "RIFABUTIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052010",
+      "used_by": "chemist",
+      "context": "RIFABUTIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129011",
+      "used_by": "chemist",
+      "context": "RIFABUTIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080639",
+      "used_by": "chemist",
+      "context": "MECLOFENAMIC ACID affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129106",
+      "used_by": "chemist",
+      "context": "BIFONAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051739",
+      "used_by": "chemist",
+      "context": "OXYBUTYNIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052004",
+      "used_by": "chemist",
+      "context": "OXYBUTYNIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128984",
+      "used_by": "chemist",
+      "context": "OXYBUTYNIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080784",
+      "used_by": "chemist",
+      "context": "CHLORPROTHIXENE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051738",
+      "used_by": "chemist",
+      "context": "FINASTERIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052002",
+      "used_by": "chemist",
+      "context": "FINASTERIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129003",
+      "used_by": "chemist",
+      "context": "FINASTERIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128992",
+      "used_by": "chemist",
+      "context": "ISRADIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051792",
+      "used_by": "chemist",
+      "context": "NORETHINDRONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080910",
+      "used_by": "chemist",
+      "context": "NORETHINDRONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081138",
+      "used_by": "chemist",
+      "context": "SERTRALINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128988",
+      "used_by": "chemist",
+      "context": "DUTASTERIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081174",
+      "used_by": "chemist",
+      "context": "THIOTHIXENE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080781",
+      "used_by": "chemist",
+      "context": "VALSARTAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129107",
+      "used_by": "chemist",
+      "context": "DIGITOXIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051737",
+      "used_by": "chemist",
+      "context": "PRIMAQUINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081100",
+      "used_by": "chemist",
+      "context": "PRIMAQUINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129007",
+      "used_by": "chemist",
+      "context": "PRIMAQUINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051787",
+      "used_by": "chemist",
+      "context": "AMIODARONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129037",
+      "used_by": "chemist",
+      "context": "AMIODARONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051789",
+      "used_by": "chemist",
+      "context": "CHLORDIAZEPOXIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129097",
+      "used_by": "chemist",
+      "context": "CHLORDIAZEPOXIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052028",
+      "used_by": "chemist",
+      "context": "NISOLDIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128990",
+      "used_by": "chemist",
+      "context": "NISOLDIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080936",
+      "used_by": "chemist",
+      "context": "METHYSERGIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080969",
+      "used_by": "chemist",
+      "context": "METHYLPREDNISOLONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000496",
+      "used_by": "chemist",
+      "context": "CHLORPROMAZINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000497",
+      "used_by": "chemist",
+      "context": "CHLORPROMAZINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080786",
+      "used_by": "chemist",
+      "context": "CHLORPROMAZINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129040",
+      "used_by": "chemist",
+      "context": "RABEPRAZOLE SODIUM affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081086",
+      "used_by": "chemist",
+      "context": "PERPHENAZINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051779",
+      "used_by": "chemist",
+      "context": "TOLCAPONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129076",
+      "used_by": "chemist",
+      "context": "TOLCAPONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051780",
+      "used_by": "chemist",
+      "context": "FLUPIRTINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129030",
+      "used_by": "chemist",
+      "context": "FLUPIRTINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051781",
+      "used_by": "chemist",
+      "context": "FLUVASTATIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052006",
+      "used_by": "chemist",
+      "context": "FLUVASTATIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129005",
+      "used_by": "chemist",
+      "context": "FLUVASTATIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081020",
+      "used_by": "chemist",
+      "context": "CLEVIDIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052022",
+      "used_by": "chemist",
+      "context": "ISOTRETINOIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129042",
+      "used_by": "chemist",
+      "context": "ISOTRETINOIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080788",
+      "used_by": "chemist",
+      "context": "CLOMIPRAMINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129029",
+      "used_by": "chemist",
+      "context": "EPALRESTAT affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080951",
+      "used_by": "chemist",
+      "context": "QUINAPRIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129123",
+      "used_by": "chemist",
+      "context": "QUINAPRIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081188",
+      "used_by": "chemist",
+      "context": "TRIFLUPROMAZINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080751",
+      "used_by": "chemist",
+      "context": "DICYCLOMINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080752",
+      "used_by": "chemist",
+      "context": "DICUMAROL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128978",
+      "used_by": "chemist",
+      "context": "CALCITRIOL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128977",
+      "used_by": "chemist",
+      "context": "BIMATOPROST affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129055",
+      "used_by": "chemist",
+      "context": "DOCETAXEL ANHYDROUS affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129108",
+      "used_by": "chemist",
+      "context": "LOTEPREDNOL ETABONATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051784",
+      "used_by": "chemist",
+      "context": "MIDAZOLAM affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052003",
+      "used_by": "chemist",
+      "context": "MIDAZOLAM affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128994",
+      "used_by": "chemist",
+      "context": "MIDAZOLAM affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051785",
+      "used_by": "chemist",
+      "context": "INDOMETHACIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080666",
+      "used_by": "chemist",
+      "context": "INDOMETHACIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129033",
+      "used_by": "chemist",
+      "context": "INDOMETHACIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080769",
+      "used_by": "chemist",
+      "context": "CLOXACILLIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080783",
+      "used_by": "chemist",
+      "context": "DIBUCAINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129096",
+      "used_by": "chemist",
+      "context": "RIFAXIMIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129031",
+      "used_by": "chemist",
+      "context": "FEBUXOSTAT affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129109",
+      "used_by": "chemist",
+      "context": "TRAVOPROST affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460415",
+      "used_by": "chemist",
+      "context": "TICLOPIDINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081175",
+      "used_by": "chemist",
+      "context": "TICLOPIDINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460425",
+      "used_by": "chemist",
+      "context": "NIFEDIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051979",
+      "used_by": "chemist",
+      "context": "NIFEDIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080602",
+      "used_by": "chemist",
+      "context": "NIFEDIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129008",
+      "used_by": "chemist",
+      "context": "NIFEDIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051790",
+      "used_by": "chemist",
+      "context": "AMPRENAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18052023",
+      "used_by": "chemist",
+      "context": "AMPRENAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129048",
+      "used_by": "chemist",
+      "context": "AMPRENAVIR affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129004",
+      "used_by": "chemist",
+      "context": "DOXAZOSIN MESYLATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081148",
+      "used_by": "chemist",
+      "context": "SUNITINIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128980",
+      "used_by": "chemist",
+      "context": "BUDESONIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128999",
+      "used_by": "chemist",
+      "context": "ADEFOVIR DIPIVOXIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080617",
+      "used_by": "chemist",
+      "context": "MIANSERIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081147",
+      "used_by": "chemist",
+      "context": "SPIRAPRIL HYDROCHLORIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051982",
+      "used_by": "chemist",
+      "context": "BICALUTAMIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129059",
+      "used_by": "chemist",
+      "context": "BICALUTAMIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051791",
+      "used_by": "chemist",
+      "context": "ETORICOXIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129113",
+      "used_by": "chemist",
+      "context": "ETORICOXIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129111",
+      "used_by": "chemist",
+      "context": "OXYMETHOLONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129112",
+      "used_by": "chemist",
+      "context": "OXICONAZOLE NITRATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051984",
+      "used_by": "chemist",
+      "context": "DICLOFENAC affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080753",
+      "used_by": "chemist",
+      "context": "DICLOFENAC affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081106",
+      "used_by": "chemist",
+      "context": "PROPAFENONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080599",
+      "used_by": "chemist",
+      "context": "OLANZAPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15460439",
+      "used_by": "chemist",
+      "context": "DICLOXACILLIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051793",
+      "used_by": "chemist",
+      "context": "DICLOXACILLIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129071",
+      "used_by": "chemist",
+      "context": "DICLOXACILLIN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080807",
+      "used_by": "chemist",
+      "context": "BISACODYL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129009",
+      "used_by": "chemist",
+      "context": "EZETIMIBE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129038",
+      "used_by": "chemist",
+      "context": "ENTACAPONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051986",
+      "used_by": "chemist",
+      "context": "MEFENAMIC ACID affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080815",
+      "used_by": "chemist",
+      "context": "BENZTHIAZIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128982",
+      "used_by": "chemist",
+      "context": "ASTEMIZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129079",
+      "used_by": "chemist",
+      "context": "DEFERASIROX affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080800",
+      "used_by": "chemist",
+      "context": "BUSPIRONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000498",
+      "used_by": "chemist",
+      "context": "VINBLASTINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051976",
+      "used_by": "chemist",
+      "context": "ETHYNODIOL DIACETATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080714",
+      "used_by": "chemist",
+      "context": "ETOMIDATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081119",
+      "used_by": "chemist",
+      "context": "RAMATROBAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081160",
+      "used_by": "chemist",
+      "context": "SULINDAC affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051953",
+      "used_by": "chemist",
+      "context": "FLUTAMIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051956",
+      "used_by": "chemist",
+      "context": "FLUTAMIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051985",
+      "used_by": "chemist",
+      "context": "FLUTAMIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080697",
+      "used_by": "chemist",
+      "context": "FLUTAMIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051796",
+      "used_by": "chemist",
+      "context": "CLOFIBRATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129066",
+      "used_by": "chemist",
+      "context": "CLOFIBRATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "15449835",
+      "used_by": "chemist",
+      "context": "PRAZIQUANTEL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081099",
+      "used_by": "chemist",
+      "context": "PRAZIQUANTEL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129047",
+      "used_by": "chemist",
+      "context": "PRAZIQUANTEL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051970",
+      "used_by": "chemist",
+      "context": "LOPERAMIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080822",
+      "used_by": "chemist",
+      "context": "BENDROFLUMETHIAZIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081075",
+      "used_by": "chemist",
+      "context": "PAROXETINE HYDROCHLORIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128985",
+      "used_by": "chemist",
+      "context": "FELODIPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080705",
+      "used_by": "chemist",
+      "context": "FLURANDRENOLIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080672",
+      "used_by": "chemist",
+      "context": "HYDROXYZINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129117",
+      "used_by": "chemist",
+      "context": "CLOPIDOGREL BISULFATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081019",
+      "used_by": "chemist",
+      "context": "BENAZEPRIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081190",
+      "used_by": "chemist",
+      "context": "METHYLPROMAZINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129006",
+      "used_by": "chemist",
+      "context": "DRONEDARONE HYDROCHLORIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129118",
+      "used_by": "chemist",
+      "context": "FEPRAZONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080782",
+      "used_by": "chemist",
+      "context": "CLOZAPINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129085",
+      "used_by": "chemist",
+      "context": "MYCOPHENOLATE MOFETIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129119",
+      "used_by": "chemist",
+      "context": "ERGOCALCIFEROL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081038",
+      "used_by": "chemist",
+      "context": "AMODIAQUINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18128996",
+      "used_by": "chemist",
+      "context": "LOXAPINE SUCCINATE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129015",
+      "used_by": "chemist",
+      "context": "DONEPEZIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129120",
+      "used_by": "chemist",
+      "context": "MELOXICAM affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "11000504",
+      "used_by": "chemist",
+      "context": "VERAPAMIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080966",
+      "used_by": "chemist",
+      "context": "DILTIAZEM HYDROCHLORIDE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129028",
+      "used_by": "chemist",
+      "context": "CEFPODOXIME PROXETIL affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129121",
+      "used_by": "chemist",
+      "context": "SERTINDOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081120",
+      "used_by": "chemist",
+      "context": "RAMELTEON affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051797",
+      "used_by": "chemist",
+      "context": "OMEPRAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129014",
+      "used_by": "chemist",
+      "context": "OMEPRAZOLE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18051962",
+      "used_by": "chemist",
+      "context": "TRAZODONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18129122",
+      "used_by": "chemist",
+      "context": "EXEMESTANE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080920",
+      "used_by": "chemist",
+      "context": "PREDNISOLONE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080637",
+      "used_by": "chemist",
+      "context": "MELPHALAN affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081128",
+      "used_by": "chemist",
+      "context": "ROFECOXIB affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18081065",
+      "used_by": "chemist",
+      "context": "CARMUSTINE affinity vs ABCB11"
+    },
+    {
+      "source_type": "chembl_activity",
+      "source_id": "18080922",
+      "used_by": "chemist",
+      "context": "QUININE affinity vs ABCB11"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "NEUTROPENIA",
+      "source_id": "BLOOD GLUCOSE INCREASED",
       "used_by": "reviewer",
-      "context": "PENTOSTATIN adverse event"
+      "context": "PIOGLITAZONE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "PYREXIA",
+      "source_id": "NAUSEA",
       "used_by": "reviewer",
-      "context": "PENTOSTATIN adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DRUG INEFFECTIVE",
-      "used_by": "reviewer",
-      "context": "PENTOSTATIN adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "MALIGNANT NEOPLASM PROGRESSION",
-      "used_by": "reviewer",
-      "context": "FORODESINE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "STOMATITIS",
-      "used_by": "reviewer",
-      "context": "FORODESINE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "BLOOD LACTATE DEHYDROGENASE INCREASED",
-      "used_by": "reviewer",
-      "context": "FORODESINE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "NEUTROPHIL COUNT DECREASED",
-      "used_by": "reviewer",
-      "context": "FORODESINE HYDROCHLORIDE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "OFF LABEL USE",
-      "used_by": "reviewer",
-      "context": "CLADRIBINE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "FEBRILE NEUTROPENIA",
-      "used_by": "reviewer",
-      "context": "CLADRIBINE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DISCOLOURED VOMIT",
-      "used_by": "reviewer",
-      "context": "AFAMELANOTIDE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "VOMITING",
-      "used_by": "reviewer",
-      "context": "AFAMELANOTIDE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "WEIGHT INCREASED",
-      "used_by": "reviewer",
-      "context": "AFAMELANOTIDE adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "FATIGUE",
-      "used_by": "reviewer",
-      "context": "ACYCLOVIR adverse event"
+      "context": "PIOGLITAZONE adverse event"
     },
     {
       "source_type": "openfda_event",
       "source_id": "DIARRHOEA",
       "used_by": "reviewer",
-      "context": "ACYCLOVIR adverse event"
+      "context": "PIOGLITAZONE adverse event"
     },
     {
-      "source_type": "biogrid_interaction",
-      "source_id": "15096",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TGFBR1"
+      "source_type": "openfda_event",
+      "source_id": "DRUG INEFFECTIVE",
+      "used_by": "reviewer",
+      "context": "CYCLOSPORINE adverse event"
     },
     {
-      "source_type": "biogrid_interaction",
-      "source_id": "15105",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor YY1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "241364",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor MTOR"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "241365",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor RPTOR"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "256733",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor DHFR"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "259188",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor RYR1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "277904",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor RYR3"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "282277",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ITPR1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "282693",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor GLMN"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "304632",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor BMPR1A"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "318079",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TGFB1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "438503",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ACVR1B"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "438504",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor SMAD7"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "662848",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ELAVL1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "738216",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor APP"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "752634",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ZPR1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "808116",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor BARD1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "870295",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ACVRL1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "876124",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor BAG3"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1038360",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor MID1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1038361",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor SF3B4"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1038362",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor AHSP"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1260536",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor CTBP1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262200",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor AGL"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262201",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ENO1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262202",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ENO2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262203",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ENO3"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262204",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor FABP3"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262205",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor FABP5"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262206",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor FKBP2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262207",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor GPX4"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262208",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor GSTO2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262209",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor HINT1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262210",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor MSI2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262212",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor NME1-NME2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262213",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor NME2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262214",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor PIN1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262215",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor PPIB"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262216",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor RAE1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262217",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor SOD1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262218",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TAGLN"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262219",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TAGLN2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262220",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TAGLN3"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262221",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor UFC1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262222",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor YKT6"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1262807",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor GSTT1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1263257",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor HSD17B10"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1263445",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor HSPE1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1265654",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor NMRAL1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1267139",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor PPIF"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1272304",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor SMEK1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1273821",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TXN"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1428092",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor MED20"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1444464",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TOMM40"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1444465",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor NAF1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1511864",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor MCM2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "1526074",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor NLGN3"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2208256",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor MDM2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2466987",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ACVR1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2487579",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor AAR2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2536956",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor GPC1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2633433",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor APEX1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2648244",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor DCAF16"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2648279",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor HSP90AA1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2648281",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor MAPT"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2691375",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TRPC3"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2691376",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TRPC6"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2691377",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TRPC7"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2702555",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ABI2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2779703",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor PEBP1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2782126",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ERBB2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2782195",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ERBB3"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2782223",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ERBB4"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2783909",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor RPS9"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2877547",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor CDC42"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2892471",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor BRD4"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2970335",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor PMAIP1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3206096",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor DCAF11"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3305350",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor CCNF"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3410548",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor MSX2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3429520",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor NUDT19"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3430340",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor PIR"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3431125",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor PMM2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3434784",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ANXA1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3435335",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor GPI"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3440576",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor CTSS"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3441676",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ALDH4A1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3441688",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor DDT"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3444527",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ALDH7A1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3446248",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TPI1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3447534",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ABAT"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3447535",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor SELENBP1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3447536",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TST"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3447537",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor LACTB2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3447538",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor C19ORF10"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3447539",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor CMBL"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3447540",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor PPIL1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3467879",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor BAP1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3475176",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ZRANB1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3483024",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor RIPK4"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3524779",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TRIM67"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3631445",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor RPA1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3637105",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor RPA3"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3677060",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor CALU"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3750733",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor ACE2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3763755",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor YTHDF1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3763783",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor YTHDF2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3767628",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor REST"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3786954",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor NLRP6"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3837419",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor SOCS5"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3845634",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TRAF2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3848120",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor HEXB"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3851485",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor AGO2"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3854902",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor TOPBP1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3866322",
-      "used_by": "biologist",
-      "context": "FKBP1A interactor SUCLG2"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "19113984",
-      "used_by": "chemist",
-      "context": "CHEMBL4449096 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "716330",
-      "used_by": "chemist",
-      "context": "CHEMBL262778 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18226054",
-      "used_by": "chemist",
-      "context": "CHEMBL4090599 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "992865",
-      "used_by": "chemist",
-      "context": "CHEMBL151727 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "745828",
-      "used_by": "chemist",
-      "context": "CHEMBL52035 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "86134",
-      "used_by": "chemist",
-      "context": "CHEMBL303852 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1007860",
-      "used_by": "chemist",
-      "context": "CHEMBL2052020 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1080188",
-      "used_by": "chemist",
-      "context": "CHEMBL71458 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "94167",
-      "used_by": "chemist",
-      "context": "CHEMBL68027 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "990649",
-      "used_by": "chemist",
-      "context": "CHEMBL54189 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1007848",
-      "used_by": "chemist",
-      "context": "CHEMBL151841 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18721921",
-      "used_by": "chemist",
-      "context": "CHEMBL4276944 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18721923",
-      "used_by": "chemist",
-      "context": "CHEMBL4280369 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18721924",
-      "used_by": "chemist",
-      "context": "CHEMBL4291011 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18721934",
-      "used_by": "chemist",
-      "context": "CHEMBL4287849 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18721938",
-      "used_by": "chemist",
-      "context": "CHEMBL4291053 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "207656",
-      "used_by": "chemist",
-      "context": "CHEMBL280262 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18721933",
-      "used_by": "chemist",
-      "context": "CHEMBL4279943 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "73200",
-      "used_by": "chemist",
-      "context": "CHEMBL70822 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "736556",
-      "used_by": "chemist",
-      "context": "CHEMBL48863 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1023140",
-      "used_by": "chemist",
-      "context": "CHEMBL50795 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "729353",
-      "used_by": "chemist",
-      "context": "ASCOMYCIN affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1085791",
-      "used_by": "chemist",
-      "context": "ASCOMYCIN affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "911352",
-      "used_by": "chemist",
-      "context": "CHEMBL437064 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "736559",
-      "used_by": "chemist",
-      "context": "CHEMBL263776 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "82126",
-      "used_by": "chemist",
-      "context": "CHEMBL303180 affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "64601",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "719989",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "937964",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "992867",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1605332",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18721917",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18721920",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "22899252",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26657327",
-      "used_by": "chemist",
-      "context": "SIROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "724502",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1007850",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1086804",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1288526",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18083828",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "22921747",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "25848558",
-      "used_by": "chemist",
-      "context": "TACROLIMUS ANHYDROUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "26657330",
-      "used_by": "chemist",
-      "context": "TACROLIMUS affinity vs FKBP1A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1023148",
-      "used_by": "chemist",
-      "context": "CYCLOSPORINE affinity vs FKBP1A"
+      "source_type": "openfda_event",
+      "source_id": "OFF LABEL USE",
+      "used_by": "reviewer",
+      "context": "CYCLOSPORINE adverse event"
     },
     {
       "source_type": "openfda_event",
       "source_id": "PRODUCT USE IN UNAPPROVED INDICATION",
       "used_by": "reviewer",
-      "context": "SIROLIMUS adverse event"
+      "context": "CYCLOSPORINE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07369505",
+      "source_type": "openfda_event",
+      "source_id": "OVARIAN HYPERSTIMULATION SYNDROME",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "CETRORELIX ACETATE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03140449",
+      "source_type": "openfda_event",
+      "source_id": "CONDITION AGGRAVATED",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "CETRORELIX ACETATE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07327164",
+      "source_type": "openfda_event",
+      "source_id": "MALIGNANT NEOPLASM PROGRESSION",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "EVEROLIMUS adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00411619",
+      "source_type": "openfda_event",
+      "source_id": "ABORTION INCOMPLETE",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "MIFEPRISTONE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT06160310",
+      "source_type": "openfda_event",
+      "source_id": "HAEMORRHAGE",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "MIFEPRISTONE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05104983",
+      "source_type": "openfda_event",
+      "source_id": "PREGNANCY",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "MIFEPRISTONE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07477548",
+      "source_type": "openfda_event",
+      "source_id": "DRUG INTERACTION",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "RITONAVIR adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02451696",
+      "source_type": "openfda_event",
+      "source_id": "FOETAL EXPOSURE DURING PREGNANCY",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "RITONAVIR adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03047213",
+      "source_type": "openfda_event",
+      "source_id": "DISEASE PROGRESSION",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "TEMSIROLIMUS adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01070316",
+      "source_type": "openfda_event",
+      "source_id": "PNEUMONIA",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "TEMSIROLIMUS adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00126672",
+      "source_type": "openfda_event",
+      "source_id": "PYREXIA",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "PRANLUKAST adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00457808",
+      "source_type": "openfda_event",
+      "source_id": "ASTHMA",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "PRANLUKAST adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01217125",
+      "source_type": "openfda_event",
+      "source_id": "FATIGUE",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "KETOCONAZOLE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05495425",
+      "source_type": "openfda_event",
+      "source_id": "LIPODYSTROPHY ACQUIRED",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "SAQUINAVIR adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05342519",
+      "source_type": "openfda_event",
+      "source_id": "MITOCHONDRIAL TOXICITY",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "SAQUINAVIR adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02635789",
+      "source_type": "openfda_event",
+      "source_id": "EYELID PTOSIS",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "SAQUINAVIR adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01031901",
+      "source_type": "openfda_event",
+      "source_id": "FALL",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "DIPYRIDAMOLE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00792766",
+      "source_type": "openfda_event",
+      "source_id": "HYPOTENSION",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "DIPYRIDAMOLE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04388371",
+      "source_type": "openfda_event",
+      "source_id": "PAIN",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "DIPYRIDAMOLE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02338609",
+      "source_type": "openfda_event",
+      "source_id": "MYOCARDIAL INFARCTION",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "ROSIGLITAZONE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02188550",
+      "source_type": "openfda_event",
+      "source_id": "CARDIAC FAILURE CONGESTIVE",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "ROSIGLITAZONE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03826628",
+      "source_type": "openfda_event",
+      "source_id": "DEATH",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "ROSIGLITAZONE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01289912",
+      "source_type": "openfda_event",
+      "source_id": "WEIGHT DECREASED",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "OLMESARTAN MEDOXOMIL adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02104011",
+      "source_type": "openfda_event",
+      "source_id": "VISION BLURRED",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "TELITHROMYCIN adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02201212",
+      "source_type": "openfda_event",
+      "source_id": "DYSPNOEA",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "TELITHROMYCIN adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03972592",
+      "source_type": "openfda_event",
+      "source_id": "PULMONARY OEDEMA",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "TROGLITAZONE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00457964",
+      "source_type": "openfda_event",
+      "source_id": "RENAL FAILURE",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "TROGLITAZONE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01853423",
+      "source_type": "openfda_event",
+      "source_id": "ACIDOSIS",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "TROGLITAZONE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02634931",
+      "source_type": "openfda_event",
+      "source_id": "DEPRESSION",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "NEFAZODONE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07680322",
+      "source_type": "openfda_event",
+      "source_id": "VOMITING",
       "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05252585",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07304856",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07218575",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01690871",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05103358",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01954693",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03356769",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00790400",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03525834",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02061397",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02962414",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02860494",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00490789",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02294006",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05534672",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02325505",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04595513",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01526356",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05467397",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00789828",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01730209",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01929642",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT06065852",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04128722",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04987463",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03363763",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01713946",
-      "used_by": "reviewer",
-      "context": "SIROLIMUS/Tuberous sclerosis complex trial"
+      "context": "LAPATINIB adverse event"
     },
     {
       "source_type": "openfda_event",
@@ -1579,1240 +3343,700 @@
       "context": "TACROLIMUS ANHYDROUS adverse event"
     },
     {
-      "source_type": "biogrid_interaction",
-      "source_id": "2328359",
-      "used_by": "biologist",
-      "context": "PDE5A interactor AIPL1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2328386",
-      "used_by": "biologist",
-      "context": "PDE5A interactor MIOS"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2328433",
-      "used_by": "biologist",
-      "context": "PDE5A interactor FGFR1OP"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2330512",
-      "used_by": "biologist",
-      "context": "PDE5A interactor BLM"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2330804",
-      "used_by": "biologist",
-      "context": "PDE5A interactor SUPT5H"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2330813",
-      "used_by": "biologist",
-      "context": "PDE5A interactor WDR24"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2331314",
-      "used_by": "biologist",
-      "context": "PDE5A interactor PATZ1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2332010",
-      "used_by": "biologist",
-      "context": "PDE5A interactor FKBP15"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2633087",
-      "used_by": "biologist",
-      "context": "PDE5A interactor RHOBTB1"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2703026",
-      "used_by": "biologist",
-      "context": "PDE5A interactor SPG21"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "2783545",
-      "used_by": "biologist",
-      "context": "PDE5A interactor HIST1H2BH"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3020617",
-      "used_by": "biologist",
-      "context": "PDE5A interactor DDX39A"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3074825",
-      "used_by": "biologist",
-      "context": "PDE5A interactor MSH5"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3775424",
-      "used_by": "biologist",
-      "context": "PDE5A interactor DYRK1A"
-    },
-    {
-      "source_type": "biogrid_interaction",
-      "source_id": "3879546",
-      "used_by": "biologist",
-      "context": "PDE5A interactor NUDT21"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "34981661",
-      "used_by": "biologist",
-      "context": "PDE5A/Idiopathic pulmonary arterial hypertension literature"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "33596129",
-      "used_by": "biologist",
-      "context": "PDE5A/Idiopathic pulmonary arterial hypertension literature"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "17396193",
-      "used_by": "biologist",
-      "context": "PDE5A/Idiopathic pulmonary arterial hypertension literature"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "16980375",
-      "used_by": "biologist",
-      "context": "PDE5A/Idiopathic pulmonary arterial hypertension literature"
-    },
-    {
-      "source_type": "pmid",
-      "source_id": "17030688",
-      "used_by": "biologist",
-      "context": "PDE5A/Idiopathic pulmonary arterial hypertension literature"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "566969",
-      "used_by": "chemist",
-      "context": "CHEMBL410215 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "493908",
-      "used_by": "chemist",
-      "context": "CHEMBL38735 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "556416",
-      "used_by": "chemist",
-      "context": "CHEMBL344018 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "978858",
-      "used_by": "chemist",
-      "context": "CHEMBL298295 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "298958",
-      "used_by": "chemist",
-      "context": "CHEMBL139785 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "934449",
-      "used_by": "chemist",
-      "context": "CHEMBL245317 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "934448",
-      "used_by": "chemist",
-      "context": "CHEMBL245517 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "722943",
-      "used_by": "chemist",
-      "context": "CHEMBL2112876 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "963913",
-      "used_by": "chemist",
-      "context": "CHEMBL42988 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "295236",
-      "used_by": "chemist",
-      "context": "CHEMBL1744059 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "296498",
-      "used_by": "chemist",
-      "context": "CHEMBL336815 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1279024",
-      "used_by": "chemist",
-      "context": "CHEMBL158374 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "286531",
-      "used_by": "chemist",
-      "context": "CHEMBL130721 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1297350",
-      "used_by": "chemist",
-      "context": "CHEMBL351813 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "295167",
-      "used_by": "chemist",
-      "context": "CHEMBL342159 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "919662",
-      "used_by": "chemist",
-      "context": "CHEMBL63548 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "930257",
-      "used_by": "chemist",
-      "context": "CHEMBL541468 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "295244",
-      "used_by": "chemist",
-      "context": "CHEMBL133687 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "909427",
-      "used_by": "chemist",
-      "context": "CHEMBL67064 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1307123",
-      "used_by": "chemist",
-      "context": "CHEMBL158817 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "361538",
-      "used_by": "chemist",
-      "context": "CHEMBL542166 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "385479",
-      "used_by": "chemist",
-      "context": "CHEMBL107349 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "558899",
-      "used_by": "chemist",
-      "context": "CHEMBL139998 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1520661",
-      "used_by": "chemist",
-      "context": "CHEMBL139998 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "735308",
-      "used_by": "chemist",
-      "context": "CHEMBL26396 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "943905",
-      "used_by": "chemist",
-      "context": "CHEMBL245315 affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "574531",
-      "used_by": "chemist",
-      "context": "VARDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1506645",
-      "used_by": "chemist",
-      "context": "VARDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1520505",
-      "used_by": "chemist",
-      "context": "VARDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "902360",
-      "used_by": "chemist",
-      "context": "VARDENAFIL HYDROCHLORIDE affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "353169",
-      "used_by": "chemist",
-      "context": "SILDENAFIL CITRATE affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "268223",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "280637",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "322721",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "381175",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "477010",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "584306",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "726578",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "736693",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "837348",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "837349",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "869550",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "885958",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "920974",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "924690",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "925443",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1243003",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1269964",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1434747",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1506524",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1520494",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1521901",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1523271",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1722223",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1748965",
-      "used_by": "chemist",
-      "context": "SILDENAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "331695",
-      "used_by": "chemist",
-      "context": "TADALAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "556410",
-      "used_by": "chemist",
-      "context": "TADALAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1506647",
-      "used_by": "chemist",
-      "context": "TADALAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "1520620",
-      "used_by": "chemist",
-      "context": "TADALAFIL affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "383057",
-      "used_by": "chemist",
-      "context": "DIPYRIDAMOLE affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "858691",
-      "used_by": "chemist",
-      "context": "DIPYRIDAMOLE affinity vs PDE5A"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "513807",
-      "used_by": "chemist",
-      "context": "MILRINONE affinity vs PDE5A"
+      "source_type": "openfda_event",
+      "source_id": "PREMATURE BABY",
+      "used_by": "reviewer",
+      "context": "NICARDIPINE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "DIZZINESS",
+      "source_id": "FEBRILE NEUTROPENIA",
       "used_by": "reviewer",
-      "context": "VARDENAFIL adverse event"
+      "context": "POSACONAZOLE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "GASTROINTESTINAL HAEMORRHAGE",
+      "used_by": "reviewer",
+      "context": "RESERPINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HYPOGLYCAEMIA",
+      "used_by": "reviewer",
+      "context": "RESERPINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "SHOCK",
+      "used_by": "reviewer",
+      "context": "RESERPINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "PRURITUS",
+      "used_by": "reviewer",
+      "context": "CLOBETASOL PROPIONATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ALOPECIA",
+      "used_by": "reviewer",
+      "context": "ALPIDEM adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DERMATITIS ATOPIC",
+      "used_by": "reviewer",
+      "context": "PIMECROLIMUS adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "RASH",
+      "used_by": "reviewer",
+      "context": "PIMECROLIMUS adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "THIRST",
+      "used_by": "reviewer",
+      "context": "TOLVAPTAN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "PRODUCT DOSE OMISSION ISSUE",
+      "used_by": "reviewer",
+      "context": "TOLVAPTAN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "RHABDOMYOLYSIS",
+      "used_by": "reviewer",
+      "context": "FUSIDIC ACID adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DEHYDRATION",
+      "used_by": "reviewer",
+      "context": "CHENODIOL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ADENOVIRUS INFECTION",
+      "used_by": "reviewer",
+      "context": "CHENODIOL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "TOXIC EPIDERMAL NECROLYSIS",
+      "used_by": "reviewer",
+      "context": "RIFAMYCIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ABDOMINAL PAIN",
+      "used_by": "reviewer",
+      "context": "SULFINPYRAZONE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DRUG RESISTANCE",
+      "used_by": "reviewer",
+      "context": "GEFITINIB adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ACQUIRED GENE MUTATION",
+      "used_by": "reviewer",
+      "context": "GEFITINIB adverse event"
     },
     {
       "source_type": "openfda_event",
       "source_id": "HEADACHE",
       "used_by": "reviewer",
-      "context": "VARDENAFIL adverse event"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07536880",
-      "used_by": "reviewer",
-      "context": "VARDENAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05567367",
-      "used_by": "reviewer",
-      "context": "VARDENAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04266197",
-      "used_by": "reviewer",
-      "context": "VARDENAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00705588",
-      "used_by": "reviewer",
-      "context": "VARDENAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01649739",
-      "used_by": "reviewer",
-      "context": "VARDENAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00718952",
-      "used_by": "reviewer",
-      "context": "VARDENAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05343637",
-      "used_by": "reviewer",
-      "context": "VARDENAFIL/Idiopathic pulmonary arterial hypertension trial"
+      "context": "LIOTHYRONINE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "HYPOTENSION",
+      "source_id": "DRUG EXPOSURE DURING PREGNANCY",
       "used_by": "reviewer",
-      "context": "VARDENAFIL HYDROCHLORIDE adverse event"
+      "context": "NELFINAVIR adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "ENTEROCOLITIS INFECTIOUS",
+      "source_id": "ACUTE HEPATIC FAILURE",
       "used_by": "reviewer",
-      "context": "VARDENAFIL HYDROCHLORIDE adverse event"
+      "context": "SITAXENTAN adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "DYSPNOEA",
+      "source_id": "BRAIN OEDEMA",
       "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE adverse event"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00742014",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00454207",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00780728",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00644605",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01266265",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01517854",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03185364",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02951429",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02060487",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01043627",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05546125",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02284737",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04994860",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02007629",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00159861",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02565030",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT06778330",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01382368",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05201144",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01392469",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00586794",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00946114",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04039464",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00359736",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01247116",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00666198",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00617305",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01383083",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00433329",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01347216",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00159874",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01897740",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03356353",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00159887",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00302211",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00796666",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03236818",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00866983",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT06213077",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00795639",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01244620",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00452218",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00800592",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00424021",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01055405",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02244528",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00491803",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00517933",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00380068",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00709098",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00483626",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01445873",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04797286",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03610217",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01582438",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00878943",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02891850",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00796510",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT06317805",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03053739",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01966302",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01409122",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01179334",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01181284",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01319045",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03139084",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01365585",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00853112",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00155714",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03431649",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00303459",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00323297",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02595541",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00709956",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00430716",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02484807",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03364244",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03997097",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00159913",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT06753981",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01642407",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01712997",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00352482",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07713914",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01548950",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05039086",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01637675",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01391104",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01757808",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00625079",
-      "used_by": "reviewer",
-      "context": "SILDENAFIL CITRATE/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02968901",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT05179876",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02999906",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01302444",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT02558231",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04483115",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00125918",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01824290",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00549302",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT06968962",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01042158",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01066845",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01484431",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT07245680",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03904693",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01178073",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT01305252",
-      "used_by": "reviewer",
-      "context": "TADALAFIL/Idiopathic pulmonary arterial hypertension trial"
+      "context": "SITAXENTAN adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "FALL",
+      "source_id": "TREATMENT FAILURE",
       "used_by": "reviewer",
-      "context": "DIPYRIDAMOLE adverse event"
+      "context": "LATANOPROST adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "PAIN",
+      "source_id": "DRUG HYPERSENSITIVITY",
       "used_by": "reviewer",
-      "context": "DIPYRIDAMOLE adverse event"
+      "context": "ERYTHROMYCIN ESTOLATE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "RENAL FAILURE",
+      "source_id": "DRUG INTOLERANCE",
       "used_by": "reviewer",
-      "context": "MILRINONE adverse event"
+      "context": "ERYTHROMYCIN ESTOLATE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT06685679",
+      "source_type": "openfda_event",
+      "source_id": "ELECTROCARDIOGRAM QT PROLONGED",
       "used_by": "reviewer",
-      "context": "MILRINONE/Idiopathic pulmonary arterial hypertension trial"
+      "context": "CLOFAZIMINE adverse event"
     },
     {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04278404",
+      "source_type": "openfda_event",
+      "source_id": "ANAEMIA",
       "used_by": "reviewer",
-      "context": "MILRINONE/Idiopathic pulmonary arterial hypertension trial"
+      "context": "CLOFAZIMINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "PLEURAL EFFUSION",
+      "used_by": "reviewer",
+      "context": "DASATINIB adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "NO ADVERSE EVENT",
+      "used_by": "reviewer",
+      "context": "ETHINYL ESTRADIOL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "PRODUCT ADHESION ISSUE",
+      "used_by": "reviewer",
+      "context": "ETHINYL ESTRADIOL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "RENAL FAILURE ACUTE",
+      "used_by": "reviewer",
+      "context": "PERHEXILINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "AGITATION",
+      "used_by": "reviewer",
+      "context": "CYCLANDELATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "AGRANULOCYTOSIS",
+      "used_by": "reviewer",
+      "context": "CYCLANDELATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ASTHENIA",
+      "used_by": "reviewer",
+      "context": "CYCLANDELATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "BREAST CANCER FEMALE",
+      "used_by": "reviewer",
+      "context": "MEDROXYPROGESTERONE ACETATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "BREAST CANCER",
+      "used_by": "reviewer",
+      "context": "MEDROXYPROGESTERONE ACETATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "MENINGIOMA",
+      "used_by": "reviewer",
+      "context": "MEDROXYPROGESTERONE ACETATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DIZZINESS",
+      "used_by": "reviewer",
+      "context": "CINNARIZINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "INJURY",
+      "used_by": "reviewer",
+      "context": "DROSPIRENONE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "CHOLECYSTITIS CHRONIC",
+      "used_by": "reviewer",
+      "context": "DROSPIRENONE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "BRADYCARDIA",
+      "used_by": "reviewer",
+      "context": "BENZBROMARONE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ANXIETY",
+      "used_by": "reviewer",
+      "context": "CISAPRIDE MONOHYDRATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "BACK PAIN",
+      "used_by": "reviewer",
+      "context": "CISAPRIDE MONOHYDRATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "CONFUSIONAL STATE",
+      "used_by": "reviewer",
+      "context": "CISAPRIDE MONOHYDRATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "COAGULOPATHY",
+      "used_by": "reviewer",
+      "context": "GLAFENINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "NEUROLEPTIC MALIGNANT SYNDROME",
+      "used_by": "reviewer",
+      "context": "HALOPERIDOL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "SPEECH DISORDER",
+      "used_by": "reviewer",
+      "context": "ILOPERIDONE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "BLADDER PAIN",
+      "used_by": "reviewer",
+      "context": "VALRUBICIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "BLADDER SPASM",
+      "used_by": "reviewer",
+      "context": "VALRUBICIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "MICTURITION URGENCY",
+      "used_by": "reviewer",
+      "context": "VALRUBICIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "NEUTROPENIA",
+      "used_by": "reviewer",
+      "context": "PACLITAXEL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "TOXICITY TO VARIOUS AGENTS",
+      "used_by": "reviewer",
+      "context": "THIORIDAZINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "WEIGHT INCREASED",
+      "used_by": "reviewer",
+      "context": "THIORIDAZINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "BLOOD CORTISOL DECREASED",
+      "used_by": "reviewer",
+      "context": "MIBEFRADIL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DRUG LEVEL INCREASED",
+      "used_by": "reviewer",
+      "context": "MIBEFRADIL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "PSORIASIS",
+      "used_by": "reviewer",
+      "context": "ACITRETIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DYSPEPSIA",
+      "used_by": "reviewer",
+      "context": "MECLOFENAMIC ACID adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "GASTRODUODENAL HAEMORRHAGE",
+      "used_by": "reviewer",
+      "context": "MECLOFENAMIC ACID adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "GASTRODUODENAL ULCER",
+      "used_by": "reviewer",
+      "context": "MECLOFENAMIC ACID adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ADVERSE DRUG REACTION",
+      "used_by": "reviewer",
+      "context": "FINASTERIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DIABETES MELLITUS",
+      "used_by": "reviewer",
+      "context": "THIOTHIXENE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "GENERAL PHYSICAL HEALTH DETERIORATION",
+      "used_by": "reviewer",
+      "context": "DIGITOXIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ATRIAL FIBRILLATION",
+      "used_by": "reviewer",
+      "context": "DIGITOXIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "METHAEMOGLOBINAEMIA",
+      "used_by": "reviewer",
+      "context": "PRIMAQUINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DRUG ABUSE",
+      "used_by": "reviewer",
+      "context": "CHLORDIAZEPOXIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "COMPLETED SUICIDE",
+      "used_by": "reviewer",
+      "context": "CHLORDIAZEPOXIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DRUG-INDUCED LIVER INJURY",
+      "used_by": "reviewer",
+      "context": "FLUPIRTINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HYPERTENSIVE CRISIS",
+      "used_by": "reviewer",
+      "context": "CLEVIDIPINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "MYALGIA",
+      "used_by": "reviewer",
+      "context": "FLUVASTATIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "SUICIDE ATTEMPT",
+      "used_by": "reviewer",
+      "context": "CLOMIPRAMINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "EXPOSURE DURING PREGNANCY",
+      "used_by": "reviewer",
+      "context": "ISOTRETINOIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HEPATIC FUNCTION ABNORMAL",
+      "used_by": "reviewer",
+      "context": "EPALRESTAT adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "STEVENS-JOHNSON SYNDROME",
+      "used_by": "reviewer",
+      "context": "TRIFLUPROMAZINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "CHEST PAIN",
+      "used_by": "reviewer",
+      "context": "DICUMAROL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "OSTEOPOROSIS",
+      "used_by": "reviewer",
+      "context": "DICUMAROL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "RIB FRACTURE",
+      "used_by": "reviewer",
+      "context": "DICUMAROL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "STATUS EPILEPTICUS",
+      "used_by": "reviewer",
+      "context": "DOCETAXEL ANHYDROUS adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "EYE PAIN",
+      "used_by": "reviewer",
+      "context": "LOTEPREDNOL ETABONATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "EYE IRRITATION",
+      "used_by": "reviewer",
+      "context": "LOTEPREDNOL ETABONATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "OCULAR HYPERAEMIA",
+      "used_by": "reviewer",
+      "context": "BIMATOPROST adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "INTRAOCULAR PRESSURE INCREASED",
+      "used_by": "reviewer",
+      "context": "BIMATOPROST adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DRUG REACTION WITH EOSINOPHILIA AND SYSTEMIC SYMPTOMS",
+      "used_by": "reviewer",
+      "context": "CLOXACILLIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "MALAISE",
+      "used_by": "reviewer",
+      "context": "DIBUCAINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ARTHRALGIA",
+      "used_by": "reviewer",
+      "context": "INDOMETHACIN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "VIRAL MUTATION IDENTIFIED",
+      "used_by": "reviewer",
+      "context": "AMPRENAVIR adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "PATHOGEN RESISTANCE",
+      "used_by": "reviewer",
+      "context": "AMPRENAVIR adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "OSTEOMALACIA",
+      "used_by": "reviewer",
+      "context": "ADEFOVIR DIPIVOXIL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HYPOPHOSPHATAEMIA",
+      "used_by": "reviewer",
+      "context": "ADEFOVIR DIPIVOXIL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ABDOMINAL PAIN UPPER",
+      "used_by": "reviewer",
+      "context": "SPIRAPRIL HYDROCHLORIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ALANINE AMINOTRANSFERASE INCREASED",
+      "used_by": "reviewer",
+      "context": "SPIRAPRIL HYDROCHLORIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ANTICOAGULATION DRUG LEVEL BELOW THERAPEUTIC",
+      "used_by": "reviewer",
+      "context": "SPIRAPRIL HYDROCHLORIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "PROSTATIC SPECIFIC ANTIGEN INCREASED",
+      "used_by": "reviewer",
+      "context": "BICALUTAMIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "RASH PAPULAR",
+      "used_by": "reviewer",
+      "context": "OXICONAZOLE NITRATE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "AORTIC ANEURYSM",
+      "used_by": "reviewer",
+      "context": "OXYMETHOLONE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "POLYCYTHAEMIA",
+      "used_by": "reviewer",
+      "context": "OXYMETHOLONE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HALLUCINATION",
+      "used_by": "reviewer",
+      "context": "ENTACAPONE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DYSKINESIA",
+      "used_by": "reviewer",
+      "context": "ENTACAPONE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "CONSTIPATION",
+      "used_by": "reviewer",
+      "context": "BISACODYL adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ECZEMA",
+      "used_by": "reviewer",
+      "context": "BENZTHIAZIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "IMPETIGO",
+      "used_by": "reviewer",
+      "context": "BENZTHIAZIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "COMA",
+      "used_by": "reviewer",
+      "context": "ASTEMIZOLE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "SICKLE CELL ANAEMIA WITH CRISIS",
+      "used_by": "reviewer",
+      "context": "DEFERASIROX adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HEPATOCELLULAR DAMAGE",
+      "used_by": "reviewer",
+      "context": "RAMATROBAN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "JAUNDICE",
+      "used_by": "reviewer",
+      "context": "RAMATROBAN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "LIVER DISORDER",
+      "used_by": "reviewer",
+      "context": "RAMATROBAN adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "DEMENTIA ALZHEIMER^S TYPE",
+      "used_by": "reviewer",
+      "context": "FLUTAMIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "PROSTATE CANCER",
+      "used_by": "reviewer",
+      "context": "FLUTAMIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "SWELLING FACE",
+      "used_by": "reviewer",
+      "context": "FLURANDRENOLIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "HOSPITALISATION",
+      "used_by": "reviewer",
+      "context": "CLOZAPINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "STILLBIRTH",
+      "used_by": "reviewer",
+      "context": "AMODIAQUINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ABORTION",
+      "used_by": "reviewer",
+      "context": "AMODIAQUINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "MYELODYSPLASTIC SYNDROME",
+      "used_by": "reviewer",
+      "context": "CARMUSTINE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "LIVER TRANSPLANT",
+      "used_by": "reviewer",
+      "context": "MARALIXIBAT adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "ASPARTATE AMINOTRANSFERASE INCREASED",
+      "used_by": "reviewer",
+      "context": "MARALIXIBAT CHLORIDE adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "SWELLING",
+      "used_by": "reviewer",
+      "context": "DEOXYCHOLIC ACID adverse event"
+    },
+    {
+      "source_type": "openfda_event",
+      "source_id": "GASTROINTESTINAL DISORDER",
+      "used_by": "reviewer",
+      "context": "TAURURSODIOL adverse event"
     }
   ]
 }
