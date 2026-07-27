@@ -1,35 +1,35 @@
 [
   {
     "drug_name": "Sildenafil",
-    "disease_name": "pulmonary arterial hypertension",
+    "disease_name": "Idiopathic pulmonary arterial hypertension",
     "confirmed_year": 2005,
     "known_target_note": "Acts on PDE5 (PDE5A) — a phosphodiesterase, not the typical top OT-associated target for PAH.",
     "source_note": "FDA approved sildenafil (Revatio, Pfizer) for pulmonary arterial hypertension on 2005-06-03. Originally developed for angina/hypertension and first marketed for erectile dysfunction (Viagra, 1998); PAH is a repurposing. Source: Drugs.com Revatio FDA approval history + Pfizer press release."
   },
   {
     "drug_name": "Thalidomide",
-    "disease_name": "multiple myeloma",
+    "disease_name": "Multiple myeloma",
     "confirmed_year": 2006,
     "known_target_note": "Binds CRBN (cereblon); also anti-angiogenic / anti-TNF. Molecular target only elucidated years after clinical use.",
     "source_note": "FDA granted accelerated approval of thalidomide (Thalomid, Celgene) in combination with dexamethasone for newly diagnosed multiple myeloma on 2006-05-25. Originally a 1950s sedative/antiemetic withdrawn for teratogenicity; repurposed decades later. Source: Celgene/FDA sNDA approval announcement (CancerConnect, CancerNetwork, BioSpace)."
   },
   {
     "drug_name": "Metformin",
-    "disease_name": "polycystic ovary syndrome",
+    "disease_name": "Polycystic ovary syndrome",
     "confirmed_year": 1994,
     "known_target_note": "Insulin-sensitizer (AMPK / mitochondrial complex I); no single clean protein target. Used OFF-LABEL for PCOS.",
     "source_note": "Metformin is NOT FDA-approved for PCOS — it is prescribed OFF-LABEL; no drug is FDA-approved specifically for PCOS. First clinical report of metformin for PCOS: Velazquez et al. 1994 (Metabolism). Metformin itself was FDA-approved for type 2 diabetes in 1994-1995. PCOS is common (~10% of women), not a rare disease. Source: PMC reviews on metformin in PCOS management (PMC10544455, PMC3475283)."
   },
   {
     "drug_name": "Everolimus",
-    "disease_name": "tuberous sclerosis complex",
+    "disease_name": "Tuberous sclerosis complex",
     "confirmed_year": 2010,
     "known_target_note": "mTOR inhibitor (MTOR); TSC1/TSC2 loss drives mTOR hyperactivation, so MTOR is a strong disease-mechanistic target.",
     "source_note": "FDA granted accelerated approval of everolimus (Afinitor, Novartis) for TSC-associated subependymal giant cell astrocytoma (SEGA) on 2010-11-02 — the first-ever approved therapy for TSC. Everolimus is an mTOR inhibitor originally developed as an immunosuppressant/oncology agent. Source: FDA/Novartis approval (Pharmacy Times, CancerNetwork)."
   },
   {
     "drug_name": "Propranolol",
-    "disease_name": "infantile hemangioma",
+    "disease_name": "Airway infantile hemangioma",
     "confirmed_year": 2014,
     "known_target_note": "Non-selective beta-blocker (ADRB1/ADRB2). Effect on hemangioma discovered serendipitously.",
     "source_note": "FDA approved propranolol (Hemangeol, Pierre Fabre) for proliferating infantile hemangioma requiring systemic therapy on 2014-03-17 — first and only FDA-approved treatment. Propranolol is a beta-blocker originally for hypertension/angina/arrhythmia; the hemangioma effect was discovered serendipitously (Leaute-Labreze et al., NEJM 2008). Source: Drugs.com Hemangeol FDA approval history + FDA label (accessdata.fda.gov)."
