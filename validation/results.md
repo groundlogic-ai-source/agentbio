@@ -1,6 +1,6 @@
 # Silver Bullet — Retrospective Validation Results
 
-_Generated: 2026-07-03 03:14:40_
+_Generated: 2026-07-27 19:51:12_
 
 ## What this tests
 
@@ -14,33 +14,35 @@ For each confirmed real-world drug-repurposing success, we ran the existing Biol
 
 ## Overall summary
 
-- **1/5** confirmed pairs recovered in the top 10 candidates.
-- **1/5** confirmed pairs reached STRONG_MATCH (composite_score >= 0.7).
-- **1/5** confirmed pairs appeared anywhere in the ranked list (any rank).
-- **1/5** diseases were outside the rare/NTD universe the system covers.
-- **0/5** cases errored before producing a ranked list.
+- **1/7** confirmed pairs recovered in the top 10 candidates.
+- **1/7** confirmed pairs reached STRONG_MATCH (composite_score >= 0.7).
+- **1/7** confirmed pairs appeared anywhere in the ranked list (any rank).
+- **3/7** diseases were outside the rare/NTD universe the system covers.
+- **1/7** cases errored before producing a ranked list.
 
 ## Per-case results
 
 | Drug | Disease | Confirmed | Status | Top target pursued | Rank | Composite | Top 10 | STRONG_MATCH |
 |---|---|---|---|---|---|---|---|---|
-| Sildenafil | pulmonary arterial hypertension | 2005 | hit | PDE5A | 3 | 0.7133 | ✓ | ✓ |
+| Sildenafil | Idiopathic pulmonary arterial hypertension | 2005 | hit | PDE5A | 3 | 0.7402 | ✓ | ✓ |
 | Thalidomide | multiple myeloma | 2006 | miss | FKBP1A | — | — | — | — |
-| Metformin | polycystic ovary syndrome | 1994 | miss | ESR1 | — | — | — | — |
+| Metformin | Polycystic ovary syndrome | 1994 | out_of_scope | — | — | — | — | — |
 | Everolimus | tuberous sclerosis complex | 2010 | miss | FKBP1A | — | — | — | — |
+| Propranolol | Airway infantile hemangioma | 2014 | error | — | — | — | — | — |
+| Sildenafil | pulmonary arterial hypertension | 2005 | out_of_scope | — | — | — | — | — |
 | Propranolol | infantile hemangioma | 2014 | out_of_scope | — | — | — | — | — |
 
 ## Per-case detail
 
-### Sildenafil — pulmonary arterial hypertension (confirmed 2005)
+### Sildenafil — Idiopathic pulmonary arterial hypertension (confirmed 2005)
 
 - **Status:** hit
 - **Known target (context only):** Acts on PDE5 (PDE5A) — a phosphodiesterase, not the typical top OT-associated target for PAH.
 - **Top target pursued:** PDE5A (O76074), OT association 0.9
-- **All targets considered for the disease:** PDE5A (0.9), PTGIR (0.9), EIF2AK4 (0.8096), KCNK3 (0.7857), BMPR2 (0.8544), INHBA (0.9), SMAD9 (0.7834), ATP13A3 (0.7547)
+- **All targets considered for the disease:** PDE5A (0.9), PTGIR (0.5106), EIF2AK4 (0.4783), BMPR2 (0.6809), INHBA (0.9), SMAD9 (0.4679), PPARGC1A (0.3046)
 - **Candidate pool:** 32 chemist candidates -> 32 reviewed.
-- **Found at rank 3** — composite_score 0.7133, STRONG_MATCH=True, is_approved_drug=True, matched by inchikey/chembl_id.
-- **Interpretation:** HIT — Sildenafil appears at rank 3/32 (composite_score=0.7133, within top 10, reached STRONG_MATCH) against target PDE5A, matched by inchikey/chembl_id.
+- **Found at rank 3** — composite_score 0.7402, STRONG_MATCH=True, is_approved_drug=True, matched by inchikey/chembl_id.
+- **Interpretation:** HIT — Sildenafil appears at rank 3/32 (composite_score=0.7402, within top 10, reached STRONG_MATCH) against target PDE5A, matched by inchikey/chembl_id.
 
 ### Thalidomide — multiple myeloma (confirmed 2006)
 
@@ -52,15 +54,12 @@ For each confirmed real-world drug-repurposing success, we ran the existing Biol
 - **Reason:** 'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
 - **Interpretation:** MISS — Thalidomide was not surfaced. 'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
 
-### Metformin — polycystic ovary syndrome (confirmed 1994)
+### Metformin — Polycystic ovary syndrome (confirmed 1994)
 
-- **Status:** miss
+- **Status:** out_of_scope
 - **Known target (context only):** Insulin-sensitizer (AMPK / mitochondrial complex I); no single clean protein target. Used OFF-LABEL for PCOS.
-- **Top target pursued:** ESR1 (P03372), OT association 0.5989
-- **All targets considered for the disease:** ESR1 (0.5989), FTO (0.5206), ERBB4 (0.5384), FSHB (0.4827), DENND1A (0.4757)
-- **Candidate pool:** 34 chemist candidates -> 34 reviewed.
-- **Reason:** 'Metformin' did not appear among the 34 ChEMBL candidate compound(s) for the selected top target ESR1 (P03372). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not ESR1 (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
-- **Interpretation:** MISS — Metformin was not surfaced. 'Metformin' did not appear among the 34 ChEMBL candidate compound(s) for the selected top target ESR1 (P03372). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not ESR1 (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
+- **Reason:** 'Polycystic ovary syndrome' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.
+- **Interpretation:** 'Polycystic ovary syndrome' is outside Silver Bullet's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure — the harness correctly refuses to auto-pick an unrelated disease.
 
 ### Everolimus — tuberous sclerosis complex (confirmed 2010)
 
@@ -71,6 +70,20 @@ For each confirmed real-world drug-repurposing success, we ran the existing Biol
 - **Candidate pool:** 29 chemist candidates -> 29 reviewed.
 - **Reason:** 'Everolimus' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
 - **Interpretation:** MISS — Everolimus was not surfaced. 'Everolimus' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
+
+### Propranolol — Airway infantile hemangioma (confirmed 2014)
+
+- **Status:** error
+- **Known target (context only):** Non-selective beta-blocker (ADRB1/ADRB2). Effect on hemangioma discovered serendipitously.
+- **Reason:** target_selection failed: 'Airway infantile hemangioma' is in the rare/NTD universe but could not be matched to an Open Targets EFO ID (tried official name, prefix-stripped name, and original query 'Airway infantile hemangioma'). Try an alternate common name for this disease — for example, use 'polycystic ovary syndrome' rather than the Orphanet administrative name that may include prefixes like 'NON RARE IN EUROPE:'.
+- **Interpretation:** The disease is in-universe but target selection raised an error (e.g. no Open Targets EFO mapping or no associated targets), so no candidates could be scored.
+
+### Sildenafil — pulmonary arterial hypertension (confirmed 2005)
+
+- **Status:** out_of_scope
+- **Known target (context only):** Acts on PDE5 (PDE5A) — a phosphodiesterase, not the typical top OT-associated target for PAH.
+- **Reason:** 'pulmonary arterial hypertension' is an Orphanet 'Group of disorders' umbrella term, not a single scorable disease — it aggregates several distinct disorders. Silver Bullet scores one (disease, target) pair at a time, so please pick a specific constituent disease within this group (e.g. a named subtype) rather than the umbrella category.
+- **Interpretation:** 'pulmonary arterial hypertension' is outside Silver Bullet's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure — the harness correctly refuses to auto-pick an unrelated disease.
 
 ### Propranolol — infantile hemangioma (confirmed 2014)
 
