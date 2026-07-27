@@ -646,16 +646,25 @@ def get_molecule_safety_flags(
 
     Returns:
         {
-          "confirmed"        : bool     — True iff withdrawn_flag OR black_box_warning
-          "layer"            : "chembl_structured"
-          "chembl_id"        : str | None
-          "flag_type"        : "withdrawn_flag" | "black_box_warning" | None
-          "availability_type": int | None   # -2 withdrawn, -1 discontinued, 1 available
-          "source_url"       : str | None   # ChEMBL compound page URL
-          "disclosure_text"  : str
+          "confirmed"          : bool — True ONLY for market-withdrawn drugs
+                                        (withdrawn_flag=True).  A black-box warning
+                                        alone does NOT set confirmed=True; use the
+                                        "black_box_advisory" field for disclosure.
+          "black_box_advisory" : bool — True when black_box_warning=True but the
+                                        drug is NOT market-withdrawn.  Triggers a
+                                        prominent disclosure note in the report but
+                                        does NOT apply a hard scoring cap (black-box
+                                        warnings cover >30% of approved drugs and
+                                        do not indicate a drug is unavailable).
+          "layer"              : "chembl_structured"
+          "chembl_id"          : str | None
+          "flag_type"          : "withdrawn_flag" | "black_box_warning" | None
+          "availability_type"  : int | None  # -2 withdrawn, -1 discontinued, 1 available
+          "source_url"         : str | None  # ChEMBL compound page URL
+          "disclosure_text"    : str
         }
     """
-    cache_key = make_key("get_molecule_safety_flags_v1", drug_name,
+    cache_key = make_key("get_molecule_safety_flags_v2", drug_name,
                          molecule_chembl_id or "")
     cached = get(cache_key)
     if cached is not None:
@@ -663,6 +672,7 @@ def get_molecule_safety_flags(
 
     result: dict[str, Any] = {
         "confirmed": False,
+        "black_box_advisory": False,
         "api_error": False,   # True only when an exception prevented the check
         "layer": "chembl_structured",
         "chembl_id": molecule_chembl_id,
@@ -703,11 +713,17 @@ def get_molecule_safety_flags(
                 f"Source: {source_url}"
             )
         elif flags.get("black_box_warning"):
-            result["confirmed"] = True
+            # Black-box warning ≠ market withdrawal.  >30% of FDA-approved drugs
+            # carry boxed warnings (warfarin, SSRIs, fluoroquinolones, clozapine,
+            # brexanolone, thalidomide+REMS, etc.) and remain fully available.
+            # Do NOT hard-cap the score; surface a prominent advisory note only.
+            result["confirmed"] = False          # no hard-cap triggered
+            result["black_box_advisory"] = True  # disclosure banner in report
             result["flag_type"] = "black_box_warning"
             result["disclosure_text"] = (
                 f"ChEMBL records black_box_warning=True for {drug_name} ({mid}): "
-                f"this compound carries a regulatory black-box warning. "
+                f"this compound carries a regulatory black-box (boxed) warning. "
+                f"The drug is still approved and available (not withdrawn). "
                 f"Source: {source_url}"
             )
 
