@@ -69,6 +69,7 @@ class ReviewerCandidate(TypedDict, total=False):
     mechanism_cap_applied: Required[bool]
     mechanism_direction: Optional[dict]
     safety_cap_applied: Required[bool]
+    black_box_advisory: Optional[bool]   # BBW present but drug NOT withdrawn
     trials_query_failed: Required[bool]
     prior_trial_count: int
     # REQUIRED: must not be dropped by reviewer.append() or structure_validation

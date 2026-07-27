@@ -307,6 +307,7 @@ def run_reviewer(chemist_output: dict[str, Any],
             # layers have been evaluated.  Placeholders here:
             "status_badge": None,
             "safety_cap_applied": False,
+            "black_box_advisory": False,
             "safety_layer1": None,
             "safety_layer2": None,
             "strong_match": composite >= STRONG_MATCH_THRESHOLD,
@@ -569,6 +570,12 @@ def run_reviewer(chemist_output: dict[str, Any],
         l2_hit = layer2 is not None and layer2.get("confirmed", False)
         safety_triggered = l1_hit or l2_hit
 
+        # Black-box advisory: L1 found a boxed warning but NOT a withdrawal.
+        # Surface as a disclosure note; do NOT apply the hard safety cap.
+        r["black_box_advisory"] = (
+            layer1.get("black_box_advisory", False) and not safety_triggered
+        )
+
         if safety_triggered:
             r["composite_score"] = min(r["composite_score"], SAFETY_CAP)
             r["safety_cap_applied"] = True
@@ -590,7 +597,7 @@ def run_reviewer(chemist_output: dict[str, Any],
             layer_str = " + ".join(layer_parts)
             cite_str = "; ".join(c for c in cite_parts if c)
             r["status_badge"] = (
-                f"WITHDRAWN FOR SAFETY ({layer_str}) — {cite_str}"
+                f"WITHDRAWN FROM MARKET ({layer_str}) — {cite_str}"
             )
             needs_resort = True
         else:

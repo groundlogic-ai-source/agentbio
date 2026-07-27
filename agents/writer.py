@@ -439,6 +439,27 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             "only the disease-relevance link is inferred from pathway adjacency.\n\n"
         )
 
+    # Black-box warning advisory — surfaced when ChEMBL records black_box_warning=True
+    # but the drug has NOT been withdrawn from any market.  A boxed warning means
+    # serious risks require prescriber attention; it does NOT mean the drug is
+    # unavailable.  More than 30% of FDA-approved drugs carry boxed warnings
+    # (warfarin, clozapine, SSRIs, fluoroquinolones, thalidomide+REMS, brexanolone…).
+    # This banner is disclosure only — it does NOT affect any score.
+    if candidate.get("black_box_advisory"):
+        l1 = (candidate.get("safety_layer1") or {})
+        bbw_url = l1.get("source_url") or ""
+        url_text = f" ([ChEMBL]({bbw_url}))" if bbw_url else ""
+        parts.append(
+            f"> ⚠ **Black-box (boxed) warning — disclosure only.** "
+            f"ChEMBL records a regulatory black-box warning for **{drug}**{url_text}. "
+            f"The drug is still approved and available; this warning reflects serious "
+            f"risks (sedation, haematological effects, teratogenicity, etc.) that require "
+            f"monitoring in its approved indication. "
+            f"**This flag does not affect the composite score.** "
+            f"The reviewer must judge whether these risks are acceptable in the context "
+            f"of the proposed repurposing indication.\n\n"
+        )
+
     # DILI-screening target disclosure — surfaced when the candidate's target is
     # a well-known pharmaceutical safety-profiling target (BSEP/ABCB11, hERG/KCNH2,
     # P-gp/ABCB1, CYP enzymes, etc.).  Activity records for these proteins in ChEMBL
