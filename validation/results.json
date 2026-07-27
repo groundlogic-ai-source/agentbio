@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-03T03:14:40",
+  "generated_at": "2026-07-27T19:52:14",
   "limitation": "This harness tests the SCORING AND RANKING LOGIC on TODAY's live data, not the historical data available at the time of each discovery. The confirmed drug is intentionally NOT removed from ChEMBL/PubChem results \u2014 reconstructing pre-approval data availability is infeasible with current public APIs. A 'hit' means the existing scoring logic ranks the correct compound highly among real candidates for the disease's top target; it does NOT claim the pipeline would have made the discovery blind to history. The pipeline also pursues only the single top OT-associated target per disease (exactly as the live graph does), so a confirmed drug whose molecular target is not that top target cannot be surfaced \u2014 this is a real, reported limitation, not a scoring failure.",
   "top_n": 10,
   "strong_match_threshold": 0.7,
@@ -10,12 +10,12 @@
     "recovered_top10": 1,
     "strong_matches": 1,
     "out_of_scope": 1,
-    "errors": 0
+    "errors": 1
   },
   "cases": [
     {
       "drug_name": "Sildenafil",
-      "disease_name": "pulmonary arterial hypertension",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
       "confirmed_year": 2005,
       "known_target_note": "Acts on PDE5 (PDE5A) \u2014 a phosphodiesterase, not the typical top OT-associated target for PAH.",
       "status": "hit",
@@ -34,22 +34,17 @@
         {
           "target_symbol": "PTGIR",
           "uniprot_id": "P43119",
-          "ot_association_score": 0.9
+          "ot_association_score": 0.5106
         },
         {
           "target_symbol": "EIF2AK4",
           "uniprot_id": "Q9P2K8",
-          "ot_association_score": 0.8096
-        },
-        {
-          "target_symbol": "KCNK3",
-          "uniprot_id": "O14649",
-          "ot_association_score": 0.7857
+          "ot_association_score": 0.4783
         },
         {
           "target_symbol": "BMPR2",
           "uniprot_id": "Q13873",
-          "ot_association_score": 0.8544
+          "ot_association_score": 0.6809
         },
         {
           "target_symbol": "INHBA",
@@ -59,12 +54,12 @@
         {
           "target_symbol": "SMAD9",
           "uniprot_id": "O15198",
-          "ot_association_score": 0.7834
+          "ot_association_score": 0.4679
         },
         {
-          "target_symbol": "ATP13A3",
-          "uniprot_id": "Q9H7F0",
-          "ot_association_score": 0.7547
+          "target_symbol": "PPARGC1A",
+          "uniprot_id": "Q9UBK2",
+          "ot_association_score": 0.3046
         }
       ],
       "n_chemist_candidates": 32,
@@ -72,12 +67,12 @@
       "found": true,
       "rank": 3,
       "recovered_top10": true,
-      "composite_score": 0.7133,
+      "composite_score": 0.7402,
       "strong_match": true,
       "is_approved_drug": true,
       "match_method": "inchikey/chembl_id",
       "miss_reason": null,
-      "interpretation": "HIT \u2014 Sildenafil appears at rank 3/32 (composite_score=0.7133, within top 10, reached STRONG_MATCH) against target PDE5A, matched by inchikey/chembl_id."
+      "interpretation": "HIT \u2014 Sildenafil appears at rank 3/32 (composite_score=0.7402, within top 10, reached STRONG_MATCH) against target PDE5A, matched by inchikey/chembl_id."
     },
     {
       "drug_name": "Thalidomide",
@@ -177,45 +172,15 @@
     },
     {
       "drug_name": "Metformin",
-      "disease_name": "polycystic ovary syndrome",
+      "disease_name": "Polycystic ovary syndrome",
       "confirmed_year": 1994,
       "known_target_note": "Insulin-sensitizer (AMPK / mitochondrial complex I); no single clean protein target. Used OFF-LABEL for PCOS.",
-      "status": "miss",
-      "in_universe": true,
-      "selected_target": {
-        "target_symbol": "ESR1",
-        "uniprot_id": "P03372",
-        "ot_association_score": 0.5989
-      },
-      "candidate_targets_considered": [
-        {
-          "target_symbol": "ESR1",
-          "uniprot_id": "P03372",
-          "ot_association_score": 0.5989
-        },
-        {
-          "target_symbol": "FTO",
-          "uniprot_id": "Q9C0B1",
-          "ot_association_score": 0.5206
-        },
-        {
-          "target_symbol": "ERBB4",
-          "uniprot_id": "Q15303",
-          "ot_association_score": 0.5384
-        },
-        {
-          "target_symbol": "FSHB",
-          "uniprot_id": "P01225",
-          "ot_association_score": 0.4827
-        },
-        {
-          "target_symbol": "DENND1A",
-          "uniprot_id": "Q8TEH3",
-          "ot_association_score": 0.4757
-        }
-      ],
-      "n_chemist_candidates": 34,
-      "n_reviewed_candidates": 34,
+      "status": "out_of_scope",
+      "in_universe": false,
+      "selected_target": null,
+      "candidate_targets_considered": [],
+      "n_chemist_candidates": null,
+      "n_reviewed_candidates": null,
       "found": false,
       "rank": null,
       "recovered_top10": false,
@@ -223,8 +188,8 @@
       "strong_match": null,
       "is_approved_drug": null,
       "match_method": null,
-      "miss_reason": "'Metformin' did not appear among the 34 ChEMBL candidate compound(s) for the selected top target ESR1 (P03372). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not ESR1 (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there.",
-      "interpretation": "MISS \u2014 Metformin was not surfaced. 'Metformin' did not appear among the 34 ChEMBL candidate compound(s) for the selected top target ESR1 (P03372). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not ESR1 (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool \u2014 or it lacks qualifying high-confidence bioactivity records there."
+      "miss_reason": "'Polycystic ovary syndrome' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.",
+      "interpretation": "'Polycystic ovary syndrome' is outside Silver Bullet's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure \u2014 the harness correctly refuses to auto-pick an unrelated disease."
     },
     {
       "drug_name": "Everolimus",
@@ -279,11 +244,11 @@
     },
     {
       "drug_name": "Propranolol",
-      "disease_name": "infantile hemangioma",
+      "disease_name": "Airway infantile hemangioma",
       "confirmed_year": 2014,
       "known_target_note": "Non-selective beta-blocker (ADRB1/ADRB2). Effect on hemangioma discovered serendipitously.",
-      "status": "out_of_scope",
-      "in_universe": false,
+      "status": "error",
+      "in_universe": null,
       "selected_target": null,
       "candidate_targets_considered": [],
       "n_chemist_candidates": null,
@@ -295,8 +260,8 @@
       "strong_match": null,
       "is_approved_drug": null,
       "match_method": null,
-      "miss_reason": "'infantile hemangioma' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.",
-      "interpretation": "'infantile hemangioma' is outside Silver Bullet's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure \u2014 the harness correctly refuses to auto-pick an unrelated disease."
+      "miss_reason": "target_selection failed: 'Airway infantile hemangioma' is in the rare/NTD universe but could not be matched to an Open Targets EFO ID (tried official name, prefix-stripped name, and original query 'Airway infantile hemangioma'). Try an alternate common name for this disease \u2014 for example, use 'polycystic ovary syndrome' rather than the Orphanet administrative name that may include prefixes like 'NON RARE IN EUROPE:'.",
+      "interpretation": "The disease is in-universe but target selection raised an error (e.g. no Open Targets EFO mapping or no associated targets), so no candidates could be scored."
     }
   ]
 }
