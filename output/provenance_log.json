@@ -1,538 +1,262 @@
 {
   "entries": [
     {
-      "source_type": "chembl_activity",
-      "source_id": "15247904",
-      "used_by": "chemist",
-      "context": "LENVATINIB affinity vs RET"
+      "source_type": "pmid",
+      "source_id": "33309011",
+      "used_by": "biologist",
+      "context": "ADK/Hypermethioninemia encephalopathy due to adenosine kinase deficiency literature"
+    },
+    {
+      "source_type": "pmid",
+      "source_id": "21963049",
+      "used_by": "biologist",
+      "context": "ADK/Hypermethioninemia encephalopathy due to adenosine kinase deficiency literature"
+    },
+    {
+      "source_type": "pmid",
+      "source_id": "27903722",
+      "used_by": "biologist",
+      "context": "ADK/Hypermethioninemia encephalopathy due to adenosine kinase deficiency literature"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "17662979",
+      "source_id": "205842",
       "used_by": "chemist",
-      "context": "GILTERITINIB affinity vs RET"
+      "context": "PENTOSTATIN affinity vs ADA"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "15247906",
+      "source_id": "372606",
       "used_by": "chemist",
-      "context": "PONATINIB affinity vs RET"
+      "context": "PENTOSTATIN affinity vs ADA"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "15247911",
+      "source_id": "19143399",
       "used_by": "chemist",
-      "context": "PONATINIB affinity vs RET"
+      "context": "PENTOSTATIN affinity vs ADA"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16797833",
+      "source_id": "19143402",
       "used_by": "chemist",
-      "context": "PONATINIB affinity vs RET"
+      "context": "PENTOSTATIN affinity vs ADA"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "18002375",
+      "source_id": "1294499",
       "used_by": "chemist",
-      "context": "PONATINIB affinity vs RET"
+      "context": "AFAMELANOTIDE affinity vs ADA"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "3446178",
+      "source_id": "356244",
       "used_by": "chemist",
-      "context": "SORAFENIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "9533009",
+      "source_id": "458579",
       "used_by": "chemist",
-      "context": "SORAFENIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "15247902",
+      "source_id": "458580",
       "used_by": "chemist",
-      "context": "SORAFENIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "15019877",
+      "source_id": "1077891",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "15247901",
+      "source_id": "1077892",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16446699",
+      "source_id": "1089174",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16446702",
+      "source_id": "1772056",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16446705",
+      "source_id": "1772057",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16446708",
+      "source_id": "2391442",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16446711",
+      "source_id": "2587836",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16446806",
+      "source_id": "2587846",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16465573",
+      "source_id": "2587870",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16498898",
+      "source_id": "2667365",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16655178",
+      "source_id": "19103821",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16655179",
+      "source_id": "24999857",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16742601",
+      "source_id": "25532889",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "18096405",
+      "source_id": "25995008",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "18250464",
+      "source_id": "26191710",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "FORODESINE HYDROCHLORIDE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "18309586",
+      "source_id": "25994948",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "CLADRIBINE affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "18390491",
+      "source_id": "19103834",
       "used_by": "chemist",
-      "context": "CABOZANTINIB affinity vs RET"
+      "context": "ACYCLOVIR affinity vs PNP"
     },
     {
       "source_type": "chembl_activity",
-      "source_id": "16655171",
+      "source_id": "25995000",
       "used_by": "chemist",
-      "context": "ALECTINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "16655172",
-      "used_by": "chemist",
-      "context": "ALECTINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "10952729",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18502853",
-      "used_by": "chemist",
-      "context": "IBRUTINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "16844154",
-      "used_by": "chemist",
-      "context": "FEDRATINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9532958",
-      "used_by": "chemist",
-      "context": "PAZOPANIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "3345948",
-      "used_by": "chemist",
-      "context": "VANDETANIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9532955",
-      "used_by": "chemist",
-      "context": "VANDETANIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15138131",
-      "used_by": "chemist",
-      "context": "VANDETANIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15247900",
-      "used_by": "chemist",
-      "context": "VANDETANIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "16498899",
-      "used_by": "chemist",
-      "context": "VANDETANIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "18656419",
-      "used_by": "chemist",
-      "context": "VANDETANIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9537074",
-      "used_by": "chemist",
-      "context": "ENTRECTINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "16587009",
-      "used_by": "chemist",
-      "context": "ENTRECTINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "3101516",
-      "used_by": "chemist",
-      "context": "SUNITINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15247903",
-      "used_by": "chemist",
-      "context": "SUNITINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "15247910",
-      "used_by": "chemist",
-      "context": "SUNITINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "17622012",
-      "used_by": "chemist",
-      "context": "CYCLOBENZAPRINE affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "3446143",
-      "used_by": "chemist",
-      "context": "DASATINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "16640022",
-      "used_by": "chemist",
-      "context": "DASATINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "13365833",
-      "used_by": "chemist",
-      "context": "CERITINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "13367220",
-      "used_by": "chemist",
-      "context": "CERITINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "17622013",
-      "used_by": "chemist",
-      "context": "AMITRIPTYLINE affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9545299",
-      "used_by": "chemist",
-      "context": "LAPATINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9532925",
-      "used_by": "chemist",
-      "context": "ERLOTINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "3446139",
-      "used_by": "chemist",
-      "context": "GEFITINIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "9541246",
-      "used_by": "chemist",
-      "context": "PALBOCICLIB affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "17622014",
-      "used_by": "chemist",
-      "context": "NORTRIPTYLINE affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "17622018",
-      "used_by": "chemist",
-      "context": "NORTRIPTYLINE affinity vs RET"
-    },
-    {
-      "source_type": "chembl_activity",
-      "source_id": "6387485",
-      "used_by": "chemist",
-      "context": "INFIGRATINIB PHOSPHATE affinity vs RET"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "HYPERTENSION",
-      "used_by": "reviewer",
-      "context": "LENVATINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DIARRHOEA",
-      "used_by": "reviewer",
-      "context": "LENVATINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "MALIGNANT NEOPLASM PROGRESSION",
-      "used_by": "reviewer",
-      "context": "LENVATINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "OFF LABEL USE",
-      "used_by": "reviewer",
-      "context": "GILTERITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "FEBRILE NEUTROPENIA",
-      "used_by": "reviewer",
-      "context": "GILTERITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DRUG INEFFECTIVE",
-      "used_by": "reviewer",
-      "context": "GILTERITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DEATH",
-      "used_by": "reviewer",
-      "context": "PONATINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "PRODUCT DOSE OMISSION ISSUE",
-      "used_by": "reviewer",
-      "context": "PONATINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "FATIGUE",
-      "used_by": "reviewer",
-      "context": "SORAFENIB adverse event"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00390325",
-      "used_by": "reviewer",
-      "context": "SORAFENIB/Multiple endocrine neoplasia type 2A trial"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "DISEASE PROGRESSION",
-      "used_by": "reviewer",
-      "context": "ALECTINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ANAEMIA",
-      "used_by": "reviewer",
-      "context": "ALECTINIB adverse event"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT03194893",
-      "used_by": "reviewer",
-      "context": "ALECTINIB/Multiple endocrine neoplasia type 2A trial"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "ATRIAL FIBRILLATION",
-      "used_by": "reviewer",
-      "context": "IBRUTINIB adverse event"
+      "context": "ACYCLOVIR affinity vs PNP"
     },
     {
       "source_type": "openfda_event",
       "source_id": "NEUTROPENIA",
       "used_by": "reviewer",
-      "context": "IBRUTINIB adverse event"
+      "context": "PENTOSTATIN adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "VITAMIN B1 DECREASED",
+      "source_id": "PYREXIA",
       "used_by": "reviewer",
-      "context": "FEDRATINIB adverse event"
+      "context": "PENTOSTATIN adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "VITAMIN B1 DEFICIENCY",
+      "source_id": "DRUG INEFFECTIVE",
       "used_by": "reviewer",
-      "context": "FEDRATINIB adverse event"
+      "context": "PENTOSTATIN adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "SPLENOMEGALY",
+      "source_id": "MALIGNANT NEOPLASM PROGRESSION",
       "used_by": "reviewer",
-      "context": "FEDRATINIB adverse event"
+      "context": "FORODESINE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "PRODUCT USE IN UNAPPROVED INDICATION",
+      "source_id": "STOMATITIS",
       "used_by": "reviewer",
-      "context": "PAZOPANIB adverse event"
+      "context": "FORODESINE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "ELECTROCARDIOGRAM QT PROLONGED",
+      "source_id": "BLOOD LACTATE DEHYDROGENASE INCREASED",
       "used_by": "reviewer",
-      "context": "VANDETANIB adverse event"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00514046",
-      "used_by": "reviewer",
-      "context": "VANDETANIB/Multiple endocrine neoplasia type 2A trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT00923247",
-      "used_by": "reviewer",
-      "context": "VANDETANIB/Multiple endocrine neoplasia type 2A trial"
+      "context": "FORODESINE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "PAIN",
+      "source_id": "NEUTROPHIL COUNT DECREASED",
       "used_by": "reviewer",
-      "context": "CYCLOBENZAPRINE adverse event"
+      "context": "FORODESINE HYDROCHLORIDE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "PLEURAL EFFUSION",
+      "source_id": "OFF LABEL USE",
       "used_by": "reviewer",
-      "context": "DASATINIB adverse event"
+      "context": "CLADRIBINE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "DRUG INTOLERANCE",
+      "source_id": "FEBRILE NEUTROPENIA",
       "used_by": "reviewer",
-      "context": "DASATINIB adverse event"
+      "context": "CLADRIBINE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "NAUSEA",
+      "source_id": "DISCOLOURED VOMIT",
       "used_by": "reviewer",
-      "context": "AMITRIPTYLINE adverse event"
+      "context": "AFAMELANOTIDE adverse event"
     },
     {
       "source_type": "openfda_event",
       "source_id": "VOMITING",
       "used_by": "reviewer",
-      "context": "LAPATINIB adverse event"
+      "context": "AFAMELANOTIDE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "RASH",
+      "source_id": "WEIGHT INCREASED",
       "used_by": "reviewer",
-      "context": "ERLOTINIB adverse event"
+      "context": "AFAMELANOTIDE adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "DRUG RESISTANCE",
+      "source_id": "FATIGUE",
       "used_by": "reviewer",
-      "context": "GEFITINIB adverse event"
+      "context": "ACYCLOVIR adverse event"
     },
     {
       "source_type": "openfda_event",
-      "source_id": "ACQUIRED GENE MUTATION",
+      "source_id": "DIARRHOEA",
       "used_by": "reviewer",
-      "context": "GEFITINIB adverse event"
-    },
-    {
-      "source_type": "openfda_event",
-      "source_id": "NEOPLASM PROGRESSION",
-      "used_by": "reviewer",
-      "context": "PALBOCICLIB adverse event"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04606446",
-      "used_by": "reviewer",
-      "context": "PALBOCICLIB/Multiple endocrine neoplasia type 2A trial"
-    },
-    {
-      "source_type": "clinical_trial",
-      "source_id": "NCT04553133",
-      "used_by": "reviewer",
-      "context": "PALBOCICLIB/Multiple endocrine neoplasia type 2A trial"
+      "context": "ACYCLOVIR adverse event"
     }
   ]
 }

@@ -275,14 +275,16 @@ def run_biologist(target: dict[str, Any]) -> dict[str, Any]:
     disease = target.get("disease_name", "")
     uniprot_id = target.get("uniprot_id")
 
-    interactions = get_interactions(symbol)
+    biogrid_result = get_interactions(symbol)
+    biogrid_query_status = biogrid_result.get("query_status", "query_failed")
+    raw_interactions = biogrid_result.get("interactions", [])
     literature = search_literature(None, symbol, disease)
 
     # Unique interactor genes, preserving order.
     interacting_genes: list[str] = []
     seen: set[str] = set()
     prov_entries: list[dict[str, Any]] = []
-    for it in interactions:
+    for it in raw_interactions:
         g = it.get("interactor_symbol")
         if g and g not in seen:
             seen.add(g)
@@ -330,7 +332,8 @@ def run_biologist(target: dict[str, Any]) -> dict[str, Any]:
                                                    "genetic_association"),
         },
         "interacting_genes": interacting_genes,
-        "interaction_records": interactions,
+        "interaction_records": raw_interactions,
+        "biogrid_query_status": biogrid_query_status,
         "literature_hits": literature_hits,
         "interaction_note": (
             "BioGRID edges are physical/genetic interactions, NOT activating/"

@@ -116,10 +116,47 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
     if candidate.get("unapproved_cap_applied"):
         lines.append("| Unapproved-compound cap (hard gate, max 0.400) | — | — | applied |")
 
+    if candidate.get("mechanism_cap_applied"):
+        mdir = candidate.get("mechanism_direction") or {}
+        verdict = mdir.get("verdict", "DIRECTIONALLY_INCOMPATIBLE")
+        lines.append(
+            f"| Mechanism-direction cap ({verdict}, hard gate, max 0.400) | — | — | applied |"
+        )
+
+    if candidate.get("safety_cap_applied"):
+        s2 = candidate.get("safety_layer2") or {}
+        layer_parts: list[str] = []
+        if (candidate.get("safety_layer1") or {}).get("confirmed"):
+            layer_parts.append("ChEMBL safety signal")
+        if s2.get("confirmed"):
+            layer_parts.append("web-search safety signal")
+        layer_str = " + ".join(layer_parts) if layer_parts else "safety signal"
+        lines.append(
+            f"| Safety cap ({layer_str}, hard gate, max 0.400) | — | — | applied |"
+        )
+
     total = candidate.get("composite_score")
     lines.append(f"| **Composite (weighted sum − penalty − cap)** | | | **{_fmt(total, 4)}** |")
     lines.append("")
-    cap_note = " Unapproved-compound cap applied (capped at 0.400)." if candidate.get("unapproved_cap_applied") else ""
+
+    cap_notes = []
+    if candidate.get("unapproved_cap_applied"):
+        cap_notes.append("Unapproved-compound cap applied (capped at 0.400).")
+    if candidate.get("mechanism_cap_applied"):
+        mdir = candidate.get("mechanism_direction") or {}
+        verdict = mdir.get("verdict", "DIRECTIONALLY_INCOMPATIBLE")
+        reason  = mdir.get("reason") or "drug mechanism is incompatible with target's causal role in disease"
+        cap_notes.append(
+            f"Mechanism-direction cap applied (capped at 0.400): {verdict} — {reason}"
+        )
+    if candidate.get("safety_cap_applied"):
+        badge = candidate.get("status_badge", "")
+        cap_notes.append(
+            f"Safety cap applied (capped at 0.400) — {badge}" if badge else
+            "Safety cap applied (capped at 0.400): known adverse indication or safety signal detected."
+        )
+
+    cap_note = (" " + " ".join(cap_notes)) if cap_notes else ""
     lines.append(f"Weighted sum before penalty = {subtotal:.4f}; "
                  f"penalty = {penalty:.4f}; "
                  f"reported composite_score = {_fmt(total, 4)}.{cap_note}")
@@ -195,7 +232,10 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
         ("Boltz ADME — permeability", _fmt(adme.get("permeability"))),
         ("Boltz ADME — solubility", _fmt(adme.get("solubility"))),
         ("openFDA adverse-event signal (FAERS)", ae_str),
-        ("Prior trials for this exact drug+disease", _fmt(candidate.get("prior_trial_count"))),
+        ("Prior trials for this exact drug+disease",
+         ("⚠ query failed (API unreachable) — trial count unavailable; no_failed_trial credit withheld"
+          if candidate.get("trials_query_failed")
+          else _fmt(candidate.get("prior_trial_count")))),
         ("Target discovery method",
          candidate.get("target_discovery_method", "genetic_association")),
     ]
@@ -318,7 +358,15 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     threshold = formula.get("strong_match_threshold")
 
     network = (biologist_output or {}).get("interacting_genes", [])[:8]
-    net_str = ", ".join(network) if network else "none mapped"
+    biogrid_status = (biologist_output or {}).get("biogrid_query_status", "")
+    if biogrid_status == "query_failed":
+        net_str = "⚠ BioGRID query failed (API error) — network context unavailable"
+    elif biogrid_status == "no_key":
+        net_str = "⚠ BioGRID API key not configured — network context unavailable"
+    elif network:
+        net_str = ", ".join(network)
+    else:
+        net_str = "none found (query succeeded; no interactions in BioGRID for this gene)"
 
     cites = _citations(candidate, biologist_output)
 
@@ -389,6 +437,33 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"{_fmt(candidate.get('ot_association_score'))} (0 = no direct link). "
             "The drug–target binding evidence (pChEMBL, confidence) is real; "
             "only the disease-relevance link is inferred from pathway adjacency.\n\n"
+        )
+
+    # DILI-screening target disclosure — surfaced when the candidate's target is
+    # a well-known pharmaceutical safety-profiling target (BSEP/ABCB11, hERG/KCNH2,
+    # P-gp/ABCB1, CYP enzymes, etc.).  Activity records for these proteins in ChEMBL
+    # commonly originate from DILI / cardiac-safety screening assays (companies test
+    # drugs against them to detect liver/heart toxicity risk BEFORE approval), NOT from
+    # therapeutic-intent binding studies.  A high pChEMBL against BSEP does NOT mean
+    # the drug is a good treatment for a BSEP-deficiency disease — it may mean the
+    # drug is a hepatotoxicity risk.  This disclosure does NOT affect scoring.
+    _DILI_SCREEN_TARGETS: frozenset[str] = frozenset({
+        "ABCB11", "BSEP", "KCNH2", "HERG", "ABCB1", "MDR1",
+        "ABCC2", "MRP2", "CYP3A4", "CYP2D6", "CYP2C9", "CYP2C19", "CYP1A2", "SCN5A",
+    })
+    if target.upper() in _DILI_SCREEN_TARGETS:
+        parts.append(
+            f"> ⚠ **DILI/safety-screening target (disclosure).** "
+            f"**{target}** is a well-known pharmaceutical safety-profiling target. "
+            f"Drug companies routinely measure IC50/Ki of candidate drugs against "
+            f"{target} to detect DRUG-INDUCED LIVER INJURY (DILI) or cardiac toxicity "
+            f"risk *before* regulatory submission — not because those drugs are intended "
+            f"to treat diseases caused by {target} dysfunction. "
+            f"The pChEMBL value in this report may therefore come from a **safety-screening "
+            f"assay** (recording a toxicity liability) rather than a therapeutic-intent "
+            f"binding study. Verify the source assay context in ChEMBL before treating "
+            f"this binding data as evidence of a therapeutic mechanism. "
+            f"This disclosure does not affect any score.\n\n"
         )
 
     # Mutation-specificity DISCLOSURE caveat — surfaced whenever the drug's

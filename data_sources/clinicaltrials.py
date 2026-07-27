@@ -87,7 +87,13 @@ def _classify_why_stopped(why_stopped: str, client: anthropic.Anthropic) -> str:
         return "UNCLEAR"
 
 
-def _search_trials(drug_name: str, disease_name: str) -> list[dict]:
+def _search_trials(drug_name: str, disease_name: str) -> tuple[list[dict], bool]:
+    """
+    Returns (studies, query_failed).
+    query_failed=True means the API was unreachable — callers must NOT treat
+    this as "no trials exist" (fail-open). Callers should conservatively
+    withhold the no-failed-trial scoring credit when query_failed=True.
+    """
     query = f"{drug_name} AND {disease_name}"
     params = {
         "query.term": query,
@@ -99,10 +105,10 @@ def _search_trials(drug_name: str, disease_name: str) -> list[dict]:
         resp = requests.get(BASE_URL, params=params, timeout=30)
         resp.raise_for_status()
         data = resp.json()
-        return data.get("studies", [])
+        return data.get("studies", []), False
     except Exception as e:
         print(f"[clinicaltrials] WARNING: API call failed ({e})")
-        return []
+        return [], True
 
 
 def check_prior_trials(drug_name: str, disease_name: str) -> dict[str, Any]:
@@ -125,7 +131,7 @@ def check_prior_trials(drug_name: str, disease_name: str) -> dict[str, Any]:
     if cached is not None:
         return cached
 
-    raw_studies = _search_trials(drug_name, disease_name)
+    raw_studies, query_failed = _search_trials(drug_name, disease_name)
     client = _anthropic_client()
 
     trials = []
@@ -171,6 +177,12 @@ def check_prior_trials(drug_name: str, disease_name: str) -> dict[str, Any]:
         "trials": trials,
         "has_negative_repurposing_result": has_negative,
         "trial_count": len(trials),
+        # True when the API was unreachable — distinguishes "queried successfully,
+        # found nothing" from "query failed".  Callers must not award
+        # no-failed-trial scoring credit when this flag is set.
+        "query_failed": query_failed,
     }
-    cache_set(cache_key, result, ttl_days=3)
+    # Do not cache a failed query result — retry next time.
+    if not query_failed:
+        cache_set(cache_key, result, ttl_days=3)
     return result

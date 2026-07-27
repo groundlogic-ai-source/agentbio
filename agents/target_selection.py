@@ -177,8 +177,11 @@ def _disorder_group_maps() -> tuple[dict[str, str], set[str]]:
 
     Used to drop umbrella "Group of disorders" terms (e.g. "RASopathy") from the
     candidate universe and to give a specific error when a manual query names an
-    umbrella term. Falls back to empty maps if the product fetch failed, in which
-    case filtering is skipped (fail-open, never crash the sweep).
+    umbrella term.
+
+    FAIL-CLOSED: an empty result means the Orphanet metadata API was unreachable.
+    Callers that require filtering MUST check for an empty by_code and refuse to
+    proceed rather than silently skipping the umbrella filter.
     """
     by_code: dict[str, str] = {}
     group_names: set[str] = set()
@@ -212,16 +215,29 @@ def _build_candidate_universe(exclude_groups: bool = True) -> list[dict[str, Any
     if exclude_groups:
         group_by_code, _ = _disorder_group_maps()
         if not group_by_code:
-            _log("  WARNING: DisorderGroup metadata unavailable — "
-                 "umbrella 'Group of disorders' filtering skipped this run")
+            raise RuntimeError(
+                "[orphadata] DisorderGroup metadata unavailable (API returned empty "
+                "result). Refusing to build the candidate universe without umbrella "
+                "'Group of disorders' filtering — an empty filter map would allow "
+                "all umbrella terms into the sweep. Retry when the Orphanet XML "
+                "product endpoint recovers."
+            )
 
     candidates: list[dict[str, Any]] = []
     seen_names: set[str] = set()
     excluded_groups = 0
+    excluded_admin = 0
 
     for d in orphanet:
         name = d.get("name", "").strip()
         code = d.get("orpha_code")
+        # FAIL-CLOSED: drop Orphanet administrative-prefix entries that are not
+        # genuine rare diseases.  "OBSOLETE:" marks retired/merged nomenclature;
+        # "NON RARE IN EUROPE:" marks diseases whose European prevalence does not
+        # qualify as rare.  Neither should ever reach the scoring pipeline.
+        if _EFO_PREFIX_RE.match(name):
+            excluded_admin += 1
+            continue
         if exclude_groups and code is not None and \
                 group_by_code.get(str(code)) == GROUP_OF_DISORDERS:
             excluded_groups += 1
@@ -239,6 +255,9 @@ def _build_candidate_universe(exclude_groups: bool = True) -> list[dict[str, Any
                 "prevalence": None,
             })
 
+    if excluded_admin:
+        _log(f"  Excluded {excluded_admin} Orphanet administrative-prefix entries "
+             f"(OBSOLETE / NON RARE IN EUROPE) from the candidate universe")
     if exclude_groups and excluded_groups:
         _log(f"  Excluded {excluded_groups} Orphanet 'Group of disorders' "
              f"umbrella entries from the candidate universe")
@@ -289,6 +308,10 @@ def _diseases_from_top_candidates() -> list[dict[str, Any]]:
         if not key or key in seen:
             continue
         seen.add(key)
+        # Drop administrative-prefix entries even if they somehow snuck into a
+        # stale top_candidates.json produced before this filter was added.
+        if _EFO_PREFIX_RE.match(name or ""):
+            continue
         # A stale top_candidates.json (produced before umbrella filtering) may
         # carry "Group of disorders" rows. Drop them here too, otherwise they
         # re-enter the matchable universe and bypass the exclusion + error path.

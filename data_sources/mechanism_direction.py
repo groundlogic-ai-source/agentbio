@@ -55,6 +55,24 @@ _NO_INFO_TEXT = (
     "compatibility; this does not confirm the candidate is directionally compatible."
 )
 
+# Known pharmaceutical safety-screening targets.
+# Companies routinely measure IC50/Ki of drug candidates against these proteins
+# to detect DRUG-INDUCED LIVER INJURY (DILI) or cardiac liability BEFORE
+# regulatory submission — NOT because the drug might treat a disease caused by
+# these proteins.  Activity records in ChEMBL for these targets may therefore
+# come from SAFETY PROFILING ASSAYS rather than therapeutic-intent binding studies.
+# When the candidate target is in this set, the Step 1 search query is augmented
+# to explicitly ask the LLM to consider the safety-screen context.
+_DILI_SAFETY_SCREEN_TARGETS: frozenset[str] = frozenset({
+    "ABCB11", "BSEP",        # Bile salt export pump — BSEP inhibition = cholestasis (DILI)
+    "KCNH2", "HERG",         # hERG K⁺ channel — block = QT prolongation (cardiac safety)
+    "ABCB1", "MDR1",         # P-glycoprotein / MDR1 — multidrug efflux, DDI screening
+    "ABCC2", "MRP2",         # MRP2 — bile acid/drug exporter, DILI screening
+    "CYP3A4", "CYP2D6",      # CYP enzymes — DDI/hepatotoxicity liability screening
+    "CYP2C9", "CYP2C19", "CYP1A2",
+    "SCN5A",                 # NaV1.5 cardiac sodium channel — cardiac safety
+})
+
 
 def _openai_client() -> OpenAI | None:
     base_url = os.environ.get("AI_INTEGRATIONS_OPENAI_BASE_URL")
@@ -110,7 +128,7 @@ def check_mechanism_direction(
     Cached 30 days on success, 1 day on error/skip.
     """
     cache_key = make_key(
-        "mechanism_direction_v3",
+        "mechanism_direction_v4",
         drug_name, target_symbol, disease_name,
         action_type or "", mechanism_of_action or "",
     )
@@ -154,6 +172,29 @@ def check_mechanism_direction(
         # Part (C) matters for drugs like sirolimus/FKBP12 where the therapeutic
         # mechanism is a multi-protein gain-of-function complex, making the naive
         # "inhibitor of FKBP1A" framing misleading.
+        # For known DILI/safety-screening targets, add a fourth question that
+        # asks the LLM to assess whether the ChEMBL activity record likely comes
+        # from a pharmaceutical safety screen rather than a therapeutic-intent assay.
+        dili_question = ""
+        if target_symbol.upper() in _DILI_SAFETY_SCREEN_TARGETS:
+            dili_question = (
+                f"\n\n4. ASSAY CONTEXT (REQUIRED for this target): "
+                f"{target_symbol!r} is a well-known pharmaceutical DILI/safety "
+                f"screening target. Drug companies routinely measure IC50/Ki of "
+                f"candidate drugs against {target_symbol!r} to detect liver or "
+                f"cardiac toxicity risk BEFORE regulatory submission — NOT to find "
+                f"treatments for diseases caused by {target_symbol!r} dysfunction. "
+                f"Does the literature indicate whether {drug_name!r}'s activity "
+                f"against {target_symbol!r} comes from a DILI/safety screening "
+                f"context (recording a toxicity liability) or from a genuine "
+                f"therapeutic-intent study for {disease_name!r}? "
+                f"This distinction is critical: if the activity is safety-screen "
+                f"origin, the binding data does NOT support a therapeutic hypothesis "
+                f"and the direction check should reflect that this is an INHIBITOR "
+                f"of a protein that the disease already lacks — i.e., "
+                f"DIRECTIONALLY_INCOMPATIBLE."
+            )
+
         search_query = (
             f"Context: The drug {drug_name!r} has IC50/Ki bioactivity against "
             f"the protein target {target_symbol!r} (gene symbol) in ChEMBL assay "
@@ -162,7 +203,7 @@ def check_mechanism_direction(
             f"ChEMBL pharmacological class of {drug_name!r}: "
             f"action_type={action_desc!r}, "
             f"mechanism_of_action={moa_desc!r}.\n\n"
-            f"Please answer all three questions with cited sources:\n\n"
+            f"Please answer all questions with cited sources:\n\n"
             f"1. DISEASE MECHANISM: What is the core pathophysiological defect "
             f"in {disease_name!r}?  Is {target_symbol!r} DEFICIENT (lost/reduced "
             f"function) or OVERACTIVE (gained/elevated function) in this disease? "
@@ -179,6 +220,7 @@ def check_mechanism_direction(
             f"disease caused by dysfunction of {target_symbol!r}? "
             f"If yes, what is the confirmed clinical mechanism through "
             f"{target_symbol!r}? Cite sources."
+            f"{dili_question}"
         )
         search_response = client.responses.create(
             model="gpt-5.4",

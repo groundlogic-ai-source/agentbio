@@ -1,0 +1,58 @@
+Keep working
+
+Stop — do not approve this Verapamil case, and I want to walk through exactly why, because I think this is the single most important finding in this whole batch.
+
+The search confirms something specific and serious: BSEP (encoded by ABCB11) is a well-documented target of drug-induced cholestasis — rifampicin, glibenclamide, and several statins are established BSEP inhibitors, and inhibiting BSEP is a recognized mechanism by which drugs actively cause cholestatic liver injury in healthy people. That's not a minor detail; it's a whole category of pharmaceutical safety screening (companies test new drugs against BSEP specifically to catch this liver-toxicity risk before approval).
+
+Now look at what BRIC2 actually is: a disease caused by reduced BSEP function. And look at what's really being proposed: verapamil is textbook-known as a broad, low-specificity ABC-transporter inhibitor — it's the classic reference compound used in P-glycoprotein inhibition assays, and its ChEMBL activity record against ABCB11 (a weak pChEMBL of 4.69, roughly 20 micromolar) has exactly the profile of a BSEP-inhibition safety-screening assay result, not a therapeutic-binding assay. If verapamil's real action on ABCB11 is inhibition — which is the far more likely reading given everything above — then giving it to a BRIC2 patient means further suppressing a transporter that's already underperforming. That's the same shape of error as mazindol on GCH1-deficient dopamine synthesis: real binding, real target, backwards direction.
+
+This is exactly the scenario the mechanism-direction checker exists to catch, and I need a direct answer: did this candidate actually go through that check, and if so, what did it say? If it passed silently, or was never evaluated, that's a live gap in a safety-critical gate, sitting in front of you right now as "awaiting review." Reject this case regardless of the answer, with a note capturing this reasoning, and get the mechanism-direction question answered before trusting any other current candidate.
+
+1. Confirm directly whether the Verapamil/ABCB11/BRIC2 case was evaluated
+   by the mechanism-direction checker, and if so, show the actual verdict
+   and reasoning. If it was skipped (e.g. because ChEMBL's action_type
+   field was empty or ambiguous for this specific record), that is itself
+   a real gap -- a candidate should never reach STRONG_MATCH-clearing
+   status without this check either passing or being explicitly disclosed
+   as not run, the same way other disclosure gaps have been fixed
+   throughout this project.
+
+2. Separately: investigate whether this candidate's ChEMBL activity
+   record for ABCB11 specifically comes from a BSEP-inhibition safety/DILI
+   screening assay (a real, common ChEMBL assay category) rather than a
+   therapeutic-intent binding assay, and whether the pipeline currently
+   has any way to distinguish "this compound was tested here because
+   pharma was checking for liver-toxicity risk" from "this compound was
+   tested here because someone thought it might treat this disease." If
+   there's no such distinction today, that's a new, real gap worth
+   naming, since it could recur for any target with a dense DILI-
+   screening literature (BSEP, hERG, and similar are all heavily screened
+   for exactly this reason across huge swaths of ChEMBL).
+
+Two more real problems in this same dossier, both new, both worth fixing before trusting the current score on anything.
+
+First: look at the Tanimoto row. "Nearest approved drug: VERAPAMIL, similarity 0.979" — for a candidate that is verapamil hydrochloride. That's comparing a salt form of a compound to its own free base, which of course comes back at ~0.98 similarity — it's not telling you anything about genuine structural analogy to a different successful drug, it's just confirming verapamil-HCl is chemically almost identical to verapamil. This is a fresh, specific instance of exactly the same category of scoring artifact as the earlier pool-relative-normalization bug — the reference set needs to explicitly exclude other salt/hydrate forms of the same active moiety, or this term will be silently inflated any time a salt-form candidate shares a pool with its own free base.
+
+Second: that BioGRID interactor list is garbled, not just sparse. "NR4A1, LY6D, AP2A1, Ap2a1, Ap2m1, DDIT4L, HIST2H3PS2, ORF3a" — AP2A1 and Ap2a1 are the same gene symbol duplicated with different casing as if they were two separate hits, and ORF3a is a SARS-CoV-2 viral gene, not a human one. That's real, wrong data being displayed with full confidence right after a key renewal specifically meant to restore trust in this feed. Worth checking whether this is a parsing bug (case-folding failure creating false duplicates) or a genuinely bad query before trusting BioGRID data in any report going forward.
+
+3. Exclude same-active-moiety salt/hydrate forms (and the candidate
+   compound itself) from the Tanimoto "nearest approved drug" reference
+   search, so a salt form is never scored as structurally similar to its
+   own free base. Re-verify the Verapamil case's real Tanimoto score
+   against a genuinely different reference compound once this is fixed.
+
+4. Investigate the garbled BioGRID interactor output for ABCB11 (case-
+   duplicate gene symbols, a non-human viral gene appearing in a human
+   liver-transporter interactome). Determine whether this is a parsing
+   bug or a bad underlying query, and confirm this doesn't affect other
+   already-generated reports before trusting BioGRID data going forward.
+
+On the Tanimoto recalibration note from the fix report — I don't think "one calibration note" does this justice, and I want to be direct about why. The STRONG_MATCH threshold of 0.70 was informally tuned across this whole project against a formula where Tanimoto was artificially suppressed by pool-relative normalization. Now that it's correctly bounded to its real 0–1 range, a genuinely high real-world Tanimoto (0.7+) contributes far more to the composite than it used to — meaning candidates will clear 0.70 more easily than the threshold was ever calibrated for, and this Verapamil case may be a live example of exactly that (weak affinity, but a now-uninflated-but-still-trivial Tanimoto term propping the composite up over the line). Before trusting any current or future score:
+
+5. Re-run the retrospective validation study (sildenafil/PAH, thalidomide/
+   multiple myeloma, everolimus/TSC) under the corrected normalization and
+   report whether STRONG_MATCH classifications and rankings still hold as
+   they did in the original canonical run. If the threshold now behaves
+   differently, recalibrate 0.70 deliberately, justified independently of
+   any single case's outcome -- the same discipline already used once
+   before for the pharmacological-precedent association-score constant.

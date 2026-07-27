@@ -1,0 +1,1040 @@
+{
+  "formula": {
+    "composite_weights": {
+      "pchembl": 0.3,
+      "confidence": 0.2,
+      "ot_association": 0.2,
+      "tanimoto": 0.15,
+      "no_failed_trial": 0.15
+    },
+    "lipinski_penalty": 0.25,
+    "strong_match_threshold": 0.7,
+    "normalization": "pChEMBL: fixed range [3.0, 10.0] (pharmacological reference \u2014 run-independent); Tanimoto: direct [0, 1] \u2014 no normalization applied; OT association: direct [0, 1] \u2014 no normalization applied",
+    "pchembl_norm_min": 3.0,
+    "pchembl_norm_max": 10.0
+  },
+  "n_candidates": 6,
+  "n_strong_matches": 2,
+  "repurposing_only": true,
+  "candidates": [
+    {
+      "drug_name": "FORODESINE",
+      "molecule_chembl_id": "CHEMBL218291",
+      "target_symbol": "PNP",
+      "disease_name": "Hypermethioninemia encephalopathy due to adenosine kinase deficiency",
+      "smiles": "O=c1[nH]cnc2c([C@@H]3N[C@H](CO)[C@@H](O)[C@H]3O)c[nH]c12",
+      "pchembl_value": 10.14,
+      "confidence_score": 9,
+      "ot_association_score": 0.0,
+      "tanimoto_score": 0.975,
+      "most_similar_approved_drug": "FORODESINE HYDROCHLORIDE",
+      "is_approved_drug": true,
+      "rationale": "Forodesine has a median pChEMBL affinity of 10.14 against PNP, measured at assay confidence score 9 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.975 to the nearest approved drug, Forodesine Hydrochloride. No physical or genetic interactors for the target are recorded in BioGRID.",
+      "descriptors": {
+        "molecular_weight": 266.26,
+        "logp": -2.02,
+        "h_bond_donors": 6,
+        "h_bond_acceptors": 6,
+        "tpsa": 134.26,
+        "rotatable_bonds": 2,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "MALIGNANT NEOPLASM PROGRESSION",
+          "count": 15
+        },
+        {
+          "term": "STOMATITIS",
+          "count": 6
+        },
+        {
+          "term": "BLOOD LACTATE DEHYDROGENASE INCREASED",
+          "count": 4
+        },
+        {
+          "term": "NEUTROPHIL COUNT DECREASED",
+          "count": 4
+        },
+        {
+          "term": "DEATH",
+          "count": 3
+        },
+        {
+          "term": "LYMPHOPENIA",
+          "count": 3
+        },
+        {
+          "term": "MALAISE",
+          "count": 3
+        },
+        {
+          "term": "PLATELET COUNT DECREASED",
+          "count": 3
+        },
+        {
+          "term": "WHITE BLOOD CELL COUNT DECREASED",
+          "count": 3
+        },
+        {
+          "term": "ALANINE AMINOTRANSFERASE INCREASED",
+          "count": 2
+        }
+      ],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 1.0,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 0.0,
+        "normalized_tanimoto": 0.975,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.7963,
+      "unapproved_cap_applied": false,
+      "trials_query_failed": false,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": null
+      },
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P00491",
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "safety_layer1": {
+        "confirmed": false,
+        "api_error": false,
+        "layer": "chembl_structured",
+        "chembl_id": "CHEMBL218291",
+        "flag_type": null,
+        "availability_type": -1,
+        "source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL218291/",
+        "disclosure_text": "No market withdrawal or black-box warning found in ChEMBL structured data."
+      },
+      "safety_layer2": {
+        "confirmed": false,
+        "layer": "web_search",
+        "verdict": "NO",
+        "citation": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.24",
+        "search_summary": "Based on thorough research across multiple authoritative sources, here is a comprehensive answer regarding Forodesine's regulatory and safety history:\n\n---\n\n## Forodesine (Mundesine / Fodosine): Withdrawals, Black Box Warnings, and Discontinuations\n\n### Summary Answer: **No market withdrawal for safety reasons, no FDA black box warning, but clinical development was discontinued in the US and Europe.**\n\n---\n\n### 1. \ud83d\udeab No FDA Black Box Warning\n\n\nThere is currently **no FDA Black Box Warning** for forodesine hydrochloride.\n\n\n---\n\n### 2. \u274c Not Withdrawn from Any Market for Safety Reasons\n\nThere is no record of forodesine appearing on any regulatory list of drugs withdrawn or removed from the market for safety or effectiveness reasons. The FDA's official list of such drugs (21 CFR \u00a7 216.24), maintained by the eCFR, does not include forodesine. (Source: [eCFR \u00a7 216.24](https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.24))\n\nSimilarly, the Wikipedia [List of Withdrawn Drugs](https://en.wikipedia.org/wiki/List_of_withdrawn_drugs) does not include forodesine.\n\n---\n\n### 3. \u26a0\ufe0f Clinical Development Discontinued in the US and Europe (Not for Safety)\n\n\nAlthough the **clinical development of forodesine was discontinued in the US and Europe**, a multicenter Phase I/II study of oral forodesine for relapsed peripheral T-cell lymphoma (PTCL) was recently completed in Japan.\n The discontinuation in the US/Europe appears to have been driven by insufficient efficacy results in early trials rather than a formal safety-driven regulatory action.\n\n---\n\n### 4. \u2705 Approved in Japan (2017) \u2014 Not Withdrawn\n\n\nOn 30th March 2017, the Japanese Ministry of Health, Labor and Welfare (MHLW) **approved MUNDESINE\u00ae (forodesine hydrochloride)** for the treatment of Relapsed or Refractory (R/R) Peripheral T-Cell Lymphoma (PTCL).\n \nThe Ministry's decision followed successful clinical trials and made Japan the first country in the world to make Mundesine available for treatment of PTCL.\n There is no evidence that this approval has since been withdrawn.\n\n---\n\n### 5. \ud83d\udd2c Still Investigational in the US and Europe\n\n\nForodesine's FDA approval status is currently **investigational** in the United States. It has received Orphan Drug designation for certain leukemias but is not yet approved for general public use in the US or Europe.\n\n\n---\n\n### 6. Known Side Effects (But Not Grounds for Withdrawal)\n\n\nIn general, the **toxicity of forodesine is manageable**.\n However, \nit is necessary to appropriately manage **opportunistic infections and secondary lymphomas** possibly associated with long-lasting lymphocytopenia caused by forodesine.\n Common side effects include \ngastrointestinal issues such as nausea, vomiting, and diarrhea; fatigue, headache, and upper respiratory tract infections; and more severe but less common side effects including **neutropenia**.\n\n\n---\n\n### Sources:\n- Liv Hospital Drug Profile: https://int.livhospital.com/drugs/forodesine-hydrochloride/\n- Wikipedia \u2013 Forodesine: https://en.wikipedia.org/wiki/Forodesine\n- Lymphoma Hub (MHLW Approval): https://lymphomahub.com/medical-information/mundesine-r-forodesine-hydrochloride-approved-by-japan-s-mhlw-for-relapsed-or-refractory-peripheral-t-cell-lymphoma\n- BioCryst Press Release (GlobeNewswire): https://www.globenewswire.com/news-release/2017/04/03/953473/0/en/BioCryst-Announces-Mundipharma-Receives-Approval-for-Mundesine-in-Japan.html\n- PMC/NIH Evidence-Based Review: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5916385/\n- Synapse/PatSnap Drug Profile: https://synapse.patsnap.com/article/what-is-forodesine-hydrochloride-used-for\n- eCFR \u00a7 216.24 (FDA Withdrawn Drug List): https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.24\n- DrugBank: https://go.drugbank.com/drugs/DB06185\n\n---\n\n**Bottom Line:** Forodesine has **never been withdrawn from a market for safety reasons**, has **no FDA black box warning**, and has **not been formally discontinued for safety reasons**. Its clinical development in the US and Europe stalled largely due to limited efficacy results. It remains approved and marketed in Japan as Mundesine for relapsed/refractory PTCL.",
+        "disclosure_text": "No market-withdrawal information found in this search; this does not confirm the compound is safe."
+      },
+      "strong_match": true,
+      "mechanism_direction": {
+        "verdict": "INSUFFICIENT_INFO",
+        "disease_mechanism_summary": "Here\u2019s the target-focused assessment.\n\n## 1) Disease mechanism\n\n**Core defect:** *Hypermethioninemia encephalopathy due to adenosine kinase deficiency* is caused by **loss of function of ADK (adenosine kinase)**, not by abnormal PNP activity. ADK normally phosphorylates adenosine to AMP; when ADK is deficient, **adenosine accumulates**, which drives the **SAH hydrolase reaction toward S-adenosylhomocysteine (SAH) formation**, causing **elevated SAH and SAM, impaired transmethylation, and hypermethioninemia**. This is the primary molecular mechanism described in the original disease paper and subsequent reviews. ([pmc.ncbi.nlm.nih.gov](https://pmc.ncbi.nlm.nih.gov/articles/PMC3188832/?utm_source=openai))\n\n**What about PNP?** Based on the disease mechanism, **PNP is neither the primary deficient enzyme nor the overactive enzyme in this disorder**. The causal defect is **ADK deficiency**; the literature describing this disease does **not** identify PNP gain or loss as the primary molecular lesion. ([pmc.ncbi.nlm.nih.gov](https://pmc.ncbi.nlm.nih.gov/articles/PMC3188832/?utm_source=openai))\n\n**Answer to Q1:**  \n- Core pathophysiological defect: **ADK loss of function**, causing adenosine accumulation and disruption of the methionine cycle/transmethylation pathway. ([pmc.ncbi.nlm.nih.gov](https://pmc.ncbi.nlm.nih.gov/articles/PMC3188832/?utm_source=openai))  \n- **PNP in this disease:** **neither \u201cdeficient\u201d nor \u201coveractive\u201d as the primary disease mechanism**; the relevant primary defect is upstream at **ADK**. ([pmc.ncbi.nlm.nih.gov](https://pmc.ncbi.nlm.nih.gov/articles/PMC3188832/?utm_source=openai))\n\n## 2) Target-specific direction of forodesine on PNP\n\n**Forodesine is a PNP inhibitor.** It was explicitly developed as a **purine nucleoside phosphorylase (PNP) inhibitor**. ([pubmed.ncbi.nlm.nih.gov](https://pubmed.ncbi.nlm.nih.gov/16131572/?utm_source=openai))\n\nSince the disease defect in question is **not PNP overactivity**, inhibiting PNP does **not directly correct or compensate for the primary lesion**. In fact, focusing only on the drug\u2019s direct action on **PNP itself**, **forodesine would push PNP activity downward**, i.e. toward a **PNP-deficient state**, which is **not the known defect in ADK deficiency**. Therefore, on a strict target-mechanism basis, **forodesine\u2019s direct effect on PNP would not correct the disease defect and is better classified as potentially worsening/mismatching the defect rather than compensating for it**. ([pmc.ncbi.nlm.nih.gov](https://pmc.ncbi.nlm.nih.gov/articles/PMC3188832/?utm_source=openai))\n\nA useful anchor is that **PNP deficiency itself is a recognized inborn error** with toxic deoxyguanosine/dGTP accumulation in immune cells; forodesine pharmacology intentionally mimics PNP deficiency to achieve T-cell toxicity. ([pubmed.ncbi.nlm.nih.gov](https://pubmed.ncbi.nlm.nih.gov/16131572/?utm_source=openai))\n\n**Answer to Q2:**  \n- **Would PNP inhibition correct the disease defect?** **No.**  \n- **Direct action on PNP:** **does not compensate for ADK deficiency**; mechanistically it is more consistent with **worsening/misdirecting** the target state because it further suppresses PNP, a different enzyme. ([pmc.ncbi.nlm.nih.gov](https://pmc.ncbi.nlm.nih.gov/articles/PMC3188832/?utm_source=openai))\n\n## 3) Clinical use anchor\n\n**Forodesine is not a known treatment for adenosine kinase deficiency.** The ADK-deficiency literature emphasizes supportive/metabolic management, including **methionine restriction**, not PNP inhibition. ([pmc.ncbi.nlm.nih.gov](https://pmc.ncbi.nlm.nih.gov/articles/PMC8411109/?utm_source=openai))\n\n**Forodesine is an approved/investigational PNP inhibitor for T-cell malignancies, not for PNP-defect disorders.** Clinical studies and regulatory documents describe it as a **PNP inhibitor** developed because **pharmacologic PNP inhibition can mimic aspects of inherited PNP deficiency**, leading to **deoxyguanosine accumulation, intracellular dGTP buildup, ribonucleotide reductase inhibition, and selective T-cell toxicity**. ([pubmed.ncbi.nlm.nih.gov](https://pubmed.ncbi.nlm.nih.gov/16131572/?utm_source=openai))\n\nFor diseases caused by **PNP dysfunction itself**, the relevant dysfunction is typically **PNP deficiency**, an inborn error associated with immune dysfunction. A PNP inhibitor like forodesine would **not** be the confirmed therapeutic mechanism for such a disease; rather, it would be expected to **phenocopy** the deficiency state. ([pubmed.ncbi.nlm.nih.gov](https://pubmed.ncbi.nlm.nih.gov/16131572/?utm_source=openai))\n\n**Answer to Q3:**  \n- **ADK deficiency / hypermethioninemia encephalopathy due to ADK deficiency:** No evidence found that forodesine is an approved, investigational, or validated treatment. Management in the literature centers on metabolic therapy such as methionine restriction. ([pmc.ncbi.nlm.nih.gov](https://pmc.ncbi.nlm.nih.gov/articles/PMC8411109/?utm_source=openai))  \n- **Disease caused by PNP dysfunction:** Forodesine is **not** a treatment for **PNP deficiency**; its confirmed clinical mechanism is the opposite context\u2014**intentional PNP inhibition** to induce toxic dGTP accumulation in malignant T cells in **T-cell malignancies**. ([pubmed.ncbi.nlm.nih.gov](https://pubmed.ncbi.nlm.nih.gov/16131572/?utm_source=openai))\n\n## Bottom line\n\n1. **Disease mechanism:** ADK deficiency is a **loss-of-function ADK disorder** causing adenosine accumulation and methionine-cycle disruption; **PNP is not the primary deficient or overactive target**. ([pmc.ncbi.nlm.nih.gov](https://pmc.ncbi.nlm.nih.gov/articles/PMC3188832/?utm_source=openai))  \n2. **Direction on PNP:** Because forodesine **inhibits PNP**, its direct action on PNP would **not correct** ADK deficiency and is best viewed as **mechanistically mismatched / potentially worsening relative to the target direction**. ([pubmed.ncbi.nlm.nih.gov](https://pubmed.ncbi.nlm.nih.gov/16131572/?utm_source=openai))  \n3. **Clinical anchor:** Forodesine is used/investigated for **T-cell malignancies via PNP inhibition**, not for **ADK deficiency** or for treating **PNP deficiency disorders**. ([pubmed.ncbi.nlm.nih.gov](https://pubmed.ncbi.nlm.nih.gov/16131572/?utm_source=openai))",
+        "reason": "The retrieved text states that hypermethioninemia encephalopathy due to adenosine kinase deficiency is caused by ADK loss of function, that PNP is not the primary deficient or overactive target, and that forodesine inhibits PNP without correcting ADK deficiency, but this is a mechanistic mismatch rather than direct unambiguous evidence of worsening the core defect required for directional incompatibility (PMC3188832; PMID:16131572).",
+        "action_type_used": "INHIBITOR",
+        "mechanism_of_action_used": "Purine nucleoside phosphorylase inhibitor",
+        "target_symbol_used": "PNP",
+        "model_used": "gpt-5.4",
+        "search_citations": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3188832/, https://pubmed.ncbi.nlm.nih.gov/16131572/",
+        "step2_raw": "VERDICT: INSUFFICIENT_INFO\nREASON: The retrieved text states that hypermethioninemia encephalopathy due to adenosine kinase deficiency is caused by ADK loss of function, that PNP is not the primary deficient or overactive target, and that forodesine inhibits PNP without correcting ADK deficiency, but this is a mechanistic mismatch rather than direct unambiguous evidence of worsening the core defect required for directional incompatibility (PMC3188832; PMID:16131572).\nCITATIONS: https://pmc.ncbi.nlm.nih.gov/articles/PMC3188832/, https://pubmed.ncbi.nlm.nih.gov/16131572/",
+        "compatible": false,
+        "incompatible": false
+      },
+      "mechanism_cap_applied": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "356244"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "458579"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "458580"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "1077891"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "1077892"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "1089174"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "1772056"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "1772057"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2391442"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2587836"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2587846"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2587870"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "2667365"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "19103821"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "24999857"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "25532889"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "25995008"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL218291"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1023647"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL4369205"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5232760"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5341493"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5551563"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL764177"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL764178"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL764180"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL766546"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL766712"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL856601"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL908314"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL951777"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL960618"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL963040"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL963041"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "pmid",
+            "source_id": "33309011"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "21963049"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "27903722"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL218291",
+        "CHEMBL1023647",
+        "CHEMBL4369205",
+        "CHEMBL5232760",
+        "CHEMBL5341493",
+        "CHEMBL5551563",
+        "CHEMBL764177",
+        "CHEMBL764178",
+        "CHEMBL764180",
+        "CHEMBL766546",
+        "CHEMBL766712",
+        "CHEMBL856601",
+        "CHEMBL908314",
+        "CHEMBL951777",
+        "CHEMBL960618",
+        "CHEMBL963040",
+        "CHEMBL963041"
+      ]
+    },
+    {
+      "drug_name": "FORODESINE HYDROCHLORIDE",
+      "molecule_chembl_id": "CHEMBL550755",
+      "target_symbol": "PNP",
+      "disease_name": "Hypermethioninemia encephalopathy due to adenosine kinase deficiency",
+      "smiles": "Cl.O=c1[nH]cnc2c([C@@H]3N[C@H](CO)[C@@H](O)[C@H]3O)c[nH]c12",
+      "pchembl_value": 9.32,
+      "confidence_score": 9,
+      "ot_association_score": 0.0,
+      "tanimoto_score": 0.975,
+      "most_similar_approved_drug": "FORODESINE",
+      "is_approved_drug": true,
+      "rationale": "Forodesine hydrochloride has a median pChEMBL affinity of 9.32 against PNP, measured at an assay confidence score of 9 out of 9, and is recorded as an approved or known drug with a Tanimoto similarity of 0.975 to the nearest approved drug, forodesine. No BioGRID physical or genetic interactors are listed for the target.",
+      "descriptors": {
+        "molecular_weight": 302.72,
+        "logp": -1.6,
+        "h_bond_donors": 6,
+        "h_bond_acceptors": 6,
+        "tpsa": 134.26,
+        "rotatable_bonds": 2,
+        "lipinski_violations": 1,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "MALIGNANT NEOPLASM PROGRESSION",
+          "count": 13
+        },
+        {
+          "term": "NEUTROPHIL COUNT DECREASED",
+          "count": 4
+        },
+        {
+          "term": "STOMATITIS",
+          "count": 4
+        },
+        {
+          "term": "BLOOD LACTATE DEHYDROGENASE INCREASED",
+          "count": 3
+        },
+        {
+          "term": "DEATH",
+          "count": 3
+        },
+        {
+          "term": "LYMPHOPENIA",
+          "count": 3
+        },
+        {
+          "term": "MALAISE",
+          "count": 3
+        },
+        {
+          "term": "PLATELET COUNT DECREASED",
+          "count": 3
+        },
+        {
+          "term": "WHITE BLOOD CELL COUNT DECREASED",
+          "count": 3
+        },
+        {
+          "term": "ALANINE AMINOTRANSFERASE INCREASED",
+          "count": 2
+        }
+      ],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.9029,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 0.0,
+        "normalized_tanimoto": 0.975,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.7671,
+      "unapproved_cap_applied": false,
+      "trials_query_failed": false,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": null
+      },
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P00491",
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "safety_layer1": {
+        "confirmed": false,
+        "api_error": false,
+        "layer": "chembl_structured",
+        "chembl_id": "CHEMBL550755",
+        "flag_type": null,
+        "availability_type": -1,
+        "source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL550755/",
+        "disclosure_text": "No market withdrawal or black-box warning found in ChEMBL structured data."
+      },
+      "safety_layer2": {
+        "confirmed": false,
+        "layer": "web_search",
+        "verdict": "NO",
+        "citation": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.24",
+        "search_summary": "Based on the search results from multiple authoritative sources, here is a comprehensive answer:\n\n---\n\n## Forodesine Hydrochloride: Safety Withdrawals, Black Box Warnings, and Discontinuations\n\n**No.** Based on available evidence, **Forodesine Hydrochloride (brand name: Mundesine\u00ae)** has **not** been withdrawn from any market for safety reasons, received an FDA Black Box Warning, or been discontinued due to safety concerns. Here is a detailed breakdown:\n\n---\n\n### 1. \ud83d\udeab No FDA Black Box Warning\n\n\nThere is currently no FDA Black Box Warning for forodesine hydrochloride.\n\n\n---\n\n### 2. \ud83d\udeab No Market Withdrawal for Safety Reasons\n\nA review of the FDA's official list of drugs withdrawn or removed from the market for safety or effectiveness reasons (21 CFR \u00a7 216.24, maintained at [eCFR](https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.24)) does not include forodesine hydrochloride. Forodesine is not listed among the drugs on that roster.\n\n---\n\n### 3. \ud83d\udccb Regulatory Status: Investigational in the US, Approved in Japan\n\n\nForodesine hydrochloride is currently investigational in the United States. It has received Orphan Drug designation for certain leukemias but is not yet approved for general public use in the US or Europe. It is approved for use in Japan for specific types of lymphoma.\n\n\nSpecifically, \non 30th March 2017, the Japanese Ministry of Health, Labor and Welfare (MHLW) approved MUNDESINE\u00ae (forodesine hydrochloride) for the treatment of Relapsed or Refractory (R/R) Peripheral T-Cell Lymphoma (PTCL).\n\n\n\nThe Ministry's decision followed successful clinical trials and made Japan the first country in the world to make Mundesine available for treatment of PTCL.\n\n\nSince the drug has only ever been **formally approved in Japan**, and has not been approved (and thus cannot be \"withdrawn\") in the US or EU, there is no market from which it could be withdrawn for safety reasons in those jurisdictions.\n\n---\n\n### 4. \u26a0\ufe0f Known Side Effects (But No Safety-Based Discontinuation)\n\nWhile the drug has known adverse effects, these have not triggered regulatory safety actions such as a withdrawal or black box warning. Known side effects include:\n\n\nLymphopenia (a drop in white blood cells, which is expected because the drug targets these cells), opportunistic infections (because the drug lowers white blood cell counts, making the body less able to fight off viruses or fungi), and thrombocytopenia (a drop in platelets, which can lead to easy bruising or bleeding).\n\n\n---\n\n### 5. \ud83d\udd2c Still Under Investigation\n\n\nForodesine hydrochloride is an investigational agent in many countries and is not currently approved by the US Food and Drug Administration (FDA) for general clinical use. It is available only through participation in approved clinical trials or in countries where it has received local regulatory approval.\n\n\n---\n\n### Summary Table\n\n| Safety Action | Status |\n|---|---|\n| FDA Black Box Warning | \u274c None |\n| Withdrawn from market (safety) | \u274c None |\n| Discontinued for safety reasons | \u274c None |\n| Approved in Japan (Mundesine\u00ae) | \u2705 Yes (2017) |\n| FDA-approved (US) | \u274c No (investigational only) |\n| EMA-approved (Europe) | \u274c No (orphan designations only) |\n\n**Sources:**\n- Liv Hospital Drug Reference: https://int.livhospital.com/drugs/forodesine-hydrochloride/\n- BioCryst Press Release (GlobeNewswire): https://www.globenewswire.com/news-release/2017/04/03/953473/0/en/BioCryst-Announces-Mundipharma-Receives-Approval-for-Mundesine-in-Japan.html\n- Lymphoma Hub: https://lymphomahub.com/medical-information/mundesine-r-forodesine-hydrochloride-approved-by-japan-s-mhlw-for-relapsed-or-refractory-peripheral-t-cell-lymphoma\n- New Drug Approvals: https://newdrugapprovals.org/2018/03/06/forodesine-hydrochloride/\n- FDA eCFR (Withdrawn Drug List): https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.24\n- EMA Paediatric Investigation Plan: https://www.ema.europa.eu/en/medicines/human/paediatric-investigation-plans/forodesine-hydrochloride",
+        "disclosure_text": "No market-withdrawal information found in this search; this does not confirm the compound is safe."
+      },
+      "strong_match": true,
+      "mechanism_direction": null,
+      "mechanism_cap_applied": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "26191710"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL550755"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5636756"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "pmid",
+            "source_id": "33309011"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "21963049"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "27903722"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL550755",
+        "CHEMBL5636756"
+      ]
+    },
+    {
+      "drug_name": "ACYCLOVIR",
+      "molecule_chembl_id": "CHEMBL184",
+      "target_symbol": "PNP",
+      "disease_name": "Hypermethioninemia encephalopathy due to adenosine kinase deficiency",
+      "smiles": "Nc1nc2c(ncn2COCCO)c(=O)[nH]1",
+      "pchembl_value": 5.52,
+      "confidence_score": 9,
+      "ot_association_score": 0.0,
+      "tanimoto_score": 0.2424,
+      "most_similar_approved_drug": "CLADRIBINE",
+      "is_approved_drug": true,
+      "rationale": "Acyclovir has a median pChEMBL affinity of 5.52 against PNP, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.242 to the nearest approved drug cladribine. No BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 225.21,
+        "logp": -1.33,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 6,
+        "tpsa": 119.05,
+        "rotatable_bonds": 4,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "FATIGUE",
+          "count": 8428
+        },
+        {
+          "term": "DIARRHOEA",
+          "count": 7514
+        },
+        {
+          "term": "OFF LABEL USE",
+          "count": 6732
+        },
+        {
+          "term": "NAUSEA",
+          "count": 5870
+        },
+        {
+          "term": "PNEUMONIA",
+          "count": 5810
+        },
+        {
+          "term": "PYREXIA",
+          "count": 4971
+        },
+        {
+          "term": "DEATH",
+          "count": 4956
+        },
+        {
+          "term": "DRUG INEFFECTIVE",
+          "count": 4817
+        },
+        {
+          "term": "RASH",
+          "count": 4349
+        },
+        {
+          "term": "DYSPNOEA",
+          "count": 3705
+        }
+      ],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.36,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 0.0,
+        "normalized_tanimoto": 0.2424,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4944,
+      "unapproved_cap_applied": false,
+      "trials_query_failed": false,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P00491",
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "safety_layer1": {
+        "confirmed": false,
+        "api_error": false,
+        "layer": "chembl_structured",
+        "chembl_id": "CHEMBL184",
+        "flag_type": null,
+        "availability_type": 1,
+        "source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL184/",
+        "disclosure_text": "No market withdrawal or black-box warning found in ChEMBL structured data."
+      },
+      "safety_layer2": null,
+      "strong_match": false,
+      "mechanism_direction": null,
+      "mechanism_cap_applied": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "19103834"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "25995000"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL184"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL4369203"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5551562"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "pmid",
+            "source_id": "33309011"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "21963049"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "27903722"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL184",
+        "CHEMBL4369203",
+        "CHEMBL5551562"
+      ]
+    },
+    {
+      "drug_name": "PENTOSTATIN",
+      "molecule_chembl_id": "CHEMBL1580",
+      "target_symbol": "ADA",
+      "disease_name": "Hypermethioninemia encephalopathy due to adenosine kinase deficiency",
+      "smiles": "OC[C@H]1O[C@@H](n2cnc3c2N=CNC[C@H]3O)C[C@@H]1O",
+      "pchembl_value": 10.24,
+      "confidence_score": 9,
+      "ot_association_score": 0.0,
+      "tanimoto_score": 0.4426,
+      "most_similar_approved_drug": "CLADRIBINE",
+      "is_approved_drug": true,
+      "rationale": "Pentostatin has a median pChEMBL affinity of 10.24 against ADA, measured at assay confidence score 9 out of 9, and is an approved drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, cladribine, is 0.443, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 268.27,
+        "logp": -1.18,
+        "h_bond_donors": 4,
+        "h_bond_acceptors": 7,
+        "tpsa": 112.13,
+        "rotatable_bonds": 2,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "NEUTROPENIA",
+          "count": 76
+        },
+        {
+          "term": "PYREXIA",
+          "count": 60
+        },
+        {
+          "term": "DRUG INEFFECTIVE",
+          "count": 58
+        },
+        {
+          "term": "OFF LABEL USE",
+          "count": 58
+        },
+        {
+          "term": "DIARRHOEA",
+          "count": 52
+        },
+        {
+          "term": "DYSPNOEA",
+          "count": 51
+        },
+        {
+          "term": "PNEUMONIA",
+          "count": 49
+        },
+        {
+          "term": "THROMBOCYTOPENIA",
+          "count": 49
+        },
+        {
+          "term": "ANAEMIA",
+          "count": 47
+        },
+        {
+          "term": "SEPSIS",
+          "count": 45
+        }
+      ],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 1.0,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 0.0,
+        "normalized_tanimoto": 0.4426,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": false,
+      "trials_query_failed": false,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P00813",
+      "status_badge": "WITHDRAWN FOR SAFETY (ChEMBL structured data + web search) \u2014 https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1580/; https://www.accessdata.fda.gov/drugsatfda_docs/label/2025/020122s021lbl.pdf",
+      "safety_cap_applied": true,
+      "safety_layer1": {
+        "confirmed": true,
+        "api_error": false,
+        "layer": "chembl_structured",
+        "chembl_id": "CHEMBL1580",
+        "flag_type": "black_box_warning",
+        "availability_type": 1,
+        "source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1580/",
+        "disclosure_text": "ChEMBL records black_box_warning=True for PENTOSTATIN (CHEMBL1580): this compound carries a regulatory black-box warning. Source: https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1580/"
+      },
+      "safety_layer2": {
+        "confirmed": true,
+        "layer": "web_search",
+        "verdict": "YES",
+        "citation": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2025/020122s021lbl.pdf",
+        "search_summary": "Here is a comprehensive summary of what is known about **Pentostatin (brand name: Nipent)** regarding market withdrawal, black box warnings, and safety-related discontinuation:\n\n---\n\n## Pentostatin (Nipent): Safety Regulatory History\n\n### \u2705 Black Box Warning \u2014 YES\n\nPentostatin **does carry an FDA Black Box Warning** (the most serious type of warning the FDA can require). \nThe drug must be administered under the supervision of an experienced cancer chemotherapy physician in a facility equipped to diagnose and manage complications, and recommended doses must not be exceeded.\n\n\nThe full scope of the Boxed Warning, as documented in the official FDA prescribing information, includes the following serious concerns:\n\n- **Severe toxicity at higher doses:** \nNephrotoxicity, hepatotoxicity, central nervous system (CNS), and pulmonary toxicity occurred in Phase 1 studies that used higher doses than recommended.\n\n\n- **Fatal pulmonary toxicity with fludarabine:** \nPentostatin should not be used with concurrent fludarabine because of increased risk of pulmonary toxicity.\n This is confirmed in the official Pfizer prescribing information: \nThe combined use of NIPENT and fludarabine phosphate is not recommended because it may be associated with an increased risk of fatal pulmonary toxicity.\n\n\n- **Acute pulmonary edema and death in bone marrow transplant settings:** \nAcute pulmonary edema and hypotension, leading to death, have been reported in patients treated with pentostatin in combination with carmustine, etoposide and high dose cyclophosphamide as part of the ablative regimen for bone marrow transplant.\n\n\n- **Nervous system toxicity:** \nPentostatin treatment should be withheld or discontinued in patients showing evidence of nervous system toxicity.\n\n\n- **Supervision requirement:** \nPentostatin injection must be given under the supervision of a doctor who is experienced in giving chemotherapy medications for cancer.\n\n\n\ud83d\udcc4 **Source:** FDA Prescribing Information (NIPENT\u2122), 2025 label:\nhttps://www.accessdata.fda.gov/drugsatfda_docs/label/2025/020122s021lbl.pdf\nand Pfizer Medical Information: https://www.pfizermedical.com/nipent\n\n---\n\n### \u274c Market Withdrawal \u2014 NO\n\nThere is **no evidence** that pentostatin has ever been withdrawn from any market for safety reasons. \nPentostatin received its initial FDA approval on October 11, 1991, for the treatment of adult patients with alpha-interferon-refractory hairy cell leukemia,\n and it remains an approved drug to this day.\n\n\ud83d\udcc4 **Source:** HemOnc.org: https://hemonc.org/wiki/Pentostatin_(Nipent)\n\n---\n\n### \u26a0\ufe0f Commercial Availability Concerns (Not a Safety Withdrawal)\n\nWhile pentostatin has not been withdrawn for safety reasons, there are some commercial availability issues. \nNipent is a brand name of pentostatin approved by the FDA, and while a generic version has also been approved by the FDA, FDA approval doesn't guarantee the generic will be available in pharmacies.\n \nThe generic medication may be approved, but does not appear to be commercially available at this time, and market launch delays can occur.\n This is a supply/commercial issue, **not** a safety-driven discontinuation.\n\n\ud83d\udcc4 **Source:** Drugs.com Generic Nipent Availability: https://www.drugs.com/availability/generic-nipent.html\n\n---\n\n### \u26a0\ufe0f Overdose / Higher Dose Safety Concerns\n\n\nAdministration of pentostatin in dosages higher than those currently recommended (20\u201350 mg/m\u00b2 over 5 days as compared with 4 mg/m\u00b2 every other week) has been associated with severe renal, hepatic, pulmonary, and CNS toxicity, which was unpredictable and occasionally fatal.\n\n\n\ud83d\udcc4 **Source:** Healio Drug Information: https://www.healio.com/clinical-guidance/drugs/pentostatin\n\n---\n\n### Summary Table\n\n| Category | Status |\n|---|---|\n| **Black Box Warning** | \u2705 YES \u2014 Physician supervision required; no dose exceedance; fatal toxicity risks with fludarabine and certain combination regimens |\n| **Market Withdrawal** | \u274c NO \u2014 Never withdrawn from any market for safety reasons |\n| **Discontinued for Safety** | \u274c NO \u2014 Still FDA-approved and marketed as Nipent (Pfizer) |\n| **Commercial Availability Issues** | \u26a0\ufe0f Generic approved but may not be commercially available (not safety-related) |\n\nPentostatin remains a valid FDA-approved cancer treatment, but it is subject to serious warnings and must be used carefully within the recommended dosage parameters and under appropriate medical supervision.",
+        "disclosure_text": "MARKET WITHDRAWAL / BLACK-BOX WARNING CONFIRMED by web search for PENTOSTATIN. Source: https://www.accessdata.fda.gov/drugsatfda_docs/label/2025/020122s021lbl.pdf"
+      },
+      "strong_match": false,
+      "mechanism_direction": null,
+      "mechanism_cap_applied": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "205842"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "372606"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "19143399"
+          },
+          {
+            "source_type": "chembl_activity",
+            "source_id": "19143402"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1580"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL4377131"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL4377132"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL646139"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL873052"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "33309011"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "21963049"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "27903722"
+          }
+        ],
+        "collapsed_as_duplicate": []
+      },
+      "source_chembl_ids": [
+        "CHEMBL1580",
+        "CHEMBL4377131",
+        "CHEMBL4377132",
+        "CHEMBL646139",
+        "CHEMBL873052"
+      ]
+    },
+    {
+      "drug_name": "CLADRIBINE",
+      "molecule_chembl_id": "CHEMBL1619",
+      "target_symbol": "PNP",
+      "disease_name": "Hypermethioninemia encephalopathy due to adenosine kinase deficiency",
+      "smiles": "Nc1nc(Cl)nc2c1ncn2[C@H]1C[C@H](O)[C@@H](CO)O1",
+      "pchembl_value": 8.64,
+      "confidence_score": 9,
+      "ot_association_score": 0.0,
+      "tanimoto_score": 0.4426,
+      "most_similar_approved_drug": "PENTOSTATIN",
+      "is_approved_drug": true,
+      "rationale": "Cladribine has a median pChEMBL affinity of 8.64 against PNP, measured at assay confidence score 9 out of 9, and is an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, pentostatin, is 0.443, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 285.69,
+        "logp": -0.3,
+        "h_bond_donors": 3,
+        "h_bond_acceptors": 7,
+        "tpsa": 119.31,
+        "rotatable_bonds": 2,
+        "lipinski_violations": 0,
+        "veber_pass": true,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": false,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "OFF LABEL USE",
+          "count": 304
+        },
+        {
+          "term": "DRUG INEFFECTIVE",
+          "count": 213
+        },
+        {
+          "term": "FEBRILE NEUTROPENIA",
+          "count": 207
+        },
+        {
+          "term": "PYREXIA",
+          "count": 189
+        },
+        {
+          "term": "PANCYTOPENIA",
+          "count": 156
+        },
+        {
+          "term": "NEUTROPENIA",
+          "count": 154
+        },
+        {
+          "term": "THROMBOCYTOPENIA",
+          "count": 126
+        },
+        {
+          "term": "PRODUCT USE IN UNAPPROVED INDICATION",
+          "count": 122
+        },
+        {
+          "term": "PNEUMONIA",
+          "count": 106
+        },
+        {
+          "term": "RASH MACULO-PAPULAR",
+          "count": 93
+        }
+      ],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.8057,
+        "confidence_term": 1.0,
+        "normalized_ot_association": 0.0,
+        "normalized_tanimoto": 0.4426,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.4,
+      "unapproved_cap_applied": false,
+      "trials_query_failed": false,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P00491",
+      "status_badge": "WITHDRAWN FOR SAFETY (ChEMBL structured data) \u2014 https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1619/",
+      "safety_cap_applied": true,
+      "safety_layer1": {
+        "confirmed": true,
+        "api_error": false,
+        "layer": "chembl_structured",
+        "chembl_id": "CHEMBL1619",
+        "flag_type": "black_box_warning",
+        "availability_type": 1,
+        "source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1619/",
+        "disclosure_text": "ChEMBL records black_box_warning=True for CLADRIBINE (CHEMBL1619): this compound carries a regulatory black-box warning. Source: https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1619/"
+      },
+      "safety_layer2": null,
+      "strong_match": false,
+      "mechanism_direction": null,
+      "mechanism_cap_applied": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "25994948"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL1619"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL5551552"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "pmid",
+            "source_id": "33309011"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "21963049"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "27903722"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL1619",
+        "CHEMBL5551552"
+      ]
+    },
+    {
+      "drug_name": "AFAMELANOTIDE",
+      "molecule_chembl_id": "CHEMBL441738",
+      "target_symbol": "ADA",
+      "disease_name": "Hypermethioninemia encephalopathy due to adenosine kinase deficiency",
+      "smiles": "CCCC[C@H](NC(=O)[C@H](CO)NC(=O)[C@H](Cc1ccc(O)cc1)NC(=O)[C@H](CO)NC(C)=O)C(=O)N[C@@H](CCC(=O)O)C(=O)N[C@@H](Cc1c[nH]cn1)C(=O)N[C@H](Cc1ccccc1)C(=O)N[C@@H](CCCNC(=N)N)C(=O)N[C@@H](Cc1c[nH]c2ccccc12)C(=O)NCC(=O)N[C@@H](CCCCN)C(=O)N1CCC[C@H]1C(=O)N[C@H](C(N)=O)C(C)C",
+      "pchembl_value": 7.8,
+      "confidence_score": 8,
+      "ot_association_score": 0.0,
+      "tanimoto_score": 0.0915,
+      "most_similar_approved_drug": "PENTOSTATIN",
+      "is_approved_drug": true,
+      "rationale": "Afamelanotide has a median pChEMBL affinity of 7.8 against ADA, measured at an assay confidence score of 8 out of 9, and is itself an approved or known drug. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, pentostatin, is 0.092, and no BioGRID physical or genetic interactors are recorded for the target.",
+      "descriptors": {
+        "molecular_weight": 1646.87,
+        "logp": -4.1,
+        "h_bond_donors": 23,
+        "h_bond_acceptors": 21,
+        "tpsa": 642.98,
+        "rotatable_bonds": 50,
+        "lipinski_violations": 3,
+        "veber_pass": false,
+        "valid_structure": true
+      },
+      "lipinski_penalty_applied": true,
+      "lipinski_note": "Lipinski/Veber are soft developability flags, NOT a hard ADME prediction.",
+      "adverse_events": [
+        {
+          "term": "DISCOLOURED VOMIT",
+          "count": 1
+        },
+        {
+          "term": "VOMITING",
+          "count": 1
+        },
+        {
+          "term": "WEIGHT INCREASED",
+          "count": 1
+        }
+      ],
+      "prior_trial_count": 0,
+      "has_negative_repurposing_result": false,
+      "score_components": {
+        "normalized_pchembl": 0.6857,
+        "confidence_term": 0.8889,
+        "normalized_ot_association": 0.0,
+        "normalized_tanimoto": 0.0915,
+        "no_failed_trial": 1
+      },
+      "composite_score": 0.2972,
+      "unapproved_cap_applied": false,
+      "trials_query_failed": false,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P00813",
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "safety_layer1": {
+        "confirmed": false,
+        "api_error": false,
+        "layer": "chembl_structured",
+        "chembl_id": "CHEMBL441738",
+        "flag_type": null,
+        "availability_type": 1,
+        "source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL441738/",
+        "disclosure_text": "No market withdrawal or black-box warning found in ChEMBL structured data."
+      },
+      "safety_layer2": null,
+      "strong_match": false,
+      "mechanism_direction": null,
+      "mechanism_cap_applied": false,
+      "provenance": {
+        "counted_once": [
+          {
+            "source_type": "chembl_activity",
+            "source_id": "1294499"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL441738"
+          },
+          {
+            "source_type": "chembl",
+            "source_id": "CHEMBL646140"
+          }
+        ],
+        "collapsed_as_duplicate": [
+          {
+            "source_type": "pmid",
+            "source_id": "33309011"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "21963049"
+          },
+          {
+            "source_type": "pmid",
+            "source_id": "27903722"
+          }
+        ]
+      },
+      "source_chembl_ids": [
+        "CHEMBL441738",
+        "CHEMBL646140"
+      ]
+    }
+  ]
+}

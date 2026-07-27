@@ -28,6 +28,7 @@ from typing import Any, Optional
 
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
+from rdkit.Chem.SaltRemover import SaltRemover
 import anthropic
 
 from agents.target_selection import OUTPUT_DIR
@@ -41,6 +42,10 @@ from data_sources.openfda import get_label_indications
 MODEL = "claude-sonnet-4-6"
 FP_RADIUS = 2
 FP_BITS = 2048
+
+# Singleton salt remover — strips counterions/solvents so two salt forms of the
+# same active moiety produce identical desalted fingerprints.
+_SALT_REMOVER = SaltRemover()
 
 # Lazy pathway-neighbor expansion threshold.
 # Pathway-neighbor expansion is only triggered when the primary target's own
@@ -69,6 +74,28 @@ def _fingerprint(smiles: Optional[str]):
     if mol is None:
         return None
     return AllChem.GetMorganFingerprintAsBitVect(mol, FP_RADIUS, nBits=FP_BITS)
+
+
+def _desalted_fingerprint(smiles: Optional[str]):
+    """
+    Morgan fingerprint of the desalted (stripped) form of a molecule.
+    Used to detect salt/hydrate variants of the same active moiety:
+    if two compounds have desalted Tanimoto >= 0.99, they are the same
+    drug in different salt/hydrate forms and one should be excluded as a
+    Tanimoto reference for the other (to avoid trivial 0.98+ self-similarity).
+    """
+    if not smiles:
+        return None
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    try:
+        stripped = _SALT_REMOVER.StripMol(mol, dontRemoveEverything=True)
+        if stripped is None or stripped.GetNumAtoms() == 0:
+            stripped = mol  # nothing to strip; use original
+    except Exception:
+        stripped = mol
+    return AllChem.GetMorganFingerprintAsBitVect(stripped, FP_RADIUS, nBits=FP_BITS)
 
 
 def _is_approved(compound: dict[str, Any]) -> bool:
@@ -197,7 +224,15 @@ def _enrich_compounds(
         e = {**c, "smiles": smiles, "inchikey": inchikey,
              "pubchem_known_drug": pubchem_known, "atc_codes": atc,
              "target_symbol": symbol,
-             "target_discovery_method": target_discovery_method}
+             "target_discovery_method": target_discovery_method,
+             # Stamp the correct per-compound UniProt so structure_validation_node
+             # folds the right protein.  For primary-target compounds this is the
+             # primary target's UniProt; for pathway_neighbor compounds this is the
+             # NEIGHBOR's UniProt (nbr_uid), not the primary target's.
+             # Without this stamp, line 345 below falls back to the outer scope's
+             # `uniprot` (the primary target) for EVERY compound — causing Boltz
+             # to fold the wrong protein for all pathway_neighbor candidates.
+             "uniprot_id": uniprot}
         e["is_approved_drug"] = _is_approved(e)
         e["drug_name"] = name or c["molecule_chembl_id"]
         e["ot_association_score"] = ot_association_score
@@ -329,12 +364,26 @@ def run_chemist(biologist_output: dict[str, Any],
 
     # Build approved-drug reference fingerprints from the FULL pooled set —
     # so Tanimoto similarity is computed against the combined approved reference.
-    approved_fps: dict[str, tuple[dict[str, Any], Any]] = {}
+    # Each entry stores (compound_dict, raw_fp, desalted_fp) so we can exclude
+    # salt/hydrate variants of the same active moiety from the reference set.
+    approved_fps: dict[str, tuple[dict[str, Any], Any, Any]] = {}
     for e in all_enriched:
         if e["is_approved_drug"]:
             fp = _fingerprint(e["smiles"])
             if fp is not None:
-                approved_fps[e["molecule_chembl_id"]] = (e, fp)
+                dfp = _desalted_fingerprint(e["smiles"])
+                approved_fps[e["molecule_chembl_id"]] = (e, fp, dfp)
+
+    # Pre-build parent_chembl_id lookup: maps molecule_chembl_id → parent_chembl_id
+    # (or self if no parent is recorded).  Used for ChEMBL-hierarchy-based salt
+    # exclusion, which catches organic acid salts (salicylate, tartrate, citrate)
+    # that RDKit SaltRemover doesn't strip from the SMILES.
+    # Example: PHYSOSTIGMINE (CHEMBL94) and PHYSOSTIGMINE SALICYLATE (CHEMBL…)
+    # share the same parent_chembl_id so one is excluded as a reference for the other.
+    _parent: dict[str, str | None] = {
+        e["molecule_chembl_id"]: e.get("parent_chembl_id")
+        for e in all_enriched
+    }
 
     client = _anthropic_client()
     prov_entries: list[dict[str, Any]] = []
@@ -344,12 +393,41 @@ def run_chemist(biologist_output: dict[str, Any],
         e_sym = e.get("target_symbol", symbol)
         e_uid = e.get("uniprot_id", uniprot)
         cand_fp = _fingerprint(e["smiles"])
+        # Desalted fingerprint for salt-form exclusion check.
+        cand_dfp = _desalted_fingerprint(e["smiles"])
         best_drug = None
         best_score = 0.0
+        cand_id     = e["molecule_chembl_id"]
+        cand_parent = _parent.get(cand_id)
         if cand_fp is not None:
-            for mid, (ref, ref_fp) in approved_fps.items():
-                if mid == e["molecule_chembl_id"]:
+            for mid, (ref, ref_fp, ref_dfp) in approved_fps.items():
+                if mid == cand_id:
                     continue
+
+                # ── Salt / hydrate exclusion (two complementary checks) ──────
+                # 1. ChEMBL parent-hierarchy check (covers organic acid salts:
+                #    salicylate, tartrate, citrate, maleate, etc.).
+                #    If both molecules share the same ChEMBL parent_chembl_id,
+                #    they are registered salt/hydrate forms of the same active
+                #    moiety and one should not serve as a Tanimoto reference for
+                #    the other.
+                #    Example: PHYSOSTIGMINE (CHEMBL94) vs PHYSOSTIGMINE
+                #    SALICYLATE share the same parent → excluded.
+                ref_parent = _parent.get(mid)
+                if (cand_parent and ref_parent
+                        and cand_parent == ref_parent):
+                    continue  # same active moiety (ChEMBL hierarchy)
+
+                # 2. RDKit desalted-fingerprint check (catches simple inorganic
+                #    salts HCl, NaBr, etc. even when ChEMBL parent is missing).
+                #    Example: VERAPAMIL HYDROCHLORIDE vs VERAPAMIL free base
+                #    → desalted Tanimoto 1.0 → excluded.
+                if cand_dfp is not None and ref_dfp is not None:
+                    desalted_sim = DataStructs.TanimotoSimilarity(cand_dfp, ref_dfp)
+                    if desalted_sim >= 0.99:
+                        continue  # same active moiety (desalted fingerprint)
+                # ── End salt exclusion ─────────────────────────────────────────
+
                 s = DataStructs.TanimotoSimilarity(cand_fp, ref_fp)
                 if s > best_score:
                     best_score = s
