@@ -1,0 +1,47 @@
+This is genuinely solid engineering — the dual-layer desalting (ChEMBL parent hierarchy plus RDKit's actual SaltRemover, not a hand-rolled string match), the interspecies exclusion at the BioGRID query level, expanding the dead top-1-only loop to top-3 — all real, well-targeted fixes, not patches. But there's one gap in this report big enough that I don't think anything here should be trusted yet, and it's the most important thing in the whole session.
+
+**The actual Verapamil/ABCB11 case — the one that started this entire investigation — was never shown re-run.** Everything in this report proves the fixes don't *break* a known-good case (sildenafil still scores 0.7402, still COMPATIBLE). Nothing in it proves the fixes now *correctly catch* a known-bad one. That's the more important direction to verify, since it's the entire point of the check existing. Physostigmine is explicitly labeled unconfirmed — "should now produce," not "produced." Verapamil isn't mentioned as re-run at all. Right now you have good evidence the mechanism-direction gate still passes clean cases; you have zero fresh evidence it still catches a real mismatch. That's the gap that actually matters, and it needs closing before anything else here counts as done.
+
+There's also a real, direct question hanging: **was the live Verapamil case actually rejected in the app, as I recommended two messages ago, or is it still sitting in awaiting_review right now, unresolved, while this fix work happened around it?**
+
+```
+1. Confirm directly: is the Verapamil/ABCB11/BRIC2 case still sitting
+   in the app? If it was never rejected, reject it now with a note
+   referencing the mechanism-direction failure.
+
+2. Re-run BOTH Verapamil/ABCB11 and Physostigmine/BCHE through the fully
+   corrected pipeline (all 6 fixes active) and report the actual verdict
+   for each -- not a prediction. This is the single most important piece
+   of evidence missing from this session. If either still fails to
+   return DIRECTIONALLY_INCOMPATIBLE, the fix is not done, regardless of
+   what the retrospective validation showed on unrelated known-good cases.
+
+3. Report the full, actual contents of _DILI_SAFETY_SCREEN_TARGETS. Is
+   this list just BSEP/ABCB11 (the one target this session happened to
+   find), or does it draw on a real, established safety-pharmacology
+   reference (e.g. known hERG/cardiac-risk targets, P-gp/ABCB1, CYP450
+   panel members, or a published DILI-screening target list)? If it's
+   currently a list of one, that's the same "patch only the instance we
+   found by accident" pattern this project has hit multiple times before
+   -- broaden it deliberately now, before it recurs on a different target
+   nobody's tested yet.
+
+4. New finding worth checking: the sildenafil re-run's top-3 mechanism-
+   direction candidates included both VARDENAFIL and VARDENAFIL HCl as
+   separate entries. Does the salt-form deduplication fix (Bug 4) apply
+   only to the Tanimoto reference-set search, or does it also apply to
+   general candidate-pool composition and Top-K selection? If salt-form
+   duplicates are still occupying separate slots elsewhere in the
+   pipeline, that's a related but distinct instance of the same bug
+   class, wasting review slots on what's chemically one compound.
+
+5. Elevate the "re-check existing archived STRONG_MATCH reports
+   generated before these fixes" item from a backlog task to a required
+   action before outreach. Verapamil proves this exact failure mode
+   already happened once, live, undetected, until manual review caught
+   it. Any other pre-fix STRONG_MATCH report could be carrying the same
+   undetected flaw right now -- this needs a real sweep, not a someday
+   follow-up.
+```
+
+Get items 1 and 2 back with real evidence, and this session is genuinely closed. Until then, I'd treat every fix in this report as "implemented, not yet proven" — same standard as everything else in this project.
