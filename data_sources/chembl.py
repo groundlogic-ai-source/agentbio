@@ -265,10 +265,19 @@ def _fetch_molecule_meta(molecule_ids: list[str]) -> dict[str, dict[str, Any]]:
             if not mid:
                 continue
             struct = m.get("molecule_structures") or {}
+            # molecule_hierarchy.parent_chembl_id groups salt forms / hydrates
+            # under a single canonical parent so Tanimoto reference exclusion
+            # can detect same-moiety variants that differ only in counterion
+            # (e.g. physostigmine vs physostigmine salicylate, verapamil vs
+            # verapamil hydrochloride).  Stored raw; exclusion logic is in
+            # agents/chemist.py.
+            hier = m.get("molecule_hierarchy") or {}
+            parent_id = hier.get("parent_chembl_id")
             meta[mid] = {
                 "max_phase": m.get("max_phase"),
                 "pref_name": m.get("pref_name"),
                 "canonical_smiles": struct.get("canonical_smiles"),
+                "parent_chembl_id": parent_id,
             }
     return meta
 
@@ -531,19 +540,53 @@ def get_drug_indications(molecule_chembl_id: str, limit: int = 30) -> list[str]:
 def _find_molecule_chembl_id(drug_name: str) -> str | None:
     """
     Look up a ChEMBL molecule ID for a drug by preferred name.
-    Tries pref_name exact match first, then synonym match.
+    Tries pref_name exact match first (guaranteed 1:1 in ChEMBL), then synonym
+    match with best-not-first selection: among all synonym-matched molecules,
+    prefers the one whose pref_name most closely matches the query drug name
+    (exact match first, then highest string-overlap ratio) rather than blindly
+    returning mols[0] which may be an unrelated compound that shares a synonym.
+
     Returns the exact mol ID matched — do NOT resolve to parent, because
     ChEMBL stores mechanism-of-action records on the specific form
     (often the salt, e.g. CHEMBL1737 = sildenafil citrate) rather than
     on the free-base parent (CHEMBL192).
     Returns None if not found.
     """
-    for param_key in ("pref_name__iexact", "molecule_synonyms__synonym_value__iexact"):
-        data = _get_json(f"{BASE_URL}/molecule.json", {param_key: drug_name, "limit": 5})
-        mols = data.get("molecules", [])
-        if mols:
-            return mols[0].get("molecule_chembl_id")
-    return None
+    # Path 1: pref_name exact match — 1:1 in ChEMBL; if found, always correct.
+    data = _get_json(f"{BASE_URL}/molecule.json",
+                     {"pref_name__iexact": drug_name, "limit": 5})
+    mols = data.get("molecules", [])
+    if mols:
+        return mols[0].get("molecule_chembl_id")
+
+    # Path 2: synonym match — may return multiple molecules that share this
+    # synonym (e.g. salt forms, polymorphs). Pick best-not-first:
+    #   (a) exact pref_name match (case-insensitive)
+    #   (b) highest character overlap ratio between pref_name and query
+    data = _get_json(f"{BASE_URL}/molecule.json",
+                     {"molecule_synonyms__synonym_value__iexact": drug_name, "limit": 20})
+    mols = data.get("molecules", [])
+    if not mols:
+        return None
+
+    query_lower = drug_name.lower()
+
+    # (a) Exact pref_name match.
+    for mol in mols:
+        pref = (mol.get("pref_name") or "").lower()
+        if pref == query_lower:
+            return mol.get("molecule_chembl_id")
+
+    # (b) Best partial match by longest-common-subsequence ratio (simple overlap).
+    def _overlap(mol: dict) -> float:
+        pref = (mol.get("pref_name") or "").lower()
+        if not pref:
+            return 0.0
+        common = sum(1 for c in query_lower if c in pref)
+        return common / max(len(query_lower), len(pref))
+
+    best = max(mols, key=_overlap)
+    return best.get("molecule_chembl_id")
 
 
 def _fetch_molecule_safety(molecule_chembl_id: str) -> dict[str, Any]:
