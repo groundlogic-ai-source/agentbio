@@ -34,11 +34,11 @@ from data_sources.mechanism_direction import check_mechanism_direction
 
 # ---- Auditable scoring constants (edit here to adjust the policy) -------------
 COMPOSITE_WEIGHTS: dict[str, float] = {
-    "pchembl": 0.30,          # normalized(pchembl_value)
+    "pchembl": 0.30,          # _norm_pchembl(pchembl_value) — fixed range [3.0, 10.0]
     "confidence": 0.20,       # confidence_score / 9
-    "ot_association": 0.20,   # normalized(open_targets_association_score)
-    "tanimoto": 0.15,         # normalized(tanimoto_score)
-    "no_failed_trial": 0.15,  # 1 if no prior failed trial else 0
+    "ot_association": 0.20,   # ot_association_score direct [0, 1] — no pool normalization
+    "tanimoto": 0.15,         # tanimoto_score direct [0, 1] — no pool normalization
+    "no_failed_trial": 0.15,  # 1 if no prior failed trial and query succeeded; 0 otherwise
 }
 LIPINSKI_PENALTY = 0.25       # flat, soft — subtracted if Lipinski violations > 1
 STRONG_MATCH_THRESHOLD = 0.70
@@ -78,14 +78,29 @@ MAX_SAFETY_LAYER2_CANDIDATES = 3
 # -----------------------------------------------------------------------------
 
 
-def _normalize(value: Optional[float], vmin: float, vmax: float) -> float:
-    """Min-max normalize across the candidate set. If all values are equal,
-    map a positive value to 1.0 and a non-positive/None value to 0.0."""
+# Fixed reference ranges for score normalization.
+# Using absolute ranges instead of per-run pool min-max so that a composite
+# score means the same thing across different disease cases.
+#
+# pChEMBL (= -log10 IC50 in mol/L):
+#   3.0 → IC50 of 1 mM  (barely detectable, noise floor)
+#   10.0 → IC50 of 100 pM (ultra-potent)
+#   Values outside this range are clamped to [0, 1].
+PCHEMBL_NORM_MIN = 3.0
+PCHEMBL_NORM_MAX = 10.0
+
+# Tanimoto similarity (Morgan fingerprint vs approved drugs): already bounded
+# [0, 1] by definition — used directly, never pool-normalized.
+
+# Open Targets association score: already bounded [0, 1] by OT's own
+# aggregation — used directly, never pool-normalized.
+
+
+def _norm_pchembl(value: Optional[float]) -> float:
+    """Normalize pChEMBL to [0, 1] using fixed pharmacology reference range."""
     if value is None:
         return 0.0
-    if vmax == vmin:
-        return 1.0 if value > 0 else 0.0
-    return (value - vmin) / (vmax - vmin)
+    return max(0.0, min(1.0, (value - PCHEMBL_NORM_MIN) / (PCHEMBL_NORM_MAX - PCHEMBL_NORM_MIN)))
 
 
 def _descriptors(smiles: Optional[str]) -> dict[str, Any]:
@@ -130,13 +145,12 @@ def run_reviewer(chemist_output: dict[str, Any],
     if biologist_output:
         target_pmids = [h["pmid"] for h in biologist_output.get("literature_hits", [])]
 
-    # Normalization ranges across the candidate set.
-    pchembls = [c["pchembl_value"] for c in candidates if c.get("pchembl_value") is not None]
-    tanimotos = [c.get("tanimoto_score", 0.0) for c in candidates]
-    ot_scores = [c.get("ot_association_score", 0.0) for c in candidates]
-    p_min, p_max = (min(pchembls), max(pchembls)) if pchembls else (0.0, 0.0)
-    t_min, t_max = (min(tanimotos), max(tanimotos)) if tanimotos else (0.0, 0.0)
-    o_min, o_max = (min(ot_scores), max(ot_scores)) if ot_scores else (0.0, 0.0)
+    # Normalization:
+    #   pChEMBL  → fixed range [3.0, 10.0] (pharmacological reference, run-independent)
+    #   Tanimoto → already 0-1 by definition, used directly
+    #   OT score → already 0-1 by OT's aggregation, used directly
+    # No per-run pool min-max: a composite score now means the same thing
+    # across different disease cases.
 
     counted_sources: set[tuple[str, str]] = set()  # for cross-candidate dedup
     prov_entries: list[dict[str, Any]] = []
@@ -146,11 +160,20 @@ def run_reviewer(chemist_output: dict[str, Any],
         desc = _descriptors(c.get("smiles"))
         adverse = get_adverse_events(c["drug_name"])
         trials = check_prior_trials(c["drug_name"], disease)
-        no_failed_trial = not trials.get("has_negative_repurposing_result", False)
+        # Fail-closed: if the ClinicalTrials API was unreachable, do NOT award
+        # the no-failed-trial credit — we cannot verify the claim.
+        if trials.get("query_failed"):
+            no_failed_trial = False
+            print(f"[reviewer] ClinicalTrials query failed for {c['drug_name']} / {disease} "
+                  f"— withholding no_failed_trial credit (fail-closed)")
+        else:
+            no_failed_trial = not trials.get("has_negative_repurposing_result", False)
 
-        n_pchembl = _normalize(c.get("pchembl_value"), p_min, p_max)
-        n_tanimoto = _normalize(c.get("tanimoto_score", 0.0), t_min, t_max)
-        n_ot = _normalize(c.get("ot_association_score", 0.0), o_min, o_max)
+        n_pchembl = _norm_pchembl(c.get("pchembl_value"))
+        # Tanimoto is inherently [0, 1]; use directly without pool normalization.
+        n_tanimoto = float(c.get("tanimoto_score") or 0.0)
+        # OT association score is inherently [0, 1]; use directly.
+        n_ot = float(c.get("ot_association_score") or 0.0)
         conf = c.get("confidence_score") or 0
 
         composite = (
@@ -238,6 +261,9 @@ def run_reviewer(chemist_output: dict[str, Any],
             },
             "composite_score": composite,
             "unapproved_cap_applied": unapproved_cap_applied,
+            # Record whether the trials query itself failed (distinct from "found
+            # no trials").  When True, no_failed_trial credit was withheld (fail-closed).
+            "trials_query_failed": bool(trials.get("query_failed")),
             # DISCLOSURE flag only — passed straight through from the Chemist,
             # never used in the composite. Tells the reviewer the drug's approved
             # indication names a specific mutation (see mutation_disclosure.py).
@@ -248,6 +274,11 @@ def run_reviewer(chemist_output: dict[str, Any],
             # HOW each primary target was surfaced. Without this the field drops here
             # and shows as None in every downstream artifact.
             "target_discovery_method": c.get("target_discovery_method"),
+            # Carry the candidate's UniProt accession through to structure_validation_node
+            # so Boltz always folds the correct protein.  Without this field, the node
+            # falls back to the PRIMARY target's UniProt for ALL pathway_neighbor
+            # candidates — silently folding the wrong protein for every pathway hit.
+            "uniprot_id": c.get("uniprot_id"),
             # status_badge, safety_cap_applied, safety_layer1, safety_layer2 are
             # all set in the post-sort safety-disclosure pass below, after both
             # layers have been evaluated.  Placeholders here:
@@ -270,31 +301,67 @@ def run_reviewer(chemist_output: dict[str, Any],
     provenance.log_many(prov_entries)
     reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
 
-    # ── Mechanism-direction check (top-1 only, same scope as Boltz) ───────────
-    # Runs AFTER initial composite-score sort so the top candidate is stable.
+    # ── Mechanism-direction check (top-MAX_MECHANISM_DIRECTION_CANDIDATES) ──────
+    # Runs AFTER initial composite-score sort so the top candidates are stable.
     # Only DIRECTIONALLY_INCOMPATIBLE triggers a cap; COMPATIBLE and
     # INSUFFICIENT_INFO leave the score unchanged (fail-open, same philosophy
     # as safety Layer 2's NO/UNCLEAR outcomes).
-    if reviewed:
-        top = reviewed[0]
-        _target_sym = top.get("target_symbol") or ""
-        _at_info    = get_drug_action_type(top["drug_name"], _target_sym)
+    #
+    # Checks the top-K candidates (not just top-1) because a DILI-screening
+    # assay artifact or salt-form-inflated score may place the real dangerous
+    # candidate at position #2 or #3.
+    _mdc_candidates  = reviewed[:MAX_MECHANISM_DIRECTION_CANDIDATES]
+    _mdc_needs_resort = False
+    for _top in _mdc_candidates:
+        _target_sym = _top.get("target_symbol") or ""
+        _at_info    = get_drug_action_type(_top["drug_name"], _target_sym)
         _action_t   = _at_info.get("action_type")
         _moa        = _at_info.get("mechanism_of_action")
-        _direction  = check_mechanism_direction(
-            top["drug_name"], _target_sym, _action_t, _moa, disease
+
+        # Detect when the mechanism record is for a DIFFERENT protein than the
+        # candidate target being evaluated.  get_drug_action_type returns
+        # source="any_mechanism" when it could not find a mechanism record that
+        # mentions target_symbol — meaning the returned action_type reflects the
+        # drug's PRIMARY pharmacology (e.g. verapamil → "BLOCKER / Voltage-gated
+        # L-type calcium channel blocker" for CACNA1C, not ABCB11/BSEP).
+        # In that case, passing the wrong action_type to the direction check
+        # causes the LLM to reason about calcium channels instead of BSEP, and
+        # may produce INSUFFICIENT_INFO instead of the correct INCOMPATIBLE verdict.
+        # Fix: override with an IC50/Ki-inferred inhibitory label so the LLM
+        # reasons about the actual target-specific interaction.
+        if _at_info.get("source") == "any_mechanism" and _action_t:
+            _action_t = (
+                f"INHIBITOR (inferred from IC50/Ki bioactivity assay data; "
+                f"ChEMBL primary registered mechanism is '{_action_t} / {_moa}' "
+                f"which is for a DIFFERENT protein target — do NOT use this as "
+                f"the drug's action on {_target_sym}; instead reason from the "
+                f"fact that this drug has IC50/Ki binding activity against "
+                f"{_target_sym} in ChEMBL assays, which implies inhibitory interaction)"
+            )
+        elif _at_info.get("source") == "not_found":
+            _action_t = (
+                f"INHIBITOR (inferred: no ChEMBL mechanism record found; "
+                f"drug has IC50/Ki binding activity against {_target_sym})"
+            )
+
+        _direction = check_mechanism_direction(
+            _top["drug_name"], _target_sym, _action_t, _moa, disease
         )
-        top["mechanism_direction"] = _direction
+        _top["mechanism_direction"] = _direction
         if _direction.get("incompatible"):
-            top["composite_score"]      = min(top["composite_score"], MECHANISM_DIRECTION_CAP)
-            top["mechanism_cap_applied"] = True
-            top["strong_match"]          = top["composite_score"] >= STRONG_MATCH_THRESHOLD
-            reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+            _top["composite_score"]       = min(_top["composite_score"], MECHANISM_DIRECTION_CAP)
+            _top["mechanism_cap_applied"] = True
+            _top["strong_match"]          = _top["composite_score"] >= STRONG_MATCH_THRESHOLD
+            _mdc_needs_resort = True
         print(
-            f"[reviewer] mechanism-direction: {top['drug_name']} / {disease} "
+            f"[reviewer] mechanism-direction: {_top['drug_name']} / {disease} "
             f"→ {_direction.get('verdict')} "
-            f"(action_type={_action_t!r}, cap={'YES' if _direction.get('incompatible') else 'no'})"
+            f"(action_src={_at_info.get('source')!r}, "
+            f"cap={'YES' if _direction.get('incompatible') else 'no'})"
         )
+
+    if _mdc_needs_resort:
+        reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
     # ── End mechanism-direction pass ──────────────────────────────────────────
 
     # ── Safety-disclosure pass (Layer 1 + Layer 2) ────────────────────────────
@@ -392,7 +459,14 @@ def main() -> None:
             "composite_weights": COMPOSITE_WEIGHTS,
             "lipinski_penalty": LIPINSKI_PENALTY,
             "strong_match_threshold": STRONG_MATCH_THRESHOLD,
-            "normalization": "min-max across the candidate set (equal values -> 1.0 if >0)",
+            "normalization": (
+                f"pChEMBL: fixed range [{PCHEMBL_NORM_MIN}, {PCHEMBL_NORM_MAX}] "
+                "(pharmacological reference — run-independent); "
+                "Tanimoto: direct [0, 1] — no normalization applied; "
+                "OT association: direct [0, 1] — no normalization applied"
+            ),
+            "pchembl_norm_min": PCHEMBL_NORM_MIN,
+            "pchembl_norm_max": PCHEMBL_NORM_MAX,
         },
         "n_candidates": len(reviewed),
         "n_strong_matches": sum(1 for r in reviewed if r["strong_match"]),

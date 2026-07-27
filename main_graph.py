@@ -50,7 +50,10 @@ from agents.reviewer import (
     COMPOSITE_WEIGHTS,
     LIPINSKI_PENALTY,
     STRONG_MATCH_THRESHOLD,
+    PCHEMBL_NORM_MIN,
+    PCHEMBL_NORM_MAX,
 )
+from agents.schemas import validate_chemist_handoff, validate_reviewer_handoff
 from agents import provenance
 from data_sources.afdb import get_structure_confidence
 from data_sources.uniprot import get_protein_sequence
@@ -412,6 +415,9 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
 
     if k == 1:
         out = run_chemist(bio_outputs[0], repurposing_only=repurposing_only)
+        # Runtime schema validation: catch field-dropout bugs at the boundary
+        # rather than discovering them in a downstream report.
+        validate_chemist_handoff(out.get("candidates", []))
         _write_json("chemist_output.json", out)
         print(f"[graph] chemist: {len(out['candidates'])} candidates ranked")
         return {"chemist_output": out}
@@ -497,6 +503,8 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
             "tagged target_discovery_method='pathway_neighbor'."
         ),
     }
+    # Runtime schema validation across the pooled K-target candidate list.
+    validate_chemist_handoff(all_candidates)
     _write_json("chemist_output.json", pooled_out)
     print(f"[graph] chemist: pooled {len(all_candidates)} total candidate(s) "
           f"from {k} target(s)")
@@ -510,12 +518,21 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
         print("[graph] reviewer: reusing existing reviewed_candidates.json")
         return {"reviewed": existing}
     reviewed = run_reviewer(state["chemist_output"], state.get("biologist_output"))
+    # Runtime schema validation at the reviewer→writer handoff.
+    validate_reviewer_handoff(reviewed)
     payload = {
         "formula": {
             "composite_weights": COMPOSITE_WEIGHTS,
             "lipinski_penalty": LIPINSKI_PENALTY,
             "strong_match_threshold": STRONG_MATCH_THRESHOLD,
-            "normalization": "min-max across the candidate set (equal values -> 1.0 if >0)",
+            "normalization": (
+                f"pChEMBL: fixed range [{PCHEMBL_NORM_MIN}, {PCHEMBL_NORM_MAX}] "
+                "(pharmacological reference — run-independent); "
+                "Tanimoto: direct [0, 1] — no normalization applied; "
+                "OT association: direct [0, 1] — no normalization applied"
+            ),
+            "pchembl_norm_min": PCHEMBL_NORM_MIN,
+            "pchembl_norm_max": PCHEMBL_NORM_MAX,
         },
         "n_candidates": len(reviewed),
         "n_strong_matches": sum(1 for r in reviewed if r["strong_match"]),

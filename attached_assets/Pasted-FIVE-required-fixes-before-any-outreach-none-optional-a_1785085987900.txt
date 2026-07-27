@@ -1,0 +1,48 @@
+FIVE required fixes before any outreach, none optional, all needing real
+live re-verification, not code-review confidence.
+
+1. Filter OBSOLETE and NON RARE IN EUROPE entries from
+   _build_candidate_universe(). Purge the three confirmed-contaminated
+   entries from top_candidates.json. Re-run a batch and confirm zero
+   OBSOLETE/NON-RARE entries appear in any new case.
+
+2. Make the "Group of disorders" umbrella guard fail CLOSED: if
+   _disorder_group_maps() returns empty or errors, block scoring for
+   that disease entirely rather than passing it through. Then do a
+   full codebase sweep for every other place a safety-relevant check
+   silently defaults to "allow" on missing/failed data (this is now a
+   confirmed repeat pattern, not a one-off) and report every instance
+   found, fixed to fail closed.
+
+3. Renew the BioGRID key. Separately, and more importantly: audit every
+   external data source wrapper (BioGRID, PubChem, ClinicalTrials,
+   ChEMBL, Open Targets, Reactome) and ensure each one distinguishes
+   "queried successfully, found nothing" from "query failed" as visibly
+   different states in the report -- never silently converge them into
+   the same blank/null display.
+
+4. Add uniprot_id to reviewer.py's reviewed.append() output. Then, since
+   this is the third confirmed field-dropout bug across stage handoffs,
+   define an explicit schema (TypedDict or dataclass) for every object
+   passed between stages, with a runtime validation check after each
+   handoff confirming all required fields are present and non-null --
+   convert this from "found by accident, three times" to "caught
+   automatically, always."
+
+5. Fix score normalization: Tanimoto similarity must be used directly
+   (already bounded 0-1), never pool-relative min-max normalized.
+   Evaluate whether pChEMBL affinity and OT association score should
+   also move to fixed, predetermined reference ranges rather than
+   per-run relative normalization, so a composite score means the same
+   thing across different disease cases. Also add the mechanism-
+   direction cap's disclosure to the report exactly as the unapproved-
+   compound cap already is (Finding G) -- no cap may ever silently
+   reduce a score without a visible, narrated reason.
+6. Proactively apply the same "collect-all-candidates, pick best-not-
+   first" defensive logic already built for EFO resolution to drug-name
+   resolution's synonym-fallback path, given it shares the identical
+   structural risk shape, even though no live failure has occurred yet.
+
+Re-run a real batch of new cases after all fixes and report live evidence
+for each, the same standard already established: no case is considered
+fixed until watched working, not just read as correct in the diff.
