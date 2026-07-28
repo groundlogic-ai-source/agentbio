@@ -326,24 +326,28 @@ def run_reviewer(chemist_output: dict[str, Any],
     reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
 
     # ── DILI-target whole-pool pre-cap pass ───────────────────────────────────
-    # For ABCB11/BSEP and KCNH2/hERG — the two pharmaceutical safety-profiling
-    # targets where ANY inhibition is a hepatotoxicity / QT-prolongation liability
-    # rather than a therapeutic action — ALL candidates whose ChEMBL mechanism is
-    # for a DIFFERENT protein (source="any_mechanism") are pre-capped without an
-    # LLM call.  This handles the structural problem where the ENTIRE approved-drug
-    # pool for these targets comes from BSEP/hERG safety screens (e.g. BRIC2 with
-    # 199 compounds), and the direction-check N-at-a-time window cannot cover all of
-    # them.  The shortcut is safe because:
-    #   • ABCB11/BSEP inhibition CAUSES cholestatic liver injury — it can never treat
-    #     a disease caused by deficient BSEP function.
-    #   • KCNH2/hERG blockade CAUSES long-QT arrhythmia — no approved cardiac drug
-    #     works by hERG blockade therapeutically.
-    # Drugs that genuinely target ABCB11 or KCNH2 (none exist in the current approved
-    # pool) would have source="target_specific" or similar and are passed through.
-    _AUTO_INCOMPATIBLE_TARGETS: frozenset[str] = frozenset({
-        "ABCB11", "BSEP",   # bile salt export pump — BSEP inhibition = cholestasis
-        "KCNH2", "HERG",    # hERG K⁺ channel — blockade = QT prolongation / torsades
-    })
+    # For every target in the ICH S7A/S7B pharmaceutical safety-profiling panel,
+    # ALL candidates whose ChEMBL mechanism is for a DIFFERENT protein
+    # (source="any_mechanism") are pre-capped without an LLM call.  This handles
+    # the structural problem where the ENTIRE approved-drug pool for these targets
+    # may come from safety screens, and the direction-check N-at-a-time window
+    # cannot cover all of them.
+    #
+    # ICH S7A/S7B panel — inhibition is a toxicity signal, not a therapeutic
+    # action, when the ChEMBL record carries source=any_mechanism:
+    #   • ABCB11/BSEP  — inhibition → cholestatic liver injury (DILI)
+    #   • KCNH2/hERG   — blockade   → QT prolongation / torsades de pointes
+    #   • SCN5A        — blockade   → Brugada-pattern / cardiac arrest
+    #   • ABCB1/MDR1   — inhibition → multidrug-efflux DDI screening artifact
+    #   • ABCC2/MRP2   — inhibition → bile-acid/drug-exporter DILI artifact
+    #   • CYP3A4, CYP2D6, CYP2C9, CYP2C19, CYP1A2
+    #                  — inhibition → DDI / hepatotoxicity liability artifact
+    #
+    # Drugs that GENUINELY target any of these proteins carry
+    # source="target_specific" or similar and are passed through unchanged.
+    # We re-use the canonical set from mechanism_direction.py so both panels
+    # stay in sync automatically.
+    from data_sources.mechanism_direction import _DILI_SAFETY_SCREEN_TARGETS as _AUTO_INCOMPATIBLE_TARGETS
     _pre_cap_resort = False
     for _cand in reviewed:
         _ts = (_cand.get("target_symbol") or "").upper()
@@ -562,8 +566,15 @@ def run_reviewer(chemist_output: dict[str, Any],
         #   (b) Redundancy path: Layer 1 had an API error and cannot be trusted —
         #       Layer 2 always runs in this case regardless of the budget cap,
         #       so an L1 outage can never silently skip safety screening.
+        #   (c) Black-box advisory path: Layer 1 found a boxed warning but did NOT
+        #       confirm a market withdrawal (confirmed=False, black_box_advisory=True).
+        #       A boxed warning can precede regulatory action; Layer 2 independently
+        #       checks whether a post-ChEMBL withdrawal or serious alert exists that
+        #       structured data missed.  This path is budget-free: black-box drugs
+        #       are rare, so the extra web-search calls are minimal.
         l1_error = layer1.get("api_error", False)
-        layer2 = web_safety_check(drug) if (drug in top_k_names or l1_error) else None
+        l1_bbw   = layer1.get("black_box_advisory", False)
+        layer2 = web_safety_check(drug) if (drug in top_k_names or l1_error or l1_bbw) else None
         r["safety_layer2"] = layer2
 
         l1_hit = layer1.get("confirmed", False)
