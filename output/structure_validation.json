@@ -1,28 +1,46 @@
 {
-  "DEOXYCHOLIC ACID": {
+  "DEXAMETHASONE": {
     "afdb": {
       "has_structure": true,
-      "mean_plddt": 82.69,
-      "model_url": "https://alphafold.ebi.ac.uk/files/AF-Q12908-F1-model_v6.pdb"
+      "mean_plddt": 59.59,
+      "model_url": "https://alphafold.ebi.ac.uk/files/AF-P04150-F1-model_v6.pdb"
     },
     "complex": {
-      "available": false,
-      "structure_confidence": null,
-      "binding_pose_confidence": null,
-      "predicted_affinity": null,
-      "pdb_or_cif_url": null,
+      "available": true,
+      "structure_confidence": 0.6060273051261902,
+      "binding_pose_confidence": 0.9296284914016724,
+      "predicted_affinity": 0.5711476802825928,
+      "pdb_or_cif_url": "https://boltz-platform-prod-compute-api-storage.s3.us-east-1.amazonaws.com/org/311afb47-841a-494f-ab03-1ea7fa58b70a/workspace/ws_ai6T67fapbF5DEbF8qVZ/prediction/sab_pred_8ZKELnuatCiO9CoKmx9z/output/public/sample_0_predicted_structure.cif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=REDACTED&X-Amz-Date=20260728T162316Z&X-Amz-Expires=1800&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED&X-Amz-SignedHeaders=host&x-id=GetObject",
       "estimated_cost_usd": 0.025,
-      "raw_metrics": {},
+      "raw_metrics": {
+        "structure_metrics": {
+          "complex_ipde": 0.6391627788543701,
+          "complex_iplddt": 0.7160173654556274,
+          "complex_pde": 4.009346961975098,
+          "complex_plddt": 0.5092855095863342,
+          "iptm": 0.9929946660995483,
+          "ligand_iptm": 0.9929946660995483,
+          "protein_iptm": 0.0,
+          "ptm": 0.4724065661430359,
+          "structure_confidence": 0.6060273051261902
+        },
+        "binding_metrics": {
+          "binding_confidence": 0.9296284914016724,
+          "optimization_score": 0.5711476802825928,
+          "type": "ligand_protein_binding_metrics"
+        }
+      },
       "model": "boltz-2.1",
-      "error": "Error code: 402 - {'code': 'payment_required', 'message': 'All credits depleted. Purchase prepaid credits or enable on-demand billing to continue running jobs.'}"
+      "error": null,
+      "local_cif_filename": "6a2dfaf15c681f67a6d65356332cd562.cif"
     },
     "adme": {
-      "available": false,
-      "lipophilicity": null,
-      "permeability": null,
-      "solubility": null,
+      "available": true,
+      "lipophilicity": 1.2670010328292847,
+      "permeability": 0.6710224151611328,
+      "solubility": "high-confidence",
       "model": "adme-v1",
-      "error": "Error code: 402 - {'code': 'payment_required', 'message': 'All credits depleted. Purchase prepaid credits or enable on-demand billing to continue running jobs.'}"
+      "error": null
     }
   }
 }
