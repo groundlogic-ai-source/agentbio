@@ -50,3 +50,7 @@ Thumbs.db
 
 # Stage 4 runtime job tracking DB (local state)
 jobs.db
+
+# Runtime state — never commit
+cache/cache.db
+output/provenance_log.json
