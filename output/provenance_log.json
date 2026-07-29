@@ -19553,6 +19553,816 @@
       "source_id": "HALLUCINATION",
       "used_by": "reviewer",
       "context": "RIVASTIGMINE adverse event"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "666521",
+      "used_by": "biologist",
+      "context": "PDE3B interactor ANKRA2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "666525",
+      "used_by": "biologist",
+      "context": "PDE3B interactor YWHAQ"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1178283",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SRPRB"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1180349",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC8A3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1181762",
+      "used_by": "biologist",
+      "context": "PDE3B interactor TMEM59"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1182091",
+      "used_by": "biologist",
+      "context": "PDE3B interactor TEX264"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1185228",
+      "used_by": "biologist",
+      "context": "PDE3B interactor IL9R"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1186586",
+      "used_by": "biologist",
+      "context": "PDE3B interactor GNAI1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1187911",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC39A4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1191985",
+      "used_by": "biologist",
+      "context": "PDE3B interactor FAM189A2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1194921",
+      "used_by": "biologist",
+      "context": "PDE3B interactor EVA1C"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1196531",
+      "used_by": "biologist",
+      "context": "PDE3B interactor CHRNA9"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "1196742",
+      "used_by": "biologist",
+      "context": "PDE3B interactor LRRTM2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2232015",
+      "used_by": "biologist",
+      "context": "PDE3B interactor TEX28"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2234989",
+      "used_by": "biologist",
+      "context": "PDE3B interactor ZNRF4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2243566",
+      "used_by": "biologist",
+      "context": "PDE3B interactor LRRTM1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2251728",
+      "used_by": "biologist",
+      "context": "PDE3B interactor PCDHAC2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2255593",
+      "used_by": "biologist",
+      "context": "PDE3B interactor HLA-DRB1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2255629",
+      "used_by": "biologist",
+      "context": "PDE3B interactor IL17RC"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2258494",
+      "used_by": "biologist",
+      "context": "PDE3B interactor KCNS3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2260103",
+      "used_by": "biologist",
+      "context": "PDE3B interactor FAM189B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2261845",
+      "used_by": "biologist",
+      "context": "PDE3B interactor KCNC4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2261881",
+      "used_by": "biologist",
+      "context": "PDE3B interactor TMPRSS3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2264069",
+      "used_by": "biologist",
+      "context": "PDE3B interactor CD79B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2265929",
+      "used_by": "biologist",
+      "context": "PDE3B interactor LRRC8B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2267490",
+      "used_by": "biologist",
+      "context": "PDE3B interactor RNF170"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2271084",
+      "used_by": "biologist",
+      "context": "PDE3B interactor PDGFRB"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2397744",
+      "used_by": "biologist",
+      "context": "PDE3B interactor HNRNPL"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2465587",
+      "used_by": "biologist",
+      "context": "PDE3B interactor EGLN3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2525387",
+      "used_by": "biologist",
+      "context": "PDE3B interactor RNF123"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2564554",
+      "used_by": "biologist",
+      "context": "PDE3B interactor KIAA1429"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2655371",
+      "used_by": "biologist",
+      "context": "PDE3B interactor LMBR1L"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2658709",
+      "used_by": "biologist",
+      "context": "PDE3B interactor FAM105A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2699420",
+      "used_by": "biologist",
+      "context": "PDE3B interactor LNX1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2731860",
+      "used_by": "biologist",
+      "context": "PDE3B interactor HPGDS"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2748771",
+      "used_by": "biologist",
+      "context": "PDE3B interactor PLEKHA4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2816362",
+      "used_by": "biologist",
+      "context": "PDE3B interactor ST7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2851128",
+      "used_by": "biologist",
+      "context": "PDE3B interactor FKBP8"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2857833",
+      "used_by": "biologist",
+      "context": "PDE3B interactor PTPN1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2876817",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SEC61B"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2938762",
+      "used_by": "biologist",
+      "context": "PDE3B interactor DNAJC16"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2939038",
+      "used_by": "biologist",
+      "context": "PDE3B interactor DNAJC1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2939200",
+      "used_by": "biologist",
+      "context": "PDE3B interactor DNAJC25"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2940816",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SEC63"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2954213",
+      "used_by": "biologist",
+      "context": "PDE3B interactor MARCH4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2954419",
+      "used_by": "biologist",
+      "context": "PDE3B interactor TMEM129"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2980290",
+      "used_by": "biologist",
+      "context": "PDE3B interactor ATP2A1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2980900",
+      "used_by": "biologist",
+      "context": "PDE3B interactor BCAP31"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2983322",
+      "used_by": "biologist",
+      "context": "PDE3B interactor CKAP4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2984967",
+      "used_by": "biologist",
+      "context": "PDE3B interactor CXADR"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2985133",
+      "used_by": "biologist",
+      "context": "PDE3B interactor CYP2C9"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2985840",
+      "used_by": "biologist",
+      "context": "PDE3B interactor DERL1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2986073",
+      "used_by": "biologist",
+      "context": "PDE3B interactor DHFRL1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2987526",
+      "used_by": "biologist",
+      "context": "PDE3B interactor EMD"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2989312",
+      "used_by": "biologist",
+      "context": "PDE3B interactor GJD3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2990600",
+      "used_by": "biologist",
+      "context": "PDE3B interactor HSD17B11"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2990898",
+      "used_by": "biologist",
+      "context": "PDE3B interactor HSD3B7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2994412",
+      "used_by": "biologist",
+      "context": "PDE3B interactor LMAN1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2994941",
+      "used_by": "biologist",
+      "context": "PDE3B interactor KIAA1715"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2995240",
+      "used_by": "biologist",
+      "context": "PDE3B interactor LRRC59"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2996532",
+      "used_by": "biologist",
+      "context": "PDE3B interactor METTL7A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2997483",
+      "used_by": "biologist",
+      "context": "PDE3B interactor NUP155"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "2998251",
+      "used_by": "biologist",
+      "context": "PDE3B interactor PANX1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3000572",
+      "used_by": "biologist",
+      "context": "PDE3B interactor PXMP2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3001826",
+      "used_by": "biologist",
+      "context": "PDE3B interactor RAB35"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3003471",
+      "used_by": "biologist",
+      "context": "PDE3B interactor RAB9A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3003872",
+      "used_by": "biologist",
+      "context": "PDE3B interactor REEP5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3004891",
+      "used_by": "biologist",
+      "context": "PDE3B interactor RPN1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3005183",
+      "used_by": "biologist",
+      "context": "PDE3B interactor RPN2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3006462",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SEC62"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3007177",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SSR1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3007461",
+      "used_by": "biologist",
+      "context": "PDE3B interactor STIM1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3008909",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SYNE3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3009636",
+      "used_by": "biologist",
+      "context": "PDE3B interactor TMPO"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3028822",
+      "used_by": "biologist",
+      "context": "PDE3B interactor GRIN2A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3031725",
+      "used_by": "biologist",
+      "context": "PDE3B interactor LGR4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3042757",
+      "used_by": "biologist",
+      "context": "PDE3B interactor KCNMB3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3046762",
+      "used_by": "biologist",
+      "context": "PDE3B interactor PDE3A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3082034",
+      "used_by": "biologist",
+      "context": "PDE3B interactor TLR9"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3090304",
+      "used_by": "biologist",
+      "context": "PDE3B interactor PCDHGC4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3090486",
+      "used_by": "biologist",
+      "context": "PDE3B interactor TCIRG1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3098137",
+      "used_by": "biologist",
+      "context": "PDE3B interactor TTYH1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3101650",
+      "used_by": "biologist",
+      "context": "PDE3B interactor ZDHHC12"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3110206",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SCAP"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3124066",
+      "used_by": "biologist",
+      "context": "PDE3B interactor EDAR"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3127859",
+      "used_by": "biologist",
+      "context": "PDE3B interactor C3ORF52"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3131714",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC30A2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3132451",
+      "used_by": "biologist",
+      "context": "PDE3B interactor LRP3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3136203",
+      "used_by": "biologist",
+      "context": "PDE3B interactor IL17RA"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3139248",
+      "used_by": "biologist",
+      "context": "PDE3B interactor KCNA2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3156360",
+      "used_by": "biologist",
+      "context": "PDE3B interactor CYP19A1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3168609",
+      "used_by": "biologist",
+      "context": "PDE3B interactor AMHR2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3177411",
+      "used_by": "biologist",
+      "context": "PDE3B interactor PIGH"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3179012",
+      "used_by": "biologist",
+      "context": "PDE3B interactor AKT3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3185214",
+      "used_by": "biologist",
+      "context": "PDE3B interactor AKT1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3192289",
+      "used_by": "biologist",
+      "context": "PDE3B interactor HLA-DRB3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3194172",
+      "used_by": "biologist",
+      "context": "PDE3B interactor CLEC14A"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3328687",
+      "used_by": "biologist",
+      "context": "PDE3B interactor RHOA"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3332768",
+      "used_by": "biologist",
+      "context": "PDE3B interactor RAC2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3334418",
+      "used_by": "biologist",
+      "context": "PDE3B interactor RHOC"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3336768",
+      "used_by": "biologist",
+      "context": "PDE3B interactor CDC42"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3337058",
+      "used_by": "biologist",
+      "context": "PDE3B interactor RHOG"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3380224",
+      "used_by": "biologist",
+      "context": "PDE3B interactor RNF43"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3472290",
+      "used_by": "biologist",
+      "context": "PDE3B interactor ZRANB1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3536147",
+      "used_by": "biologist",
+      "context": "PDE3B interactor YWHAE"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3536199",
+      "used_by": "biologist",
+      "context": "PDE3B interactor YWHAG"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3536279",
+      "used_by": "biologist",
+      "context": "PDE3B interactor YWHAH"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3536377",
+      "used_by": "biologist",
+      "context": "PDE3B interactor YWHAZ"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3589224",
+      "used_by": "biologist",
+      "context": "PDE3B interactor PDZD8"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3589228",
+      "used_by": "biologist",
+      "context": "PDE3B interactor TEX2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3744539",
+      "used_by": "biologist",
+      "context": "PDE3B interactor ATP5A1"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3769802",
+      "used_by": "biologist",
+      "context": "PDE3B interactor ALK"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3786797",
+      "used_by": "biologist",
+      "context": "PDE3B interactor NLRP6"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3806106",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC30A9"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3807376",
+      "used_by": "biologist",
+      "context": "PDE3B interactor MFSD5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3808785",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC12A3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3809851",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC16A3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3812488",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC26A8"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3812868",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC27A3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3812960",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC27A4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3813072",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC27A5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3813219",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC27A6"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3814633",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC30A5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3814971",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC30A7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3816741",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC35F3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3818318",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC39A14"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3820282",
+      "used_by": "biologist",
+      "context": "PDE3B interactor MFSD7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3820786",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC4A9"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3823031",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC9A3"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3823116",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC9A4"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3823194",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC9A5"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3823332",
+      "used_by": "biologist",
+      "context": "PDE3B interactor SLC9A7"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3851777",
+      "used_by": "biologist",
+      "context": "PDE3B interactor AGO2"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3878779",
+      "used_by": "biologist",
+      "context": "PDE3B interactor NUDT21"
+    },
+    {
+      "source_type": "biogrid_interaction",
+      "source_id": "3886215",
+      "used_by": "biologist",
+      "context": "PDE3B interactor BAG2"
     }
   ]
 }
