@@ -9,6 +9,24 @@ args = ["pnpm", "store", "prune"]
 env = { "CI" = "true" }
 
 [workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "repodb-validation"
+
+[[workflows.workflow]]
+name = "repodb-validation"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && python3 -m validation.run_repodb_cases 2>&1 | tee /tmp/repodb_val.log"
 
 [agent]
 stack = "PNPM_WORKSPACE"
