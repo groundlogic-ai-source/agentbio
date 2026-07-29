@@ -131,6 +131,26 @@ export function generateHypothesisReport(hypothesisId, { refresh = false } = {})
   );
 }
 
+// ── Candidate audit (Part A) ──────────────────────────────────────────────
+
+/**
+ * Look up where a specific drug stands in AgentBio's reviewed-candidates pool
+ * for a given disease.  Returns a structured result whose .status is one of:
+ *   "found"         — drug is in the pool; full breakdown + narration included
+ *   "absent"        — drug absent; target comparison + narration included
+ *   "no_case"       — no completed case for this disease; start one first
+ *   "no_candidates" — job exists but predates per-job persistence; re-run case
+ */
+export function auditDrug(diseaseName, drugName, jobId = null) {
+  const body = { disease_name: diseaseName, drug_name: drugName };
+  if (jobId) body.job_id = jobId;
+  return request("/api/audit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
 // ── Saved reports ──────────────────────────────────────────────────────────
 // Freeze a generated report as a permanent snapshot. Returns the stored row.
 export function saveReport(payload) {
