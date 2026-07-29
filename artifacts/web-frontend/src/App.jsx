@@ -4,6 +4,7 @@ import CaseView from "./components/CaseView.jsx";
 import NewCaseDialog from "./components/NewCaseDialog.jsx";
 import ResearchTab from "./components/ResearchTab.jsx";
 import SavedReportsTab from "./components/SavedReportsTab.jsx";
+import AuditTab from "./components/AuditTab.jsx";
 import {
   listRuns,
   getRun,
@@ -204,7 +205,7 @@ export default function App() {
     [refreshList],
   );
 
-  const isTopLevel = view === "dashboard" || view === "research" || view === "saved";
+  const isTopLevel = view === "dashboard" || view === "research" || view === "saved" || view === "audit";
 
   return (
     <div className="min-h-full">
@@ -233,6 +234,7 @@ export default function App() {
             { id: "dashboard", label: "Case Files" },
             { id: "research", label: "Research" },
             { id: "saved", label: "Saved Reports" },
+            { id: "audit", label: "Audit" },
           ].map(({ id, label }) => {
             const active = view === id;
             return (
@@ -267,6 +269,17 @@ export default function App() {
 
       {view === "saved" && (
         <SavedReportsTab />
+      )}
+
+      {view === "audit" && (
+        <AuditTab
+          onNavigate={(target, opts) => {
+            if (target === "dashboard") {
+              setView("dashboard");
+              if (opts?.prefill) setDialogOpen(true);
+            }
+          }}
+        />
       )}
 
       {view === "case" && (
