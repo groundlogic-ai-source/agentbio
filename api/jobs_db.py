@@ -178,6 +178,24 @@ def _now() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S")
 
 
+def find_completed_job_by_disease(disease_name: str) -> Optional[dict[str, Any]]:
+    """Return the most recently created completed or awaiting_review job for a
+    disease, matched case-insensitively. Returns None if no match exists."""
+    with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        cur.execute(
+            """
+            SELECT * FROM jobs
+            WHERE status IN ('completed', 'awaiting_review')
+              AND LOWER(disease_name) = LOWER(%s)
+            ORDER BY created_at DESC
+            LIMIT 1
+            """,
+            (disease_name,),
+        )
+        row = cur.fetchone()
+        return dict(row) if row else None
+
+
 def create_job(disease_name: Optional[str] = None,
                thread_id: Optional[str] = None) -> dict[str, Any]:
     """

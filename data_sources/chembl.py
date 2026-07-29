@@ -986,6 +986,43 @@ def get_drug_action_type(
     return result
 
 
+def get_drug_mechanism_targets_for_audit(
+    drug_name: str,
+    chembl_id: str | None = None,
+) -> list[str]:
+    """Return the mechanism-of-action strings this drug has in ChEMBL.
+
+    Used by the audit endpoint to explain why a drug is absent from an
+    AgentBio candidate pool (i.e. to show which proteins it actually targets,
+    versus which protein AgentBio selected for the queried disease).
+
+    Returns strings like "Phosphodiesterase 5A inhibitor", "CRBN modulator".
+    Returns empty list on lookup failure or not-found.
+    """
+    mid = chembl_id or _find_molecule_chembl_id(drug_name)
+    if not mid:
+        return []
+    try:
+        data = _get_json(f"{BASE_URL}/mechanism.json",
+                         {"molecule_chembl_id": mid, "limit": 50})
+        mechs = data.get("mechanisms", [])
+        if not mechs:
+            # Fallback: parent molecule
+            data2 = _get_json(f"{BASE_URL}/mechanism.json",
+                               {"parent_molecule_chembl_id": mid, "limit": 50})
+            mechs = data2.get("mechanisms", [])
+        seen: set[str] = set()
+        result: list[str] = []
+        for m in mechs:
+            moa = (m.get("mechanism_of_action") or "").strip()
+            if moa and moa not in seen:
+                seen.add(moa)
+                result.append(moa)
+        return result
+    except Exception:
+        return []
+
+
 def get_molecule_data(drug_name: str) -> dict[str, Any]:
     """
     Drug-level ChEMBL lookup: molecule_type, max_phase (global), oral flag.
