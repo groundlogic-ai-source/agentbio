@@ -165,7 +165,14 @@ def _history_blurb() -> str:
         note = str(r.get("outcome_note") or "").strip()
         dom = str(r.get("domain_description") or "").strip()
         passed = r.get("discovery_pass")
-        status = "passed discovery" if passed is True or str(passed) == "True" else "did not survive"
+        if passed is True or str(passed) == "True":
+            status = "passed discovery"
+        elif note.startswith("SALVAGEABLE"):
+            # SALVAGEABLE means real mechanistic justification but needs a different
+            # feature_spec — generators may re-propose this domain with a corrected spec.
+            status = "salvageable (good rationale, needs different feature_spec)"
+        else:
+            status = "did not survive"
         lines.append(f"- {dom} [{status}] {note}")
     # de-dup identical lines, keep order
     seen, out = set(), []
@@ -294,41 +301,75 @@ def lead_review(a: list[dict], b: list[dict]) -> list[dict]:
     payload = {"LLM_A_Opus": a, "LLM_B_Sol": b}
     prompt = f"""
 You are the LEAD reviewer (Claude Opus 4.8). Below are bisociative hypotheses from two
-models (A = Opus, B = Sol). Review ALL of them and produce a single consolidated list.
+models (A = Opus, B = Sol). Review ALL of them and produce a single output list.
 
-Rules:
-- Keep the one-sentence mechanistic justification for each; if it is not a real causal
-  or structural argument (just "sounds plausible"), DISCARD the hypothesis.
-- DISCARD anything trivial or redundant with features a cheminformatics repurposing
-  pipeline already uses (e.g. Tanimoto structural similarity, Open Targets association
-  score).
-- DISCARD label-confounded features (those built on prior_repurposing_count), since the
-  outcome label is defined using that count.
-- LABEL-ENTANGLEMENT STRUCTURAL CHECK (mandatory for EVERY candidate — show your
-  reasoning even for hypotheses you keep): reason explicitly about whether the proposed
-  feature's defining terms could be definitionally or structurally entangled with how
-  the outcome label itself was constructed. The core test is: "If I know this feature
-  value, does that already tell me something about whether the label was assigned — not
-  by biology, but by the logic of how the label is defined?" DISCARD anything where the
-  answer is yes. Record your one-sentence structural reasoning (not just the conclusion)
-  in needs_or_discard_reason for EVERY candidate, including ones you keep (write "not
-  entangled: [why]" for passing items). The canonical illustration is an indication-stage
-  keyword ("refractory", "relapsed", "salvage"): such indications definitionally
-  presuppose an existing approved first-line therapy, so the keyword co-varies with the
-  administrative label by construction. But this is an ILLUSTRATION, not a complete
-  list — new tautological patterns will not resemble old ones. Evaluate each feature's
-  structural relationship to label construction independently; never rely on keyword
-  pattern-matching alone.
-- ACTIVELY PROPOSE INTERACTION-EFFECT HYPOTHESES: do not restrict yourself to
-  single-variable main effects. Where two computable features plausibly interact,
-  propose a hypothesis that a base feature's effect DIFFERS across the levels of a
-  binary moderator (e.g. "the effect of an indication keyword on repurposing success
-  is stronger among established products than non-established products"). Encode these
-  with the "interaction" op (base + binary moderator) defined in the DSL below. Add at
-  least one well-motivated interaction hypothesis if any plausible one exists.
-- Re-tag each surviving hypothesis READY (testable now via the feature DSL) or
-  NEEDS_ENRICHMENT (name the exact missing data).
-- Keep feature_spec exactly as an op/params object for READY items (or null for NE).
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ANTI-CONSOLIDATION RULE (read this first):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Do NOT merge or consolidate a Sol domain with an Opus domain, even if they sound similar.
+Each hypothesis from each LLM is a SEPARATE review item and must appear as a SEPARATE
+entry in your output — never fold them together under a merged domain name. The
+"proposing_llm" field must accurately reflect which model proposed the hypothesis
+(keep the original value — never change it). Both LLMs' perspectives are needed for
+diversity; merging destroys the signal about which framing is predictive.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REVIEW RULES (applied per-hypothesis):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. MECHANISTIC JUSTIFICATION: Keep the one-sentence justification if it names a
+   plausible structural analogy between the domain phenomenon and drug-repurposing
+   dynamics (it does NOT need to prove causality — a structural parallel is sufficient).
+   Only DISCARD if the justification is entirely circular ("X predicts success because
+   successful drugs do X") or has no real argument at all.
+
+2. REDUNDANCY CHECK: DISCARD anything whose computable feature is identical to an
+   already-retained entry (same op + same params). A Sol hypothesis sharing the SAME
+   DOMAIN TOPIC as an Opus hypothesis is NOT redundant if its feature_spec is distinct
+   — review it independently on its own merits.
+
+3. SALVAGEABLE TAG: When a hypothesis has a real mechanistic justification but its
+   proposed feature_spec is entangled, missing, or non-computable — yet a DIFFERENT
+   feature from the DSL could validly test the same structural claim — tag it
+   SALVAGEABLE and provide a concrete alternative feature_spec in needs_or_discard_reason.
+   The bar for SALVAGEABLE vs DISCARDED: if you can write a specific corrected
+   feature_spec right now, it's SALVAGEABLE; otherwise DISCARDED.
+
+4. DSL RESCUE for NEEDS_ENRICHMENT: Before tagging NEEDS_ENRICHMENT, actively try to
+   reduce the hypothesis to the available DSL ops. Many "network" or "trajectory"
+   hypotheses can be approximated: polypharmacology → is_oral + mw_threshold; clinical
+   maturity → global_max_phase_threshold; platform molecules → drug_keyword with stems.
+   Only tag NEEDS_ENRICHMENT if NO available op can even approximately test the claim.
+
+5. LABEL-ENTANGLEMENT STRUCTURAL CHECK (mandatory for EVERY candidate): Reason
+   explicitly about whether the proposed feature's defining terms could be DEFINITIONALLY
+   entangled with how the outcome label was constructed — not merely correlated, but
+   structurally co-determined. The core test: "If I know this feature value, does that
+   already logically determine whether the label was assigned — not by biology, but by
+   the algorithm that built the label?" DISCARD only where the answer is clearly yes.
+   Record one sentence of structural reasoning (not just the conclusion) in
+   needs_or_discard_reason for EVERY candidate, including ones you keep ("not entangled:
+   [why]" for passing items). The canonical illustration: indication-stage keywords
+   ("refractory", "relapsed", "salvage") presuppose an existing approved first-line
+   therapy, so they co-vary with the administrative-exclude label by construction.
+   But this is an ILLUSTRATION — evaluate each feature independently; do not pattern-
+   match on surface similarity to the illustration.
+
+6. HARD EXCLUSIONS: DISCARD (a) features built on prior_repurposing_count (that count
+   defines the outcome label); (b) Tanimoto structural similarity or Open Targets
+   association score (already in the pipeline baseline).
+
+7. INTERACTION HYPOTHESES: Actively propose at least one interaction-effect hypothesis
+   if a plausible moderator exists — "the effect of X on repurposing success differs
+   across levels of binary Y". Encode with the "interaction" op in the DSL.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GOAL: Maximize READY hypotheses across BOTH LLMs. Prefer SALVAGEABLE over DISCARDED
+whenever a concrete DSL fix exists. The downstream statistical pipeline (Fisher's exact,
+logistic regression, BH-FDR) handles false positives — the reviewer's role is NOT to
+pre-filter speculative ideas, but to ensure every surviving hypothesis is testable and
+non-tautological.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Feature DSL (only these ops are computable):
 {DSL_DOC}
@@ -341,7 +382,7 @@ Return ONLY a JSON array; each element:
   "mechanistic_justification": "...",
   "feature_spec": {{"op": "...", "params": {{...}}}} | null,
   "predictor_kind": "binary" | "continuous" | null,
-  "tag": "READY" | "NEEDS_ENRICHMENT" | "DISCARDED",
+  "tag": "READY" | "NEEDS_ENRICHMENT" | "SALVAGEABLE" | "DISCARDED",
   "needs_or_discard_reason": "..."
 }}
 
@@ -350,10 +391,21 @@ Input:
 """.strip()
     print("[review] Lead (Opus 4.8) consolidating...", flush=True)
     out = L.extract_json_list(L.opus(prompt, max_tokens=8000))
-    tags = {}
+    tags: dict[str, int] = {}
     for h in out:
         tags[h.get("tag", "?")] = tags.get(h.get("tag", "?"), 0) + 1
     print(f"[review]   {len(out)} hypotheses: {tags}", flush=True)
+    # Log any Sol hypotheses present so we can track diversity
+    sol_count = sum(1 for h in out if h.get("proposing_llm") == "Sol")
+    opus_count = sum(1 for h in out if h.get("proposing_llm") == "Opus")
+    print(f"[review]   LLM attribution: Opus={opus_count} Sol={sol_count}", flush=True)
+    if sol_count == 0 and opus_count > 0:
+        print(
+            "[review]   WARNING: zero Sol hypotheses in output — check whether lead "
+            "reviewer merged Sol entries into Opus domains (anti-consolidation rule "
+            "violation) or Sol produced no proposals.",
+            flush=True,
+        )
     return out
 
 
@@ -377,7 +429,7 @@ def tag_novelty(reviewed: list[dict]) -> list[dict]:
     """
     to_tag = [
         h for h in reviewed
-        if h.get("tag") != "DISCARDED" and h.get("hypothesis_text")
+        if h.get("tag") not in ("DISCARDED",) and h.get("hypothesis_text")
     ]
     if not to_tag:
         return reviewed
@@ -506,8 +558,11 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
         mech = h.get("mechanistic_justification", "")
         spec = h.get("feature_spec")
 
-        if tag != "READY":
-            # record the domain/hypothesis even though it produces no test
+        if tag not in ("READY",):
+            # record the domain/hypothesis even though it produces no test.
+            # SALVAGEABLE entries carry a suggested corrected feature_spec in
+            # needs_or_discard_reason — they are recorded as SALVAGEABLE in
+            # bisociation_history so future runs can look them up and promote them.
             hid = new_hid()
             note = h.get("needs_or_discard_reason", "")
             hist_rows.append({
@@ -1052,14 +1107,23 @@ def _report(run_id: str, reviewed: list[dict], log_rows: list[dict], qmap: dict)
               f"{float(r['raw_p']):>10.4g} {q:>10.4g}  {passed:<4}  {nov or '—':<21}  {r['hypothesis_text'][:60]}")
 
     ne = [h for h in reviewed if h.get("tag") == "NEEDS_ENRICHMENT"]
+    salvageable = [h for h in reviewed if h.get("tag") == "SALVAGEABLE"]
     disc_ = [h for h in reviewed if h.get("tag") == "DISCARDED"]
     print(f"\n-- NEEDS_ENRICHMENT (future-work appendix): {len(ne)} --")
     for h in ne:
-        print(f"  * [{h.get('domain','')}] {h.get('hypothesis_text','')[:70]} "
+        print(f"  * [{h.get('proposing_llm','?')}] [{h.get('domain','')}] "
+              f"{h.get('hypothesis_text','')[:70]} "
               f"-> needs: {h.get('needs_or_discard_reason','')}")
+    if salvageable:
+        print(f"\n-- SALVAGEABLE (fixable feature_spec — promote in next run): {len(salvageable)} --")
+        for h in salvageable:
+            print(f"  * [{h.get('proposing_llm','?')}] [{h.get('domain','')}] "
+                  f"{h.get('hypothesis_text','')[:60]} "
+                  f"-> fix: {h.get('needs_or_discard_reason','')}")
     print(f"\n-- DISCARDED by lead review: {len(disc_)} --")
     for h in disc_:
-        print(f"  * [{h.get('domain','')}] {h.get('hypothesis_text','')[:60]} "
+        print(f"  * [{h.get('proposing_llm','?')}] [{h.get('domain','')}] "
+              f"{h.get('hypothesis_text','')[:60]} "
               f"-> {h.get('needs_or_discard_reason','')}")
 
     total = len(R.load_log())
