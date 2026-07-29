@@ -1,117 +1,264 @@
 {
   "target": {
-    "target_symbol": "FKBP1A",
-    "uniprot_id": "P62942",
+    "target_symbol": "PDE5A",
+    "uniprot_id": "O76074",
     "ensembl_id": "",
-    "disease_name": "Multiple myeloma",
-    "orpha_code": "29073",
+    "disease_name": "Idiopathic pulmonary arterial hypertension",
+    "orpha_code": "275766",
     "ot_association_score": 0.9,
-    "target_discovery_method": "pharmacological_precedent"
+    "target_discovery_method": "pharmacological_precedent_via_parent_umbrella"
   },
   "targets": [
     {
-      "target_symbol": "FKBP1A",
-      "uniprot_id": "P62942",
+      "target_symbol": "PDE5A",
+      "uniprot_id": "O76074",
       "ensembl_id": "",
-      "disease_name": "Multiple myeloma",
-      "orpha_code": "29073",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "orpha_code": "275766",
       "ot_association_score": 0.9,
-      "target_discovery_method": "pharmacological_precedent"
+      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella"
     },
     {
-      "target_symbol": "FDPS",
-      "uniprot_id": "P14324",
-      "ensembl_id": "",
-      "disease_name": "Multiple myeloma",
-      "orpha_code": "29073",
-      "ot_association_score": 0.9,
-      "target_discovery_method": "pharmacological_precedent"
+      "target_symbol": "PTGIR",
+      "uniprot_id": "P43119",
+      "ensembl_id": "ENSG00000160013",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "orpha_code": "275766",
+      "ot_association_score": 0.5106,
+      "target_discovery_method": "genetic_association"
     },
     {
-      "target_symbol": "TOP2A",
-      "uniprot_id": "P11388",
-      "ensembl_id": "",
-      "disease_name": "Multiple myeloma",
-      "orpha_code": "29073",
-      "ot_association_score": 0.9,
-      "target_discovery_method": "pharmacological_precedent"
+      "target_symbol": "EIF2AK4",
+      "uniprot_id": "Q9P2K8",
+      "ensembl_id": "ENSG00000128829",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "orpha_code": "275766",
+      "ot_association_score": 0.4783,
+      "target_discovery_method": "genetic_association"
     },
     {
-      "target_symbol": "GSR",
-      "uniprot_id": "P00390",
-      "ensembl_id": "",
-      "disease_name": "Multiple myeloma",
-      "orpha_code": "29073",
-      "ot_association_score": 0.9,
-      "target_discovery_method": "pharmacological_precedent"
+      "target_symbol": "BMPR2",
+      "uniprot_id": "Q13873",
+      "ensembl_id": "ENSG00000204217",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "orpha_code": "275766",
+      "ot_association_score": 0.6809,
+      "target_discovery_method": "genetic_association"
     },
     {
-      "target_symbol": "NR3C1",
-      "uniprot_id": "P04150",
+      "target_symbol": "INHBA",
+      "uniprot_id": "P08476",
       "ensembl_id": "",
-      "disease_name": "Multiple myeloma",
-      "orpha_code": "29073",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "orpha_code": "275766",
       "ot_association_score": 0.9,
-      "target_discovery_method": "pharmacological_precedent"
+      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella"
     }
   ],
   "candidates": [
     {
-      "drug_name": "DABRAFENIB",
-      "molecule_chembl_id": "CHEMBL2028663",
-      "smiles": "CC(C)(C)c1nc(-c2cccc(NS(=O)(=O)c3c(F)cccc3F)c2F)c(-c2ccnc(N)n2)s1",
-      "inchikey": null,
-      "pchembl_value": 5.43,
+      "drug_name": "VARDENAFIL",
+      "molecule_chembl_id": "CHEMBL1520",
+      "smiles": "CCCc1nc(C)c2c(=O)nc(-c3cc(S(=O)(=O)N4CCN(CC)CC4)ccc3OCC)[nH]n12",
+      "inchikey": "SECKRCOLJRRGGV-UHFFFAOYSA-N",
+      "pchembl_value": 9.15,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [],
-      "most_similar_approved_drug": null,
-      "tanimoto_score": 0.0,
+      "most_similar_approved_drug": "VARDENAFIL HYDROCHLORIDE",
+      "tanimoto_score": 0.6234,
       "mutation_specificity": {
-        "is_mutation_specific": true,
-        "matched_terms": [
-          "V600E",
-          "V600K",
-          "V600E mutation"
-        ],
-        "source_excerpt": "\u2026patients with unresectable or metastatic melanoma with BRAF V600E mutation as detected by an FDA-approved test. ( 1.1 , 2.1 )\u2026",
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Dabrafenib has a median pChEMBL affinity of 5.43 against TGFBR1, measured at an assay confidence score of 9 out of 9, and is an approved drug with no nearest approved structural analog in the candidate set. The BioGRID interactors recorded for TGFBR1 include YY1, MTOR, RPTOR, DHFR, RYR1, RYR3, and ITPR1.",
+      "rationale": "Vardenafil has a median pChEMBL affinity of 9.15 against PDE5A, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.623 to the nearest approved drug, vardenafil hydrochloride. PDE5A has eight recorded BioGRID physical or genetic interactors: AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
       "source_chembl_ids": [
-        "CHEMBL2028663",
-        "CHEMBL2340067"
+        "CHEMBL1520",
+        "CHEMBL762826",
+        "CHEMBL830357",
+        "CHEMBL831692"
       ],
       "source_activity_ids": [
-        12691437
+        574531,
+        1506645,
+        1520505
       ],
-      "target_symbol": "TGFBR1",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P36897",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
+      "target_symbol": "PDE5A",
+      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
+      "uniprot_id": "O76074",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.9,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "TERBINAFINE",
-      "molecule_chembl_id": "CHEMBL822",
-      "smiles": "CN(C/C=C/C#CC(C)(C)C)Cc1cccc2ccccc12",
-      "inchikey": "DOMXUEMWDBAQBQ-WEVVVXLNSA-N",
-      "pchembl_value": 6.369999999999999,
+      "drug_name": "VARDENAFIL HYDROCHLORIDE",
+      "molecule_chembl_id": "CHEMBL1339",
+      "smiles": "CCCc1nc(C)c2c(O)nc(-c3cc(S(=O)(=O)N4CCN(CC)CC4)ccc3OCC)nn12.Cl",
+      "inchikey": "XCMULUAPJXCOHI-UHFFFAOYSA-N",
+      "pchembl_value": 9.15,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "VARDENAFIL",
+      "tanimoto_score": 0.6234,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Vardenafil hydrochloride has a median pChEMBL affinity of 9.15 against PDE5A, measured at an assay confidence score of 9 out of 9, and it is a known approved drug with a Tanimoto similarity of 0.623 to the nearest approved drug vardenafil. The PDE5A target has eight recorded BioGRID physical or genetic interactors: AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
+      "source_chembl_ids": [
+        "CHEMBL1339",
+        "CHEMBL762828"
+      ],
+      "source_activity_ids": [
+        902360
+      ],
+      "target_symbol": "PDE5A",
+      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
+      "uniprot_id": "O76074",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.9,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "SILDENAFIL CITRATE",
+      "molecule_chembl_id": "CHEMBL1737",
+      "smiles": "CCCc1nn(C)c2c(=O)[nH]c(-c3cc(S(=O)(=O)N4CCN(C)CC4)ccc3OCC)nc12.O=C(O)CC(O)(CC(=O)O)C(=O)O",
+      "inchikey": "DEIYFTQMQPDXOT-UHFFFAOYSA-N",
+      "pchembl_value": 8.66,
       "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "SILDENAFIL",
+      "tanimoto_score": 0.8243,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Sildenafil citrate has a median pChEMBL affinity of 8.66 against PDE5A, measured at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.824 to the approved drug sildenafil. PDE5A has eight recorded BioGRID physical or genetic interactors: AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
+      "source_chembl_ids": [
+        "CHEMBL1737",
+        "CHEMBL762502"
+      ],
+      "source_activity_ids": [
+        353169
+      ],
+      "target_symbol": "PDE5A",
+      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
+      "uniprot_id": "O76074",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.9,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "SILDENAFIL",
+      "molecule_chembl_id": "CHEMBL192",
+      "smiles": "CCCc1nn(C)c2c(=O)[nH]c(-c3cc(S(=O)(=O)N4CCN(C)CC4)ccc3OCC)nc12",
+      "inchikey": null,
+      "pchembl_value": 8.52,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "SILDENAFIL CITRATE",
+      "tanimoto_score": 0.8243,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Sildenafil has a median pChEMBL affinity of 8.52 against PDE5A, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.824 to the nearest approved drug sildenafil citrate. PDE5A has eight recorded BioGRID physical or genetic interactors: AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
+      "source_chembl_ids": [
+        "CHEMBL192",
+        "CHEMBL757897",
+        "CHEMBL760590",
+        "CHEMBL760828",
+        "CHEMBL762496",
+        "CHEMBL762497",
+        "CHEMBL762498",
+        "CHEMBL762508",
+        "CHEMBL762509",
+        "CHEMBL762818",
+        "CHEMBL762820",
+        "CHEMBL762822",
+        "CHEMBL762823",
+        "CHEMBL762825",
+        "CHEMBL762826",
+        "CHEMBL762827",
+        "CHEMBL762828",
+        "CHEMBL762831",
+        "CHEMBL827173",
+        "CHEMBL827930",
+        "CHEMBL828414",
+        "CHEMBL831692",
+        "CHEMBL832838",
+        "CHEMBL860521",
+        "CHEMBL871523"
+      ],
+      "source_activity_ids": [
+        268223,
+        280637,
+        322721,
+        381175,
+        477010,
+        584306,
+        726578,
+        736693,
+        837348,
+        837349,
+        869550,
+        885958,
+        920974,
+        924690,
+        925443,
+        1243003,
+        1269964,
+        1434747,
+        1506524,
+        1520494,
+        1521901,
+        1523271,
+        1722223,
+        1748965
+      ],
+      "target_symbol": "PDE5A",
+      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
+      "uniprot_id": "O76074",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.9,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "TADALAFIL",
+      "molecule_chembl_id": "CHEMBL779",
+      "smiles": "CN1CC(=O)N2[C@H](c3ccc4c(c3)OCO4)c3[nH]c4ccccc4c3C[C@@H]2C1=O",
+      "inchikey": "WOXKDUGGOYFFRN-IIBYNOLFSA-N",
+      "pchembl_value": 8.285,
+      "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "D01AE15",
-        "D01BA02",
+        "G04BE08",
         "N02BA01"
       ],
-      "most_similar_approved_drug": "AMIODARONE",
-      "tanimoto_score": 0.1358,
+      "most_similar_approved_drug": "MILRINONE",
+      "tanimoto_score": 0.1282,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -119,35 +266,39 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Terbinafine is an approved drug with a median pChEMBL affinity of 6.37 against SQLE measured at assay confidence score 8, and a Tanimoto similarity of 0.136 to the nearest approved drug amiodarone. The BioGRID interactors recorded for SQLE are FGFR1, ATXN1, EIF4ENIF1, EGFR, ADSS, SORD, STAMBP, and IDH1.",
+      "rationale": "Tadalafil has a median pChEMBL affinity of 8.285 against PDE5A, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.128 to the nearest approved drug milrinone. PDE5A has eight recorded BioGRID interactors\u2014AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
       "source_chembl_ids": [
-        "CHEMBL822",
-        "CHEMBL806128",
-        "CHEMBL808208"
+        "CHEMBL779",
+        "CHEMBL762824",
+        "CHEMBL762826",
+        "CHEMBL830357",
+        "CHEMBL831692"
       ],
       "source_activity_ids": [
-        1244509,
-        1244510
+        331695,
+        556410,
+        1506647,
+        1520620
       ],
-      "target_symbol": "SQLE",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "Q14534",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
+      "target_symbol": "PDE5A",
+      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
+      "uniprot_id": "O76074",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.9,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "AMIODARONE",
-      "molecule_chembl_id": "CHEMBL633",
-      "smiles": "CCCCc1oc2ccccc2c1C(=O)c1cc(I)c(OCCN(CC)CC)c(I)c1",
+      "drug_name": "DIPYRIDAMOLE",
+      "molecule_chembl_id": "CHEMBL932",
+      "smiles": "OCCN(CCO)c1nc(N2CCCCC2)c2nc(N(CCO)CCO)nc(N3CCCCC3)c2n1",
       "inchikey": null,
-      "pchembl_value": 4.92,
+      "pchembl_value": 6.26,
       "confidence_score": 8,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [],
-      "most_similar_approved_drug": "TERBINAFINE",
-      "tanimoto_score": 0.1358,
+      "most_similar_approved_drug": "SILDENAFIL",
+      "tanimoto_score": 0.0964,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -155,252 +306,40 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Amiodarone has a median pChEMBL affinity of 4.92 against SQLE, measured at an assay confidence score of 8 out of 9, and has a Tanimoto similarity of 0.136 to the nearest approved drug terbinafine. BioGRID records physical or genetic interactors of SQLE as FGFR1, ATXN1, EIF4ENIF1, EGFR, ADSS, SORD, STAMBP, and IDH1.",
+      "rationale": "Dipyridamole has a median pChEMBL affinity of 6.26 against PDE5A, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.096 to the nearest approved drug sildenafil. PDE5A has eight recorded BioGRID interactors\u2014AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
       "source_chembl_ids": [
-        "CHEMBL633",
-        "CHEMBL869978"
+        "CHEMBL932",
+        "CHEMBL762503",
+        "CHEMBL822071"
       ],
       "source_activity_ids": [
-        1675117
+        383057,
+        858691
       ],
-      "target_symbol": "SQLE",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "Q14534",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
+      "target_symbol": "PDE5A",
+      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
+      "uniprot_id": "O76074",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.9,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "SORAFENIB",
-      "molecule_chembl_id": "CHEMBL1336",
-      "smiles": "CNC(=O)c1cc(Oc2ccc(NC(=O)Nc3ccc(Cl)c(C(F)(F)F)c3)cc2)ccn1",
-      "inchikey": null,
-      "pchembl_value": 6.7,
-      "confidence_score": 8,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "DASATINIB",
-      "tanimoto_score": 0.17,
-      "mutation_specificity": {
-        "is_mutation_specific": true,
-        "matched_terms": [
-          "BCR-ABL"
-        ],
-        "source_excerpt": "\u2026ronic myelogenous leukemia  Leukemia, Myelogenous, Chronic, BCR-ABL Positive  glioblastoma multiforme  Glioblastoma  mesothelio\u2026",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Sorafenib has a median pChEMBL affinity of 6.7 against AURKB at an assay confidence score of 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.170 to the nearest approved drug dasatinib. AURKB has eight recorded BioGRID physical or genetic interactors: DHX9, HDAC1, HDAC2, PIN1, TOP2B, XRCC5, TP53, and DFFB.",
-      "source_chembl_ids": [
-        "CHEMBL1336",
-        "CHEMBL1963807"
-      ],
-      "source_activity_ids": [
-        9592950
-      ],
-      "target_symbol": "AURKB",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "Q96GD4",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "ERLOTINIB",
-      "molecule_chembl_id": "CHEMBL553",
-      "smiles": "C#Cc1cccc(Nc2ncnc3cc(OCCOC)c(OCCOC)cc23)c1",
-      "inchikey": null,
-      "pchembl_value": 6.1,
-      "confidence_score": 8,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "LAPATINIB",
-      "tanimoto_score": 0.2766,
-      "mutation_specificity": {
-        "is_mutation_specific": true,
-        "matched_terms": [
-          "L858R",
-          "exon 19 deletion",
-          "exon 21 (L858R"
-        ],
-        "source_excerpt": "\u2026growth factor receptor (EGFR) exon 19 deletions or exon 21 (L858R) substitution mutations as detected by an FDA-approved test\u2026",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Erlotinib has a median pChEMBL affinity of 6.1 against AURKB measured at assay confidence score 8, and its Tanimoto similarity (Morgan r2) to the nearest approved drug lapatinib is 0.277. The AURKB target has eight BioGRID interactors recorded\u2014DHX9, HDAC1, HDAC2, PIN1, TOP2B, XRCC5, TP53, and DFFB\u2014and erlotinib is itself an approved drug.",
-      "source_chembl_ids": [
-        "CHEMBL553",
-        "CHEMBL1963807"
-      ],
-      "source_activity_ids": [
-        9589260
-      ],
-      "target_symbol": "AURKB",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "Q96GD4",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "PAZOPANIB",
-      "molecule_chembl_id": "CHEMBL477772",
-      "smiles": "Cc1ccc(Nc2nccc(N(C)c3ccc4c(C)n(C)nc4c3)n2)cc1S(N)(=O)=O",
-      "inchikey": null,
-      "pchembl_value": 5.9,
-      "confidence_score": 8,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "SULFADIAZINE",
-      "tanimoto_score": 0.1831,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Pazopanib has a median pChEMBL affinity of 5.9 against AURKB measured at assay confidence score 8, and a Tanimoto similarity of 0.183 to the nearest approved drug sulfadiazine. AURKB has eight recorded BioGRID interactors\u2014DHX9, HDAC1, HDAC2, PIN1, TOP2B, XRCC5, TP53, and DFFB\u2014and pazopanib is an approved drug.",
-      "source_chembl_ids": [
-        "CHEMBL477772",
-        "CHEMBL1963807"
-      ],
-      "source_activity_ids": [
-        9589314
-      ],
-      "target_symbol": "AURKB",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "Q96GD4",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "LIOTHYRONINE",
-      "molecule_chembl_id": "CHEMBL1544",
-      "smiles": "N[C@@H](Cc1cc(I)c(Oc2ccc(O)c(I)c2)c(I)c1)C(=O)O",
-      "inchikey": null,
-      "pchembl_value": 5.77,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "SORAFENIB",
-      "tanimoto_score": 0.1538,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Liothyronine has a median pChEMBL affinity of 5.77 against PCNA at an assay confidence score of 9, and its Tanimoto similarity (Morgan r2) to the nearest approved drug sorafenib is 0.154. PCNA has eight recorded BioGRID interactors\u2014DHX9, HDAC1, HDAC2, PIN1, TOP2B, XRCC5, TP53, and DFFB\u2014and liothyronine is an approved drug.",
-      "source_chembl_ids": [
-        "CHEMBL1544",
-        "CHEMBL2352795",
-        "CHEMBL6126897",
-        "CHEMBL6126898"
-      ],
-      "source_activity_ids": [
-        12724448,
-        29227196,
-        29227242
-      ],
-      "target_symbol": "PCNA",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P12004",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "LAPATINIB",
-      "molecule_chembl_id": "CHEMBL554",
-      "smiles": "CS(=O)(=O)CCNCc1ccc(-c2ccc3ncnc(Nc4ccc(OCc5cccc(F)c5)c(Cl)c4)c3c2)o1",
-      "inchikey": null,
-      "pchembl_value": 5.7,
-      "confidence_score": 8,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "ERLOTINIB",
-      "tanimoto_score": 0.2766,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Lapatinib has a median pChEMBL affinity of 5.7 against AURKB measured at assay confidence score 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.277 to the nearest approved drug erlotinib. AURKB has eight recorded BioGRID physical or genetic interactors: DHX9, HDAC1, HDAC2, PIN1, TOP2B, XRCC5, TP53, and DFFB.",
-      "source_chembl_ids": [
-        "CHEMBL554",
-        "CHEMBL1963807"
-      ],
-      "source_activity_ids": [
-        9581589
-      ],
-      "target_symbol": "AURKB",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "Q96GD4",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "VANDETANIB",
-      "molecule_chembl_id": "CHEMBL24828",
-      "smiles": "COc1cc2/c(=N/c3ccc(Br)cc3F)nc[nH]c2cc1OCC1CCN(C)CC1",
-      "inchikey": null,
-      "pchembl_value": 5.6,
-      "confidence_score": 8,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "ERLOTINIB",
-      "tanimoto_score": 0.163,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Vandetanib has a median pChEMBL affinity of 5.6 against AURKB at an assay confidence score of 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.163 to the nearest approved drug erlotinib. AURKB has eight recorded BioGRID interactors\u2014DHX9, HDAC1, HDAC2, PIN1, TOP2B, XRCC5, TP53, and DFFB.",
-      "source_chembl_ids": [
-        "CHEMBL24828",
-        "CHEMBL1963807"
-      ],
-      "source_activity_ids": [
-        9589305
-      ],
-      "target_symbol": "AURKB",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "Q96GD4",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "BELUMOSUDIL",
-      "molecule_chembl_id": "CHEMBL2005186",
-      "smiles": "CC(C)NC(=O)COc1cccc(-c2nc(Nc3ccc4[nH]ncc4c3)c3ccccc3n2)c1",
-      "inchikey": "GKHIVNAUVKXIIY-UHFFFAOYSA-N",
-      "pchembl_value": 5.3,
+      "drug_name": "MILRINONE",
+      "molecule_chembl_id": "CHEMBL189",
+      "smiles": "Cc1[nH]c(=O)c(C#N)cc1-c1ccncc1",
+      "inchikey": "PZRHRDRVRGEVNW-UHFFFAOYSA-N",
+      "pchembl_value": 6.13,
       "confidence_score": 8,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "L04AA48",
+        "C01CE02",
         "N02BA01"
       ],
-      "most_similar_approved_drug": "ERLOTINIB",
-      "tanimoto_score": 0.2088,
+      "most_similar_approved_drug": "SILDENAFIL",
+      "tanimoto_score": 0.1463,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -408,75 +347,259 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Belumosudil has a median pChEMBL affinity of 5.3 against AURKB at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.209 to the nearest approved drug, erlotinib. AURKB has eight recorded BioGRID interactors\u2014DHX9, HDAC1, HDAC2, PIN1, TOP2B, XRCC5, TP53, and DFFB\u2014and belumosudil is itself an approved drug.",
+      "rationale": "Milrinone, an approved drug, has a median pChEMBL affinity of 6.13 against PDE5A measured at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.146 to the nearest approved drug sildenafil. PDE5A has eight recorded BioGRID interactors\u2014AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
       "source_chembl_ids": [
-        "CHEMBL2005186",
-        "CHEMBL1963807"
+        "CHEMBL189",
+        "CHEMBL768661"
       ],
       "source_activity_ids": [
-        9589355
+        513807
       ],
-      "target_symbol": "AURKB",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "Q96GD4",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
+      "target_symbol": "PDE5A",
+      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
+      "uniprot_id": "O76074",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.9,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "DASATINIB",
-      "molecule_chembl_id": "CHEMBL5416410",
-      "smiles": "Cc1nc(Nc2ncc(C(=O)Nc3c(C)cccc3Cl)s2)cc(N2CCN(CCO)CC2)n1.O",
-      "inchikey": null,
-      "pchembl_value": 5.19,
+      "drug_name": "ILOPROST",
+      "molecule_chembl_id": "CHEMBL494",
+      "smiles": "CC#CCC(C)[C@H](O)/C=C/[C@@H]1[C@H]2C/C(=C/CCCC(=O)O)C[C@H]2C[C@H]1O",
+      "inchikey": "HIFJCPQKFCZDDL-ACWOEMLNSA-N",
+      "pchembl_value": 8.05,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "B01AC11",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "DINOPROSTONE",
+      "tanimoto_score": 0.3506,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Iloprost has a median pChEMBL affinity of 8.05 against PTGIR at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.351 to the nearest approved drug dinoprostone. The target PTGIR has eight recorded BioGRID interactors\u2014LNX1, PDE6D, RAB11A, TBXA2R, GNAS, PDZD3, GNAQ, and RAB5A.",
+      "source_chembl_ids": [
+        "CHEMBL494",
+        "CHEMBL2394933",
+        "CHEMBL2394989",
+        "CHEMBL3779740",
+        "CHEMBL3876387",
+        "CHEMBL4005267",
+        "CHEMBL4005280",
+        "CHEMBL768433",
+        "CHEMBL768434",
+        "CHEMBL768440",
+        "CHEMBL839468",
+        "CHEMBL947376"
+      ],
+      "source_activity_ids": [
+        247781,
+        776738,
+        1110469,
+        1487960,
+        2381331,
+        2401834,
+        13336174,
+        13342004,
+        13342076,
+        16501800,
+        16838448,
+        18017609,
+        18017711
+      ],
+      "target_symbol": "PTGIR",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P43119",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.5106,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "ALPROSTADIL",
+      "molecule_chembl_id": "CHEMBL495",
+      "smiles": "CCCCC[C@H](O)/C=C/[C@H]1[C@H](O)CC(=O)[C@@H]1CCCCCCC(=O)O",
+      "inchikey": "GMVPRGQOIOIIMI-DWKJAMRDSA-N",
+      "pchembl_value": 6.82,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "C01EA01",
+        "G04BE01",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "DINOPROSTONE",
+      "tanimoto_score": 0.7273,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Alprostadil has a median pChEMBL affinity of 6.82 against PTGIR at assay confidence score 9, and it is an approved drug with a Tanimoto similarity of 0.727 to the nearest approved drug dinoprostone. The target PTGIR has eight recorded BioGRID interactors\u2014LNX1, PDE6D, RAB11A, TBXA2R, GNAS, PDZD3, GNAQ, and RAB5A.",
+      "source_chembl_ids": [
+        "CHEMBL495",
+        "CHEMBL764126",
+        "CHEMBL764127",
+        "CHEMBL764128",
+        "CHEMBL768434"
+      ],
+      "source_activity_ids": [
+        92303,
+        596636,
+        768940,
+        1149943
+      ],
+      "target_symbol": "PTGIR",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P43119",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.5106,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "DINOPROSTONE",
+      "molecule_chembl_id": "CHEMBL548",
+      "smiles": "CCCCC[C@H](O)/C=C/[C@H]1[C@H](O)CC(=O)[C@@H]1C/C=C\\CCCC(=O)O",
+      "inchikey": "XEYBRNLFEZDVAW-ARSRFYASSA-N",
+      "pchembl_value": 6.58,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "G02AD02",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "ALPROSTADIL",
+      "tanimoto_score": 0.7273,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Dinoprostone is an approved drug with a median pChEMBL affinity of 6.58 against PTGIR at assay confidence score 9, and a Tanimoto similarity of 0.727 to the nearest approved drug Alprostadil. The BioGRID-recorded physical and genetic interactors of PTGIR are LNX1, PDE6D, RAB11A, TBXA2R, GNAS, PDZD3, GNAQ, and RAB5A.",
+      "source_chembl_ids": [
+        "CHEMBL548",
+        "CHEMBL3294250"
+      ],
+      "source_activity_ids": [
+        14726583
+      ],
+      "target_symbol": "PTGIR",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P43119",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.5106,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "SELEXIPAG",
+      "molecule_chembl_id": "CHEMBL238804",
+      "smiles": "CC(C)N(CCCCOCC(=O)NS(C)(=O)=O)c1cnc(-c2ccccc2)c(-c2ccccc2)n1",
+      "inchikey": "QXWZQTURMXZVHJ-UHFFFAOYSA-N",
+      "pchembl_value": 6.2,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "B01AC27",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "LAROPIPRANT",
+      "tanimoto_score": 0.1489,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Selexipag has a median pChEMBL affinity of 6.2 against PTGIR, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.149 to the nearest approved drug laropiprant. The BioGRID-recorded physical and genetic interactors of PTGIR are LNX1, PDE6D, RAB11A, TBXA2R, GNAS, PDZD3, GNAQ, and RAB5A.",
+      "source_chembl_ids": [
+        "CHEMBL238804",
+        "CHEMBL4005267",
+        "CHEMBL5246771"
+      ],
+      "source_activity_ids": [
+        18017460,
+        25048357
+      ],
+      "target_symbol": "PTGIR",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P43119",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.5106,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "LAROPIPRANT",
+      "molecule_chembl_id": "CHEMBL426559",
+      "smiles": "CS(=O)(=O)c1cc(F)cc2c3c(n(Cc4ccc(Cl)cc4)c12)[C@@H](CC(=O)O)CC3",
+      "inchikey": "NXFFJDQHYLNEJK-CYBMUJFWSA-N",
+      "pchembl_value": 5.18,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "SELEXIPAG",
+      "tanimoto_score": 0.1489,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": null
+      },
+      "rationale": "Laropiprant has a median pChEMBL affinity of 5.18 against PTGIR measured at assay confidence score 9, and it is an approved or known drug with a Tanimoto similarity of 0.149 to the nearest approved drug selexipag. The PTGIR target has eight recorded BioGRID interactors\u2014LNX1, PDE6D, RAB11A, TBXA2R, GNAS, PDZD3, GNAQ, and RAB5A.",
+      "source_chembl_ids": [
+        "CHEMBL426559",
+        "CHEMBL907938"
+      ],
+      "source_activity_ids": [
+        1818001
+      ],
+      "target_symbol": "PTGIR",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P43119",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.5106,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "MOMELOTINIB",
+      "molecule_chembl_id": "CHEMBL1078178",
+      "smiles": "N#CCNC(=O)c1ccc(-c2ccnc(Nc3ccc(N4CCOCC4)cc3)n2)cc1",
+      "inchikey": "ZVHNDZWQTBEVRY-UHFFFAOYSA-N",
+      "pchembl_value": 6.97,
       "confidence_score": 8,
       "max_phase": "4.0",
       "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "BELUMOSUDIL",
-      "tanimoto_score": 0.1727,
-      "mutation_specificity": {
-        "is_mutation_specific": true,
-        "matched_terms": [
-          "BCR-ABL1",
-          "BCR-ABL"
-        ],
-        "source_excerpt": "\u2026eukemia-Lymphoma  Blast Phase Chronic Myelogenous Leukemia, BCR-ABL1 Positive  Leukemia, Myelogenous, Chronic, BCR-ABL Positive\u2026",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Dasatinib has a median pChEMBL affinity of 5.19 against AURKB measured at assay confidence score 8, and it is an approved drug with a Tanimoto similarity of 0.173 to the nearest approved drug belumosudil. The AURKB target has eight BioGRID interactors recorded\u2014DHX9, HDAC1, HDAC2, PIN1, TOP2B, XRCC5, TP53, and DFFB.",
-      "source_chembl_ids": [
-        "CHEMBL5416410",
-        "CHEMBL1839619"
-      ],
-      "source_activity_ids": [
-        6390389
-      ],
-      "target_symbol": "AURKB",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "Q96GD4",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "MENADIONE",
-      "molecule_chembl_id": "CHEMBL590",
-      "smiles": "CC1=CC(=O)c2ccccc2C1=O",
-      "inchikey": "MJVAVZPDRWSRRC-UHFFFAOYSA-N",
-      "pchembl_value": 5.16,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "B02BA02",
+        "L01EJ04",
         "N02BA01"
       ],
-      "most_similar_approved_drug": "SULFADIAZINE",
-      "tanimoto_score": 0.1429,
+      "most_similar_approved_drug": "DEUCRAVACITINIB",
+      "tanimoto_score": 0.1485,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -484,38 +607,81 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Menadione has a median pChEMBL affinity of 5.16 against CDC25A, measured at assay confidence score 9, and is an approved or known drug with a Tanimoto similarity of 0.143 to the nearest approved drug, sulfadiazine. CDC25A has eight recorded BioGRID interactors\u2014DHX9, HDAC1, HDAC2, PIN1, TOP2B, XRCC5, TP53, and DFFB\u2014based on physical or genetic interaction data.",
+      "rationale": "Momelotinib has a median pChEMBL affinity of 6.97 against BMPR1B at an assay confidence score of 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.149 to the nearest approved drug deucravacitinib. BMPR1B has the following BioGRID-recorded physical or genetic interactors: LIMK1, CES3, GCGR, CRYAB, FRS3, TGFBR1, ACVR1B, and TSR1.",
       "source_chembl_ids": [
-        "CHEMBL590",
-        "CHEMBL4314168"
+        "CHEMBL1078178",
+        "CHEMBL3889145",
+        "CHEMBL5730299"
       ],
       "source_activity_ids": [
-        18890577
+        17796707,
+        26644612
       ],
-      "target_symbol": "CDC25A",
+      "target_symbol": "BMPR1B",
       "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P30304",
-      "disease_name": "Multiple myeloma",
+      "uniprot_id": "O00238",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
       "ot_association_score": 0.0,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "SULFADIAZINE",
-      "molecule_chembl_id": "CHEMBL439",
-      "smiles": "Nc1ccc(S(=O)(=O)Nc2ncccn2)cc1",
-      "inchikey": "SEEPANYCNGTZFQ-UHFFFAOYSA-N",
-      "pchembl_value": 4.68,
+      "drug_name": "DEUCRAVACITINIB",
+      "molecule_chembl_id": "CHEMBL4435170",
+      "smiles": "[2H]C([2H])([2H])NC(=O)c1nnc(NC(=O)C2CC2)cc1Nc1cccc(-c2ncn(C)n2)c1OC",
+      "inchikey": "BZZKEPGENYLQSC-FIBGUPNXSA-N",
+      "pchembl_value": 6.71,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "L04AF07",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "MOMELOTINIB",
+      "tanimoto_score": 0.1485,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Deucravacitinib is an approved drug with a median pChEMBL affinity of 6.71 against BMPR2, measured at assay confidence score 9, and a Tanimoto similarity of 0.149 to the nearest approved drug momelotinib. BioGRID records physical or genetic interactions between BMPR2 and the proteins LIMK1, CES3, GCGR, CRYAB, FRS3, TGFBR1, ACVR1B, and TSR1.",
+      "source_chembl_ids": [
+        "CHEMBL4435170",
+        "CHEMBL4377403",
+        "CHEMBL5479496"
+      ],
+      "source_activity_ids": [
+        19143937,
+        25790630
+      ],
+      "target_symbol": "BMPR2",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "Q13873",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "ot_association_score": 0.6809,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "MOMELOTINIB",
+      "molecule_chembl_id": "CHEMBL1078178",
+      "smiles": "N#CCNC(=O)c1ccc(-c2ccnc(Nc3ccc(N4CCOCC4)cc3)n2)cc1",
+      "inchikey": "ZVHNDZWQTBEVRY-UHFFFAOYSA-N",
+      "pchembl_value": 6.39,
       "confidence_score": 8,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "J01EC02",
+        "L01EJ04",
         "N02BA01"
       ],
-      "most_similar_approved_drug": "PAZOPANIB",
-      "tanimoto_score": 0.1831,
+      "most_similar_approved_drug": "DEUCRAVACITINIB",
+      "tanimoto_score": 0.1485,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -523,360 +689,19 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Sulfadiazine has a median pChEMBL affinity of 4.68 against AURKA at an assay confidence score of 8 out of 9, and it has a Tanimoto similarity of 0.183 to the nearest approved drug pazopanib. AURKA has eight recorded BioGRID interactors\u2014DHX9, HDAC1, HDAC2, PIN1, TOP2B, XRCC5, TP53, and DFFB\u2014and sulfadiazine is an approved drug.",
+      "rationale": "Momelotinib has a median pChEMBL affinity of 6.39 against BMPR1A at an assay confidence score of 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.149 to the nearest approved drug deucravacitinib. BMPR1A has eight recorded BioGRID interactors\u2014LIMK1, CES3, GCGR, CRYAB, FRS3, TGFBR1, ACVR1B, and TSR1.",
       "source_chembl_ids": [
-        "CHEMBL439",
-        "CHEMBL958737"
+        "CHEMBL1078178",
+        "CHEMBL3889144"
       ],
       "source_activity_ids": [
-        2460278
+        17796705
       ],
-      "target_symbol": "AURKA",
+      "target_symbol": "BMPR1A",
       "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "O14965",
-      "disease_name": "Multiple myeloma",
+      "uniprot_id": "P36894",
+      "disease_name": "Idiopathic pulmonary arterial hypertension",
       "ot_association_score": 0.0,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "MILTEFOSINE",
-      "molecule_chembl_id": "CHEMBL125",
-      "smiles": "CCCCCCCCCCCCCCCCOP(=O)([O-])OCC[N+](C)(C)C",
-      "inchikey": "PQLXHQMOHUQAKB-UHFFFAOYSA-N",
-      "pchembl_value": 4.6,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [
-        "A01AD05",
-        "B01AC06",
-        "N02BA01",
-        "P01CX04"
-      ],
-      "most_similar_approved_drug": "ERLOTINIB",
-      "tanimoto_score": 0.087,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Miltefosine has a median pChEMBL affinity of 4.6 against CDC25A at assay confidence score 9, and it is an approved drug with a Tanimoto similarity of 0.087 to the nearest approved drug erlotinib. CDC25A has eight recorded BioGRID interactors\u2014DHX9, HDAC1, HDAC2, PIN1, TOP2B, XRCC5, TP53, and DFFB.",
-      "source_chembl_ids": [
-        "CHEMBL125",
-        "CHEMBL662131"
-      ],
-      "source_activity_ids": [
-        1097840
-      ],
-      "target_symbol": "CDC25A",
-      "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P30304",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.0,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "FLUTICASONE PROPIONATE",
-      "molecule_chembl_id": "CHEMBL1473",
-      "smiles": "CCC(=O)O[C@]1(C(=O)SCF)[C@H](C)C[C@H]2[C@@H]3C[C@H](F)C4=CC(=O)C=C[C@]4(C)[C@@]3(F)[C@@H](O)C[C@@]21C",
-      "inchikey": null,
-      "pchembl_value": 9.3,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "DEXAMETHASONE",
-      "tanimoto_score": 0.4217,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Fluticasone propionate has a median pChEMBL affinity of 9.3 against NR3C1, measured at assay confidence score 9 out of 9, and is a approved drug with a Tanimoto similarity of 0.422 to the nearest approved drug dexamethasone. NR3C1 has eight recorded BioGRID physical or genetic interactors: SFN, TGFB1I1, ECD, RAD9A, NCOA6, RANBP9, JUN, and STAT3.",
-      "source_chembl_ids": [
-        "CHEMBL1473",
-        "CHEMBL685131"
-      ],
-      "source_activity_ids": [
-        744321
-      ],
-      "target_symbol": "NR3C1",
-      "target_discovery_method": "pharmacological_precedent",
-      "uniprot_id": "P04150",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.9,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "MIFEPRISTONE",
-      "molecule_chembl_id": "CHEMBL1276308",
-      "smiles": "CC#C[C@]1(O)CC[C@H]2[C@@H]3CCC4=CC(=O)CCC4=C3[C@@H](c3ccc(N(C)C)cc3)C[C@@]21C",
-      "inchikey": null,
-      "pchembl_value": 8.96,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "MEDROXYPROGESTERONE ACETATE",
-      "tanimoto_score": 0.2273,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Mifepristone is an approved drug with a median pChEMBL affinity of 8.96 against NR3C1, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.227 to the nearest approved drug medroxyprogesterone acetate. NR3C1 has eight recorded BioGRID physical or genetic interactors: SFN, TGFB1I1, ECD, RAD9A, NCOA6, RANBP9, JUN, and STAT3.",
-      "source_chembl_ids": [
-        "CHEMBL1276308",
-        "CHEMBL679613",
-        "CHEMBL681737",
-        "CHEMBL681744",
-        "CHEMBL681747",
-        "CHEMBL683493",
-        "CHEMBL683494",
-        "CHEMBL683498",
-        "CHEMBL683918",
-        "CHEMBL685257",
-        "CHEMBL830157",
-        "CHEMBL833648",
-        "CHEMBL834764",
-        "CHEMBL835185",
-        "CHEMBL837822",
-        "CHEMBL838827",
-        "CHEMBL869701",
-        "CHEMBL869709",
-        "CHEMBL875218",
-        "CHEMBL877001",
-        "CHEMBL906013",
-        "CHEMBL906014",
-        "CHEMBL906015",
-        "CHEMBL909042",
-        "CHEMBL909043"
-      ],
-      "source_activity_ids": [
-        275737,
-        297317,
-        297318,
-        493318,
-        493321,
-        592330,
-        592331,
-        855035,
-        1002421,
-        1443395,
-        1444258,
-        1444260,
-        1463070,
-        1463077,
-        1463078,
-        1495508,
-        1495628,
-        1733218,
-        1733221,
-        1811229,
-        1811230,
-        1890039,
-        1890040,
-        1890041
-      ],
-      "target_symbol": "NR3C1",
-      "target_discovery_method": "pharmacological_precedent",
-      "uniprot_id": "P04150",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.9,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "DEXAMETHASONE",
-      "molecule_chembl_id": "CHEMBL384467",
-      "smiles": "C[C@@H]1C[C@H]2[C@@H]3CCC4=CC(=O)C=C[C@]4(C)[C@@]3(F)[C@@H](O)C[C@]2(C)[C@@]1(O)C(=O)CO",
-      "inchikey": null,
-      "pchembl_value": 8.39,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "FLUTICASONE PROPIONATE",
-      "tanimoto_score": 0.4217,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Dexamethasone has a median pChEMBL affinity of 8.39 against NR3C1, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.422 to the nearest approved drug fluticasone propionate. NR3C1 has eight recorded BioGRID physical/genetic interactors: SFN, TGFB1I1, ECD, RAD9A, NCOA6, RANBP9, JUN, and STAT3.",
-      "source_chembl_ids": [
-        "CHEMBL384467",
-        "CHEMBL681744",
-        "CHEMBL869701",
-        "CHEMBL869702",
-        "CHEMBL909349"
-      ],
-      "source_activity_ids": [
-        501558,
-        1733236,
-        1741691,
-        1799337
-      ],
-      "target_symbol": "NR3C1",
-      "target_discovery_method": "pharmacological_precedent",
-      "uniprot_id": "P04150",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.9,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "PREDNISOLONE",
-      "molecule_chembl_id": "CHEMBL131",
-      "smiles": "C[C@]12C=CC(=O)C=C1CC[C@@H]1[C@@H]2[C@@H](O)C[C@@]2(C)[C@H]1CC[C@]2(O)C(=O)CO",
-      "inchikey": null,
-      "pchembl_value": 8.1,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "DEXAMETHASONE",
-      "tanimoto_score": 0.4189,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Prednisolone has a median pChEMBL affinity of 8.1 against NR3C1 at assay confidence score 9, and a Tanimoto similarity of 0.419 to the nearest approved drug dexamethasone. NR3C1 has eight recorded BioGRID interactors\u2014SFN, TGFB1I1, ECD, RAD9A, NCOA6, RANBP9, JUN, and STAT3\u2014and prednisolone is an approved drug.",
-      "source_chembl_ids": [
-        "CHEMBL131",
-        "CHEMBL658535",
-        "CHEMBL658536",
-        "CHEMBL666796",
-        "CHEMBL680190",
-        "CHEMBL681749",
-        "CHEMBL683496",
-        "CHEMBL685249",
-        "CHEMBL696546",
-        "CHEMBL802067",
-        "CHEMBL831159",
-        "CHEMBL869702",
-        "CHEMBL874034",
-        "CHEMBL909349"
-      ],
-      "source_activity_ids": [
-        208920,
-        419084,
-        512878,
-        801756,
-        801758,
-        1044965,
-        1044970,
-        1044972,
-        1044974,
-        1044976,
-        1521467,
-        1733226,
-        1799673
-      ],
-      "target_symbol": "NR3C1",
-      "target_discovery_method": "pharmacological_precedent",
-      "uniprot_id": "P04150",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.9,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "MEDROXYPROGESTERONE ACETATE",
-      "molecule_chembl_id": "CHEMBL717",
-      "smiles": "CC(=O)O[C@]1(C(C)=O)CC[C@H]2[C@@H]3C[C@H](C)C4=CC(=O)CC[C@]4(C)[C@H]3CC[C@@]21C",
-      "inchikey": null,
-      "pchembl_value": 7.88,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "PROGESTERONE",
-      "tanimoto_score": 0.3788,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Medroxyprogesterone acetate is an approved drug with a median pChEMBL affinity of 7.88 against NR3C1 at assay confidence score 9, and a Tanimoto similarity of 0.379 to the nearest approved drug progesterone. BioGRID records physical or genetic interactors of NR3C1 as SFN, TGFB1I1, ECD, RAD9A, NCOA6, RANBP9, JUN, and STAT3.",
-      "source_chembl_ids": [
-        "CHEMBL717",
-        "CHEMBL654290",
-        "CHEMBL680188",
-        "CHEMBL680189",
-        "CHEMBL680192",
-        "CHEMBL681750",
-        "CHEMBL681751",
-        "CHEMBL685254"
-      ],
-      "source_activity_ids": [
-        48438,
-        48443,
-        228560,
-        619053,
-        828774,
-        828778,
-        1211183
-      ],
-      "target_symbol": "NR3C1",
-      "target_discovery_method": "pharmacological_precedent",
-      "uniprot_id": "P04150",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.9,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "PROGESTERONE",
-      "molecule_chembl_id": "CHEMBL103",
-      "smiles": "CC(=O)[C@H]1CC[C@H]2[C@@H]3CCC4=CC(=O)CC[C@]4(C)[C@H]3CC[C@]12C",
-      "inchikey": null,
-      "pchembl_value": 7.52,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "MEDROXYPROGESTERONE ACETATE",
-      "tanimoto_score": 0.3788,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Progesterone has a median pChEMBL affinity of 7.52 against NR3C1 at assay confidence score 9, and a Tanimoto similarity of 0.379 to the nearest approved drug medroxyprogesterone acetate. NR3C1 has eight recorded BioGRID interactors\u2014SFN, TGFB1I1, ECD, RAD9A, NCOA6, RANBP9, JUN, and STAT3\u2014and progesterone is an approved drug.",
-      "source_chembl_ids": [
-        "CHEMBL103",
-        "CHEMBL680187",
-        "CHEMBL680188",
-        "CHEMBL680189",
-        "CHEMBL680192",
-        "CHEMBL681744",
-        "CHEMBL681750"
-      ],
-      "source_activity_ids": [
-        57306,
-        263043,
-        474123,
-        595057,
-        860315,
-        1203367
-      ],
-      "target_symbol": "NR3C1",
-      "target_discovery_method": "pharmacological_precedent",
-      "uniprot_id": "P04150",
-      "disease_name": "Multiple myeloma",
-      "ot_association_score": 0.9,
       "pathway_specificity_note": null
     }
   ],
@@ -891,7 +716,7 @@
     "note": "5 of 5 target(s) successfully evaluated."
   },
   "repurposing_only": true,
-  "pooled_across_multiple_targets": false,
-  "approved_reference_set_size": 20,
+  "pooled_across_multiple_targets": true,
+  "approved_reference_set_size": 14,
   "reference_set_note": "Candidates pooled from 5 targets for the same disease (TOP_K_TARGETS=5). Pathway-neighbor candidates tagged target_discovery_method='pathway_neighbor'."
 }
