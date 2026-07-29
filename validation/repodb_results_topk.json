@@ -1,0 +1,138 @@
+{
+  "generated_at": "2026-07-29T17:22:07",
+  "top_k": 3,
+  "top_n": 10,
+  "strong_match_threshold": 0.7,
+  "cases": [
+    {
+      "drug_name": "Dornase alfa",
+      "disease_name": "Cystic Fibrosis",
+      "top_k": 3,
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "VCP",
+        "uniprot_id": "P55072",
+        "ot_association_score": 0.4647
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "VCP",
+          "uniprot_id": "P55072",
+          "ot_association_score": 0.4647
+        },
+        {
+          "target_symbol": "CFTR",
+          "uniprot_id": "P13569",
+          "ot_association_score": 0.9182
+        },
+        {
+          "target_symbol": "RPS27A",
+          "uniprot_id": "P62979",
+          "ot_association_score": 0.559
+        },
+        {
+          "target_symbol": "UBC",
+          "uniprot_id": "P0CG48",
+          "ot_association_score": 0.4664
+        },
+        {
+          "target_symbol": "RNF5",
+          "uniprot_id": "Q99942",
+          "ot_association_score": 0.4808
+        }
+      ],
+      "n_chemist_candidates": 162,
+      "n_reviewed_candidates": 162,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [
+        {
+          "target_symbol": "VCP",
+          "uniprot_id": "P55072",
+          "ot_association_score": 0.4647,
+          "status": "miss",
+          "n_chemist_candidates": 28,
+          "n_reviewed": 28,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 1
+        },
+        {
+          "target_symbol": "CFTR",
+          "uniprot_id": "P13569",
+          "ot_association_score": 0.9182,
+          "status": "miss",
+          "n_chemist_candidates": 102,
+          "n_reviewed": 102,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 2
+        },
+        {
+          "target_symbol": "RPS27A",
+          "uniprot_id": "P62979",
+          "ot_association_score": 0.559,
+          "status": "miss",
+          "n_chemist_candidates": 32,
+          "n_reviewed": 32,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 3
+        }
+      ],
+      "miss_reason": "'Dornase alfa' absent across 162 ChEMBL compound(s) drawn from top-3 targets [VCP (P55072), CFTR (P13569), RPS27A (P62979)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "interpretation": "MISS \u2014 Dornase alfa not found in any of the top-3 target pools. 'Dornase alfa' absent across 162 ChEMBL compound(s) drawn from top-3 targets [VCP (P55072), CFTR (P13569), RPS27A (P62979)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Anakinra",
+      "disease_name": "Cryopyrin-Associated Periodic Syndromes",
+      "top_k": 3,
+      "status": "out_of_scope",
+      "in_universe": false,
+      "selected_target": null,
+      "candidate_targets_considered": [],
+      "n_chemist_candidates": null,
+      "n_reviewed_candidates": null,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [],
+      "miss_reason": "'Cryopyrin-Associated Periodic Syndromes' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.",
+      "interpretation": "'Cryopyrin-Associated Periodic Syndromes' outside rare/NTD universe.",
+      "audit_rank": null,
+      "audit_status": null,
+      "audit_cap": null
+    }
+  ]
+}

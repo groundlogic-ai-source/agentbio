@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29T15:41:41",
+  "generated_at": "2026-07-29T18:16:47",
   "top_n": 10,
   "strong_match_threshold": 0.7,
   "cases": [
@@ -57,13 +57,43 @@
     },
     {
       "drug_name": "Anagrelide",
-      "disease_name": "Thrombocythemia, Essential",
-      "status": "out_of_scope",
-      "in_universe": false,
-      "selected_target": null,
-      "candidate_targets_considered": [],
-      "n_chemist_candidates": null,
-      "n_reviewed_candidates": null,
+      "disease_name": "Essential thrombocythemia",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "PDE3B",
+        "uniprot_id": "Q13370",
+        "ot_association_score": 0.5771
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "PDE3B",
+          "uniprot_id": "Q13370",
+          "ot_association_score": 0.5771
+        },
+        {
+          "target_symbol": "PDE3A",
+          "uniprot_id": "Q14432",
+          "ot_association_score": 0.5789
+        },
+        {
+          "target_symbol": "JAK2",
+          "uniprot_id": "O60674",
+          "ot_association_score": 0.6294
+        },
+        {
+          "target_symbol": "MPL",
+          "uniprot_id": "P40238",
+          "ot_association_score": 0.6592
+        },
+        {
+          "target_symbol": "IFNAR1",
+          "uniprot_id": "P17181",
+          "ot_association_score": 0.5185
+        }
+      ],
+      "n_chemist_candidates": 28,
+      "n_reviewed_candidates": 28,
       "found": false,
       "rank": null,
       "recovered_top10": false,
@@ -71,10 +101,10 @@
       "strong_match": null,
       "is_approved_drug": null,
       "match_method": null,
-      "miss_reason": "'Thrombocythemia, Essential' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.",
-      "interpretation": "'Thrombocythemia, Essential' outside rare/NTD universe.",
+      "miss_reason": "'Anagrelide' absent among 28 ChEMBL compound(s) for top target PDE3B (Q13370). Confirmed drug's primary target likely differs from PDE3B, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Anagrelide was not surfaced. 'Anagrelide' absent among 28 ChEMBL compound(s) for top target PDE3B (Q13370). Confirmed drug's primary target likely differs from PDE3B, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
-      "audit_status": null,
+      "audit_status": "absent",
       "audit_cap": null
     },
     {
