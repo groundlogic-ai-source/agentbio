@@ -54,6 +54,7 @@ from data_sources.clinicaltrials import check_prior_trials
 from data_sources.chembl import get_molecule_safety_flags, get_drug_action_type
 from data_sources.safety_check import web_safety_check
 from data_sources.mechanism_direction import check_mechanism_direction
+from data_sources.pubchem import get_compound_data
 
 # ---- Auditable scoring constants (edit here to adjust the policy) -------------
 COMPOSITE_WEIGHTS: dict[str, float] = {
@@ -253,6 +254,18 @@ def run_reviewer(chemist_output: dict[str, Any],
                     "used_by": "reviewer", "context": f"{c['drug_name']}/{disease} trial",
                 })
 
+        # Lipophilicity flag: fetch PubChem XLogP (cached) and flag if >= 5.
+        # Threshold of 5 matches the Lipinski Rule-of-5 logP boundary and the
+        # bisociation benchmark split (run-629a01b9) which found XLogP >= 5
+        # associated with 0.426x odds of repurposing success (Fisher p = 3e-9,
+        # holdout-confirmed p = 0.009). Disclosure only — does NOT affect scoring.
+        HIGH_XLOGP_THRESHOLD = 5.0
+        _pc = get_compound_data(c["drug_name"])
+        _pubchem_xlogp: Optional[float] = _pc.get("xlogp")
+        _high_lipophilicity_flag: bool = (
+            _pubchem_xlogp is not None and _pubchem_xlogp >= HIGH_XLOGP_THRESHOLD
+        )
+
         reviewed.append({
             "drug_name": c["drug_name"],
             "molecule_chembl_id": c.get("molecule_chembl_id"),
@@ -272,6 +285,14 @@ def run_reviewer(chemist_output: dict[str, Any],
                 "Lipinski/Veber are soft developability flags, NOT a hard ADME "
                 "prediction."
             ),
+            # High-lipophilicity disclosure (XLogP >= 5). Disclosure only — does NOT
+            # affect any score. The bisociation analysis (run-629a01b9) found XLogP >= 5
+            # is associated with 0.426x odds of repurposing success (p = 3e-9,
+            # holdout-confirmed p = 0.009). The direction of effect is empirical and
+            # an unresolved incumbency-confound caveat remains (see task-14 for
+            # confirmation run).
+            "pubchem_xlogp": _pubchem_xlogp,
+            "high_lipophilicity_flag": _high_lipophilicity_flag,
             "adverse_events": adverse.get("adverse_events", [])[:10],
             "prior_trial_count": trials.get("trial_count", 0),
             "has_negative_repurposing_result": trials.get("has_negative_repurposing_result", False),

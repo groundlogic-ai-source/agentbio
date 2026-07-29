@@ -221,6 +221,11 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
          f"{_fmt(desc.get('tpsa'),1)}, {_fmt(desc.get('rotatable_bonds'))}"),
         ("Lipinski violations / Veber pass",
          f"{_fmt(desc.get('lipinski_violations'))} / {_fmt(desc.get('veber_pass'))}"),
+        ("PubChem XLogP (lipophilicity)",
+         (f"⚠ {_fmt(candidate.get('pubchem_xlogp'), 2)} (≥ 5 — empirical caution flag; "
+          f"see high-lipophilicity disclosure above)"
+          if candidate.get("high_lipophilicity_flag")
+          else _fmt(candidate.get("pubchem_xlogp"), 2))),
         ("AFDB apo structure mean pLDDT (free protein, no ligand)",
          _fmt(afdb.get("mean_plddt"), 1)),
         ("Boltz structure confidence (0-1)", _fmt(cx.get("structure_confidence"))),
@@ -485,6 +490,34 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"binding study. Verify the source assay context in ChEMBL before treating "
             f"this binding data as evidence of a therapeutic mechanism. "
             f"This disclosure does not affect any score.\n\n"
+        )
+
+    # High-lipophilicity DISCLOSURE — surfaced when PubChem XLogP >= 5.
+    # The bisociation analysis (run-629a01b9) found XLogP >= 5 is associated
+    # with 0.426x odds of repurposing success (broad-framing Fisher's exact
+    # p = 3×10⁻⁹, holdout-confirmed p = 0.009, survives adjustment for
+    # established-product status and CNS-area membership). Direction is opposite
+    # to the original hypothesis — lipophilic drugs are LESS likely to succeed.
+    # An incumbency-confound caveat is unresolved (Task 14 confirmation run).
+    # This banner is disclosure only — it does NOT affect any score.
+    if candidate.get("high_lipophilicity_flag"):
+        _xlogp_val = candidate.get("pubchem_xlogp")
+        _xlogp_str = f"{_xlogp_val:.2f}" if _xlogp_val is not None else "≥ 5"
+        parts.append(
+            f"> ⚠ **High lipophilicity (XLogP = {_xlogp_str}) — empirical caution flag.** "
+            f"**{drug}** has a PubChem XLogP of {_xlogp_str}, above the threshold of 5. "
+            f"A dataset-derived analysis (repoDB, n ≈ 8,700 drug–disease pairs) found that "
+            f"drugs with XLogP ≥ 5 have **0.426× the odds of repurposing success** "
+            f"(Fisher's exact p = 3×10⁻⁹; holdout p = 0.009; survives adjustment for "
+            f"established-product status and CNS-area membership). The direction of effect "
+            f"is opposite to the original hypothesis — high-lipophilicity drugs repurpose "
+            f"*less* often, not more. "
+            f"**Unresolved caveat:** an incumbency-confound (lipophilic drugs are "
+            f"disproportionately represented in historically studied disease areas) has not "
+            f"yet been fully ruled out; treat this as an alert rather than a disqualifier. "
+            f"**This flag does not affect the composite score.** "
+            f"The reviewer must judge whether lipophilicity is a material concern in the "
+            f"context of the proposed repurposing indication.\n\n"
         )
 
     # Mutation-specificity DISCLOSURE caveat — surfaced whenever the drug's
