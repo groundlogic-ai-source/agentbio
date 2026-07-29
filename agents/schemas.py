@@ -77,6 +77,9 @@ class ReviewerCandidate(TypedDict, total=False):
     uniprot_id: Required[Optional[str]]
     # REQUIRED: must be carried through every stage handoff.
     target_discovery_method: Required[str]
+    # High-lipophilicity disclosure (XLogP >= 5 from PubChem). Disclosure only.
+    pubchem_xlogp: Optional[float]
+    high_lipophilicity_flag: Optional[bool]
 
 
 # ---------------------------------------------------------------------------
