@@ -776,6 +776,58 @@ class _Tee:
             st.flush()
 
 
+def _fill_missing_domains(a: list[dict], b: list[dict], reviewed: list[dict]) -> list[dict]:
+    """
+    After lead_review() returns, detect any domain proposed by A or B that was
+    silently omitted from the reviewer's consolidated output (not even tagged
+    DISCARDED).  The reviewer is instructed to tag everything DISCARDED rather
+    than drop it, but LLM output is imperfect — this guard ensures every proposed
+    domain always gets at least one history row so future batches can exclude it.
+
+    For each completely-dropped domain, one synthetic DISCARDED entry is inserted
+    per proposed hypothesis.  If the domain had no hypotheses sub-list (shouldn't
+    happen) a single placeholder entry is created for the domain.
+    """
+    reviewed_domains = {str(h.get("domain", "")).strip().lower() for h in reviewed}
+    extra: list[dict] = []
+    for llm_label, proposals in (("Opus", a), ("Sol", b)):
+        for prop in proposals:
+            dom = str(prop.get("domain", "")).strip()
+            if not dom or dom.lower() in reviewed_domains:
+                continue
+            hypotheses = prop.get("hypotheses") or []
+            if hypotheses:
+                for hyp in hypotheses:
+                    extra.append({
+                        "domain": dom,
+                        "proposing_llm": llm_label,
+                        "hypothesis_text": hyp.get("hypothesis_text", ""),
+                        "mechanistic_justification": hyp.get("mechanistic_justification", ""),
+                        "feature_spec": hyp.get("feature_spec"),
+                        "predictor_kind": None,
+                        "tag": "DISCARDED",
+                        "needs_or_discard_reason": (
+                            "domain silently dropped by lead reviewer "
+                            "(not included in consolidated output)"
+                        ),
+                    })
+            else:
+                extra.append({
+                    "domain": dom,
+                    "proposing_llm": llm_label,
+                    "hypothesis_text": f"[{dom}] (no hypotheses listed)",
+                    "mechanistic_justification": "",
+                    "feature_spec": None,
+                    "predictor_kind": None,
+                    "tag": "DISCARDED",
+                    "needs_or_discard_reason": (
+                        "domain silently dropped by lead reviewer "
+                        "(not included in consolidated output)"
+                    ),
+                })
+    return extra
+
+
 def run_batch(run_id: str | None = None) -> dict:
     """
     Run ONE full autonomous discovery batch (generation → lead review → discovery
@@ -799,6 +851,22 @@ def run_batch(run_id: str | None = None) -> dict:
     a, b = generate()
     reviewed = lead_review(a, b)
     reviewed = tag_novelty(reviewed)
+
+    # Guard: ensure every domain proposed by A or B gets a history row even if
+    # the lead reviewer silently omitted the entire domain from its output.
+    # Such domains must appear in the exclusion prompt so future batches don't
+    # re-propose and re-discard the same ground.
+    _dropped = _fill_missing_domains(a, b, reviewed)
+    if _dropped:
+        _dropped_domains = sorted({h["domain"] for h in _dropped})
+        print(
+            f"[run_batch] {len(_dropped)} hypothesis(es) across "
+            f"{len(_dropped_domains)} domain(s) were silently dropped by the lead "
+            f"reviewer — adding DISCARDED rows so they appear in future exclusion "
+            f"prompts: {_dropped_domains}",
+            flush=True,
+        )
+        reviewed = reviewed + _dropped
 
     log_rows, hist_rows, test_meta = test_ready(disc, reviewed, run_id, ts)
 
