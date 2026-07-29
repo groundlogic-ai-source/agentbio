@@ -72,3 +72,18 @@ One case (row 36, CAPS) was out-of-scope because the CSV uses a disease-group na
 - `validation/repodb_results.json` — machine-readable 10-case results
 - `validation/results.json` — original 3+2 case results  
 - `validation/run_repodb_cases.py` — Part B harness script
+
+---
+
+## Small-molecule-only rate (Part C)
+
+Filtering to `chembl_molecule_type == "Small molecule"` changes the picture significantly:
+
+| Set | In-universe cases | Hits | **Hit rate** |
+|-----|------------------|------|-------------|
+| All drugs (this table, Parts A+B) | 12 | 1 | 8% |
+| **Small molecules only (Part C)** | **14** | **2** | **14%** |
+
+The 3 original cases (O1/O2/O3) are all small molecules; 11 new small-molecule cases were run from `enriched_dataset.csv`. Ibrutinib / Waldenstrom Macroglobulinemia hit at **rank 2 (composite 0.62)** against BTK — Ibrutinib's confirmed covalent target. The remaining 10 small-mol misses split into wrong target selection (9 cases) and correct target but absent from ChEMBL IC50/Ki pool (3 cases, e.g. Sapropterin/PAH, Pyridostigmine/ACHE).
+
+→ See `validation/combined_table_smallmol.md` for the full Part C table and analysis.

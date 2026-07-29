@@ -1,0 +1,651 @@
+{
+  "generated_at": "2026-07-29T15:41:41",
+  "top_n": 10,
+  "strong_match_threshold": 0.7,
+  "cases": [
+    {
+      "drug_name": "Dapsone",
+      "disease_name": "Leprosy",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "RIPK2",
+        "uniprot_id": "O43353",
+        "ot_association_score": 0.4423
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "RIPK2",
+          "uniprot_id": "O43353",
+          "ot_association_score": 0.4423
+        },
+        {
+          "target_symbol": "LACC1",
+          "uniprot_id": "Q8IV20",
+          "ot_association_score": 0.5121
+        },
+        {
+          "target_symbol": "TNFSF15",
+          "uniprot_id": "O95150",
+          "ot_association_score": 0.4511
+        },
+        {
+          "target_symbol": "SNX20",
+          "uniprot_id": "Q7Z614",
+          "ot_association_score": 0.4223
+        },
+        {
+          "target_symbol": "ADGB",
+          "uniprot_id": "Q8N7X0",
+          "ot_association_score": 0.4141
+        }
+      ],
+      "n_chemist_candidates": 32,
+      "n_reviewed_candidates": 32,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Dapsone' absent among 32 ChEMBL compound(s) for top target RIPK2 (O43353). Confirmed drug's primary target likely differs from RIPK2, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Dapsone was not surfaced. 'Dapsone' absent among 32 ChEMBL compound(s) for top target RIPK2 (O43353). Confirmed drug's primary target likely differs from RIPK2, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Anagrelide",
+      "disease_name": "Thrombocythemia, Essential",
+      "status": "out_of_scope",
+      "in_universe": false,
+      "selected_target": null,
+      "candidate_targets_considered": [],
+      "n_chemist_candidates": null,
+      "n_reviewed_candidates": null,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Thrombocythemia, Essential' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.",
+      "interpretation": "'Thrombocythemia, Essential' outside rare/NTD universe.",
+      "audit_rank": null,
+      "audit_status": null,
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Sapropterin",
+      "disease_name": "Phenylketonuria",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "PAH",
+        "uniprot_id": "P00439",
+        "ot_association_score": 0.8975
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "PAH",
+          "uniprot_id": "P00439",
+          "ot_association_score": 0.8975
+        },
+        {
+          "target_symbol": "NSUN2",
+          "uniprot_id": "Q08J23",
+          "ot_association_score": 0.4702
+        },
+        {
+          "target_symbol": "COL1A1",
+          "uniprot_id": "P02452",
+          "ot_association_score": 0.2739
+        },
+        {
+          "target_symbol": "FDXR",
+          "uniprot_id": "P22570",
+          "ot_association_score": 0.2661
+        },
+        {
+          "target_symbol": "PI4KA",
+          "uniprot_id": "P42356",
+          "ot_association_score": 0.1386
+        }
+      ],
+      "n_chemist_candidates": 25,
+      "n_reviewed_candidates": 25,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Sapropterin' absent among 25 ChEMBL compound(s) for top target PAH (P00439). Confirmed drug's primary target likely differs from PAH, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Sapropterin was not surfaced. 'Sapropterin' absent among 25 ChEMBL compound(s) for top target PAH (P00439). Confirmed drug's primary target likely differs from PAH, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Miglustat",
+      "disease_name": "Gaucher Disease",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "GBA1",
+        "uniprot_id": "P04062",
+        "ot_association_score": 0.8786
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "GBA1",
+          "uniprot_id": "P04062",
+          "ot_association_score": 0.8786
+        },
+        {
+          "target_symbol": "UGCG",
+          "uniprot_id": "Q16739",
+          "ot_association_score": 0.5905
+        },
+        {
+          "target_symbol": "PSAP",
+          "uniprot_id": "P07602",
+          "ot_association_score": 0.5085
+        },
+        {
+          "target_symbol": "SCARB2",
+          "uniprot_id": "Q14108",
+          "ot_association_score": 0.3837
+        },
+        {
+          "target_symbol": "PRX",
+          "uniprot_id": "Q9BXM0",
+          "ot_association_score": 0.3505
+        }
+      ],
+      "n_chemist_candidates": 28,
+      "n_reviewed_candidates": 28,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Miglustat' absent among 28 ChEMBL compound(s) for top target GBA1 (P04062). Confirmed drug's primary target likely differs from GBA1, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Miglustat was not surfaced. 'Miglustat' absent among 28 ChEMBL compound(s) for top target GBA1 (P04062). Confirmed drug's primary target likely differs from GBA1, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Pentamidine",
+      "disease_name": "African Trypanosomiasis",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "FGF1",
+        "uniprot_id": "P05230",
+        "ot_association_score": 0.9
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "FGF1",
+          "uniprot_id": "P05230",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "ODC1",
+          "uniprot_id": "P11926",
+          "ot_association_score": 0.4852
+        }
+      ],
+      "n_chemist_candidates": 52,
+      "n_reviewed_candidates": 52,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Pentamidine' absent among 52 ChEMBL compound(s) for top target FGF1 (P05230). Confirmed drug's primary target likely differs from FGF1, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Pentamidine was not surfaced. 'Pentamidine' absent among 52 ChEMBL compound(s) for top target FGF1 (P05230). Confirmed drug's primary target likely differs from FGF1, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Temozolomide",
+      "disease_name": "Anaplastic astrocytoma",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "FKBP1A",
+        "uniprot_id": "P62942",
+        "ot_association_score": 0.9
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "FKBP1A",
+          "uniprot_id": "P62942",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "GSR",
+          "uniprot_id": "P00390",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "IDH1",
+          "uniprot_id": "O75874",
+          "ot_association_score": 0.3979
+        },
+        {
+          "target_symbol": "TP53",
+          "uniprot_id": "P04637",
+          "ot_association_score": 0.5198
+        },
+        {
+          "target_symbol": "FGFR1",
+          "uniprot_id": "P11362",
+          "ot_association_score": 0.3705
+        },
+        {
+          "target_symbol": "CDKN2A",
+          "uniprot_id": "P42771",
+          "ot_association_score": 0.3737
+        },
+        {
+          "target_symbol": "ATRX",
+          "uniprot_id": "P46100",
+          "ot_association_score": 0.4554
+        }
+      ],
+      "n_chemist_candidates": 29,
+      "n_reviewed_candidates": 29,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Temozolomide' absent among 29 ChEMBL compound(s) for top target FKBP1A (P62942). Confirmed drug's primary target likely differs from FKBP1A, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Temozolomide was not surfaced. 'Temozolomide' absent among 29 ChEMBL compound(s) for top target FKBP1A (P62942). Confirmed drug's primary target likely differs from FKBP1A, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Riociguat",
+      "disease_name": "Chronic thromboembolic pulmonary hypertension",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "PDE5A",
+        "uniprot_id": "O76074",
+        "ot_association_score": 0.9
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "PDE5A",
+          "uniprot_id": "O76074",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "PTGIR",
+          "uniprot_id": "P43119",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "EDNRA",
+          "uniprot_id": "P25101",
+          "ot_association_score": 0.3862
+        },
+        {
+          "target_symbol": "EDNRB",
+          "uniprot_id": "P24530",
+          "ot_association_score": 0.3838
+        },
+        {
+          "target_symbol": "INHBA",
+          "uniprot_id": "P08476",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "GUCY1B1",
+          "uniprot_id": "Q02153",
+          "ot_association_score": 0.5281
+        },
+        {
+          "target_symbol": "GUCY1A1",
+          "uniprot_id": "Q02108",
+          "ot_association_score": 0.536
+        },
+        {
+          "target_symbol": "GUCY1A2",
+          "uniprot_id": "P33402",
+          "ot_association_score": 0.5281
+        }
+      ],
+      "n_chemist_candidates": 32,
+      "n_reviewed_candidates": 32,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Riociguat' absent among 32 ChEMBL compound(s) for top target PDE5A (O76074). Confirmed drug's primary target likely differs from PDE5A, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Riociguat was not surfaced. 'Riociguat' absent among 32 ChEMBL compound(s) for top target PDE5A (O76074). Confirmed drug's primary target likely differs from PDE5A, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Ibrutinib",
+      "disease_name": "Waldenstrom Macroglobulinemia",
+      "status": "hit",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "BTK",
+        "uniprot_id": "Q06187",
+        "ot_association_score": 0.5605
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "BTK",
+          "uniprot_id": "Q06187",
+          "ot_association_score": 0.5605
+        },
+        {
+          "target_symbol": "MYD88",
+          "uniprot_id": "Q99836",
+          "ot_association_score": 0.5048
+        },
+        {
+          "target_symbol": "MS4A1",
+          "uniprot_id": "P11836",
+          "ot_association_score": 0.3654
+        },
+        {
+          "target_symbol": "PSMC2",
+          "uniprot_id": "P35998",
+          "ot_association_score": 0.3038
+        },
+        {
+          "target_symbol": "PSMD13",
+          "uniprot_id": "Q9UNM6",
+          "ot_association_score": 0.3038
+        }
+      ],
+      "n_chemist_candidates": 34,
+      "n_reviewed_candidates": 34,
+      "found": true,
+      "rank": 2,
+      "recovered_top10": true,
+      "composite_score": 0.6185,
+      "strong_match": false,
+      "is_approved_drug": true,
+      "match_method": "inchikey/chembl_id",
+      "miss_reason": null,
+      "interpretation": "HIT \u2014 Ibrutinib at rank 2/34 (composite=0.6185, within top 10, did NOT reach STRONG_MATCH) against BTK, by inchikey/chembl_id.",
+      "audit_rank": 2,
+      "audit_status": "found",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Imatinib",
+      "disease_name": "Idiopathic Hypereosinophilic Syndrome",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "IL5",
+        "uniprot_id": "P05113",
+        "ot_association_score": 0.9
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "IL5",
+          "uniprot_id": "P05113",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "PDGFRA",
+          "uniprot_id": "P16234",
+          "ot_association_score": 0.2059
+        },
+        {
+          "target_symbol": "KIT",
+          "uniprot_id": "P10721",
+          "ot_association_score": 0.1123
+        },
+        {
+          "target_symbol": "ABL1",
+          "uniprot_id": "P00519",
+          "ot_association_score": 0.112
+        },
+        {
+          "target_symbol": "PDGFRB",
+          "uniprot_id": "P09619",
+          "ot_association_score": 0.1014
+        },
+        {
+          "target_symbol": "BCR",
+          "uniprot_id": "P11274",
+          "ot_association_score": 0.1006
+        }
+      ],
+      "n_chemist_candidates": 154,
+      "n_reviewed_candidates": 154,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Imatinib' absent among 154 ChEMBL compound(s) for top target IL5 (P05113). Confirmed drug's primary target likely differs from IL5, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Imatinib was not surfaced. 'Imatinib' absent among 154 ChEMBL compound(s) for top target IL5 (P05113). Confirmed drug's primary target likely differs from IL5, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Imatinib",
+      "disease_name": "Chronic eosinophilic leukemia",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "JAK1",
+        "uniprot_id": "P23458",
+        "ot_association_score": 0.9
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "JAK1",
+          "uniprot_id": "P23458",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "ACVR1",
+          "uniprot_id": "Q04771",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "FLT3",
+          "uniprot_id": "P36888",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "STAT5B",
+          "uniprot_id": "P51692",
+          "ot_association_score": 0.3751
+        },
+        {
+          "target_symbol": "JAK2",
+          "uniprot_id": "O60674",
+          "ot_association_score": 0.2889
+        },
+        {
+          "target_symbol": "ABL1",
+          "uniprot_id": "P00519",
+          "ot_association_score": 0.3005
+        },
+        {
+          "target_symbol": "PDGFRA",
+          "uniprot_id": "P16234",
+          "ot_association_score": 0.3278
+        },
+        {
+          "target_symbol": "BCR",
+          "uniprot_id": "P11274",
+          "ot_association_score": 0.2999
+        }
+      ],
+      "n_chemist_candidates": 35,
+      "n_reviewed_candidates": 35,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Imatinib' absent among 35 ChEMBL compound(s) for top target JAK1 (P23458). Confirmed drug's primary target likely differs from JAK1, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Imatinib was not surfaced. 'Imatinib' absent among 35 ChEMBL compound(s) for top target JAK1 (P23458). Confirmed drug's primary target likely differs from JAK1, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Pyridostigmine",
+      "disease_name": "Myasthenia Gravis",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "ACHE",
+        "uniprot_id": "P22303",
+        "ot_association_score": 0.6053
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "ACHE",
+          "uniprot_id": "P22303",
+          "ot_association_score": 0.6053
+        },
+        {
+          "target_symbol": "FCGRT",
+          "uniprot_id": "P55899",
+          "ot_association_score": 0.6066
+        },
+        {
+          "target_symbol": "C5",
+          "uniprot_id": "P01031",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "KCND3",
+          "uniprot_id": "Q9UK17",
+          "ot_association_score": 0.6307
+        },
+        {
+          "target_symbol": "KCNS3",
+          "uniprot_id": "Q9BQ31",
+          "ot_association_score": 0.6121
+        },
+        {
+          "target_symbol": "KCNH5",
+          "uniprot_id": "Q8NCM2",
+          "ot_association_score": 0.6059
+        }
+      ],
+      "n_chemist_candidates": 35,
+      "n_reviewed_candidates": 35,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Pyridostigmine' absent among 35 ChEMBL compound(s) for top target ACHE (P22303). Confirmed drug's primary target likely differs from ACHE, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Pyridostigmine was not surfaced. 'Pyridostigmine' absent among 35 ChEMBL compound(s) for top target ACHE (P22303). Confirmed drug's primary target likely differs from ACHE, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Lorazepam",
+      "disease_name": "Lennox-Gastaut syndrome",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "CA2",
+        "uniprot_id": "P00918",
+        "ot_association_score": 0.9
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "CA2",
+          "uniprot_id": "P00918",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "CA4",
+          "uniprot_id": "P22748",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "CNR1",
+          "uniprot_id": "P21554",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "DNM1",
+          "uniprot_id": "Q05193",
+          "ot_association_score": 0.7735
+        },
+        {
+          "target_symbol": "SCN1A",
+          "uniprot_id": "P35498",
+          "ot_association_score": 0.677
+        },
+        {
+          "target_symbol": "GABRB3",
+          "uniprot_id": "P28472",
+          "ot_association_score": 0.8265
+        },
+        {
+          "target_symbol": "SCN2A",
+          "uniprot_id": "Q99250",
+          "ot_association_score": 0.61
+        },
+        {
+          "target_symbol": "GABRG2",
+          "uniprot_id": "P18507",
+          "ot_association_score": 0.6561
+        }
+      ],
+      "n_chemist_candidates": 38,
+      "n_reviewed_candidates": 38,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Lorazepam' absent among 38 ChEMBL compound(s) for top target CA2 (P00918). Confirmed drug's primary target likely differs from CA2, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Lorazepam was not surfaced. 'Lorazepam' absent among 38 ChEMBL compound(s) for top target CA2 (P00918). Confirmed drug's primary target likely differs from CA2, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    }
+  ]
+}

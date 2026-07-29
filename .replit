@@ -20,6 +20,10 @@ author = "agent"
 task = "workflow.run"
 args = "repodb-validation"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "repodb-smallmol-validation"
+
 [[workflows.workflow]]
 name = "repodb-validation"
 author = "agent"
@@ -27,6 +31,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd /home/runner/workspace && python3 -m validation.run_repodb_cases 2>&1 | tee /tmp/repodb_val.log"
+
+[[workflows.workflow]]
+name = "repodb-smallmol-validation"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && python3 -m validation.run_repodb_cases_smallmol 2>&1 | tee /tmp/smallmol_val.log"
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [agent]
 stack = "PNPM_WORKSPACE"
