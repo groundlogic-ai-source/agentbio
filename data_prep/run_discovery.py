@@ -373,6 +373,15 @@ non-tautological.
 Feature DSL (only these ops are computable):
 {DSL_DOC}
 
+DIRECTION PRE-REGISTRATION: for every READY or SALVAGEABLE entry, set
+expected_direction to the direction the hypothesis predicts for the feature's
+effect on repurposing SUCCESS: "increase" (the feature raises success odds),
+"decrease" (lowers them), or "none" (no directional claim — use for most
+interaction hypotheses unless the SIGN of the interaction term itself is
+explicitly predicted). This is pre-registered and enforced in code: if the
+confirmed effect later contradicts it, the hypothesis is marked REFUTED, not
+reported as a discovery.
+
 Return ONLY a JSON array; each element:
 {{
   "domain": "...",
@@ -382,6 +391,7 @@ Return ONLY a JSON array; each element:
   "feature_spec": {{"op": "...", "params": {{...}}}} | null,
   "predictor_kind": "binary" | "continuous" | null,
   "tag": "READY" | "NEEDS_ENRICHMENT" | "SALVAGEABLE" | "DISCARDED",
+  "expected_direction": "increase" | "decrease" | "none",
   "needs_or_discard_reason": "..."
 }}
 
@@ -515,6 +525,20 @@ def _framed(df: pd.DataFrame, framing: str) -> pd.DataFrame:
     return sub
 
 
+def _framed_admin(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Admin-artifact screen: positives = repurposed-success, negatives =
+    administrative-exclude ONLY. If a broad-framing effect is reproduced under
+    this framing, the "discovery" is a property of the administrative label
+    class, not of genuine repurposing outcomes — the broad framing mixes
+    ~1290 administrative-exclude rows with only ~51 genuine failures, so any
+    broad-only signal is an artifact of the label construction by design.
+    """
+    sub = df[df["label"].isin(["repurposed-success", "administrative-exclude"])].copy()
+    sub["y"] = (sub["label"] == "repurposed-success").astype(int)
+    return sub
+
+
 def _run_single_test(sub: pd.DataFrame, spec: dict, kind: str):
     """
     Compute the feature(s) and run the pre-registered test for a spec on one framed
@@ -589,6 +613,7 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
         htext = h.get("hypothesis_text", "")
         mech = h.get("mechanistic_justification", "")
         spec = h.get("feature_spec")
+        expected_dir = str(h.get("expected_direction") or "none").strip().lower()
 
         if tag not in ("READY",):
             # record the domain/hypothesis even though it produces no test.
@@ -750,7 +775,7 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
                 "correction_method": R.CORRECTION_METHOD,
                 "locked_at": locked_at,
             })
-            hist_rows.append({
+            row = {
                 "test_id": tid, "hypothesis_id": hid, "run_id": run_id,
                 "session_timestamp": ts, "domain_description": domain,
                 "proposing_llm": llm, "resulting_hypothesis_text": htext,
@@ -763,7 +788,26 @@ def test_ready(disc: pd.DataFrame, reviewed: list[dict], run_id: str, ts: str):
                     f"n={res.n} mech: {mech}"
                 ),
                 "feature_spec": json.dumps(spec),
-            })
+            }
+            # Pre-registered direction check: an effect pointing opposite to the
+            # prediction is a REFUTATION of the hypothesis, not a discovery.
+            if expected_dir in ("increase", "decrease"):
+                if (expected_dir == "increase" and res.odds_ratio < 1) or \
+                   (expected_dir == "decrease" and res.odds_ratio > 1):
+                    row["direction_refuted"] = True
+            # Admin-artifact screen (broad framing only): replay the identical
+            # test with negatives = administrative-exclude alone. If that
+            # reproduces the effect (same direction, p<0.05), the association
+            # lives in the administrative label class, not genuine outcomes.
+            if framing == "broad":
+                ares, _awhy = _run_single_test(_framed_admin(disc), spec, kind)
+                if ares is not None:
+                    same_dir = (ares.odds_ratio - 1) * (res.odds_ratio - 1) > 0
+                    row["admin_screen"] = {
+                        "or": ares.odds_ratio, "p": ares.p_value,
+                        "artifact": bool(ares.p_value < 0.05 and same_dir),
+                    }
+            hist_rows.append(row)
     return log_rows, hist_rows, test_meta
 
 
@@ -982,6 +1026,38 @@ def run_batch(run_id: str | None = None) -> dict:
             q = qmap[tid]
             hr["discovery_fdr_p"] = q
             hr["discovery_pass"] = bool(q < FDR_Q)
+
+    # ── Post-FDR validity gates ───────────────────────────────────────────────
+    # A statistical pass is necessary but not sufficient for a discovery. Two
+    # code-enforced verdicts can revoke it before confirmation (and before any
+    # double-pass count): a pre-registered direction contradiction (REFUTED)
+    # and an admin-only replay that reproduces the broad effect
+    # (LABEL_ARTIFACT_SUSPECT). Both stay in history — they are real knowledge —
+    # but they are never presented as discoveries.
+    for hr in hist_rows:
+        if hr.get("discovery_pass") is not True:
+            continue
+        if hr.get("direction_refuted"):
+            hr["discovery_pass"] = False
+            hr["outcome_note"] = (
+                "REFUTED (direction): effect contradicts the pre-registered "
+                "prediction — " + str(hr.get("outcome_note", ""))
+            )
+            print(f"[gate] {hr.get('test_id')}: REFUTED — direction contradicts "
+                  f"pre-registration; excluded from confirmation", flush=True)
+            continue
+        screen = hr.get("admin_screen") or {}
+        if screen.get("artifact"):
+            hr["discovery_pass"] = False
+            hr["outcome_note"] = (
+                f"LABEL_ARTIFACT_SUSPECT: admin-only replay reproduces the broad "
+                f"effect (admin OR={screen['or']:.3g} p={screen['p']:.2g}) — the "
+                f"association lives in the administrative-exclude class, not "
+                f"genuine outcomes — " + str(hr.get("outcome_note", ""))
+            )
+            print(f"[gate] {hr.get('test_id')}: LABEL_ARTIFACT_SUSPECT — "
+                  f"admin-only replay reproduces broad effect; excluded from "
+                  f"confirmation", flush=True)
 
     # confirmation step: run surviving hypotheses on the holdout half
     surviving_count = sum(1 for hr in hist_rows if hr.get("discovery_pass") is True)
