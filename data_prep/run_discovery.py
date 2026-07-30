@@ -297,8 +297,7 @@ def generate() -> tuple[list[dict], list[dict]]:
     return a, b
 
 
-def lead_review(a: list[dict], b: list[dict]) -> list[dict]:
-    payload = {"LLM_A_Opus": a, "LLM_B_Sol": b}
+def _lead_review_prompt(payload: dict) -> str:
     prompt = f"""
 You are the LEAD reviewer (Claude Opus 4.8). Below are bisociative hypotheses from two
 models (A = Opus, B = Sol). Review ALL of them and produce a single output list.
@@ -389,8 +388,41 @@ Return ONLY a JSON array; each element:
 Input:
 {json.dumps(payload, indent=2)}
 """.strip()
-    print("[review] Lead (Opus 4.8) consolidating...", flush=True)
-    out = L.extract_json_list(L.opus(prompt, max_tokens=8000))
+    return prompt
+
+
+def _review_chunk(payload: dict, label: str) -> list[dict]:
+    print(f"[review] Lead (Opus 4.8) consolidating {label}...", flush=True)
+    return L.extract_json_list(L.opus(_lead_review_prompt(payload), max_tokens=16000))
+
+
+def lead_review(a: list[dict], b: list[dict]) -> list[dict]:
+    # Chunk the review — this is load-bearing, do NOT revert to a single call.
+    # A single call reviewing both LLMs' full proposal sets needs far more than
+    # 8000 output tokens (the prompt requires a reason for EVERY candidate).
+    # Truncated output was then silently salvaged by extract_json's next-opener
+    # fallback into its first complete object: in two consecutive production
+    # batches exactly 1 of ~28 hypotheses survived review and the rest were
+    # recorded as DISCARDED ("silently dropped"). Chunk to <=3 domains per call,
+    # one LLM per call, so the output always fits in the token budget. A useful
+    # side effect: separate calls make Opus/Sol cross-merging impossible.
+    _CHUNK = 3
+    chunks: list[tuple[dict, str]] = []
+    for key, label, proposals in (("LLM_A_Opus", "Opus", a), ("LLM_B_Sol", "Sol", b)):
+        for i in range(0, len(proposals), _CHUNK):
+            end = min(i + _CHUNK, len(proposals))
+            chunks.append(({key: proposals[i:end]}, f"{label} domains {i + 1}-{end}"))
+    out: list[dict] = []
+    for payload, label in chunks:
+        out.extend(_review_chunk(payload, label))
+    in_count = sum(len(p.get("hypotheses") or []) for p in a) + \
+               sum(len(p.get("hypotheses") or []) for p in b)
+    if len(out) < max(1, in_count // 2):
+        print(
+            f"[review]   WARNING: mass-drop suspected — {in_count} hypotheses went in, "
+            f"only {len(out)} came out. Check for truncated Opus responses above.",
+            flush=True,
+        )
     tags: dict[str, int] = {}
     for h in out:
         tags[h.get("tag", "?")] = tags.get(h.get("tag", "?"), 0) + 1

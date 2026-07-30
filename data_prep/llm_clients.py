@@ -53,6 +53,16 @@ def opus(prompt: str, max_tokens: int = 8000) -> str:
         max_tokens=max_tokens,
         messages=[{"role": "user", "content": prompt}],
     )
+    if getattr(resp, "stop_reason", None) == "max_tokens":
+        # Truncated output is catastrophic for JSON-array callers: extract_json's
+        # next-opener fallback silently salvages only the first complete object.
+        # Surface it loudly so callers/logs can see WHY items vanished.
+        print(
+            f"[llm_clients] WARNING: Opus response TRUNCATED at max_tokens={max_tokens} "
+            f"— output JSON is incomplete; downstream parsing will silently drop items. "
+            f"Raise max_tokens or chunk the request.",
+            flush=True,
+        )
     return resp.content[0].text
 
 
