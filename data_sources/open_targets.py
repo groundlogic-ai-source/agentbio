@@ -222,7 +222,12 @@ def get_disease_known_drugs(disease_efo_id: str) -> dict[str, Any]:
         disease_data = data.get("data", {}).get("disease") or {}
         candidates = disease_data.get("drugAndClinicalCandidates")
 
-        if candidates is None:
+        if disease_data.get("disease") is None and not disease_data:
+            # GraphQL returned no disease node at all → data unavailable, not
+            # evidence of "no treatment". Keep None so the score degrades to
+            # the 0.5 "unknown" branch instead of 1.0.
+            pass
+        elif candidates is None:
             # disease node exists but no clinical candidate entry → no clinical drugs
             result["has_approved_treatment"] = False
         else:
@@ -242,7 +247,10 @@ def get_disease_known_drugs(disease_efo_id: str) -> dict[str, Any]:
         print(f"[open_targets] WARNING: drugAndClinicalCandidates query failed for '{disease_efo_id}': {e}")
         # has_approved_treatment stays None — caller will treat as unknown
 
-    cache_set(cache_key, result, ttl_days=7)
+    # Only cache when the query actually succeeded: caching the None "unknown"
+    # result after a transient GraphQL failure would poison 7 days of lookups.
+    if result["has_approved_treatment"] is not None:
+        cache_set(cache_key, result, ttl_days=7)
     return result
 
 

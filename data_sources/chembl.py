@@ -196,6 +196,9 @@ def get_target_bioactivity_count(uniprot_id: str) -> dict[str, Any]:
 
     except Exception as e:
         print(f"[chembl] WARNING: bioactivity query failed for '{uniprot_id}': {e}")
+        # Do NOT cache failures: a transient API error would otherwise be
+        # cached for 7 days as a legitimate "zero bioactivity" result.
+        return result
 
     cache_set(cache_key, result, ttl_days=7)
     return result
@@ -352,6 +355,9 @@ def get_approved_drugs_for_target(uniprot_id: str) -> dict[str, Any]:
 
     except Exception as e:
         print(f"[chembl] WARNING: approved-drug mechanism lookup failed for '{uniprot_id}': {e}")
+        # Do NOT cache failures: a transient error would otherwise be cached
+        # for 7 days as "no approved mechanism drugs exist".
+        return result
 
     cache_set(cache_key, result, ttl_days=7)
     return result
@@ -498,25 +504,33 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
 
     except Exception as e:
         print(f"[chembl] WARNING: candidate compound query failed for '{uniprot_id}': {e}")
+        # Do NOT cache failures: a transient error would otherwise be cached
+        # for 7 days as an empty candidate pool.
+        return result
 
     cache_set(cache_key, result, ttl_days=7)
     return result
 
 
-def get_drug_indications(molecule_chembl_id: str, limit: int = 30) -> list[str]:
+def get_drug_indications(molecule_chembl_id: str, limit: int = 200) -> list[str]:
     """
-    Return the approved/known-indication term strings for a ChEMBL molecule from
-    the /drug_indication endpoint (efo_term + mesh_heading).
+    Return the APPROVED-indication term strings for a ChEMBL molecule from
+    the /drug_indication endpoint (efo_term + mesh_heading), phase-4 rows only.
 
     NOTE: ChEMBL normalizes these to mutation-STRIPPED disease terms (e.g.
     "non-small cell lung carcinoma", never "KRAS G12C-mutated NSCLC"), so they
     are only a secondary input to the mutation-specificity DISCLOSURE scan — the
-    FDA label indications text is the primary source. Included so the scan reads
-    every indication surface ChEMBL exposes.
+    FDA label indications text is the primary source.
+
+    Trial-phase indication rows (max_phase_for_ind < 4) are EXCLUDED: their MeSH
+    headings can name mutations from unapproved trials (e.g. "Leukemia,
+    Myelogenous, Chronic, BCR-ABL Positive" at phase 2 for bortezomib), and
+    letting them reach the mutation scan produced false "approved indication
+    names mutation X" disclosure flags.
     """
     if not molecule_chembl_id:
         return []
-    cache_key = make_key("get_drug_indications", molecule_chembl_id, limit)
+    cache_key = make_key("get_drug_indications_v2", molecule_chembl_id, limit)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -526,12 +540,19 @@ def get_drug_indications(molecule_chembl_id: str, limit: int = 30) -> list[str]:
         data = _get_json(f"{BASE_URL}/drug_indication.json",
                          {"molecule_chembl_id": molecule_chembl_id, "limit": limit})
         for ind in data.get("drug_indications", []):
+            try:
+                phase = float(ind.get("max_phase_for_ind") or 0)
+            except (TypeError, ValueError):
+                phase = 0.0
+            if phase < 4:
+                continue
             for k in ("efo_term", "mesh_heading"):
                 v = ind.get(k)
                 if v and v not in terms:
                     terms.append(v)
     except Exception as e:
         print(f"[chembl] WARNING: drug_indication query failed for '{molecule_chembl_id}': {e}")
+        return []  # do not cache transient failures as "no indications"
 
     cache_set(cache_key, terms, ttl_days=30)
     return terms

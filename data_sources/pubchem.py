@@ -73,7 +73,8 @@ def get_compound_data(drug_name: str) -> dict[str, Any]:
         inchikey = _resolve_inchikey(drug_name)
         if not inchikey:
             result["error"] = f"Could not resolve InChIKey for '{drug_name}'"
-            cache_set(cache_key, result, ttl_days=7)
+            # Not cached: _resolve_inchikey also returns None on transient
+            # network failure, and caching that poisons 7 days of lookups.
             return result
 
         result["inchikey"] = inchikey
@@ -89,17 +90,27 @@ def get_compound_data(drug_name: str) -> dict[str, Any]:
                 p = props[0]
                 # PubChem renamed CanonicalSMILES -> ConnectivitySMILES (2025).
                 result["canonical_smiles"] = p.get("ConnectivitySMILES") or p.get("CanonicalSMILES") or p.get("SMILES")
-                mw = p.get("MolecularWeight")
-                result["molecular_weight"] = float(mw) if mw is not None else None
-                xlogp = p.get("XLogP")
-                result["xlogp"] = float(xlogp) if xlogp is not None else None
                 result["resolved"] = True
+                # Cast each numeric property independently: PUG REST returns
+                # them as strings, and one malformed value must not kill the
+                # rest of the payload via the outer except.
+                for key, prop in (("molecular_weight", "MolecularWeight"),
+                                  ("xlogp", "XLogP")):
+                    raw = p.get(prop)
+                    if raw is not None:
+                        try:
+                            result[key] = float(raw)
+                        except (TypeError, ValueError):
+                            print(f"[pubchem] WARNING: could not cast {prop}={raw!r} for '{drug_name}'")
 
     except Exception as e:
         result["error"] = str(e)
         print(f"[pubchem] WARNING: compound data fetch failed for '{drug_name}': {e}")
 
-    cache_set(cache_key, result, ttl_days=7)
+    # Never cache failures or unresolved lookups: a transient network error
+    # would otherwise poison the cache for 7 days with xlogp=None.
+    if result["error"] is None and result["resolved"]:
+        cache_set(cache_key, result, ttl_days=7)
     return result
 
 
@@ -149,8 +160,7 @@ def get_drug_classification(inchikey: str) -> dict[str, Any]:
         cid = _inchikey_to_cid(inchikey)
         if cid is None:
             result["error"] = "no CID for InChIKey"
-            cache_set(cache_key, result, ttl_days=7)
-            return result
+            return result  # not cached — could be a transient failure
         result["cid"] = cid
 
         url = f"{PUG_VIEW_URL}/{cid}/JSON?heading=ATC+Code"
@@ -165,5 +175,6 @@ def get_drug_classification(inchikey: str) -> dict[str, Any]:
         result["error"] = str(e)
         print(f"[pubchem] WARNING: drug classification failed for '{inchikey}': {e}")
 
-    cache_set(cache_key, result, ttl_days=7)
+    if result["error"] is None:
+        cache_set(cache_key, result, ttl_days=7)
     return result
