@@ -1,0 +1,48 @@
+**Stop before treating pindolol/pancreatitis as your showcase — I think there's a real mechanism-direction problem hiding in it, and I want to walk through exactly why, because the evidence is genuinely specific.**
+
+The actual published literature on beta-adrenergic signaling and acute pancreatitis points the opposite direction from what this candidate proposes. A real, classic study (Karanjia et al., a Reber-lab paper from 1991, still cited in this space) found that beta-adrenergic *agonists* — isoproterenol and terbutaline — *protect against* acute pancreatitis by reducing the microvascular permeability that drives the disease. That's *stimulating* the receptor, not blocking it.
+
+Pindolol is a beta-*blocker* — it antagonizes that same receptor. If the real protective mechanism in acute pancreatitis is agonism, a blocker would be expected to do nothing or actively work against that protection, not replicate it. This is precisely the mazindol/GCH1 and verapamil/ABCB11 pattern again: a real, genuine target, with the drug's actual direction of action pointing the wrong way for this specific disease. (Worth noting separately, so it doesn't get confused: there's a *different* body of literature where beta-blockers *are* the beneficial direction — but that's for pancreatic *cancer*, where the mechanism is blocking a proliferative signal, not preventing vascular permeability in acute pancreatitis. Same receptor family, opposite reasoning, entirely different disease. That contrast is exactly why direction has to be checked disease-by-disease, never assumed from a target name alone.)
+
+```
+Before anything else: confirm ChEMBL's recorded action_type for pindolol
+against ADRB2 (almost certainly ANTAGONIST/blocker). Then show the actual
+mechanism-direction verdict this specific case produced -- did the checker
+run on pindolol at all, and if so, did it return COMPATIBLE? If yes, that
+verdict is very likely wrong given the literature above, and this is a
+live gap in the checker, not a confirmed discovery. Do not present this
+case as a showcase candidate until this is resolved with a real, cited
+verdict.
+```
+
+---
+
+**Now, "why so many fundamental problems" — I want to give you a real answer, not just reassurance.** The honest answer is that cache poisoning is a *systemic*, cross-cutting bug, and systemic bugs surface differently than isolated ones: every dossier generated *before* today could have been quietly affected by it, since a poisoned "no data" entry is indistinguishable from an honest one to everything downstream. That's not evidence the system keeps getting worse — it's evidence a bug that's been silently present for a while just got found, which is strictly better than it staying hidden until a real reviewer noticed a suspiciously blank XLogP field themselves.
+
+**Two real technical follow-ups on the fix itself, not just the finding.**
+
+**First — the fix stops permanent poisoning, but does it fix the underlying flakiness?** Not caching a transient failure means it won't corrupt data for 30 days, but if PubChem or ChEMBL times out on a *live* call, that field is still blank *this run*, with no retry. Fable5's audit found PubChem returning live 503s systematically, not just old poisoned cache entries — worth confirming directly whether retry/backoff logic got added, or whether a transient failure during an actual outreach demo could still show up as an unexplained blank field.
+
+**Second — the new "unknown unmet-need defaults to 0.5" fix.** I want to flag something subtle: the old bug (missing data → 1.0) was wrong, but at least an extreme number might catch a careful reader's eye. A quiet 0.5 is *less* likely to be questioned, precisely because it looks like an ordinary, unremarkable score. Confirm this is explicitly disclosed in the report as "uncertain — no data available" rather than presented as a normal computed value, or you've traded one silent failure mode for a subtler one.
+
+```
+1. Confirm whether retry/backoff logic was added to PubChem/ChEMBL calls,
+   or whether a live transient failure can still produce a blank field
+   with no cache involved at all.
+
+2. Confirm the 0.5 unmet-need default is visibly disclosed as an
+   uncertainty flag in the report, not shown as an ordinary score.
+
+3. Confirm both architecture-review sub-agents actually completed after
+   their retry, with full coverage -- not partial results treated as a
+   clean pass. (Worth noting: a sub-agent silently failing and that being
+   read as "nothing more to find" would be the exact same failure shape
+   as the bug this session was hunting for.)
+
+4. Given cache poisoning could have affected data quietly for a while:
+   check whether the retrospective validation study's results (sildenafil/
+   thalidomide/everolimus) or any previously-archived dossier could have
+   been affected, and flag anything that needs a re-check.
+```
+
+Fix the pindolol question first — that one determines whether your actual showcase candidate is real or another caught-in-time near-miss, and either answer is fine, but you need to know which before this goes anywhere.

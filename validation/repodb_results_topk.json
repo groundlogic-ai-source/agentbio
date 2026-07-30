@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-30T03:04:22",
+  "generated_at": "2026-07-30T14:22:57",
   "top_k": 3,
   "top_n": 10,
   "strong_match_threshold": 0.7,
@@ -788,6 +788,207 @@
       ],
       "miss_reason": "'Somatropin recombinant' absent across 99 ChEMBL compound(s) drawn from top-3 targets [ESR1 (P03372), AR (P10275), PGR (P06401)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
       "interpretation": "MISS \u2014 Somatropin recombinant not found in any of the top-3 target pools. 'Somatropin recombinant' absent across 99 ChEMBL compound(s) drawn from top-3 targets [ESR1 (P03372), AR (P10275), PGR (P06401)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Imiglucerase",
+      "disease_name": "Gaucher Disease",
+      "top_k": 3,
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "GBA1",
+        "uniprot_id": "P04062",
+        "ot_association_score": 0.8786
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "GBA1",
+          "uniprot_id": "P04062",
+          "ot_association_score": 0.8786
+        },
+        {
+          "target_symbol": "UGCG",
+          "uniprot_id": "Q16739",
+          "ot_association_score": 0.5905
+        },
+        {
+          "target_symbol": "PSAP",
+          "uniprot_id": "P07602",
+          "ot_association_score": 0.5085
+        },
+        {
+          "target_symbol": "SCARB2",
+          "uniprot_id": "Q14108",
+          "ot_association_score": 0.3837
+        },
+        {
+          "target_symbol": "PRX",
+          "uniprot_id": "Q9BXM0",
+          "ot_association_score": 0.3505
+        }
+      ],
+      "n_chemist_candidates": 279,
+      "n_reviewed_candidates": 279,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [
+        {
+          "target_symbol": "GBA1",
+          "uniprot_id": "P04062",
+          "ot_association_score": 0.8786,
+          "status": "miss",
+          "n_chemist_candidates": 28,
+          "n_reviewed": 28,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 1
+        },
+        {
+          "target_symbol": "UGCG",
+          "uniprot_id": "Q16739",
+          "ot_association_score": 0.5905,
+          "status": "miss",
+          "n_chemist_candidates": 27,
+          "n_reviewed": 27,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 2
+        },
+        {
+          "target_symbol": "PSAP",
+          "uniprot_id": "P07602",
+          "ot_association_score": 0.5085,
+          "status": "miss",
+          "n_chemist_candidates": 224,
+          "n_reviewed": 224,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 3
+        }
+      ],
+      "miss_reason": "'Imiglucerase' absent across 279 ChEMBL compound(s) drawn from top-3 targets [GBA1 (P04062), UGCG (Q16739), PSAP (P07602)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "interpretation": "MISS \u2014 Imiglucerase not found in any of the top-3 target pools. 'Imiglucerase' absent across 279 ChEMBL compound(s) drawn from top-3 targets [GBA1 (P04062), UGCG (Q16739), PSAP (P07602)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Laronidase",
+      "disease_name": "Mucopolysaccharidosis I",
+      "top_k": 3,
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "IDUA",
+        "uniprot_id": "P35475",
+        "ot_association_score": 0.9001
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "IDUA",
+          "uniprot_id": "P35475",
+          "ot_association_score": 0.9001
+        },
+        {
+          "target_symbol": "SLC26A1",
+          "uniprot_id": "Q9H2B4",
+          "ot_association_score": 0.586
+        },
+        {
+          "target_symbol": "PITX1",
+          "uniprot_id": "P78337",
+          "ot_association_score": 0.2815
+        },
+        {
+          "target_symbol": "GHR",
+          "uniprot_id": "P10912",
+          "ot_association_score": 0.231
+        }
+      ],
+      "n_chemist_candidates": 117,
+      "n_reviewed_candidates": 117,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [
+        {
+          "target_symbol": "IDUA",
+          "uniprot_id": "P35475",
+          "ot_association_score": 0.9001,
+          "status": "miss",
+          "n_chemist_candidates": 60,
+          "n_reviewed": 60,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 1
+        },
+        {
+          "target_symbol": "SLC26A1",
+          "uniprot_id": "Q9H2B4",
+          "ot_association_score": 0.586,
+          "status": "miss",
+          "n_chemist_candidates": 57,
+          "n_reviewed": 57,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 2
+        },
+        {
+          "target_symbol": "PITX1",
+          "uniprot_id": "P78337",
+          "ot_association_score": 0.2815,
+          "status": "miss",
+          "n_chemist_candidates": 0,
+          "n_reviewed": 0,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 3
+        }
+      ],
+      "miss_reason": "'Laronidase' absent across 117 ChEMBL compound(s) drawn from top-3 targets [IDUA (P35475), SLC26A1 (Q9H2B4), PITX1 (P78337)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "interpretation": "MISS \u2014 Laronidase not found in any of the top-3 target pools. 'Laronidase' absent across 117 ChEMBL compound(s) drawn from top-3 targets [IDUA (P35475), SLC26A1 (Q9H2B4), PITX1 (P78337)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
       "audit_rank": null,
       "audit_status": "absent",
       "audit_cap": null
