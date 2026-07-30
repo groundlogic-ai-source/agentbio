@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29T23:19:50",
+  "generated_at": "2026-07-30T00:05:04",
   "top_k": 3,
   "top_n": 10,
   "strong_match_threshold": 0.7,
@@ -233,6 +233,227 @@
       ],
       "miss_reason": "'Anakinra' absent across 341 ChEMBL compound(s) drawn from top-3 targets [IL1B (P01584), NLRP3 (A0A2R8YEG7), IL1R1 (P14778)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
       "interpretation": "MISS \u2014 Anakinra not found in any of the top-3 target pools. 'Anakinra' absent across 341 ChEMBL compound(s) drawn from top-3 targets [IL1B (P01584), NLRP3 (A0A2R8YEG7), IL1R1 (P14778)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Desmopressin",
+      "disease_name": "Hemophilia A",
+      "top_k": 3,
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "PLG",
+        "uniprot_id": "P00747",
+        "ot_association_score": 0.9
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "PLG",
+          "uniprot_id": "P00747",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "F9",
+          "uniprot_id": "P00740",
+          "ot_association_score": 0.7627
+        },
+        {
+          "target_symbol": "F7",
+          "uniprot_id": "P08709",
+          "ot_association_score": 0.552
+        },
+        {
+          "target_symbol": "TFPI",
+          "uniprot_id": "P10646",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "ACVRL1",
+          "uniprot_id": "P37023",
+          "ot_association_score": 0.4812
+        },
+        {
+          "target_symbol": "F8",
+          "uniprot_id": "P00451",
+          "ot_association_score": 0.9184
+        },
+        {
+          "target_symbol": "F10",
+          "uniprot_id": "P00742",
+          "ot_association_score": 0.5855
+        },
+        {
+          "target_symbol": "VWF",
+          "uniprot_id": "P04275",
+          "ot_association_score": 0.9
+        }
+      ],
+      "n_chemist_candidates": 374,
+      "n_reviewed_candidates": 374,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [
+        {
+          "target_symbol": "PLG",
+          "uniprot_id": "P00747",
+          "ot_association_score": 0.9,
+          "status": "miss",
+          "n_chemist_candidates": 30,
+          "n_reviewed": 30,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 1
+        },
+        {
+          "target_symbol": "F9",
+          "uniprot_id": "P00740",
+          "ot_association_score": 0.7627,
+          "status": "miss",
+          "n_chemist_candidates": 189,
+          "n_reviewed": 189,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 2
+        },
+        {
+          "target_symbol": "F7",
+          "uniprot_id": "P08709",
+          "ot_association_score": 0.552,
+          "status": "miss",
+          "n_chemist_candidates": 155,
+          "n_reviewed": 155,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 3
+        }
+      ],
+      "miss_reason": "'Desmopressin' absent across 374 ChEMBL compound(s) drawn from top-3 targets [PLG (P00747), F9 (P00740), F7 (P08709)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "interpretation": "MISS \u2014 Desmopressin not found in any of the top-3 target pools. 'Desmopressin' absent across 374 ChEMBL compound(s) drawn from top-3 targets [PLG (P00747), F9 (P00740), F7 (P08709)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null
+    },
+    {
+      "drug_name": "Desmopressin",
+      "disease_name": "von Willebrand Disease",
+      "top_k": 3,
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "PLG",
+        "uniprot_id": "P00747",
+        "ot_association_score": 0.3265
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "PLG",
+          "uniprot_id": "P00747",
+          "ot_association_score": 0.3265
+        },
+        {
+          "target_symbol": "F8",
+          "uniprot_id": "P00451",
+          "ot_association_score": 0.4088
+        },
+        {
+          "target_symbol": "ABO",
+          "uniprot_id": "A0A087X009",
+          "ot_association_score": 0.3849
+        },
+        {
+          "target_symbol": "VWF",
+          "uniprot_id": "P04275",
+          "ot_association_score": 0.8602
+        },
+        {
+          "target_symbol": "MIR7158",
+          "uniprot_id": null,
+          "ot_association_score": 0.2661
+        }
+      ],
+      "n_chemist_candidates": 89,
+      "n_reviewed_candidates": 89,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [
+        {
+          "target_symbol": "PLG",
+          "uniprot_id": "P00747",
+          "ot_association_score": 0.3265,
+          "status": "miss",
+          "n_chemist_candidates": 30,
+          "n_reviewed": 30,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 1
+        },
+        {
+          "target_symbol": "F8",
+          "uniprot_id": "P00451",
+          "ot_association_score": 0.4088,
+          "status": "miss",
+          "n_chemist_candidates": 59,
+          "n_reviewed": 59,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 2
+        },
+        {
+          "target_symbol": "ABO",
+          "uniprot_id": "A0A087X009",
+          "ot_association_score": 0.3849,
+          "status": "miss",
+          "n_chemist_candidates": 0,
+          "n_reviewed": 0,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 3
+        }
+      ],
+      "miss_reason": "'Desmopressin' absent across 89 ChEMBL compound(s) drawn from top-3 targets [PLG (P00747), F8 (P00451), ABO (A0A087X009)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "interpretation": "MISS \u2014 Desmopressin not found in any of the top-3 target pools. 'Desmopressin' absent across 89 ChEMBL compound(s) drawn from top-3 targets [PLG (P00747), F8 (P00451), ABO (A0A087X009)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
       "audit_rank": null,
       "audit_status": "absent",
       "audit_cap": null
