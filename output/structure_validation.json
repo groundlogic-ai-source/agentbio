@@ -1,44 +1,44 @@
 {
-  "VARDENAFIL": {
+  "PINDOLOL": {
     "afdb": {
       "has_structure": true,
-      "mean_plddt": 82.0,
-      "model_url": "https://alphafold.ebi.ac.uk/files/AF-O76074-F1-model_v6.pdb"
+      "mean_plddt": 79.12,
+      "model_url": "https://alphafold.ebi.ac.uk/files/AF-P07550-F1-model_v6.pdb"
     },
     "complex": {
       "available": true,
-      "structure_confidence": 0.8124047517776489,
-      "binding_pose_confidence": 0.9329684376716614,
-      "predicted_affinity": 0.5974845290184021,
-      "pdb_or_cif_url": "https://boltz-platform-prod-compute-api-storage.s3.us-east-1.amazonaws.com/org/311afb47-841a-494f-ab03-1ea7fa58b70a/workspace/ws_ai6T67fapbF5DEbF8qVZ/prediction/sab_pred_Zeo82D6L71kjdoQPEOTA/output/public/sample_0_predicted_structure.cif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=REDACTED&X-Amz-Date=20260729T000719Z&X-Amz-Expires=1800&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "structure_confidence": 0.8168925642967224,
+      "binding_pose_confidence": 0.999312162399292,
+      "predicted_affinity": 0.7495027780532837,
+      "pdb_or_cif_url": "https://boltz-platform-prod-compute-api-storage.s3.us-east-1.amazonaws.com/org/311afb47-841a-494f-ab03-1ea7fa58b70a/workspace/ws_ai6T67fapbF5DEbF8qVZ/prediction/sab_pred_3h00UaUaeCir7eHeMqQ8/output/public/sample_0_predicted_structure.cif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=REDACTED&X-Amz-Date=20260730T000221Z&X-Amz-Expires=1800&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED&X-Amz-SignedHeaders=host&x-id=GetObject",
       "estimated_cost_usd": 0.025,
       "raw_metrics": {
         "structure_metrics": {
-          "complex_ipde": 1.0721946954727173,
-          "complex_iplddt": 0.8158120512962341,
-          "complex_pde": 0.9212594032287598,
-          "complex_plddt": 0.7742154598236084,
-          "iptm": 0.9651618599891663,
-          "ligand_iptm": 0.9651618599891663,
+          "complex_ipde": 0.5378386974334717,
+          "complex_iplddt": 0.8704936504364014,
+          "complex_pde": 0.9373403787612915,
+          "complex_plddt": 0.7736763954162598,
+          "iptm": 0.9897568821907043,
+          "ligand_iptm": 0.9897568821907043,
           "protein_iptm": 0.0,
-          "ptm": 0.6339246034622192,
-          "structure_confidence": 0.8124047517776489
+          "ptm": 0.8363341093063354,
+          "structure_confidence": 0.8168925642967224
         },
         "binding_metrics": {
-          "binding_confidence": 0.9329684376716614,
-          "optimization_score": 0.5974845290184021,
+          "binding_confidence": 0.999312162399292,
+          "optimization_score": 0.7495027780532837,
           "type": "ligand_protein_binding_metrics"
         }
       },
       "model": "boltz-2.1",
       "error": null,
-      "local_cif_filename": "69708ded65c5d35c4bfeda0da735daa4.cif"
+      "local_cif_filename": "d39c3a9944ff7beb210956353c16a160.cif"
     },
     "adme": {
       "available": true,
-      "lipophilicity": 2.425380229949951,
-      "permeability": 0.2459874004125595,
-      "solubility": "medium-confidence",
+      "lipophilicity": -0.06282906234264374,
+      "permeability": 0.8193237781524658,
+      "solubility": "high-confidence",
       "model": "adme-v1",
       "error": null
     }

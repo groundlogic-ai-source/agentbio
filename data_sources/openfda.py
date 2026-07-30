@@ -13,6 +13,25 @@ from cache.cache import get, set as cache_set, make_key
 BASE_URL = "https://api.fda.gov/drug/event.json"
 LABEL_URL = "https://api.fda.gov/drug/label.json"
 
+# MedDRA preferred terms that are reporting artifacts, not adverse events:
+# product-use metadata, effectiveness complaints, and disease-progression terms
+# that echo the indication rather than describe a drug-induced harm. FAERS
+# ranks these among the most-reported PTs for many drugs (e.g. "OFF LABEL USE"
+# and "DRUG INEFFECTIVE" for bortezomib), and presenting them as adverse-event
+# signals is misleading.
+_NON_EVENT_PT = {
+    "DRUG INEFFECTIVE",
+    "OFF LABEL USE",
+    "PRODUCT USE ISSUE",
+    "PRODUCT USE COMPLAINT",
+    "INTENTIONAL PRODUCT MISUSE",
+    "PRODUCT DOSE OMISSION ISSUE",
+    "NO ADVERSE EVENT",
+    "DISEASE PROGRESSION",
+    "MALIGNANT NEOPLASM PROGRESSION",
+    "NEOPLASM PROGRESSION",
+}
+
 
 def get_label_indications(drug_name: str) -> dict[str, Any]:
     """
@@ -64,7 +83,10 @@ def get_label_indications(drug_name: str) -> dict[str, Any]:
         result["error"] = str(e)
         print(f"[openfda] WARNING: label indications query failed for '{drug_name}': {e}")
 
-    cache_set(cache_key, result, ttl_days=30)
+    # Only cache successful lookups (including explicit 404s handled above):
+    # caching a transient failure would poison 30 days of label lookups.
+    if result["error"] is None:
+        cache_set(cache_key, result, ttl_days=30)
     return result
 
 
@@ -83,7 +105,9 @@ def get_adverse_events(drug_name: str, limit: int = 15) -> dict[str, Any]:
     openFDA returns HTTP 404 when there are zero matching reports; that is treated
     as "no signal found" (empty list), not an error.
     """
-    cache_key = make_key("get_adverse_events", drug_name, limit)
+    # v2: filters non-adverse-event MedDRA PTs; v1 entries mixed reporting
+    # artifacts (OFF LABEL USE, DRUG INEFFECTIVE, ...) into the AE list.
+    cache_key = make_key("get_adverse_events_v2", drug_name, limit)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -109,6 +133,10 @@ def get_adverse_events(drug_name: str, limit: int = 15) -> dict[str, Any]:
         resp.raise_for_status()
         data = resp.json()
         rows = data.get("results", [])
+        # Drop non-adverse-event MedDRA PTs so the dossier's safety signal
+        # contains only actual harms, not reporting artifacts.
+        rows = [r for r in rows
+                if (r.get("term") or "").strip().upper() not in _NON_EVENT_PT]
         events = [{"term": r.get("term"), "count": int(r.get("count", 0))} for r in rows[:limit]]
         result["adverse_events"] = events
         result["total_event_terms"] = len(rows)
@@ -116,5 +144,8 @@ def get_adverse_events(drug_name: str, limit: int = 15) -> dict[str, Any]:
         result["error"] = str(e)
         print(f"[openfda] WARNING: adverse event query failed for '{drug_name}': {e}")
 
-    cache_set(cache_key, result, ttl_days=7)
+    # Only cache successful lookups: a transient failure cached as an empty
+    # event list would masquerade as "no safety signal" for 7 days.
+    if result["error"] is None:
+        cache_set(cache_key, result, ttl_days=7)
     return result

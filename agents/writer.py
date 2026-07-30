@@ -265,7 +265,15 @@ def _druggability_subsection(biologist_output: Optional[dict[str, Any]]) -> str:
     has_approved = dc.get("has_approved_drug_for_target", False)
     if has_approved:
         names = [d.get("name") for d in dc.get("approved_drugs", []) if d.get("name")]
-        name_str = ", ".join(names[:5]) if names else "see ChEMBL"
+        # Show the full list when short; otherwise truncate WITH an explicit
+        # "+N more". Printing "9 — A, B, C, D, E" (count larger than the visible
+        # list) reads as an error to a careful reviewer.
+        if names and len(names) <= 10:
+            name_str = ", ".join(names)
+        elif names:
+            name_str = ", ".join(names[:10]) + f" (+{len(names) - 10} more)"
+        else:
+            name_str = "see ChEMBL"
         lines.append(
             f"- **Approved drugs with known mechanism against this target (ChEMBL):** "
             f"{count} — {name_str}"
@@ -568,6 +576,37 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"rare-disease / NTD universe; a manually chosen target is scored "
             f"identically, never faked or skipped.\n"
         )
+        # Unmet-need reconciliation disclosure: OT links approved drugs at the
+        # DISEASE level (or a parent-umbrella EFO). Syndromic diseases whose
+        # treatable manifestations live under separate EFO nodes (e.g. MEN2A,
+        # treated via its medullary-thyroid-carcinoma manifestation) can show
+        # unmet_need_score ≈ 1.0 while approved mechanism-drugs exist for the
+        # causal target. Surface that tension instead of leaving an apparent
+        # contradiction between this score and the druggability section.
+        _dc = (biologist_output or {}).get("druggability_context") or {}
+        _tgt_approved = (
+            _dc.get("approved_drug_count", 0)
+            if _dc.get("has_approved_drug_for_target") else 0
+        )
+        _no_disease_therapy = (
+            meta.get("has_approved_treatment") is False
+            or (
+                meta.get("has_approved_treatment") is not True
+                and isinstance(unmet, (int, float)) and unmet >= 0.9
+            )
+        )
+        if _tgt_approved and _no_disease_therapy:
+            parts.append(
+                f"\n> **Unmet-need reconciliation:** Open Targets links no approved "
+                f"therapy to this disease's own EFO record, yet {_tgt_approved} "
+                f"approved drug(s) with known mechanism against the selected target "
+                f"exist (see Target druggability context). For syndromic diseases "
+                f"this usually means an approved therapy treats a manifestation "
+                f"recorded under a different EFO node (e.g. medullary thyroid "
+                f"carcinoma for MEN2A). The unmet_need_score above reflects "
+                f"disease-level OT linkage only and may overstate unmet need — "
+                f"judge accordingly.\n"
+            )
 
     # 2. Evidence table
     parts.append("\n## 2. Evidence table\n")

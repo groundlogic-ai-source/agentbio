@@ -169,7 +169,17 @@ textarea:focus-visible,
   padding: 0.45rem 0.65rem;
   text-align: left;
   vertical-align: top;
-  word-break: break-word;
+  /* overflow-wrap breaks only when a word cannot fit on its own line.
+     word-break: break-word shattered narrow headers mid-word ("Wei ght")
+     in the printed dossier PDF. */
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* Keep short numeric/label columns wide enough that headers never shatter. */
+.dossier table th:not(:first-child),
+.dossier table td:not(:first-child) {
+  min-width: 4.25rem;
 }
 
 .dossier th {

@@ -1,264 +1,79 @@
 {
   "target": {
-    "target_symbol": "PDE5A",
-    "uniprot_id": "O76074",
-    "ensembl_id": "",
-    "disease_name": "Idiopathic pulmonary arterial hypertension",
-    "orpha_code": "275766",
-    "ot_association_score": 0.9,
-    "target_discovery_method": "pharmacological_precedent_via_parent_umbrella"
+    "target_symbol": "PRSS1",
+    "uniprot_id": "P07477",
+    "ensembl_id": "ENSG00000204983",
+    "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+    "orpha_code": "700124",
+    "ot_association_score": 0.8071,
+    "target_discovery_method": "genetic_association"
   },
   "targets": [
     {
-      "target_symbol": "PDE5A",
-      "uniprot_id": "O76074",
-      "ensembl_id": "",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "orpha_code": "275766",
-      "ot_association_score": 0.9,
-      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella"
-    },
-    {
-      "target_symbol": "PTGIR",
-      "uniprot_id": "P43119",
-      "ensembl_id": "ENSG00000160013",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "orpha_code": "275766",
-      "ot_association_score": 0.5106,
+      "target_symbol": "PRSS1",
+      "uniprot_id": "P07477",
+      "ensembl_id": "ENSG00000204983",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "orpha_code": "700124",
+      "ot_association_score": 0.8071,
       "target_discovery_method": "genetic_association"
     },
     {
-      "target_symbol": "EIF2AK4",
-      "uniprot_id": "Q9P2K8",
-      "ensembl_id": "ENSG00000128829",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "orpha_code": "275766",
-      "ot_association_score": 0.4783,
+      "target_symbol": "CTRC",
+      "uniprot_id": "Q99895",
+      "ensembl_id": "ENSG00000162438",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "orpha_code": "700124",
+      "ot_association_score": 0.7625,
       "target_discovery_method": "genetic_association"
     },
     {
-      "target_symbol": "BMPR2",
-      "uniprot_id": "Q13873",
-      "ensembl_id": "ENSG00000204217",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "orpha_code": "275766",
-      "ot_association_score": 0.6809,
+      "target_symbol": "CFTR",
+      "uniprot_id": "P13569",
+      "ensembl_id": "ENSG00000001626",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "orpha_code": "700124",
+      "ot_association_score": 0.7177,
       "target_discovery_method": "genetic_association"
     },
     {
-      "target_symbol": "INHBA",
-      "uniprot_id": "P08476",
-      "ensembl_id": "",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "orpha_code": "275766",
-      "ot_association_score": 0.9,
-      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella"
+      "target_symbol": "CPA1",
+      "uniprot_id": "P15085",
+      "ensembl_id": "ENSG00000091704",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "orpha_code": "700124",
+      "ot_association_score": 0.4003,
+      "target_discovery_method": "genetic_association"
+    },
+    {
+      "target_symbol": "SPINK1",
+      "uniprot_id": "P00995",
+      "ensembl_id": "ENSG00000164266",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "orpha_code": "700124",
+      "ot_association_score": 0.7504,
+      "target_discovery_method": "genetic_association"
     }
   ],
   "candidates": [
     {
-      "drug_name": "VARDENAFIL",
-      "molecule_chembl_id": "CHEMBL1520",
-      "smiles": "CCCc1nc(C)c2c(=O)nc(-c3cc(S(=O)(=O)N4CCN(CC)CC4)ccc3OCC)[nH]n12",
-      "inchikey": "SECKRCOLJRRGGV-UHFFFAOYSA-N",
-      "pchembl_value": 9.15,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "VARDENAFIL HYDROCHLORIDE",
-      "tanimoto_score": 0.6234,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Vardenafil has a median pChEMBL affinity of 9.15 against PDE5A, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.623 to the nearest approved drug, vardenafil hydrochloride. PDE5A has eight recorded BioGRID physical or genetic interactors: AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
-      "source_chembl_ids": [
-        "CHEMBL1520",
-        "CHEMBL762826",
-        "CHEMBL830357",
-        "CHEMBL831692"
-      ],
-      "source_activity_ids": [
-        574531,
-        1506645,
-        1520505
-      ],
-      "target_symbol": "PDE5A",
-      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
-      "uniprot_id": "O76074",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.9,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "VARDENAFIL HYDROCHLORIDE",
-      "molecule_chembl_id": "CHEMBL1339",
-      "smiles": "CCCc1nc(C)c2c(O)nc(-c3cc(S(=O)(=O)N4CCN(CC)CC4)ccc3OCC)nn12.Cl",
-      "inchikey": "XCMULUAPJXCOHI-UHFFFAOYSA-N",
-      "pchembl_value": 9.15,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "VARDENAFIL",
-      "tanimoto_score": 0.6234,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Vardenafil hydrochloride has a median pChEMBL affinity of 9.15 against PDE5A, measured at an assay confidence score of 9 out of 9, and it is a known approved drug with a Tanimoto similarity of 0.623 to the nearest approved drug vardenafil. The PDE5A target has eight recorded BioGRID physical or genetic interactors: AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
-      "source_chembl_ids": [
-        "CHEMBL1339",
-        "CHEMBL762828"
-      ],
-      "source_activity_ids": [
-        902360
-      ],
-      "target_symbol": "PDE5A",
-      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
-      "uniprot_id": "O76074",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.9,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "SILDENAFIL CITRATE",
-      "molecule_chembl_id": "CHEMBL1737",
-      "smiles": "CCCc1nn(C)c2c(=O)[nH]c(-c3cc(S(=O)(=O)N4CCN(C)CC4)ccc3OCC)nc12.O=C(O)CC(O)(CC(=O)O)C(=O)O",
-      "inchikey": "DEIYFTQMQPDXOT-UHFFFAOYSA-N",
-      "pchembl_value": 8.66,
-      "confidence_score": 8,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "SILDENAFIL",
-      "tanimoto_score": 0.8243,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Sildenafil citrate has a median pChEMBL affinity of 8.66 against PDE5A, measured at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.824 to the approved drug sildenafil. PDE5A has eight recorded BioGRID physical or genetic interactors: AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
-      "source_chembl_ids": [
-        "CHEMBL1737",
-        "CHEMBL762502"
-      ],
-      "source_activity_ids": [
-        353169
-      ],
-      "target_symbol": "PDE5A",
-      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
-      "uniprot_id": "O76074",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.9,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "SILDENAFIL",
-      "molecule_chembl_id": "CHEMBL192",
-      "smiles": "CCCc1nn(C)c2c(=O)[nH]c(-c3cc(S(=O)(=O)N4CCN(C)CC4)ccc3OCC)nc12",
-      "inchikey": null,
-      "pchembl_value": 8.52,
-      "confidence_score": 9,
-      "max_phase": "4.0",
-      "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "SILDENAFIL CITRATE",
-      "tanimoto_score": 0.8243,
-      "mutation_specificity": {
-        "is_mutation_specific": false,
-        "matched_terms": [],
-        "source_excerpt": "",
-        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
-        "indication_source": "openfda_label"
-      },
-      "rationale": "Sildenafil has a median pChEMBL affinity of 8.52 against PDE5A, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.824 to the nearest approved drug sildenafil citrate. PDE5A has eight recorded BioGRID physical or genetic interactors: AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
-      "source_chembl_ids": [
-        "CHEMBL192",
-        "CHEMBL757897",
-        "CHEMBL760590",
-        "CHEMBL760828",
-        "CHEMBL762496",
-        "CHEMBL762497",
-        "CHEMBL762498",
-        "CHEMBL762508",
-        "CHEMBL762509",
-        "CHEMBL762818",
-        "CHEMBL762820",
-        "CHEMBL762822",
-        "CHEMBL762823",
-        "CHEMBL762825",
-        "CHEMBL762826",
-        "CHEMBL762827",
-        "CHEMBL762828",
-        "CHEMBL762831",
-        "CHEMBL827173",
-        "CHEMBL827930",
-        "CHEMBL828414",
-        "CHEMBL831692",
-        "CHEMBL832838",
-        "CHEMBL860521",
-        "CHEMBL871523"
-      ],
-      "source_activity_ids": [
-        268223,
-        280637,
-        322721,
-        381175,
-        477010,
-        584306,
-        726578,
-        736693,
-        837348,
-        837349,
-        869550,
-        885958,
-        920974,
-        924690,
-        925443,
-        1243003,
-        1269964,
-        1434747,
-        1506524,
-        1520494,
-        1521901,
-        1523271,
-        1722223,
-        1748965
-      ],
-      "target_symbol": "PDE5A",
-      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
-      "uniprot_id": "O76074",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.9,
-      "pathway_specificity_note": null
-    },
-    {
-      "drug_name": "TADALAFIL",
-      "molecule_chembl_id": "CHEMBL779",
-      "smiles": "CN1CC(=O)N2[C@H](c3ccc4c(c3)OCO4)c3[nH]c4ccccc4c3C[C@@H]2C1=O",
-      "inchikey": "WOXKDUGGOYFFRN-IIBYNOLFSA-N",
-      "pchembl_value": 8.285,
+      "drug_name": "BORTEZOMIB",
+      "molecule_chembl_id": "CHEMBL325041",
+      "smiles": "CC(C)C[C@H](NC(=O)[C@H](Cc1ccccc1)NC(=O)c1cnccn1)B(O)O",
+      "inchikey": "GXJABQQUPOEUTA-RDJZCZTQSA-N",
+      "pchembl_value": 6.5,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "G04BE08",
+        "L01XG01",
+        "L01XX32",
         "N02BA01"
       ],
-      "most_similar_approved_drug": "MILRINONE",
-      "tanimoto_score": 0.1282,
+      "most_similar_approved_drug": "ACARBOSE",
+      "tanimoto_score": 0.087,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -266,39 +81,38 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Tadalafil has a median pChEMBL affinity of 8.285 against PDE5A, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.128 to the nearest approved drug milrinone. PDE5A has eight recorded BioGRID interactors\u2014AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
+      "rationale": "Bortezomib has a median pChEMBL affinity of 6.5 against CTRB1, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.087 to the nearest approved drug acarbose. The target CTRB1 has eight recorded BioGRID interactors\u2014SERPINB8, SERPINF2, DDX5, ALB, LGR4, CEP250, STK38L, and KRT1.",
       "source_chembl_ids": [
-        "CHEMBL779",
-        "CHEMBL762824",
-        "CHEMBL762826",
-        "CHEMBL830357",
-        "CHEMBL831692"
+        "CHEMBL325041",
+        "CHEMBL662080"
       ],
       "source_activity_ids": [
-        331695,
-        556410,
-        1506647,
-        1520620
+        89211
       ],
-      "target_symbol": "PDE5A",
-      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
-      "uniprot_id": "O76074",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.9,
+      "target_symbol": "CTRB1",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P17538",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "DIPYRIDAMOLE",
-      "molecule_chembl_id": "CHEMBL932",
-      "smiles": "OCCN(CCO)c1nc(N2CCCCC2)c2nc(N(CCO)CCO)nc(N3CCCCC3)c2n1",
-      "inchikey": null,
-      "pchembl_value": 6.26,
-      "confidence_score": 8,
+      "drug_name": "ACARBOSE",
+      "molecule_chembl_id": "CHEMBL404271",
+      "smiles": "C[C@H]1O[C@H](O[C@H]2[C@H](O)[C@@H](O)[C@@H](O[C@H]3[C@H](O)[C@@H](O)C(O)O[C@@H]3CO)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@@H]1N[C@H]1C=C(CO)[C@@H](O)[C@H](O)[C@H]1O",
+      "inchikey": "CEMXHAPUFJOOSV-XGWNLRGSSA-N",
+      "pchembl_value": 4.49,
+      "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "SILDENAFIL",
-      "tanimoto_score": 0.0964,
+      "atc_codes": [
+        "A01AD05",
+        "A10BF01",
+        "B01AC06",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "BORTEZOMIB",
+      "tanimoto_score": 0.087,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -306,40 +120,77 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Dipyridamole has a median pChEMBL affinity of 6.26 against PDE5A, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.096 to the nearest approved drug sildenafil. PDE5A has eight recorded BioGRID interactors\u2014AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
+      "rationale": "Acarbose has a median pChEMBL affinity of 4.49 against AMY2A at assay confidence score 9, and its Tanimoto similarity (Morgan r2) to the nearest approved drug, bortezomib, is 0.087. The BioGRID-recorded physical/genetic interactors of AMY2A are SERPINB8, SERPINF2, DDX5, ALB, LGR4, CEP250, STK38L, and KRT1.",
       "source_chembl_ids": [
-        "CHEMBL932",
-        "CHEMBL762503",
-        "CHEMBL822071"
+        "CHEMBL404271",
+        "CHEMBL6178278"
       ],
       "source_activity_ids": [
-        383057,
-        858691
+        29292577
       ],
-      "target_symbol": "PDE5A",
-      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
-      "uniprot_id": "O76074",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.9,
+      "target_symbol": "AMY2A",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P04746",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "MILRINONE",
-      "molecule_chembl_id": "CHEMBL189",
-      "smiles": "Cc1[nH]c(=O)c(C#N)cc1-c1ccncc1",
-      "inchikey": "PZRHRDRVRGEVNW-UHFFFAOYSA-N",
-      "pchembl_value": 6.13,
+      "drug_name": "ACARBOSE",
+      "molecule_chembl_id": "CHEMBL404271",
+      "smiles": "C[C@H]1O[C@H](O[C@H]2[C@H](O)[C@@H](O)[C@@H](O[C@H]3[C@H](O)[C@@H](O)C(O)O[C@@H]3CO)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@@H]1N[C@H]1C=C(CO)[C@@H](O)[C@H](O)[C@H]1O",
+      "inchikey": "CEMXHAPUFJOOSV-XGWNLRGSSA-N",
+      "pchembl_value": 4.49,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "A10BF01",
+        "B01AC06",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": null,
+      "tanimoto_score": 0.0,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Acarbose has a median pChEMBL affinity of 4.49 against AMY2A, measured at an assay confidence score of 9 out of 9, and is a approved drug with no nearest approved structural analog in the candidate set. The BioGRID-recorded physical and genetic interactors of AMY2A include NEDD8, ST13, UBC, KRTAP10-7, KRTAP10-3, SUMF1, MDFI, and KRT34.",
+      "source_chembl_ids": [
+        "CHEMBL404271",
+        "CHEMBL6178278"
+      ],
+      "source_activity_ids": [
+        29292577
+      ],
+      "target_symbol": "AMY2A",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P04746",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "CARVEDILOL",
+      "molecule_chembl_id": "CHEMBL723",
+      "smiles": "COc1ccccc1OCCNCC(O)COc1cccc2[nH]c3ccccc3c12",
+      "inchikey": "OGHNVEJMJSYVRP-UHFFFAOYSA-N",
+      "pchembl_value": 9.7,
       "confidence_score": 8,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "C01CE02",
+        "C07AG02",
         "N02BA01"
       ],
-      "most_similar_approved_drug": "SILDENAFIL",
-      "tanimoto_score": 0.1463,
+      "most_similar_approved_drug": "PROPRANOLOL",
+      "tanimoto_score": 0.4068,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -347,38 +198,80 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Milrinone, an approved drug, has a median pChEMBL affinity of 6.13 against PDE5A measured at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.146 to the nearest approved drug sildenafil. PDE5A has eight recorded BioGRID interactors\u2014AIPL1, MIOS, FGFR1OP, BLM, SUPT5H, WDR24, PATZ1, and FKBP15.",
+      "rationale": "Carvedilol has a median pChEMBL affinity of 9.7 against ADRB2 at assay confidence score 8 (out of 9), and a Tanimoto similarity of 0.407 to the nearest approved drug propranolol. BioGRID records eight physical or genetic interactors for ADRB2: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
       "source_chembl_ids": [
-        "CHEMBL189",
-        "CHEMBL768661"
+        "CHEMBL723",
+        "CHEMBL1909092"
       ],
       "source_activity_ids": [
-        513807
+        7711856,
+        7711857
       ],
-      "target_symbol": "PDE5A",
-      "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
-      "uniprot_id": "O76074",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.9,
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "ILOPROST",
-      "molecule_chembl_id": "CHEMBL494",
-      "smiles": "CC#CCC(C)[C@H](O)/C=C/[C@@H]1[C@H]2C/C(=C/CCCC(=O)O)C[C@H]2C[C@H]1O",
-      "inchikey": "HIFJCPQKFCZDDL-ACWOEMLNSA-N",
-      "pchembl_value": 8.05,
+      "drug_name": "TIMOLOL",
+      "molecule_chembl_id": "CHEMBL499",
+      "smiles": "CC(C)(C)NC[C@H](O)COc1nsnc1N1CCOCC1",
+      "inchikey": "BLJRIMJGRPQVNF-JTQLQIEISA-N",
+      "pchembl_value": 9.62,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "C07AA06",
+        "N02BA01",
+        "S01ED01"
+      ],
+      "most_similar_approved_drug": "LEVOBUNOLOL",
+      "tanimoto_score": 0.3538,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Timolol has a median pChEMBL affinity of 9.62 against ADRB2 measured at assay confidence score 8, and a Tanimoto similarity of 0.354 to the nearest approved drug levobunolol. ADRB2 has eight recorded BioGRID interactors\u2014GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1\u2014and timolol is an approved drug.",
+      "source_chembl_ids": [
+        "CHEMBL499",
+        "CHEMBL1909092"
+      ],
+      "source_activity_ids": [
+        7819344,
+        7819345
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "PINDOLOL",
+      "molecule_chembl_id": "CHEMBL500",
+      "smiles": "CC(C)NCC(O)COc1cccc2[nH]ccc12",
+      "inchikey": "JZQKKSLKJUAGIC-UHFFFAOYSA-N",
+      "pchembl_value": 9.4,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "B01AC11",
+        "C07AA03",
         "N02BA01"
       ],
-      "most_similar_approved_drug": "DINOPROSTONE",
-      "tanimoto_score": 0.3506,
+      "most_similar_approved_drug": "PROPRANOLOL",
+      "tanimoto_score": 0.6444,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -386,61 +279,81 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Iloprost has a median pChEMBL affinity of 8.05 against PTGIR at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.351 to the nearest approved drug dinoprostone. The target PTGIR has eight recorded BioGRID interactors\u2014LNX1, PDE6D, RAB11A, TBXA2R, GNAS, PDZD3, GNAQ, and RAB5A.",
+      "rationale": "Pindolol has a median pChEMBL affinity of 9.4 against ADRB2 measured at assay confidence score 9, and a Tanimoto similarity of 0.644 to the nearest approved drug propranolol. BioGRID records physical or genetic interactions between ADRB2 and the proteins GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
       "source_chembl_ids": [
-        "CHEMBL494",
-        "CHEMBL2394933",
-        "CHEMBL2394989",
-        "CHEMBL3779740",
-        "CHEMBL3876387",
-        "CHEMBL4005267",
-        "CHEMBL4005280",
-        "CHEMBL768433",
-        "CHEMBL768434",
-        "CHEMBL768440",
-        "CHEMBL839468",
-        "CHEMBL947376"
+        "CHEMBL500",
+        "CHEMBL1909092",
+        "CHEMBL899656"
       ],
       "source_activity_ids": [
-        247781,
-        776738,
-        1110469,
-        1487960,
-        2381331,
-        2401834,
-        13336174,
-        13342004,
-        13342076,
-        16501800,
-        16838448,
-        18017609,
-        18017711
+        1985057,
+        7725987,
+        7725988
       ],
-      "target_symbol": "PTGIR",
-      "target_discovery_method": "genetic_association",
-      "uniprot_id": "P43119",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.5106,
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "ALPROSTADIL",
-      "molecule_chembl_id": "CHEMBL495",
-      "smiles": "CCCCC[C@H](O)/C=C/[C@H]1[C@H](O)CC(=O)[C@@H]1CCCCCCC(=O)O",
-      "inchikey": "GMVPRGQOIOIIMI-DWKJAMRDSA-N",
-      "pchembl_value": 6.82,
+      "drug_name": "LEVOBUNOLOL",
+      "molecule_chembl_id": "CHEMBL1201237",
+      "smiles": "CC(C)(C)NC[C@H](O)COc1cccc2c1CCCC2=O",
+      "inchikey": "IXHBTMCLRNMKHZ-LBPRGKRZSA-N",
+      "pchembl_value": 9.18,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "N02BA01",
+        "S01ED03"
+      ],
+      "most_similar_approved_drug": "PROPRANOLOL",
+      "tanimoto_score": 0.386,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Levobunolol has a median pChEMBL affinity of 9.18 against ADRB2 at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.386 to the nearest approved drug propranolol. The ADRB2 target has eight recorded BioGRID interactors\u2014GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1\u2014and levobunolol is an approved drug.",
+      "source_chembl_ids": [
+        "CHEMBL1201237",
+        "CHEMBL1909092"
+      ],
+      "source_activity_ids": [
+        7750840,
+        7750841
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "PROPRANOLOL",
+      "molecule_chembl_id": "CHEMBL27",
+      "smiles": "CC(C)NCC(O)COc1cccc2ccccc12",
+      "inchikey": "AQHHHDLHHXJYJD-UHFFFAOYSA-N",
+      "pchembl_value": 9.035,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "C01EA01",
-        "G04BE01",
+        "C07AA05",
         "N02BA01"
       ],
-      "most_similar_approved_drug": "DINOPROSTONE",
-      "tanimoto_score": 0.7273,
+      "most_similar_approved_drug": "PINDOLOL",
+      "tanimoto_score": 0.6444,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -448,44 +361,43 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Alprostadil has a median pChEMBL affinity of 6.82 against PTGIR at assay confidence score 9, and it is an approved drug with a Tanimoto similarity of 0.727 to the nearest approved drug dinoprostone. The target PTGIR has eight recorded BioGRID interactors\u2014LNX1, PDE6D, RAB11A, TBXA2R, GNAS, PDZD3, GNAQ, and RAB5A.",
+      "rationale": "Propranolol has a median pChEMBL affinity of 9.035 against ADRB2 from assays with a confidence score of 9 out of 9, and it is a approved drug with a Tanimoto similarity of 0.644 to the nearest approved drug pindolol. BioGRID records physical or genetic interactions between ADRB2 and the proteins GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
       "source_chembl_ids": [
-        "CHEMBL495",
-        "CHEMBL764126",
-        "CHEMBL764127",
-        "CHEMBL764128",
-        "CHEMBL768434"
+        "CHEMBL27",
+        "CHEMBL1909092",
+        "CHEMBL3100637",
+        "CHEMBL3100638"
       ],
       "source_activity_ids": [
-        92303,
-        596636,
-        768940,
-        1149943
+        7741502,
+        7741503,
+        13871662,
+        13871672
       ],
-      "target_symbol": "PTGIR",
-      "target_discovery_method": "genetic_association",
-      "uniprot_id": "P43119",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.5106,
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "DINOPROSTONE",
-      "molecule_chembl_id": "CHEMBL548",
-      "smiles": "CCCCC[C@H](O)/C=C/[C@H]1[C@H](O)CC(=O)[C@@H]1C/C=C\\CCCC(=O)O",
-      "inchikey": "XEYBRNLFEZDVAW-ARSRFYASSA-N",
-      "pchembl_value": 6.58,
+      "drug_name": "SALMETEROL",
+      "molecule_chembl_id": "CHEMBL1263",
+      "smiles": "OCc1cc(C(O)CNCCCCCCOCCCCc2ccccc2)ccc1O",
+      "inchikey": "GIIZNNXWQWCKIB-UHFFFAOYSA-N",
+      "pchembl_value": 8.6,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "G02AD02",
-        "N02BA01"
+        "N02BA01",
+        "R03AC12"
       ],
-      "most_similar_approved_drug": "ALPROSTADIL",
-      "tanimoto_score": 0.7273,
+      "most_similar_approved_drug": "ALBUTEROL",
+      "tanimoto_score": 0.4464,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -493,38 +405,95 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Dinoprostone is an approved drug with a median pChEMBL affinity of 6.58 against PTGIR at assay confidence score 9, and a Tanimoto similarity of 0.727 to the nearest approved drug Alprostadil. The BioGRID-recorded physical and genetic interactors of PTGIR are LNX1, PDE6D, RAB11A, TBXA2R, GNAS, PDZD3, GNAQ, and RAB5A.",
+      "rationale": "Salmeterol is an approved drug with a median pChEMBL affinity of 8.6 against ADRB2 measured at assay confidence score 9, and a Tanimoto similarity of 0.446 to the nearest approved drug albuterol. The ADRB2 target has eight recorded BioGRID physical or genetic interactors: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
       "source_chembl_ids": [
-        "CHEMBL548",
-        "CHEMBL3294250"
+        "CHEMBL1263",
+        "CHEMBL1115584",
+        "CHEMBL1227592",
+        "CHEMBL1686737",
+        "CHEMBL1804516",
+        "CHEMBL1804899",
+        "CHEMBL1943767",
+        "CHEMBL3294890",
+        "CHEMBL3369035",
+        "CHEMBL876356"
       ],
       "source_activity_ids": [
-        14726583
+        1447619,
+        3294069,
+        3423535,
+        5238442,
+        6278176,
+        6278182,
+        8007815,
+        14712710,
+        15030865
       ],
-      "target_symbol": "PTGIR",
-      "target_discovery_method": "genetic_association",
-      "uniprot_id": "P43119",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.5106,
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "SELEXIPAG",
-      "molecule_chembl_id": "CHEMBL238804",
-      "smiles": "CC(C)N(CCCCOCC(=O)NS(C)(=O)=O)c1cnc(-c2ccccc2)c(-c2ccccc2)n1",
-      "inchikey": "QXWZQTURMXZVHJ-UHFFFAOYSA-N",
-      "pchembl_value": 6.2,
+      "drug_name": "LABETALOL",
+      "molecule_chembl_id": "CHEMBL429",
+      "smiles": "CC(CCc1ccccc1)NCC(O)c1ccc(O)c(C(N)=O)c1",
+      "inchikey": "SGUAFYQXFOLMHL-UHFFFAOYSA-N",
+      "pchembl_value": 7.88,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "C07AG01",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "ISOPROTERENOL",
+      "tanimoto_score": 0.4314,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Labetalol has a median pChEMBL affinity of 7.88 against ADRB2 measured at an assay confidence score of 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.431 to the nearest approved drug isoproterenol. ADRB2 has eight recorded BioGRID physical/genetic interactors: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL429",
+        "CHEMBL1909092"
+      ],
+      "source_activity_ids": [
+        7767768,
+        7767769
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "FORMOTEROL",
+      "molecule_chembl_id": "CHEMBL1256786",
+      "smiles": "COc1ccc(CC(C)NCC(O)c2ccc(O)c(NC=O)c2)cc1",
+      "inchikey": "BPZSYCZIITTYBL-UHFFFAOYSA-N",
+      "pchembl_value": 7.57,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "B01AC27",
-        "N02BA01"
+        "N02BA01",
+        "R03AC13",
+        "R03CC15"
       ],
-      "most_similar_approved_drug": "LAROPIPRANT",
-      "tanimoto_score": 0.1489,
+      "most_similar_approved_drug": "FENOTEROL",
+      "tanimoto_score": 0.4727,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -532,35 +501,89 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Selexipag has a median pChEMBL affinity of 6.2 against PTGIR, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.149 to the nearest approved drug laropiprant. The BioGRID-recorded physical and genetic interactors of PTGIR are LNX1, PDE6D, RAB11A, TBXA2R, GNAS, PDZD3, GNAQ, and RAB5A.",
+      "rationale": "Formoterol is an approved drug with a median pChEMBL affinity of 7.57 against ADRB2 measured at assay confidence score 9, and a Tanimoto similarity of 0.473 to the nearest approved drug fenoterol. The ADRB2 target has eight recorded BioGRID interactors\u2014GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
       "source_chembl_ids": [
-        "CHEMBL238804",
-        "CHEMBL4005267",
-        "CHEMBL5246771"
+        "CHEMBL1256786",
+        "CHEMBL1115584",
+        "CHEMBL1227592",
+        "CHEMBL1686737",
+        "CHEMBL3294890",
+        "CHEMBL3369035",
+        "CHEMBL876356"
       ],
       "source_activity_ids": [
-        18017460,
-        25048357
+        1447614,
+        3294063,
+        3423531,
+        5238441,
+        14712711,
+        15030866
       ],
-      "target_symbol": "PTGIR",
-      "target_discovery_method": "genetic_association",
-      "uniprot_id": "P43119",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.5106,
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "LAROPIPRANT",
-      "molecule_chembl_id": "CHEMBL426559",
-      "smiles": "CS(=O)(=O)c1cc(F)cc2c3c(n(Cc4ccc(Cl)cc4)c12)[C@@H](CC(=O)O)CC3",
-      "inchikey": "NXFFJDQHYLNEJK-CYBMUJFWSA-N",
-      "pchembl_value": 5.18,
+      "drug_name": "DARIFENACIN",
+      "molecule_chembl_id": "CHEMBL1346",
+      "smiles": "NC(=O)C(c1ccccc1)(c1ccccc1)[C@@H]1CCN(CCc2ccc3c(c2)CCO3)C1",
+      "inchikey": "HXGBXQDTNZMWGS-RUZDIDTESA-N",
+      "pchembl_value": 7.505,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
-      "atc_codes": [],
-      "most_similar_approved_drug": "SELEXIPAG",
-      "tanimoto_score": 0.1489,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "G04BD10",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "DOXAZOSIN",
+      "tanimoto_score": 0.2247,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Darifenacin, an approved drug, has a median pChEMBL affinity of 7.505 against ADRB2 measured at assay confidence score 9, and a Tanimoto similarity of 0.225 to the nearest approved drug doxazosin. The ADRB2 target has eight recorded BioGRID interactors\u2014GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL1346",
+        "CHEMBL1686737",
+        "CHEMBL2091584"
+      ],
+      "source_activity_ids": [
+        5238443,
+        11004931
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "INDACATEROL",
+      "molecule_chembl_id": "CHEMBL1095777",
+      "smiles": "CCc1cc2c(cc1CC)CC(NC[C@H](O)c1ccc(O)c3[nH]c(=O)ccc13)C2",
+      "inchikey": "QZZUEBNBZAPZLX-QFIPXVFZSA-N",
+      "pchembl_value": 7.405,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "N02BA01",
+        "R03AC18"
+      ],
+      "most_similar_approved_drug": "EPINEPHRINE",
+      "tanimoto_score": 0.2542,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -568,38 +591,40 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": null
       },
-      "rationale": "Laropiprant has a median pChEMBL affinity of 5.18 against PTGIR measured at assay confidence score 9, and it is an approved or known drug with a Tanimoto similarity of 0.149 to the nearest approved drug selexipag. The PTGIR target has eight recorded BioGRID interactors\u2014LNX1, PDE6D, RAB11A, TBXA2R, GNAS, PDZD3, GNAQ, and RAB5A.",
+      "rationale": "Indacaterol has a median pChEMBL affinity of 7.405 against ADRB2 measured at assay confidence score 9, and a Tanimoto similarity of 0.254 to the nearest approved drug epinephrine. ADRB2 has eight recorded BioGRID interactors\u2014GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1\u2014and indacaterol is itself an approved drug.",
       "source_chembl_ids": [
-        "CHEMBL426559",
-        "CHEMBL907938"
+        "CHEMBL1095777",
+        "CHEMBL1115584",
+        "CHEMBL1227592"
       ],
       "source_activity_ids": [
-        1818001
+        3294105,
+        3423533
       ],
-      "target_symbol": "PTGIR",
-      "target_discovery_method": "genetic_association",
-      "uniprot_id": "P43119",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.5106,
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "MOMELOTINIB",
-      "molecule_chembl_id": "CHEMBL1078178",
-      "smiles": "N#CCNC(=O)c1ccc(-c2ccnc(Nc3ccc(N4CCOCC4)cc3)n2)cc1",
-      "inchikey": "ZVHNDZWQTBEVRY-UHFFFAOYSA-N",
-      "pchembl_value": 6.97,
+      "drug_name": "PROPAFENONE",
+      "molecule_chembl_id": "CHEMBL631",
+      "smiles": "CCCNCC(O)COc1ccccc1C(=O)CCc1ccccc1",
+      "inchikey": "JWHAUXFOSRPERK-UHFFFAOYSA-N",
+      "pchembl_value": 7.36,
       "confidence_score": 8,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "L01EJ04",
+        "C01BC03",
         "N02BA01"
       ],
-      "most_similar_approved_drug": "DEUCRAVACITINIB",
-      "tanimoto_score": 0.1485,
+      "most_similar_approved_drug": "CARVEDILOL",
+      "tanimoto_score": 0.3676,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -607,40 +632,83 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Momelotinib has a median pChEMBL affinity of 6.97 against BMPR1B at an assay confidence score of 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.149 to the nearest approved drug deucravacitinib. BMPR1B has the following BioGRID-recorded physical or genetic interactors: LIMK1, CES3, GCGR, CRYAB, FRS3, TGFBR1, ACVR1B, and TSR1.",
+      "rationale": "Propafenone has a median pChEMBL affinity of 7.36 against ADRB2, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.368 to the nearest approved drug carvedilol. The ADRB2 target has eight recorded BioGRID interactors\u2014GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
       "source_chembl_ids": [
-        "CHEMBL1078178",
-        "CHEMBL3889145",
-        "CHEMBL5730299"
+        "CHEMBL631",
+        "CHEMBL1909092"
       ],
       "source_activity_ids": [
-        17796707,
-        26644612
+        7728661,
+        7728662
       ],
-      "target_symbol": "BMPR1B",
+      "target_symbol": "ADRB2",
       "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "O00238",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
       "ot_association_score": 0.0,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "DEUCRAVACITINIB",
-      "molecule_chembl_id": "CHEMBL4435170",
-      "smiles": "[2H]C([2H])([2H])NC(=O)c1nnc(NC(=O)C2CC2)cc1Nc1cccc(-c2ncn(C)n2)c1OC",
-      "inchikey": "BZZKEPGENYLQSC-FIBGUPNXSA-N",
-      "pchembl_value": 6.71,
+      "drug_name": "FENOTEROL",
+      "molecule_chembl_id": "CHEMBL32800",
+      "smiles": "CC(Cc1ccc(O)cc1)NCC(O)c1cc(O)cc(O)c1",
+      "inchikey": "LSLYOANBFKQKPT-UHFFFAOYSA-N",
+      "pchembl_value": 6.9,
       "confidence_score": 9,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "L04AF07",
-        "N02BA01"
+        "G02CA03",
+        "N02BA01",
+        "R03AC04",
+        "R03AL01",
+        "R03CC04"
       ],
-      "most_similar_approved_drug": "MOMELOTINIB",
-      "tanimoto_score": 0.1485,
+      "most_similar_approved_drug": "FORMOTEROL",
+      "tanimoto_score": 0.4727,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": null
+      },
+      "rationale": "Fenoterol is an approved drug with a median pChEMBL affinity of 6.9 against ADRB2, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.473 to the nearest approved drug formoterol. The ADRB2 target has eight recorded BioGRID physical or genetic interactors: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL32800",
+        "CHEMBL2445019"
+      ],
+      "source_activity_ids": [
+        13492813
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "ISOPROTERENOL",
+      "molecule_chembl_id": "CHEMBL434",
+      "smiles": "CC(C)NCC(O)c1ccc(O)c(O)c1",
+      "inchikey": "JWZZKOKVBUJMES-UHFFFAOYSA-N",
+      "pchembl_value": 6.72,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "C01CA02",
+        "N02BA01",
+        "R03AB02",
+        "R03CB01"
+      ],
+      "most_similar_approved_drug": "EPINEPHRINE",
+      "tanimoto_score": 0.6875,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -648,40 +716,90 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Deucravacitinib is an approved drug with a median pChEMBL affinity of 6.71 against BMPR2, measured at assay confidence score 9, and a Tanimoto similarity of 0.149 to the nearest approved drug momelotinib. BioGRID records physical or genetic interactions between BMPR2 and the proteins LIMK1, CES3, GCGR, CRYAB, FRS3, TGFBR1, ACVR1B, and TSR1.",
+      "rationale": "Isoproterenol has a median pChEMBL affinity of 6.72 against ADRB2 measured at assay confidence score 9, and a Tanimoto similarity of 0.688 to the nearest approved drug epinephrine. The target ADRB2 has eight recorded BioGRID interactors\u2014GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1\u2014and isoproterenol is itself an approved drug.",
       "source_chembl_ids": [
-        "CHEMBL4435170",
-        "CHEMBL4377403",
-        "CHEMBL5479496"
+        "CHEMBL434",
+        "CHEMBL1909092",
+        "CHEMBL3100637",
+        "CHEMBL3100638",
+        "CHEMBL875069"
       ],
       "source_activity_ids": [
-        19143937,
-        25790630
+        1137488,
+        7778089,
+        7778090,
+        13871661,
+        13871671
       ],
-      "target_symbol": "BMPR2",
-      "target_discovery_method": "genetic_association",
-      "uniprot_id": "Q13873",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
-      "ot_association_score": 0.6809,
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
       "pathway_specificity_note": null
     },
     {
-      "drug_name": "MOMELOTINIB",
-      "molecule_chembl_id": "CHEMBL1078178",
-      "smiles": "N#CCNC(=O)c1ccc(-c2ccnc(Nc3ccc(N4CCOCC4)cc3)n2)cc1",
-      "inchikey": "ZVHNDZWQTBEVRY-UHFFFAOYSA-N",
-      "pchembl_value": 6.39,
+      "drug_name": "EPINEPHRINE",
+      "molecule_chembl_id": "CHEMBL679",
+      "smiles": "CNC[C@H](O)c1ccc(O)c(O)c1",
+      "inchikey": "UCTWMZQNUQWSLP-VIFPVBQESA-N",
+      "pchembl_value": 6.63,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD01",
+        "A01AD05",
+        "B01AC06",
+        "B02BC09",
+        "C01CA24",
+        "N02BA01",
+        "R01AA14",
+        "R03AA01",
+        "S01EA01"
+      ],
+      "most_similar_approved_drug": "ISOPROTERENOL",
+      "tanimoto_score": 0.6875,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Epinephrine has a median pChEMBL affinity of 6.63 against ADRB2 measured at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.688 to the nearest approved drug isoproterenol. The ADRB2 target has eight recorded BioGRID interactors\u2014GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1\u2014and epinephrine is an approved drug.",
+      "source_chembl_ids": [
+        "CHEMBL679",
+        "CHEMBL1909092"
+      ],
+      "source_activity_ids": [
+        7649991,
+        7649992
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "SOTALOL",
+      "molecule_chembl_id": "CHEMBL471",
+      "smiles": "CC(C)NCC(O)c1ccc(NS(C)(=O)=O)cc1",
+      "inchikey": "ZBMZVLHSJCTVON-UHFFFAOYSA-N",
+      "pchembl_value": 6.445,
       "confidence_score": 8,
       "max_phase": "4.0",
       "is_approved_drug": true,
       "atc_codes": [
         "A01AD05",
         "B01AC06",
-        "L01EJ04",
+        "C07AA07",
         "N02BA01"
       ],
-      "most_similar_approved_drug": "DEUCRAVACITINIB",
-      "tanimoto_score": 0.1485,
+      "most_similar_approved_drug": "ISOPROTERENOL",
+      "tanimoto_score": 0.5,
       "mutation_specificity": {
         "is_mutation_specific": false,
         "matched_terms": [],
@@ -689,18 +807,579 @@
         "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
         "indication_source": "openfda_label"
       },
-      "rationale": "Momelotinib has a median pChEMBL affinity of 6.39 against BMPR1A at an assay confidence score of 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.149 to the nearest approved drug deucravacitinib. BMPR1A has eight recorded BioGRID interactors\u2014LIMK1, CES3, GCGR, CRYAB, FRS3, TGFBR1, ACVR1B, and TSR1.",
+      "rationale": "Sotalol has a median pChEMBL affinity of 6.445 against ADRB2 measured at assay confidence score 8, and a Tanimoto similarity of 0.500 to the nearest approved drug isoproterenol. ADRB2 has eight recorded BioGRID physical/genetic interactors: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
       "source_chembl_ids": [
-        "CHEMBL1078178",
-        "CHEMBL3889144"
+        "CHEMBL471",
+        "CHEMBL1909092"
       ],
       "source_activity_ids": [
-        17796705
+        7807541,
+        7807542
       ],
-      "target_symbol": "BMPR1A",
+      "target_symbol": "ADRB2",
       "target_discovery_method": "pathway_neighbor",
-      "uniprot_id": "P36894",
-      "disease_name": "Idiopathic pulmonary arterial hypertension",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "ISOPROTERENOL HYDROCHLORIDE",
+      "molecule_chembl_id": "CHEMBL1711",
+      "smiles": "CC(C)NCC(O)c1ccc(O)c(O)c1.Cl",
+      "inchikey": "IROWCYIEJAOFOW-UHFFFAOYSA-N",
+      "pchembl_value": 6.3,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "EPINEPHRINE",
+      "tanimoto_score": 0.6667,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Isoproterenol hydrochloride is an approved drug with a ChEMBL median pChEMBL affinity of 6.3 against ADRB2, measured at assay confidence score 9 out of 9, and a Tanimoto similarity (Morgan r2) of 0.667 to the nearest approved drug epinephrine. BioGRID records physical or genetic interactions between ADRB2 and the proteins GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL1711",
+        "CHEMBL1937030"
+      ],
+      "source_activity_ids": [
+        7995356,
+        7995381
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "ALBUTEROL",
+      "molecule_chembl_id": "CHEMBL714",
+      "smiles": "CC(C)(C)NCC(O)c1ccc(O)c(CO)c1",
+      "inchikey": "NDAUXUAQIAJITI-UHFFFAOYSA-N",
+      "pchembl_value": 6.05,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "N02BA01",
+        "R03AC02",
+        "R03CC02"
+      ],
+      "most_similar_approved_drug": "EPINEPHRINE",
+      "tanimoto_score": 0.475,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Albuterol has a median pChEMBL affinity of 6.05 against ADRB2 at assay confidence score 9, and a Tanimoto similarity of 0.475 to the nearest approved drug epinephrine. The ADRB2 target has eight recorded BioGRID interactors\u2014GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1\u2014and albuterol is itself an approved drug.",
+      "source_chembl_ids": [
+        "CHEMBL714",
+        "CHEMBL1010734",
+        "CHEMBL1115584",
+        "CHEMBL1909092",
+        "CHEMBL1943767"
+      ],
+      "source_activity_ids": [
+        2612944,
+        2612950,
+        3294075,
+        7826267,
+        7826268,
+        8007816
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "DOBUTAMINE",
+      "molecule_chembl_id": "CHEMBL926",
+      "smiles": "CC(CCc1ccc(O)cc1)NCCc1ccc(O)c(O)c1",
+      "inchikey": "JRWZLRBJNMZMFE-UHFFFAOYSA-N",
+      "pchembl_value": 5.9,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "C01CA07",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "LABETALOL",
+      "tanimoto_score": 0.386,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Dobutamine has a median pChEMBL affinity of 5.9 against ADRB2 measured at assay confidence score 8 out of 9, and a Tanimoto similarity of 0.386 to the nearest approved drug labetalol. BioGRID records physical or genetic interactions between ADRB2 and the proteins GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL926",
+        "CHEMBL1909092"
+      ],
+      "source_activity_ids": [
+        7700751,
+        7700752
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "METOPROLOL",
+      "molecule_chembl_id": "CHEMBL13",
+      "smiles": "COCCc1ccc(OCC(O)CNC(C)C)cc1",
+      "inchikey": "IUBSYMUCCVWXPE-UHFFFAOYSA-N",
+      "pchembl_value": 5.67,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "C07AB02",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "ATENOLOL",
+      "tanimoto_score": 0.6222,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Metoprolol is an approved drug with a median pChEMBL affinity of 5.67 against ADRB2 measured at assay confidence score 8 (on a 0\u20139 scale), and a Tanimoto similarity of 0.622 to the nearest approved drug atenolol. The ADRB2 target has eight recorded BioGRID physical/genetic interactors: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL13",
+        "CHEMBL1909092"
+      ],
+      "source_activity_ids": [
+        7758324,
+        7758325
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "DOXAZOSIN",
+      "molecule_chembl_id": "CHEMBL707",
+      "smiles": "COc1cc2nc(N3CCN(C(=O)C4COc5ccccc5O4)CC3)nc(N)c2cc1OC",
+      "inchikey": "RUZYUOTYCVRMRZ-UHFFFAOYSA-N",
+      "pchembl_value": 5.64,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "C02CA04",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "DARIFENACIN",
+      "tanimoto_score": 0.2247,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Doxazosin, an approved drug, has a median pChEMBL affinity of 5.64 against ADRB2 measured at assay confidence score 8, and a Tanimoto similarity of 0.225 to the nearest approved drug darifenacin. The ADRB2 target has eight recorded BioGRID interactors\u2014GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL707",
+        "CHEMBL1909092"
+      ],
+      "source_activity_ids": [
+        7683766,
+        7683767
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "ERGOTAMINE",
+      "molecule_chembl_id": "CHEMBL442",
+      "smiles": "CN1C[C@H](C(=O)N[C@]2(C)O[C@@]3(O)[C@@H]4CCCN4C(=O)[C@H](Cc4ccccc4)N3C2=O)C=C2c3cccc4[nH]cc(c34)C[C@H]21",
+      "inchikey": "XCGSFFUVFURLIX-VFGNJEKYSA-N",
+      "pchembl_value": 5.64,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "N02BA01",
+        "N02CA02"
+      ],
+      "most_similar_approved_drug": "DARIFENACIN",
+      "tanimoto_score": 0.1724,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Ergotamine has a median pChEMBL affinity of 5.64 against ADRB2 measured at assay confidence score 8, and a Tanimoto similarity of 0.172 to the nearest approved drug darifenacin. The ADRB2 target has eight recorded BioGRID physical/genetic interactors: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL442",
+        "CHEMBL1909092"
+      ],
+      "source_activity_ids": [
+        7671337,
+        7671338
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "LOPERAMIDE",
+      "molecule_chembl_id": "CHEMBL841",
+      "smiles": "CN(C)C(=O)C(CCN1CCC(O)(c2ccc(Cl)cc2)CC1)(c1ccccc1)c1ccccc1",
+      "inchikey": "RDOIQAHITMMDAJ-UHFFFAOYSA-N",
+      "pchembl_value": 5.6,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "A07DA03",
+        "B01AC06",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "DARIFENACIN",
+      "tanimoto_score": 0.2222,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Loperamide has a median pChEMBL affinity of 5.6 against ADRB2, measured at assay confidence score 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.222 to the nearest approved drug darifenacin. The ADRB2 target has eight recorded BioGRID physical or genetic interactors: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL841",
+        "CHEMBL1909092"
+      ],
+      "source_activity_ids": [
+        7772414,
+        7772415
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "MONTELUKAST",
+      "molecule_chembl_id": "CHEMBL787",
+      "smiles": "CC(C)(O)c1ccccc1CC[C@@H](SCC1(CC(=O)O)CC1)c1cccc(/C=C/c2ccc3ccc(Cl)cc3n2)c1",
+      "inchikey": "UCHDWCPVSPXUMX-TZIWLTJVSA-N",
+      "pchembl_value": 5.54,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "N02BA01",
+        "R03DC03"
+      ],
+      "most_similar_approved_drug": "LOPERAMIDE",
+      "tanimoto_score": 0.202,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Montelukast has a median pChEMBL affinity of 5.54 against ADRB2, measured at assay confidence score 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.202 to the nearest approved drug loperamide. The ADRB2 target has eight recorded BioGRID physical or genetic interactors: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL787",
+        "CHEMBL1909092"
+      ],
+      "source_activity_ids": [
+        7760757,
+        7760758
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "LEVOSALBUTAMOL",
+      "molecule_chembl_id": "CHEMBL1002",
+      "smiles": "CC(C)(C)NC[C@H](O)c1ccc(O)c(CO)c1",
+      "inchikey": "NDAUXUAQIAJITI-LBPRGKRZSA-N",
+      "pchembl_value": 5.33,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [],
+      "most_similar_approved_drug": "EPINEPHRINE",
+      "tanimoto_score": 0.475,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": null
+      },
+      "rationale": "Levosalbutamol has a median pChEMBL affinity of 5.33 against ADRB2 measured at assay confidence score 9, and a Tanimoto similarity of 0.475 to the nearest approved drug epinephrine. ADRB2 has eight recorded BioGRID physical/genetic interactors: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL1002",
+        "CHEMBL1937030",
+        "CHEMBL1937034",
+        "CHEMBL1937182"
+      ],
+      "source_activity_ids": [
+        7995359,
+        7995370,
+        7995372,
+        7995384,
+        7995393,
+        7995395
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "ATENOLOL",
+      "molecule_chembl_id": "CHEMBL24",
+      "smiles": "CC(C)NCC(O)COc1ccc(CC(N)=O)cc1",
+      "inchikey": "METKIMKYRPQLGS-UHFFFAOYSA-N",
+      "pchembl_value": 4.915,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "C07AB03",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "METOPROLOL",
+      "tanimoto_score": 0.6222,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Atenolol is an approved drug with a median pChEMBL affinity of 4.915 against ADRB2, measured at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.622 to the nearest approved drug metoprolol. The ADRB2 target has eight recorded BioGRID physical/genetic interactors: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL24",
+        "CHEMBL1909092"
+      ],
+      "source_activity_ids": [
+        7603223,
+        7603224
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "GLYBURIDE",
+      "molecule_chembl_id": "CHEMBL472",
+      "smiles": "COc1ccc(Cl)cc1C(=O)NCCc1ccc(S(=O)(=O)NC(=O)NC2CCCCC2)cc1",
+      "inchikey": "ZNNLBTZKUZBEKO-UHFFFAOYSA-N",
+      "pchembl_value": 4.82,
+      "confidence_score": 8,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "A10BB01",
+        "B01AC06",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "METOPROLOL",
+      "tanimoto_score": 0.1899,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Glyburide has a median pChEMBL affinity of 4.82 against CFTR, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.190 to the nearest approved drug metoprolol. CFTR has eight recorded BioGRID physical or genetic interactors: GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, and DNAJA1.",
+      "source_chembl_ids": [
+        "CHEMBL472",
+        "CHEMBL1780321"
+      ],
+      "source_activity_ids": [
+        6206796
+      ],
+      "target_symbol": "CFTR",
+      "target_discovery_method": "genetic_association",
+      "uniprot_id": "P13569",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.7177,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "NOREPINEPHRINE",
+      "molecule_chembl_id": "CHEMBL1437",
+      "smiles": "NC[C@H](O)c1ccc(O)c(O)c1",
+      "inchikey": "SFLSHLFXELFNJZ-QMMMGPOBSA-N",
+      "pchembl_value": 4.01,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "B01AC06",
+        "C01CA03",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": "EPINEPHRINE",
+      "tanimoto_score": 0.5806,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Norepinephrine is an approved drug with a ChEMBL median pChEMBL affinity of 4.01 against ADRB2 at assay confidence score 9, and a Tanimoto similarity (Morgan r2) of 0.581 to the nearest approved drug epinephrine. The ADRB2 target has eight BioGRID interactors recorded (GOPC, KCNJ1, PDZD3, SLC9A3R1, STX1A, HSPA8, DNAJB1, DNAJA1).",
+      "source_chembl_ids": [
+        "CHEMBL1437",
+        "CHEMBL1043293"
+      ],
+      "source_activity_ids": [
+        3084953
+      ],
+      "target_symbol": "ADRB2",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P07550",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "ACARBOSE",
+      "molecule_chembl_id": "CHEMBL404271",
+      "smiles": "C[C@H]1O[C@H](O[C@H]2[C@H](O)[C@@H](O)[C@@H](O[C@H]3[C@H](O)[C@@H](O)C(O)O[C@@H]3CO)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@@H]1N[C@H]1C=C(CO)[C@@H](O)[C@H](O)[C@H]1O",
+      "inchikey": "CEMXHAPUFJOOSV-XGWNLRGSSA-N",
+      "pchembl_value": 4.49,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "A10BF01",
+        "B01AC06",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": null,
+      "tanimoto_score": 0.0,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Acarbose has a median pChEMBL affinity of 4.49 against AMY2A, recorded at an assay confidence score of 9 out of 9, and is an approved drug with no nearest approved structural analog in the candidate set. The target AMY2A has physical or genetic interactors in BioGRID recorded as ARRB1, SPPL3, and POLI.",
+      "source_chembl_ids": [
+        "CHEMBL404271",
+        "CHEMBL6178278"
+      ],
+      "source_activity_ids": [
+        29292577
+      ],
+      "target_symbol": "AMY2A",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P04746",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "ot_association_score": 0.0,
+      "pathway_specificity_note": null
+    },
+    {
+      "drug_name": "ACARBOSE",
+      "molecule_chembl_id": "CHEMBL404271",
+      "smiles": "C[C@H]1O[C@H](O[C@H]2[C@H](O)[C@@H](O)[C@@H](O[C@H]3[C@H](O)[C@@H](O)C(O)O[C@@H]3CO)O[C@@H]2CO)[C@H](O)[C@@H](O)[C@@H]1N[C@H]1C=C(CO)[C@@H](O)[C@H](O)[C@H]1O",
+      "inchikey": "CEMXHAPUFJOOSV-XGWNLRGSSA-N",
+      "pchembl_value": 4.49,
+      "confidence_score": 9,
+      "max_phase": "4.0",
+      "is_approved_drug": true,
+      "atc_codes": [
+        "A01AD05",
+        "A10BF01",
+        "B01AC06",
+        "N02BA01"
+      ],
+      "most_similar_approved_drug": null,
+      "tanimoto_score": 0.0,
+      "mutation_specificity": {
+        "is_mutation_specific": false,
+        "matched_terms": [],
+        "source_excerpt": "",
+        "note": "DISCLOSURE ONLY: the drug's approved/known indication names a specific mutation. This does NOT assert the repurposing target carries that mutation and does NOT affect any score.",
+        "indication_source": "openfda_label"
+      },
+      "rationale": "Acarbose has a median pChEMBL affinity of 4.49 against AMY2A, measured at assay confidence score 9 out of 9, and is an approved drug with no nearest approved structural analog in the candidate set. The target AMY2A has six recorded BioGRID interactors\u2014UBE3A, DCAF4, ASPH, CD59, ST14, and PDIA5\u2014based on physical or genetic interaction data.",
+      "source_chembl_ids": [
+        "CHEMBL404271",
+        "CHEMBL6178278"
+      ],
+      "source_activity_ids": [
+        29292577
+      ],
+      "target_symbol": "AMY2A",
+      "target_discovery_method": "pathway_neighbor",
+      "uniprot_id": "P04746",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
       "ot_association_score": 0.0,
       "pathway_specificity_note": null
     }
@@ -717,6 +1396,6 @@
   },
   "repurposing_only": true,
   "pooled_across_multiple_targets": true,
-  "approved_reference_set_size": 14,
+  "approved_reference_set_size": 32,
   "reference_set_note": "Candidates pooled from 5 targets for the same disease (TOP_K_TARGETS=5). Pathway-neighbor candidates tagged target_discovery_method='pathway_neighbor'."
 }
