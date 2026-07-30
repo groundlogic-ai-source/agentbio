@@ -881,6 +881,10 @@ def get_research_hypotheses(include_archived: bool = False) -> list[dict]:
             rtag = "DISCARDED"
         elif note.startswith("NEEDS_ENRICHMENT:") or note.startswith("NEEDS_ENRICHMENT "):
             rtag = "NEEDS_ENRICHMENT"
+        elif note.startswith("REFUTED (direction):"):
+            rtag = "REFUTED"
+        elif note.startswith("LABEL_ARTIFACT_SUSPECT:"):
+            rtag = "LABEL_ARTIFACT_SUSPECT"
         elif has_result:
             rtag = "READY"
         else:
