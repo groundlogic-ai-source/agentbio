@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-31T03:14:09",
+  "generated_at": "2026-07-31T04:43:56",
   "top_n": 10,
   "strong_match_threshold": 0.7,
   "cases": [
@@ -53,7 +53,17 @@
       "interpretation": "MISS \u2014 Dapsone was not surfaced. 'Dapsone' absent among 32 ChEMBL compound(s) for top target RIPK2 (O43353). Confirmed drug's primary target likely differs from RIPK2, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
       "audit_status": "absent",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "folP1"
+      ],
+      "target_was_right": false,
+      "recoverable_by_pool_fix": false,
+      "recoverable_by_target_fix": false,
+      "true_target_rank_in_considered": null,
+      "class_detail": "Drug's mechanism target(s) ['folP1'] absent from the entire considered-target list \u2014 discovery problem, not ranking.",
+      "miss_class": "wrong_target",
+      "classifier_version": 2
     },
     {
       "drug_name": "Anagrelide",
@@ -105,7 +115,18 @@
       "interpretation": "MISS \u2014 Anagrelide was not surfaced. 'Anagrelide' absent among 28 ChEMBL compound(s) for top target PDE3B (Q13370). Confirmed drug's primary target likely differs from PDE3B, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
       "audit_status": "absent",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "PDE3A",
+        "PDE3B"
+      ],
+      "target_was_right": true,
+      "recoverable_by_pool_fix": true,
+      "recoverable_by_target_fix": false,
+      "true_target_rank_in_considered": null,
+      "class_detail": "Mechanism endpoint links drug to PDE3A/PDE3B (Phosphodiesterase 3 inhibitor) but no qualifying Homo sapiens IC50/Ki assay exists \u2014 activity pool cannot see it.",
+      "miss_class": "right_target_pool_gap",
+      "classifier_version": 2
     },
     {
       "drug_name": "Sapropterin",
@@ -157,7 +178,17 @@
       "interpretation": "MISS \u2014 Sapropterin was not surfaced. 'Sapropterin' absent among 25 ChEMBL compound(s) for top target PAH (P00439). Confirmed drug's primary target likely differs from PAH, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
       "audit_status": "absent",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "PAH"
+      ],
+      "target_was_right": true,
+      "recoverable_by_pool_fix": true,
+      "recoverable_by_target_fix": false,
+      "true_target_rank_in_considered": null,
+      "class_detail": "Mechanism endpoint links drug to PAH (Phenylalanine-4-hydroxylase activator) but no qualifying Homo sapiens IC50/Ki assay exists \u2014 activity pool cannot see it.",
+      "miss_class": "right_target_pool_gap",
+      "classifier_version": 2
     },
     {
       "drug_name": "Miglustat",
@@ -209,7 +240,17 @@
       "interpretation": "MISS \u2014 Miglustat was not surfaced. 'Miglustat' absent among 28 ChEMBL compound(s) for top target GBA1 (P04062). Confirmed drug's primary target likely differs from GBA1, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
       "audit_status": "absent",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "UGCG"
+      ],
+      "target_was_right": false,
+      "recoverable_by_pool_fix": false,
+      "recoverable_by_target_fix": true,
+      "true_target_rank_in_considered": 2,
+      "class_detail": "Drug's mechanism target(s) ['UGCG'] were NOT tried; true target sits at selection rank 2 (tried top-1).",
+      "miss_class": "wrong_target",
+      "classifier_version": 2
     },
     {
       "drug_name": "Pentamidine",
@@ -246,7 +287,18 @@
       "interpretation": "MISS \u2014 Pentamidine was not surfaced. 'Pentamidine' absent among 52 ChEMBL compound(s) for top target FGF1 (P05230). Confirmed drug's primary target likely differs from FGF1, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
       "audit_status": "absent",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "DNA",
+        "Kinetoplast DNA"
+      ],
+      "target_was_right": false,
+      "recoverable_by_pool_fix": false,
+      "recoverable_by_target_fix": false,
+      "true_target_rank_in_considered": null,
+      "class_detail": "Drug's mechanism target(s) ['DNA', 'Kinetoplast DNA'] absent from the entire considered-target list \u2014 discovery problem, not ranking.",
+      "miss_class": "wrong_target",
+      "classifier_version": 2
     },
     {
       "drug_name": "Temozolomide",
@@ -308,7 +360,17 @@
       "interpretation": "MISS \u2014 Temozolomide was not surfaced. 'Temozolomide' absent among 29 ChEMBL compound(s) for top target FKBP1A (P62942). Confirmed drug's primary target likely differs from FKBP1A, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
       "audit_status": "absent",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "DNA"
+      ],
+      "target_was_right": false,
+      "recoverable_by_pool_fix": false,
+      "recoverable_by_target_fix": false,
+      "true_target_rank_in_considered": null,
+      "class_detail": "Drug's mechanism target(s) ['DNA'] absent from the entire considered-target list \u2014 discovery problem, not ranking.",
+      "miss_class": "wrong_target",
+      "classifier_version": 2
     },
     {
       "drug_name": "Riociguat",
@@ -375,7 +437,20 @@
       "interpretation": "MISS \u2014 Riociguat was not surfaced. 'Riociguat' absent among 32 ChEMBL compound(s) for top target PDE5A (O76074). Confirmed drug's primary target likely differs from PDE5A, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
       "audit_status": "absent",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "GUCY1A1",
+        "GUCY1A2",
+        "GUCY1B1",
+        "GUCY1B2"
+      ],
+      "target_was_right": false,
+      "recoverable_by_pool_fix": false,
+      "recoverable_by_target_fix": true,
+      "true_target_rank_in_considered": 6,
+      "class_detail": "Drug's mechanism target(s) ['GUCY1A1', 'GUCY1A2', 'GUCY1B1', 'GUCY1B2'] were NOT tried; true target sits at selection rank 6 (tried top-1).",
+      "miss_class": "wrong_target",
+      "classifier_version": 2
     },
     {
       "drug_name": "Ibrutinib",
@@ -427,7 +502,15 @@
       "interpretation": "HIT \u2014 Ibrutinib at rank 2/34 (composite=0.6185, within top 10, did NOT reach STRONG_MATCH) against BTK, by inchikey/chembl_id.",
       "audit_rank": 2,
       "audit_status": "found",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [],
+      "target_was_right": null,
+      "recoverable_by_pool_fix": false,
+      "recoverable_by_target_fix": false,
+      "true_target_rank_in_considered": null,
+      "class_detail": null,
+      "miss_class": "hit",
+      "classifier_version": 2
     },
     {
       "drug_name": "Imatinib",
@@ -484,7 +567,20 @@
       "interpretation": "MISS \u2014 Imatinib was not surfaced. 'Imatinib' absent among 154 ChEMBL compound(s) for top target IL5 (P05113). Confirmed drug's primary target likely differs from IL5, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
       "audit_status": "absent",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "ABL1",
+        "BCR",
+        "KIT",
+        "PDGFRB"
+      ],
+      "target_was_right": false,
+      "recoverable_by_pool_fix": false,
+      "recoverable_by_target_fix": true,
+      "true_target_rank_in_considered": 3,
+      "class_detail": "Drug's mechanism target(s) ['ABL1', 'BCR', 'KIT', 'PDGFRB'] were NOT tried; true target sits at selection rank 3 (tried top-1).",
+      "miss_class": "wrong_target",
+      "classifier_version": 2
     },
     {
       "drug_name": "Imatinib",
@@ -551,7 +647,20 @@
       "interpretation": "MISS \u2014 Imatinib was not surfaced. 'Imatinib' absent among 35 ChEMBL compound(s) for top target JAK1 (P23458). Confirmed drug's primary target likely differs from JAK1, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
       "audit_status": "absent",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "ABL1",
+        "BCR",
+        "KIT",
+        "PDGFRB"
+      ],
+      "target_was_right": false,
+      "recoverable_by_pool_fix": false,
+      "recoverable_by_target_fix": true,
+      "true_target_rank_in_considered": 6,
+      "class_detail": "Drug's mechanism target(s) ['ABL1', 'BCR', 'KIT', 'PDGFRB'] were NOT tried; true target sits at selection rank 6 (tried top-1).",
+      "miss_class": "wrong_target",
+      "classifier_version": 2
     },
     {
       "drug_name": "Pyridostigmine",
@@ -608,7 +717,17 @@
       "interpretation": "MISS \u2014 Pyridostigmine was not surfaced. 'Pyridostigmine' absent among 35 ChEMBL compound(s) for top target ACHE (P22303). Confirmed drug's primary target likely differs from ACHE, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
       "audit_status": "absent",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "ACHE"
+      ],
+      "target_was_right": true,
+      "recoverable_by_pool_fix": true,
+      "recoverable_by_target_fix": false,
+      "true_target_rank_in_considered": null,
+      "class_detail": "Mechanism endpoint links drug to ACHE (Acetylcholinesterase inhibitor) but no qualifying Homo sapiens IC50/Ki assay exists \u2014 activity pool cannot see it.",
+      "miss_class": "right_target_pool_gap",
+      "classifier_version": 2
     },
     {
       "drug_name": "Lorazepam",
@@ -675,7 +794,100 @@
       "interpretation": "MISS \u2014 Lorazepam was not surfaced. 'Lorazepam' absent among 38 ChEMBL compound(s) for top target CA2 (P00918). Confirmed drug's primary target likely differs from CA2, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
       "audit_rank": null,
       "audit_status": "absent",
-      "audit_cap": null
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "GABRA1",
+        "GABRA2",
+        "GABRA3",
+        "GABRA4",
+        "GABRA5",
+        "GABRA6",
+        "GABRB1",
+        "GABRB2",
+        "GABRB3",
+        "GABRD",
+        "GABRE",
+        "GABRG1",
+        "GABRG2",
+        "GABRG3",
+        "GABRP",
+        "GABRQ"
+      ],
+      "target_was_right": false,
+      "recoverable_by_pool_fix": false,
+      "recoverable_by_target_fix": true,
+      "true_target_rank_in_considered": 6,
+      "class_detail": "Drug's mechanism target(s) ['GABRA1', 'GABRA2', 'GABRA3', 'GABRA4', 'GABRA5', 'GABRA6', 'GABRB1', 'GABRB2', 'GABRB3', 'GABRD', 'GABRE', 'GABRG1', 'GABRG2', 'GABRG3', 'GABRP', 'GABRQ'] were NOT tried; true target sits at selection rank 6 (tried top-1).",
+      "miss_class": "wrong_target",
+      "classifier_version": 2
+    },
+    {
+      "drug_name": "Everolimus",
+      "disease_name": "Tuberous sclerosis complex",
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "FKBP1A",
+        "uniprot_id": "P62942",
+        "ot_association_score": 0.9
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "FKBP1A",
+          "uniprot_id": "P62942",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "TSC1",
+          "uniprot_id": "Q92574",
+          "ot_association_score": 0.7808
+        },
+        {
+          "target_symbol": "TSC2",
+          "uniprot_id": "P49815",
+          "ot_association_score": 0.4931
+        },
+        {
+          "target_symbol": "PI4KA",
+          "uniprot_id": "P42356",
+          "ot_association_score": 0.1478
+        },
+        {
+          "target_symbol": "GFI1B",
+          "uniprot_id": "Q5VTD9",
+          "ot_association_score": 0.1183
+        },
+        {
+          "target_symbol": "MIR548AW",
+          "uniprot_id": null,
+          "ot_association_score": 0.1183
+        }
+      ],
+      "n_chemist_candidates": 29,
+      "n_reviewed_candidates": 29,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "miss_reason": "'Everolimus' absent among 29 ChEMBL compound(s) for top target FKBP1A (P62942). Confirmed drug's primary target likely differs from FKBP1A, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "interpretation": "MISS \u2014 Everolimus was not surfaced. 'Everolimus' absent among 29 ChEMBL compound(s) for top target FKBP1A (P62942). Confirmed drug's primary target likely differs from FKBP1A, or no Homo sapiens IC50/Ki at confidence \u2265 8 exists in ChEMBL.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null,
+      "drug_mechanism_targets": [
+        "FKBP1A"
+      ],
+      "target_was_right": true,
+      "recoverable_by_pool_fix": true,
+      "recoverable_by_target_fix": false,
+      "true_target_rank_in_considered": null,
+      "class_detail": "Mechanism endpoint links drug to FKBP1A (FK506-binding protein 1A inhibitor) but no qualifying Homo sapiens IC50/Ki assay exists \u2014 activity pool cannot see it.",
+      "miss_class": "right_target_pool_gap",
+      "classifier_version": 2
     }
-  ]
+  ],
+  "classified_at": "2026-07-31T04:49:27"
 }
