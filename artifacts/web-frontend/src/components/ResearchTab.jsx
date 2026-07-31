@@ -71,7 +71,7 @@ function ReportPanel({ hypothesisId, onSaved }) {
 
   if (state.loading)
     return (
-      <div style={{ padding: "1rem 1.25rem", fontSize: "0.75rem", color: "var(--silver)", fontFamily: "monospace" }}>
+      <div style={{ padding: "1rem 1.25rem", fontSize: "0.75rem", color: "var(--ink-muted)", fontFamily: "monospace" }}>
         ⟳ Opus 4.8 is writing the full report from the stored statistics…
       </div>
     );
@@ -86,20 +86,20 @@ function ReportPanel({ hypothesisId, onSaved }) {
   const checks = facts?.confound_check?.checks ?? [];
 
   const cell = { padding: "4px 8px", fontFamily: "monospace", fontSize: "0.62rem", whiteSpace: "nowrap" };
-  const hcell = { ...cell, color: "var(--silver-dim)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.55rem", textAlign: "left" };
+  const hcell = { ...cell, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.55rem", textAlign: "left" };
 
   return (
-    <div style={{ padding: "1.25rem 1.5rem", backgroundColor: "rgba(199,202,209,0.03)" }}>
+    <div style={{ padding: "1.25rem 1.5rem", backgroundColor: "var(--paper-warm)" }}>
       {/* ── Audit numbers, rendered directly from the registry facts ── */}
       <div style={{
         fontFamily: "monospace", fontSize: "0.55rem", textTransform: "uppercase",
-        letterSpacing: "0.2em", color: "var(--brass)", marginBottom: "0.6rem",
+        letterSpacing: "0.14em", color: "var(--brass-deep)", marginBottom: "0.6rem",
       }}>
         Audit numbers — from the registry
       </div>
 
       <div style={{ overflowX: "auto", marginBottom: "1rem" }}>
-        <table style={{ borderCollapse: "collapse", color: "var(--silver)" }}>
+        <table style={{ borderCollapse: "collapse", color: "var(--ink-base)" }}>
           <thead>
             <tr>
               {["Frame", "Test", "OR", "95% CI", "n", "Discovery raw p", "FDR q", "Disc.", "Confirm raw p", "Conf."].map((h, i) => (
@@ -109,11 +109,11 @@ function ReportPanel({ hypothesisId, onSaved }) {
           </thead>
           <tbody>
             {(facts?.framings ?? []).map((f, i) => (
-              <tr key={i} style={{ borderTop: "1px solid rgba(199,202,209,0.1)" }}>
-                <td style={{ ...cell, color: "var(--silver)" }}>{f.framing ?? "—"}</td>
-                <td style={{ ...cell, color: "var(--silver)" }}>{f.test_type ?? "—"}</td>
-                <td style={{ ...cell, color: "var(--paper)" }}>{f.effect_size ? f.effect_size.odds_ratio : "—"}</td>
-                <td style={{ ...cell, color: "var(--silver)" }}>
+              <tr key={i} style={{ borderTop: "1px solid var(--border-light)" }}>
+                <td style={{ ...cell, color: "var(--ink-muted)" }}>{f.framing ?? "—"}</td>
+                <td style={{ ...cell, color: "var(--ink-muted)" }}>{f.test_type ?? "—"}</td>
+                <td style={{ ...cell, color: "var(--ink)" }}>{f.effect_size ? f.effect_size.odds_ratio : "—"}</td>
+                <td style={{ ...cell, color: "var(--ink-muted)" }}>
                   {f.effect_size ? `[${f.effect_size.ci_low}, ${f.effect_size.ci_high}]` : "—"}
                 </td>
                 <td style={cell}>{f.effect_size ? f.effect_size.n : "—"}</td>
@@ -132,11 +132,11 @@ function ReportPanel({ hypothesisId, onSaved }) {
         <div style={{ overflowX: "auto", marginBottom: "1.25rem" }}>
           <div style={{
             fontFamily: "monospace", fontSize: "0.55rem", textTransform: "uppercase",
-            letterSpacing: "0.2em", color: "var(--brass)", marginBottom: "0.5rem",
+            letterSpacing: "0.14em", color: "var(--brass-deep)", marginBottom: "0.5rem",
           }}>
             Confound checks
           </div>
-          <table style={{ borderCollapse: "collapse", color: "var(--silver)" }}>
+          <table style={{ borderCollapse: "collapse", color: "var(--ink-muted)" }}>
             <thead>
               <tr>
                 {["Confound", "Unadj. OR", "Adj. OR", "Adj. 95% CI", "Adj. p", "Survives?"].map((h, i) => (
@@ -149,20 +149,20 @@ function ReportPanel({ hypothesisId, onSaved }) {
                 const a = c.adjustment_result;
                 const survives = a == null ? null : a.survives_adjustment;
                 return (
-                  <tr key={i} style={{ borderTop: "1px solid rgba(199,202,209,0.1)" }}>
-                    <td style={{ ...cell, whiteSpace: "normal", maxWidth: "16rem", color: "var(--silver)" }}>{c.confound_name}</td>
+                  <tr key={i} style={{ borderTop: "1px solid var(--border-light)" }}>
+                    <td style={{ ...cell, whiteSpace: "normal", maxWidth: "16rem", color: "var(--ink-muted)" }}>{c.confound_name}</td>
                     <td style={cell}>{a?.or_unadjusted != null ? Number(a.or_unadjusted).toPrecision(3) : "—"}</td>
-                    <td style={{ ...cell, color: "var(--paper)" }}>{a?.or_adjusted != null ? Number(a.or_adjusted).toPrecision(3) : "—"}</td>
+                    <td style={{ ...cell, color: "var(--ink)" }}>{a?.or_adjusted != null ? Number(a.or_adjusted).toPrecision(3) : "—"}</td>
                     <td style={cell}>
                       {a?.ci_low_adjusted != null ? `[${a.ci_low_adjusted}, ${a.ci_high_adjusted}]` : "—"}
                     </td>
                     <td style={cell}>{a?.p_adjusted != null ? Number(a.p_adjusted).toExponential(2) : "—"}</td>
                     <td style={cell}>
                       {survives === true
-                        ? <span style={{ color: "#7ec97e" }}>survives</span>
+                        ? <span style={{ color: "var(--success)" }}>survives</span>
                         : survives === false
                           ? <span style={{ color: "var(--oxide)" }}>DOES NOT survive</span>
-                          : <span style={{ color: "var(--silver-dim)" }} title={a?.note || "not testable"}>not testable</span>}
+                          : <span style={{ color: "var(--ink-dim)" }} title={a?.note || "not testable"}>not testable</span>}
                     </td>
                   </tr>
                 );
@@ -174,7 +174,7 @@ function ReportPanel({ hypothesisId, onSaved }) {
 
       {/* ── Opus narrative, grounded strictly in the numbers above ── */}
       <div className="eyebrow" style={{ marginBottom: "0.5rem" }}>Narrative — Claude Opus 4.8</div>
-      <div className="report-markdown" style={{ fontSize: "0.8rem", color: "var(--paper)", lineHeight: 1.6 }}>
+      <div className="report-markdown" style={{ fontSize: "0.8rem", color: "var(--ink)", lineHeight: 1.6 }}>
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{report_markdown}</ReactMarkdown>
       </div>
 
@@ -195,7 +195,7 @@ function ReportPanel({ hypothesisId, onSaved }) {
       </div>
 
       {generated_at && (
-        <div style={{ marginTop: "0.75rem", fontSize: "0.55rem", fontFamily: "monospace", color: "var(--silver-dim)" }}>
+        <div style={{ marginTop: "0.75rem", fontSize: "0.55rem", fontFamily: "monospace", color: "var(--ink-dim)" }}>
           generated {new Date(generated_at).toLocaleString()} · numbers read directly from the registry
         </div>
       )}
@@ -209,19 +209,19 @@ function PassBadge({ value }) {
     return badgePass;
   if (v === "False" || v === "false" || v === "0")
     return badgeFail;
-  return <span style={{ color: "var(--silver-dim)", fontSize: "0.62rem" }}>—</span>;
+  return <span style={{ color: "var(--ink-dim)", fontSize: "0.62rem" }}>—</span>;
 }
 
 const badgePass = (
   <span style={{
-    background: "rgba(76,175,80,0.13)", color: "#7ec97e",
+    background: "var(--success-glow)", color: "var(--success)",
     borderRadius: "3px", padding: "1px 7px",
     fontSize: "0.62rem", fontFamily: "monospace", letterSpacing: "0.05em",
   }}>PASS</span>
 );
 const badgeFail = (
   <span style={{
-    background: "rgba(155,74,63,0.13)", color: "var(--oxide)",
+    background: "var(--oxide-glow)", color: "var(--oxide)",
     borderRadius: "3px", padding: "1px 7px",
     fontSize: "0.62rem", fontFamily: "monospace", letterSpacing: "0.05em",
   }}>FAIL</span>
@@ -232,12 +232,12 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
   const [expanded, setExpanded] = useState(null); // hypothesis_id whose report is open
 
   if (loading)
-    return <p style={{ color: "var(--silver)", fontSize: "0.8rem", padding: "1.5rem 0" }}>Loading registry…</p>;
+    return <p style={{ color: "var(--ink-muted)", fontSize: "0.8rem", padding: "1.5rem 0" }}>Loading registry…</p>;
   if (!hypotheses.length)
     return (
-      <p style={{ color: "var(--silver)", fontSize: "0.8rem", padding: "1.5rem 0", lineHeight: 1.6 }}>
+      <p style={{ color: "var(--ink-muted)", fontSize: "0.8rem", padding: "1.5rem 0", lineHeight: 1.6 }}>
         No hypotheses in the registry yet.<br />
-        Run <code style={{ color: "var(--brass)" }}>python -m data_prep.run_discovery</code> or submit one below.
+        Run <code style={{ color: "var(--brass-deep)" }}>python -m data_prep.run_discovery</code> or submit one below.
       </p>
     );
 
@@ -268,10 +268,10 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
   }
 
   return (
-    <div style={{ overflowX: "auto", borderRadius: "6px", border: "1px solid rgba(199,202,209,0.14)" }}>
+    <div style={{ overflowX: "auto", borderRadius: "6px", border: "1px solid var(--border)" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.72rem", color: "var(--ink)" }}>
         <thead>
-          <tr style={{ backgroundColor: "rgba(199,202,209,0.05)", borderBottom: "1px solid rgba(199,202,209,0.18)" }}>
+          <tr style={{ backgroundColor: "var(--surface-raised)", borderBottom: "1px solid var(--border)" }}>
             {[
               "Hypothesis", "Test", "Frame", "Raw p", "FDR q",
               "Discovery", "Confirm", "Confound", "Domain", "Report", "",
@@ -279,7 +279,7 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
               <th key={i} style={{
                 padding: "6px 10px", textAlign: "left", whiteSpace: "nowrap",
                 fontFamily: "monospace", fontSize: "0.58rem", textTransform: "uppercase",
-                letterSpacing: "0.15em", fontWeight: 400, color: "var(--silver-dim)",
+                letterSpacing: "0.15em", fontWeight: 400, color: "var(--ink-dim)",
               }}>{h}</th>
             ))}
           </tr>
@@ -310,20 +310,20 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
                     <tr
                       key={h.test_id || rowIdx}
                       style={{
-                        borderBottom: (isOpen && isLastRow) ? "none" : "1px solid rgba(199,202,209,0.09)",
+                        borderBottom: (isOpen && isLastRow) ? "none" : "1px solid var(--border-light)",
                         opacity: isArchived ? 0.45 : 1,
                         transition: "opacity 0.15s ease",
                       }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(199,202,209,0.04)"; }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "var(--surface-raised)"; }}
                       onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
                     >
-                      <td style={{ padding: "7px 10px", maxWidth: "22rem", color: "var(--paper)" }}>
+                      <td style={{ padding: "7px 10px", maxWidth: "22rem", color: "var(--ink)" }}>
                         <span title={txt}>{txt.length > 90 ? txt.slice(0, 90) + "…" : txt}</span>
                       </td>
-                      <td style={{ padding: "7px 10px", fontFamily: "monospace", color: "var(--silver)", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 10px", fontFamily: "monospace", color: "var(--ink-muted)", whiteSpace: "nowrap" }}>
                         {h.discovery_test_type || "—"}
                       </td>
-                      <td style={{ padding: "7px 10px", fontFamily: "monospace", color: "var(--silver-dim)", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 10px", fontFamily: "monospace", color: "var(--ink-dim)", whiteSpace: "nowrap" }}>
                         {h.outcome_framing || "—"}
                       </td>
                       <td style={{ padding: "7px 10px", fontFamily: "monospace", whiteSpace: "nowrap" }}>
@@ -340,17 +340,17 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
                       <td style={{ padding: "7px 10px", whiteSpace: "nowrap" }}>
                         {h.confirmation_pass != null && h.confirmation_pass !== ""
                           ? <PassBadge value={h.confirmation_pass} />
-                          : <span style={{ color: "var(--silver-dim)", fontSize: "0.62rem" }}>—</span>}
+                          : <span style={{ color: "var(--ink-dim)", fontSize: "0.62rem" }}>—</span>}
                       </td>
                       <td style={{ padding: "7px 10px", whiteSpace: "nowrap" }}>
                         {hasConfound
-                          ? <span style={{ color: "var(--silver)", fontSize: "0.62rem", fontFamily: "monospace" }}
+                          ? <span style={{ color: "var(--ink-muted)", fontSize: "0.62rem", fontFamily: "monospace" }}
                               title={JSON.stringify(confoundSummary?.checks, null, 2)}>
                               {confoundSummary.checks?.length ?? 0} checked
                             </span>
-                          : <span style={{ color: "var(--silver-dim)", fontSize: "0.62rem" }}>—</span>}
+                          : <span style={{ color: "var(--ink-dim)", fontSize: "0.62rem" }}>—</span>}
                       </td>
-                      <td style={{ padding: "7px 10px", color: "var(--silver-dim)", maxWidth: "14rem" }}>
+                      <td style={{ padding: "7px 10px", color: "var(--ink-dim)", maxWidth: "14rem" }}>
                         {rowIdx === 0 && (
                           <span title={h.domain_description}>
                             {(h.domain_description || "").length > 45
@@ -370,7 +370,7 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
                               {isOpen ? "hide report" : "full report"}
                             </button>
                           ) : (
-                            <span style={{ color: "var(--silver-dim)", fontSize: "0.58rem" }}>—</span>
+                            <span style={{ color: "var(--ink-dim)", fontSize: "0.58rem" }}>—</span>
                           )}
                         </td>
                       )}
@@ -390,7 +390,7 @@ function HypothesisTable({ hypotheses, loading, onArchive }) {
                   );
                 })}
                 {isOpen && (
-                  <tr style={{ borderBottom: "1px solid rgba(199,202,209,0.09)" }}>
+                  <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
                     <td colSpan={11} style={{ padding: 0 }}>
                       <ReportPanel hypothesisId={hid} />
                     </td>
@@ -464,20 +464,20 @@ function SubmitHypothesis({ onSubmitted }) {
   })();
 
   const statusColor = jobState?.status === "error" ? "var(--oxide)"
-    : jobState?.status === "completed" ? "var(--brass)"
-    : "var(--silver)";
+    : jobState?.status === "completed" ? "var(--brass-deep)"
+    : "var(--ink-muted)";
 
   return (
     <div style={{
       marginTop: "2.5rem", padding: "1.5rem 1.75rem",
-      border: "1px solid rgba(199,202,209,0.2)", borderRadius: "8px",
-      backgroundColor: "rgba(199,202,209,0.03)",
+      border: "1px solid var(--border)", borderRadius: "8px",
+      backgroundColor: "var(--paper-warm)",
     }}>
       <div className="eyebrow" style={{ marginBottom: "0.5rem" }}>Submit your own hypothesis</div>
-      <p style={{ fontSize: "0.75rem", color: "var(--silver)", lineHeight: 1.6, marginBottom: "1rem" }}>
+      <p style={{ fontSize: "0.75rem", color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: "1rem" }}>
         Write a testable claim in plain English. Claude Opus will parse it into the dataset DSL and test it on
-        the <strong style={{ color: "var(--paper)" }}>same discovery split</strong> as pipeline runs, appending to
-        the <strong style={{ color: "var(--paper)" }}>same cumulative FDR log</strong> — no separate accounting.
+        the <strong style={{ color: "var(--ink)" }}>same discovery split</strong> as pipeline runs, appending to
+        the <strong style={{ color: "var(--ink)" }}>same cumulative FDR log</strong> — no separate accounting.
         Re-submission under different wording creates a new log entry; nothing is overwritten.
       </p>
       <form onSubmit={handleSubmit}>
@@ -489,9 +489,9 @@ function SubmitHypothesis({ onSubmitted }) {
           placeholder={'e.g. "Drugs whose generic names contain \'mab\' (monoclonal antibodies) show higher repurposing success in inflammatory indications."'}
           style={{
             width: "100%", boxSizing: "border-box",
-            backgroundColor: "rgba(199,202,209,0.06)",
-            border: "1px solid rgba(199,202,209,0.22)", borderRadius: "5px",
-            color: "var(--paper)", fontSize: "0.8rem", padding: "0.65rem 0.8rem",
+            backgroundColor: "var(--surface-raised)",
+            border: "1px solid var(--border)", borderRadius: "5px",
+            color: "var(--ink)", fontSize: "0.8rem", padding: "0.65rem 0.8rem",
             resize: "vertical", fontFamily: "inherit", lineHeight: 1.5,
           }}
         />
@@ -598,8 +598,8 @@ function DiscoveryBatch({ onCompleted }) {
   })();
 
   const statusColor = jobState?.status === "error" ? "var(--oxide)"
-    : jobState?.status === "completed" ? "var(--brass)"
-    : "var(--silver)";
+    : jobState?.status === "completed" ? "var(--brass-deep)"
+    : "var(--ink-muted)";
 
   return (
     <div style={{
@@ -608,10 +608,10 @@ function DiscoveryBatch({ onCompleted }) {
       backgroundColor: "rgba(184,151,90,0.05)",
     }}>
       <div className="eyebrow" style={{ marginBottom: "0.5rem" }}>Autonomous discovery</div>
-      <p style={{ fontSize: "0.75rem", color: "var(--silver)", lineHeight: 1.6, marginBottom: "1rem", maxWidth: "52rem" }}>
-        Runs the full three-model pipeline with <strong style={{ color: "var(--paper)" }}>no hypothesis from you</strong>:
-        two generators (<strong style={{ color: "var(--paper)" }}>Claude Opus 4.8</strong> and{" "}
-        <strong style={{ color: "var(--paper)" }}>GPT-5.6 Sol</strong>) each propose their own bisociative domains, a lead
+      <p style={{ fontSize: "0.75rem", color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: "1rem", maxWidth: "52rem" }}>
+        Runs the full three-model pipeline with <strong style={{ color: "var(--ink)" }}>no hypothesis from you</strong>:
+        two generators (<strong style={{ color: "var(--ink)" }}>Claude Opus 4.8</strong> and{" "}
+        <strong style={{ color: "var(--ink)" }}>GPT-5.6 Sol</strong>) each propose their own bisociative domains, a lead
         reviewer consolidates them, and every ready hypothesis is tested on the discovery split, FDR-corrected over the
         whole cumulative log, then confirmed on the holdout half and confound-checked. Results append to the same registry
         below. This takes several minutes and makes many model calls.
@@ -710,10 +710,10 @@ export default function ResearchTab({ onRefresh }) {
     <div style={{ maxWidth: "1180px", margin: "0 auto", padding: "2.5rem 1.5rem" }}>
       <header style={{ marginBottom: "2rem" }}>
         <div className="eyebrow" style={{ marginBottom: "0.35rem" }}>Bisociation Registry</div>
-        <h2 style={{ fontSize: "2rem", fontWeight: 700, color: "var(--paper)", margin: 0, lineHeight: 1.1 }}>
+        <h2 style={{ fontSize: "2rem", fontWeight: 700, color: "var(--ink)", margin: 0, lineHeight: 1.1 }}>
           Research Hypotheses
         </h2>
-        <p style={{ marginTop: "0.5rem", fontSize: "0.8rem", color: "var(--silver)", lineHeight: 1.6, maxWidth: "52rem" }}>
+        <p style={{ marginTop: "0.5rem", fontSize: "0.8rem", color: "var(--ink-muted)", lineHeight: 1.6, maxWidth: "52rem" }}>
           Every hypothesis ever tested across all pipeline runs and user submissions. FDR correction is
           cumulative — adding a new hypothesis updates the adjusted q-values for all prior entries.
           Methodology (test type, threshold, correction method) is locked at submission time, before any
@@ -721,13 +721,13 @@ export default function ResearchTab({ onRefresh }) {
         </p>
         <div style={{
           marginTop: "0.75rem", padding: "0.6rem 0.85rem",
-          borderLeft: "2px solid var(--brass)", backgroundColor: "rgba(180,140,60,0.07)",
+          borderLeft: "2px solid var(--brass-deep)", backgroundColor: "var(--brass-glow)",
           borderRadius: "0 4px 4px 0", maxWidth: "52rem",
         }}>
-          <span style={{ fontFamily: "monospace", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brass)", display: "block", marginBottom: "0.25rem" }}>
+          <span style={{ fontFamily: "monospace", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brass-deep)", display: "block", marginBottom: "0.25rem" }}>
             Registry reset notice
           </span>
-          <span style={{ fontSize: "0.75rem", color: "var(--silver)", lineHeight: 1.55 }}>
+          <span style={{ fontSize: "0.75rem", color: "var(--ink-muted)", lineHeight: 1.55 }}>
             Cumulative testing history reset on July 21, 2026. 79 hypothesis-test pairs recorded prior to
             this date used indication/drug-name keyword matching only — before real molecular and
             bioactivity features (PubChem, ChEMBL) were added — and are excluded from the current
@@ -739,7 +739,7 @@ export default function ResearchTab({ onRefresh }) {
       {error && (
         <div style={{
           padding: "0.75rem 1rem", borderRadius: "5px",
-          backgroundColor: "rgba(155,74,63,0.12)", color: "var(--oxide)",
+          backgroundColor: "var(--oxide-glow)", color: "var(--oxide)",
           fontSize: "0.78rem", marginBottom: "1.25rem",
         }}>
           {error}
@@ -749,7 +749,7 @@ export default function ResearchTab({ onRefresh }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem", gap: "0.75rem", flexWrap: "wrap" }}>
         <span style={{
           fontFamily: "monospace", fontSize: "0.58rem", textTransform: "uppercase",
-          letterSpacing: "0.16em", color: "var(--silver-dim)",
+          letterSpacing: "0.16em", color: "var(--ink-dim)",
         }}>
           {loading ? "…" : `${visibleHypotheses.length} of ${allHypotheses.length} test${allHypotheses.length !== 1 ? "s" : ""} shown`}
         </span>

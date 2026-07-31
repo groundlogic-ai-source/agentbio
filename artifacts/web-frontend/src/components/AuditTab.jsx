@@ -3,16 +3,24 @@ import { auditDrug } from "../api";
 
 // ── Tiny shared primitives ────────────────────────────────────────────────────
 
-function Pill({ color = "slate", children }) {
+function Pill({ color = "neutral", children }) {
   const map = {
-    slate:  "bg-slate-100 text-slate-700",
-    green:  "bg-emerald-50 text-emerald-700 border border-emerald-200",
-    red:    "bg-red-50 text-red-700 border border-red-200",
-    amber:  "bg-amber-50 text-amber-700 border border-amber-200",
-    blue:   "bg-blue-50 text-blue-700 border border-blue-200",
+    neutral: { bg: "var(--surface-raised)", text: "var(--ink-muted)", border: "var(--border)" },
+    green:   { bg: "var(--success-glow)", text: "var(--success)", border: "rgba(61, 122, 61, 0.3)" },
+    red:     { bg: "var(--oxide-glow)", text: "var(--oxide)", border: "var(--oxide-border)" },
+    amber:   { bg: "rgba(218, 165, 32, 0.08)", text: "#9b7e1f", border: "rgba(218, 165, 32, 0.3)" },
+    blue:    { bg: "var(--steel-glow)", text: "var(--steel-deep)", border: "var(--steel-border)" },
   };
+  const style = map[color];
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${map[color]}`}>
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+      style={{
+        backgroundColor: style.bg,
+        color: style.text,
+        border: `1px solid ${style.border}`,
+      }}
+    >
       {children}
     </span>
   );
@@ -20,15 +28,22 @@ function Pill({ color = "slate", children }) {
 
 function Banner({ kind = "info", children }) {
   const map = {
-    info:  "bg-blue-50 border-blue-200 text-blue-800",
-    warn:  "bg-amber-50 border-amber-200 text-amber-800",
-    cap:   "bg-red-50 border-red-200 text-red-800",
-    note:  "bg-slate-50 border-slate-200 text-slate-600",
+    info:  { bg: "var(--steel-glow)", border: "var(--steel-border)", text: "var(--steel-deep)", marker: "◆" },
+    warn:  { bg: "rgba(218, 165, 32, 0.08)", border: "rgba(218, 165, 32, 0.3)", text: "#9b7e1f", marker: "▲" },
+    cap:   { bg: "var(--oxide-glow)", border: "var(--oxide-border)", text: "var(--oxide)", marker: "■" },
+    note:  { bg: "var(--surface-raised)", border: "var(--border)", text: "var(--ink-muted)", marker: "◇" },
   };
-  const icons = { info: "ℹ️", warn: "⚠️", cap: "🔒", note: "📋" };
+  const style = map[kind];
   return (
-    <div className={`rounded-lg border px-4 py-3 text-sm flex gap-3 ${map[kind]}`}>
-      <span className="shrink-0 text-base">{icons[kind]}</span>
+    <div
+      className="rounded-lg border px-4 py-3 text-sm flex gap-3"
+      style={{
+        backgroundColor: style.bg,
+        borderColor: style.border,
+        color: style.text,
+      }}
+    >
+      <span className="shrink-0 text-base font-mono" style={{ color: style.text }}>{style.marker}</span>
       <span>{children}</span>
     </div>
   );
@@ -36,14 +51,17 @@ function Banner({ kind = "info", children }) {
 
 function ScoreBar({ value = 0, strong }) {
   const pct = Math.round(value * 100);
-  const color = value >= 0.70 ? "bg-emerald-500" :
-                value >= 0.50 ? "bg-amber-400" : "bg-slate-300";
+  const color = value >= 0.70 ? "var(--success)" :
+                value >= 0.50 ? "#daa520" : "var(--border-strong)";
   return (
     <div className="flex items-center gap-3">
-      <div className="flex-1 h-2 rounded-full bg-slate-100">
-        <div className={`h-2 rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
+      <div className="flex-1 h-2 rounded-full" style={{ backgroundColor: "var(--surface-raised)" }}>
+        <div
+          className="h-2 rounded-full transition-all"
+          style={{ width: `${pct}%`, backgroundColor: color }}
+        />
       </div>
-      <span className="text-xs tabular-nums font-semibold text-slate-700 w-10 text-right">
+      <span className="text-xs tabular-nums font-semibold w-10 text-right" style={{ color: "var(--ink-base)" }}>
         {value.toFixed(3)}
       </span>
       {strong && <Pill color="green">Strong match</Pill>}
@@ -55,10 +73,10 @@ function ScoreBar({ value = 0, strong }) {
 
 function ScoreRow({ label, value, note }) {
   return (
-    <tr className="border-t border-slate-100">
-      <td className="py-2 pr-4 text-slate-500 text-sm">{label}</td>
-      <td className="py-2 pr-4 text-slate-800 text-sm font-mono">{value ?? "—"}</td>
-      {note && <td className="py-2 text-xs text-slate-400">{note}</td>}
+    <tr style={{ borderTop: "1px solid var(--border-light)" }}>
+      <td className="py-2 pr-4 text-sm" style={{ color: "var(--ink-muted)" }}>{label}</td>
+      <td className="py-2 pr-4 text-sm font-mono" style={{ color: "var(--ink-base)" }}>{value ?? "—"}</td>
+      {note && <td className="py-2 text-xs" style={{ color: "var(--ink-dim)" }}>{note}</td>}
     </tr>
   );
 }
@@ -66,36 +84,51 @@ function ScoreRow({ label, value, note }) {
 function CandidateCard({ cand, rank, total, capReason }) {
   if (!cand) return null;
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div
+      className="rounded-xl border overflow-hidden"
+      style={{
+        borderColor: "var(--border)",
+        backgroundColor: "var(--surface)",
+        boxShadow: "var(--shadow-soft)",
+      }}
+    >
       {/* Header */}
-      <div className="px-5 py-4 border-b border-slate-100 flex items-start justify-between gap-4">
+      <div
+        className="px-5 py-4 border-b flex items-start justify-between gap-4"
+        style={{ borderColor: "var(--border-light)" }}
+      >
         <div>
-          <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">
+          <p
+            className="text-xs font-medium uppercase tracking-wide mb-0.5"
+            style={{ color: "var(--ink-dim)" }}
+          >
             Rank {rank} of {total}
           </p>
-          <h3 className="text-lg font-semibold text-slate-900">
+          <h3 className="text-lg font-semibold" style={{ color: "var(--ink)" }}>
             {cand.drug_name}
           </h3>
           {cand.molecule_chembl_id && (
-            <p className="text-xs text-slate-400 mt-0.5">{cand.molecule_chembl_id}</p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--ink-dim)" }}>
+              {cand.molecule_chembl_id}
+            </p>
           )}
         </div>
         <div className="text-right shrink-0">
-          <p className="text-xs text-slate-400 mb-1">Composite score</p>
+          <p className="text-xs mb-1" style={{ color: "var(--ink-dim)" }}>Composite score</p>
           <ScoreBar value={cand.composite_score ?? 0} strong={cand.strong_match} />
         </div>
       </div>
 
       {/* Cap disclosure */}
       {capReason && (
-        <div className="px-5 py-3 border-b border-red-100">
+        <div className="px-5 py-3 border-b" style={{ borderColor: "var(--oxide-border)" }}>
           <Banner kind="cap">
             Score capped: {capReason}
           </Banner>
         </div>
       )}
       {cand.black_box_advisory && (
-        <div className="px-5 py-3 border-b border-amber-100">
+        <div className="px-5 py-3 border-b" style={{ borderColor: "rgba(218, 165, 32, 0.3)" }}>
           <Banner kind="warn">
             Black-box advisory: This drug carries an FDA black-box (boxed) warning. This is a
             disclosure only and does not affect the score.
@@ -105,7 +138,10 @@ function CandidateCard({ cand, rank, total, capReason }) {
 
       {/* Score breakdown */}
       <div className="px-5 py-4">
-        <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
+        <h4
+          className="text-xs font-semibold uppercase tracking-wide mb-3"
+          style={{ color: "var(--ink-muted)" }}
+        >
           Score breakdown
         </h4>
         <table className="w-full">
@@ -159,12 +195,23 @@ function FoundResult({ data }) {
       />
 
       {data.top_candidate?.drug_name !== data.candidate?.drug_name && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-4">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+        <div
+          className="rounded-xl border px-5 py-4"
+          style={{
+            borderColor: "var(--border)",
+            backgroundColor: "var(--surface-raised)",
+          }}
+        >
+          <p
+            className="text-xs font-semibold uppercase tracking-wide mb-2"
+            style={{ color: "var(--ink-muted)" }}
+          >
             AgentBio's top-ranked candidate
           </p>
           <div className="flex items-center justify-between">
-            <p className="text-slate-800 font-medium">{data.top_candidate?.drug_name}</p>
+            <p className="font-medium" style={{ color: "var(--ink-base)" }}>
+              {data.top_candidate?.drug_name}
+            </p>
             <ScoreBar value={data.top_candidate?.composite_score ?? 0} strong={data.top_candidate?.strong_match} />
           </div>
         </div>
@@ -189,43 +236,50 @@ function AbsentResult({ data }) {
         {data.narration}
       </Banner>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100">
-          <p className="text-sm font-semibold text-slate-700">Target comparison</p>
-          <p className="text-xs text-slate-400 mt-0.5">
+      <div
+        className="rounded-xl border overflow-hidden"
+        style={{
+          borderColor: "var(--border)",
+          backgroundColor: "var(--surface)",
+          boxShadow: "var(--shadow-soft)",
+        }}
+      >
+        <div className="px-5 py-4 border-b" style={{ borderColor: "var(--border-light)" }}>
+          <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>Target comparison</p>
+          <p className="text-xs mt-0.5" style={{ color: "var(--ink-dim)" }}>
             {data.total_candidates} candidates evaluated by AgentBio for this disease
           </p>
         </div>
-        <div className="divide-y divide-slate-100">
-          <div className="px-5 py-4 flex gap-4">
-            <div className="w-44 shrink-0 text-xs text-slate-500 pt-0.5">
+        <div style={{ borderTop: "1px solid var(--border-light)" }}>
+          <div className="px-5 py-4 flex gap-4" style={{ borderBottom: "1px solid var(--border-light)" }}>
+            <div className="w-44 shrink-0 text-xs pt-0.5" style={{ color: "var(--ink-muted)" }}>
               AgentBio selected target
             </div>
             <div>
-              <span className="font-mono text-sm text-slate-800">
+              <span className="font-mono text-sm" style={{ color: "var(--ink-base)" }}>
                 {agentTarget ?? "unknown"}
               </span>
             </div>
           </div>
           <div className="px-5 py-4 flex gap-4">
-            <div className="w-44 shrink-0 text-xs text-slate-500 pt-0.5">
+            <div className="w-44 shrink-0 text-xs pt-0.5" style={{ color: "var(--ink-muted)" }}>
               Drug's ChEMBL mechanisms
             </div>
             <div className="space-y-1">
               {drugTargets.length > 0 ? (
                 drugTargets.map((t, i) => (
-                  <p key={i} className="text-sm text-slate-700">{t}</p>
+                  <p key={i} className="text-sm" style={{ color: "var(--ink-base)" }}>{t}</p>
                 ))
               ) : (
-                <p className="text-sm text-slate-400 italic">
+                <p className="text-sm italic" style={{ color: "var(--ink-dim)" }}>
                   No mechanism records found in ChEMBL
                 </p>
               )}
             </div>
           </div>
           {!overlap && drugTargets.length > 0 && agentTarget && (
-            <div className="px-5 py-3 bg-amber-50">
-              <p className="text-xs text-amber-700">
+            <div className="px-5 py-3" style={{ backgroundColor: "rgba(218, 165, 32, 0.08)" }}>
+              <p className="text-xs" style={{ color: "#9b7e1f" }}>
                 The drug's recorded ChEMBL mechanism targets don't match AgentBio's
                 selected target for this disease — a likely explanation for its absence
                 from the pool.
@@ -236,12 +290,23 @@ function AbsentResult({ data }) {
       </div>
 
       {data.top_candidate && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-4">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+        <div
+          className="rounded-xl border px-5 py-4"
+          style={{
+            borderColor: "var(--border)",
+            backgroundColor: "var(--surface-raised)",
+          }}
+        >
+          <p
+            className="text-xs font-semibold uppercase tracking-wide mb-2"
+            style={{ color: "var(--ink-muted)" }}
+          >
             AgentBio's top-ranked candidate
           </p>
           <div className="flex items-center justify-between">
-            <p className="text-slate-800 font-medium">{data.top_candidate?.drug_name}</p>
+            <p className="font-medium" style={{ color: "var(--ink-base)" }}>
+              {data.top_candidate?.drug_name}
+            </p>
             <ScoreBar value={data.top_candidate?.composite_score ?? 0} strong={data.top_candidate?.strong_match} />
           </div>
         </div>
@@ -254,19 +319,26 @@ function AbsentResult({ data }) {
 
 function NoCaseResult({ diseaseName, drugName, onNewCase }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm px-6 py-8 text-center space-y-4">
-      <div className="text-4xl">🔬</div>
+    <div
+      className="rounded-xl border px-6 py-8 text-center space-y-4"
+      style={{
+        borderColor: "var(--border)",
+        backgroundColor: "var(--surface)",
+        boxShadow: "var(--shadow-soft)",
+      }}
+    >
+      <div className="text-4xl" style={{ color: "var(--steel)" }}>◆</div>
       <div>
-        <p className="text-slate-800 font-semibold">No case found for this disease</p>
-        <p className="text-sm text-slate-500 mt-1">
+        <p className="font-semibold" style={{ color: "var(--ink)" }}>No case found for this disease</p>
+        <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
           AgentBio hasn't run a drug-repurposing analysis for
-          <span className="font-medium text-slate-700"> {diseaseName}</span> yet.
+          <span className="font-medium" style={{ color: "var(--ink-base)" }}> {diseaseName}</span> yet.
           Submit a new case to generate a candidate pool, then re-run the audit.
         </p>
       </div>
       <button
         onClick={onNewCase}
-        className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+        className="btn btn-primary"
       >
         Submit new case
       </button>
@@ -276,9 +348,15 @@ function NoCaseResult({ diseaseName, drugName, onNewCase }) {
 
 function NoCandidatesResult({ jobId, onNewCase }) {
   return (
-    <div className="rounded-xl border border-amber-200 bg-amber-50 px-6 py-6 space-y-3">
-      <p className="text-amber-800 font-medium">Candidates file unavailable</p>
-      <p className="text-sm text-amber-700">
+    <div
+      className="rounded-xl border px-6 py-6 space-y-3"
+      style={{
+        borderColor: "rgba(218, 165, 32, 0.3)",
+        backgroundColor: "rgba(218, 165, 32, 0.08)",
+      }}
+    >
+      <p className="font-medium" style={{ color: "#9b7e1f" }}>Candidates file unavailable</p>
+      <p className="text-sm" style={{ color: "#9b7e1f" }}>
         The case <code className="text-xs">{jobId}</code> predates per-job candidate
         persistence. Re-run the disease to generate a fresh candidates file, then
         repeat the audit.
@@ -286,7 +364,7 @@ function NoCandidatesResult({ jobId, onNewCase }) {
       {onNewCase && (
         <button
           onClick={onNewCase}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+          className="btn btn-primary"
         >
           Re-run this disease
         </button>
@@ -299,12 +377,18 @@ function UnresolvedResult({ data }) {
   return (
     <div className="space-y-5">
       <Banner kind="warn">{data.narration}</Banner>
-      <div className="rounded-xl border border-slate-200 bg-white px-5 py-4">
-        <p className="text-sm font-semibold text-slate-700">Why this matters</p>
-        <p className="text-sm text-slate-500 mt-1">
+      <div
+        className="rounded-xl border px-5 py-4"
+        style={{
+          borderColor: "var(--border)",
+          backgroundColor: "var(--surface)",
+        }}
+      >
+        <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>Why this matters</p>
+        <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
           AgentBio resolves drug names against ChEMBL before checking the pool.
           An unresolvable name means the audit could not run — it does{" "}
-          <span className="font-medium text-slate-700">not</span> mean the drug was
+          <span className="font-medium" style={{ color: "var(--ink-base)" }}>not</span> mean the drug was
           evaluated and rejected.
         </p>
       </div>
@@ -351,8 +435,8 @@ export default function AuditTab({ onNavigate }) {
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-semibold text-slate-900">Candidate Audit</h2>
-        <p className="text-sm text-slate-500 mt-1">
+        <h2 className="text-2xl font-semibold" style={{ color: "var(--ink)" }}>Candidate Audit</h2>
+        <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
           Look up where a specific drug stands in AgentBio's reasoning for a disease —
           rank, score, cap disclosures, and a target comparison if absent.
         </p>
@@ -360,12 +444,12 @@ export default function AuditTab({ onNavigate }) {
 
       {/* Examples */}
       <div className="flex flex-wrap gap-2">
-        <span className="text-xs text-slate-400 self-center">Try:</span>
+        <span className="text-xs self-center" style={{ color: "var(--ink-dim)" }}>Try:</span>
         {examples.map((ex, i) => (
           <button
             key={i}
             onClick={() => { setDisease(ex.disease); setDrug(ex.drug); setResult(null); setError(null); }}
-            className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+            className="audit-chip text-xs px-3 py-1.5 rounded-full transition-colors"
           >
             {ex.drug} / {ex.disease}
           </button>
@@ -373,33 +457,47 @@ export default function AuditTab({ onNavigate }) {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-xl border p-5 space-y-4"
+        style={{
+          borderColor: "var(--border)",
+          backgroundColor: "var(--surface)",
+          boxShadow: "var(--shadow-soft)",
+        }}
+      >
         <div>
-          <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">
+          <label
+            className="block text-xs font-semibold uppercase tracking-wide mb-1.5"
+            style={{ color: "var(--ink-muted)" }}
+          >
             Disease name
           </label>
           <input
             value={disease}
             onChange={e => setDisease(e.target.value)}
             placeholder="e.g. Idiopathic pulmonary arterial hypertension"
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+            className="audit-input w-full border rounded-lg px-3 py-2 text-sm focus:outline-none"
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">
+          <label
+            className="block text-xs font-semibold uppercase tracking-wide mb-1.5"
+            style={{ color: "var(--ink-muted)" }}
+          >
             Drug name
           </label>
           <input
             value={drug}
             onChange={e => setDrug(e.target.value)}
             placeholder="e.g. Sildenafil"
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+            className="audit-input w-full border rounded-lg px-3 py-2 text-sm focus:outline-none"
           />
         </div>
         <button
           type="submit"
           disabled={loading || !disease.trim() || !drug.trim()}
-          className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white text-sm font-semibold rounded-lg transition-colors"
+          className="audit-submit w-full py-2.5 text-sm font-semibold rounded-lg transition-colors"
         >
           {loading ? "Looking up…" : "Run Audit"}
         </button>

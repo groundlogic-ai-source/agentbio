@@ -11,9 +11,9 @@ function Paper({ children, className = "" }) {
     <div
       className={`rounded-lg border ${className}`}
       style={{
-        backgroundColor: "var(--paper)",
-        borderColor: "rgba(199,202,209,0.6)",
-        color: "var(--ink)",
+        backgroundColor: "var(--surface)",
+        borderColor: "var(--border)",
+        color: "var(--ink-base)",
         boxShadow: "var(--shadow-paper)",
       }}
     >
@@ -32,31 +32,31 @@ function CaseHeader({ job, cost }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3 mb-1">
             <div
-              className="font-mono text-[0.58rem] uppercase tracking-[0.22em]"
-              style={{ color: "var(--brass)" }}
+              className="text-xs font-semibold"
+              style={{ color: "var(--ink-muted)" }}
             >
               Case dossier
             </div>
             <div
-              className="font-mono text-[0.58rem] tracking-wider"
-              style={{ color: "var(--silver-dim)" }}
+              className="font-mono text-xs"
+              style={{ color: "var(--ink-muted)" }}
             >
               #{caseId}
             </div>
           </div>
           <h1
             className="text-3xl font-semibold leading-tight tracking-tight"
-            style={{ color: "var(--paper)" }}
+            style={{ color: "var(--ink)" }}
           >
             {diseaseLabel(job)}
           </h1>
           <div
-            className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[0.65rem]"
-            style={{ color: "var(--silver)" }}
+            className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs"
+            style={{ color: "var(--ink-muted)" }}
           >
             <span>Opened {formatDate(job.created_at)}</span>
             {liveCost != null && (
-              <span style={{ color: "var(--brass)" }}>
+              <span style={{ color: "var(--brass-deep)" }}>
                 Run cost {formatCost(liveCost)}
               </span>
             )}
@@ -76,7 +76,7 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
       <div className="mx-auto max-w-4xl px-4 py-10">
         <p
           className="font-mono text-sm"
-          style={{ color: "var(--silver-dim)" }}
+          style={{ color: "var(--ink-dim)" }}
         >
           Loading case…
         </p>
@@ -116,7 +116,7 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
       {(status === "queued" || status === "running") && (
         <Paper>
           <div className="p-6">
-            <div className="text-lg font-semibold">
+            <div className="text-lg font-semibold" style={{ color: "var(--ink)" }}>
               Pipeline in progress
             </div>
             <p
@@ -135,7 +135,7 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
         <div className="flex flex-col gap-5">
           <Paper>
             <div className="p-6">
-              <div className="text-lg font-semibold">
+              <div className="text-lg font-semibold" style={{ color: "var(--ink)" }}>
                 Pipeline complete — awaiting your sign-off
               </div>
               <div className="mt-5">
@@ -162,17 +162,17 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
             {job.review_notes && (
               <div
                 className="mt-8 border-t pt-5"
-                style={{ borderColor: "rgba(42,43,46,0.15)" }}
+                style={{ borderColor: "var(--border-light)" }}
               >
                 <div
-                  className="font-mono text-[0.62rem] uppercase tracking-[0.2em] mb-2"
+                  className="text-xs font-semibold mb-2"
                   style={{ color: "var(--ink-muted)" }}
                 >
                   Reviewer sign-off note
                 </div>
                 <p
                   className="text-sm leading-relaxed"
-                  style={{ color: "var(--ink)", fontStyle: "italic" }}
+                  style={{ color: "var(--ink-base)", fontStyle: "italic" }}
                 >
                   "{job.review_notes}"
                 </p>

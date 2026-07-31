@@ -52,12 +52,12 @@ function Marker({ state }) {
   return (
     <span
       className="grid h-6 w-6 shrink-0 place-items-center rounded-full"
-      style={{ border: "2px solid rgba(42,43,46,0.2)" }}
+      style={{ border: "2px solid var(--border)" }}
       aria-hidden="true"
     >
       <span
         className="h-1.5 w-1.5 rounded-full"
-        style={{ backgroundColor: "rgba(42,43,46,0.2)" }}
+        style={{ backgroundColor: "var(--border-strong)" }}
       />
     </span>
   );
@@ -77,17 +77,17 @@ export default function Stepper({ status, currentStage }) {
 
         const labelColor =
           state === "active"
-            ? "var(--brass)"
+            ? "var(--brass-deep)"
             : state === "done"
               ? "var(--ink)"
-              : "rgba(42,43,46,0.4)";
+              : "var(--ink-dim)";
 
         const descColor =
           state === "done"
             ? "var(--ink-muted)"
             : state === "active"
-              ? "rgba(192,138,53,0.8)"
-              : "rgba(42,43,46,0.3)";
+              ? "var(--brass-deep)"
+              : "var(--ink-dim)";
 
         const description = STAGE_DESCRIPTIONS[stage.key];
 
@@ -105,8 +105,8 @@ export default function Stepper({ status, currentStage }) {
                     backgroundColor:
                       i < activeIndex
                         ? "var(--brass)"
-                        : "rgba(42,43,46,0.15)",
-                    opacity: i < activeIndex ? 0.5 : 1,
+                        : "var(--border-light)",
+                    opacity: i < activeIndex ? 0.6 : 1,
                     transition: "background-color 0.3s ease",
                   }}
                   aria-hidden="true"
