@@ -19,23 +19,23 @@ export default function SignOff({ onResume, busy }) {
     <div
       className="rounded-lg border"
       style={{
-        borderColor: "rgba(199,202,209,0.45)",
-        backgroundColor: "var(--graphite-raised)",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
+        borderColor: "var(--border)",
+        backgroundColor: "var(--surface)",
+        boxShadow: "var(--shadow-paper)",
       }}
     >
       {/* Header strip */}
       <div
         className="px-6 py-3 border-b"
         style={{
-          borderColor: "rgba(199,202,209,0.15)",
+          borderColor: "var(--border-light)",
           borderLeft: "3px solid var(--brass)",
           borderRadius: "8px 8px 0 0",
         }}
       >
         <span
-          className="font-mono text-[0.62rem] uppercase tracking-[0.22em]"
-          style={{ color: "var(--brass)" }}
+          className="font-mono text-[0.62rem] uppercase tracking-[0.14em]"
+          style={{ color: "var(--brass-deep)" }}
         >
           Human Review Checkpoint
         </span>
@@ -44,13 +44,13 @@ export default function SignOff({ onResume, busy }) {
       <div className="px-6 py-5">
         <p
           className="text-base font-semibold leading-snug"
-          style={{ color: "var(--paper)" }}
+          style={{ color: "var(--ink)" }}
         >
           This is a falsifiable hypothesis, not a finding.
         </p>
         <p
           className="mt-1.5 text-sm leading-relaxed"
-          style={{ color: "var(--silver)" }}
+          style={{ color: "var(--ink-muted)" }}
         >
           Record your scientific reasoning below, then sign off. Approving
           advances this candidate for wet-lab validation; rejecting closes the
@@ -63,7 +63,7 @@ export default function SignOff({ onResume, busy }) {
         >
           <span
             className="font-mono text-[0.62rem] uppercase tracking-wider"
-            style={{ color: "var(--silver)" }}
+            style={{ color: "var(--ink-base)" }}
           >
             Reviewer note
           </span>
@@ -87,18 +87,18 @@ export default function SignOff({ onResume, busy }) {
           style={{
             borderColor: note.trim()
               ? "var(--brass)"
-              : "rgba(199,202,209,0.3)",
-            backgroundColor: "rgba(237,232,223,0.06)",
-            color: "var(--silver)",
+              : "var(--border)",
+            backgroundColor: "var(--paper-warm)",
+            color: "var(--ink-base)",
             transition: "border-color 0.2s ease",
           }}
           onFocus={(e) => {
             if (!note.trim())
-              e.currentTarget.style.borderColor = "rgba(192,138,53,0.5)";
+              e.currentTarget.style.borderColor = "var(--brass-border)";
           }}
           onBlur={(e) => {
             if (!note.trim())
-              e.currentTarget.style.borderColor = "rgba(199,202,209,0.3)";
+              e.currentTarget.style.borderColor = "var(--border)";
           }}
         />
 
@@ -120,7 +120,7 @@ export default function SignOff({ onResume, busy }) {
             style={{
               backgroundColor: "var(--brass)",
               color: "var(--paper)",
-              boxShadow: "0 2px 8px rgba(192,138,53,0.25)",
+              boxShadow: "0 2px 8px rgba(176, 122, 40, 0.2)",
               transition:
                 "background-color 0.15s ease, transform 0.1s ease",
             }}
@@ -154,8 +154,7 @@ export default function SignOff({ onResume, busy }) {
             }}
             onMouseEnter={(e) => {
               if (!busy)
-                e.currentTarget.style.backgroundColor =
-                  "rgba(155,74,63,0.12)";
+                e.currentTarget.style.backgroundColor = "var(--oxide-glow)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "transparent";

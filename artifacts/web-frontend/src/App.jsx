@@ -213,8 +213,9 @@ export default function App() {
         <div
           className="px-4 py-2 text-center font-mono text-xs"
           style={{
-            backgroundColor: "rgba(155,74,63,0.18)",
+            backgroundColor: "var(--oxide-glow)",
             color: "var(--oxide)",
+            borderBottom: "1px solid var(--oxide-border)",
           }}
           role="alert"
         >
@@ -226,8 +227,8 @@ export default function App() {
       {isTopLevel && (
         <nav style={{
           display: "flex", alignItems: "center", gap: "0",
-          borderBottom: "1px solid rgba(199,202,209,0.18)",
-          backgroundColor: "var(--graphite)",
+          borderBottom: "1px solid var(--border)",
+          backgroundColor: "var(--surface)",
           padding: "0 1.5rem",
         }}>
           {[
