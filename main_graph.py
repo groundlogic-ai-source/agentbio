@@ -638,21 +638,43 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
         print("[graph] writer: no candidates selected — no reports written")
         return {"reports": []}
 
-    # For K > 1 targets, pass the biologist_outputs keyed by target_symbol so
+    # For K > 1 targets, pass the biologist_outputs keyed by target identity so
     # build_report_markdown receives the matching biologist context per candidate.
-    # The primary biologist_output is the fallback for any candidate whose symbol
-    # is not found in the map (e.g. pathway-neighbor candidates).
+    # Matching is UniProt-first (stable identifier), symbol second; the primary
+    # biologist_output is the last-resort fallback (e.g. pathway-neighbor
+    # candidates with no biologist run) and is ALWAYS logged loudly, because a
+    # silent fallback would stamp the wrong target's druggability context into
+    # the dossier (F3, validation/target_selection_diagnosis.md).
     bio_outputs_list = state.get("biologist_outputs") or []
     bio_map: dict[str, dict[str, Any]] = {}
+    bio_map_uid: dict[str, dict[str, Any]] = {}
     for bio in bio_outputs_list:
-        sym = (bio.get("target") or {}).get("target_symbol")
+        t = bio.get("target") or {}
+        sym = t.get("target_symbol")
+        uid = t.get("uniprot_id")
         if sym:
             bio_map[sym] = bio
+        if uid:
+            bio_map_uid[uid] = bio
     primary_bio = state.get("biologist_output")
 
     def _bio_for(cand: dict) -> Optional[dict]:
         sym = cand.get("target_symbol")
-        return bio_map.get(sym) or primary_bio
+        uid = cand.get("uniprot_id")
+        by_sym = bio_map.get(sym) if sym else None
+        by_uid = bio_map_uid.get(uid) if uid else None
+        if by_sym is not None and by_uid is not None and by_sym is not by_uid:
+            # Symbol and UniProt disagree — trust the stable identifier and
+            # make the disagreement visible rather than silently picking one.
+            print(f"[graph] writer WARNING: biologist-output conflict for "
+                  f"candidate {sym}/{uid} — using UniProt match")
+            return by_uid
+        match = by_uid or by_sym
+        if match is None:
+            print(f"[graph] writer WARNING: no biologist output matches candidate "
+                  f"target {sym}/{uid} — falling back to PRIMARY target context; "
+                  f"dossier druggability context may describe the wrong target")
+        return match or primary_bio
 
     reports = writer.run_writer(
         reviewed, selected, structure_results, primary_bio,
