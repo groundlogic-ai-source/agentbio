@@ -231,20 +231,24 @@ export default function App() {
           padding: "0 1.5rem",
         }}>
           {[
-            { id: "dashboard", label: "Case Files" },
-            { id: "research", label: "Research" },
-            { id: "saved", label: "Saved Reports" },
-            { id: "audit", label: "Audit" },
-          ].map(({ id, label }) => {
+            // Two product surfaces, visually grouped: the case pipeline
+            // (Case Files + Audit) and the research module (Research + Saved).
+            { id: "dashboard", label: "Case Files", group: "case" },
+            { id: "audit", label: "Audit", group: "case" },
+            { id: "research", label: "Research", group: "research" },
+            { id: "saved", label: "Saved Reports", group: "research" },
+          ].map(({ id, label, group }, idx) => {
             const active = view === id;
             return (
-              <button
-                key={id}
-                onClick={() => setView(id)}
-                className={`nav-tab${active ? " nav-tab--active" : ""}`}
-              >
-                {label}
-              </button>
+              <span key={id} style={{ display: "inline-flex", alignItems: "center" }}>
+                {idx === 2 && <span className="nav-group-divider" aria-hidden="true" />}
+                <button
+                  onClick={() => setView(id)}
+                  className={`nav-tab nav-tab--${group}${active ? " nav-tab--active" : ""}`}
+                >
+                  {label}
+                </button>
+              </span>
             );
           })}
         </nav>
