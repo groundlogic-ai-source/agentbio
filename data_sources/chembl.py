@@ -59,7 +59,11 @@ def _get_gene_symbol(uniprot_id: str) -> str:
     except Exception:
         pass
 
-    cache_set(cache_key, symbol, ttl_days=30)
+    # Only cache a genuinely resolved symbol. Caching the accession fallback
+    # after a transient UniProt failure freezes the degraded value for 30 days
+    # (check_prior_trials depends on real gene symbols).
+    if symbol != uniprot_id:
+        cache_set(cache_key, symbol, ttl_days=30)
     return symbol
 
 
@@ -117,10 +121,14 @@ def _fetch_assay_confidence(assay_ids: list[str]) -> dict[str, int]:
     return confidence
 
 
-def _fetch_activities(target_chembl_id: str) -> list[dict[str, Any]]:
+def _fetch_activities(target_chembl_id: str) -> tuple[list[dict[str, Any]], bool]:
     """
     Fetch IC50/Ki activities (pchembl_value present) for a target, then keep
     only those whose assay confidence_score >= 8. Pulls up to 1000 records.
+
+    Returns (kept, raw_seen). raw_seen is True when the upstream payload
+    contained ANY activity rows (pre-filter), letting callers distinguish a
+    genuine post-filter empty from an ambiguous empty payload (degraded 200).
     """
     url = f"{BASE_URL}/activity.json"
     params = {
@@ -134,7 +142,7 @@ def _fetch_activities(target_chembl_id: str) -> list[dict[str, Any]]:
     data = _get_json(url, params)
     activities = data.get("activities", [])
     if not activities:
-        return []
+        return [], False
 
     assay_ids = sorted({a["assay_chembl_id"] for a in activities if a.get("assay_chembl_id")})
     confidence = _fetch_assay_confidence(assay_ids)
@@ -142,7 +150,7 @@ def _fetch_activities(target_chembl_id: str) -> list[dict[str, Any]]:
     return [
         a for a in activities
         if confidence.get(a.get("assay_chembl_id"), 0) >= 8
-    ]
+    ], True
 
 
 def get_target_bioactivity_count(uniprot_id: str) -> dict[str, Any]:
@@ -173,7 +181,8 @@ def get_target_bioactivity_count(uniprot_id: str) -> dict[str, Any]:
     try:
         target_ids = _resolve_target_chembl_id(uniprot_id)
         if not target_ids:
-            cache_set(cache_key, result, ttl_days=7)
+            # Empty resolution is ambiguous (genuine no-match vs degraded
+            # 200-with-empty-payload) — do NOT cache; refetch next run.
             return result
 
         result["target_chembl_ids"] = target_ids
@@ -182,8 +191,11 @@ def get_target_bioactivity_count(uniprot_id: str) -> dict[str, Any]:
 
         all_pchembl: list[float] = []
         total_count = 0
+        saw_raw_payload = False  # any non-empty pre-filter activity payload seen
         for tid in target_ids:
-            activities = _fetch_activities(tid)
+            activities, raw_seen = _fetch_activities(tid)
+            if raw_seen:
+                saw_raw_payload = True
             total_count += len(activities)
             for a in activities:
                 try:
@@ -202,21 +214,30 @@ def get_target_bioactivity_count(uniprot_id: str) -> dict[str, Any]:
         # cached for 7 days as a legitimate "zero bioactivity" result.
         return result
 
-    cache_set(cache_key, result, ttl_days=7)
+    # Cache only a non-zero result or a genuine post-filter zero (at least one
+    # raw payload seen). An all-empty-payload zero is ambiguous (degraded 200)
+    # and must not be cached as "zero bioactivity" for 7 days.
+    if result["count"] > 0 or saw_raw_payload:
+        cache_set(cache_key, result, ttl_days=7)
     return result
 
 
-def _fetch_activities_full(target_chembl_id: str) -> list[dict[str, Any]]:
+def _fetch_activities_full(target_chembl_id: str) -> tuple[list[dict[str, Any]], bool]:
     """
     Like _fetch_activities, but retains molecule identity and structure so callers
     can build a candidate-compound list (not just a count). Keeps only activities
     whose assay confidence_score >= 8 and tags each kept record with `_confidence`.
-    Cached with a 7-day TTL so both the count and compound functions share the data.
+
+    Returns (kept, raw_seen). raw_seen is True when the upstream payload
+    contained ANY activity rows (pre-filter) — the signal callers need to
+    distinguish a genuine post-filter empty (cacheable) from an ambiguous
+    empty payload (degraded 200 vs no data; never cached).
+    Cache v2 stores {kept, raw_seen}; v1 rows (bare lists) are superseded.
     """
-    cache_key = make_key("_fetch_activities_full_v1", target_chembl_id)
+    cache_key = make_key("_fetch_activities_full_v2", target_chembl_id)
     cached = get(cache_key)
     if cached is not None:
-        return cached
+        return cached["kept"], cached["raw_seen"]
 
     url = f"{BASE_URL}/activity.json"
     params = {
@@ -230,8 +251,10 @@ def _fetch_activities_full(target_chembl_id: str) -> list[dict[str, Any]]:
     data = _get_json(url, params)
     activities = data.get("activities", [])
     if not activities:
-        cache_set(cache_key, [], ttl_days=7)
-        return []
+        # Empty payload is ambiguous: genuine "no IC50/Ki assays" vs a degraded
+        # 200-with-empty-body during a ChEMBL outage. Do NOT cache — a cached
+        # empty zeroes the target's candidate pool for 7 days (MTOR/TSC 2026-07).
+        return [], False
 
     assay_ids = sorted({a["assay_chembl_id"] for a in activities if a.get("assay_chembl_id")})
     confidence = _fetch_assay_confidence(assay_ids)
@@ -243,8 +266,10 @@ def _fetch_activities_full(target_chembl_id: str) -> list[dict[str, Any]]:
             a["_confidence"] = c
             kept.append(a)
 
-    cache_set(cache_key, kept, ttl_days=7)
-    return kept
+    # kept may be [] here (all rows below confidence) — that IS a genuine
+    # post-filter empty and is cacheable, flagged by raw_seen=True.
+    cache_set(cache_key, {"kept": kept, "raw_seen": True}, ttl_days=7)
+    return kept, True
 
 
 def _fetch_molecule_meta(molecule_ids: list[str]) -> dict[str, dict[str, Any]]:
@@ -418,15 +443,19 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
     try:
         target_ids = _resolve_target_chembl_id(uniprot_id)
         if not target_ids:
-            cache_set(cache_key, result, ttl_days=7)
+            # Ambiguous empty (genuine no-match vs degraded 200) — not cached.
             return result
 
         result["target_chembl_ids"] = target_ids
         result["pooled_across_multiple_targets"] = len(target_ids) > 1
 
         by_mol: dict[str, dict[str, Any]] = {}
+        saw_activity_payload = False  # any non-empty activity payload seen
         for tid in target_ids:
-            for a in _fetch_activities_full(tid):
+            tid_acts, raw_seen = _fetch_activities_full(tid)
+            if raw_seen:
+                saw_activity_payload = True
+            for a in tid_acts:
                 mid = a.get("molecule_chembl_id")
                 if not mid:
                     continue
@@ -510,7 +539,13 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
         # for 7 days as an empty candidate pool.
         return result
 
-    cache_set(cache_key, result, ttl_days=7)
+    # An empty pool is only cacheable when it is empty AFTER FILTERING — i.e.
+    # at least one activity payload was actually seen. If every fetch returned
+    # an empty payload, the emptiness is indistinguishable from a degraded 200
+    # (ChEMBL outage), and caching it would zero the pool for 7 days
+    # (MTOR/TSC incident, 2026-07).
+    if result["compounds"] or saw_activity_payload:
+        cache_set(cache_key, result, ttl_days=7)
     return result
 
 
@@ -647,6 +682,10 @@ def _fetch_molecule_safety(molecule_chembl_id: str) -> dict[str, Any]:
     except Exception as e:
         print(f"[chembl] WARNING: molecule safety fetch failed for "
               f"'{molecule_chembl_id}': {e}")
+        # Do NOT cache safe defaults after a failure: a transient error would
+        # otherwise be frozen for 30 days as "not withdrawn / no black-box
+        # warning" — a safety-critical false negative.
+        return result
 
     cache_set(cache_key, result, ttl_days=30)
     return result
@@ -951,7 +990,8 @@ def get_pharmacological_targets_for_disease(
                 }
 
         if not mol_ids:
-            cache_set(cache_key, results, ttl_days=7)
+            # Ambiguous empty (genuine no-indication vs degraded 200 payload)
+            # — not cached; refetch next run.
             return results
 
         # Get MOA target IDs for each approved drug molecule
@@ -967,7 +1007,7 @@ def get_pharmacological_targets_for_disease(
                     target_chembl_ids.add(tid)
 
         if not target_chembl_ids:
-            cache_set(cache_key, results, ttl_days=7)
+            # Ambiguous empty — not cached.
             return results
 
         # Resolve target_chembl_ids -> UniProt (Homo sapiens SINGLE PROTEIN only)
@@ -1009,9 +1049,14 @@ def get_pharmacological_targets_for_disease(
                     "uniprot_id": uniprot_id,
                 })
 
+    except RuntimeError:
+        raise  # fail-loud holdout/resolution errors must abort, not be swallowed
     except Exception as e:
         print(f"[chembl] WARNING: pharmacological target lookup failed "
               f"for '{disease_efo_id}': {e}")
+        # Do NOT cache partial/empty results after a failure — a cached empty
+        # silently disables the precedent path for 7 days.
+        return results
 
     # Cache the raw facts only (no scoring constants).
     cache_set(cache_key, results, ttl_days=7)
@@ -1120,6 +1165,8 @@ def get_drug_action_type(
 
     except Exception as e:
         print(f"[chembl] WARNING: get_drug_action_type failed for '{drug_name}': {e}")
+        # Do NOT cache the not-found default after a failure (30-day poisoning).
+        return result
 
     cache_set(cache_key, result, ttl_days=30)
     return result
@@ -1209,6 +1256,8 @@ def get_molecule_data(drug_name: str) -> dict[str, Any]:
 
     except Exception as e:
         print(f"[chembl] WARNING: get_molecule_data failed for '{drug_name}': {e}")
+        # Do NOT cache resolved=False after a failure (30-day poisoning).
+        return result
 
     cache_set(cache_key, result, ttl_days=30)
     return result

@@ -37,6 +37,8 @@ def get_protein_sequence(uniprot_id: str) -> Optional[str]:
     except Exception as e:
         print(f"[uniprot] WARNING: sequence fetch failed for '{uniprot_id}': {e}")
 
-    # Cache empty string on miss so we don't hammer the API; return None to caller.
-    cache_set(cache_key, seq or "", ttl_days=30)
+    # Cache only a real sequence; a fetch failure must not be frozen as the
+    # "" sentinel for 30 days. Genuine empty responses simply refetch.
+    if seq:
+        cache_set(cache_key, seq, ttl_days=30)
     return seq or None

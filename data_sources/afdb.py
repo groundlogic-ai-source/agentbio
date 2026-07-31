@@ -43,7 +43,8 @@ def get_structure_confidence(uniprot_id: str) -> dict[str, Any]:
     try:
         predictions = _fetch_prediction(uniprot_id)
         if not predictions:
-            cache_set(cache_key, result, ttl_days=7)
+            # Ambiguous empty (genuine no-structure vs degraded payload) —
+            # not cached; refetch next run.
             return result
 
         prediction = predictions[0]
@@ -74,6 +75,9 @@ def get_structure_confidence(uniprot_id: str) -> dict[str, Any]:
 
     except Exception as e:
         print(f"[afdb] WARNING: structure query failed for '{uniprot_id}': {e}")
+        # Do NOT cache the default after a failure: a transient error would be
+        # frozen for 7 days as "no structure", demoting tractability.
+        return result
 
     cache_set(cache_key, result, ttl_days=7)
     return result

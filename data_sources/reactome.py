@@ -143,7 +143,12 @@ def get_pathway_neighbors(
         return cached
 
     # Step 1: fetch all pathways the protein participates in.
-    pathways = _get(f"{BASE_URL}/data/mapping/UniProt/{uniprot_id}/pathways") or []
+    # _get returns None on failure — distinguish failure from a genuine empty
+    # pathway list: only the genuine empty may be cached.
+    pathways = _get(f"{BASE_URL}/data/mapping/UniProt/{uniprot_id}/pathways")
+    if pathways is None:
+        print(f"[reactome] pathway query FAILED for {uniprot_id} (not caching)")
+        return []
     if not isinstance(pathways, list) or not pathways:
         print(f"[reactome] no pathways found for {uniprot_id}")
         cache_set(cache_key, [], ttl_days=30)
@@ -166,6 +171,7 @@ def get_pathway_neighbors(
     # pathway_meta maps stId → {name, participant_count, is_metabolic}
     pathway_meta: dict[str, dict[str, Any]] = {}
     freq: dict[str, dict[str, Any]] = {}  # uid -> {gene_name, pathway_count, shared_stids}
+    fetch_failed = False  # any participant fetch failed → aggregate is partial
 
     for pw in selected:
         st_id = pw.get("stId")
@@ -174,7 +180,10 @@ def get_pathway_neighbors(
             continue
 
         is_metabolic = _is_broad_metabolic(pw_name)
-        entities = _get(f"{BASE_URL}/data/participants/{st_id}/referenceEntities") or []
+        entities = _get(f"{BASE_URL}/data/participants/{st_id}/referenceEntities")
+        if entities is None:
+            fetch_failed = True
+            continue
         if not isinstance(entities, list):
             continue
         time.sleep(0.05)  # gentle rate limiting
@@ -210,7 +219,8 @@ def get_pathway_neighbors(
     if not freq:
         print(f"[reactome] no UniProt neighbors found for {uniprot_id} "
               f"in the examined pathways")
-        cache_set(cache_key, [], ttl_days=30)
+        if not fetch_failed:
+            cache_set(cache_key, [], ttl_days=30)
         return []
 
     # Step 4: rank by co-occurrence frequency, then alphabetically for determinism.
@@ -272,5 +282,8 @@ def get_pathway_neighbors(
             f"Reviewer must verify cellular compartment and mechanism compatibility."
         )
 
-    cache_set(cache_key, results, ttl_days=30)
+    # A partial aggregate (some participant fetches failed) must not be
+    # cached: a cached partial neighbor list poisons expansion for 30 days.
+    if not fetch_failed:
+        cache_set(cache_key, results, ttl_days=30)
     return results

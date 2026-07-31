@@ -194,6 +194,9 @@ def get_druggability_literature(
         result["druggability_flag"] = "literature signal found"
     except Exception as e:
         print(f"[biologist] WARNING: druggability summarisation failed: {e}")
+        # Do NOT cache the partial result after an LLM failure (7-day
+        # poisoning of the druggability context).
+        return result
 
     cache_set(cache_key, result, ttl_days=7)
     return result
