@@ -1,31 +1,23 @@
 # Rediscovery-rate summary — repoDB retrospective
 
-_Generated: 2026-07-31 04:49:27 — computed by validation/miss_classifier.py_
+_Generated: 2026-07-31 16:37:59 — computed by validation/miss_classifier.py_
 
 ## repoDB first-10 (biologic-leaning, top-3 targets)
 
 ## Miss-reason breakdown (computed)
 
-- Recovered (hit): **0/9**
+- Recovered (hit): **0/1**
 - Right target, drug absent from activity pool (mechanism-endpoint gap): **0** — recoverable by the candidate-pool fix
 - Right target but pool truncation: **0**
 - Wrong target selected: **0** (true target was in the considered list for 0 → recoverable by target-selection fix)
-- Biologic / non-small-molecule (structurally outside the pool): **9**
+- Biologic / non-small-molecule (structurally outside the pool): **0**
 - No ChEMBL mechanism record for drug: **0**
 
-**Projected ceiling under both fixes: 0/9** (hits + pool-fix recoverable + target-fix recoverable).
+**Projected ceiling under both fixes: 0/1** (hits + pool-fix recoverable + target-fix recoverable).
 
 | Drug | Disease | Class | Detail |
 |---|---|---|---|
-| Dornase alfa | Cystic Fibrosis | biologic_not_addressable | molecule_type=Enzyme; small-molecule IC50/Ki pool cannot contain it. |
-| Anakinra | Chronic Infantile Neurological, Cutaneous, and Articular Syndrome | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. Its mechanism target WAS among tried targets. |
-| Desmopressin | Hemophilia A | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. |
-| Desmopressin | von Willebrand Disease | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. |
-| Coagulation factor VIIa Recombinant Human | Hemophilia B | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. |
-| Somatropin recombinant | Prader-Willi Syndrome | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. Its mechanism target WAS among tried targets. |
-| Somatropin recombinant | Turner Syndrome | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. |
-| Imiglucerase | Gaucher Disease | biologic_not_addressable | molecule_type=Enzyme; small-molecule IC50/Ki pool cannot contain it. |
-| Laronidase | Mucopolysaccharidosis I | biologic_not_addressable | molecule_type=Enzyme; small-molecule IC50/Ki pool cannot contain it. |
+| Dornase alfa | Cystic Fibrosis | — |  |
 
 ## repoDB small-molecule set (top-1 target)
 
@@ -60,26 +52,18 @@ _Generated: 2026-07-31 04:49:27 — computed by validation/miss_classifier.py_
 
 ## Miss-reason breakdown (computed)
 
-- Recovered (hit): **1/22**
+- Recovered (hit): **1/14**
 - Right target, drug absent from activity pool (mechanism-endpoint gap): **4** — recoverable by the candidate-pool fix
 - Right target but pool truncation: **0**
 - Wrong target selected: **8** (true target was in the considered list for 5 → recoverable by target-selection fix)
-- Biologic / non-small-molecule (structurally outside the pool): **9**
+- Biologic / non-small-molecule (structurally outside the pool): **0**
 - No ChEMBL mechanism record for drug: **0**
 
-**Projected ceiling under both fixes: 10/22** (hits + pool-fix recoverable + target-fix recoverable).
+**Projected ceiling under both fixes: 10/14** (hits + pool-fix recoverable + target-fix recoverable).
 
 | Drug | Disease | Class | Detail |
 |---|---|---|---|
-| Dornase alfa | Cystic Fibrosis | biologic_not_addressable | molecule_type=Enzyme; small-molecule IC50/Ki pool cannot contain it. |
-| Anakinra | Chronic Infantile Neurological, Cutaneous, and Articular Syndrome | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. Its mechanism target WAS among tried targets. |
-| Desmopressin | Hemophilia A | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. |
-| Desmopressin | von Willebrand Disease | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. |
-| Coagulation factor VIIa Recombinant Human | Hemophilia B | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. |
-| Somatropin recombinant | Prader-Willi Syndrome | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. Its mechanism target WAS among tried targets. |
-| Somatropin recombinant | Turner Syndrome | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. |
-| Imiglucerase | Gaucher Disease | biologic_not_addressable | molecule_type=Enzyme; small-molecule IC50/Ki pool cannot contain it. |
-| Laronidase | Mucopolysaccharidosis I | biologic_not_addressable | molecule_type=Enzyme; small-molecule IC50/Ki pool cannot contain it. |
+| Dornase alfa | Cystic Fibrosis | — |  |
 | Dapsone | Leprosy | wrong_target | Drug's mechanism target(s) ['folP1'] absent from the entire considered-target list — discovery problem, not ranking. |
 | Anagrelide | Essential thrombocythemia | right_target_pool_gap | Mechanism endpoint links drug to PDE3A/PDE3B (Phosphodiesterase 3 inhibitor) but no qualifying Homo sapiens IC50/Ki assay exists — activity pool cannot see it. |
 | Sapropterin | Phenylketonuria | right_target_pool_gap | Mechanism endpoint links drug to PAH (Phenylalanine-4-hydroxylase activator) but no qualifying Homo sapiens IC50/Ki assay exists — activity pool cannot see it. |

@@ -6,9 +6,11 @@ then fetches IC50/Ki bioactivity records with confidence_score >= 8.
 
 import math
 import statistics
+import time
 import requests
 from typing import Any
 from cache.cache import get, set as cache_set, make_key
+from data_sources import holdout
 
 BASE_URL = "https://www.ebi.ac.uk/chembl/api/data"
 UNIPROT_REST = "https://rest.uniprot.org/uniprotkb"
@@ -764,6 +766,95 @@ def get_molecule_safety_flags(
     return result
 
 
+def _ensure_holdout_resolved() -> None:
+    """Resolve held-out drug names to ChEMBL mol_ids + parent IDs (+ all
+    registered salt/ester child forms) for molecule-level redaction.
+
+    Name-level redaction always applies regardless; failure to resolve a
+    name is recorded (holdout.unresolved()) and logged loudly rather than
+    raised, because unresolvable names (e.g. biologics outside ChEMBL's
+    molecule dictionary) can still be name-redacted.
+    """
+    if not holdout.is_active() or holdout.ids_resolved():
+        return
+    for name in holdout.drugs():
+        # _find_molecule_chembl_id raises on HTTP/network errors (raise_for_status)
+        # and returns None only when ChEMBL genuinely has no match — so an
+        # exception means the redaction would silently degrade if we continued.
+        # Retry briefly, then FAIL LOUD: an under-redacted benchmark run is
+        # worse than no run.
+        mid = None
+        last_err: Exception | None = None
+        for attempt in (1, 2, 3):
+            try:
+                mid = _find_molecule_chembl_id(name)
+                last_err = None
+                break
+            except Exception as e:
+                last_err = e
+                time.sleep(2 * attempt)
+        if last_err is not None:
+            raise RuntimeError(
+                f"benchmark holdout: could not resolve held-out drug '{name}' "
+                f"after 3 attempts ({last_err}) — refusing to run under-redacted"
+            )
+        if not mid:
+            print(f"[holdout] WARNING: held-out drug '{name}' genuinely absent "
+                  f"from ChEMBL; name-level redaction only")
+            holdout.mark_unresolved(name)
+            continue
+        parent = (_fetch_molecule_meta([mid]).get(mid) or {}).get("parent_chembl_id") or mid
+        ids = {mid}
+        data = _get_json(f"{BASE_URL}/molecule.json", {
+            "parent_chembl_id": parent, "limit": 200,
+        })
+        for m in data.get("molecules", []):
+            if m.get("molecule_chembl_id"):
+                ids.add(m["molecule_chembl_id"])
+        holdout.register_molecules(ids, {parent})
+    holdout.mark_resolved()
+
+
+def redact_holdout_names(names: list[str]) -> list[str]:
+    """Benchmark-holdout filter: drop held-out drugs (and their salt/ester
+    forms, via shared ChEMBL parent ID) from an approved-drug name list.
+
+    No-op when no holdout is active. Resolution lookups are cached, so this
+    is cheap after the first call.
+    """
+    if not holdout.is_active() or not names:
+        return list(names or [])
+    _ensure_holdout_resolved()
+    kept: list[str] = []
+    held_norms = ["".join(ch for ch in d.lower() if ch.isalnum()) for d in holdout.drugs()]
+    for name in names:
+        if holdout.matches_name(name):
+            continue
+        try:
+            mid = _find_molecule_chembl_id(name)
+        except Exception:
+            # Transient failure: cannot verify this name is not a salt/ester of
+            # the held-out drug. Conservatively drop names sharing a normalized
+            # substring with any held-out drug; clearly-unrelated names cannot
+            # be the held-out drug and are kept.
+            n_norm = "".join(ch for ch in name.lower() if ch.isalnum())
+            if any(h and (h in n_norm or n_norm in h) for h in held_norms):
+                print(f"[holdout] WARNING: could not resolve '{name}' during "
+                      f"redaction; conservatively dropped (name overlaps holdout)")
+                continue
+            kept.append(name)
+            continue
+        if mid:
+            parent = (_fetch_molecule_meta([mid]).get(mid) or {}).get("parent_chembl_id")
+            if holdout.matches_molecule(mid, parent):
+                continue
+        kept.append(name)
+    dropped = sorted(set(names) - set(kept))
+    if dropped:
+        print(f"[holdout] redacted {len(dropped)} approved-drug name(s): {dropped}")
+    return kept
+
+
 def get_pharmacological_targets_for_disease(
     disease_efo_id: str,
     approved_drug_names: list[str] | None = None,
@@ -787,6 +878,21 @@ def get_pharmacological_targets_for_disease(
 
     Returns [] gracefully on any API or format error.
     """
+    # Benchmark holdout: redact held-out drug(s) from the precedent input.
+    # Under an active holdout, an empty names list — redacted-to-empty OR no
+    # OT names at all (the `or None` call-site coerces both to None) — must
+    # NEVER fall through to the drug_indication EFO fallback: that path can
+    # re-discover the held-out drug, and it shares its empty-names_key cache
+    # entry with non-holdout runs (poisoning). Conservative under-discovery
+    # is the correct failure mode for a benchmark.
+    if holdout.is_active():
+        if approved_drug_names:
+            approved_drug_names = redact_holdout_names(approved_drug_names)
+        if not approved_drug_names:
+            sentinel_key = make_key("get_pharmacological_targets_for_disease_v3",
+                                    disease_efo_id, ("__holdout_redacted__",))
+            cache_set(sentinel_key, [], ttl_days=7)
+            return []
     names_key = tuple(sorted(approved_drug_names)) if approved_drug_names else ()
     # Cache key v3: stores ONLY raw mechanism-lookup facts (target_symbol,
     # uniprot_id, ensembl_id). association_score and target_discovery_method
@@ -832,6 +938,16 @@ def get_pharmacological_targets_for_disease(
                 mol_ids = {
                     mid for mid, info in meta.items()
                     if float(info.get("max_phase") or 0) >= 4
+                }
+            # Benchmark holdout: also drop held-out molecules (incl. salt forms
+            # via shared parent) from the fallback path.
+            if holdout.is_active() and mol_ids:
+                _ensure_holdout_resolved()
+                meta = _fetch_molecule_meta(list(mol_ids))
+                mol_ids = {
+                    mid for mid in mol_ids
+                    if not holdout.matches_molecule(
+                        mid, (meta.get(mid) or {}).get("parent_chembl_id"))
                 }
 
         if not mol_ids:

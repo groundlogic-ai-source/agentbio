@@ -28,7 +28,8 @@ from data_sources.open_targets import (
     get_disease_orphanet_code, get_disease_parents, get_disease_descendant_count,
     get_ot_canonical_disease_name,
 )
-from data_sources.chembl import get_target_bioactivity_count, get_pharmacological_targets_for_disease
+from data_sources.chembl import get_target_bioactivity_count, get_pharmacological_targets_for_disease, redact_holdout_names
+from data_sources import holdout as _holdout
 from data_sources.afdb import get_structure_confidence
 from data_sources.clinicaltrials import check_prior_trials
 
@@ -656,6 +657,19 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
     has_approved: Optional[bool] = drug_info.get("has_approved_treatment")
     approved_drug_names: list = drug_info.get("approved_drug_names", [])
 
+    # BENCHMARK HOLDOUT: redact the held-out drug from the approved-names list
+    # before it feeds precedent target discovery OR unmet-need scoring. If the
+    # held-out drug was the only approved treatment, the blind world has no
+    # approved therapy — flip has_approved accordingly.
+    if _holdout.is_active() and approved_drug_names:
+        approved_drug_names = redact_holdout_names(approved_drug_names)
+        if not approved_drug_names and has_approved is True:
+            has_approved = False
+            _log(
+                f"  Benchmark holdout: has_approved_treatment → False "
+                f"(only approved drug(s) held out for EFO {efo_id})"
+            )
+
     # PARENT-UMBRELLA SUPPLEMENT for pharmacological-precedent drug-indication lookup.
     #
     # Approved-drug indications in Open Targets are sometimes linked only to an
@@ -696,6 +710,10 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
             continue
         _parent_drugs = get_disease_known_drugs(_parent_efo)
         _parent_names = _parent_drugs.get("approved_drug_names", [])
+        # Benchmark holdout applies to parent-umbrella names too — the held-out
+        # drug must not re-enter via an umbrella EFO's approval list.
+        if _holdout.is_active() and _parent_names:
+            _parent_names = redact_holdout_names(_parent_names)
         # Restrict to drugs not already covered by the specific subtype's EFO list.
         _additional = [n for n in _parent_names if n.upper() not in _specific_drug_set]
         if _additional:
