@@ -229,7 +229,7 @@ def _has_qualifying_assay(drug_name: str, target_chembl_id: str) -> bool:
         # Drug unresolvable to any ChEMBL molecule: cannot verify — fail loudly.
         raise _TransientLookupError(f"no ChEMBL molecule ids for '{drug_name}'")
     try:
-        acts = _chembl._fetch_activities_full(target_chembl_id)
+        acts, _raw_seen = _chembl._fetch_activities_full(target_chembl_id)
     except _TransientLookupError:
         raise
     except Exception as e:

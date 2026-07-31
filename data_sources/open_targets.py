@@ -174,6 +174,10 @@ def get_target_disease_score(disease_efo_id: str) -> list[dict[str, Any]]:
         results.sort(key=lambda x: x["association_score"], reverse=True)
     except Exception as e:
         print(f"[open_targets] WARNING: association query failed for '{disease_efo_id}': {e}")
+        # Do NOT cache an empty association list after a failure — a cached []
+        # silently removes all genetic targets for 7 days and lets the
+        # pharmacological-precedent path win by default.
+        return results
 
     cache_set(cache_key, results, ttl_days=7)
     return results
@@ -296,6 +300,9 @@ def get_disease_parents(efo_id: str) -> list[dict[str, Any]]:
                 results.append({"id": pid, "name": pname})
     except Exception as e:
         print(f"[open_targets] WARNING: disease parents query failed for '{efo_id}': {e}")
+        # Do NOT cache empty parents after a failure (7-day poisoning of the
+        # parent-umbrella supplement).
+        return results
 
     cache_set(cache_key, results, ttl_days=7)
     return results
@@ -337,6 +344,9 @@ def get_disease_descendant_count(efo_id: str) -> Optional[int]:
         result = len(descendants)
     except Exception as e:
         print(f"[open_targets] WARNING: descendant count query failed for '{efo_id}': {e}")
+        # Do NOT cache None after a failure: the caller treats None as
+        # fail-closed "too broad", and caching it freezes that for 30 days.
+        return result
 
     cache_set(cache_key, result, ttl_days=30)
     return result
@@ -366,13 +376,18 @@ def get_ot_canonical_disease_name(efo_id: str) -> Optional[str]:
     }
     """
     name: Optional[str] = None
+    ok = False
     try:
         data = _graphql(query, {"efoId": efo_id})
         name = (data.get("data", {}).get("disease") or {}).get("name")
+        ok = True
     except Exception as e:
         print(f"[open_targets] WARNING: canonical name lookup failed for '{efo_id}': {e}")
 
-    cache_set(cache_key, name if name is not None else "", ttl_days=30)
+    # Cache only on success — a failure must not be frozen as the "" sentinel
+    # (indistinguishable from "OT has no name for this ID").
+    if ok:
+        cache_set(cache_key, name if name is not None else "", ttl_days=30)
     return name
 
 
@@ -397,6 +412,7 @@ def get_disease_orphanet_code(efo_id: str) -> Optional[str]:
     }
     """
     orpha_code: Optional[str] = None
+    ok = False
     try:
         data = _graphql(query, {"efoId": efo_id})
         xrefs = (data.get("data", {}).get("disease") or {}).get("dbXRefs") or []
@@ -404,8 +420,11 @@ def get_disease_orphanet_code(efo_id: str) -> Optional[str]:
             if isinstance(xref, str) and xref.startswith("Orphanet:"):
                 orpha_code = xref.split(":", 1)[1]
                 break
+        ok = True
     except Exception as e:
         print(f"[open_targets] WARNING: dbXRefs lookup failed for '{efo_id}': {e}")
 
-    cache_set(cache_key, orpha_code if orpha_code is not None else "", ttl_days=7)
+    # Cache only on success — a failure must not be frozen as the "" sentinel.
+    if ok:
+        cache_set(cache_key, orpha_code if orpha_code is not None else "", ttl_days=7)
     return orpha_code

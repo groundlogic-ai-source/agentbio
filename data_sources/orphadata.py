@@ -86,6 +86,9 @@ def get_rare_disease_list() -> list[dict[str, Any]]:
 
     except Exception as e:
         print(f"[orphadata] WARNING: API call failed ({e}). Returning empty rare disease list.")
+        # Do NOT cache the empty universe after a failure — a cached [] would
+        # silently zero the entire sweep for 7 days.
+        return diseases
 
     cache_set(cache_key, diseases, ttl_days=7)
     return diseases
@@ -177,6 +180,8 @@ def get_disease_xrefs(orpha_code: str) -> dict[str, Any]:
                 result["umls"] = value
     except Exception as e:
         print(f"[orphadata] WARNING: xref lookup failed for ORPHAcode {orpha_code}: {e}")
+        # Do NOT cache the all-None result after a failure (7-day poisoning).
+        return result
 
     cache_set(cache_key, result, ttl_days=7)
     return result
