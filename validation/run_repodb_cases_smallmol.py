@@ -4,8 +4,12 @@ Retrospective validation — small-molecule-only cases from enriched_dataset.csv
 Selection rule:
   - status == "Approved" AND chembl_molecule_type == "Small molecule"
   - disease is in the pipeline universe (Orphanet rare / WHO NTD)
-  - exclude diseases already benchmarked in run_repodb_cases.py or the 3
-    original ground-truth cases (IPAH/MM/TSC)
+  - exclude diseases already benchmarked in run_repodb_cases.py or the
+    original ground-truth cases (IPAH/MM)
+  - TSC/everolimus is INCLUDED (row 5095) as the canonical confirmed-repurpose
+    case; note the current top-1 target (FKBP1A) comes from the
+    pharmacological_precedent path, which itself knows everolimus/sirolimus
+    are approved for TSC — treat target discovery here as partially circular
   - pre-verified via select_for_disease() against cached Orphanet list
 
 Run: python -m validation.run_repodb_cases_smallmol
@@ -32,6 +36,7 @@ from agents.chemist import run_chemist
 from agents.reviewer import run_reviewer, STRONG_MATCH_THRESHOLD
 from data_sources.pubchem import get_compound_data
 from api import audit as _audit
+from validation import miss_classifier
 
 VALIDATION_DIR = os.path.dirname(os.path.abspath(__file__))
 RESULTS_JSON = os.path.join(VALIDATION_DIR, "repodb_results_smallmol.json")
@@ -60,6 +65,8 @@ TARGET_CASES: list[tuple[int, str, str, str]] = [
     (1747, "Pyridostigmine",  "Myasthenia Gravis",                              "Myasthenia Gravis"),
     # CA2 has thousands of ChEMBL inhibitors — run last so others complete first
     (249,  "Lorazepam",       "Lennox-Gastaut syndrome",                        "Lennox-Gastaut syndrome"),
+    # Canonical confirmed repurpose (EXIST-1 → FDA 2010); added 2026-07-31
+    (5095, "Everolimus",      "Tuberous sclerosis complex",                     "Tuberous Sclerosis"),
 ]
 
 
@@ -334,11 +341,14 @@ def main() -> None:
         done[key] = result
         _flush(cases_ordered)
 
+    cases_ordered = miss_classifier.classify_cases(cases_ordered)
     _flush(cases_ordered)
     md = _build_markdown(cases_ordered)
+    md += "\n\n" + "\n".join(miss_classifier.breakdown_lines(cases_ordered)) + "\n"
     with open(RESULTS_MD, "w", encoding="utf-8") as f:
         f.write(md)
     _log(f"All {len(cases_ordered)} cases done → {RESULTS_MD}")
+    miss_classifier.write_combined_summary()
 
 
 if __name__ == "__main__":

@@ -34,6 +34,7 @@ from agents.chemist import run_chemist
 from agents.reviewer import run_reviewer, STRONG_MATCH_THRESHOLD
 from data_sources.pubchem import get_compound_data
 from api import audit as _audit
+from validation import miss_classifier
 import api.jobs_db as jobs_db
 
 VALIDATION_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -498,11 +499,14 @@ def main() -> None:
         done[key] = result
         _flush(cases_ordered)
 
+    cases_ordered = miss_classifier.classify_cases(cases_ordered)
     _flush(cases_ordered)
     md = _build_markdown(cases_ordered)
+    md += "\n\n" + "\n".join(miss_classifier.breakdown_lines(cases_ordered)) + "\n"
     with open(RESULTS_MD, "w", encoding="utf-8") as f:
         f.write(md)
     _log(f"All {len(cases_ordered)} cases done → {RESULTS_MD}")
+    miss_classifier.write_combined_summary()
 
     # Summary line for quick review
     in_uni = [c for c in cases_ordered if c.get("in_universe")]

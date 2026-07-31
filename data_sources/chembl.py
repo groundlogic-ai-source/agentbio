@@ -584,8 +584,10 @@ def _find_molecule_chembl_id(drug_name: str) -> str | None:
     # synonym (e.g. salt forms, polymorphs). Pick best-not-first:
     #   (a) exact pref_name match (case-insensitive)
     #   (b) highest character overlap ratio between pref_name and query
+    # NOTE: the synonym filter field is `molecule_synonym` — the old
+    # `synonym_value` variant returns HTTP 400 for every query (fixed 2026-07-31).
     data = _get_json(f"{BASE_URL}/molecule.json",
-                     {"molecule_synonyms__synonym_value__iexact": drug_name, "limit": 20})
+                     {"molecule_synonyms__molecule_synonym__iexact": drug_name, "limit": 20})
     mols = data.get("molecules", [])
     if not mols:
         return None
