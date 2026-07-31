@@ -33,6 +33,7 @@ from agents.biologist import run_biologist
 from agents.chemist import run_chemist
 from agents.reviewer import run_reviewer, STRONG_MATCH_THRESHOLD
 from data_sources.pubchem import get_compound_data
+from data_sources import holdout as holdout_mod
 from api import audit as _audit
 from validation import miss_classifier
 import api.jobs_db as jobs_db
@@ -358,14 +359,21 @@ def _run_inline_pipeline(
     return result
 
 
-def _load_existing() -> dict[tuple[str, str], dict[str, Any]]:
+def _holdout_fp(holdout_drugs: list[str]) -> tuple[str, ...]:
+    return tuple(sorted(_norm_name(h) for h in (holdout_drugs or [])))
+
+
+def _load_existing() -> dict[tuple[str, str, tuple[str, ...]], dict[str, Any]]:
     if not os.path.exists(RESULTS_JSON):
         return {}
     try:
         with open(RESULTS_JSON, encoding="utf-8") as f:
             data = json.load(f)
+        # Key includes the holdout fingerprint: pre-holdout (naive) results
+        # have no holdout_drugs field and therefore never satisfy a blind resume.
         return {
-            (_norm_name(c["drug_name"]), _norm_name(c["disease_name"])): c
+            (_norm_name(c["drug_name"]), _norm_name(c["disease_name"]),
+             _holdout_fp(c.get("holdout_drugs"))): c
             for c in data.get("cases", [])
         }
     except (json.JSONDecodeError, OSError):
@@ -487,14 +495,22 @@ def main() -> None:
 
     cases_ordered: list[dict[str, Any]] = []
     for csv_idx, drug, disease in TARGET_CASES:
-        key = (_norm_name(drug), _norm_name(disease))
+        holdout_drugs = [drug]
+        key = (_norm_name(drug), _norm_name(disease), _holdout_fp(holdout_drugs))
         if key in done:
             _log(f"  SKIP (already done): {drug} / {disease}")
             cases_ordered.append(done[key])
             continue
 
-        _log(f"=== CASE (row {csv_idx}): {drug} / {disease} ===")
-        result = _run_inline_pipeline(drug, disease)
+        _log(f"=== CASE (row {csv_idx}): {drug} / {disease} "
+             f"[benchmark holdout: {holdout_drugs}] ===")
+        with holdout_mod.holdout_active(holdout_drugs):
+            result = _run_inline_pipeline(drug, disease)
+            unresolved = holdout_mod.unresolved()
+        result["benchmark_mode"] = "holdout"
+        result["holdout_drugs"] = holdout_drugs
+        if unresolved:
+            result["holdout_unresolved"] = unresolved
         cases_ordered.append(result)
         done[key] = result
         _flush(cases_ordered)
