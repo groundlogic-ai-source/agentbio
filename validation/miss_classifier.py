@@ -426,8 +426,14 @@ def write_combined_summary() -> str:
         path = os.path.join(VALIDATION_DIR, fname)
         if not os.path.exists(path):
             continue
-        with open(path, encoding="utf-8") as f:
-            cases = json.load(f).get("cases", [])
+        try:
+            with open(path, encoding="utf-8") as f:
+                cases = json.load(f).get("cases", [])
+        except (json.JSONDecodeError, OSError) as e:
+            # The sibling validation workflow may be mid-write on this file;
+            # skip it rather than killing the whole combined summary.
+            _log(f"WARNING: could not read {fname} ({e}); skipped in combined summary")
+            continue
         all_cases.extend(cases)
         lines += [f"## {label}\n"] + breakdown_lines(cases) + [""]
     if all_cases:
