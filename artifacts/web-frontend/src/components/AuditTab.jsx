@@ -274,15 +274,40 @@ function NoCaseResult({ diseaseName, drugName, onNewCase }) {
   );
 }
 
-function NoCandidatesResult({ jobId }) {
+function NoCandidatesResult({ jobId, onNewCase }) {
   return (
-    <div className="rounded-xl border border-amber-200 bg-amber-50 px-6 py-6 space-y-2">
+    <div className="rounded-xl border border-amber-200 bg-amber-50 px-6 py-6 space-y-3">
       <p className="text-amber-800 font-medium">Candidates file unavailable</p>
       <p className="text-sm text-amber-700">
         The case <code className="text-xs">{jobId}</code> predates per-job candidate
         persistence. Re-run the disease to generate a fresh candidates file, then
         repeat the audit.
       </p>
+      {onNewCase && (
+        <button
+          onClick={onNewCase}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+        >
+          Re-run this disease
+        </button>
+      )}
+    </div>
+  );
+}
+
+function UnresolvedResult({ data }) {
+  return (
+    <div className="space-y-5">
+      <Banner kind="warn">{data.narration}</Banner>
+      <div className="rounded-xl border border-slate-200 bg-white px-5 py-4">
+        <p className="text-sm font-semibold text-slate-700">Why this matters</p>
+        <p className="text-sm text-slate-500 mt-1">
+          AgentBio resolves drug names against ChEMBL before checking the pool.
+          An unresolvable name means the audit could not run — it does{" "}
+          <span className="font-medium text-slate-700">not</span> mean the drug was
+          evaluated and rejected.
+        </p>
+      </div>
     </div>
   );
 }
@@ -390,6 +415,7 @@ export default function AuditTab({ onNavigate }) {
         <div>
           {result.status === "found" && <FoundResult data={result} />}
           {result.status === "absent" && <AbsentResult data={result} />}
+          {result.status === "unresolved" && <UnresolvedResult data={result} />}
           {result.status === "no_case" && (
             <NoCaseResult
               diseaseName={disease}
@@ -398,7 +424,7 @@ export default function AuditTab({ onNavigate }) {
             />
           )}
           {result.status === "no_candidates" && (
-            <NoCandidatesResult jobId={result.job_id} />
+            <NoCandidatesResult jobId={result.job_id} onNewCase={handleNewCase} />
           )}
         </div>
       )}

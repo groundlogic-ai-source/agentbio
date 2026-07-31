@@ -12,6 +12,8 @@
   --brass:          #c08a35;
   --brass-deep:     #9a6e22;
   --brass-glow:     rgba(192, 138, 53, 0.15);
+  --steel:          #7fa8c9;
+  --steel-dim:      rgba(127, 168, 201, 0.45);
   --oxide:          #9b4a3f;
   --oxide-glow:     rgba(155, 74, 63, 0.12);
   --ink:            #2a2b2e;
@@ -406,41 +408,59 @@ textarea:focus-visible,
    Top-level tab strip in App.jsx.
 ──────────────────────────────────────────────────────────────────────────── */
 .nav-tab {
-  padding: 0.72rem 1.1rem;
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-weight: 400;
-  color: var(--silver);
+  padding: 0.72rem 1.05rem;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--silver-dim);
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   cursor: pointer;
-  transition: color 0.13s;
+  transition: color 0.13s, border-color 0.13s;
 }
 .nav-tab:hover {
   color: var(--paper);
 }
 .nav-tab--active {
-  color: var(--brass);
-  border-bottom-color: var(--brass);
   font-weight: 600;
 }
-.nav-tab--active:hover {
+/* Case pipeline group — brass accent */
+.nav-tab--case.nav-tab--active {
   color: var(--brass);
+  border-bottom-color: var(--brass);
+}
+.nav-tab--case.nav-tab--active:hover {
+  color: var(--brass);
+}
+/* Research module group — steel accent */
+.nav-tab--research.nav-tab--active {
+  color: var(--steel);
+  border-bottom-color: var(--steel);
+}
+.nav-tab--research.nav-tab--active:hover {
+  color: var(--steel);
+}
+/* Vertical rule separating the two product surfaces */
+.nav-group-divider {
+  display: inline-block;
+  width: 1px;
+  height: 1.1rem;
+  margin: 0 0.55rem 0 0.35rem;
+  background: rgba(199, 202, 209, 0.22);
 }
 
 /* ── Eyebrow / section label ─────────────────────────────────────────────────
    Replaces repeated inline fontFamily / fontSize / letterSpacing combos.
 ──────────────────────────────────────────────────────────────────────────── */
 .eyebrow {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.55rem;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.64rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
-  color: var(--brass);
+  letter-spacing: 0.08em;
+  color: var(--silver-dim);
 }
 
 /* ── Saved-report list card ──────────────────────────────────────────────────

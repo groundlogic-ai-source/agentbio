@@ -139,6 +139,8 @@ def run_audit(
 
       "found"         — drug present in pool; full breakdown included
       "absent"        — drug absent; target-mismatch explanation included
+      "unresolved"    — drug name could not be resolved to any ChEMBL molecule
+                        (typo / brand name / unindexed) — NOT evidence of absence
       "no_case"       — no completed/awaiting_review job for this disease
       "no_candidates" — job exists but candidates file unavailable (pre-persistence)
     """
@@ -199,6 +201,21 @@ def run_audit(
             "cap_reason": cap,
         }
 
+    elif chembl_id is None:
+        # The queried name could not be resolved to any ChEMBL molecule. This
+        # is NOT evidence of absence — likely a typo, brand name, or compound
+        # ChEMBL doesn't index. Returning "absent" here would be a false
+        # authoritative claim, so it gets its own honest status.
+        result = {
+            "status": "unresolved",
+            "job_id": job_id,
+            "disease_name": canonical_disease,
+            "drug_name": drug_name,
+            "resolved_chembl_id": None,
+            "total_candidates": len(candidates),
+            "top_candidate": top,
+        }
+
     else:
         # Drug absent — explain why via target comparison
         selected_target = top.get("target_symbol") if top else None
@@ -221,8 +238,18 @@ def run_audit(
             "drug_mechanism_targets": drug_moa,
         }
 
-    # 5. Narrate with Opus 4.8 — strictly the computed numbers, no new claims
-    result["narration"] = _narrate(result)
+    # 5. Narrate with Opus 4.8 — strictly the computed numbers, no new claims.
+    # Unresolved queries skip the LLM: there are no facts to narrate, and a
+    # generated paragraph would only risk implying the name was evaluated.
+    if result["status"] == "unresolved":
+        result["narration"] = (
+            f"'{drug_name}' could not be resolved to any molecule in ChEMBL, so "
+            "nothing can be said about its standing in this pool. Check the "
+            "spelling, or try the INN/generic name rather than a brand name or "
+            "salt form."
+        )
+    else:
+        result["narration"] = _narrate(result)
 
     # 6. Mandatory disclosure, always present regardless of outcome
     result["disclosure"] = (
