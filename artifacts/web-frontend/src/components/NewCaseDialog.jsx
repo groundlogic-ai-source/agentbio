@@ -26,7 +26,7 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
   return (
     <div
       className="fixed inset-0 z-50 grid place-items-center p-4"
-      style={{ backgroundColor: "rgba(28,29,33,0.82)", backdropFilter: "blur(3px)" }}
+      style={{ backgroundColor: "rgba(0,0,0,0.4)", backdropFilter: "blur(3px)" }}
       onMouseDown={(e) => {
         if (e.target === e.currentTarget && !busy) onClose();
       }}
@@ -35,9 +35,9 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
         onSubmit={submit}
         className="w-full max-w-md rounded-lg border fade-in"
         style={{
-          backgroundColor: "var(--paper)",
-          borderColor: "rgba(199,202,209,0.6)",
-          color: "var(--ink)",
+          backgroundColor: "var(--surface)",
+          borderColor: "var(--border)",
+          color: "var(--ink-base)",
           boxShadow: "var(--shadow-paper)",
         }}
         role="dialog"
@@ -47,12 +47,12 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
         {/* Modal header strip */}
         <div
           className="flex items-center justify-between border-b px-6 py-4"
-          style={{ borderColor: "rgba(42,43,46,0.12)" }}
+          style={{ borderColor: "var(--border-light)" }}
         >
           <div className="flex items-center gap-3">
             <span
-              className="font-mono text-[0.58rem] uppercase tracking-[0.22em]"
-              style={{ color: "var(--brass)" }}
+              className="font-mono text-[0.6rem] uppercase tracking-[0.14em]"
+              style={{ color: "var(--brass-deep)" }}
             >
               New case
             </span>
@@ -91,7 +91,7 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
           <label
             htmlFor="disease"
             className="mt-5 block font-mono text-[0.62rem] uppercase tracking-wider mb-1.5"
-            style={{ color: "var(--ink)" }}
+            style={{ color: "var(--ink-base)" }}
           >
             Disease — one name, or leave blank to explore
           </label>
@@ -102,17 +102,18 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
             value={disease}
             onChange={(e) => setDisease(e.target.value)}
             placeholder="e.g. Pompe disease — or leave blank to explore"
-            className="w-full rounded border bg-white/60 p-2.5 font-mono text-sm outline-none"
+            className="w-full rounded border p-2.5 font-mono text-sm outline-none"
             style={{
-              borderColor: "rgba(42,43,46,0.22)",
-              color: "var(--ink)",
+              borderColor: "var(--border)",
+              backgroundColor: "var(--paper-warm)",
+              color: "var(--ink-base)",
               transition: "border-color 0.2s ease",
             }}
             onFocus={(e) => {
               e.currentTarget.style.borderColor = "var(--brass)";
             }}
             onBlur={(e) => {
-              e.currentTarget.style.borderColor = "rgba(42,43,46,0.22)";
+              e.currentTarget.style.borderColor = "var(--border)";
             }}
           />
 
@@ -122,7 +123,6 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
               onClick={onClose}
               disabled={busy}
               className="btn btn-ghost btn-sm"
-              style={{ color: "var(--ink)", borderColor: "rgba(42,43,46,0.25)" }}
             >
               Cancel
             </button>

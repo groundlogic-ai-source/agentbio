@@ -1,31 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:wght@600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 /* ── Design tokens ─────────────────────────────────────────────────────────── */
 :root {
-  /* Core palette */
-  --graphite:       #1c1d21;
-  --graphite-raised: #222329;
-  --paper:          #ede8df;
-  --paper-aged:     #e2dbd0;
-  --silver:         #c7cad1;
-  --silver-dim:     rgba(199, 202, 209, 0.45);
-  --brass:          #c08a35;
-  --brass-deep:     #9a6e22;
-  --brass-glow:     rgba(192, 138, 53, 0.15);
-  --steel:          #7fa8c9;
-  --steel-dim:      rgba(127, 168, 201, 0.45);
+  /* Light instrument palette — warm paper surfaces */
+  --bg:             #faf8f4;
+  --surface:        #ffffff;
+  --surface-raised: #f5f2ed;
+  --paper:          #fffefb;
+  --paper-warm:     #faf7f2;
+  
+  /* Text hierarchy — ink-based */
+  --ink:            #1a1b1d;
+  --ink-base:       #2f3033;
+  --ink-muted:      #6b6d72;
+  --ink-dim:        #7e8187;
+  
+  /* Borders & dividers */
+  --border:         #dcd8d0;
+  --border-light:   #e8e5de;
+  --border-strong:  #b8b4aa;
+  
+  /* Case pipeline accent — brass/gold */
+  --brass:          #b07a28;
+  --brass-deep:     #8a5e1a;
+  --brass-soft:     #d69b4a;
+  --brass-glow:     rgba(176, 122, 40, 0.08);
+  --brass-border:   rgba(176, 122, 40, 0.28);
+  
+  /* Research module accent — steel blue */
+  --steel:          #5a7d9e;
+  --steel-deep:     #456078;
+  --steel-soft:     #7a9bc0;
+  --steel-glow:     rgba(90, 125, 158, 0.08);
+  --steel-border:   rgba(90, 125, 158, 0.28);
+  
+  /* Semantic colors */
   --oxide:          #9b4a3f;
-  --oxide-glow:     rgba(155, 74, 63, 0.12);
-  --ink:            #2a2b2e;
-  --ink-muted:      rgba(42, 43, 46, 0.55);
-
-  /* Shadows */
-  --shadow-paper:   0 1px 0 rgba(0,0,0,0.07),
-                    0 4px 12px rgba(0,0,0,0.13),
-                    0 20px 48px rgba(0,0,0,0.09);
-  --shadow-paper-hover: 0 1px 0 rgba(0,0,0,0.09),
-                    0 8px 24px rgba(0,0,0,0.18),
-                    0 24px 56px rgba(0,0,0,0.12);
+  --oxide-glow:     rgba(155, 74, 63, 0.08);
+  --oxide-border:   rgba(155, 74, 63, 0.32);
+  --success:        #3d7a3d;
+  --success-glow:   rgba(61, 122, 61, 0.08);
+  
+  /* Shadows for light theme */
+  --shadow-paper:   0 1px 0 rgba(0,0,0,0.02),
+                    0 2px 8px rgba(0,0,0,0.04),
+                    0 12px 24px rgba(0,0,0,0.06);
+  --shadow-paper-hover: 0 1px 0 rgba(0,0,0,0.03),
+                    0 4px 16px rgba(0,0,0,0.08),
+                    0 16px 32px rgba(0,0,0,0.1);
+  --shadow-soft:    0 1px 3px rgba(0,0,0,0.06),
+                    0 4px 12px rgba(0,0,0,0.04);
 }
 
 html,
@@ -36,8 +61,8 @@ body,
 
 body {
   margin: 0;
-  background-color: var(--graphite);
-  color: var(--silver);
+  background-color: var(--bg);
+  color: var(--ink-base);
   font-family: "Inter", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -46,18 +71,18 @@ body {
 
 /* Scrollbar — webkit only */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--graphite);
+  background: var(--surface-raised);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(199, 202, 209, 0.2);
+  background: var(--border);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(199, 202, 209, 0.35);
+  background: var(--border-strong);
 }
 
 /* Keyboard focus — brass ring on all interactive elements */
@@ -105,7 +130,7 @@ textarea:focus-visible,
   font-size: 1.15rem;
   margin: 2.25rem 0 0.65rem;
   padding-bottom: 0.4rem;
-  border-bottom: 1px solid rgba(42, 43, 46, 0.16);
+  border-bottom: 1px solid var(--border);
   color: var(--ink);
 }
 
@@ -115,11 +140,12 @@ textarea:focus-visible,
   letter-spacing: 0.02em;
   margin: 1.5rem 0 0.4rem;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--ink-base);
 }
 
 .dossier p {
   margin: 0.65rem 0;
+  color: var(--ink-base);
 }
 
 .dossier a {
@@ -145,6 +171,7 @@ textarea:focus-visible,
 
 .dossier strong {
   font-weight: 600;
+  color: var(--ink);
 }
 
 .dossier blockquote {
@@ -154,6 +181,7 @@ textarea:focus-visible,
   background: var(--oxide-glow);
   font-size: 0.91rem;
   border-radius: 0 4px 4px 0;
+  color: var(--ink-base);
 }
 
 /* Data face: monospace for all identifiers / scores */
@@ -167,36 +195,38 @@ textarea:focus-visible,
 
 .dossier th,
 .dossier td {
-  border: 1px solid rgba(42, 43, 46, 0.18);
+  border: 1px solid var(--border);
   padding: 0.45rem 0.65rem;
   text-align: left;
   vertical-align: top;
-  /* overflow-wrap breaks only when a word cannot fit on its own line.
-     word-break: break-word shattered narrow headers mid-word ("Wei ght")
-     in the printed dossier PDF. */
   word-break: normal;
   overflow-wrap: break-word;
 }
 
-/* Keep short numeric/label columns wide enough that headers never shatter. */
 .dossier table th:not(:first-child),
 .dossier table td:not(:first-child) {
   min-width: 4.25rem;
 }
 
 .dossier th {
-  background: rgba(42, 43, 46, 0.07);
+  background: var(--surface-raised);
   font-weight: 600;
   letter-spacing: 0.03em;
+  color: var(--ink-muted);
+}
+
+.dossier td {
+  color: var(--ink-base);
 }
 
 .dossier code {
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.83em;
-  background: rgba(42, 43, 46, 0.07);
+  background: var(--surface-raised);
   padding: 0.06rem 0.32rem;
   border-radius: 3px;
-  border: 1px solid rgba(42, 43, 46, 0.1);
+  border: 1px solid var(--border-light);
+  color: var(--ink-base);
 }
 
 /* ── Outcome badge ──────────────────────────────────────────────────────────── */
@@ -216,15 +246,15 @@ textarea:focus-visible,
 }
 
 .stamp--match {
-  color: var(--brass);
+  color: var(--brass-deep);
   border-color: var(--brass);
-  background-color: rgba(192, 138, 53, 0.08);
+  background-color: var(--brass-glow);
 }
 
 .stamp--rejected {
   color: var(--oxide);
   border-color: var(--oxide);
-  background-color: rgba(155, 74, 63, 0.08);
+  background-color: var(--oxide-glow);
 }
 
 /* ── Animations ────────────────────────────────────────────────────────────── */
@@ -299,7 +329,7 @@ textarea:focus-visible,
 .btn-primary {
   background-color: var(--brass);
   color: var(--paper);
-  box-shadow: 0 1px 6px rgba(192, 138, 53, 0.2);
+  box-shadow: 0 1px 4px rgba(176, 122, 40, 0.2);
 }
 .btn-primary:hover {
   background-color: var(--brass-deep);
@@ -311,26 +341,42 @@ textarea:focus-visible,
 /* Ghost — subtle border */
 .btn-ghost {
   background: transparent;
-  color: var(--silver);
-  border: 1px solid rgba(199, 202, 209, 0.28);
+  color: var(--ink-muted);
+  border: 1px solid var(--border);
 }
 .btn-ghost:hover {
-  color: var(--paper);
-  border-color: rgba(199, 202, 209, 0.55);
+  color: var(--ink-base);
+  border-color: var(--border-strong);
+  background-color: var(--surface-raised);
 }
 
 /* Ghost brass — brass-tinted outline */
 .btn-ghost-brass {
   background: transparent;
-  color: var(--brass);
-  border: 1px solid rgba(192, 138, 53, 0.38);
+  color: var(--brass-deep);
+  border: 1px solid var(--brass-border);
 }
 .btn-ghost-brass:hover {
-  background: rgba(192, 138, 53, 0.07);
-  border-color: rgba(192, 138, 53, 0.7);
+  background: var(--brass-glow);
+  border-color: var(--brass);
 }
 .btn-ghost-brass.active {
   background: var(--brass);
+  color: var(--paper);
+}
+
+/* Ghost steel — steel-tinted outline for research module */
+.btn-ghost-steel {
+  background: transparent;
+  color: var(--steel-deep);
+  border: 1px solid var(--steel-border);
+}
+.btn-ghost-steel:hover {
+  background: var(--steel-glow);
+  border-color: var(--steel);
+}
+.btn-ghost-steel.active {
+  background: var(--steel);
   color: var(--paper);
 }
 
@@ -338,18 +384,18 @@ textarea:focus-visible,
 .btn-danger {
   background: transparent;
   color: var(--oxide);
-  border: 1px solid rgba(155, 74, 63, 0.38);
+  border: 1px solid var(--oxide-border);
 }
 .btn-danger:hover {
-  background: rgba(155, 74, 63, 0.08);
+  background: var(--oxide-glow);
   border-color: var(--oxide);
 }
 
 /* Confirmed / saved state */
 .btn-saved {
   background: transparent;
-  color: #7ec97e;
-  border: 1px solid rgba(126, 201, 126, 0.42);
+  color: var(--success);
+  border: 1px solid rgba(61, 122, 61, 0.32);
   cursor: default;
   pointer-events: none;
 }
@@ -360,10 +406,10 @@ textarea:focus-visible,
   padding: 0.35rem 0.9rem;
 }
 .btn-xs {
-  font-size: 0.6rem;
+  font-size: 0.64rem;
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-weight: 500;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   padding: 0.22rem 0.65rem;
   border-radius: 3px;
 }
@@ -373,8 +419,8 @@ textarea:focus-visible,
 ──────────────────────────────────────────────────────────────────────────── */
 .mode-selector {
   display: inline-flex;
-  background: rgba(199, 202, 209, 0.06);
-  border: 1px solid rgba(199, 202, 209, 0.12);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
   border-radius: 5px;
   padding: 3px;
   gap: 2px;
@@ -385,14 +431,15 @@ textarea:focus-visible,
   border-radius: 3px;
   border: none;
   background: transparent;
-  color: var(--silver);
+  color: var(--ink-muted);
   font-size: 0.72rem;
-  font-weight: 400;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.13s, color 0.13s;
 }
 .mode-option:hover:not(.mode-option--disabled) {
-  color: var(--paper);
+  color: var(--ink-base);
+  background: var(--surface);
 }
 .mode-option--active {
   background: var(--brass);
@@ -401,7 +448,7 @@ textarea:focus-visible,
 }
 .mode-option--disabled {
   cursor: default;
-  opacity: 0.55;
+  opacity: 0.4;
 }
 
 /* ── Navigation tabs ─────────────────────────────────────────────────────────
@@ -412,7 +459,7 @@ textarea:focus-visible,
   font-family: "Inter", system-ui, sans-serif;
   font-size: 0.8rem;
   font-weight: 500;
-  color: var(--silver-dim);
+  color: var(--ink-dim);
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
@@ -421,26 +468,26 @@ textarea:focus-visible,
   transition: color 0.13s, border-color 0.13s;
 }
 .nav-tab:hover {
-  color: var(--paper);
+  color: var(--ink-base);
 }
 .nav-tab--active {
   font-weight: 600;
 }
 /* Case pipeline group — brass accent */
 .nav-tab--case.nav-tab--active {
-  color: var(--brass);
+  color: var(--brass-deep);
   border-bottom-color: var(--brass);
 }
 .nav-tab--case.nav-tab--active:hover {
-  color: var(--brass);
+  color: var(--brass-deep);
 }
 /* Research module group — steel accent */
 .nav-tab--research.nav-tab--active {
-  color: var(--steel);
+  color: var(--steel-deep);
   border-bottom-color: var(--steel);
 }
 .nav-tab--research.nav-tab--active:hover {
-  color: var(--steel);
+  color: var(--steel-deep);
 }
 /* Vertical rule separating the two product surfaces */
 .nav-group-divider {
@@ -448,7 +495,7 @@ textarea:focus-visible,
   width: 1px;
   height: 1.1rem;
   margin: 0 0.55rem 0 0.35rem;
-  background: rgba(199, 202, 209, 0.22);
+  background: var(--border);
 }
 
 /* ── Eyebrow / section label ─────────────────────────────────────────────────
@@ -460,7 +507,7 @@ textarea:focus-visible,
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--silver-dim);
+  color: var(--ink-dim);
 }
 
 /* ── Saved-report list card ──────────────────────────────────────────────────
@@ -469,19 +516,20 @@ textarea:focus-visible,
 .report-card {
   text-align: left;
   cursor: pointer;
-  background: rgba(199, 202, 209, 0.03);
-  border: 1px solid rgba(199, 202, 209, 0.14);
-  border-left: 3px solid rgba(192, 138, 53, 0);
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid transparent;
   border-radius: 6px;
   padding: 1rem 1.25rem;
-  color: var(--paper);
-  transition: border-color 0.15s, background-color 0.15s;
+  color: var(--ink-base);
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
   width: 100%;
 }
 .report-card:hover {
-  border-color: rgba(199, 202, 209, 0.25);
+  border-color: var(--border-strong);
   border-left-color: var(--brass);
-  background: rgba(199, 202, 209, 0.05);
+  background: var(--paper-warm);
+  box-shadow: var(--shadow-soft);
 }
 
 /* ── Research registry: report-markdown ─────────────────────────────────────
@@ -490,43 +538,45 @@ textarea:focus-visible,
 .report-markdown h2 {
   font-size: 0.98rem;
   font-weight: 600;
-  color: var(--paper);
+  color: var(--ink);
   margin: 1.75rem 0 0.5rem;
   padding-bottom: 0.3rem;
-  border-bottom: 1px solid rgba(199, 202, 209, 0.15);
+  border-bottom: 1px solid var(--border-light);
 }
 .report-markdown h3 {
   font-weight: 600;
   font-size: 0.72rem;
-  color: var(--silver);
+  color: var(--ink-muted);
   margin: 1.25rem 0 0.35rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 .report-markdown p {
   margin: 0.6rem 0;
-  color: var(--paper);
+  color: var(--ink-base);
   line-height: 1.65;
 }
 .report-markdown ul {
   margin: 0.5rem 0;
   padding-left: 1.25rem;
-  color: var(--paper);
+  color: var(--ink-base);
 }
 .report-markdown li {
   margin: 0.3rem 0;
   line-height: 1.55;
 }
 .report-markdown strong {
-  color: var(--paper);
+  color: var(--ink);
   font-weight: 600;
 }
 .report-markdown code {
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.82em;
-  background: rgba(199, 202, 209, 0.1);
+  background: var(--surface-raised);
   padding: 0.06rem 0.32rem;
   border-radius: 3px;
+  border: 1px solid var(--border-light);
+  color: var(--ink-base);
 }
 .report-markdown table {
   width: 100%;
@@ -537,15 +587,15 @@ textarea:focus-visible,
 }
 .report-markdown th,
 .report-markdown td {
-  border: 1px solid rgba(199, 202, 209, 0.15);
+  border: 1px solid var(--border);
   padding: 0.4rem 0.7rem;
   text-align: left;
   vertical-align: top;
-  color: var(--silver);
+  color: var(--ink-base);
 }
 .report-markdown th {
-  background: rgba(199, 202, 209, 0.06);
-  color: var(--silver-dim);
+  background: var(--surface-raised);
+  color: var(--ink-muted);
   font-size: 0.58rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -585,7 +635,7 @@ textarea:focus-visible,
 
   .rounded-md,
   .rounded-lg {
-    border: 1px solid rgba(42, 43, 46, 0.2) !important;
+    border: 1px solid var(--border) !important;
     background-color: white !important;
     box-shadow: none !important;
   }
@@ -700,4 +750,37 @@ textarea:focus-visible,
     border: none !important;
     page-break-inside: avoid !important;
   }
+}
+
+/* ── Audit tab form controls — token-based, no JS hover handlers ──────────── */
+.audit-chip {
+  background-color: var(--surface-raised);
+  color: var(--ink-muted);
+  border: 1px solid var(--border);
+}
+.audit-chip:hover {
+  background-color: var(--surface);
+  border-color: var(--border-strong);
+}
+
+.audit-input {
+  border-color: var(--border);
+  background-color: var(--paper-warm);
+  color: var(--ink-base);
+}
+.audit-input:focus {
+  border-color: var(--steel);
+}
+
+.audit-submit {
+  background-color: var(--steel);
+  color: var(--paper);
+  cursor: pointer;
+}
+.audit-submit:hover:not(:disabled) {
+  background-color: var(--steel-deep);
+}
+.audit-submit:disabled {
+  background-color: var(--border);
+  cursor: not-allowed;
 }

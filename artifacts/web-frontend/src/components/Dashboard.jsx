@@ -11,13 +11,13 @@ function FolderTab({ job, onOpen, onArchive }) {
       className="group relative flex shrink-0 flex-col rounded-t-lg border border-b-0 p-4 text-left cursor-pointer"
       style={{
         width: "17rem",
-        backgroundColor: isArchived ? "var(--graphite-raised)" : "var(--paper)",
-        borderColor: isArchived ? "rgba(199,202,209,0.35)" : "var(--silver)",
-        borderLeft: `4px solid ${isArchived ? "rgba(199,202,209,0.4)" : "var(--brass)"}`,
-        color: "var(--ink)",
-        boxShadow: "0 -1px 0 rgba(0,0,0,0.04), 2px -2px 8px rgba(0,0,0,0.06)",
+        backgroundColor: isArchived ? "var(--surface-raised)" : "var(--surface)",
+        borderColor: isArchived ? "var(--border-light)" : "var(--border)",
+        borderLeft: `4px solid ${isArchived ? "var(--border)" : "var(--brass)"}`,
+        color: "var(--ink-base)",
+        boxShadow: "0 -1px 0 rgba(0,0,0,0.02), 2px -2px 8px rgba(0,0,0,0.04)",
         transition: "transform 0.18s ease, box-shadow 0.18s ease",
-        opacity: isArchived ? 0.65 : 1,
+        opacity: isArchived ? 0.6 : 1,
       }}
       role="button"
       tabIndex={0}
@@ -31,12 +31,12 @@ function FolderTab({ job, onOpen, onArchive }) {
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-5px)";
         e.currentTarget.style.boxShadow =
-          "0 -1px 0 rgba(0,0,0,0.06), 2px -6px 18px rgba(0,0,0,0.14)";
+          "0 -1px 0 rgba(0,0,0,0.04), 2px -6px 18px rgba(0,0,0,0.1)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "translateY(0)";
         e.currentTarget.style.boxShadow =
-          "0 -1px 0 rgba(0,0,0,0.04), 2px -2px 8px rgba(0,0,0,0.06)";
+          "0 -1px 0 rgba(0,0,0,0.02), 2px -2px 8px rgba(0,0,0,0.04)";
       }}
     >
       <div className="flex items-start justify-between gap-2">
@@ -54,8 +54,8 @@ function FolderTab({ job, onOpen, onArchive }) {
                 e.currentTarget.style.borderColor = "var(--oxide)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = "var(--silver-dim)";
-                e.currentTarget.style.borderColor = "rgba(199,202,209,0.3)";
+                e.currentTarget.style.color = "var(--ink-dim)";
+                e.currentTarget.style.borderColor = "var(--border)";
               }}
               style={{
                 display: "flex",
@@ -64,9 +64,9 @@ function FolderTab({ job, onOpen, onArchive }) {
                 width: "1.1rem",
                 height: "1.1rem",
                 borderRadius: "3px",
-                border: "1px solid rgba(199,202,209,0.3)",
+                border: "1px solid var(--border)",
                 background: "transparent",
-                color: "var(--silver-dim)",
+                color: "var(--ink-dim)",
                 fontSize: "0.65rem",
                 lineHeight: 1,
                 cursor: "pointer",
@@ -78,8 +78,8 @@ function FolderTab({ job, onOpen, onArchive }) {
             </button>
           )}
           <span
-            className="font-mono text-[0.58rem] uppercase tracking-[0.2em]"
-            style={{ color: isArchived ? "var(--silver-dim)" : "var(--brass)" }}
+            className="font-mono text-[0.6rem] uppercase tracking-[0.14em]"
+            style={{ color: isArchived ? "var(--ink-dim)" : "var(--brass-deep)" }}
           >
             Case #{caseId}
           </span>
@@ -101,7 +101,7 @@ function FolderTab({ job, onOpen, onArchive }) {
         style={{ color: "var(--ink-muted)" }}
       >
         <span>{formatDate(job.created_at)}</span>
-        <span style={{ color: isArchived ? "var(--ink-muted)" : "var(--brass)" }}>
+        <span style={{ color: isArchived ? "var(--ink-muted)" : "var(--brass-deep)" }}>
           {formatCost(job.total_cost_usd)}
         </span>
       </div>
@@ -147,8 +147,8 @@ export default function Dashboard({
       <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div
-            className="font-mono text-[0.6rem] uppercase tracking-[0.28em] mb-2"
-            style={{ color: "var(--brass)" }}
+            className="font-mono text-[0.62rem] uppercase tracking-[0.14em] mb-2"
+            style={{ color: "var(--brass-deep)" }}
           >
             Drug Repurposing Research System
           </div>
@@ -156,14 +156,14 @@ export default function Dashboard({
             className="text-5xl font-bold tracking-tight leading-none"
             style={{
               fontFamily: "Inter, system-ui, sans-serif",
-              color: "var(--paper)",
+              color: "var(--ink)",
             }}
           >
             AgentBio
           </h1>
           <p
             className="mt-3 max-w-lg text-sm leading-relaxed"
-            style={{ color: "var(--silver)" }}
+            style={{ color: "var(--ink-muted)" }}
           >
             A case file for every drug-repurposing hypothesis — evidence,
             citations, and limitations, compiled for human review. Each candidate
@@ -180,15 +180,15 @@ export default function Dashboard({
               onChange={(e) => setBatchN(Number(e.target.value))}
               disabled={batchBusy || batchRunning}
               style={{
-                background: "var(--graphite-raised)",
-                border: "1px solid rgba(199,202,209,0.35)",
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
                 borderRadius: "6px",
-                color: "var(--silver)",
+                color: "var(--ink-base)",
                 fontFamily: "var(--font-mono, monospace)",
                 fontSize: "0.72rem",
                 padding: "0.3rem 0.5rem",
                 cursor: batchBusy || batchRunning ? "not-allowed" : "pointer",
-                opacity: batchBusy || batchRunning ? 0.55 : 1,
+                opacity: batchBusy || batchRunning ? 0.5 : 1,
               }}
             >
               {[3, 5, 10].map((n) => (
@@ -222,12 +222,12 @@ export default function Dashboard({
         <div
           className="mt-6 rounded-lg border px-4 py-3 font-mono text-xs fade-in"
           style={{
-            borderColor: "rgba(199,202,209,0.35)",
-            background: "var(--graphite-raised)",
+            borderColor: "var(--border)",
+            background: "var(--surface-raised)",
             color: "var(--ink-muted)",
           }}
         >
-          <span style={{ color: "var(--silver)" }}>Batch scan in progress — </span>
+          <span style={{ color: "var(--ink-base)" }}>Batch scan in progress — </span>
           {batchState.completed} of {batchState.n} cases explored.
           New cases appear below as they complete.
         </div>
@@ -236,9 +236,9 @@ export default function Dashboard({
         <div
           className="mt-6 rounded-lg border px-4 py-3 font-mono text-xs fade-in"
           style={{
-            borderColor: "rgba(180,139,80,0.4)",
-            background: "rgba(180,139,80,0.06)",
-            color: "var(--brass)",
+            borderColor: "var(--brass-border)",
+            background: "var(--brass-glow)",
+            color: "var(--brass-deep)",
           }}
         >
           Batch scan complete — {batchState.n} case{batchState.n !== 1 ? "s" : ""} explored.
@@ -250,14 +250,14 @@ export default function Dashboard({
         <section
           className="mt-8 rounded-lg border p-5 fade-in"
           style={{
-            borderColor: "rgba(180,139,80,0.55)",
-            background: "rgba(180,139,80,0.07)",
+            borderColor: "var(--brass)",
+            background: "var(--brass-glow)",
           }}
         >
           <div className="flex items-center gap-3 mb-3">
             <span
-              className="font-mono text-[0.6rem] uppercase tracking-[0.22em]"
-              style={{ color: "var(--brass)" }}
+              className="font-mono text-[0.62rem] uppercase tracking-[0.14em]"
+              style={{ color: "var(--brass-deep)" }}
             >
               Review queue
             </span>
@@ -287,8 +287,8 @@ export default function Dashboard({
         {/* Section header row */}
         <div className="mb-3 flex items-center justify-between gap-4">
           <div
-            className="font-mono text-[0.62rem] uppercase tracking-[0.22em]"
-            style={{ color: "var(--silver-dim)" }}
+            className="font-mono text-[0.62rem] uppercase tracking-[0.14em]"
+            style={{ color: "var(--ink-dim)" }}
           >
             Case files
           </div>
@@ -309,11 +309,11 @@ export default function Dashboard({
         {!hasAny && (
           <div
             className="rounded-lg border border-dashed p-12 text-center fade-in"
-            style={{ borderColor: "rgba(199,202,209,0.3)" }}
+            style={{ borderColor: "var(--border)" }}
           >
             <p
               className="text-base font-medium"
-              style={{ color: "var(--paper)" }}
+              style={{ color: "var(--ink)" }}
             >
               No cases yet — open one to start.
             </p>
@@ -331,7 +331,7 @@ export default function Dashboard({
         {noneVisible && (
           <div
             className="rounded-lg border border-dashed p-8 text-center fade-in"
-            style={{ borderColor: "rgba(199,202,209,0.2)" }}
+            style={{ borderColor: "var(--border-light)" }}
           >
             <p
               className="text-sm"
@@ -341,7 +341,7 @@ export default function Dashboard({
               <button
                 type="button"
                 className="underline"
-                style={{ color: "var(--silver)" }}
+                style={{ color: "var(--ink-base)" }}
                 onClick={onToggleArchived}
               >
                 Show archived
@@ -355,7 +355,7 @@ export default function Dashboard({
           <div
             className="flex gap-3 overflow-x-auto pb-0"
             style={{
-              borderBottom: "3px solid rgba(199,202,209,0.35)",
+              borderBottom: "3px solid var(--border)",
               scrollSnapType: "x proximity",
             }}
           >
