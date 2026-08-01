@@ -44,10 +44,16 @@ def _dev_suite_drugs() -> set[str]:
                  "validation/run_repodb_cases_smallmol.py"):
         tree = ast.parse(open(path).read())
         for node in ast.walk(tree):
+            value = None
             if isinstance(node, ast.Assign) and any(
                     getattr(t, "id", "") == "TARGET_CASES" for t in node.targets):
-                for tup in ast.literal_eval(node.value):
-                    drugs.add(_norm(tup[1]))  # (num, drug, disease)
+                value = node.value
+            elif (isinstance(node, ast.AnnAssign)
+                  and getattr(node.target, "id", "") == "TARGET_CASES"):
+                value = node.value
+            if value is not None:
+                for tup in ast.literal_eval(value):
+                    drugs.add(_norm(tup[1]))  # (num, drug, disease, ...)
     return drugs
 
 
