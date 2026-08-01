@@ -263,6 +263,13 @@ def run_chemist(biologist_output: dict[str, Any],
 
     cc = get_target_candidate_compounds(uniprot, repurposing_only=repurposing_only)
     compounds = cc["compounds"]
+    # Degradation honesty: track whether any ChEMBL pool feeding this run was
+    # built against an unhealthy/degraded API, so the writer can flag the
+    # dossier instead of silently presenting a thinned candidate pool.
+    pool_degraded = bool(cc.get("degraded"))
+    pool_degraded_reasons: list[str] = []
+    if cc.get("degraded_reason"):
+        pool_degraded_reasons.append(f"{symbol}: {cc['degraded_reason']}")
     if repurposing_only:
         print(f"[chemist] repurposing_only mode: pool restricted to "
               f"{len(compounds)} approved compound(s) (unapproved tool "
@@ -305,6 +312,11 @@ def run_chemist(biologist_output: dict[str, Any],
             try:
                 nbr_cc = get_target_candidate_compounds(
                     nbr_uid, repurposing_only=repurposing_only)
+                if nbr_cc.get("degraded"):
+                    pool_degraded = True
+                    if nbr_cc.get("degraded_reason"):
+                        pool_degraded_reasons.append(
+                            f"{nbr_sym}: {nbr_cc['degraded_reason']}")
                 nbr_compounds = nbr_cc.get("compounds", [])
                 if nbr_compounds:
                     nbr_enriched = _enrich_compounds(
@@ -498,6 +510,11 @@ def run_chemist(biologist_output: dict[str, Any],
         "reference_set_note": (
             "Tanimoto computed against approved drugs found in this target's "
             "candidate pool (bounded scope)."
+        ),
+        # Degradation honesty flags (surfaced in the dossier by the writer).
+        "pool_degraded": pool_degraded,
+        "pool_degraded_reason": (
+            " ".join(pool_degraded_reasons) if pool_degraded_reasons else None
         ),
     }
 
