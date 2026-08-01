@@ -1,5 +1,5 @@
 """
-Cost-safety guardrails for the Silver Bullet API.
+Cost-safety guardrails for the AgentBio API.
 
 Two independent limits gate POST /api/runs:
 

@@ -1,5 +1,5 @@
 """
-Retrospective validation harness for Silver Bullet.
+Retrospective validation harness for AgentBio.
 
 Tests whether the EXISTING Biologist -> Chemist -> Reviewer scoring/ranking
 pipeline would surface drug-disease pairs that are ALREADY confirmed real-world
@@ -190,7 +190,7 @@ def run_case(entry: dict[str, Any]) -> dict[str, Any]:
         result["in_universe"] = False
         result["miss_reason"] = str(e)
         result["interpretation"] = (
-            f"'{disease}' is outside Silver Bullet's rare-disease / neglected-"
+            f"'{disease}' is outside AgentBio's rare-disease / neglected-"
             f"tropical-disease scope, so the pipeline never evaluates it. This is a "
             f"scope boundary, not a scoring failure — the harness correctly refuses "
             f"to auto-pick an unrelated disease."
@@ -293,7 +293,7 @@ def run_case(entry: dict[str, Any]) -> dict[str, Any]:
 
 def _build_markdown(cases: list[dict[str, Any]], summary: dict[str, Any]) -> str:
     lines: list[str] = []
-    lines.append("# Silver Bullet — Retrospective Validation Results\n")
+    lines.append("# AgentBio — Retrospective Validation Results\n")
     lines.append(f"_Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}_\n")
 
     lines.append("## What this tests\n")

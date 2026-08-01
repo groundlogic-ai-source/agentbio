@@ -188,8 +188,8 @@
       "strong_match": null,
       "is_approved_drug": null,
       "match_method": null,
-      "miss_reason": "'Polycystic ovary syndrome' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.",
-      "interpretation": "'Polycystic ovary syndrome' is outside Silver Bullet's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure \u2014 the harness correctly refuses to auto-pick an unrelated disease."
+      "miss_reason": "'Polycystic ovary syndrome' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). AgentBio is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.",
+      "interpretation": "'Polycystic ovary syndrome' is outside AgentBio's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure \u2014 the harness correctly refuses to auto-pick an unrelated disease."
     },
     {
       "drug_name": "Everolimus",

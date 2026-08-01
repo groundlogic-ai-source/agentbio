@@ -1,4 +1,4 @@
-# Silver Bullet — Final Canonical Validation
+# AgentBio — Final Canonical Validation
 
 **Run date:** 2026-07-05  
 **Settings:** `REPURPOSING_ONLY=True` · `K=5` · `PATHWAY_NEIGHBOR_MIN_APPROVED=3` · `TOP_K_FRACTION=0.0 (disabled)` · code frozen, no scoring/weight/threshold changes in this pass  
@@ -144,7 +144,7 @@ These cases are not scored. They fall outside what the pipeline's approved-drug 
 
 **Status:** `EXCLUDED`
 
-**Exclusion reason:** Metformin has no FDA-approved indication for PCOS. Its use in PCOS is off-label. Silver Bullet's approved-drug discovery path surfaces only formally approved repurposing; off-label use is outside scope and cannot form a valid scored pair.
+**Exclusion reason:** Metformin has no FDA-approved indication for PCOS. Its use in PCOS is off-label. AgentBio's approved-drug discovery path surfaces only formally approved repurposing; off-label use is outside scope and cannot form a valid scored pair.
 
 **Universe probe:** PCOS IS in the Orphanet universe, matched as *"NON RARE IN EUROPE: Polycystic ovary syndrome"*. The exclusion is at the approved-indication level only — the disease entry exists but metformin's use for this indication is not formally approved, so no valid (drug, indication) pair exists for this pipeline to rediscover.
 

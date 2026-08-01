@@ -1,5 +1,5 @@
 """
-Job tracking for the Silver Bullet FastAPI backend (Stage 4).
+Job tracking for the AgentBio FastAPI backend (Stage 4).
 
 Storage is Replit-managed PostgreSQL (via DATABASE_URL), NOT a local SQLite file.
 Cloud Run's per-instance disk is ephemeral, so any job history written to a local

@@ -1157,6 +1157,6 @@
     "query": "infantile hemangioma",
     "expected_drug": "PROPRANOLOL",
     "status": "EXCLUDED_NOT_IN_UNIVERSE",
-    "notes": "'infantile hemangioma' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    "notes": "'infantile hemangioma' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). AgentBio is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
   }
 ]

@@ -44,7 +44,7 @@ export default function Dashboard({ runs, onOpenCase, onNewCase }) {
             className="font-display text-4xl font-semibold tracking-tight"
             style={{ color: "var(--paper)" }}
           >
-            Silver Bullet
+            AgentBio
           </h1>
           <p className="mt-2 max-w-xl text-sm" style={{ color: "var(--silver)" }}>
             A case file for every drug-repurposing hypothesis — evidence,

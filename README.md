@@ -1,4 +1,4 @@
-# Drug Repurposing Pipeline — Stages 1, 2, 3, 4 & 5 (Silver Bullet)
+# Drug Repurposing Pipeline — Stages 1, 2, 3, 4 & 5 (AgentBio)
 
 A Python pipeline that systematically identifies drug-repurposing candidates for rare diseases and WHO Neglected Tropical Diseases (NTDs) by integrating data from public biomedical APIs.
 
@@ -312,7 +312,7 @@ Writes one Markdown report per selected candidate to `output/reports/{disease}_{
 | `STAGE3_MAX_CANDIDATES` | `3` | Caps how many candidates receive a (paid) Boltz prediction. |
 | `STAGE3_BOLTZ_SAMPLES` | `1` | Number of Boltz structure samples per prediction. |
 
-## Running Stage 4 — Silver Bullet API
+## Running Stage 4 — AgentBio API
 
 Stage 4 wraps the exact Stage 1–3 LangGraph pipeline in a **FastAPI** backend so runs can be started, monitored, and approved over HTTP. It is a single-user hobby service: **no auth, no accounts, no Celery/Redis** — each run executes on a plain Python background thread.
 
@@ -324,7 +324,7 @@ The API layer never reimplements pipeline logic. It imports `build_graph` from `
 uvicorn api.main:app --host 0.0.0.0 --port $PORT
 ```
 
-`PORT` is provided by Replit (defaults to `8000` locally). On Replit the **Silver Bullet API** workflow runs this for you; open the webview and append `/docs`.
+`PORT` is provided by Replit (defaults to `8000` locally). On Replit the **AgentBio API** workflow runs this for you; open the webview and append `/docs`.
 
 ### Job tracking
 
@@ -347,7 +347,7 @@ Job metadata lives in its **own** SQLite file, `jobs.db` — kept separate from 
 >
 > Both modes carry the real Stage 1 scores into the final report (a **"Stage 1 prioritization scores"** section), and selecting a new target automatically invalidates the stale Stage 2/3 artifacts so the report always describes the pair actually chosen.
 
-## Stage 5 — Silver Bullet web frontend
+## Stage 5 — AgentBio web frontend
 
 Stage 5 is a **React + Vite + Tailwind** single-page app that turns the Stage 4 API into a usable interface. It is deliberately styled as a **"case dossier"** (a detective's file folder), not a generic admin dashboard: graphite/paper palette, Fraunces / Inter / JetBrains Mono type, file-folder tabs, a vertical pipeline stepper for live runs, an inline report with a sign-off panel, and a circular wax-style **stamp** (`STRONG MATCH` / `REJECTED`) on completed cases. The voice throughout frames every result as a *hypothesis to investigate*, never a cure.
 
@@ -390,7 +390,7 @@ cd frontend
 npm run build        # emits the SPA into ../api/static/
 ```
 
-Vite writes `index.html` + hashed `assets/` straight into **`api/static/`**, which FastAPI serves at `/` via its SPA catch-all (any non-`/api` path falls through to `index.html`). After a build, just (re)start the **Silver Bullet API** workflow — no separate frontend server in production; the one FastAPI process serves both the API and the UI.
+Vite writes `index.html` + hashed `assets/` straight into **`api/static/`**, which FastAPI serves at `/` via its SPA catch-all (any non-`/api` path falls through to `index.html`). After a build, just (re)start the **AgentBio API** workflow — no separate frontend server in production; the one FastAPI process serves both the API and the UI.
 
 ### How the UI talks to the API
 
@@ -401,7 +401,7 @@ Vite writes `index.html` + hashed `assets/` straight into **`api/static/`**, whi
 
 ### Full end-to-end flow
 
-1. **Build the frontend** (`npm run build`) and start the **Silver Bullet API** workflow. Open the webview at `/`.
+1. **Build the frontend** (`npm run build`) and start the **AgentBio API** workflow. Open the webview at `/`.
 2. **Open Case** → either type a rare/NTD `disease_name` to investigate it directly, or leave it blank to auto-explore the next-highest-ranked pair not yet investigated → the case is created and the dashboard shows it as a live tab.
 3. **Watch the stepper** advance through the six real nodes (`target_selection` → `biologist` → `chemist` → `reviewer` → `structure_validation` → `writer`) as polling updates `current_stage`, with live cost shown.
 4. **Awaiting Review** → the compiled report renders inline; type a sign-off note and choose **Approve** or **Reject**.

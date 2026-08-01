@@ -1,5 +1,5 @@
 """
-Silver Bullet — Stage 4 FastAPI backend.
+AgentBio — Stage 4 FastAPI backend.
 
 Exposes the existing Stage 1-3 LangGraph pipeline over HTTP. This layer ONLY
 imports from the pipeline (main_graph.build_graph) and reuses resume_review's
@@ -47,7 +47,7 @@ _PIPELINE_NODES = {
     "writer",
 }
 
-app = FastAPI(title="Silver Bullet API", version="1.0.0")
+app = FastAPI(title="AgentBio API", version="1.0.0")
 
 # Permissive CORS so a local frontend (Stage 5) can call this during development.
 app.add_middleware(

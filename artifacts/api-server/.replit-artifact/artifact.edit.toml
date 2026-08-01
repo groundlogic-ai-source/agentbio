@@ -1,0 +1,21 @@
+kind = "api"
+previewPath = "/api/"
+title = "AgentBio API"
+version = "1.0.0"
+id = "3B4_FFSkEVBkAeYMFRJ2e"
+
+[[services]]
+localPort = 8000
+name = "AgentBio API"
+paths = ["/api/", "/internal/"]
+
+[services.development]
+run = "cd /home/runner/workspace && uvicorn api.main:app --host 0.0.0.0 --port 8000"
+
+[services.production]
+
+[services.production.run]
+args = ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+
+[services.production.health.startup]
+path = "/api/runs"

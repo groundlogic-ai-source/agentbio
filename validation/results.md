@@ -1,4 +1,4 @@
-# Silver Bullet — Retrospective Validation Results
+# AgentBio — Retrospective Validation Results
 
 _Generated: 2026-07-27 19:51:12_
 
@@ -58,8 +58,8 @@ For each confirmed real-world drug-repurposing success, we ran the existing Biol
 
 - **Status:** out_of_scope
 - **Known target (context only):** Insulin-sensitizer (AMPK / mitochondrial complex I); no single clean protein target. Used OFF-LABEL for PCOS.
-- **Reason:** 'Polycystic ovary syndrome' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.
-- **Interpretation:** 'Polycystic ovary syndrome' is outside Silver Bullet's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure — the harness correctly refuses to auto-pick an unrelated disease.
+- **Reason:** 'Polycystic ovary syndrome' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). AgentBio is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.
+- **Interpretation:** 'Polycystic ovary syndrome' is outside AgentBio's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure — the harness correctly refuses to auto-pick an unrelated disease.
 
 ### Everolimus — tuberous sclerosis complex (confirmed 2010)
 
@@ -82,12 +82,12 @@ For each confirmed real-world drug-repurposing success, we ran the existing Biol
 
 - **Status:** out_of_scope
 - **Known target (context only):** Acts on PDE5 (PDE5A) — a phosphodiesterase, not the typical top OT-associated target for PAH.
-- **Reason:** 'pulmonary arterial hypertension' is an Orphanet 'Group of disorders' umbrella term, not a single scorable disease — it aggregates several distinct disorders. Silver Bullet scores one (disease, target) pair at a time, so please pick a specific constituent disease within this group (e.g. a named subtype) rather than the umbrella category.
-- **Interpretation:** 'pulmonary arterial hypertension' is outside Silver Bullet's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure — the harness correctly refuses to auto-pick an unrelated disease.
+- **Reason:** 'pulmonary arterial hypertension' is an Orphanet 'Group of disorders' umbrella term, not a single scorable disease — it aggregates several distinct disorders. AgentBio scores one (disease, target) pair at a time, so please pick a specific constituent disease within this group (e.g. a named subtype) rather than the umbrella category.
+- **Interpretation:** 'pulmonary arterial hypertension' is outside AgentBio's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure — the harness correctly refuses to auto-pick an unrelated disease.
 
 ### Propranolol — infantile hemangioma (confirmed 2014)
 
 - **Status:** out_of_scope
 - **Known target (context only):** Non-selective beta-blocker (ADRB1/ADRB2). Effect on hemangioma discovered serendipitously.
-- **Reason:** 'infantile hemangioma' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.
-- **Interpretation:** 'infantile hemangioma' is outside Silver Bullet's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure — the harness correctly refuses to auto-pick an unrelated disease.
+- **Reason:** 'infantile hemangioma' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). AgentBio is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.
+- **Interpretation:** 'infantile hemangioma' is outside AgentBio's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure — the harness correctly refuses to auto-pick an unrelated disease.

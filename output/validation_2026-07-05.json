@@ -278,7 +278,7 @@
       "case": "METFORMIN / polycystic ovary syndrome",
       "expected_drug": "METFORMIN",
       "status": "EXCLUDED",
-      "exclusion_reason": "Metformin has no FDA-approved indication for polycystic ovary syndrome (PCOS). Its use in PCOS is off-label. Silver Bullet's approved-drug discovery path surfaces only formally approved repurposing; off-label use is outside scope.",
+      "exclusion_reason": "Metformin has no FDA-approved indication for polycystic ovary syndrome (PCOS). Its use in PCOS is off-label. AgentBio's approved-drug discovery path surfaces only formally approved repurposing; off-label use is outside scope.",
       "universe_probe": {
         "outcome": "found_in_universe",
         "matched_disease": "NON RARE IN EUROPE: Polycystic ovary syndrome",
