@@ -37,33 +37,6 @@ def _get_json(url: str, params: dict | None = None) -> dict:
     return resp.json()
 
 
-# Lightweight liveness probe, reusing the benchmark health-gate pattern
-# (validation/run_benchmark.py). Sildenafil is a stable, always-present record,
-# so a 200 with a non-empty molecules payload is a reliable "ChEMBL is up"
-# signal. Used ONLY to disambiguate an empty/short result: a genuine
-# no-data answer (probe healthy) from a degraded outage (probe unhealthy),
-# so degraded candidate pools can be flagged in the dossier instead of
-# silently returning fewer compounds.
-_HEALTH_PROBE_URL = f"{BASE_URL}/molecule.json"
-_HEALTH_PROBE_PARAMS = {"pref_name": "SILDENAFIL", "limit": 1}
-
-
-def is_chembl_healthy(timeout: int = 15) -> bool:
-    """Return True only when ChEMBL answers a trivial probe with real data.
-
-    A False result means the REST API is unreachable, timing out, or returning
-    the degraded 200-with-empty-payload seen during the 2026-08-01 EBI outage.
-    """
-    try:
-        r = requests.get(
-            _HEALTH_PROBE_URL, params=_HEALTH_PROBE_PARAMS,
-            headers={"Accept": "application/json"}, timeout=timeout,
-        )
-        return r.status_code == 200 and bool(r.json().get("molecules"))
-    except Exception:
-        return False
-
-
 def _get_gene_symbol(uniprot_id: str) -> str:
     """
     Look up the HGNC gene symbol for a UniProt accession via UniProt REST API.
@@ -472,27 +445,12 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
         "target_chembl_ids": [],
         "pooled_across_multiple_targets": False,
         "repurposing_only": repurposing_only,
-        # Degradation honesty: True when this pool is known to be built against
-        # an unhealthy/degraded ChEMBL (outage, timeout, or degraded 200). A
-        # degraded pool may silently be missing compounds, so the flag is
-        # surfaced in the dossier rather than returning fewer compounds quietly.
-        "degraded": False,
-        "degraded_reason": None,
     }
 
     try:
         target_ids = _resolve_target_chembl_id(uniprot_id)
         if not target_ids:
             # Ambiguous empty (genuine no-match vs degraded 200) — not cached.
-            # Probe ChEMBL: if it is unhealthy, the empty resolution is an
-            # outage artifact, not a real "no such target", so mark degraded.
-            if not is_chembl_healthy():
-                result["degraded"] = True
-                result["degraded_reason"] = (
-                    "ChEMBL target resolution returned empty and a health probe "
-                    "failed — likely an API outage. The candidate pool for this "
-                    "target may be incomplete."
-                )
             return result
 
         result["target_chembl_ids"] = target_ids
@@ -585,27 +543,8 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
     except Exception as e:
         print(f"[chembl] WARNING: candidate compound query failed for '{uniprot_id}': {e}")
         # Do NOT cache failures: a transient error would otherwise be cached
-        # for 7 days as an empty candidate pool. A raised exception means at
-        # least one ChEMBL call failed outright, so the pool is degraded.
-        result["degraded"] = True
-        result["degraded_reason"] = (
-            f"ChEMBL query error while building the candidate pool ({e}). "
-            "The pool for this target may be incomplete."
-        )
+        # for 7 days as an empty candidate pool.
         return result
-
-    # If every activity fetch came back empty (no raw payload ever seen) and we
-    # ended up with no compounds, the emptiness is ambiguous — a genuine
-    # no-bioactivity target vs a degraded outage. Probe to distinguish, and flag
-    # the pool as degraded when ChEMBL is unhealthy.
-    if not result["compounds"] and not saw_activity_payload:
-        if not is_chembl_healthy():
-            result["degraded"] = True
-            result["degraded_reason"] = (
-                "Every ChEMBL activity fetch returned an empty payload and a "
-                "health probe failed — likely an API outage. The candidate pool "
-                "for this target may be incomplete."
-            )
 
     # An empty pool is only cacheable when it is empty AFTER FILTERING — i.e.
     # at least one activity payload was actually seen. If every fetch returned
