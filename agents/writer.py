@@ -363,9 +363,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
                           biologist_output: Optional[dict[str, Any]],
                           target_meta: Optional[dict[str, Any]] = None,
                           repurposing_only: bool = False,
-                          k_target_summary: Optional[dict[str, Any]] = None,
-                          pool_degraded: bool = False,
-                          pool_degraded_reason: Optional[str] = None) -> str:
+                          k_target_summary: Optional[dict[str, Any]] = None) -> str:
     drug = candidate.get("drug_name", "Unknown drug")
     target = candidate.get("target_symbol", "?")
     disease = candidate.get("disease_name", "?")
@@ -420,26 +418,6 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             "were restricted to FDA-approved / known drugs (ChEMBL max_phase ≥ 4) "
             "at collection time. Unapproved research-grade tool compounds were "
             "excluded from the pool, not merely down-ranked.\n\n"
-        )
-
-    # Degraded-data-source disclosure — surfaced when any ChEMBL candidate pool
-    # feeding this run was built against an unhealthy/degraded API (outage,
-    # timeout, or degraded 200-with-empty-payload). A degraded pool may be
-    # silently missing compounds, so the reviewer must be told the candidate set
-    # is potentially incomplete rather than being shown a thinned list as if it
-    # were the full result. Disclosure only — does NOT affect any score.
-    if pool_degraded:
-        reason = pool_degraded_reason or (
-            "A ChEMBL health probe failed while the candidate pool was being "
-            "built.")
-        parts.append(
-            "> ⚠ **DEGRADED DATA SOURCE — candidate pool may be incomplete.**  \n"
-            "> ChEMBL (the bioactivity source for the candidate compounds) was "
-            "unhealthy while this run's pool was assembled, so one or more "
-            "targets may be missing compounds that would normally appear. Treat "
-            "the absence of any expected drug as inconclusive and **re-run this "
-            "case once ChEMBL is healthy** before drawing conclusions. "
-            f"Details: {reason}\n\n"
         )
 
     # K-target evaluation summary — visible count of how many of the K targets
@@ -666,9 +644,7 @@ def run_writer(reviewed: dict[str, Any], selected: list[dict[str, Any]],
                biologist_output: Optional[dict[str, Any]] = None,
                target: Optional[dict[str, Any]] = None,
                bio_for_candidate: Optional[Any] = None,
-               k_target_summary: Optional[dict[str, Any]] = None,
-               pool_degraded: bool = False,
-               pool_degraded_reason: Optional[str] = None) -> list[dict[str, Any]]:
+               k_target_summary: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
     """
     Write one Markdown report per selected candidate. Returns a list of
     {drug, disease, path, strong_match} descriptors.
@@ -699,9 +675,7 @@ def run_writer(reviewed: dict[str, Any], selected: list[dict[str, Any]],
                 cand_bio = resolved
         md = build_report_markdown(cand, struct, formula, cand_bio, target,
                                    repurposing_only=repurposing_only,
-                                   k_target_summary=k_target_summary,
-                                   pool_degraded=pool_degraded,
-                                   pool_degraded_reason=pool_degraded_reason)
+                                   k_target_summary=k_target_summary)
         fname = f"{_slug(disease)}_{_slug(drug)}.md"
         path = os.path.join(REPORTS_DIR, fname)
         with open(path, "w", encoding="utf-8") as f:
