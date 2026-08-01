@@ -22,6 +22,13 @@ UNIPROT_REST = "https://rest.uniprot.org/uniprotkb"
 # facts (target_symbol, uniprot_id, ensembl_id) and this constant is
 # applied as a decoration step after the cache is read.
 PHARM_PRECEDENT_ASSOC_SCORE: float = 0.90
+# F2 — parent-umbrella precedent (approval link imported via an EFO-hierarchy
+# parent, i.e. indication-adjacent rather than disease-specific) is a strictly
+# weaker claim than a direct disease-specific approval and scores 0.70, the
+# midpoint of the strong-genetic-association band (0.5–0.8). Pre-registered in
+# validation/f2_precedent_calibration_justification.md — do not tune per case;
+# changes require a written amendment before any case-level inspection.
+PHARM_PRECEDENT_UMBRELLA_ASSOC_SCORE: float = 0.70
 
 
 def _get_json(url: str, params: dict | None = None) -> dict:
