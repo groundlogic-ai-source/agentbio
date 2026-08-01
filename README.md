@@ -418,3 +418,10 @@ You can still exercise everything from **`/docs`** (interactive Swagger UI):
 3. **`GET /api/runs/{job_id}`** → re-execute every few seconds and watch `current_stage` advance through the real nodes until `status` becomes `awaiting_review`; the response now includes the full `report` text.
 4. **`GET /api/runs/{job_id}/cost`** → confirm `total_cost_usd` (e.g. `0.025`).
 5. **`POST /api/runs/{job_id}/resume`** → body `{"action": "approve", "notes": "looks good"}` → **Execute**. The job flips to `completed` / `done`. (Resuming a job that isn't `awaiting_review` returns `409`; an invalid `action` returns `400`.)
+
+## Beta status & bug reports
+
+AgentBio is in **beta**. Dossiers are machine-generated hypotheses for expert
+review — not medical advice. In-app feedback goes through the beta Google Form
+(linked from the banner). Once this repository is public, please file bugs as
+**GitHub Issues** instead.
