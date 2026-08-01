@@ -40,7 +40,8 @@ Stage 1: Given the universe of Orphanet rare diseases + 20 WHO NTDs, ranks the t
 
 ## User preferences
 
-_Populate as you build._
+- Do NOT create/propose sub-tasks or task-agent work (user finds them confusing bureaucracy; a mid-benchmark task merge broke the code freeze). Do work directly in Build mode.
+- While the benchmark freeze is armed, never merge changes to `agents/`, `data_sources/`, or `cache/`.
 
 ## Two-mode target selection (Stage 5)
 
