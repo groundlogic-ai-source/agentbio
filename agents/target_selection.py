@@ -28,7 +28,12 @@ from data_sources.open_targets import (
     get_disease_orphanet_code, get_disease_parents, get_disease_descendant_count,
     get_ot_canonical_disease_name,
 )
-from data_sources.chembl import get_target_bioactivity_count, get_pharmacological_targets_for_disease, redact_holdout_names
+from data_sources.chembl import (
+    get_target_bioactivity_count,
+    get_pharmacological_targets_for_disease,
+    redact_holdout_names,
+    PHARM_PRECEDENT_UMBRELLA_ASSOC_SCORE,
+)
 from data_sources import holdout as _holdout
 from data_sources.afdb import get_structure_confidence
 from data_sources.clinicaltrials import check_prior_trials
@@ -794,7 +799,7 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
         _seen_after_direct = seen_uniprots | {t.get("uniprot_id") for t in new_pharm
                                               if t.get("uniprot_id")}
         _umbrella_pharm = [
-            {**t, "target_discovery_method": "pharmacological_precedent_via_parent_umbrella"}
+            _tag_umbrella_precedent(t)
             for t in _umbrella_pharm_raw
             if t.get("uniprot_id") and t.get("uniprot_id") not in _seen_after_direct
         ]
@@ -834,6 +839,8 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
         ))
 
     rows.sort(key=lambda x: (x["tractability_score"] + x["unmet_need_score"]), reverse=True)
+    # F2 mechanistic-convergence cap (rank demotion only, scores unchanged).
+    rows = _apply_mechanistic_convergence_cap(rows, log=_log)
 
     # Post-resolution sanity check: compare OT's canonical name for the chosen EFO
     # against the Orphanet official name (disease_name).  Attaches a Limitations
@@ -1002,6 +1009,86 @@ def _score_pair(
         "unmet_need_score": unmet_need,
         "target_discovery_method": target.get("target_discovery_method", "genetic_association"),
     }
+
+
+# ── F2 — precedent calibration (pre-registered constants; see
+# validation/f2_precedent_calibration_justification.md — do not tune per case) ──
+
+#: A precedent-only target may not outrank the best genetic target whose OT
+#: association meets this threshold (Open Targets' moderate-association boundary).
+GENETIC_CONVERGENCE_THRESHOLD: float = 0.50
+
+#: Discovery methods carrying pharmacological-precedent evidence only.
+_PRECEDENT_ONLY_METHODS = {
+    "pharmacological_precedent",
+    "pharmacological_precedent_via_parent_umbrella",
+}
+
+
+def _tag_umbrella_precedent(t: dict[str, Any]) -> dict[str, Any]:
+    """Re-tag a parent-umbrella precedent target with the F2 demoted score.
+
+    The umbrella import is indication-adjacent (approval for a parent disease
+    concept), a strictly weaker claim than a direct disease-specific approval
+    link — so it scores PHARM_PRECEDENT_UMBRELLA_ASSOC_SCORE (0.70), not the
+    direct-precedent 0.90 stamped by the ChEMBL lookup.
+    """
+    return {
+        **t,
+        "target_discovery_method": "pharmacological_precedent_via_parent_umbrella",
+        "association_score": PHARM_PRECEDENT_UMBRELLA_ASSOC_SCORE,
+    }
+
+
+def _apply_mechanistic_convergence_cap(
+    rows: list[dict[str, Any]],
+    log=None,
+) -> list[dict[str, Any]]:
+    """F2 mechanistic-convergence cap: when a genetically supported target
+    (OT association >= GENETIC_CONVERGENCE_THRESHOLD) exists in the considered
+    set, precedent-only targets may not outrank the best such genetic target.
+
+    Rank demotion, NOT exclusion: capped rows keep their scores unchanged, are
+    flagged ``precedent_capped=True`` for dossier disclosure, keep their
+    relative order, and are inserted immediately after the best qualifying
+    genetic row. When no qualifying genetic target exists (non-monogenic or
+    genetically unmapped indications), precedent still decides — rows are
+    returned untouched. ``rows`` must be pre-sorted best-first.
+    """
+    best_genetic_idx = next(
+        (i for i, r in enumerate(rows)
+         if r.get("target_discovery_method") == "genetic_association"
+         and r.get("ot_association_score", 0.0) >= GENETIC_CONVERGENCE_THRESHOLD),
+        None,
+    )
+    if best_genetic_idx is None:
+        return rows
+    best_row = rows[best_genetic_idx]
+    best_key = best_row["tractability_score"] + best_row["unmet_need_score"]
+
+    out: list[dict[str, Any]] = []
+    deferred: list[dict[str, Any]] = []
+    for r in rows:
+        if (r.get("target_discovery_method") in _PRECEDENT_ONLY_METHODS
+                and r["tractability_score"] + r["unmet_need_score"] >= best_key):
+            r["precedent_capped"] = True
+            deferred.append(r)
+        else:
+            out.append(r)
+    if not deferred:
+        return rows
+
+    insert_at = out.index(best_row) + 1
+    capped = out[:insert_at] + deferred + out[insert_at:]
+    if log:
+        log(
+            f"  F2 mechanistic-convergence cap: precedent-only target(s) "
+            f"{[r['target_symbol'] for r in deferred]} demoted below best "
+            f"genetic target {best_row['target_symbol']} "
+            f"(assoc {best_row['ot_association_score']} >= "
+            f"{GENETIC_CONVERGENCE_THRESHOLD}); scores unchanged, rank only"
+        )
+    return capped
 
 
 def _narrate_top5(top5: list[dict[str, Any]]) -> str:
@@ -1208,6 +1295,10 @@ def run() -> None:
         sys.exit(1)
 
     scored_pairs.sort(key=lambda x: (x["tractability_score"] + x["unmet_need_score"]), reverse=True)
+    # F2 mechanistic-convergence cap. The sweep scores genetic targets only, so
+    # this is currently a no-op here — applied in both paths per the F2 document
+    # so any future precedent rows in the sweep are capped consistently.
+    scored_pairs = _apply_mechanistic_convergence_cap(scored_pairs, log=_log)
     top30 = scored_pairs[:TOP_N]
 
     # Enrich only the top-30 Orphanet diseases with ICD-10/OMIM/MeSH cross-refs
