@@ -487,6 +487,13 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
         r.get("approved_reference_set_size", 0)
         for r in chemist_results if r
     )
+    # Aggregate ChEMBL degradation across the K targets so a partially degraded
+    # pool is surfaced in the dossier rather than silently thinned.
+    pool_degraded = any(r.get("pool_degraded") for r in chemist_results if r)
+    pool_degraded_reasons = [
+        r["pool_degraded_reason"] for r in chemist_results
+        if r and r.get("pool_degraded_reason")
+    ]
     pooled_out = {
         "target": bio_outputs[0]["target"],
         "targets": [bio_outputs[i]["target"] for i in range(k)],
@@ -496,6 +503,10 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
         "k_target_summary": k_target_summary,
         "repurposing_only": repurposing_only,
         "pooled_across_multiple_targets": has_any_pooled,
+        "pool_degraded": pool_degraded,
+        "pool_degraded_reason": (
+            " ".join(pool_degraded_reasons) if pool_degraded_reasons else None
+        ),
         "approved_reference_set_size": total_approved_fps,
         "reference_set_note": (
             f"Candidates pooled from {k} targets for the same disease "
@@ -537,6 +548,9 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
         "n_candidates": len(reviewed),
         "n_strong_matches": sum(1 for r in reviewed if r["strong_match"]),
         "repurposing_only": state["chemist_output"].get("repurposing_only", False),
+        # Carry ChEMBL degradation honesty flags through to the writer.
+        "pool_degraded": state["chemist_output"].get("pool_degraded", False),
+        "pool_degraded_reason": state["chemist_output"].get("pool_degraded_reason"),
         "candidates": reviewed,
     }
     # Thread the K-target evaluation summary through to the writer so it can
@@ -635,7 +649,13 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
     selected = state.get("selected", [])
     structure_results = state.get("structure_results", {})
     if not selected:
-        print("[graph] writer: no candidates selected — no reports written")
+        if reviewed.get("pool_degraded"):
+            print("[graph] writer: no candidates selected AND ChEMBL pool was "
+                  "DEGRADED — the empty result is likely an outage artifact, not "
+                  f"a genuine no-candidate answer. Reason: "
+                  f"{reviewed.get('pool_degraded_reason')}")
+        else:
+            print("[graph] writer: no candidates selected — no reports written")
         return {"reports": []}
 
     # For K > 1 targets, pass the biologist_outputs keyed by target identity so
@@ -679,7 +699,9 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
     reports = writer.run_writer(
         reviewed, selected, structure_results, primary_bio,
         state.get("target"), bio_for_candidate=_bio_for,
-        k_target_summary=reviewed.get("k_target_summary"))
+        k_target_summary=reviewed.get("k_target_summary"),
+        pool_degraded=reviewed.get("pool_degraded", False),
+        pool_degraded_reason=reviewed.get("pool_degraded_reason"))
     print(f"[graph] writer: wrote {len(reports)} report(s) to output/reports/")
     return {"reports": reports}
 
