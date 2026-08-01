@@ -443,6 +443,125 @@
       ],
       "pool_sizes": {},
       "chance_hit_probability": null
+    },
+    {
+      "drug_name": "Promazine",
+      "disease_name": "Acute intermittent porphyria",
+      "top_k": 3,
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "HMBS",
+        "uniprot_id": "P08397",
+        "ot_association_score": 0.8606
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "HMBS",
+          "uniprot_id": "P08397",
+          "ot_association_score": 0.8606
+        },
+        {
+          "target_symbol": "ACO2",
+          "uniprot_id": "Q99798",
+          "ot_association_score": 0.34
+        }
+      ],
+      "n_chemist_candidates": 95,
+      "n_reviewed_candidates": 95,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [
+        {
+          "target_symbol": "HMBS",
+          "uniprot_id": "P08397",
+          "ot_association_score": 0.8606,
+          "status": "miss",
+          "n_chemist_candidates": 51,
+          "n_reviewed": 51,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 1
+        },
+        {
+          "target_symbol": "ACO2",
+          "uniprot_id": "Q99798",
+          "ot_association_score": 0.34,
+          "status": "miss",
+          "n_chemist_candidates": 44,
+          "n_reviewed": 44,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 2
+        }
+      ],
+      "miss_reason": "'Promazine' absent across 95 ChEMBL compound(s) drawn from top-2 targets [HMBS (P08397), ACO2 (Q99798)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 2 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "interpretation": "MISS \u2014 Promazine not found in any of the top-2 target pools. 'Promazine' absent across 95 ChEMBL compound(s) drawn from top-2 targets [HMBS (P08397), ACO2 (Q99798)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 2 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null,
+      "subset": "primary",
+      "stratum": "rare_1_10",
+      "benchmark_mode": "holdout",
+      "holdout_drugs": [
+        "Promazine"
+      ],
+      "pool_sizes": {
+        "HMBS": 2,
+        "ACO2": 0
+      },
+      "chance_hit_probability": 1.0
+    },
+    {
+      "drug_name": "Meropenem",
+      "disease_name": "Meningococcal meningitis",
+      "top_k": 3,
+      "status": "error",
+      "in_universe": true,
+      "selected_target": null,
+      "candidate_targets_considered": [],
+      "n_chemist_candidates": null,
+      "n_reviewed_candidates": null,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [],
+      "miss_reason": "target_selection failed: Open Targets returned no genetically-associated targets for 'Meningococcal meningitis' (EFO MONDO_0018059) and no approved-drug MOA targets were found in ChEMBL; there is nothing to score.",
+      "interpretation": "Target selection error.",
+      "audit_rank": null,
+      "audit_status": null,
+      "audit_cap": null,
+      "subset": "primary",
+      "stratum": "unknown",
+      "benchmark_mode": "holdout",
+      "holdout_drugs": [
+        "Meropenem"
+      ],
+      "pool_sizes": {},
+      "chance_hit_probability": null
     }
   ]
 }
