@@ -562,6 +562,286 @@
       ],
       "pool_sizes": {},
       "chance_hit_probability": null
+    },
+    {
+      "drug_name": "Mercaptopurine",
+      "disease_name": "Acute Promyelocytic Leukemia",
+      "top_k": 3,
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "RARA",
+        "uniprot_id": "P10276",
+        "ot_association_score": 0.6074
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "RARA",
+          "uniprot_id": "P10276",
+          "ot_association_score": 0.6074
+        },
+        {
+          "target_symbol": "IDH1",
+          "uniprot_id": "O75874",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "IDH2",
+          "uniprot_id": "P48735",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "KIT",
+          "uniprot_id": "P10721",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "DNMT1",
+          "uniprot_id": "P26358",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "FLT3",
+          "uniprot_id": "P36888",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "AXL",
+          "uniprot_id": "P30530",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "SMO",
+          "uniprot_id": "Q99835",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "TOP2A",
+          "uniprot_id": "P11388",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "KDR",
+          "uniprot_id": "P35968",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "DNMT3A",
+          "uniprot_id": "Q9Y6K1",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "RARG",
+          "uniprot_id": "P13631",
+          "ot_association_score": 0.5954
+        },
+        {
+          "target_symbol": "RARB",
+          "uniprot_id": "P10826",
+          "ot_association_score": 0.5935
+        },
+        {
+          "target_symbol": "EEF2",
+          "uniprot_id": "P13639",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "IL3RA",
+          "uniprot_id": "P26951",
+          "ot_association_score": 0.7
+        },
+        {
+          "target_symbol": "TXNRD1",
+          "uniprot_id": "Q16881",
+          "ot_association_score": 0.5862
+        },
+        {
+          "target_symbol": "CD33",
+          "uniprot_id": "P20138",
+          "ot_association_score": 0.4686
+        }
+      ],
+      "n_chemist_candidates": 114,
+      "n_reviewed_candidates": 114,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [
+        {
+          "target_symbol": "RARA",
+          "uniprot_id": "P10276",
+          "ot_association_score": 0.6074,
+          "status": "miss",
+          "n_chemist_candidates": 30,
+          "n_reviewed": 30,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 1
+        },
+        {
+          "target_symbol": "IDH1",
+          "uniprot_id": "O75874",
+          "ot_association_score": 0.7,
+          "status": "miss",
+          "n_chemist_candidates": 54,
+          "n_reviewed": 54,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 2
+        },
+        {
+          "target_symbol": "IDH2",
+          "uniprot_id": "P48735",
+          "ot_association_score": 0.7,
+          "status": "miss",
+          "n_chemist_candidates": 30,
+          "n_reviewed": 30,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 3
+        }
+      ],
+      "miss_reason": "'Mercaptopurine' absent across 114 ChEMBL compound(s) drawn from top-3 targets [RARA (P10276), IDH1 (O75874), IDH2 (P48735)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "interpretation": "MISS \u2014 Mercaptopurine not found in any of the top-3 target pools. 'Mercaptopurine' absent across 114 ChEMBL compound(s) drawn from top-3 targets [RARA (P10276), IDH1 (O75874), IDH2 (P48735)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null,
+      "subset": "primary",
+      "stratum": "ultra_rare_lt1",
+      "benchmark_mode": "holdout",
+      "holdout_drugs": [
+        "Mercaptopurine"
+      ],
+      "pool_sizes": {
+        "RARA": 30,
+        "IDH1": 25,
+        "IDH2": 30
+      },
+      "chance_hit_probability": 1.0
+    },
+    {
+      "drug_name": "Pazopanib",
+      "disease_name": "Renal Cell Carcinoma",
+      "top_k": 3,
+      "status": "out_of_scope",
+      "in_universe": false,
+      "selected_target": null,
+      "candidate_targets_considered": [],
+      "n_chemist_candidates": null,
+      "n_reviewed_candidates": null,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [],
+      "miss_reason": "'Renal Cell Carcinoma' is an Orphanet 'Group of disorders' umbrella term, not a single scorable disease \u2014 it aggregates several distinct disorders. Silver Bullet scores one (disease, target) pair at a time, so please pick a specific constituent disease within this group (e.g. a named subtype) rather than the umbrella category.",
+      "interpretation": "'Renal Cell Carcinoma' outside rare/NTD universe.",
+      "audit_rank": null,
+      "audit_status": null,
+      "audit_cap": null,
+      "subset": "primary",
+      "stratum": "less_rare_gt10",
+      "benchmark_mode": "holdout",
+      "holdout_drugs": [
+        "Pazopanib"
+      ],
+      "pool_sizes": {},
+      "chance_hit_probability": null
+    },
+    {
+      "drug_name": "Triamcinolone",
+      "disease_name": "Trichinellosis",
+      "top_k": 3,
+      "status": "error",
+      "in_universe": true,
+      "selected_target": null,
+      "candidate_targets_considered": [],
+      "n_chemist_candidates": null,
+      "n_reviewed_candidates": null,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [],
+      "miss_reason": "target_selection failed: EFO RESOLUTION MISMATCH \u2014 cannot proceed.\n\n  User query:          'Trichinellosis'\n  Orphanet name:       'Trichinellosis'\n  Resolved EFO ID:     EFO_0007520\n  OT canonical name:   'trichinosis'\n  Token overlap:       0%  (Orphanet name shares no meaningful tokens\n                        with OT's canonical name for this EFO node)\n\nOpen Targets mapped 'Trichinellosis' to a node (EFO_0007520) whose own canonical name is 'trichinosis'. These appear to be different diseases \u2014 proceeding would generate a report about 'trichinosis', not 'Trichinellosis'.\n\nTo fix: try rephrasing with the disease's most common synonym, its Orphanet ORPHA-code-based name (found at orphadata.com), or its OMIM preferred title. If the disease genuinely has no OT representation, it cannot be processed by this pipeline.",
+      "interpretation": "Target selection error.",
+      "audit_rank": null,
+      "audit_status": null,
+      "audit_cap": null,
+      "subset": "primary",
+      "stratum": "rare_1_10",
+      "benchmark_mode": "holdout",
+      "holdout_drugs": [
+        "Triamcinolone"
+      ],
+      "pool_sizes": {},
+      "chance_hit_probability": null
+    },
+    {
+      "drug_name": "Voriconazole",
+      "disease_name": "Fusariosis",
+      "top_k": 3,
+      "status": "error",
+      "in_universe": true,
+      "selected_target": null,
+      "candidate_targets_considered": [],
+      "n_chemist_candidates": null,
+      "n_reviewed_candidates": null,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [],
+      "miss_reason": "target_selection failed: Open Targets returned no genetically-associated targets for 'Fusariosis' (EFO MONDO_0016426) and no approved-drug MOA targets were found in ChEMBL; there is nothing to score.",
+      "interpretation": "Target selection error.",
+      "audit_rank": null,
+      "audit_status": null,
+      "audit_cap": null,
+      "subset": "primary",
+      "stratum": "unknown",
+      "benchmark_mode": "holdout",
+      "holdout_drugs": [
+        "Voriconazole"
+      ],
+      "pool_sizes": {},
+      "chance_hit_probability": null
     }
   ]
 }
