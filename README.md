@@ -419,6 +419,21 @@ You can still exercise everything from **`/docs`** (interactive Swagger UI):
 4. **`GET /api/runs/{job_id}/cost`** → confirm `total_cost_usd` (e.g. `0.025`).
 5. **`POST /api/runs/{job_id}/resume`** → body `{"action": "approve", "notes": "looks good"}` → **Execute**. The job flips to `completed` / `done`. (Resuming a job that isn't `awaiting_review` returns `409`; an invalid `action` returns `400`.)
 
+## Validation status (honest)
+
+- A pre-registered, blind retrospective benchmark (50 primary + 15 development
+  drug-repurposing rediscovery cases) is **armed but has not yet run** — it is
+  health-gated on the ChEMBL API and fires automatically when that service
+  recovers from its current outage. Selection criteria:
+  `validation/benchmark_case_selection_criteria.md`; frozen pipeline at tag
+  `benchmark-freeze-v1`; case list at tag `benchmark-cases-v2`; results will be
+  published in full (hits and misses) at `validation/benchmark_results.md`.
+- Earlier small development-suite runs were used for iteration only and are
+  superseded by this benchmark — do not quote them.
+- Known limitations and past failure postmortems are documented in
+  `validation/` — see `target_selection_diagnosis.md`,
+  `cache_failure_sweep.md`, and `f2_precedent_calibration_justification.md`.
+
 ## Beta status & bug reports
 
 AgentBio is in **beta**. Dossiers are machine-generated hypotheses for expert
