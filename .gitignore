@@ -54,3 +54,10 @@ jobs.db
 # Runtime state — never commit
 cache/cache.db
 output/provenance_log.json
+
+# Large/generated data & local state — kept on disk, not tracked
+checkpoints.db*
+data_prep/raw/
+data_prep/output/
+output/structures/
+attached_assets/
