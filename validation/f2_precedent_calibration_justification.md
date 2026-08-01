@@ -1,6 +1,6 @@
 # F2 — Pharmacological-precedent calibration: written justification (pre-registration)
 
-**Date:** 2026-07-31 · **Status:** DRAFT for approval · **Discipline:** the constants in §3 are fixed upon approval and commit. No case-level measurement may inform them. This document exists *before* the benchmark case list is selected.
+**Date:** 2026-07-31 · **Status:** APPROVED 2026-07-31 (as written) and IMPLEMENTED — umbrella demotion at `agents/target_selection.py` (`_tag_umbrella_precedent`), convergence cap at both ranking paths (`_apply_mechanistic_convergence_cap`), unit tests in `validation/test_f2_precedent.py`. Constants are now frozen: changes require a written amendment before any case-level inspection.
 
 ## 1. Discipline statement
 
