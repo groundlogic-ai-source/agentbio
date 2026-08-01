@@ -327,7 +327,7 @@ def main() -> None:
     output_dir = OUTPUT_DIR
 
     print("\n" + "="*72)
-    print(" SILVER BULLET — FINAL CANONICAL VALIDATION RUN")
+    print(" AGENTBIO — FINAL CANONICAL VALIDATION RUN")
     print(f" Date: {TODAY}")
     print(f" Settings: REPURPOSING_ONLY={REPURPOSING_ONLY}  K={TOP_K}  "
           f"PATHWAY_NEIGHBOR_MIN_APPROVED={PATHWAY_NEIGHBOR_MIN_APPROVED}  "
@@ -402,7 +402,7 @@ def main() -> None:
         expected_drug="METFORMIN",
         exclusion_reason=(
             "Metformin has no FDA-approved indication for PCOS — its use in "
-            "PCOS is off-label. Silver Bullet's approved-drug discovery path "
+            "PCOS is off-label. AgentBio's approved-drug discovery path "
             "surfaces only formally approved repurposing. PCOS may be in the "
             "Orphanet universe but metformin/PCOS cannot form a valid scored pair."
         ),
@@ -493,7 +493,7 @@ def _build_markdown(results: dict[str, Any]) -> str:
     today = results["run_date"]
     lines = []
 
-    lines.append(f"# Silver Bullet — Final Canonical Validation")
+    lines.append(f"# AgentBio — Final Canonical Validation")
     lines.append(f"")
     lines.append(f"**Run date:** {today}  ")
     lines.append(f"**Settings:** `REPURPOSING_ONLY=True` · `K={results['settings']['TOP_K_TARGETS']}` · "

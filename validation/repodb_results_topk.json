@@ -142,7 +142,7 @@
       "hit_target_symbol": null,
       "hit_target_uniprot": null,
       "per_target_results": [],
-      "miss_reason": "'Cryopyrin-Associated Periodic Syndromes' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.",
+      "miss_reason": "'Cryopyrin-Associated Periodic Syndromes' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). AgentBio is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.",
       "interpretation": "'Cryopyrin-Associated Periodic Syndromes' outside rare/NTD universe.",
       "audit_rank": null,
       "audit_status": null,
