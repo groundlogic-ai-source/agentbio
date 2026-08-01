@@ -1,12 +1,12 @@
 kind = "api"
 previewPath = "/api/"
-title = "Silver Bullet API"
+title = "AgentBio API"
 version = "1.0.0"
 id = "3B4_FFSkEVBkAeYMFRJ2e"
 
 [[services]]
 localPort = 8000
-name = "Silver Bullet API"
+name = "AgentBio API"
 paths = ["/api/", "/internal/"]
 
 [services.development]
