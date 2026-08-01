@@ -438,5 +438,5 @@ You can still exercise everything from **`/docs`** (interactive Swagger UI):
 
 AgentBio is in **beta**. Dossiers are machine-generated hypotheses for expert
 review — not medical advice. In-app feedback goes through the beta Google Form
-(linked from the banner). Once this repository is public, please file bugs as
-**GitHub Issues** instead.
+(linked from the banner). Please file bugs as **GitHub Issues** on
+<https://github.com/groundlogic-ai-source/agentbio>.
