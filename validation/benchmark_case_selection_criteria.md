@@ -15,7 +15,7 @@ The expanded benchmark must be immune to the failure mode of the old 13-case sui
 ## 3. Inclusion criteria (mechanical)
 
 - **I1.** repoDB status "approved" for the benchmark indication; indication distinct from the drug's original approval indication.
-- **I2.** Drug resolves to exactly one ChEMBL *Small molecule* entry and one PubChem CID.
+- **I2.** Drug resolves to exactly one ChEMBL *Small molecule* entry and one PubChem CID. *Amendment (2026-07-31, pre-selection): pairs whose molecule_type is EMPTY in the enriched CSV (enrichment-era ChEMBL failures) are excluded as unresolved with the count disclosed in the attrition table. Live re-resolution at selection time was rejected — ChEMBL was down during the first selection attempt and the filters ground to a halt on timeouts; selection must be reproducible regardless of transient API health. No case is permanently lost: the benchmark run itself resolves molecules live, so these pairs simply aren't selectable in this draw.*
 - **I3.** Disease resolves to an EFO term via the v3 specificity pipeline and appears in the Orphanet rare-disease universe.
 - **I4.** The disease has at least one target in the discovery universe (Open Targets association or pharmacological precedent). A case the system cannot even start measures data coverage, not selection — such cases are counted and disclosed separately as *coverage failures*, never silently dropped and never counted as discovery failures.
 
@@ -23,14 +23,14 @@ The expanded benchmark must be immune to the failure mode of the old 13-case sui
 
 - **E1.** Biologics (see §2).
 - **E2.** Combination products / drug mixtures.
-- **E3.** The 13 development-suite cases are **excluded from the primary endpoint set**: the wrong-target diagnosis inspected them, so they are contaminated for tuning. They are run and reported as a clearly-labeled *development subset* (the F2 predictions P1–P3 are scored there).
+- **E3.** Development-suite contamination: **every drug appearing in any development suite** (`ground_truth.json`, `run_repodb_cases.py`, `run_repodb_cases_smallmol.py`) is excluded from the primary endpoint set — the wrong-target diagnosis inspected those cases, so they are contaminated for tuning. *Amendment (2026-07-31, pre-selection): upgraded from pair-level to drug-level exclusion, because disease-name normalization differences between the suite files and repoDB could let a near-duplicate pair slip through; the cost (~15 of ~705 drugs) is negligible.* The development cases are still run and reported as a clearly-labeled *development subset* (the F2 predictions P1–P3 are scored there).
 - **E4.** One case per drug: if a drug qualifies for multiple rare indications, keep exactly one (the indication with the lowest Orphanet prevalence), preventing one mechanism from being double-counted.
 
 ## 5. Sampling procedure
 
 1. Enumerate all pairs passing I1–I4 and E1–E4. Publish an **attrition table** (count after each filter) with the case list — the filters themselves must be auditable for bias.
-2. Stratify by therapeutic area of the *benchmark* indication (Orphanet classification); no stratum may exceed 30% of the final list.
-3. Sample to **N = 50** (acceptable band 40–60) with a fixed RNG seed recorded in the selection script.
+2. Stratify by **prevalence band of the benchmark indication** (ultra-rare <1/M, rare 1–10/M, less-rare >10/M, prevalence-unknown); no stratum may exceed 40% of the final list. *Amendment (2026-07-31, pre-selection): the original draft specified Orphanet therapeutic-area strata, but the Orphadata pipeline exposes no per-disease therapeutic-area field (only DisorderGroup/cross-references). Prevalence bands are the finest stratification available mechanically, are fully deterministic, and guard against a sample dominated by one rarity regime. Amended before any case was selected.*
+3. Sample to **N = 50** (acceptable band 40–60) with a fixed RNG seed recorded in the selection script (`SEED = 20260731`).
 4. Commit: selection script + seed + final list, before any run.
 
 ## 6. Endpoints & statistics (fixed a priori)

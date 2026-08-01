@@ -1,0 +1,490 @@
+{
+  "seed": 20260731,
+  "target_n": 50,
+  "stratum_cap": 0.4,
+  "criteria": "validation/benchmark_case_selection_criteria.md",
+  "freeze_tag": "benchmark-freeze-v1",
+  "n_qualifying": 151,
+  "primary": [
+    {
+      "drug_name": "Cefuroxime",
+      "ind_name": "Lyme Disease",
+      "orpha_code": "91546",
+      "efo_id": "MONDO_0019632",
+      "prevalence_per_million": 177.5,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Dapsone",
+      "ind_name": "Leprosy",
+      "orpha_code": "548",
+      "efo_id": "MONDO_0005124",
+      "prevalence_per_million": 3.7,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Amphetamine",
+      "ind_name": "Narcolepsy",
+      "orpha_code": "619284",
+      "efo_id": "MONDO_0021107",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Vincristine",
+      "ind_name": "Rhabdomyosarcoma",
+      "orpha_code": "780",
+      "efo_id": "MONDO_0005212",
+      "prevalence_per_million": 0.59,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Phenytoin",
+      "ind_name": "Lennox-Gastaut syndrome",
+      "orpha_code": "2382",
+      "efo_id": "MONDO_0016532",
+      "prevalence_per_million": 15.0,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Vinblastine",
+      "ind_name": "Kaposi Sarcoma",
+      "orpha_code": "33276",
+      "efo_id": "MONDO_0005055",
+      "prevalence_per_million": 2.11,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Meropenem",
+      "ind_name": "Meningococcal meningitis",
+      "orpha_code": "33475",
+      "efo_id": "MONDO_0018059",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Lansoprazole",
+      "ind_name": "Zollinger-Ellison syndrome",
+      "orpha_code": "913",
+      "efo_id": "MONDO_0019610",
+      "prevalence_per_million": 0.3,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Temsirolimus",
+      "ind_name": "Renal Cell Carcinoma",
+      "orpha_code": "217071",
+      "efo_id": "MONDO_0005549",
+      "prevalence_per_million": 42.0,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Cortisone acetate",
+      "ind_name": "Trichinellosis",
+      "orpha_code": "863",
+      "efo_id": "EFO_0007520",
+      "prevalence_per_million": 1.06,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Voriconazole",
+      "ind_name": "Fusariosis",
+      "orpha_code": "228119",
+      "efo_id": "MONDO_0016426",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Daunorubicin",
+      "ind_name": "Acute Promyelocytic Leukemia",
+      "orpha_code": "520",
+      "efo_id": "MONDO_0012883",
+      "prevalence_per_million": 0.3,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Lenalidomide",
+      "ind_name": "Multiple Myeloma",
+      "orpha_code": "29073",
+      "efo_id": "MONDO_0009693",
+      "prevalence_per_million": 11.9,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Riociguat",
+      "ind_name": "Chronic thromboembolic pulmonary hypertension",
+      "orpha_code": "70591",
+      "efo_id": "EFO_0022954",
+      "prevalence_per_million": 5.1,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Isavuconazonium",
+      "ind_name": "Aspergillosis",
+      "orpha_code": "1163",
+      "efo_id": "MONDO_0005657",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Arsenic trioxide",
+      "ind_name": "Acute myelomonocytic leukemia",
+      "orpha_code": "517",
+      "efo_id": "MONDO_0018871",
+      "prevalence_per_million": 0.17,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Mannitol",
+      "ind_name": "Cystic Fibrosis",
+      "orpha_code": "586",
+      "efo_id": "MONDO_0009061",
+      "prevalence_per_million": 48.6381,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Voglibose",
+      "ind_name": "Gaucher Disease",
+      "orpha_code": "355",
+      "efo_id": "MONDO_0018150",
+      "prevalence_per_million": 7.5,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Sulfisoxazole",
+      "ind_name": "Meningococcal meningitis",
+      "orpha_code": "33475",
+      "efo_id": "MONDO_0018059",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Esomeprazole",
+      "ind_name": "Zollinger-Ellison syndrome",
+      "orpha_code": "913",
+      "efo_id": "MONDO_0019610",
+      "prevalence_per_million": 0.3,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Ezetimibe",
+      "ind_name": "Sitosterolemia",
+      "orpha_code": "2882",
+      "efo_id": "MONDO_0008863",
+      "prevalence_per_million": 100.0,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Chlorpromazine",
+      "ind_name": "Acute intermittent porphyria",
+      "orpha_code": "79276",
+      "efo_id": "MONDO_0008294",
+      "prevalence_per_million": 10.0,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Dextroamphetamine",
+      "ind_name": "Narcolepsy",
+      "orpha_code": "619284",
+      "efo_id": "MONDO_0021107",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Ranitidine",
+      "ind_name": "Zollinger-Ellison syndrome",
+      "orpha_code": "913",
+      "efo_id": "MONDO_0019610",
+      "prevalence_per_million": 0.3,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Bortezomib",
+      "ind_name": "Multiple Myeloma",
+      "orpha_code": "29073",
+      "efo_id": "MONDO_0009693",
+      "prevalence_per_million": 11.9,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Streptomycin",
+      "ind_name": "Brucellosis",
+      "orpha_code": "1304",
+      "efo_id": "MONDO_0005683",
+      "prevalence_per_million": 1.13,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Minoxidil",
+      "ind_name": "Alopecia",
+      "orpha_code": "79364",
+      "efo_id": "MONDO_0004907",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Omeprazole",
+      "ind_name": "Zollinger-Ellison syndrome",
+      "orpha_code": "913",
+      "efo_id": "MONDO_0019610",
+      "prevalence_per_million": 0.3,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Benzoic Acid",
+      "ind_name": "Dermatomyositis",
+      "orpha_code": "221",
+      "efo_id": "MONDO_0016367",
+      "prevalence_per_million": 13.0,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Deferasirox",
+      "ind_name": "beta Thalassemia",
+      "orpha_code": "848",
+      "efo_id": "MONDO_0019402",
+      "prevalence_per_million": 10.0,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Ceftazidime",
+      "ind_name": "Meningococcal meningitis",
+      "orpha_code": "33475",
+      "efo_id": "MONDO_0018059",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Tretinoin",
+      "ind_name": "Acute Promyelocytic Leukemia",
+      "orpha_code": "520",
+      "efo_id": "MONDO_0012883",
+      "prevalence_per_million": 0.3,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Fluorometholone",
+      "ind_name": "Uveitis",
+      "orpha_code": "98715",
+      "efo_id": "MONDO_0020283",
+      "prevalence_per_million": 38.0,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Cysteine hydrochloride",
+      "ind_name": "Amyloidosis",
+      "orpha_code": "69",
+      "efo_id": "MONDO_0019065",
+      "prevalence_per_million": 1.91,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Sodium phenylbutyrate",
+      "ind_name": "Citrullinemia",
+      "orpha_code": "187",
+      "efo_id": "MONDO_0008988",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Famotidine",
+      "ind_name": "Zollinger-Ellison syndrome",
+      "orpha_code": "913",
+      "efo_id": "MONDO_0019610",
+      "prevalence_per_million": 0.3,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Uracil mustard",
+      "ind_name": "Polycythemia Vera",
+      "orpha_code": "729",
+      "efo_id": "MONDO_0009891",
+      "prevalence_per_million": 30.0,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Eribulin",
+      "ind_name": "liposarcoma",
+      "orpha_code": "69078",
+      "efo_id": "MONDO_0005060",
+      "prevalence_per_million": 1.0,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Sodium oxybate",
+      "ind_name": "Narcolepsy",
+      "orpha_code": "619284",
+      "efo_id": "MONDO_0021107",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Diazepam",
+      "ind_name": "Tetanus",
+      "orpha_code": "3299",
+      "efo_id": "MONDO_0005526",
+      "prevalence_per_million": 0.118,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Sunitinib",
+      "ind_name": "Renal Cell Carcinoma",
+      "orpha_code": "217071",
+      "efo_id": "MONDO_0005549",
+      "prevalence_per_million": 42.0,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Imatinib",
+      "ind_name": "Dermatofibrosarcoma Protuberans",
+      "orpha_code": "31112",
+      "efo_id": "MONDO_0011934",
+      "prevalence_per_million": 10.0,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Cefotaxime",
+      "ind_name": "Meningococcal meningitis",
+      "orpha_code": "33475",
+      "efo_id": "MONDO_0018059",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Idarubicin",
+      "ind_name": "Acute Promyelocytic Leukemia",
+      "orpha_code": "520",
+      "efo_id": "MONDO_0012883",
+      "prevalence_per_million": 0.3,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Scopolamine",
+      "ind_name": "Uveitis",
+      "orpha_code": "98715",
+      "efo_id": "MONDO_0020283",
+      "prevalence_per_million": 38.0,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Deferiprone",
+      "ind_name": "beta Thalassemia",
+      "orpha_code": "848",
+      "efo_id": "MONDO_0019402",
+      "prevalence_per_million": 10.0,
+      "stratum": "rare_1_10"
+    },
+    {
+      "drug_name": "Ampicillin",
+      "ind_name": "Meningococcal meningitis",
+      "orpha_code": "33475",
+      "efo_id": "MONDO_0018059",
+      "prevalence_per_million": null,
+      "stratum": "unknown"
+    },
+    {
+      "drug_name": "Pantoprazole",
+      "ind_name": "Multiple Endocrine Neoplasia",
+      "orpha_code": "276161",
+      "efo_id": "MONDO_0017169",
+      "prevalence_per_million": 0.05,
+      "stratum": "ultra_rare_lt1"
+    },
+    {
+      "drug_name": "Bromocriptine",
+      "ind_name": "Acromegaly",
+      "orpha_code": "963",
+      "efo_id": "MONDO_0019933",
+      "prevalence_per_million": 13.4,
+      "stratum": "less_rare_gt10"
+    },
+    {
+      "drug_name": "Triamcinolone",
+      "ind_name": "Trichinellosis",
+      "orpha_code": "863",
+      "efo_id": "EFO_0007520",
+      "prevalence_per_million": 1.06,
+      "stratum": "rare_1_10"
+    }
+  ],
+  "coverage_failures": [
+    {
+      "drug_name": "Nicotine",
+      "ind_name": "Pellagra",
+      "efo_id": "EFO_0008570"
+    },
+    {
+      "drug_name": "Nitazoxanide",
+      "ind_name": "Cryptosporidiosis",
+      "efo_id": "MONDO_0015474"
+    },
+    {
+      "drug_name": "Carbamazepine",
+      "ind_name": "Glossopharyngeal Neuralgia",
+      "efo_id": "MONDO_0016372"
+    },
+    {
+      "drug_name": "Diethylcarbamazine",
+      "ind_name": "Loiasis",
+      "efo_id": "MONDO_0016566"
+    },
+    {
+      "drug_name": "Posaconazole",
+      "ind_name": "Mycetoma",
+      "efo_id": "MONDO_0005757"
+    },
+    {
+      "drug_name": "Niclosamide",
+      "ind_name": "Diphyllobothriasis",
+      "efo_id": "MONDO_0015260"
+    },
+    {
+      "drug_name": "Procaine benzylpenicillin",
+      "ind_name": "Rat-Bite Fever",
+      "efo_id": "MONDO_0006941"
+    }
+  ],
+  "development_subset_note": "Development-suite drugs (excluded per E3): run separately as the labeled development subset; F2 predictions P1-P3 are scored there.",
+  "attrition": [
+    {
+      "stage": "0. dataset rows",
+      "count": 9057
+    },
+    {
+      "stage": "I1. status=Approved & label=repurposed-success",
+      "count": 5582
+    },
+    {
+      "stage": "E2. combination products excluded ('+' in name)",
+      "count": 5582
+    },
+    {
+      "stage": "E1/I2. Small molecule per enrichment",
+      "count": 4866
+    },
+    {
+      "stage": "E1/I2. EMPTY molecule_type excluded (disclosed; ChEMBL-era failures)",
+      "count": -456
+    },
+    {
+      "stage": "E3. development-suite drugs excluded (5 drugs)",
+      "count": 4852
+    },
+    {
+      "stage": "I3a. benchmark indication in Orphanet universe",
+      "count": 248
+    },
+    {
+      "stage": "E4. one case per drug (117 unique drugs)",
+      "count": 117
+    },
+    {
+      "stage": "I3b. EFO resolved (v3 pipeline)",
+      "count": 108
+    },
+    {
+      "stage": "I4. at least one target in discovery universe",
+      "count": 101
+    }
+  ]
+}
