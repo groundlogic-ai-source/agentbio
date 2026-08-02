@@ -221,6 +221,9 @@ def _build_markdown(cases: list[dict[str, Any]]) -> str:
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main() -> None:
+    if os.path.exists("validation/BENCHMARK_V1_TERMINATED") and FREEZE_TAG == "benchmark-freeze-v1":
+        _log("v1 was terminated by protocol decision (see benchmark_v1_partial_report.md); refusing to run. rc=2.")
+        sys.exit(2)
     _check_freeze_integrity()
     _health_gate(attempts=5, wait_s=30, label="startup gate")
     done = _load_done()
