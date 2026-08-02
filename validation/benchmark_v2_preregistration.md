@@ -122,3 +122,16 @@ the production source ceiling. The production portfolio and source-admission gat
 
 These changes expand the architecture beyond the original four-item package. They are registered
 before implementation and do not authorize silent additions after benchmark execution begins.
+
+### Pre-v2 engineering acceptance test
+
+Before creating `benchmark-freeze-v2`, the upgraded runtime will be exercised on the five
+archived v1 genuine misses under the protocol in `v2_upgrade_readiness_audit.md`. This is a
+disclosed development/regression test and may be rerun while implementing general fixes; it is
+never reported as benchmark v2.
+
+The acceptance target is 5/5 **generated and mechanistically valid** through normal disease-input
+and multi-source code paths with the confirmed drug fully held out. Rank, Top-10, and STRONG_MATCH
+are reported separately and are not tuned to 5/5. Any change prompted by a fixture failure must be
+expressed as a general rule, receive positive and negative non-fixture controls, and pass broader
+drug-grouped ablation before the fixture is rerun.
