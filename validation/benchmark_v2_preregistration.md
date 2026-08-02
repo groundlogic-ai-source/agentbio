@@ -78,3 +78,47 @@ with perfect consistency, plus a confirmed leakage gap:
    memorized, it surfaced N of M"). repoDB/DrugCentral chronology is known to be sparse
    and lagged; if too few verifiable cases exist, the attempt and its failure are
    disclosed rather than silently dropped.
+
+## Amendment 2 (2026-08-02, before v2 implementation) — broad evidence architecture, anti-overfit rules
+
+The five archived genuine misses are regression fixtures, not the design population. The
+three-source set that recovers them is explicitly a **minimum recovery set for those five**, not
+the production source ceiling. The production portfolio and source-admission gate are frozen in
+`production_evidence_source_portfolio.md`.
+
+9. **Common evidence ledger and wider mechanism object.** Before adding source wrappers, candidate
+   evidence is represented as provenance-bearing assertions. The mechanism object is a tagged
+   union of protein target, protein family, pathway, mechanism class, phenotype, or pathogen
+   process. This is necessary for antimetabolites, phenotypic drugs, family-target pharmacology,
+   and pathogen-directed drugs which cannot be represented honestly as one drug→human-protein
+   edge.
+10. **Multi-source union candidate generation.** Qualified evidence from ChEMBL, BindingDB,
+    GtoPdb, DrugCentral, regulatory labels, and entity-anchored Europe PMC/PubTator3 may nominate a
+    candidate. PubChem BioAssay, LINCS, pharmacogenomics, phenotype, and pathogen-specific lanes
+    are admitted as they pass the same pre-declared source gate. Candidate generation is a union;
+    one missing database cannot erase a candidate supported by another qualified lane.
+11. **Upstream-lineage de-duplication.** Database appearances are not independent evidence.
+    Assertions are grouped by the underlying assay, paper, label, patent, or trial. A ChEMBL record
+    re-exported by BindingDB or DrugCentral receives one evidence contribution, not three.
+12. **Source- and modality-aware scoring.** The current pChEMBL-shaped composite cannot assign an
+    honest score to a label mechanism, phenotypic assay, pathway mechanism, biologic, or
+    oligonucleotide. Evidence types are calibrated separately; inapplicable features are marked
+    `not_applicable`, never zero. Safety evidence cannot raise efficacy confidence. Human-target,
+    pathogen-target, and non-small-molecule candidates use explicit separate contracts until
+    cross-contract calibration is demonstrated.
+13. **No tuning on the five misses.** The five may test whether known structural gaps remain, but
+    may not set source weights, quality thresholds, query templates, or admission decisions.
+    Calibration uses a broader development corpus grouped by drug, with final benchmark cases and
+    their drug identities held out. Every lane must show incremental value by ablation across
+    mechanism, modality, species, and evidence-sparsity strata; precision loss is disclosed.
+14. **Every lane inherits the retrospective seal and health gate.** Holdout redaction covers
+    names, synonyms, salts, active moieties, source identifiers, labels, papers, and trials across
+    all sources. Source states distinguish healthy-empty, filtered-empty, unavailable, degraded,
+    and parse-failed. No degraded or transient empty payload is cached as biological absence.
+15. **Specialized pathogen and biologic lanes.** Human-only target filtering is retained for human
+    rare-disease targets but is not applied to NTD pathogen mechanisms. Species, strain/life stage,
+    host context, and human-homolog selectivity are explicit. Biologics, enzymes, peptides, and
+    oligonucleotides are not penalized for absent SMILES, pChEMBL, Tanimoto, or Lipinski features.
+
+These changes expand the architecture beyond the original four-item package. They are registered
+before implementation and do not authorize silent additions after benchmark execution begins.

@@ -1,4 +1,4 @@
-# Source-Coverage Matrix — the 5 v1 genuine misses
+# Source-Coverage Matrix — recovery analysis for the 5 v1 genuine misses
 
 **Purpose:** before committing to a v2 multi-lane evidence architecture, prove *empirically*
 which real, licensable data sources actually contain the mechanistic evidence each v1 miss
@@ -31,11 +31,22 @@ research/documentation only — no changes to `agents/`, `data_sources/`, or `ca
   source resolves. GtoPdb returns the wrong receptor (PXR), the label doesn't name GABA-A in
   its extractable MoA text, but anchored literature is overwhelming (1579 hits).
 
-## Minimum source combination that closes all 5
+## Minimum recovery set for these 5 archived misses — not the production ceiling
 
 **GtoPdb + openFDA drug label + Europe PMC (entity-anchored).** Three lanes.
 DrugCentral (REST endpoint was unreliable in testing) and PubChem BioAssay are **not required**
 to close these five — they belong in the "breadth/insurance" tier, not the critical path.
+
+This result answers one narrow diagnostic question: *what is the smallest set of additional
+sources that contains the missing evidence for these five known failures?* It does **not** mean
+that three sources are sufficient for AgentBio's production architecture, nor that sources which
+did not happen to rescue one of these five lack value. Designing the production system around
+only these rows would overfit the benchmark.
+
+The five pairs are henceforth **regression fixtures**: every future candidate-generation
+architecture should continue to recover them, but no source is admitted to scoring merely
+because it helps these five. The broader source portfolio and admission rules are defined in
+`validation/production_evidence_source_portfolio.md`.
 
 ## Two architectural findings that change the v2 data model
 
@@ -65,3 +76,6 @@ to close these five — they belong in the "breadth/insurance" tier, not the cri
   confirmed by GtoPdb + label + literature isn't triple-counted as if independent.
 - Prefer bulk downloads over live APIs for the frozen benchmark run (reproducibility +
   outage-resilience — the ChEMBL outage already killed one run).
+- Calibrate and ablate every additional lane on a broader, drug-grouped corpus. The five known
+  misses may prove regression coverage but may not determine source weights, thresholds, or
+  whether a source is admitted to production scoring.
