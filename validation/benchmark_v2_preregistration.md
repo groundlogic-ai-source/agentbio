@@ -47,3 +47,34 @@ with perfect consistency, plus a confirmed leakage gap:
 - Chance-rate baseline + exact Poisson-binomial p-values recomputed mechanically,
   same method as v1.
 - The threshold-adjacent sensitivity audit (LLM cap-gate bias) runs on v2 results.
+
+## Amendment 1 (2026-08-01, committed before any v2 code) — case list, framing, dry-run, post-cutoff stratum
+
+5. **Screened case list, target n=35–40** (replaces "same 50-case list"). Inclusion
+   criteria are disease/target properties checkable OFFLINE without running the
+   pipeline: (a) disease resolves to a specific, non-umbrella EFO/MONDO term;
+   (b) ≥1 Open Targets genetically-associated target exists; (c) ≥1 considered target
+   has a non-empty ChEMBL pool under the v2 tier definitions. Cases are NEVER selected
+   or excluded based on v1 outcomes — the criteria are property-based and would have
+   excluded v1's error cases regardless of what v1 did. The screen's pass rate on the
+   original 50 (and on the wider repoDB universe) is computed and disclosed.
+6. **Headline framing commitment.** The v2 headline number answers "how good is the
+   ranking core on funnel-feasible diseases," NOT "how likely is a random new disease
+   submission to yield a candidate." Both the screened hit rate AND the funnel-feasibility
+   (screen pass) rate are reported in the same sentence as the headline — not as a
+   footnote. A screened list systematically underrepresents sparse-data, genuinely
+   neglected diseases; that scope limitation is stated plainly.
+7. **Pool-forced diagnostic redefined as a v2-funnel dry-run.** The sensitivity
+   experiment on v1's archived misses is executed THROUGH the actual registered v2
+   code paths (tiered pools with the −0.05/−0.10 penalties, pathway-neighbor
+   augmentation, unchanged deterministic scoring and caps) — not through hand-built
+   "best possible" injections. It therefore tests whether the registered v2 design
+   converts v1's misses into hits before the real v2 run is spent. It runs offline on
+   archived cases, is published as a design-validation sensitivity analysis, and is
+   never conflated with rediscovery results.
+8. **Post-cutoff stratum (attempt, disclosed either way).** We will attempt to find
+   3–5 confirmed repurposing pairs whose confirmation postdates frontier-model training
+   cutoffs, as a separately-labeled sub-analysis ("on cases the model cannot have
+   memorized, it surfaced N of M"). repoDB/DrugCentral chronology is known to be sparse
+   and lagged; if too few verifiable cases exist, the attempt and its failure are
+   disclosed rather than silently dropped.
