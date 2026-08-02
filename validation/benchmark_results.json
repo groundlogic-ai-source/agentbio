@@ -842,6 +842,286 @@
       ],
       "pool_sizes": {},
       "chance_hit_probability": null
+    },
+    {
+      "drug_name": "Vincristine",
+      "disease_name": "Rhabdomyosarcoma",
+      "top_k": 3,
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "TP53",
+        "uniprot_id": "P04637",
+        "ot_association_score": 0.7074
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "TP53",
+          "uniprot_id": "P04637",
+          "ot_association_score": 0.7074
+        },
+        {
+          "target_symbol": "NF1",
+          "uniprot_id": "P21359",
+          "ot_association_score": 0.6526
+        },
+        {
+          "target_symbol": "DICER1",
+          "uniprot_id": "Q9UPY3",
+          "ot_association_score": 0.7803
+        },
+        {
+          "target_symbol": "PAX3",
+          "uniprot_id": "P23760",
+          "ot_association_score": 0.7426
+        },
+        {
+          "target_symbol": "PAX7",
+          "uniprot_id": "P23759",
+          "ot_association_score": 0.6782
+        }
+      ],
+      "n_chemist_candidates": 245,
+      "n_reviewed_candidates": 245,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [
+        {
+          "target_symbol": "TP53",
+          "uniprot_id": "P04637",
+          "ot_association_score": 0.7074,
+          "status": "miss",
+          "n_chemist_candidates": 80,
+          "n_reviewed": 80,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 1
+        },
+        {
+          "target_symbol": "NF1",
+          "uniprot_id": "P21359",
+          "ot_association_score": 0.6526,
+          "status": "miss",
+          "n_chemist_candidates": 87,
+          "n_reviewed": 87,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 2
+        },
+        {
+          "target_symbol": "DICER1",
+          "uniprot_id": "Q9UPY3",
+          "ot_association_score": 0.7803,
+          "status": "miss",
+          "n_chemist_candidates": 78,
+          "n_reviewed": 78,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 3
+        }
+      ],
+      "miss_reason": "'Vincristine' absent across 245 ChEMBL compound(s) drawn from top-3 targets [TP53 (P04637), NF1 (P21359), DICER1 (Q9UPY3)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "interpretation": "MISS \u2014 Vincristine not found in any of the top-3 target pools. 'Vincristine' absent across 245 ChEMBL compound(s) drawn from top-3 targets [TP53 (P04637), NF1 (P21359), DICER1 (Q9UPY3)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null,
+      "subset": "primary",
+      "stratum": "ultra_rare_lt1",
+      "benchmark_mode": "holdout",
+      "holdout_drugs": [
+        "Vincristine"
+      ],
+      "pool_sizes": {
+        "TP53": 21,
+        "NF1": 0,
+        "DICER1": 0
+      },
+      "chance_hit_probability": 1.0
+    },
+    {
+      "drug_name": "Lamotrigine",
+      "disease_name": "Lennox-Gastaut syndrome",
+      "top_k": 3,
+      "status": "miss",
+      "in_universe": true,
+      "selected_target": {
+        "target_symbol": "DNM1",
+        "uniprot_id": "Q05193",
+        "ot_association_score": 0.7735
+      },
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "DNM1",
+          "uniprot_id": "Q05193",
+          "ot_association_score": 0.7735
+        },
+        {
+          "target_symbol": "CA2",
+          "uniprot_id": "P00918",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "CA4",
+          "uniprot_id": "P22748",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "CNR1",
+          "uniprot_id": "P21554",
+          "ot_association_score": 0.9
+        },
+        {
+          "target_symbol": "SCN1A",
+          "uniprot_id": "P35498",
+          "ot_association_score": 0.677
+        },
+        {
+          "target_symbol": "GABRB3",
+          "uniprot_id": "P28472",
+          "ot_association_score": 0.8265
+        },
+        {
+          "target_symbol": "SCN2A",
+          "uniprot_id": "Q99250",
+          "ot_association_score": 0.61
+        },
+        {
+          "target_symbol": "GABRG2",
+          "uniprot_id": "P18507",
+          "ot_association_score": 0.6561
+        }
+      ],
+      "n_chemist_candidates": 165,
+      "n_reviewed_candidates": 165,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [
+        {
+          "target_symbol": "DNM1",
+          "uniprot_id": "Q05193",
+          "ot_association_score": 0.7735,
+          "status": "miss",
+          "n_chemist_candidates": 68,
+          "n_reviewed": 68,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 1
+        },
+        {
+          "target_symbol": "CA2",
+          "uniprot_id": "P00918",
+          "ot_association_score": 0.9,
+          "status": "miss",
+          "n_chemist_candidates": 38,
+          "n_reviewed": 38,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 2
+        },
+        {
+          "target_symbol": "CA4",
+          "uniprot_id": "P22748",
+          "ot_association_score": 0.9,
+          "status": "miss",
+          "n_chemist_candidates": 59,
+          "n_reviewed": 59,
+          "found": false,
+          "rank": null,
+          "composite_score": null,
+          "strong_match": null,
+          "match_method": null,
+          "error": null,
+          "target_rank": 3
+        }
+      ],
+      "miss_reason": "'Lamotrigine' absent across 165 ChEMBL compound(s) drawn from top-3 targets [DNM1 (Q05193), CA2 (P00918), CA4 (P22748)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "interpretation": "MISS \u2014 Lamotrigine not found in any of the top-3 target pools. 'Lamotrigine' absent across 165 ChEMBL compound(s) drawn from top-3 targets [DNM1 (Q05193), CA2 (P00918), CA4 (P22748)]. The Chemist admits only Homo sapiens IC50/Ki at assay confidence \u2265 8 \u2014 the confirmed drug's primary target lies outside these 3 candidates, or it is a biologic/peptide not represented in the small-mol pool.",
+      "audit_rank": null,
+      "audit_status": "absent",
+      "audit_cap": null,
+      "subset": "primary",
+      "stratum": "less_rare_gt10",
+      "benchmark_mode": "holdout",
+      "holdout_drugs": [
+        "Lamotrigine"
+      ],
+      "pool_sizes": {
+        "DNM1": 26,
+        "CA2": 38,
+        "CA4": 59
+      },
+      "chance_hit_probability": 1.0
+    },
+    {
+      "drug_name": "Voglibose",
+      "disease_name": "Gaucher Disease",
+      "top_k": 3,
+      "status": "error",
+      "in_universe": true,
+      "selected_target": null,
+      "candidate_targets_considered": [],
+      "n_chemist_candidates": null,
+      "n_reviewed_candidates": null,
+      "found": false,
+      "rank": null,
+      "recovered_top10": false,
+      "composite_score": null,
+      "strong_match": null,
+      "is_approved_drug": null,
+      "match_method": null,
+      "hit_at_target_rank": null,
+      "hit_target_symbol": null,
+      "hit_target_uniprot": null,
+      "per_target_results": [],
+      "miss_reason": "target_selection failed: HTTPSConnectionPool(host='www.ebi.ac.uk', port=443): Read timed out. (read timeout=30)",
+      "interpretation": "Target selection error.",
+      "audit_rank": null,
+      "audit_status": null,
+      "audit_cap": null,
+      "subset": "primary",
+      "stratum": "rare_1_10",
+      "benchmark_mode": "holdout",
+      "holdout_drugs": [
+        "Voglibose"
+      ],
+      "pool_sizes": {},
+      "chance_hit_probability": null
     }
   ]
 }
