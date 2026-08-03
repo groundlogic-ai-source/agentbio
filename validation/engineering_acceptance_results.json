@@ -1,0 +1,540 @@
+{
+  "label": "engineering_acceptance",
+  "generated_at": "2026-08-03T00:32:17",
+  "fingerprint": "8bf3f0abb56bd5736a422c86b1b872e3c5a94acbe3c73d579538873b9a66523f",
+  "target_cap": 10,
+  "top_n": 10,
+  "strong_match_threshold": 0.7,
+  "cases": [
+    {
+      "label": "engineering_acceptance",
+      "drug_name": "Phenobarbital",
+      "disease_name": "Lennox-Gastaut syndrome",
+      "target_cap": 10,
+      "in_universe": true,
+      "status": "hit",
+      "candidate_targets_considered": [
+        {
+          "target_symbol": "DNM1",
+          "uniprot_id": "Q05193",
+          "ot_association_score": 0.7735,
+          "target_discovery_method": "genetic_association"
+        },
+        {
+          "target_symbol": "CA2",
+          "uniprot_id": "P00918",
+          "ot_association_score": 0.9,
+          "target_discovery_method": "pharmacological_precedent"
+        },
+        {
+          "target_symbol": "CA4",
+          "uniprot_id": "P22748",
+          "ot_association_score": 0.9,
+          "target_discovery_method": "pharmacological_precedent"
+        },
+        {
+          "target_symbol": "CNR1",
+          "uniprot_id": "P21554",
+          "ot_association_score": 0.9,
+          "target_discovery_method": "pharmacological_precedent"
+        },
+        {
+          "target_symbol": "SCN1A",
+          "uniprot_id": "P35498",
+          "ot_association_score": 0.677,
+          "target_discovery_method": "genetic_association"
+        },
+        {
+          "target_symbol": "GABRB3",
+          "uniprot_id": "P28472",
+          "ot_association_score": 0.8265,
+          "target_discovery_method": "genetic_association"
+        },
+        {
+          "target_symbol": "SCN2A",
+          "uniprot_id": "Q99250",
+          "ot_association_score": 0.61,
+          "target_discovery_method": "genetic_association"
+        },
+        {
+          "target_symbol": "GABRA1",
+          "uniprot_id": "P14867",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class"
+        },
+        {
+          "target_symbol": "GABRG2",
+          "uniprot_id": "P18507",
+          "ot_association_score": 0.6561,
+          "target_discovery_method": "genetic_association"
+        }
+      ],
+      "n_targets_run": 9,
+      "generated": true,
+      "mechanistically_valid": true,
+      "mechanistic_validity_detail": {
+        "mechanistically_valid": true,
+        "reason": "15 qualified record(s); efficacy_confidence=0.75; direction compatible",
+        "qualified_evidence_count": 15,
+        "efficacy_confidence": 0.75,
+        "direction_compatible": true,
+        "name_mention_only": false
+      },
+      "rank": 217,
+      "total_candidates": 223,
+      "top10": false,
+      "strong_match": false,
+      "match_method": "inchikey_block",
+      "generated_by_target": {
+        "target_symbol": "GABRA1",
+        "uniprot_id": "P14867",
+        "target_rank": 8,
+        "target_discovery_method": "literature_mechanism_class"
+      },
+      "therapeutic_role": "symptom_treatment",
+      "mechanism_class": "inhibitory_neurotransmission_gaba_a",
+      "process_memberships": [
+        {
+          "target_symbol": "GABRA1",
+          "uniprot_id": "P14867|P18507|P47870",
+          "target_discovery_method": "",
+          "mechanism_class": "inhibitory_neurotransmission_gaba_a",
+          "therapeutic_role": "symptom_treatment",
+          "process_support": [
+            {
+              "pmid": "41106086",
+              "pmcid": null,
+              "title": "Cenobamate in pediatric epilepsy and developmental and epileptic encephalopathies: Efficacy, safety, and syndrome-specific considerations.",
+              "excerpt": "<h4>Background</h4>Cenobamate, a dual-mechanism antiseizure medication with sodium channel and GABA-A receptor activity, has demonstrated superior efficacy in adult focal epilepsy but remains understudied in pediatric populations and developmental and epileptic encephalopathies (DEEs). This comprehensive narrative review synthesized available evidence from 27 studies examining cenobamate use in pe",
+              "evidence_sentence": "cenobamate a dual mechanism antiseizure medication with sodium channel and gaba a receptor activity has demonstrated superior efficacy in adult focal epilepsy but remains understudied in pediatric populations and developmental and epileptic encephalopathies dees"
+            },
+            {
+              "pmid": "40787618",
+              "pmcid": "PMC12335233",
+              "title": "Novel Medication Ganaxolone for Seizure Disorders.",
+              "excerpt": "Ganaxolone, a neuroactive steroid that increases GABAergic inhibition, has been tested in many trials for the resolution of different epileptic disorders. Based on these, our study implemented a systematic review to evaluate the general benefit of ganaxolone for seizures. Pubmed, google scholar, European PubMed Central, Cochrane Library, and U.S. National Library of Medicine Clinical Trials were s",
+              "evidence_sentence": "ganaxolone a neuroactive steroid that increases gabaergic inhibition has been tested in many trials for the resolution of different epileptic disorders"
+            },
+            {
+              "pmid": "39008349",
+              "pmcid": null,
+              "title": "Progress report on new medications for seizures and epilepsy: A summary of the 17th Eilat Conference on New Antiepileptic Drugs and Devices (EILAT XVII). I. Drugs in preclinical and early clinical development.",
+              "excerpt": "For >30\u2009years, the Eilat Conference on New Antiepileptic Drugs and Devices has provided a forum for the discussion of advances in the development of new therapies for seizures and epilepsy. The EILAT XVII conference took place in Madrid, Spain, on May 5-8, 2024. Participants included basic scientists and clinical investigators from industry and academia, other health care professionals, and repres",
+              "evidence_sentence": "1 1 channel density in inhibitory \u03b3 aminobutyric acidergic gabaergic neurons in development for the treatment of scn1a positive dravet syndrome"
+            },
+            {
+              "pmid": "36556407",
+              "pmcid": "PMC9786817",
+              "title": "GABAergic Neurotransmission in Human Tissues Is Modulated by Cannabidiol.",
+              "excerpt": "Recently, the potential use of phytocannabinoids (pCBs) to treat different pathological conditions has attracted great attention in the scientific community. Among the different pCBs, cannabidiol (CBD) has showed interesting biological properties, making it a promising molecule with a high security profile that has been approved for treatment as an add-on therapy in patients afflicted by severe ph",
+              "evidence_sentence": "gabaergic neurotransmission in human tissues is modulated by cannabidiol"
+            },
+            {
+              "pmid": "37064578",
+              "pmcid": "PMC10103690",
+              "title": "Cenobamate in Generalized Epilepsy and Combined Generalized and Focal Epilepsy.",
+              "excerpt": "<h4>Background and objectives</h4>Cenobamate (CNB) is a United States Food and Drug Administration-approved antiseizure medication (ASM) for focal-onset seizures; however, its potential clinical effectiveness as a broad-spectrum ASM is not established. CNB has a proposed dual mechanism of action with preferential blockade of persistent sodium currents and positive allosteric modulation of the \u03b3-am",
+              "evidence_sentence": "cnb has a proposed dual mechanism of action with preferential blockade of persistent sodium currents and positive allosteric modulation of the \u03b3 aminobutyric acid a gaba a receptor"
+            },
+            {
+              "pmid": "36077081",
+              "pmcid": "PMC9456057",
+              "title": "Variable Expression of GABAA Receptor Subunit Gamma 2 Mutation in a Nuclear Family Displaying Developmental and Encephalopathic Phenotype.",
+              "excerpt": "Mutations in GABA<sub>A</sub> receptor subunit genes (<i>GABRs</i>) are a major etiology for developmental and epileptic encephalopathies (DEEs). This article reports a case of a genetic abnormality in <i>GABRG2</i> and updates the pathophysiology and treatment development for mutations in DEEs based on recent advances. Mutations in <i>GABRs</i>, especially in <i>GABRA1</i>, <i>GABRB2</i>, <i>GABR",
+              "evidence_sentence": "impair gabaergic signaling and are frequently associated with dees such as dravet syndrome and lennox gastaut syndrome as gabaergic signaling is critical for early brain development"
+            }
+          ],
+          "process_source_status": "ok"
+        },
+        {
+          "target_symbol": "GABRA1|GABRG2|GABRB2",
+          "uniprot_id": "P14867|P18507|P47870",
+          "target_discovery_method": "",
+          "mechanism_class": "inhibitory_neurotransmission_gaba_a",
+          "therapeutic_role": "symptom_treatment",
+          "process_support": [
+            {
+              "pmid": "41106086",
+              "pmcid": null,
+              "title": "Cenobamate in pediatric epilepsy and developmental and epileptic encephalopathies: Efficacy, safety, and syndrome-specific considerations.",
+              "excerpt": "<h4>Background</h4>Cenobamate, a dual-mechanism antiseizure medication with sodium channel and GABA-A receptor activity, has demonstrated superior efficacy in adult focal epilepsy but remains understudied in pediatric populations and developmental and epileptic encephalopathies (DEEs). This comprehensive narrative review synthesized available evidence from 27 studies examining cenobamate use in pe",
+              "evidence_sentence": "cenobamate a dual mechanism antiseizure medication with sodium channel and gaba a receptor activity has demonstrated superior efficacy in adult focal epilepsy but remains understudied in pediatric populations and developmental and epileptic encephalopathies dees"
+            },
+            {
+              "pmid": "40787618",
+              "pmcid": "PMC12335233",
+              "title": "Novel Medication Ganaxolone for Seizure Disorders.",
+              "excerpt": "Ganaxolone, a neuroactive steroid that increases GABAergic inhibition, has been tested in many trials for the resolution of different epileptic disorders. Based on these, our study implemented a systematic review to evaluate the general benefit of ganaxolone for seizures. Pubmed, google scholar, European PubMed Central, Cochrane Library, and U.S. National Library of Medicine Clinical Trials were s",
+              "evidence_sentence": "ganaxolone a neuroactive steroid that increases gabaergic inhibition has been tested in many trials for the resolution of different epileptic disorders"
+            },
+            {
+              "pmid": "39008349",
+              "pmcid": null,
+              "title": "Progress report on new medications for seizures and epilepsy: A summary of the 17th Eilat Conference on New Antiepileptic Drugs and Devices (EILAT XVII). I. Drugs in preclinical and early clinical development.",
+              "excerpt": "For >30\u2009years, the Eilat Conference on New Antiepileptic Drugs and Devices has provided a forum for the discussion of advances in the development of new therapies for seizures and epilepsy. The EILAT XVII conference took place in Madrid, Spain, on May 5-8, 2024. Participants included basic scientists and clinical investigators from industry and academia, other health care professionals, and repres",
+              "evidence_sentence": "1 1 channel density in inhibitory \u03b3 aminobutyric acidergic gabaergic neurons in development for the treatment of scn1a positive dravet syndrome"
+            },
+            {
+              "pmid": "36556407",
+              "pmcid": "PMC9786817",
+              "title": "GABAergic Neurotransmission in Human Tissues Is Modulated by Cannabidiol.",
+              "excerpt": "Recently, the potential use of phytocannabinoids (pCBs) to treat different pathological conditions has attracted great attention in the scientific community. Among the different pCBs, cannabidiol (CBD) has showed interesting biological properties, making it a promising molecule with a high security profile that has been approved for treatment as an add-on therapy in patients afflicted by severe ph",
+              "evidence_sentence": "gabaergic neurotransmission in human tissues is modulated by cannabidiol"
+            },
+            {
+              "pmid": "37064578",
+              "pmcid": "PMC10103690",
+              "title": "Cenobamate in Generalized Epilepsy and Combined Generalized and Focal Epilepsy.",
+              "excerpt": "<h4>Background and objectives</h4>Cenobamate (CNB) is a United States Food and Drug Administration-approved antiseizure medication (ASM) for focal-onset seizures; however, its potential clinical effectiveness as a broad-spectrum ASM is not established. CNB has a proposed dual mechanism of action with preferential blockade of persistent sodium currents and positive allosteric modulation of the \u03b3-am",
+              "evidence_sentence": "cnb has a proposed dual mechanism of action with preferential blockade of persistent sodium currents and positive allosteric modulation of the \u03b3 aminobutyric acid a gaba a receptor"
+            },
+            {
+              "pmid": "36077081",
+              "pmcid": "PMC9456057",
+              "title": "Variable Expression of GABAA Receptor Subunit Gamma 2 Mutation in a Nuclear Family Displaying Developmental and Encephalopathic Phenotype.",
+              "excerpt": "Mutations in GABA<sub>A</sub> receptor subunit genes (<i>GABRs</i>) are a major etiology for developmental and epileptic encephalopathies (DEEs). This article reports a case of a genetic abnormality in <i>GABRG2</i> and updates the pathophysiology and treatment development for mutations in DEEs based on recent advances. Mutations in <i>GABRs</i>, especially in <i>GABRA1</i>, <i>GABRB2</i>, <i>GABR",
+              "evidence_sentence": "impair gabaergic signaling and are frequently associated with dees such as dravet syndrome and lennox gastaut syndrome as gabaergic signaling is critical for early brain development"
+            }
+          ],
+          "process_source_status": "ok"
+        }
+      ],
+      "trials_holdout_redacted": true,
+      "score_components": {
+        "normalized_pchembl": 0.0,
+        "confidence_term": 0.0,
+        "efficacy_evidence": 0.75,
+        "efficacy_evidence_source": "multisource_ledger",
+        "normalized_ot_association": 0.6561,
+        "normalized_tanimoto": 0.0,
+        "no_failed_trial": 0
+      },
+      "source_providers": [
+        "drugcentral",
+        "europepmc"
+      ],
+      "source_lineages": [
+        "explicit:assay:163724|t=p14867|p18507|p47870|m=",
+        "explicit:fact:mol=ddbrepkuvsbgfi|t=p14867|p18507|p47870|role=approval|st=regulatory_approval|mt=phase|dis=lennox-gastaut syndrome",
+        "explicit:fact:mol=ddbrepkuvsbgfi|t=p14867|role=disease_link|st=genetic_association|mt=ot_association|dis=lennox-gastaut syndrome",
+        "explicit:fact:mol=ddbrepkuvsbgfi|t=p18507|role=disease_link|st=genetic_association|mt=ot_association|dis=lennox-gastaut syndrome",
+        "explicit:pub:36077081|t=p14867|role=disease_link",
+        "explicit:pub:36077081|t=p18507|role=disease_link",
+        "explicit:pub:36556407|t=p14867|role=disease_link",
+        "explicit:pub:36556407|t=p18507|role=disease_link",
+        "explicit:pub:37064578|t=p14867|role=disease_link",
+        "explicit:pub:37064578|t=p18507|role=disease_link",
+        "explicit:pub:39008349|t=p14867|role=disease_link",
+        "explicit:pub:39008349|t=p18507|role=disease_link",
+        "explicit:pub:40787618|t=p14867|role=disease_link",
+        "explicit:pub:40787618|t=p18507|role=disease_link",
+        "explicit:pub:41106086|t=p14867|role=disease_link",
+        "explicit:pub:41106086|t=p18507|role=disease_link"
+      ],
+      "source_health": {
+        "gtopdb": true,
+        "drugcentral": true,
+        "chembl": true,
+        "europepmc": true
+      },
+      "holdout_active": true,
+      "holdout_drugs": [
+        "Phenobarbital"
+      ],
+      "holdout_unresolved": null,
+      "per_target_results": [
+        {
+          "target_symbol": "DNM1",
+          "uniprot_id": "Q05193",
+          "ot_association_score": 0.7735,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 1,
+          "n_reviewed": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "rank_in_target": null,
+          "match_method": null
+        },
+        {
+          "target_symbol": "CA2",
+          "uniprot_id": "P00918",
+          "ot_association_score": 0.9,
+          "target_discovery_method": "pharmacological_precedent",
+          "status": "ok",
+          "n_chemist_candidates": 43,
+          "n_reviewed": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "rank_in_target": null,
+          "match_method": null
+        },
+        {
+          "target_symbol": "CA4",
+          "uniprot_id": "P22748",
+          "ot_association_score": 0.9,
+          "target_discovery_method": "pharmacological_precedent",
+          "status": "ok",
+          "n_chemist_candidates": 38,
+          "n_reviewed": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "rank_in_target": null,
+          "match_method": null
+        },
+        {
+          "target_symbol": "CNR1",
+          "uniprot_id": "P21554",
+          "ot_association_score": 0.9,
+          "target_discovery_method": "pharmacological_precedent",
+          "status": "ok",
+          "n_chemist_candidates": 12,
+          "n_reviewed": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "rank_in_target": null,
+          "match_method": null
+        },
+        {
+          "target_symbol": "SCN1A",
+          "uniprot_id": "P35498",
+          "ot_association_score": 0.677,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 91,
+          "n_reviewed": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "rank_in_target": null,
+          "match_method": null
+        },
+        {
+          "target_symbol": "GABRB3",
+          "uniprot_id": "P28472",
+          "ot_association_score": 0.8265,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 56,
+          "n_reviewed": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "rank_in_target": null,
+          "match_method": null
+        },
+        {
+          "target_symbol": "SCN2A",
+          "uniprot_id": "Q99250",
+          "ot_association_score": 0.61,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 58,
+          "n_reviewed": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "rank_in_target": null,
+          "match_method": null
+        },
+        {
+          "target_symbol": "GABRA1",
+          "uniprot_id": "P14867",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 54,
+          "n_reviewed": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": true,
+          "rank_in_target": null,
+          "match_method": "name"
+        },
+        {
+          "target_symbol": "GABRG2",
+          "uniprot_id": "P18507",
+          "ot_association_score": 0.6561,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 70,
+          "n_reviewed": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": true,
+          "rank_in_target": null,
+          "match_method": "name"
+        }
+      ],
+      "error": null
+    }
+  ]
+}

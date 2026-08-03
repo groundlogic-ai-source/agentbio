@@ -45,6 +45,7 @@ from typing import Any
 from openai import OpenAI
 
 from cache.cache import get, set as cache_set, make_key
+from data_sources import holdout
 
 VERDICT_INCOMPATIBLE = "DIRECTIONALLY_INCOMPATIBLE"
 VERDICT_COMPATIBLE   = "DIRECTIONALLY_COMPATIBLE"
@@ -54,6 +55,11 @@ _NO_INFO_TEXT = (
     "Mechanism-direction check found insufficient information to classify "
     "compatibility; this does not confirm the candidate is directionally compatible."
 )
+
+# Direction evidence is a bounded gate. If the AI service is unavailable, the
+# existing exception path returns INSUFFICIENT_INFO and applies no score cap.
+_AI_TIMEOUT_SECONDS = 60.0
+_AI_MAX_RETRIES = 0
 
 # Known pharmaceutical safety-screening targets.
 # Companies routinely measure IC50/Ki of drug candidates against these proteins
@@ -79,7 +85,12 @@ def _openai_client() -> OpenAI | None:
     api_key  = os.environ.get("AI_INTEGRATIONS_OPENAI_API_KEY")
     if not base_url or not api_key:
         return None
-    return OpenAI(base_url=base_url, api_key=api_key)
+    return OpenAI(
+        base_url=base_url,
+        api_key=api_key,
+        timeout=_AI_TIMEOUT_SECONDS,
+        max_retries=_AI_MAX_RETRIES,
+    )
 
 
 def check_mechanism_direction(
@@ -88,6 +99,8 @@ def check_mechanism_direction(
     action_type: str | None,
     mechanism_of_action: str | None,
     disease_name: str,
+    candidate_chembl_ids: list[str] | None = None,
+    candidate_inchikey: str | None = None,
 ) -> dict[str, Any]:
     """
     Two-step mechanism-direction compatibility check using OpenAI.
@@ -127,9 +140,19 @@ def check_mechanism_direction(
       }
     Cached 30 days on success, 1 day on error/skip.
     """
+    heldout_mode = holdout.is_active() and (
+        holdout.matches_name(drug_name)
+        or any(
+            holdout.matches_molecule(molecule_id)
+            for molecule_id in (candidate_chembl_ids or [])
+            if molecule_id
+        )
+        or holdout.matches_inchikey(candidate_inchikey)
+    )
     cache_key = make_key(
-        "mechanism_direction_v4",
-        drug_name, target_symbol, disease_name,
+        "mechanism_direction_v5",
+        "heldout_candidate" if heldout_mode else drug_name,
+        target_symbol, disease_name,
         action_type or "", mechanism_of_action or "",
     )
     cached = get(cache_key)
@@ -175,6 +198,9 @@ def check_mechanism_direction(
         # For known DILI/safety-screening targets, add a fourth question that
         # asks the LLM to assess whether the ChEMBL activity record likely comes
         # from a pharmaceutical safety screen rather than a therapeutic-intent assay.
+        candidate_label = (
+            "the held-out candidate" if heldout_mode else f"the drug {drug_name!r}"
+        )
         dili_question = ""
         if target_symbol.upper() in _DILI_SAFETY_SCREEN_TARGETS:
             dili_question = (
@@ -184,7 +210,7 @@ def check_mechanism_direction(
                 f"candidate drugs against {target_symbol!r} to detect liver or "
                 f"cardiac toxicity risk BEFORE regulatory submission — NOT to find "
                 f"treatments for diseases caused by {target_symbol!r} dysfunction. "
-                f"Does the literature indicate whether {drug_name!r}'s activity "
+                f"Does the literature indicate whether {candidate_label}'s activity "
                 f"against {target_symbol!r} comes from a DILI/safety screening "
                 f"context (recording a toxicity liability) or from a genuine "
                 f"therapeutic-intent study for {disease_name!r}? "
@@ -195,12 +221,20 @@ def check_mechanism_direction(
                 f"DIRECTIONALLY_INCOMPATIBLE."
             )
 
+        clinical_use_question = "" if heldout_mode else (
+            f"\n\n3. CLINICAL USE ANCHOR: Is {drug_name!r} (or a closely related "
+            f"compound in the same class) known to be an approved, investigational, "
+            f"or experimentally validated treatment for {disease_name!r} or a "
+            f"disease caused by dysfunction of {target_symbol!r}? "
+            f"If yes, what is the confirmed clinical mechanism through "
+            f"{target_symbol!r}? Cite sources."
+        )
         search_query = (
-            f"Context: The drug {drug_name!r} has IC50/Ki bioactivity against "
+            f"Context: {candidate_label} has target-first pharmacology against "
             f"the protein target {target_symbol!r} (gene symbol) in ChEMBL assay "
             f"data and is being evaluated as a repurposing candidate for "
             f"{disease_name!r}.\n\n"
-            f"ChEMBL pharmacological class of {drug_name!r}: "
+            f"Target-specific pharmacological action: "
             f"action_type={action_desc!r}, "
             f"mechanism_of_action={moa_desc!r}.\n\n"
             f"Please answer all questions with cited sources:\n\n"
@@ -208,18 +242,13 @@ def check_mechanism_direction(
             f"in {disease_name!r}?  Is {target_symbol!r} DEFICIENT (lost/reduced "
             f"function) or OVERACTIVE (gained/elevated function) in this disease? "
             f"Cite the primary molecular mechanism.\n\n"
-            f"2. TARGET-SPECIFIC DIRECTION: Given {drug_name!r} has "
+            f"2. TARGET-SPECIFIC DIRECTION: Given {candidate_label} has "
             f"{action_desc!r} activity specifically against {target_symbol!r}, "
             f"would this drug's direct action ON {target_symbol!r} correct, "
             f"compensate for, or WORSEN the disease defect described in (1)? "
             f"Focus only on the drug's effect on {target_symbol!r} itself — "
-            f"not on any indirect downstream consequences through other proteins.\n\n"
-            f"3. CLINICAL USE ANCHOR: Is {drug_name!r} (or a closely related "
-            f"compound in the same class) known to be an approved, investigational, "
-            f"or experimentally validated treatment for {disease_name!r} or a "
-            f"disease caused by dysfunction of {target_symbol!r}? "
-            f"If yes, what is the confirmed clinical mechanism through "
-            f"{target_symbol!r}? Cite sources."
+            f"not on any indirect downstream consequences through other proteins."
+            f"{clinical_use_question}"
             f"{dili_question}"
         )
         search_response = client.responses.create(
@@ -241,9 +270,14 @@ def check_mechanism_direction(
         # target_symbol worsens the disease.  Complex mechanisms, indirect
         # effects, or multi-protein complexes → INSUFFICIENT_INFO (fail-open).
         # Clinical use anchor: approved/investigational status → COMPATIBLE.
+        clinical_compatibility_rule = "" if heldout_mode else (
+            f"    (a) The retrieved text shows {drug_name!r} or a closely related "
+            f"compound IS an approved or experimentally validated treatment for "
+            f"{disease_name!r} or a disease caused by {target_symbol!r} dysfunction.\n"
+        )
         classification_prompt = (
             f"CONTEXT:\n"
-            f"  Drug: {drug_name!r}\n"
+            f"  Candidate: {candidate_label}\n"
             f"  Bioactivity target: {target_symbol!r}\n"
             f"    (drug was identified as a candidate because it has IC50/Ki "
             f"activity against {target_symbol!r} in ChEMBL assays)\n"
@@ -253,14 +287,12 @@ def check_mechanism_direction(
             f"RETRIEVED EVIDENCE:\n"
             f"---\n{search_text}\n---\n\n"
             f"CLASSIFICATION TASK:\n"
-            f"Classify whether {drug_name!r}'s action ON {target_symbol!r} is "
+            f"Classify whether {candidate_label}'s action ON {target_symbol!r} is "
             f"directionally compatible with {disease_name!r}.\n\n"
             f"Verdict rules (apply in priority order):\n\n"
             f"  PRIORITY 1 — DIRECTIONALLY_COMPATIBLE:\n"
             f"    Apply if ANY of the following is true:\n"
-            f"    (a) The retrieved text shows {drug_name!r} or a closely related "
-            f"compound IS an approved or experimentally validated treatment for "
-            f"{disease_name!r} or a disease caused by {target_symbol!r} dysfunction.\n"
+            f"{clinical_compatibility_rule}"
             f"    (b) The drug's action on {target_symbol!r} clearly corrects or "
             f"compensates for the primary disease defect in the retrieved text.\n\n"
             f"  PRIORITY 2 — DIRECTIONALLY_INCOMPATIBLE:\n"

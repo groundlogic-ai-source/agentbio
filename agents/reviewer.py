@@ -19,6 +19,7 @@ Output: output/reviewed_candidates.json
 import json
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Optional
 
 from rdkit import Chem, DataStructs
@@ -54,12 +55,15 @@ from data_sources.clinicaltrials import check_prior_trials
 from data_sources.chembl import get_molecule_safety_flags, get_drug_action_type
 from data_sources.safety_check import web_safety_check
 from data_sources.mechanism_direction import check_mechanism_direction
+from data_sources import holdout as _holdout
 from data_sources.pubchem import get_compound_data
 
 # ---- Auditable scoring constants (edit here to adjust the policy) -------------
 COMPOSITE_WEIGHTS: dict[str, float] = {
-    "pchembl": 0.30,          # _norm_pchembl(pchembl_value) — fixed range [3.0, 10.0]
-    "confidence": 0.20,       # confidence_score / 9
+    # v2: one modality-aware pharmacology term.  For legacy candidates with no
+    # evidence ledger this is reconstructed as 0.6*pChEMBL + 0.4*assay
+    # confidence, preserving the old 0.30 + 0.20 contribution exactly.
+    "efficacy_evidence": 0.50,
     "ot_association": 0.20,   # ot_association_score direct [0, 1] — no pool normalization
     "tanimoto": 0.15,         # tanimoto_score direct [0, 1] — no pool normalization
     "no_failed_trial": 0.15,  # 1 if no prior failed trial and query succeeded; 0 otherwise
@@ -99,6 +103,7 @@ MAX_MECHANISM_DIRECTION_CANDIDATES = 3
 # Layer 2 (web-search) only runs on this many top candidates to mirror the
 # Boltz validation scope and keep LLM call costs bounded.
 MAX_SAFETY_LAYER2_CANDIDATES = 3
+MAX_REVIEWER_PREFETCH_WORKERS_PER_SOURCE = 8
 # -----------------------------------------------------------------------------
 
 
@@ -159,6 +164,110 @@ def _descriptors(smiles: Optional[str]) -> dict[str, Any]:
     return out
 
 
+def _candidate_chembl_ids(candidate: dict[str, Any]) -> list[str]:
+    """Return only provider-qualified ChEMBL molecule IDs for a candidate."""
+    ids: set[str] = set()
+    direct = str(candidate.get("molecule_chembl_id") or "").strip()
+    if direct.upper().startswith("CHEMBL"):
+        ids.add(direct)
+    records = (candidate.get("_evidence_ledger") or {}).get("records", [])
+    for record in records:
+        if str(record.get("provider") or "").lower() != "chembl":
+            continue
+        molecule_id = str(record.get("molecule_id") or "").strip()
+        if molecule_id.upper().startswith("CHEMBL"):
+            ids.add(molecule_id)
+    return sorted(ids)
+
+
+def _candidate_is_heldout(candidate: dict[str, Any]) -> bool:
+    """Match held-out identity by name, structure, or ChEMBL salt family."""
+    if not _holdout.is_active():
+        return False
+    if _holdout.matches_name(candidate.get("drug_name") or ""):
+        return True
+    if _holdout.matches_inchikey(candidate.get("inchikey")):
+        return True
+    return any(
+        _holdout.matches_molecule(molecule_id)
+        for molecule_id in _candidate_chembl_ids(candidate)
+    )
+
+
+def _prefetch_candidate_context(
+    candidates: list[dict[str, Any]],
+    disease: str,
+) -> list[dict[str, Any]]:
+    """Fetch four source lanes concurrently and preserve candidate order.
+
+    Each provider gets its own bounded pool.  A slow or rate-limited provider
+    therefore cannot serialize the other three lanes, while no provider sees
+    more than ``MAX_REVIEWER_PREFETCH_WORKERS_PER_SOURCE`` concurrent calls.
+    ``executor.map`` preserves input order and propagates source exceptions.
+    """
+    if not candidates:
+        return []
+    workers = min(MAX_REVIEWER_PREFETCH_WORKERS_PER_SOURCE, len(candidates))
+    drugs = [candidate["drug_name"] for candidate in candidates]
+    chembl_ids = [_candidate_chembl_ids(candidate) for candidate in candidates]
+
+    def fetch_trials(item: tuple[str, list[str], str | None]) -> dict[str, Any]:
+        drug, ids, inchikey = item
+        return check_prior_trials(
+            drug,
+            disease,
+            candidate_chembl_ids=ids,
+            candidate_inchikey=inchikey,
+        )
+
+    def fetch_safety(item: tuple[str, list[str]]) -> dict[str, Any]:
+        drug, ids = item
+        return get_molecule_safety_flags(
+            drug, ids[0] if ids else None
+        )
+
+    with ThreadPoolExecutor(max_workers=workers) as adverse_pool, \
+            ThreadPoolExecutor(max_workers=workers) as trials_pool, \
+            ThreadPoolExecutor(max_workers=workers) as pubchem_pool, \
+            ThreadPoolExecutor(max_workers=workers) as safety_pool:
+        # Submit every lane before awaiting any lane, so provider latency
+        # overlaps across all four independent sources.
+        adverse_iter = adverse_pool.map(get_adverse_events, drugs)
+        trials_iter = trials_pool.map(
+            fetch_trials,
+            zip(
+                drugs,
+                chembl_ids,
+                [candidate.get("inchikey") for candidate in candidates],
+            ),
+        )
+        pubchem_iter = pubchem_pool.map(get_compound_data, drugs)
+        safety_iter = safety_pool.map(
+            fetch_safety, zip(drugs, chembl_ids)
+        )
+        adverse = list(adverse_iter)
+        trials = list(trials_iter)
+        pubchem = list(pubchem_iter)
+        safety = list(safety_iter)
+
+    return [
+        {
+            "adverse": adverse[index],
+            "trials": trials[index],
+            "pubchem": pubchem[index],
+            "safety_layer1": safety[index],
+        }
+        for index in range(len(candidates))
+    ]
+
+
+def _no_failed_trial_credit(trials: dict[str, Any]) -> bool:
+    """Fail closed when trial evidence is unavailable or holdout-redacted."""
+    if trials.get("query_failed") or trials.get("holdout_redacted"):
+        return False
+    return not trials.get("has_negative_repurposing_result", False)
+
+
 def run_reviewer(chemist_output: dict[str, Any],
                  biologist_output: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
     candidates = chemist_output.get("candidates", [])
@@ -179,19 +288,26 @@ def run_reviewer(chemist_output: dict[str, Any],
     counted_sources: set[tuple[str, str]] = set()  # for cross-candidate dedup
     prov_entries: list[dict[str, Any]] = []
     reviewed: list[dict[str, Any]] = []
+    prefetched = _prefetch_candidate_context(candidates, disease)
 
-    for c in candidates:
+    for c, context in zip(candidates, prefetched):
         desc = _descriptors(c.get("smiles"))
-        adverse = get_adverse_events(c["drug_name"])
-        trials = check_prior_trials(c["drug_name"], disease)
-        # Fail-closed: if the ClinicalTrials API was unreachable, do NOT award
-        # the no-failed-trial credit — we cannot verify the claim.
-        if trials.get("query_failed"):
-            no_failed_trial = False
-            print(f"[reviewer] ClinicalTrials query failed for {c['drug_name']} / {disease} "
-                  f"— withholding no_failed_trial credit (fail-closed)")
-        else:
-            no_failed_trial = not trials.get("has_negative_repurposing_result", False)
+        adverse = context["adverse"]
+        trials = context["trials"]
+        # Fail-closed: unavailable OR holdout-redacted trial evidence cannot
+        # establish the absence of a failed prior trial.
+        no_failed_trial = _no_failed_trial_credit(trials)
+        if trials.get("query_failed") or trials.get("holdout_redacted"):
+            reason = (
+                "holdout-redacted"
+                if trials.get("holdout_redacted")
+                else "query failed"
+            )
+            print(
+                f"[reviewer] ClinicalTrials {reason} for "
+                f"{c['drug_name']} / {disease} — withholding "
+                "no_failed_trial credit (fail-closed)"
+            )
 
         n_pchembl = _norm_pchembl(c.get("pchembl_value"))
         # Tanimoto is inherently [0, 1]; use directly without pool normalization.
@@ -199,10 +315,17 @@ def run_reviewer(chemist_output: dict[str, Any],
         # OT association score is inherently [0, 1]; use directly.
         n_ot = float(c.get("ot_association_score") or 0.0)
         conf = c.get("confidence_score") or 0
+        legacy_evidence = 0.6 * n_pchembl + 0.4 * (conf / 9)
+        ledger_evidence = c.get("efficacy_confidence")
+        n_efficacy_evidence = (
+            float(ledger_evidence)
+            if ledger_evidence is not None
+            else legacy_evidence
+        )
+        n_efficacy_evidence = max(0.0, min(1.0, n_efficacy_evidence))
 
         composite = (
-            COMPOSITE_WEIGHTS["pchembl"] * n_pchembl
-            + COMPOSITE_WEIGHTS["confidence"] * (conf / 9)
+            COMPOSITE_WEIGHTS["efficacy_evidence"] * n_efficacy_evidence
             + COMPOSITE_WEIGHTS["ot_association"] * n_ot
             + COMPOSITE_WEIGHTS["tanimoto"] * n_tanimoto
             + COMPOSITE_WEIGHTS["no_failed_trial"] * (1 if no_failed_trial else 0)
@@ -260,7 +383,7 @@ def run_reviewer(chemist_output: dict[str, Any],
         # associated with 0.426x odds of repurposing success (Fisher p = 3e-9,
         # holdout-confirmed p = 0.009). Disclosure only — does NOT affect scoring.
         HIGH_XLOGP_THRESHOLD = 5.0
-        _pc = get_compound_data(c["drug_name"])
+        _pc = context["pubchem"]
         _pubchem_xlogp: Optional[float] = _pc.get("xlogp")
         _high_lipophilicity_flag: bool = (
             _pubchem_xlogp is not None and _pubchem_xlogp >= HIGH_XLOGP_THRESHOLD
@@ -274,6 +397,7 @@ def run_reviewer(chemist_output: dict[str, Any],
             "smiles": c.get("smiles"),
             "pchembl_value": c.get("pchembl_value"),
             "confidence_score": c.get("confidence_score"),
+            "efficacy_confidence": c.get("efficacy_confidence"),
             "ot_association_score": c.get("ot_association_score"),
             "tanimoto_score": c.get("tanimoto_score"),
             "most_similar_approved_drug": c.get("most_similar_approved_drug"),
@@ -299,6 +423,12 @@ def run_reviewer(chemist_output: dict[str, Any],
             "score_components": {
                 "normalized_pchembl": round(n_pchembl, 4),
                 "confidence_term": round(conf / 9, 4),
+                "efficacy_evidence": round(n_efficacy_evidence, 4),
+                "efficacy_evidence_source": (
+                    "multisource_ledger"
+                    if ledger_evidence is not None
+                    else "legacy_pchembl_assay_confidence"
+                ),
                 "normalized_ot_association": round(n_ot, 4),
                 "normalized_tanimoto": round(n_tanimoto, 4),
                 "no_failed_trial": 1 if no_failed_trial else 0,
@@ -308,6 +438,9 @@ def run_reviewer(chemist_output: dict[str, Any],
             # Record whether the trials query itself failed (distinct from "found
             # no trials").  When True, no_failed_trial credit was withheld (fail-closed).
             "trials_query_failed": bool(trials.get("query_failed")),
+            "trials_holdout_redacted": bool(
+                trials.get("holdout_redacted")
+            ),
             # DISCLOSURE flag only — passed straight through from the Chemist,
             # never used in the composite. Tells the reviewer the drug's approved
             # indication names a specific mutation (see mutation_disclosure.py).
@@ -318,6 +451,11 @@ def run_reviewer(chemist_output: dict[str, Any],
             # HOW each primary target was surfaced. Without this the field drops here
             # and shows as None in every downstream artifact.
             "target_discovery_method": c.get("target_discovery_method"),
+            "mechanism_class": c.get("mechanism_class"),
+            "therapeutic_role": c.get("therapeutic_role", "disease_modifying"),
+            "process_support": c.get("process_support", []),
+            "process_source_status": c.get("process_source_status"),
+            "process_memberships": c.get("process_memberships", []),
             # Carry the candidate's UniProt accession through to structure_validation_node
             # so Boltz always folds the correct protein.  Without this field, the node
             # falls back to the PRIMARY target's UniProt for ALL pathway_neighbor
@@ -341,6 +479,12 @@ def run_reviewer(chemist_output: dict[str, Any],
                 "collapsed_as_duplicate": collapsed_ids,
             },
             "source_chembl_ids": c.get("source_chembl_ids", []),
+            "source_activity_ids": c.get("source_activity_ids", []),
+            "source_types": c.get("source_types", []),
+            "source_health": c.get("source_health", {}),
+            "target_memberships": c.get("target_memberships", []),
+            "_evidence_ledger": c.get("_evidence_ledger", {}),
+            "_prefetched_safety_layer1": context["safety_layer1"],
         })
 
     provenance.log_many(prov_entries)
@@ -439,9 +583,40 @@ def run_reviewer(chemist_output: dict[str, Any],
     _mdc_needs_resort = False
     for _top in _mdc_candidates:
         _target_sym = _top.get("target_symbol") or ""
-        _at_info    = get_drug_action_type(_top["drug_name"], _target_sym)
+        _is_heldout = _candidate_is_heldout(_top)
+        _at_info = (
+            {"source": "holdout_redacted", "action_type": None,
+             "mechanism_of_action": None}
+            if _is_heldout
+            else get_drug_action_type(_top["drug_name"], _target_sym)
+        )
         _action_t   = _at_info.get("action_type")
         _moa        = _at_info.get("mechanism_of_action")
+
+        # Prefer a qualified target-specific action from the common evidence
+        # ledger.  This prevents non-ChEMBL curated interactions from being
+        # mislabeled as generic IC50/Ki inhibitors.
+        _ledger_records = (_top.get("_evidence_ledger") or {}).get("records", [])
+        _ledger_action_record = next(
+            (
+                rec for rec in _ledger_records
+                if rec.get("qualification_status") == "qualified"
+                and rec.get("evidence_role") in ("efficacy", "target_link")
+                and rec.get("action")
+                and (
+                    not _target_sym
+                    or str(rec.get("target_symbol") or "").upper() == _target_sym.upper()
+                )
+            ),
+            None,
+        )
+        if _ledger_action_record:
+            _action_t = _ledger_action_record.get("action")
+            _moa = _ledger_action_record.get("context") or _moa
+            _at_info = {
+                **_at_info,
+                "source": f"evidence_ledger:{_ledger_action_record.get('provider')}",
+            }
 
         # Detect when the mechanism record is for a DIFFERENT protein than the
         # candidate target being evaluated.  get_drug_action_type returns
@@ -470,7 +645,9 @@ def run_reviewer(chemist_output: dict[str, Any],
             )
 
         _direction = check_mechanism_direction(
-            _top["drug_name"], _target_sym, _action_t, _moa, disease
+            _top["drug_name"], _target_sym, _action_t, _moa, disease,
+            candidate_chembl_ids=_candidate_chembl_ids(_top),
+            candidate_inchikey=_top.get("inchikey"),
         )
         _top["mechanism_direction"] = _direction
         if _direction.get("incompatible"):
@@ -523,7 +700,13 @@ def run_reviewer(chemist_output: dict[str, Any],
     _mdc_second_resort = False
     for _top in _mdc_second_pass:
         _target_sym = _top.get("target_symbol") or ""
-        _at_info    = get_drug_action_type(_top["drug_name"], _target_sym)
+        _is_heldout = _candidate_is_heldout(_top)
+        _at_info = (
+            {"source": "holdout_redacted", "action_type": None,
+             "mechanism_of_action": None}
+            if _is_heldout
+            else get_drug_action_type(_top["drug_name"], _target_sym)
+        )
         _action_t   = _at_info.get("action_type")
         _moa        = _at_info.get("mechanism_of_action")
         if _at_info.get("source") == "any_mechanism" and _action_t:
@@ -541,7 +724,9 @@ def run_reviewer(chemist_output: dict[str, Any],
                 f"drug has IC50/Ki binding activity against {_target_sym})"
             )
         _direction = check_mechanism_direction(
-            _top["drug_name"], _target_sym, _action_t, _moa, disease
+            _top["drug_name"], _target_sym, _action_t, _moa, disease,
+            candidate_chembl_ids=_candidate_chembl_ids(_top),
+            candidate_inchikey=_top.get("inchikey"),
         )
         _top["mechanism_direction"] = _direction
         if _direction.get("incompatible"):
@@ -579,7 +764,7 @@ def run_reviewer(chemist_output: dict[str, Any],
         mid = r.get("molecule_chembl_id")
 
         # Layer 1 — ChEMBL structured withdrawal / black-box check
-        layer1 = get_molecule_safety_flags(drug, mid)
+        layer1 = r.pop("_prefetched_safety_layer1")
         r["safety_layer1"] = layer1
 
         # Layer 2 — web-search check:

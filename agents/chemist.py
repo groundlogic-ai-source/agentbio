@@ -24,7 +24,7 @@ Output: output/chemist_output.json
 import json
 import os
 import sys
-from typing import Any, Optional
+from typing import Any, Iterable, Optional
 
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
@@ -38,6 +38,7 @@ from agents.biologist import get_pathway_neighbor_targets
 from data_sources.chembl import get_target_candidate_compounds, get_drug_indications
 from data_sources.pubchem import get_compound_data, get_drug_classification
 from data_sources.openfda import get_label_indications
+from data_sources.multisource_candidates import collect_target_candidates
 
 MODEL = "claude-sonnet-4-6"
 FP_RADIUS = 2
@@ -247,7 +248,9 @@ def _enrich_compounds(
 
 
 def run_chemist(biologist_output: dict[str, Any],
-                repurposing_only: bool = False) -> dict[str, Any]:
+                repurposing_only: bool = False,
+                enabled_sources: Optional[Iterable[str]] = None,
+                ) -> dict[str, Any]:
     target = biologist_output["target"]
     uniprot = target.get("uniprot_id")
     symbol = target.get("target_symbol")
@@ -475,6 +478,42 @@ def run_chemist(biologist_output: dict[str, Any],
 
     provenance.log_many(prov_entries)
 
+    # V2 target-first source union. Existing ChEMBL candidates enter as fully
+    # enriched rows so their Tanimoto, mutation, rationale, and pathway fields
+    # survive; GtoPdb and DrugCentral add approved target pharmacology without
+    # any held-out-drug-name lookup. Identity and evidence deduplication are
+    # delegated to the common active-moiety ledger.
+    multisource = collect_target_candidates(
+        uniprot_id=uniprot,
+        gene=symbol or "",
+        disease_name=disease_name,
+        ot_score=ot_score,
+        target_discovery_method=primary_disc_method,
+        repurposing_only=repurposing_only,
+        chembl_enriched=results,
+        mechanism_class=target.get("mechanism_class") or "",
+        therapeutic_role=target.get("therapeutic_role", "disease_modifying"),
+        process_support=target.get("process_support", []),
+        enabled_sources=enabled_sources,
+    )
+    results = multisource["candidates"]
+    for candidate in results:
+        candidate.setdefault("atc_codes", [])
+        candidate.setdefault("most_similar_approved_drug", None)
+        candidate.setdefault("tanimoto_score", 0.0)
+        candidate.setdefault("mutation_specificity", detect_mutation_specificity(""))
+        candidate.setdefault(
+            "rationale",
+            "Target-first curated pharmacology evidence; see the evidence ledger "
+            "for provider, lineage, action, and qualification details.",
+        )
+        candidate.setdefault("pathway_specificity_note", None)
+        candidate["mechanism_class"] = target.get("mechanism_class")
+        candidate["therapeutic_role"] = target.get(
+            "therapeutic_role", "disease_modifying")
+        candidate["process_support"] = target.get("process_support", [])
+        candidate["process_source_status"] = target.get("process_source_status")
+
     # Rank: approved drugs always before unapproved (repurposing requires a prior
     # human safety profile), then by affinity, then structural novelty signal.
     results.sort(key=lambda r: (
@@ -495,6 +534,7 @@ def run_chemist(biologist_output: dict[str, Any],
         "pooled_across_multiple_targets": cc["pooled_across_multiple_targets"],
         "repurposing_only": repurposing_only,
         "approved_reference_set_size": len(approved_fps),
+        "source_status": multisource["source_status"],
         "reference_set_note": (
             "Tanimoto computed against approved drugs found in this target's "
             "candidate pool (bounded scope)."

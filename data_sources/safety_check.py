@@ -27,6 +27,8 @@ _NO_INFO_TEXT = (
     "No market-withdrawal information found in this search; "
     "this does not confirm the compound is safe."
 )
+_AI_TIMEOUT_SECONDS = 60.0
+_AI_MAX_RETRIES = 0
 
 
 def web_safety_check(drug_name: str) -> dict[str, Any]:
@@ -83,7 +85,12 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
         return result
 
     try:
-        client = anthropic.Anthropic(base_url=base_url, api_key=api_key)
+        client = anthropic.Anthropic(
+            base_url=base_url,
+            api_key=api_key,
+            timeout=_AI_TIMEOUT_SECONDS,
+            max_retries=_AI_MAX_RETRIES,
+        )
 
         # ── Step 1: web search ────────────────────────────────────────────────
         search_query = (

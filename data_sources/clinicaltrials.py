@@ -23,6 +23,7 @@ import os
 import requests
 from typing import Any, Optional
 from cache.cache import get, set as cache_set, make_key
+from data_sources import holdout
 
 import anthropic
 
@@ -32,6 +33,8 @@ NEGATIVE_STATUSES = {"TERMINATED", "WITHDRAWN", "SUSPENDED"}
 COMPLETED_STATUSES = {"COMPLETED"}
 
 HAIKU_MODEL = "claude-haiku-4-5-20251001"
+_AI_TIMEOUT_SECONDS = 60.0
+_AI_MAX_RETRIES = 0
 
 VALID_CLASSIFICATIONS = {"EFFICACY_FAILURE", "ADMINISTRATIVE", "UNCLEAR"}
 
@@ -41,7 +44,12 @@ def _anthropic_client() -> Optional[anthropic.Anthropic]:
     api_key  = os.environ.get("AI_INTEGRATIONS_ANTHROPIC_API_KEY")
     if not base_url or not api_key:
         return None
-    return anthropic.Anthropic(base_url=base_url, api_key=api_key)
+    return anthropic.Anthropic(
+        base_url=base_url,
+        api_key=api_key,
+        timeout=_AI_TIMEOUT_SECONDS,
+        max_retries=_AI_MAX_RETRIES,
+    )
 
 
 def _classify_why_stopped(why_stopped: str, client: anthropic.Anthropic) -> str:
@@ -111,7 +119,12 @@ def _search_trials(drug_name: str, disease_name: str) -> tuple[list[dict], bool]
         return [], True
 
 
-def check_prior_trials(drug_name: str, disease_name: str) -> dict[str, Any]:
+def check_prior_trials(
+    drug_name: str,
+    disease_name: str,
+    candidate_chembl_ids: Optional[list[str]] = None,
+    candidate_inchikey: Optional[str] = None,
+) -> dict[str, Any]:
     """
     Returns:
       - trials: list of {nct_id, title, status, why_stopped,
@@ -125,6 +138,26 @@ def check_prior_trials(drug_name: str, disease_name: str) -> dict[str, Any]:
     Cache key v2 — bumped from the original because the negative-signal
     classification logic changed. Old v1 entries are silently ignored.
     """
+    # Retrospective holdout: a drug+disease trial lookup is direct indication
+    # leakage. Return an explicit sealed result without touching the network.
+    heldout_molecule = any(
+        holdout.matches_molecule(mid)
+        for mid in (candidate_chembl_ids or [])
+        if mid
+    )
+    if holdout.is_active() and (
+        holdout.matches_name(drug_name)
+        or heldout_molecule
+        or holdout.matches_inchikey(candidate_inchikey)
+    ):
+        return {
+            "trials": [],
+            "has_negative_repurposing_result": False,
+            "trial_count": 0,
+            "query_failed": False,
+            "holdout_redacted": True,
+        }
+
     # v2 key: caches the LLM-classified output (not just the raw status flag)
     cache_key = make_key("check_prior_trials_v2", drug_name, disease_name)
     cached = get(cache_key)
@@ -181,6 +214,7 @@ def check_prior_trials(drug_name: str, disease_name: str) -> dict[str, Any]:
         # found nothing" from "query failed".  Callers must not award
         # no-failed-trial scoring credit when this flag is set.
         "query_failed": query_failed,
+        "holdout_redacted": False,
     }
     # Do not cache a failed query result — retry next time.
     if not query_failed:
