@@ -137,6 +137,8 @@ class OldRowBackwardCompatTest(unittest.TestCase):
         row = dict(self._OLD_STYLE_ROW)
         row["pre_cap_score"] = 0.66
         row["black_box_advisory"] = True
+        row["evidence_weight_coverage"] = 0.85
+        row["safety_reconciliation"] = None
         self.assertEqual(validate_reviewer_handoff([row]), [])
 
 
