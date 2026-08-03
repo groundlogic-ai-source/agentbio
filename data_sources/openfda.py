@@ -90,6 +90,69 @@ def get_label_indications(drug_name: str) -> dict[str, Any]:
     return result
 
 
+def get_label_mechanism(drug_name: str) -> dict[str, Any]:
+    """Return FDA-label pharmacology text as a quoted mechanism assertion.
+
+    The label is regulatory evidence for an established drug mechanism, not
+    evidence that the drug treats the requested disease.  Consumers must keep
+    that distinction explicit in their ledger role and score disclosure.
+    """
+    cache_key = make_key("get_label_mechanism_v1", drug_name)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    result: dict[str, Any] = {
+        "drug": drug_name,
+        "mechanism_text": "",
+        "label_id": None,
+        "source": None,
+        "error": None,
+    }
+    params = {
+        "search": (f'openfda.generic_name:"{drug_name}" '
+                   f'OR openfda.brand_name:"{drug_name}"'),
+        "limit": 1,
+    }
+    try:
+        resp = requests.get(LABEL_URL, params=params, timeout=30)
+        if resp.status_code == 404:
+            cache_set(cache_key, result, ttl_days=30)
+            return result
+        resp.raise_for_status()
+        rows = resp.json().get("results", [])
+        if rows:
+            row = rows[0]
+            # SPL labels vary: most use CLINICAL PHARMACOLOGY, while some
+            # carry the useful wording in mechanism_of_action instead.
+            text = (
+                row.get("mechanism_of_action")
+                or row.get("clinical_pharmacology")
+                or row.get("description")
+                or []
+            )
+            if isinstance(text, list):
+                text = " ".join(str(item) for item in text)
+            result.update({
+                "mechanism_text": str(text or "").strip(),
+                "label_id": (
+                    (row.get("set_id") or row.get("id") or
+                     (row.get("openfda") or {}).get("spl_set_id") or [None])[0]
+                    if isinstance((row.get("openfda") or {}).get("spl_set_id"), list)
+                    else row.get("set_id") or row.get("id") or
+                    (row.get("openfda") or {}).get("spl_set_id")
+                ),
+                "source": "openfda_label",
+            })
+    except Exception as e:
+        result["error"] = str(e)
+        print(f"[openfda] WARNING: label mechanism query failed for '{drug_name}': {e}")
+
+    if result["error"] is None:
+        cache_set(cache_key, result, ttl_days=30)
+    return result
+
+
 def get_adverse_events(drug_name: str, limit: int = 15) -> dict[str, Any]:
     """
     Return the top reported adverse event terms + counts for `drug_name` from FAERS.

@@ -549,5 +549,29 @@ class FixtureIdentityTest(unittest.TestCase):
         self.assertEqual(got, expected)
 
 
+class ScopeClassificationTest(unittest.TestCase):
+    """Scope reporting separates non-comparable cases without excluding them."""
+
+    def test_cytotoxic_fixture_is_reported_outside_expected_scope(self):
+        result = R.classify_scope_limitation("Vincristine", "Rhabdomyosarcoma")
+        self.assertFalse(result["in_expected_scope"])
+        self.assertEqual(result["classification"], "cytotoxic_chemo")
+
+    def test_symptomatic_fixture_is_reported_outside_expected_scope(self):
+        result = R.classify_scope_limitation("Promazine", "Acute intermittent porphyria")
+        self.assertFalse(result["in_expected_scope"])
+        self.assertEqual(result["classification"], "symptomatic")
+
+    def test_mechanism_driven_controls_are_not_misclassified(self):
+        for drug, disease in [
+            ("Ibrutinib", "Waldenstrom macroglobulinemia"),
+            ("Tretinoin", "Acute promyelocytic leukemia"),
+            ("Anagrelide", "Essential thrombocythemia"),
+        ]:
+            result = R.classify_scope_limitation(drug, disease)
+            self.assertTrue(result["in_expected_scope"])
+            self.assertEqual(result["classification"], "mechanism_driven")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

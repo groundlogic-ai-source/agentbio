@@ -118,6 +118,42 @@ FIXTURE_CASES: list[tuple[str, str]] = [
     ("Promazine", "Acute intermittent porphyria"),
 ]
 
+# The acceptance harness measures target-based, disease-modifying repurposing.
+# These archived known-drug pairs are retained for transparent reporting but are
+# not comparable to a molecular rediscovery when their established use is
+# cytotoxic chemotherapy or symptomatic/supportive care.  The classifier is
+# deliberately narrow and exact-pair based until a validated indication-level
+# source is available; it never changes production scores or candidate pools.
+_SCOPE_LIMITATIONS: dict[tuple[str, str], dict[str, str]] = {
+    ("vincristine", "rhabdomyosarcoma"): {
+        "classification": "cytotoxic_chemo",
+        "reason": (
+            "Vincristine is an antimitotic cytotoxic regimen component; tubulin "
+            "is a shared structural target rather than a disease-causal node."
+        ),
+    },
+    ("promazine", "acuteintermittentporphyria"): {
+        "classification": "symptomatic",
+        "reason": (
+            "Promazine use is symptomatic/supportive rather than a "
+            "disease-modifying intervention for heme-pathway dysfunction."
+        ),
+    },
+}
+
+
+def classify_scope_limitation(drug_name: str, disease_name: str) -> dict[str, Any]:
+    """Classify known pair scope for acceptance reporting without excluding it."""
+    scope = _SCOPE_LIMITATIONS.get((_norm_name(drug_name), _norm_name(disease_name)))
+    if scope:
+        return {"in_expected_scope": False, **scope}
+    return {
+        "in_expected_scope": True,
+        "classification": "mechanism_driven",
+        "reason": "No pre-registered cytotoxic or symptomatic scope limitation.",
+    }
+
+
 # Source files whose bytes are fingerprinted for the stale-resume guard.  If any
 # runtime module (or this harness) changed, a resume is refused without --fresh.
 _FINGERPRINT_SOURCES = [
@@ -604,6 +640,7 @@ def run_fixture(drug_name: str, disease_name: str, cap: int) -> dict[str, Any]:
         "generated_by_target": None,
         "therapeutic_role": None,
         "mechanism_class": None,
+        "scope_classification": classify_scope_limitation(drug_name, disease_name),
         "process_memberships": [],
         "trials_holdout_redacted": None,
         "score_components": None,

@@ -249,6 +249,14 @@ class QualityTests(unittest.TestCase):
         self.assertIsInstance(eff, float)
         self.assertIsInstance(saf, float)
 
+    def test_qualified_label_mechanism_is_efficacy_evidence(self):
+        label = rec(
+            source_type="drug_label", evidence_role="efficacy",
+            label_id="synthetic-spl", measurement_type="label_mechanism_class",
+            qualification_status="qualified",
+        )
+        self.assertEqual(efficacy_confidence([label]), 0.8)
+
     def test_unqualified_penalty_not_dropped_to_zero(self):
         r = rec(source_type="mechanism", qualification_status="unqualified")
         q = evidence_quality(r)

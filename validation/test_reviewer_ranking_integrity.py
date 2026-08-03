@@ -41,6 +41,23 @@ class CoverageAwareCompositeTest(unittest.TestCase):
         honest_credit, _ = reviewer._coverage_aware_composite(0.75, 0.60, None, True)
         self.assertGreater(honest_credit, no_credit)
 
+    def test_qualified_directional_evidence_resolves_a_floor_tie(self):
+        directional = _candidate("DirectionalControl")
+        directional["_evidence_ledger"]["records"] = [{
+            "qualification_status": "qualified",
+            "action": "inhibitor",
+            "direction": "inhibitor",
+        }]
+        undirected = _candidate("UndirectedControl")
+        undirected["_evidence_ledger"]["records"] = [{
+            "qualification_status": "qualified",
+            "action": "",
+            "direction": "unknown",
+        }]
+        self.assertTrue(reviewer._has_qualified_directional_evidence(directional))
+        self.assertFalse(reviewer._has_qualified_directional_evidence(undirected))
+        self.assertEqual(reviewer.QUALIFIED_DIRECTIONAL_BONUS, 0.05)
+
 
 def _candidate(name: str = "SyntheticDrug") -> dict:
     return {
