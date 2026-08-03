@@ -69,6 +69,59 @@ body {
   letter-spacing: 0.01em;
 }
 
+/* ── Candidate pool + normalized evidence cards ───────────────────────────── */
+.pool-page { max-width: 1320px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+.pool-header h2 { color: var(--ink); font-size: 2rem; line-height: 1.1; margin: .25rem 0 .45rem; }
+.pool-header p { color: var(--ink-muted); max-width: 50rem; font-size: .82rem; line-height: 1.65; }
+.pool-controls { display: grid; grid-template-columns: minmax(190px, 2fr) repeat(5, minmax(115px, 1fr)) auto; gap: .75rem; padding: 1rem; margin: 1.5rem 0 .75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow-soft); align-items: end; }
+.pool-controls input, .pool-controls select { box-sizing: border-box; width: 100%; padding: .5rem .55rem; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); font-size: .75rem; }
+.pool-apply { white-space: nowrap; min-height: 32px; }
+.pool-summary, .pool-pagination { display: flex; justify-content: space-between; gap: 1rem; align-items: center; color: var(--ink-muted); font: .68rem monospace; padding: .5rem 0; }
+.candidate-table-wrap, .benchmark-fixture-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); }
+.candidate-table, .benchmark-fixtures { width: 100%; border-collapse: collapse; font-size: .72rem; }
+.candidate-table th, .candidate-table td, .benchmark-fixtures th, .benchmark-fixtures td { padding: .62rem .65rem; text-align: left; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.candidate-table th, .benchmark-fixtures th { background: var(--surface-raised); color: var(--ink-dim); font: .57rem monospace; letter-spacing: .1em; text-transform: uppercase; }
+.candidate-table td small { display: block; margin-top: .2rem; color: var(--ink-dim); font: .58rem monospace; }
+.candidate-table td > span + span { margin-left: .2rem; }
+.pool-mono { font-family: "JetBrains Mono", monospace; color: var(--ink-muted); }
+.pool-empty, .pool-error { padding: 1rem; margin: 1rem 0; border-radius: 6px; font-size: .78rem; }
+.pool-empty { background: var(--surface-raised); color: var(--ink-muted); border: 1px solid var(--border); }
+.pool-error { background: var(--oxide-glow); color: var(--oxide); border: 1px solid var(--oxide-border); }
+.pool-muted { color: var(--ink-muted); font-size: .76rem; margin: 1rem 0; }
+.pool-disclosure { border-left: 2px solid var(--brass); color: var(--ink-muted); font-size: .72rem; line-height: 1.55; padding: .4rem .65rem; margin-top: 1rem; background: var(--brass-glow); }
+.candidate-evidence-panel { margin-top: 1.5rem; border: 1px solid var(--steel-border); border-radius: 8px; padding: 1.25rem; background: var(--paper-warm); }
+.evidence-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .75rem; margin-top: 1rem; }
+.evidence-card { padding: .85rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); font-size: .7rem; }
+.evidence-card a { color: var(--steel-deep); font-size: .67rem; }
+.evidence-claim { margin: .7rem 0 .25rem; color: var(--ink); font-weight: 600; text-transform: capitalize; }
+.evidence-measurement { margin: 0 0 .6rem; color: var(--brass-deep); font-family: monospace; }
+.evidence-meta { display: grid; grid-template-columns: 72px 1fr; gap: .3rem .5rem; margin: 0 0 .75rem; }
+.evidence-meta dt { color: var(--ink-dim); }.evidence-meta dd { margin: 0; color: var(--ink-muted); overflow-wrap: anywhere; }
+
+/* ── Research validation panel ────────────────────────────────────────────── */
+.benchmark-panel { margin: 0 0 2rem; padding: 1.25rem 1.5rem; border: 1px solid var(--steel-border); border-radius: 8px; background: var(--steel-glow); }
+.benchmark-panel h3 { margin: .25rem 0 .4rem; color: var(--ink); font-size: 1.2rem; }
+.benchmark-note { margin: 0 0 1rem; color: var(--ink-muted); font-size: .75rem; line-height: 1.55; max-width: 65rem; }
+.benchmark-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: .8rem; }
+.benchmark-card { border: 1px solid var(--border); border-radius: 6px; padding: .9rem; background: var(--surface); color: var(--ink-muted); font-size: .7rem; line-height: 1.45; }
+.benchmark-card-title { color: var(--ink); font-weight: 600; margin-bottom: .7rem; }
+.benchmark-metrics { display: flex; gap: .5rem; flex-wrap: wrap; }.benchmark-metrics span { padding: .25rem .4rem; border-radius: 3px; background: var(--surface-raised); color: var(--ink-muted); font: .62rem monospace; }.benchmark-metrics b { color: var(--steel-deep); }
+.benchmark-card details { margin-top: .65rem; color: var(--ink-muted); }.benchmark-card summary { cursor: pointer; color: var(--steel-deep); }.benchmark-card ul { margin: .4rem 0; padding-left: 1rem; }
+
+@media (max-width: 900px) {
+  .pool-page { padding: 1.5rem .8rem 3rem; }
+  .pool-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pool-controls label:first-child, .pool-controls label:nth-child(2), .pool-apply { grid-column: span 2; }
+}
+@media (max-width: 560px) {
+  nav { overflow-x: auto; padding: 0 .5rem !important; -webkit-overflow-scrolling: touch; }
+  .nav-tab { flex: 0 0 auto; padding-left: .8rem; padding-right: .8rem; }
+  .nav-group-divider { flex: 0 0 1px; }
+  .pool-header h2 { font-size: 1.55rem; }
+  .pool-controls { grid-template-columns: 1fr; }.pool-controls label:first-child, .pool-controls label:nth-child(2), .pool-apply { grid-column: auto; }
+  .candidate-table th, .candidate-table td { padding: .5rem; }
+}
+
 /* Scrollbar — webkit only */
 ::-webkit-scrollbar {
   width: 8px;
