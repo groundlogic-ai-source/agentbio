@@ -688,6 +688,24 @@ function BenchmarkPanel() {
       <p className="benchmark-note">{data.pilot_note}</p>
       <div className="benchmark-grid">
         {(data.benchmarks || []).map((bench) => (
+          bench.kind === "audit_traps" ? (
+            <article className="benchmark-card" key={bench.label}>
+              <div className="benchmark-card-title">{bench.label}</div>
+              <div className="benchmark-metrics">
+                <span><b>{bench.traps_caught}/{bench.traps_total}</b> traps caught</span>
+                <span><b>{bench.controls_false_flagged}/{bench.controls_total}</b> false flags</span>
+                <span><b>{bench.precision != null ? bench.precision.toFixed(2) : "—"}</b> precision</span>
+                <span><b>{bench.verdict}</b></span>
+              </div>
+              <p>{bench.limitations}</p>
+              <details><summary>Trap outcomes (must be caught)</summary>
+                <ul>{(bench.traps || []).map((t) => <li key={t.id}>{t.id} {t.class}: {t.caught ? "caught" : "MISSED"}</li>)}</ul>
+              </details>
+              <details><summary>Control outcomes (must not be flagged)</summary>
+                <ul>{(bench.controls || []).map((c) => <li key={c.id}>{c.id} {c.class}: {c.clean ? "clean" : "FALSE-FLAGGED"}</li>)}</ul>
+              </details>
+            </article>
+          ) : (
           <article className="benchmark-card" key={bench.label}>
             <div className="benchmark-card-title">{bench.label}</div>
             <div className="benchmark-metrics">
@@ -707,6 +725,7 @@ function BenchmarkPanel() {
               </table></div>
             </details>
           </article>
+          )
         ))}
       </div>
     </section>
