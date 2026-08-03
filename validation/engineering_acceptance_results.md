@@ -1,6 +1,6 @@
 # V2 Engineering Acceptance — Five Archived v1 Genuine Misses
 
-_Label: **engineering_acceptance** (NOT benchmark v2). Generated: 2026-08-03T03:18:09._
+_Label: **engineering_acceptance** (NOT benchmark v2). Generated: 2026-08-03T13:19:06._
 
 Disease-input pipeline only (`select_for_disease` -> biologist -> chemist -> pooled union -> reviewer); the confirmed drug is held out and used only for post-run matching. Every candidate target row is run up to a cap of **10** (engineering harness, not a production ranking).
 

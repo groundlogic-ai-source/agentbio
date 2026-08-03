@@ -336,6 +336,14 @@ def run_reviewer(chemist_output: dict[str, Any],
         if penalty_applied:
             composite -= LIPINSKI_PENALTY
 
+        # Pre-cap composite — preserved BEFORE any cap (unapproved / mechanism /
+        # DILI / safety) is applied.  All caps land tied candidates on the same
+        # floor value; without this secondary sort key, a strong-but-capped
+        # candidate is numerically indistinguishable from a weak one at the
+        # same floor and the tie-break becomes arbitrary.  Ordering within a
+        # capped tier changes nothing about STRONG_MATCH gating.
+        pre_cap_score = round(composite, 4)
+
         # Hard gate: unapproved/experimental compounds are capped below STRONG_MATCH.
         # Drug repurposing requires an established human safety profile from prior
         # regulatory approval. A research compound that merely binds the target is a
@@ -434,6 +442,7 @@ def run_reviewer(chemist_output: dict[str, Any],
                 "no_failed_trial": 1 if no_failed_trial else 0,
             },
             "composite_score": composite,
+            "pre_cap_score": pre_cap_score,
             "unapproved_cap_applied": unapproved_cap_applied,
             # Record whether the trials query itself failed (distinct from "found
             # no trials").  When True, no_failed_trial credit was withheld (fail-closed).
@@ -488,7 +497,7 @@ def run_reviewer(chemist_output: dict[str, Any],
         })
 
     provenance.log_many(prov_entries)
-    reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+    _sort_reviewed(reviewed)
 
     # ── DILI-target whole-pool pre-cap pass ───────────────────────────────────
     # For every target in the ICH S7A/S7B pharmaceutical safety-profiling panel,
@@ -545,7 +554,7 @@ def run_reviewer(chemist_output: dict[str, Any],
         _pre_cap_resort = True
 
     if _pre_cap_resort:
-        reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+        _sort_reviewed(reviewed)
         n_precap = sum(1 for c in reviewed if (c.get("mechanism_direction") or {}).get("auto_precap"))
         print(f"[reviewer] DILI-target pre-cap: {n_precap} candidate(s) auto-capped "
               f"(source=any_mechanism on safety-screen target)")
@@ -663,7 +672,7 @@ def run_reviewer(chemist_output: dict[str, Any],
         )
 
     if _mdc_needs_resort:
-        reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+        _sort_reviewed(reviewed)
 
     # ── Post-cap direction-check pass ─────────────────────────────────────────
     # Problem: if the initial top-K candidates ALL get capped (e.g. three
@@ -742,7 +751,7 @@ def run_reviewer(chemist_output: dict[str, Any],
         )
 
     if _mdc_second_resort:
-        reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+        _sort_reviewed(reviewed)
     # ── End mechanism-direction pass ──────────────────────────────────────────
 
     # ── Safety-disclosure pass (Layer 1 + Layer 2) ────────────────────────────
@@ -787,10 +796,15 @@ def run_reviewer(chemist_output: dict[str, Any],
         l2_hit = layer2 is not None and layer2.get("confirmed", False)
         safety_triggered = l1_hit or l2_hit
 
-        # Black-box advisory: L1 found a boxed warning but NOT a withdrawal.
-        # Surface as a disclosure note; do NOT apply the hard safety cap.
+        # Black-box advisory: a boxed warning was found (by L1 structured data
+        # or by L2's separate BLACK_BOX verdict) but NO withdrawal was
+        # confirmed.  Surface as a disclosure note; do NOT apply the hard cap.
         r["black_box_advisory"] = (
-            layer1.get("black_box_advisory", False) and not safety_triggered
+            (
+                layer1.get("black_box_advisory", False)
+                or (layer2 or {}).get("black_box_advisory", False)
+            )
+            and not safety_triggered
         )
 
         if safety_triggered:
@@ -827,9 +841,24 @@ def run_reviewer(chemist_output: dict[str, Any],
     # ── End safety-disclosure pass ────────────────────────────────────────────
 
     if needs_resort:
-        reviewed.sort(key=lambda r: r["composite_score"], reverse=True)
+        _sort_reviewed(reviewed)
 
     return reviewed
+
+
+def _sort_reviewed(reviewed: list[dict[str, Any]]) -> None:
+    """Sort by composite, breaking cap-floor ties by pre-cap score.
+
+    Every cap (unapproved / mechanism-direction / DILI pre-cap / safety) pins
+    candidates to the same floor value.  Sorting capped ties by the composite
+    computed BEFORE any cap keeps a genuinely strong-but-capped candidate
+    ranked above a weak one at the same floor, without changing which
+    candidates pass STRONG_MATCH.
+    """
+    reviewed.sort(
+        key=lambda r: (r["composite_score"], r.get("pre_cap_score") or 0.0),
+        reverse=True,
+    )
 
 
 def main() -> None:

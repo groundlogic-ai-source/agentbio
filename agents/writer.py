@@ -460,11 +460,22 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     # This banner is disclosure only — it does NOT affect any score.
     if candidate.get("black_box_advisory"):
         l1 = (candidate.get("safety_layer1") or {})
-        bbw_url = l1.get("source_url") or ""
-        url_text = f" ([ChEMBL]({bbw_url}))" if bbw_url else ""
+        l2 = (candidate.get("safety_layer2") or {})
+        # Advisory can come from L1 structured data, the L2 web check, or both —
+        # name the source(s) honestly instead of always attributing to ChEMBL.
+        l1_bb = l1.get("black_box_advisory", False)
+        l2_bb = l2.get("black_box_advisory", False)
+        bbw_url = l1.get("source_url") or l2.get("citation") or ""
+        url_text = f" ([source]({bbw_url}))" if bbw_url else ""
+        if l1_bb and l2_bb:
+            bb_src = "ChEMBL structured data and an independent web search both record"
+        elif l2_bb and not l1_bb:
+            bb_src = "A web-search safety check records"
+        else:
+            bb_src = "ChEMBL records"
         parts.append(
             f"> ⚠ **Black-box (boxed) warning — disclosure only.** "
-            f"ChEMBL records a regulatory black-box warning for **{drug}**{url_text}. "
+            f"{bb_src} a regulatory black-box warning for **{drug}**{url_text}. "
             f"The drug is still approved and available; this warning reflects serious "
             f"risks (sedation, haematological effects, teratogenicity, etc.) that require "
             f"monitoring in its approved indication. "
