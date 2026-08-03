@@ -268,6 +268,44 @@ def _no_failed_trial_credit(trials: dict[str, Any]) -> bool:
     return not trials.get("has_negative_repurposing_result", False)
 
 
+def _coverage_aware_composite(
+    efficacy_evidence: float,
+    ot_association: float,
+    tanimoto: Optional[float],
+    no_failed_trial: bool,
+) -> tuple[float, float]:
+    """Score evidence without converting an unavailable similarity into a zero.
+
+    Molecular similarity is an optional structural measurement: it is absent
+    for valid candidates with no resolvable structure/reference comparison.
+    Treating that absence as a measured 0.0 systematically ranks data-poor
+    modalities below equally supported small molecules.  When similarity is
+    unavailable, normalize the *observed* efficacy, disease-association, and
+    trial terms over their available maximum.  This is not a positive
+    similarity credit: a measured 0.0 remains 0.0.
+
+    Trial evidence deliberately stays in the denominator.  A failed or
+    holdout-redacted lookup cannot establish "no failed trial", so it receives
+    no credit under the existing fail-closed policy.
+
+    Returns (composite, evidence_weight_coverage).
+    """
+    numerator = (
+        COMPOSITE_WEIGHTS["efficacy_evidence"] * efficacy_evidence
+        + COMPOSITE_WEIGHTS["ot_association"] * ot_association
+        + COMPOSITE_WEIGHTS["no_failed_trial"] * (1 if no_failed_trial else 0)
+    )
+    coverage = (
+        COMPOSITE_WEIGHTS["efficacy_evidence"]
+        + COMPOSITE_WEIGHTS["ot_association"]
+        + COMPOSITE_WEIGHTS["no_failed_trial"]
+    )
+    if tanimoto is not None:
+        numerator += COMPOSITE_WEIGHTS["tanimoto"] * tanimoto
+        coverage += COMPOSITE_WEIGHTS["tanimoto"]
+    return numerator / coverage, coverage
+
+
 def run_reviewer(chemist_output: dict[str, Any],
                  biologist_output: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
     candidates = chemist_output.get("candidates", [])
@@ -310,8 +348,13 @@ def run_reviewer(chemist_output: dict[str, Any],
             )
 
         n_pchembl = _norm_pchembl(c.get("pchembl_value"))
-        # Tanimoto is inherently [0, 1]; use directly without pool normalization.
-        n_tanimoto = float(c.get("tanimoto_score") or 0.0)
+        # Keep unavailable similarity distinct from a measured zero.  The
+        # latter is adverse structural evidence and must remain 0.0; the former
+        # is coverage missingness and is handled by _coverage_aware_composite.
+        raw_tanimoto = c.get("tanimoto_score")
+        n_tanimoto: Optional[float] = (
+            None if raw_tanimoto is None else float(raw_tanimoto)
+        )
         # OT association score is inherently [0, 1]; use directly.
         n_ot = float(c.get("ot_association_score") or 0.0)
         conf = c.get("confidence_score") or 0
@@ -324,11 +367,11 @@ def run_reviewer(chemist_output: dict[str, Any],
         )
         n_efficacy_evidence = max(0.0, min(1.0, n_efficacy_evidence))
 
-        composite = (
-            COMPOSITE_WEIGHTS["efficacy_evidence"] * n_efficacy_evidence
-            + COMPOSITE_WEIGHTS["ot_association"] * n_ot
-            + COMPOSITE_WEIGHTS["tanimoto"] * n_tanimoto
-            + COMPOSITE_WEIGHTS["no_failed_trial"] * (1 if no_failed_trial else 0)
+        composite, evidence_weight_coverage = _coverage_aware_composite(
+            n_efficacy_evidence,
+            n_ot,
+            n_tanimoto,
+            no_failed_trial,
         )
 
         lipinski_violations = desc.get("lipinski_violations")
@@ -438,7 +481,11 @@ def run_reviewer(chemist_output: dict[str, Any],
                     else "legacy_pchembl_assay_confidence"
                 ),
                 "normalized_ot_association": round(n_ot, 4),
-                "normalized_tanimoto": round(n_tanimoto, 4),
+                "normalized_tanimoto": (
+                    round(n_tanimoto, 4) if n_tanimoto is not None else None
+                ),
+                "similarity_available": n_tanimoto is not None,
+                "evidence_weight_coverage": round(evidence_weight_coverage, 4),
                 "no_failed_trial": 1 if no_failed_trial else 0,
             },
             "composite_score": composite,
@@ -787,14 +834,40 @@ def run_reviewer(chemist_output: dict[str, Any],
         #       checks whether a post-ChEMBL withdrawal or serious alert exists that
         #       structured data missed.  This path is budget-free: black-box drugs
         #       are rare, so the extra web-search calls are minimal.
+        #   (d) Withdrawal-reconciliation path: a structured withdrawn_flag can
+        #       be wrong for legacy/garbled records.  Layer 2 independently
+        #       reconciles every L1 withdrawal before it applies the hard cap.
         l1_error = layer1.get("api_error", False)
         l1_bbw   = layer1.get("black_box_advisory", False)
-        layer2 = web_safety_check(drug) if (drug in top_k_names or l1_error or l1_bbw) else None
+        l1_withdrawn = layer1.get("confirmed", False)
+        layer2 = web_safety_check(drug) if (
+            drug in top_k_names or l1_error or l1_bbw or l1_withdrawn
+        ) else None
         r["safety_layer2"] = layer2
 
-        l1_hit = layer1.get("confirmed", False)
+        # A lone structured withdrawal signal is retained when the independent
+        # check is unavailable/unclear (conservative safety default).  An
+        # explicit Layer-2 NO is a source disagreement: disclose it and do not
+        # hard-cap until a withdrawal is independently corroborated.
+        l1_hit = (
+            l1_withdrawn
+            and (layer2 is None or layer2.get("verdict") != "NO")
+        )
         l2_hit = layer2 is not None and layer2.get("confirmed", False)
         safety_triggered = l1_hit or l2_hit
+        if l1_withdrawn and layer2 is not None and layer2.get("verdict") == "NO":
+            r["safety_reconciliation"] = {
+                "status": "disputed",
+                "reason": (
+                    "ChEMBL structured data reports withdrawn_flag=True, but "
+                    "the independent web safety check returned WITHDRAWAL: NO. "
+                    "No hard cap was applied; this conflict requires review."
+                ),
+                "layer1_source": layer1.get("source_url"),
+                "layer2_citation": layer2.get("citation"),
+            }
+        else:
+            r["safety_reconciliation"] = None
 
         # Black-box advisory: a boxed warning was found (by L1 structured data
         # or by L2's separate BLACK_BOX verdict) but NO withdrawal was

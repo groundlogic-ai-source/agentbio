@@ -77,6 +77,10 @@ class ReviewerCandidate(TypedDict, total=False):
     # sort key so strong-but-capped candidates outrank weak ones at the same
     # cap floor; never used for STRONG_MATCH gating.
     pre_cap_score: Optional[float]
+    # Fraction of fixed score weights observed for this candidate.  A missing
+    # structural similarity measurement is omitted (not treated as zero), so
+    # downstream reports must expose the resulting coverage.
+    evidence_weight_coverage: Optional[float]
     strong_match: Required[bool]
     is_approved_drug: Optional[bool]
     unapproved_cap_applied: Required[bool]
@@ -84,6 +88,9 @@ class ReviewerCandidate(TypedDict, total=False):
     mechanism_direction: Optional[dict]
     safety_cap_applied: Required[bool]
     black_box_advisory: Optional[bool]   # BBW present but drug NOT withdrawn
+    # Structured-vs-independent withdrawal disagreement; never silently
+    # suppresses a cap without a visible audit object.
+    safety_reconciliation: Optional[dict]
     trials_query_failed: Required[bool]
     prior_trial_count: int
     # REQUIRED: must not be dropped by reviewer.append() or structure_validation
@@ -140,6 +147,8 @@ _REVIEWER_REQUIRED_FIELDS: list[tuple[str, str]] = [
     # or the boxed-warning disclosure.
     ("pre_cap_score",           "warn"),
     ("black_box_advisory",      "warn"),
+    ("evidence_weight_coverage", "warn"),
+    ("safety_reconciliation",   "warn"),
 ]
 
 
