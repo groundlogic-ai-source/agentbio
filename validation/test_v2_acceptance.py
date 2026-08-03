@@ -391,7 +391,10 @@ class DrugNameNeverLeakedTest(unittest.TestCase):
             molecule_chembl_id="CHEMBLX",
             drug_name=drug,
             trials_holdout_redacted=True,
-            score_components={"no_failed_trial": 0},
+            # Matches runtime policy: a redacted lookup is an unmade
+            # observation, so the Reviewer emits None (term dropped from the
+            # composite), never 0 (which would read as a real failed trial).
+            score_components={"no_failed_trial": None},
             process_memberships=[{
                 "target_symbol": "TGT1",
                 "mechanism_class": "control_process",
@@ -461,7 +464,9 @@ class DrugNameNeverLeakedTest(unittest.TestCase):
         self.assertTrue(result["generated"])
         self.assertEqual(result["match_method"], "inchikey_block")
         self.assertTrue(result["trials_holdout_redacted"])
-        self.assertEqual(result["score_components"]["no_failed_trial"], 0)
+        # None, not 0: the redacted drug must be neither credited nor
+        # penalised for the trial evidence the harness itself hid.
+        self.assertIsNone(result["score_components"]["no_failed_trial"])
         self.assertEqual(
             result["process_memberships"],
             rev_spy.return_value[0]["process_memberships"],
@@ -571,6 +576,34 @@ class ScopeClassificationTest(unittest.TestCase):
             result = R.classify_scope_limitation(drug, disease)
             self.assertTrue(result["in_expected_scope"])
             self.assertEqual(result["classification"], "mechanism_driven")
+
+
+class OnlySelectionTest(unittest.TestCase):
+    """--only runs a subset without redefining or overwriting the suite."""
+
+    def test_only_selects_a_single_archived_fixture(self):
+        self.assertEqual(R.select_fixture_cases("phenobarbital"),
+                         [("Phenobarbital", "Lennox-Gastaut syndrome")])
+
+    def test_only_matches_disease_names_too(self):
+        picked = R.select_fixture_cases("Lennox-Gastaut")
+        self.assertEqual(len(picked), 2)
+        self.assertTrue(all(d == "Lennox-Gastaut syndrome" for _, d in picked))
+
+    def test_unmatched_only_is_a_hard_error(self):
+        with self.assertRaises(RuntimeError):
+            R.select_fixture_cases("nosuchdrug")
+
+    def test_no_filter_runs_every_archived_fixture(self):
+        self.assertEqual(R.select_fixture_cases(None), list(R.FIXTURE_CASES))
+
+    def test_subset_run_never_overwrites_canonical_artifacts(self):
+        full_json, full_md = R.diagnostic_result_paths(None)
+        only_json, only_md = R.diagnostic_result_paths("phenobarbital")
+        self.assertEqual(full_json, R.RESULTS_JSON)
+        self.assertEqual(full_md, R.RESULTS_MD)
+        self.assertNotEqual(only_json, R.RESULTS_JSON)
+        self.assertNotEqual(only_md, R.RESULTS_MD)
 
 
 if __name__ == "__main__":

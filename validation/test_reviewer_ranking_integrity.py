@@ -36,10 +36,86 @@ class CoverageAwareCompositeTest(unittest.TestCase):
         high, _ = reviewer._coverage_aware_composite(0.75, 0.60, 0.8, False)
         self.assertGreater(high, low)
 
-    def test_redacted_trial_is_not_normalized_away(self):
+    def test_measured_failed_trial_is_still_penalised(self):
         no_credit, _ = reviewer._coverage_aware_composite(0.75, 0.60, None, False)
         honest_credit, _ = reviewer._coverage_aware_composite(0.75, 0.60, None, True)
         self.assertGreater(honest_credit, no_credit)
+
+    def test_unobserved_trial_is_a_coverage_gap_not_a_failed_trial(self):
+        # Three DISTINCT states must not collapse into two.
+        unobserved, cov_unobserved = reviewer._coverage_aware_composite(
+            0.75, 0.60, None, None)
+        measured_failure, cov_failure = reviewer._coverage_aware_composite(
+            0.75, 0.60, None, False)
+        clean, cov_clean = reviewer._coverage_aware_composite(
+            0.75, 0.60, None, True)
+        # A drug with a real failed trial must stay below one we simply
+        # could not look up, which in turn stays below a confirmed-clean one.
+        self.assertLess(measured_failure, unobserved)
+        self.assertLess(unobserved, clean)
+        # The unobserved term leaves BOTH sides of the ratio.
+        self.assertAlmostEqual(cov_unobserved, 0.70)
+        self.assertAlmostEqual(cov_failure, 0.85)
+        self.assertAlmostEqual(cov_clean, 0.85)
+        self.assertAlmostEqual(unobserved, (0.5 * 0.75 + 0.2 * 0.60) / 0.70)
+
+    def test_dropping_a_term_renormalizes_and_never_gifts_credit(self):
+        unobserved, _ = reviewer._coverage_aware_composite(0.9, 0.9, 0.9, None)
+        clean, _ = reviewer._coverage_aware_composite(0.9, 0.9, 0.9, True)
+        self.assertLess(unobserved, clean)
+
+
+class PrecedentStampedAssociationTest(unittest.TestCase):
+    """A stamped constant is not a measured target-disease association."""
+
+    def test_precedent_stamped_constant_is_not_a_measurement(self):
+        for method in ("pharmacological_precedent",
+                       "pharmacological_precedent_via_parent_umbrella"):
+            candidate = _candidate()
+            candidate["target_discovery_method"] = method
+            candidate["ot_association_score"] = 0.90
+            self.assertIsNone(reviewer._measured_ot_association(candidate))
+
+    def test_measured_associations_are_still_scored(self):
+        for method in ("genetic_association", "pathway_neighbor"):
+            candidate = _candidate()
+            candidate["target_discovery_method"] = method
+            candidate["ot_association_score"] = 0.677
+            self.assertAlmostEqual(
+                reviewer._measured_ot_association(candidate), 0.677)
+
+    def test_every_stamped_discovery_method_is_excluded(self):
+        """Guardrail: target_selection owns the stamped-constant method list.
+
+        If a new precedent-only discovery method is added there without being
+        added here, its stamped constant would silently be scored as a real
+        measured association again — the exact flat lane-wide advantage this
+        exclusion exists to remove.  Fail loudly instead of drifting.
+        """
+        from agents.target_selection import _PRECEDENT_ONLY_METHODS
+        missing = set(_PRECEDENT_ONLY_METHODS) - reviewer._PRECEDENT_STAMPED_DISCOVERY
+        self.assertEqual(
+            missing, set(),
+            f"precedent-only discovery method(s) {sorted(missing)} stamp a "
+            "constant association but are still scored as measured evidence; "
+            "add them to reviewer._PRECEDENT_STAMPED_DISCOVERY",
+        )
+
+    def test_stamped_lane_loses_its_flat_advantage_over_a_measured_lane(self):
+        # Identical drug-level evidence.  The stamped 0.90 lane previously beat
+        # the genuinely measured 0.677 lane on the constant alone.
+        stamped = _candidate()
+        stamped["target_discovery_method"] = "pharmacological_precedent"
+        stamped["ot_association_score"] = 0.90
+        measured = _candidate()
+        measured["target_discovery_method"] = "genetic_association"
+        measured["ot_association_score"] = 0.677
+
+        stamped_score, _ = reviewer._coverage_aware_composite(
+            0.70, reviewer._measured_ot_association(stamped), 0.2, True)
+        measured_score, _ = reviewer._coverage_aware_composite(
+            0.70, reviewer._measured_ot_association(measured), 0.2, True)
+        self.assertGreater(measured_score, stamped_score)
 
     def test_qualified_directional_evidence_resolves_a_floor_tie(self):
         directional = _candidate("DirectionalControl")

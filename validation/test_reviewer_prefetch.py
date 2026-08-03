@@ -148,20 +148,30 @@ class ReviewerPrefetchTest(unittest.TestCase):
             )
         self.assertEqual(seen["molecule_id"], "CHEMBL42")
 
-    def test_trial_credit_withheld_when_holdout_redacted(self):
-        self.assertFalse(reviewer._no_failed_trial_credit({
+    def test_trial_term_is_unobserved_when_holdout_redacted(self):
+        # None (coverage gap), NOT False.  False would score an unmade
+        # observation exactly like a discovered failed trial.
+        self.assertIsNone(reviewer._trial_evidence_term({
             "query_failed": False,
             "holdout_redacted": True,
             "has_negative_repurposing_result": False,
         }))
 
-    def test_trial_credit_semantics_unchanged_when_visible(self):
-        self.assertTrue(reviewer._no_failed_trial_credit({
+    def test_trial_term_is_unobserved_when_query_failed(self):
+        self.assertIsNone(reviewer._trial_evidence_term({
+            "query_failed": True,
+            "holdout_redacted": False,
+            "has_negative_repurposing_result": False,
+        }))
+
+    def test_trial_term_semantics_unchanged_when_visible(self):
+        self.assertTrue(reviewer._trial_evidence_term({
             "query_failed": False,
             "holdout_redacted": False,
             "has_negative_repurposing_result": False,
         }))
-        self.assertFalse(reviewer._no_failed_trial_credit({
+        # A MEASURED failed trial is still adverse evidence and still False.
+        self.assertFalse(reviewer._trial_evidence_term({
             "query_failed": False,
             "holdout_redacted": False,
             "has_negative_repurposing_result": True,

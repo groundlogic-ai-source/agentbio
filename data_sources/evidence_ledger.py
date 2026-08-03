@@ -440,13 +440,52 @@ def evidence_quality(record: EvidenceRecord):
     return round(min(1.0, max(0.0, quality)), 4)
 
 
+# Independent-corroboration lift.  Evidence is deduplicated by LINEAGE KEY
+# (design invariant 1), so this can never be inflated by re-importing the same
+# fact from several providers.  Distinct MODALITIES are required, not distinct
+# records: fifty assays against one target remain ONE line of evidence, whereas
+# an assay plus a curated mechanism plus a label statement are three.
+_CORROBORATION_CAP = 0.30
+
+
+def _corroboration_factor(records: list[EvidenceRecord], modalities: set) -> float:
+    """Saturating 0.._CORROBORATION_CAP lift for independent modality support.
+
+    Rationale: a MAX over single records makes each modality's base quality a
+    hard ceiling.  Every qualified ChEMBL-only candidate therefore lands on
+    exactly the bioactivity base (0.70) unless it clears the pChEMBL
+    potency-lift threshold, which collapses large pools onto one identical
+    value and leaves the resulting rank order arbitrary.  Corroboration across
+    genuinely different modalities is real epistemic weight, and crediting it
+    de-quantizes that floor.
+
+    Unqualified and contradicted records never count toward corroboration.
+    """
+    kinds = {
+        r.source_type
+        for r in records
+        if r.source_type in modalities
+        and r.qualification_status != QualificationStatus.UNQUALIFIED
+        and r.contradiction_status != ContradictionStatus.CONTRADICTED
+        and evidence_quality(r) is not NOT_APPLICABLE
+    }
+    if len(kinds) <= 1:
+        return 0.0
+    return _CORROBORATION_CAP * (1.0 - 0.5 ** (len(kinds) - 1))
+
+
 def _dimension_quality(records: Iterable[EvidenceRecord], modalities: set):
-    """Best calibrated quality across records whose modality is in ``modalities``.
+    """Calibrated quality for one dimension, or NOT_APPLICABLE.
+
+    The base is the BEST single calibrated record — one weak record can never
+    drag down a strong one — lifted toward, but never past, 1.0 by independent
+    corroboration across distinct modalities.
 
     Returns NOT_APPLICABLE (distinct from 0.0) when no record contributes to
     this dimension, so "we have no safety evidence" is never confused with
     "safety quality is zero".
     """
+    records = list(records)
     scores = []
     for r in records:
         if r.source_type in modalities:
@@ -455,7 +494,9 @@ def _dimension_quality(records: Iterable[EvidenceRecord], modalities: set):
                 scores.append(q)
     if not scores:
         return NOT_APPLICABLE
-    return round(max(scores), 4)
+    best = max(scores)
+    factor = _corroboration_factor(records, modalities)
+    return round(min(1.0, best + (1.0 - best) * factor), 4)
 
 
 def efficacy_confidence(records: Iterable[EvidenceRecord]):

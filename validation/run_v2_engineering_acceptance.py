@@ -824,12 +824,53 @@ def run_fixture(drug_name: str, disease_name: str, cap: int) -> dict[str, Any]:
 
 # ── Persistence (incremental JSON + Markdown, fingerprint-guarded resume) ────
 
-def _load_existing(fingerprint: str) -> dict[str, dict[str, Any]]:
+def select_fixture_cases(only: Optional[str]) -> list[tuple[str, str]]:
+    """Filter the frozen fixture list for a single-case diagnostic run.
+
+    ``only`` matches a normalized substring of the drug OR disease name.  The
+    fixture list itself is never edited or reordered: this selects from the
+    archived set, it does not redefine it.
+    """
+    if not only:
+        return list(FIXTURE_CASES)
+    needle = _norm_name(only)
+    picked = [
+        (drug, disease) for drug, disease in FIXTURE_CASES
+        if needle in _norm_name(drug) or needle in _norm_name(disease)
+    ]
+    if not picked:
+        raise RuntimeError(
+            f"--only {only!r} matched none of the {len(FIXTURE_CASES)} archived "
+            f"fixtures: {[d for d, _ in FIXTURE_CASES]}"
+        )
+    return picked
+
+
+def diagnostic_result_paths(only: Optional[str]) -> tuple[str, str]:
+    """Result paths for a run, isolated when it is a partial selection.
+
+    A ``--only`` run measures a SUBSET and must never overwrite the canonical
+    acceptance artifacts, otherwise a one-case diagnostic could later be read
+    as a completed five-fixture acceptance result.
+    """
+    if not only:
+        # Read at call time so tests and callers can rebind the globals.
+        return RESULTS_JSON, RESULTS_MD
+    slug = _norm_name(only) or "subset"
+    base = os.path.join(VALIDATION_DIR, f"engineering_acceptance_only_{slug}")
+    return f"{base}.json", f"{base}.md"
+
+
+def _load_existing(fingerprint: str,
+                   results_json: Optional[str] = None) -> dict[str, dict[str, Any]]:
     """Load prior results ONLY if the fingerprint matches; else refuse resume."""
-    if not os.path.exists(RESULTS_JSON):
+    # Resolved at CALL time, not bound as a default: RESULTS_JSON is patched by
+    # tests and rebound for --only runs.
+    results_json = results_json or RESULTS_JSON
+    if not os.path.exists(results_json):
         return {}
     try:
-        with open(RESULTS_JSON, encoding="utf-8") as f:
+        with open(results_json, encoding="utf-8") as f:
             data = json.load(f)
     except (json.JSONDecodeError, OSError):
         return {}
@@ -859,7 +900,10 @@ def _strip_case(case: dict[str, Any]) -> dict[str, Any]:
 
 
 def _flush(cases: list[dict[str, Any]], fingerprint: str, cap: int,
-           generated_at: str) -> None:
+           generated_at: str, results_json: Optional[str] = None,
+           only: Optional[str] = None) -> None:
+    # Resolved at CALL time — see _load_existing.
+    results_json = results_json or RESULTS_JSON
     payload = {
         "label": LABEL,
         "generated_at": generated_at,
@@ -867,11 +911,17 @@ def _flush(cases: list[dict[str, Any]], fingerprint: str, cap: int,
         "target_cap": cap,
         "top_n": TOP_N,
         "strong_match_threshold": STRONG_MATCH_THRESHOLD,
+        # Selection provenance: a partial run is self-describing so it can
+        # never be mistaken for a completed five-fixture acceptance result.
+        "selection": only or "all_fixtures",
+        "is_partial_selection": bool(only),
+        "fixture_count_total": len(FIXTURE_CASES),
+        "fixture_count_run": len(cases),
         "cases": [_strip_case(c) for c in cases],
     }
-    with open(RESULTS_JSON, "w", encoding="utf-8") as f:
+    with open(results_json, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2, default=str)
-    _log(f"  saved {len(cases)} case(s) -> {RESULTS_JSON}")
+    _log(f"  saved {len(cases)} case(s) -> {results_json}")
 
 
 def build_markdown(cases: list[dict[str, Any]], cap: int, generated_at: str) -> str:
@@ -941,23 +991,34 @@ def build_markdown(cases: list[dict[str, Any]], cap: int, generated_at: str) -> 
 
 
 def run_all(cap: int, fresh: bool, generated_at: str,
-            *, label: str = LABEL) -> list[dict[str, Any]]:
-    """Run all five fixtures. Refuses under any benchmark label / v2 freeze."""
+            *, label: str = LABEL,
+            only: Optional[str] = None) -> list[dict[str, Any]]:
+    """Run the archived fixtures. Refuses under any benchmark label / v2 freeze.
+
+    ``only`` restricts the run to a matching archived fixture and redirects
+    output to an isolated diagnostic artifact.
+    """
     assert_not_benchmark(label)
     fingerprint = config_source_fingerprint(cap)
+    selected = select_fixture_cases(only)
+    results_json, results_md = diagnostic_result_paths(only)
+    if only:
+        _log(f"--only {only!r}: running {len(selected)}/{len(FIXTURE_CASES)} "
+             f"archived fixture(s) -> {os.path.basename(results_json)} "
+             "(canonical acceptance artifacts untouched)")
 
     if fresh:
-        for path in (RESULTS_JSON, RESULTS_MD):
+        for path in (results_json, results_md):
             if os.path.exists(path):
                 os.remove(path)
         done: dict[str, dict[str, Any]] = {}
         _log("--fresh: cleared any prior partial results")
     else:
-        done = _load_existing(fingerprint)
+        done = _load_existing(fingerprint, results_json)
         _log(f"resume: {len(done)} fingerprint-matched case(s) already done")
 
     cases: list[dict[str, Any]] = []
-    for drug, disease in FIXTURE_CASES:
+    for drug, disease in selected:
         key = (_norm_name(drug), _norm_name(disease))
         if key in done:
             _log(f"  SKIP (fingerprint-matched, done): {drug} / {disease}")
@@ -976,12 +1037,12 @@ def run_all(cap: int, fresh: bool, generated_at: str,
         result["holdout_unresolved"] = unresolved or None
         cases.append(result)
         done[key] = result
-        _flush(cases, fingerprint, cap, generated_at)
+        _flush(cases, fingerprint, cap, generated_at, results_json, only)
 
-    _flush(cases, fingerprint, cap, generated_at)
-    with open(RESULTS_MD, "w", encoding="utf-8") as f:
+    _flush(cases, fingerprint, cap, generated_at, results_json, only)
+    with open(results_md, "w", encoding="utf-8") as f:
         f.write(build_markdown(cases, cap, generated_at))
-    _log(f"done -> {RESULTS_MD}")
+    _log(f"done -> {results_md}")
     return cases
 
 
@@ -993,6 +1054,10 @@ def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
                         f"(default {DEFAULT_TARGET_CAP})")
     p.add_argument("--fresh", action="store_true",
                    help="force a clean rerun (required to discard a stale partial)")
+    p.add_argument("--only", default=None,
+                   help="run ONLY the archived fixture(s) whose drug or disease "
+                        "name contains this text (diagnostic subset run; writes "
+                        "to an isolated artifact, never the canonical results)")
     p.add_argument("--label", default=LABEL,
                    help=argparse.SUPPRESS)  # only 'engineering_acceptance' allowed
     return p.parse_args(argv)
@@ -1006,7 +1071,12 @@ def main(argv: Optional[list[str]] = None) -> int:
         _log(str(e))
         return 2
     generated_at = time.strftime("%Y-%m-%dT%H:%M:%S")
-    cases = run_all(args.cap, args.fresh, generated_at, label=args.label)
+    try:
+        cases = run_all(args.cap, args.fresh, generated_at,
+                        label=args.label, only=args.only)
+    except RuntimeError as e:
+        _log(str(e))
+        return 2
     scored = [c for c in cases if c.get("in_universe")]
     gen = sum(1 for c in scored if c.get("generated"))
     valid = sum(1 for c in scored if c.get("mechanistically_valid"))
