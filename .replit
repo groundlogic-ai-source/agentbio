@@ -28,6 +28,10 @@ args = "repodb-smallmol-validation"
 task = "workflow.run"
 args = "benchmark-run"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "v2-engineering-acceptance"
+
 [[workflows.workflow]]
 name = "repodb-validation"
 author = "agent"
@@ -57,6 +61,17 @@ args = "cd /home/runner/workspace && while true; do python3 -m validation.run_be
 
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow]]
+name = "v2-engineering-acceptance"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && python3 -m validation.run_v2_engineering_acceptance --fresh --cap 10 2>&1 | tee /tmp/v2_engineering_acceptance.log"
 
 [agent]
 stack = "PNPM_WORKSPACE"

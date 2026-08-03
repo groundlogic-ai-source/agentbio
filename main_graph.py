@@ -42,9 +42,11 @@ from agents.target_selection import (
     OUTPUT_DIR,
     run as run_target_selection,
     select_for_disease,
+    select_source_diverse_targets,
 )
 from agents.biologist import run_biologist
 from agents.chemist import run_chemist
+from data_sources.multisource_candidates import merge_chemist_candidates
 from agents.reviewer import (
     run_reviewer,
     COMPOSITE_WEIGHTS,
@@ -160,6 +162,14 @@ def _target_from_row(r: dict[str, Any]) -> dict[str, Any]:
         # neighbor primary targets.  Falls back only when the source row
         # genuinely has no method recorded (should not happen in practice).
         "target_discovery_method": r.get("target_discovery_method", "genetic_association"),
+        "mechanism_class": r.get("mechanism_class"),
+        "therapeutic_role": r.get("therapeutic_role", "disease_modifying"),
+        "process_support": r.get("process_support", []),
+        "process_query": r.get("process_query"),
+        "process_source_status": r.get("process_source_status"),
+        "process_ontology_version": r.get("process_ontology_version"),
+        "process_target_priority": r.get("process_target_priority"),
+        "process_class_priority": r.get("process_class_priority"),
     }
 
 
@@ -240,7 +250,7 @@ def _apply_k_cutoff(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 if ((r.get("tractability_score") or 0.0)
                     + (r.get("unmet_need_score") or 0.0)) >= cutoff
             ]
-            result = kept[:TOP_K_MAX]
+            result = select_source_diverse_targets(kept, TOP_K_MAX)
             print(
                 f"[graph] target_selection: fraction-cutoff TOP_K_FRACTION={TOP_K_FRACTION} "
                 f"top_score={top_score:.3f} cutoff={cutoff:.3f} → "
@@ -253,7 +263,7 @@ def _apply_k_cutoff(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "(pharmacological-precedent disease) — falling back to TOP_K_TARGETS"
         )
 
-    return rows[:TOP_K_TARGETS]
+    return select_source_diverse_targets(rows, TOP_K_TARGETS)
 
 
 def target_selection_node(state: PipelineState) -> dict[str, Any]:
@@ -457,6 +467,11 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
             if res.get("pooled_across_multiple_targets"):
                 has_any_pooled = True
 
+    # Active-moiety union across all pursued targets. This collapses salt forms
+    # and cross-source/cross-target duplicates by structure and evidence lineage
+    # while preserving every target membership in the ledger.
+    all_candidates = merge_chemist_candidates(all_candidates)
+
     # Track which targets succeeded (had no error AND produced a result object).
     n_chem_failed = sum(
         1 for r in chemist_results if r and r.get("error")
@@ -497,6 +512,12 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
         "repurposing_only": repurposing_only,
         "pooled_across_multiple_targets": has_any_pooled,
         "approved_reference_set_size": total_approved_fps,
+        "source_status": {
+            f"target_{i + 1}_{targets[i].get('target_symbol', i)}": (
+                (chemist_results[i] or {}).get("source_status", {})
+            )
+            for i in range(k)
+        },
         "reference_set_note": (
             f"Candidates pooled from {k} targets for the same disease "
             f"(TOP_K_TARGETS={TOP_K_TARGETS}). Pathway-neighbor candidates "

@@ -333,6 +333,26 @@ def run_biologist(target: dict[str, Any]) -> dict[str, Any]:
             # pharmacological_precedent_via_parent_umbrella.
             "target_discovery_method": target.get("target_discovery_method",
                                                    "genetic_association"),
+            # Preserve disease-derived process provenance for the Chemist's
+            # target-first evidence ledger. Dropping these fields silently
+            # reclassified literature-mechanism candidates as generic
+            # disease-modifying candidates after cross-target union.
+            "mechanism_class": target.get("mechanism_class"),
+            "therapeutic_role": target.get(
+                "therapeutic_role", "disease_modifying"
+            ),
+            "process_support": target.get("process_support", []),
+            "process_query": target.get("process_query"),
+            "process_source_status": target.get("process_source_status"),
+            "process_ontology_version": target.get(
+                "process_ontology_version"
+            ),
+            "process_target_priority": target.get(
+                "process_target_priority"
+            ),
+            "process_class_priority": target.get(
+                "process_class_priority"
+            ),
         },
         "interacting_genes": interacting_genes,
         "interaction_records": raw_interactions,

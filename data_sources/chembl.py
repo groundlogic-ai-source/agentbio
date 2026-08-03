@@ -854,10 +854,17 @@ def _ensure_holdout_resolved() -> None:
         data = _get_json(f"{BASE_URL}/molecule.json", {
             "parent_chembl_id": parent, "limit": 200,
         })
+        family_inchikeys: set[str] = set()
         for m in data.get("molecules", []):
             if m.get("molecule_chembl_id"):
                 ids.add(m["molecule_chembl_id"])
+            inchikey = (m.get("molecule_structures") or {}).get(
+                "standard_inchi_key"
+            )
+            if inchikey:
+                family_inchikeys.add(inchikey)
         holdout.register_molecules(ids, {parent})
+        holdout.register_inchikeys(family_inchikeys)
     holdout.mark_resolved()
 
 

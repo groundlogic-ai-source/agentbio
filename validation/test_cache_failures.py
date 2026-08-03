@@ -8,12 +8,16 @@ Covers the two bug classes from validation/cache_failure_sweep.md:
 
 Run: python3 -m unittest validation.test_cache_failures
 """
+from concurrent.futures import ThreadPoolExecutor
+import os
 import sys
+import tempfile
 import unittest
 from unittest import mock
 
 sys.path.insert(0, ".")
 
+from cache import cache as cache_backend  # noqa: E402
 from cache.cache import make_key, _get_conn  # noqa: E402
 from data_sources import chembl  # noqa: E402
 
@@ -127,6 +131,46 @@ class TestPoolAndCountCacheGates(unittest.TestCase):
             res = chembl.get_target_bioactivity_count(self.UID)
         self.assertEqual(res["count"], 0)
         self.assertTrue(_has(self.count_key))
+
+
+class TestConcurrentCacheAccess(unittest.TestCase):
+    def test_many_source_workers_can_read_and_write_without_lock_errors(self):
+        """Reviewer-style fan-out must not abort on SQLite write contention."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = os.path.join(tmpdir, "concurrent-cache.db")
+            with mock.patch.object(cache_backend, "DB_PATH", db_path):
+                cache_backend._INITIALIZED_PATHS.discard(
+                    os.path.abspath(db_path)
+                )
+
+                def write_and_read(index: int) -> tuple[int, dict]:
+                    key = f"concurrent-{index}"
+                    value = {"index": index, "provider": index % 4}
+                    cache_backend.set(key, value)
+                    return index, cache_backend.get(key)
+
+                with ThreadPoolExecutor(max_workers=32) as pool:
+                    rows = list(pool.map(write_and_read, range(256)))
+
+                self.assertEqual(
+                    rows,
+                    [
+                        (index, {"index": index, "provider": index % 4})
+                        for index in range(256)
+                    ],
+                )
+                conn = cache_backend._get_conn()
+                try:
+                    self.assertEqual(
+                        conn.execute("PRAGMA journal_mode").fetchone()[0],
+                        "wal",
+                    )
+                    self.assertEqual(
+                        conn.execute("SELECT COUNT(*) FROM cache").fetchone()[0],
+                        256,
+                    )
+                finally:
+                    conn.close()
 
 
 if __name__ == "__main__":

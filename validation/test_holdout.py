@@ -55,9 +55,13 @@ class HoldoutTestBase(unittest.TestCase):
         def fake_get_json(url, params=None):
             if "molecule.json" in url and params and "parent_chembl_id" in params:
                 parent = params["parent_chembl_id"]
-                return {"molecules": [
-                    {"molecule_chembl_id": m} for m in children.get(parent, [])
-                ]}
+                molecules = []
+                for child in children.get(parent, []):
+                    molecules.append(
+                        child if isinstance(child, dict)
+                        else {"molecule_chembl_id": child}
+                    )
+                return {"molecules": molecules}
             raise AssertionError(f"unexpected API call in test: {url} {params}")
         self._p_json = patch.object(chembl, "_get_json", fake_get_json)
         self._p_json.start()
@@ -127,6 +131,31 @@ class TestSaltFormRedaction(HoldoutTestBase):
         holdout.activate(["Sildenafil"])
         kept = chembl.redact_holdout_names(["SILDENAFIL CITRATE", "ASPIRIN"])
         self.assertEqual(kept, ["ASPIRIN"])
+
+    def test_salt_family_resolution_registers_connectivity_identity(self):
+        self._stub_resolution(
+            {"PARENTDRUG": "CHEMBLPARENT"},
+            metas={
+                "CHEMBLPARENT": {"parent_chembl_id": "CHEMBLPARENT"},
+            },
+            children={
+                "CHEMBLPARENT": [{
+                    "molecule_chembl_id": "CHEMBLSALT",
+                    "molecule_structures": {
+                        "standard_inchi_key":
+                            "ABCDEFGHIJKLMN-ABCDEFGHIJ-N",
+                    },
+                }],
+            },
+        )
+        holdout.activate(["ParentDrug"])
+        chembl._ensure_holdout_resolved()
+        self.assertTrue(
+            holdout.matches_inchikey("ABCDEFGHIJKLMN-ZYXWVUTSRQ-N")
+        )
+        self.assertFalse(
+            holdout.matches_inchikey("NOPQRSTUVWXYZA-ABCDEFGHIJ-N")
+        )
 
 
 class TestFailLoud(HoldoutTestBase):

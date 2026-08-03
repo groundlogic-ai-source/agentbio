@@ -35,12 +35,18 @@ from data_sources.chembl import (
     PHARM_PRECEDENT_UMBRELLA_ASSOC_SCORE,
 )
 from data_sources import holdout as _holdout
+from data_sources.europepmc_mechanisms import discover_disease_process_targets
 from data_sources.afdb import get_structure_confidence
 from data_sources.clinicaltrials import check_prior_trials
 
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "output")
 TOP_N = 30
 TOP_TARGETS_PER_DISEASE = 5
+# Provisional v2 engineering policy: literature-supported process targets carry
+# moderate disease specificity. This is fixed independently of the five
+# acceptance fixtures and must be calibrated on a broader drug-grouped corpus
+# before any benchmark freeze.
+PROCESS_EVIDENCE_ASSOC_SCORE = 0.50
 
 TRACTABILITY_WEIGHTS = {
     "chembl_log_count": 0.40,
@@ -812,6 +818,64 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
 
     top_targets = genetic_targets + new_pharm
 
+    # Path C — disease-process / mechanism-class targets from Europe PMC.
+    # This lane is disease-only, holdout-aware, and never queries a drug name.
+    # It widens the mechanism object beyond single causal proteins (e.g.
+    # channel families, mitotic spindle, nucleotide metabolism).
+    process_env = discover_disease_process_targets(disease_name)
+    process_targets: list[dict[str, Any]] = []
+    if process_env.get("status") == "ok":
+        existing_by_uniprot = {
+            t.get("uniprot_id"): t
+            for t in top_targets if t.get("uniprot_id")
+        }
+        for p in process_env.get("targets", []):
+            uid = p.get("uniprot_id")
+            if not uid:
+                continue
+            if uid in existing_by_uniprot:
+                # Independent literature support augments an existing genetic
+                # or precedent target without replacing its discovery method
+                # or duplicating the protein in the pursuit pool.
+                existing = existing_by_uniprot[uid]
+                existing["mechanism_class"] = p.get("mechanism_class")
+                existing["therapeutic_role"] = p.get("therapeutic_role")
+                existing["process_support"] = p.get("supporting_records", [])
+                existing["process_query"] = p.get("query")
+                existing["process_source_status"] = process_env.get("status")
+                existing["process_ontology_version"] = p.get(
+                    "ontology_version")
+                existing["process_target_priority"] = p.get(
+                    "target_priority", 0)
+                existing["process_class_priority"] = p.get("class_priority")
+                continue
+            process_targets.append({
+                "target_symbol": p.get("symbol"),
+                "uniprot_id": uid,
+                "association_score": PROCESS_EVIDENCE_ASSOC_SCORE,
+                "target_discovery_method": "literature_mechanism_class",
+                "mechanism_class": p.get("mechanism_class"),
+                "therapeutic_role": p.get("therapeutic_role"),
+                "process_support": p.get("supporting_records", []),
+                "process_query": p.get("query"),
+                "process_source_status": process_env.get("status"),
+                "process_ontology_version": p.get("ontology_version"),
+                "process_target_priority": p.get("target_priority", 0),
+                "process_class_priority": p.get("class_priority"),
+            })
+            existing_by_uniprot[uid] = process_targets[-1]
+        if process_targets:
+            _log(
+                "  Literature mechanism-class targets added: "
+                f"{[t['target_symbol'] for t in process_targets]}"
+            )
+    elif process_env.get("status") not in ("empty", None):
+        _log(
+            "  WARN Europe PMC mechanism lane "
+            f"{process_env.get('status')}: {process_env.get('error')}"
+        )
+    top_targets = top_targets + process_targets
+
     if not top_targets:
         raise RuntimeError(
             f"Open Targets returned no genetically-associated targets for '{disease_name}' "
@@ -1008,7 +1072,62 @@ def _score_pair(
         "tractability_score": tractability,
         "unmet_need_score": unmet_need,
         "target_discovery_method": target.get("target_discovery_method", "genetic_association"),
+        "mechanism_class": target.get("mechanism_class"),
+        "therapeutic_role": target.get("therapeutic_role", "disease_modifying"),
+        "process_support": target.get("process_support", []),
+        "process_query": target.get("process_query"),
+        "process_source_status": target.get("process_source_status"),
+        "process_ontology_version": target.get("process_ontology_version"),
+        "process_target_priority": target.get("process_target_priority"),
+        "process_class_priority": target.get("process_class_priority"),
     }
+
+
+def select_source_diverse_targets(
+    rows: list[dict[str, Any]],
+    cap: int,
+    *,
+    process_class_slots: int = 2,
+) -> list[dict[str, Any]]:
+    """Preserve ranked targets while reserving canonical process-class coverage.
+
+    Candidate scores and the input row order are never changed. Up to two slots
+    are reserved for priority-0 canonical targets from distinct, cited process
+    classes; all remaining slots are filled by the original target ranking.
+    """
+    if cap <= 0 or not rows:
+        return []
+    ranked = list(rows)
+    canonical = sorted(
+        (
+            row for row in ranked
+            if row.get("mechanism_class")
+            and row.get("process_support")
+            and int(row.get("process_target_priority") or 0) == 0
+        ),
+        key=lambda row: (
+            int(row.get("process_class_priority")
+                if row.get("process_class_priority") is not None else 10_000),
+            ranked.index(row),
+        ),
+    )
+    reserved: list[dict[str, Any]] = []
+    seen_classes: set[str] = set()
+    for row in canonical:
+        cls = str(row.get("mechanism_class"))
+        if cls in seen_classes:
+            continue
+        reserved.append(row)
+        seen_classes.add(cls)
+        if len(reserved) >= min(process_class_slots, cap):
+            break
+
+    selected_ids = {id(row) for row in reserved}
+    for row in ranked:
+        if len(selected_ids) >= cap:
+            break
+        selected_ids.add(id(row))
+    return [row for row in ranked if id(row) in selected_ids][:cap]
 
 
 # ── F2 — precedent calibration (pre-registered constants; see

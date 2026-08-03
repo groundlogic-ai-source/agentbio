@@ -35,6 +35,7 @@ class ChemistCandidate(TypedDict, total=False):
     smiles: Optional[str]
     pchembl_value: Optional[float]
     confidence_score: Optional[int]
+    efficacy_confidence: Optional[float]
     ot_association_score: Optional[float]
     tanimoto_score: Optional[float]
     most_similar_approved_drug: Optional[str]
@@ -49,6 +50,14 @@ class ChemistCandidate(TypedDict, total=False):
     # REQUIRED so the report writer can disclose HOW the target was found.
     target_discovery_method: Required[str]
     mutation_specificity: Optional[dict]
+    source_types: list[str]
+    source_health: dict
+    target_memberships: list[dict]
+    _evidence_ledger: dict
+    mechanism_class: Optional[str]
+    therapeutic_role: str
+    process_support: list[dict]
+    process_source_status: Optional[str]
 
 
 class ReviewerCandidate(TypedDict, total=False):
@@ -60,6 +69,7 @@ class ReviewerCandidate(TypedDict, total=False):
     smiles: Optional[str]
     pchembl_value: Optional[float]
     confidence_score: Optional[int]
+    efficacy_confidence: Optional[float]
     ot_association_score: Optional[float]
     tanimoto_score: Optional[float]
     composite_score: Required[float]
@@ -80,6 +90,14 @@ class ReviewerCandidate(TypedDict, total=False):
     # High-lipophilicity disclosure (XLogP >= 5 from PubChem). Disclosure only.
     pubchem_xlogp: Optional[float]
     high_lipophilicity_flag: Optional[bool]
+    source_types: list[str]
+    source_health: dict
+    target_memberships: list[dict]
+    _evidence_ledger: dict
+    mechanism_class: Optional[str]
+    therapeutic_role: str
+    process_support: list[dict]
+    process_source_status: Optional[str]
 
 
 # ---------------------------------------------------------------------------
@@ -94,6 +112,8 @@ _CHEMIST_REQUIRED_FIELDS: list[tuple[str, str]] = [
     ("target_symbol",           "error"),
     ("uniprot_id",              "error"),   # None is OK; key must be present
     ("target_discovery_method", "error"),
+    ("_evidence_ledger",        "error"),
+    ("source_health",           "warn"),
     ("smiles",                  "warn"),    # None is OK but absence is suspicious
     ("is_approved_drug",        "warn"),
 ]
@@ -110,6 +130,7 @@ _REVIEWER_REQUIRED_FIELDS: list[tuple[str, str]] = [
     ("trials_query_failed",     "error"),
     ("uniprot_id",              "error"),   # None is OK; key must be present
     ("target_discovery_method", "error"),
+    ("_evidence_ledger",        "error"),
 ]
 
 

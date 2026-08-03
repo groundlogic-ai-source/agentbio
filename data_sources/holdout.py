@@ -26,12 +26,19 @@ from typing import Any
 _DRUGS: list[str] = []
 _MOL_IDS: set[str] = set()
 _PARENTS: set[str] = set()
+_INCHIKEY_BLOCKS: set[str] = set()
 _UNRESOLVED: list[str] = []
 _RESOLVED: bool = False
 
 
 def _norm(s: Any) -> str:
     return "".join(ch for ch in str(s or "").lower() if ch.isalnum())
+
+
+def _inchikey_block(inchikey: Any) -> str:
+    value = str(inchikey or "").strip().upper()
+    block = value.split("-", 1)[0]
+    return block if len(block) == 14 and block.isalpha() else ""
 
 
 def is_active() -> bool:
@@ -60,6 +67,7 @@ def activate(drug_names: list[str]) -> None:
     _DRUGS = [d for d in (drug_names or []) if d]
     _MOL_IDS.clear()
     _PARENTS.clear()
+    _INCHIKEY_BLOCKS.clear()
     _UNRESOLVED.clear()
     _RESOLVED = False
 
@@ -69,6 +77,7 @@ def deactivate() -> None:
     _DRUGS = []
     _MOL_IDS.clear()
     _PARENTS.clear()
+    _INCHIKEY_BLOCKS.clear()
     _UNRESOLVED.clear()
     _RESOLVED = False
 
@@ -97,6 +106,14 @@ def register_molecules(mol_ids: set[str], parents: set[str]) -> None:
     _PARENTS.update(p for p in parents if p)
 
 
+def register_inchikeys(inchikeys: set[str]) -> None:
+    """Register structure identities for provider-independent holdout matching."""
+    _INCHIKEY_BLOCKS.update(
+        block for block in (_inchikey_block(value) for value in inchikeys)
+        if block
+    )
+
+
 def matches_name(name: str) -> bool:
     """Exact normalized-name match (catches OT's uppercase INN spellings).
 
@@ -113,3 +130,8 @@ def matches_molecule(mol_id: str | None, parent_id: str | None = None) -> bool:
         (mol_id and mol_id in _MOL_IDS)
         or (parent_id and parent_id in _PARENTS)
     )
+
+
+def matches_inchikey(inchikey: str | None) -> bool:
+    block = _inchikey_block(inchikey)
+    return bool(block and block in _INCHIKEY_BLOCKS)
