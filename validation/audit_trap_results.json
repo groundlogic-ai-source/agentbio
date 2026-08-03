@@ -1,0 +1,110 @@
+{
+  "generated_at": "2026-08-03T23:16:42.680673+00:00",
+  "label": "audit_trap_benchmark",
+  "kind": "audit_traps",
+  "preregistration": "validation/audit_traps_preregistration.md",
+  "offline": true,
+  "traps": [
+    {
+      "id": "T1",
+      "class": "safety_cap_disclosure",
+      "caught": true,
+      "error": null
+    },
+    {
+      "id": "T2",
+      "class": "blackbox_not_withdrawal",
+      "caught": true,
+      "error": null
+    },
+    {
+      "id": "T3",
+      "class": "direction_incompatible",
+      "caught": true,
+      "error": null
+    },
+    {
+      "id": "T4",
+      "class": "label_artifact_screen",
+      "caught": true,
+      "error": null
+    },
+    {
+      "id": "T5",
+      "class": "confirmation_discipline",
+      "caught": true,
+      "error": null
+    },
+    {
+      "id": "T6",
+      "class": "unresolvable_name_honesty",
+      "caught": true,
+      "error": null
+    },
+    {
+      "id": "T7",
+      "class": "salt_form_dedup",
+      "caught": true,
+      "error": null
+    },
+    {
+      "id": "T8",
+      "class": "degraded_source_honesty",
+      "caught": true,
+      "error": null
+    },
+    {
+      "id": "T9",
+      "class": "unobserved_not_zero",
+      "caught": true,
+      "error": null
+    },
+    {
+      "id": "T10",
+      "class": "xlogp_unresolved_disclosure",
+      "caught": true,
+      "error": null
+    }
+  ],
+  "controls": [
+    {
+      "id": "C1",
+      "class": "clean_candidate_no_flags",
+      "clean": true,
+      "error": null
+    },
+    {
+      "id": "C2",
+      "class": "verified_hypothesis_not_flagged",
+      "clean": true,
+      "error": null
+    },
+    {
+      "id": "C3",
+      "class": "measured_zero_still_counts",
+      "clean": true,
+      "error": null
+    },
+    {
+      "id": "C4",
+      "class": "resolved_absent_not_unresolved",
+      "clean": true,
+      "error": null
+    }
+  ],
+  "metrics": {
+    "traps_total": 10,
+    "traps_caught": 10,
+    "trap_recall": 1.0,
+    "controls_total": 4,
+    "controls_false_flagged": 0,
+    "control_false_flag_rate": 0.0,
+    "precision": 1.0,
+    "thresholds": {
+      "min_trap_recall": 0.9,
+      "max_control_false_flag_rate": 0.25
+    }
+  },
+  "verdict": "PASS",
+  "limitations": "Engineering acceptance instrument measuring audit-layer detection of known failure classes against stubbed inputs. NOT discovery accuracy; must never be reported as benchmark v2. External organizational validation still requires a frozen claim set with independent ground truth and an inter-rater study."
+}

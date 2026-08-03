@@ -36,6 +36,9 @@ from resume_review import resume_run
 from api import jobs_db
 from api import research_db
 from api import saved_reports_db
+from api import triage_db
+from api import triage as _triage
+from api import dossier as _dossier
 from api import audit as _audit
 
 # Node names emitted by graph.stream(...) map 1:1 onto current_stage values.
@@ -64,6 +67,7 @@ jobs_db.init_db()
 jobs_db.reap_orphaned_running_jobs()
 research_db.init_db()
 saved_reports_db.init_db()
+triage_db.init_db()
 
 
 @app.on_event("startup")
@@ -98,6 +102,12 @@ class BatchRequest(BaseModel):
 class AuditRequest(BaseModel):
     disease_name: str
     drug_name: str
+    job_id: Optional[str] = None  # hint an existing job to bypass DB search
+
+
+class TriageRequest(BaseModel):
+    disease_name: str
+    drug_names: list[str]
     job_id: Optional[str] = None  # hint an existing job to bypass DB search
 
 
@@ -424,6 +434,70 @@ def audit_drug(req: AuditRequest) -> dict[str, Any]:
     )
 
 
+@app.post("/api/audit/triage")
+def triage_candidate_list(req: TriageRequest) -> dict[str, Any]:
+    """
+    Adversarially audit a caller-supplied candidate list (up to 25 drugs)
+    against the persisted reviewed-candidates pool of one completed case.
+
+    Reuses run_audit per drug with narration disabled — no pipeline re-run, no
+    extra LLM calls, deterministic verdicts. The run is persisted to Postgres
+    and retrievable by run id (GET /api/audit/triage/{run_id}).
+    """
+    if not req.disease_name.strip():
+        raise HTTPException(status_code=400, detail="disease_name is required")
+    if not req.drug_names:
+        raise HTTPException(status_code=400, detail="drug_names must not be empty")
+    if len(req.drug_names) > _triage.MAX_TRIAGE_DRUGS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"triage lists are capped at {_triage.MAX_TRIAGE_DRUGS} drugs "
+                   f"per run; got {len(req.drug_names)}",
+        )
+    return _triage.run_triage(
+        req.disease_name.strip(), req.drug_names, job_id_hint=req.job_id,
+    )
+
+
+@app.get("/api/audit/triage/{run_id}")
+def get_triage_run(run_id: str) -> dict[str, Any]:
+    """Retrieve a persisted triage run by id (the audit trail)."""
+    row = triage_db.get_triage_run(run_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail=f"triage run {run_id!r} not found")
+    return row
+
+
+@app.get("/api/audit/triage")
+def list_triage_runs() -> list[dict[str, Any]]:
+    """Recent triage runs (summary fields only)."""
+    return triage_db.list_triage_runs()
+
+
+@app.get("/api/audit/dossiers")
+def list_audit_dossiers() -> list[dict[str, Any]]:
+    """Saved hypothesis reports with their current read-time audit status.
+
+    Status is recomputed from the registry on every request (never served
+    from the frozen snapshot), so a dossier whose claims stop confirming
+    flips status here even though the saved narrative stays frozen.
+    """
+    return _dossier.list_dossiers()
+
+
+@app.get("/api/audit/dossiers/{hypothesis_id}/claims")
+def get_dossier_claims(hypothesis_id: str) -> dict[str, Any]:
+    """Claim ledger for one dossier: framings, effect sizes, confirmation,
+    confound checks, provenance, reviewer tags, and the facts fingerprint
+    matching the report-cache re-gating scheme."""
+    ledger = _dossier.dossier_claims(hypothesis_id)
+    if ledger is None:
+        raise HTTPException(
+            status_code=404, detail=f"hypothesis_id {hypothesis_id!r} not found"
+        )
+    return ledger
+
+
 @app.get("/api/candidates")
 def get_candidate_pool(
     disease_name: str,
@@ -518,6 +592,29 @@ def _benchmark_summary(artifact: dict[str, Any], label: str) -> dict[str, Any]:
     }
 
 
+def _audit_trap_summary(artifact: dict[str, Any]) -> dict[str, Any]:
+    """Summary card for the audit trap benchmark — a different shape from the
+    rediscovery artifacts (detection metrics, not Top-N ranks)."""
+    m = artifact.get("metrics") or {}
+    return {
+        "kind": "audit_traps",
+        "label": "Audit trap benchmark",
+        "generated_at": artifact.get("generated_at"),
+        "verdict": artifact.get("verdict"),
+        "traps_total": m.get("traps_total"),
+        "traps_caught": m.get("traps_caught"),
+        "trap_recall": m.get("trap_recall"),
+        "controls_total": m.get("controls_total"),
+        "controls_false_flagged": m.get("controls_false_flagged"),
+        "control_false_flag_rate": m.get("control_false_flag_rate"),
+        "precision": m.get("precision"),
+        "thresholds": m.get("thresholds") or {},
+        "traps": artifact.get("traps") or [],
+        "controls": artifact.get("controls") or [],
+        "limitations": artifact.get("limitations"),
+    }
+
+
 @app.get("/api/research/benchmarks")
 def get_research_benchmarks() -> dict[str, Any]:
     """Expose existing validation artifacts with their provenance and limits."""
@@ -531,6 +628,9 @@ def get_research_benchmarks() -> dict[str, Any]:
         for label, filename in artifacts
         if (artifact := _load_validation_artifact(filename)) is not None
     ]
+    trap_artifact = _load_validation_artifact("audit_trap_results.json")
+    if trap_artifact is not None:
+        summaries.append(_audit_trap_summary(trap_artifact))
     return {
         "benchmarks": summaries,
         "pilot_status": "not_run",
@@ -981,6 +1081,8 @@ def get_research_hypotheses(include_archived: bool = False) -> list[dict]:
     # embedded in outcome_note as "TAG: reason" rather than a standalone column.
     # Extracting it here makes it a first-class field in every API response so the
     # UI and callers can filter/display it without string-parsing outcome_note.
+    # Single source of truth: api/dossier.parse_reviewer_tag (shared with the
+    # dossier audit workspace — do not fork the parsing).
     for rec in records:
         note = str(rec.get("outcome_note") or "")
         dt = str(rec.get("discovery_test_type") or "").strip()
@@ -988,27 +1090,7 @@ def get_research_hypotheses(include_archived: bool = False) -> list[dict]:
         # A row was actually tested if it has a test_type AND a raw p-value.
         # Rows with a test_type but no raw_p are degenerate (separation/non-convergence).
         has_result = bool(dt and dp is not None and dp != "")
-        if note.startswith("SKIPPED (duplicate):"):
-            rtag = "SKIPPED_DUPLICATE"
-        elif note.startswith("hard-blocked:"):
-            rtag = "HARD_BLOCKED"
-        elif note.startswith("auto-demoted"):
-            rtag = "NEEDS_ENRICHMENT"
-        elif note.startswith("not tested:"):
-            rtag = "NOT_TESTED"
-        elif note.startswith("DISCARDED:") or note.startswith("DISCARDED "):
-            rtag = "DISCARDED"
-        elif note.startswith("NEEDS_ENRICHMENT:") or note.startswith("NEEDS_ENRICHMENT "):
-            rtag = "NEEDS_ENRICHMENT"
-        elif note.startswith("REFUTED (direction):"):
-            rtag = "REFUTED"
-        elif note.startswith("LABEL_ARTIFACT_SUSPECT:"):
-            rtag = "LABEL_ARTIFACT_SUSPECT"
-        elif has_result:
-            rtag = "READY"
-        else:
-            rtag = ""
-        rec["reviewer_tag"] = rtag
+        rec["reviewer_tag"] = _dossier.parse_reviewer_tag(note, has_result)
     return records
 
 

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { auditDrug } from "../api";
+import TriagePanel from "./TriagePanel";
+import DossierPanel from "./DossierPanel";
 
 // ── Tiny shared primitives ────────────────────────────────────────────────────
 
@@ -396,9 +398,9 @@ function UnresolvedResult({ data }) {
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+// ── Single-drug audit pane ────────────────────────────────────────────────────
 
-export default function AuditTab({ onNavigate }) {
+function SingleDrugAudit({ onNavigate }) {
   const [disease, setDisease] = useState("");
   const [drug, setDrug]       = useState("");
   const [loading, setLoading] = useState(false);
@@ -526,6 +528,51 @@ export default function AuditTab({ onNavigate }) {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Unified Audit mode ────────────────────────────────────────────────────────
+
+const AUDIT_MODES = [
+  { id: "triage",  label: "Triage a list" },
+  { id: "single",  label: "Single drug" },
+  { id: "dossier", label: "Dossiers" },
+];
+
+export default function AuditTab({ onNavigate }) {
+  const [mode, setMode] = useState("triage");
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+      <div>
+        <h2 className="text-2xl font-semibold" style={{ color: "var(--ink)" }}>Audit</h2>
+        <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
+          Independent verification, not discovery: triage your own candidate list,
+          audit a single drug, or re-verify saved dossiers claim by claim.
+        </p>
+      </div>
+
+      <div className="flex gap-2 border-b pb-0" style={{ borderColor: "var(--border)" }}>
+        {AUDIT_MODES.map((m) => (
+          <button
+            key={m.id}
+            onClick={() => setMode(m.id)}
+            className="text-sm px-3 py-2 font-medium transition-colors"
+            style={{
+              color: mode === m.id ? "var(--ink)" : "var(--ink-muted)",
+              borderBottom: mode === m.id ? "2px solid var(--accent, #3a6ea5)" : "2px solid transparent",
+              marginBottom: "-1px",
+            }}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+
+      {mode === "triage" && <TriagePanel onNavigate={onNavigate} />}
+      {mode === "single" && <SingleDrugAudit onNavigate={onNavigate} />}
+      {mode === "dossier" && <DossierPanel />}
     </div>
   );
 }

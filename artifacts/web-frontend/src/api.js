@@ -172,6 +172,35 @@ export function getResearchBenchmarks() {
   return request("/api/research/benchmarks");
 }
 
+// ── Audit mode: list triage + dossier workspace ─────────────────────────────
+// Triage audits a caller-supplied drug list against one completed case's
+// persisted pool. The run is persisted server-side and retrievable by run id.
+export function triageCandidates(diseaseName, drugNames, jobId = null) {
+  const body = { disease_name: diseaseName, drug_names: drugNames };
+  if (jobId) body.job_id = jobId;
+  return request("/api/audit/triage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function listTriageRuns() {
+  return request("/api/audit/triage");
+}
+
+export function getTriageRun(runId) {
+  return request(`/api/audit/triage/${encodeURIComponent(runId)}`);
+}
+
+export function getAuditDossiers() {
+  return request("/api/audit/dossiers");
+}
+
+export function getDossierClaims(hypothesisId) {
+  return request(`/api/audit/dossiers/${encodeURIComponent(hypothesisId)}/claims`);
+}
+
 // ── Saved reports ──────────────────────────────────────────────────────────
 // Freeze a generated report as a permanent snapshot. Returns the stored row.
 export function saveReport(payload) {

@@ -133,6 +133,7 @@ def run_audit(
     drug_name: str,
     *,
     job_id_hint: Optional[str] = None,
+    narrate: bool = True,
 ) -> dict[str, Any]:
     """
     Core audit function. Returns a structured dict. Status values:
@@ -248,8 +249,12 @@ def run_audit(
             "spelling, or try the INN/generic name rather than a brand name or "
             "salt form."
         )
-    else:
+    elif narrate:
         result["narration"] = _narrate(result)
+    else:
+        # Batch callers (triage) skip the LLM: verdicts stay deterministic
+        # and a long list costs no extra model calls.
+        result["narration"] = None
 
     # 6. Mandatory disclosure, always present regardless of outcome
     result["disclosure"] = (
