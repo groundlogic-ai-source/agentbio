@@ -387,5 +387,87 @@ class DeterminismTests(unittest.TestCase):
         self.assertTrue(merged["_evidence_ledger"]["efficacy_not_applicable"])
 
 
+class CorroborationLiftTest(unittest.TestCase):
+    """Independent corroboration de-quantizes the per-modality quality floor.
+
+    ``_dimension_quality`` is a MAX over single records, so each modality's
+    base quality is a hard ceiling: every qualified ChEMBL-only candidate
+    lands on exactly 0.70 unless it clears the pChEMBL potency lift.  Large
+    pools then collapse onto one identical score and the resulting rank order
+    is arbitrary.  Corroboration across genuinely DIFFERENT modalities is what
+    separates them — never repetition of one modality, and never a provider
+    re-import (those are already lineage-deduplicated).
+    """
+
+    def _rec(self, source_type, **kw):
+        return EvidenceRecord(
+            provider=kw.pop("provider", "p"),
+            source_type=source_type,
+            evidence_role=EvidenceRole.EFFICACY,
+            source_id=kw.pop("source_id", f"id-{source_type.value}"),
+            molecule_name="SyntheticMoiety",
+            qualification_status=kw.pop(
+                "qualification_status", QualificationStatus.QUALIFIED),
+            **kw,
+        )
+
+    def test_single_modality_gets_no_corroboration_lift(self):
+        self.assertAlmostEqual(
+            efficacy_confidence([self._rec(SourceType.BIOACTIVITY_ASSAY)]), 0.70)
+
+    def test_repeated_same_modality_is_not_corroboration(self):
+        recs = [self._rec(SourceType.BIOACTIVITY_ASSAY, source_id=f"a{i}")
+                for i in range(5)]
+        self.assertAlmostEqual(efficacy_confidence(recs), 0.70)
+
+    def test_distinct_modalities_lift_confidence_but_stay_bounded(self):
+        two = efficacy_confidence([
+            self._rec(SourceType.BIOACTIVITY_ASSAY),
+            self._rec(SourceType.PATHWAY),
+        ])
+        three = efficacy_confidence([
+            self._rec(SourceType.BIOACTIVITY_ASSAY),
+            self._rec(SourceType.PATHWAY),
+            self._rec(SourceType.PUBLICATION),
+        ])
+        self.assertGreater(two, 0.70)
+        self.assertGreater(three, two)
+        self.assertLess(three, 1.0)
+
+    def test_corroboration_never_exceeds_one(self):
+        recs = [self._rec(st) for st in (
+            SourceType.CLINICAL_TRIAL, SourceType.MECHANISM,
+            SourceType.GENETIC_ASSOCIATION, SourceType.BIOACTIVITY_ASSAY,
+            SourceType.PUBLICATION, SourceType.PATHWAY, SourceType.DRUG_LABEL,
+        )]
+        self.assertLessEqual(efficacy_confidence(recs), 1.0)
+
+    def test_unqualified_and_contradicted_do_not_corroborate(self):
+        base = [self._rec(SourceType.BIOACTIVITY_ASSAY)]
+        noisy = base + [
+            self._rec(SourceType.PATHWAY,
+                      qualification_status=QualificationStatus.UNQUALIFIED),
+            self._rec(SourceType.PUBLICATION,
+                      contradiction_status=ContradictionStatus.CONTRADICTED),
+        ]
+        self.assertAlmostEqual(
+            efficacy_confidence(noisy), efficacy_confidence(base))
+
+    def test_generator_input_is_not_consumed_twice(self):
+        recs = (r for r in [
+            self._rec(SourceType.BIOACTIVITY_ASSAY),
+            self._rec(SourceType.PATHWAY),
+        ])
+        self.assertGreater(efficacy_confidence(recs), 0.70)
+
+    def test_efficacy_and_safety_corroborate_independently(self):
+        safety_only = [
+            self._rec(SourceType.ADVERSE_EVENT),
+            self._rec(SourceType.REGULATORY_APPROVAL),
+        ]
+        self.assertIs(efficacy_confidence(safety_only), NOT_APPLICABLE)
+        self.assertGreater(safety_confidence(safety_only), 0.70)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

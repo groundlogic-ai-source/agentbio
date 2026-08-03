@@ -66,7 +66,8 @@ COMPOSITE_WEIGHTS: dict[str, float] = {
     "efficacy_evidence": 0.50,
     "ot_association": 0.20,   # ot_association_score direct [0, 1] — no pool normalization
     "tanimoto": 0.15,         # tanimoto_score direct [0, 1] — no pool normalization
-    "no_failed_trial": 0.15,  # 1 if no prior failed trial and query succeeded; 0 otherwise
+    "no_failed_trial": 0.15,  # 1 = looked and found none; 0 = looked and found one;
+                              # None = never observed -> term dropped entirely
 }
 # A small, bounded evidence-resolution term.  It only distinguishes candidates
 # whose normalized evidence otherwise lands on the same floor; it is not a
@@ -265,45 +266,112 @@ def _prefetch_candidate_context(
     ]
 
 
-def _no_failed_trial_credit(trials: dict[str, Any]) -> bool:
-    """Fail closed when trial evidence is unavailable or holdout-redacted."""
+#: Discovery methods whose ``ot_association_score`` is a STAMPED CONSTANT
+#: (0.90 direct precedent / 0.70 parent-umbrella, see
+#: agents/target_selection.py) rather than a measured Open Targets
+#: target-disease association.
+_PRECEDENT_STAMPED_DISCOVERY = {
+    "pharmacological_precedent",
+    "pharmacological_precedent_via_parent_umbrella",
+}
+
+
+def _trial_evidence_term(trials: dict[str, Any]) -> Optional[bool]:
+    """Trial evidence as an OBSERVATION, or None when it was never observed.
+
+    Three distinct states, previously collapsed into two:
+
+      * observed, no negative repurposing result -> True  (credit earned)
+      * observed, a negative repurposing result  -> False (adverse evidence,
+        genuinely penalised — this term stays in the denominator)
+      * NOT OBSERVED (API failure or holdout redaction) -> None
+
+    The old behaviour returned False for the third state *while keeping the
+    term in the denominator*, which scores "we never looked" identically to
+    "we looked and found a failed trial".  That is not conservatism, it is a
+    measurement error: it silently subtracts a fixed 0.15 of composite from
+    exactly those candidates the pipeline is blind to.  Under a benchmark
+    holdout the redacted candidate is the drug being measured and no
+    competitor is redacted, so the penalty lands only on the drug whose rank
+    IS the measurement.  ``_coverage_aware_composite`` now treats None as a
+    coverage gap, exactly as an unavailable Tanimoto is already handled.
+    """
     if trials.get("query_failed") or trials.get("holdout_redacted"):
-        return False
+        return None
     return not trials.get("has_negative_repurposing_result", False)
+
+
+def _measured_ot_association(candidate: dict[str, Any]) -> Optional[float]:
+    """Measured OT association, or None when the score is a stamped constant.
+
+    Targets surfaced by pharmacological precedent carry NO measured
+    target-disease association; target selection stamps a fixed constant
+    (0.90 direct, 0.70 parent-umbrella) purely so those rows can be ranked
+    during selection.  Feeding that constant into a 0.20-weighted scoring
+    term hands every candidate in a precedent lane a flat advantage over
+    candidates entering through a genuinely measured genetic association —
+    an advantage that has nothing to do with the candidate drug itself, and
+    which systematically buries drugs that arrive via the true causal gene.
+    Treat a stamped constant as a coverage gap, not as evidence.
+
+    The constant remains fully available for target selection, ordering and
+    dossier disclosure; only the composite score stops treating it as a
+    measurement.
+    """
+    method = str(candidate.get("target_discovery_method") or "").strip().lower()
+    if method in _PRECEDENT_STAMPED_DISCOVERY:
+        return None
+    raw = candidate.get("ot_association_score")
+    if raw is None:
+        return None
+    try:
+        return float(raw)
+    except (TypeError, ValueError):
+        return None
 
 
 def _coverage_aware_composite(
     efficacy_evidence: float,
-    ot_association: float,
+    ot_association: Optional[float],
     tanimoto: Optional[float],
-    no_failed_trial: bool,
+    no_failed_trial: Optional[bool],
 ) -> tuple[float, float]:
-    """Score evidence without converting an unavailable similarity into a zero.
+    """Score only what was actually OBSERVED, renormalized over its own weight.
 
-    Molecular similarity is an optional structural measurement: it is absent
-    for valid candidates with no resolvable structure/reference comparison.
-    Treating that absence as a measured 0.0 systematically ranks data-poor
-    modalities below equally supported small molecules.  When similarity is
-    unavailable, normalize the *observed* efficacy, disease-association, and
-    trial terms over their available maximum.  This is not a positive
-    similarity credit: a measured 0.0 remains 0.0.
+    One rule, applied to every optional term: an observation that was never
+    made is a COVERAGE GAP, never a measured value.  A term that is None is
+    dropped from the numerator AND the denominator; the remaining observed
+    terms are renormalized over the weight they actually cover.  A term that
+    was measured keeps its measured value, including a genuine 0.0.
 
-    Trial evidence deliberately stays in the denominator.  A failed or
-    holdout-redacted lookup cannot establish "no failed trial", so it receives
-    no credit under the existing fail-closed policy.
+      * ``tanimoto`` None      -> no resolvable structure comparison.
+        A measured 0.0 is adverse structural evidence and still counts.
+      * ``ot_association`` None -> the target carries no MEASURED
+        target-disease association (precedent-stamped constant, or absent).
+        Scoring a stamped constant as evidence would flatly advantage every
+        candidate in that lane regardless of the drug.
+      * ``no_failed_trial`` None -> the trial lookup failed or was
+        holdout-redacted.  Previously this was forced to 0 while staying in
+        the denominator, making "we never looked" cost exactly as much as
+        "we looked and found a failed trial" — a fixed 0.15 penalty imposed
+        on precisely the candidates the pipeline could not see.  A measured
+        failed trial is still False and still penalised.
+
+    This is never a positive credit for missing data: dropping a term leaves
+    the candidate scored on its own observed evidence rather than imputing a
+    zero it never earned.
 
     Returns (composite, evidence_weight_coverage).
     """
-    numerator = (
-        COMPOSITE_WEIGHTS["efficacy_evidence"] * efficacy_evidence
-        + COMPOSITE_WEIGHTS["ot_association"] * ot_association
-        + COMPOSITE_WEIGHTS["no_failed_trial"] * (1 if no_failed_trial else 0)
-    )
-    coverage = (
-        COMPOSITE_WEIGHTS["efficacy_evidence"]
-        + COMPOSITE_WEIGHTS["ot_association"]
-        + COMPOSITE_WEIGHTS["no_failed_trial"]
-    )
+    numerator = COMPOSITE_WEIGHTS["efficacy_evidence"] * efficacy_evidence
+    coverage = COMPOSITE_WEIGHTS["efficacy_evidence"]
+
+    if ot_association is not None:
+        numerator += COMPOSITE_WEIGHTS["ot_association"] * ot_association
+        coverage += COMPOSITE_WEIGHTS["ot_association"]
+    if no_failed_trial is not None:
+        numerator += COMPOSITE_WEIGHTS["no_failed_trial"] * (1 if no_failed_trial else 0)
+        coverage += COMPOSITE_WEIGHTS["no_failed_trial"]
     if tanimoto is not None:
         numerator += COMPOSITE_WEIGHTS["tanimoto"] * tanimoto
         coverage += COMPOSITE_WEIGHTS["tanimoto"]
@@ -351,17 +419,17 @@ def run_reviewer(chemist_output: dict[str, Any],
         trials = context["trials"]
         # Fail-closed: unavailable OR holdout-redacted trial evidence cannot
         # establish the absence of a failed prior trial.
-        no_failed_trial = _no_failed_trial_credit(trials)
-        if trials.get("query_failed") or trials.get("holdout_redacted"):
-            reason = (
-                "holdout-redacted"
-                if trials.get("holdout_redacted")
-                else "query failed"
-            )
+        no_failed_trial = _trial_evidence_term(trials)
+        _trial_basis = (
+            "observed" if no_failed_trial is not None
+            else ("holdout_redacted" if trials.get("holdout_redacted")
+                  else "query_failed")
+        )
+        if no_failed_trial is None:
             print(
-                f"[reviewer] ClinicalTrials {reason} for "
-                f"{c['drug_name']} / {disease} — withholding "
-                "no_failed_trial credit (fail-closed)"
+                f"[reviewer] ClinicalTrials {_trial_basis} for "
+                f"{c['drug_name']} / {disease} — trial term dropped from the "
+                "composite as a coverage gap (NOT scored as a failed trial)"
             )
 
         n_pchembl = _norm_pchembl(c.get("pchembl_value"))
@@ -372,8 +440,19 @@ def run_reviewer(chemist_output: dict[str, Any],
         n_tanimoto: Optional[float] = (
             None if raw_tanimoto is None else float(raw_tanimoto)
         )
-        # OT association score is inherently [0, 1]; use directly.
-        n_ot = float(c.get("ot_association_score") or 0.0)
+        # OT association is used directly when it is a real measurement.  A
+        # precedent-stamped constant is not a measurement, so it becomes a
+        # coverage gap rather than a flat lane-wide score advantage.
+        n_ot = _measured_ot_association(c)
+        _ot_basis = (
+            "measured_open_targets" if n_ot is not None
+            else (
+                "precedent_stamped_constant"
+                if str(c.get("target_discovery_method") or "").strip().lower()
+                in _PRECEDENT_STAMPED_DISCOVERY
+                else "unavailable"
+            )
+        )
         conf = c.get("confidence_score") or 0
         legacy_evidence = 0.6 * n_pchembl + 0.4 * (conf / 9)
         ledger_evidence = c.get("efficacy_confidence")
@@ -500,13 +579,22 @@ def run_reviewer(chemist_output: dict[str, Any],
                     if ledger_evidence is not None
                     else "legacy_pchembl_assay_confidence"
                 ),
-                "normalized_ot_association": round(n_ot, 4),
+                "normalized_ot_association": (
+                    round(n_ot, 4) if n_ot is not None else None
+                ),
+                "ot_association_available": n_ot is not None,
+                "ot_association_basis": _ot_basis,
                 "normalized_tanimoto": (
                     round(n_tanimoto, 4) if n_tanimoto is not None else None
                 ),
                 "similarity_available": n_tanimoto is not None,
                 "evidence_weight_coverage": round(evidence_weight_coverage, 4),
-                "no_failed_trial": 1 if no_failed_trial else 0,
+                "no_failed_trial": (
+                    None if no_failed_trial is None
+                    else (1 if no_failed_trial else 0)
+                ),
+                "trial_evidence_observed": no_failed_trial is not None,
+                "trial_evidence_basis": _trial_basis,
                 "qualified_directional": qualified_directional,
                 "qualified_directional_bonus": directional_bonus,
             },

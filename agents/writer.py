@@ -87,6 +87,26 @@ def _citations(candidate: dict[str, Any],
     }
 
 
+# Score terms that can be genuinely UNOBSERVED rather than measured.  When the
+# Reviewer reports None for one of these it dropped the term from both sides of
+# the composite, so the breakdown must show it as excluded, not as a zero.
+# Maps score_components key -> (basis field, fallback wording).
+_COVERAGE_GAP_TERMS = {
+    "normalized_ot_association": (
+        "ot_association_basis",
+        "no measured target-disease association",
+    ),
+    "no_failed_trial": (
+        "trial_evidence_basis",
+        "trial lookup unavailable",
+    ),
+    "normalized_tanimoto": (
+        "tanimoto_basis",
+        "no resolvable structure comparison",
+    ),
+}
+
+
 def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> str:
     weights = formula.get("composite_weights", {})
     comp = candidate.get("score_components", {}) or {}
@@ -101,9 +121,20 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
     lines = ["| Term | Weight | Component value | Contribution |",
              "| --- | ---: | ---: | ---: |"]
     subtotal = 0.0
+    excluded: list[str] = []
     for wkey, label, ckey in rows:
         w = float(weights.get(wkey, 0.0))
         val = comp.get(ckey)
+        if val is None and ckey in _COVERAGE_GAP_TERMS:
+            # The observation was never made, so the Reviewer dropped this term
+            # from BOTH the numerator and the denominator.  Printing a 0.0000
+            # contribution against its full weight would misreport how the
+            # score was actually computed and would read as adverse evidence.
+            basis_key, default_basis = _COVERAGE_GAP_TERMS[ckey]
+            basis = comp.get(basis_key) or default_basis
+            excluded.append(f"{label} ({basis})")
+            lines.append(f"| {label} | excluded | not observed — {basis} | — |")
+            continue
         contrib = w * float(val) if isinstance(val, (int, float)) else 0.0
         subtotal += contrib
         lines.append(f"| {label} | {w:.2f} | {_fmt(val)} | {contrib:.4f} |")
@@ -160,6 +191,21 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
     lines.append(f"Weighted sum before penalty = {subtotal:.4f}; "
                  f"penalty = {penalty:.4f}; "
                  f"reported composite_score = {_fmt(total, 4)}.{cap_note}")
+
+    if excluded:
+        coverage = comp.get("evidence_weight_coverage")
+        lines.append("")
+        lines.append(
+            "**Coverage note.** " + "; ".join(excluded) + ". "
+            "These observations were never made, so they were excluded from "
+            "the score rather than recorded as zero — the remaining terms are "
+            "renormalized over the weight actually covered"
+            + (f" ({_fmt(coverage, 2)} of 1.00)." if coverage is not None else ".")
+            + " This is not a credit for missing data: a *measured* zero "
+            "(including a real failed trial) still counts against the "
+            "candidate. It means the pipeline could not see this evidence, "
+            "so the candidate is scored on what is actually known about it."
+        )
     return "\n".join(lines)
 
 
@@ -238,7 +284,9 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
         ("Boltz ADME — solubility", _fmt(adme.get("solubility"))),
         ("openFDA adverse-event signal (FAERS)", ae_str),
         ("Prior trials for this exact drug+disease",
-         ("⚠ query failed (API unreachable) — trial count unavailable; no_failed_trial credit withheld"
+         ("⚠ query failed (API unreachable) — trial count unavailable; the "
+          "trial term was excluded from the score as a coverage gap "
+          "(neither credited nor penalised)"
           if candidate.get("trials_query_failed")
           else _fmt(candidate.get("prior_trial_count")))),
         ("Target discovery method",

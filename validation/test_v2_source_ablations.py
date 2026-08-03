@@ -97,15 +97,17 @@ class SourceConditionsTest(unittest.TestCase):
 # ── Holdout self-audit ────────────────────────────────────────────────────────
 
 class HoldoutSelfAuditTest(unittest.TestCase):
-    def test_passes_when_redacted_and_no_credit(self):
+    def test_passes_when_redacted_and_term_dropped_as_coverage_gap(self):
+        # None, not 0: a redacted lookup is an unmade observation, so the term
+        # leaves BOTH sides of the composite instead of scoring as a failure.
         row = {"trials_holdout_redacted": True,
-               "score_components": {"no_failed_trial": 0}}
+               "score_components": {"no_failed_trial": None}}
         audit = A.holdout_self_audit(row)
         self.assertTrue(audit["ok"])
 
     def test_fails_when_not_redacted(self):
         row = {"trials_holdout_redacted": False,
-               "score_components": {"no_failed_trial": 0}}
+               "score_components": {"no_failed_trial": None}}
         audit = A.holdout_self_audit(row)
         self.assertFalse(audit["ok"])
         self.assertIn("trials_holdout_redacted", audit["reason"])
@@ -117,10 +119,20 @@ class HoldoutSelfAuditTest(unittest.TestCase):
         self.assertFalse(audit["ok"])
         self.assertIn("no_failed_trial", audit["reason"])
 
+    def test_fails_when_redacted_drug_was_penalised_as_a_failed_trial(self):
+        # The regression this audit exists to catch: scoring the held-out drug
+        # a hard 0 for evidence the harness itself hid from the pipeline.
+        row = {"trials_holdout_redacted": True,
+               "score_components": {"no_failed_trial": 0}}
+        audit = A.holdout_self_audit(row)
+        self.assertFalse(audit["ok"])
+        self.assertIn("coverage gap", audit["reason"])
+
     def test_fails_when_missing_components(self):
         row = {"trials_holdout_redacted": True}
         audit = A.holdout_self_audit(row)
         self.assertFalse(audit["ok"])
+        self.assertIn("missing", audit["reason"])
 
     def test_none_row_fails(self):
         audit = A.holdout_self_audit(None)

@@ -35,8 +35,10 @@ Protocol seals (each unit-tested in validation/test_v2_source_ablations.py):
   * Per-condition source/config/code FINGERPRINT: a resume is refused when the
     condition set, config, or pipeline source bytes changed (unless --fresh).
   * Holdout SELF-AUDIT of every matched row: ``trials_holdout_redacted`` must be
-    True and ``score_components.no_failed_trial`` must be 0.  A row failing that
-    is marked invalid/error and NOT counted as generated/valid/hit.
+    True and ``score_components.no_failed_trial`` must be None (the term is
+    dropped as a coverage gap, so the redacted drug is neither credited nor
+    penalised).  A row failing that is marked invalid/error and NOT counted as
+    generated/valid/hit.
 
 Grouping: evaluation is grouped by NORMALIZED DRUG (confirmed active moiety) so
 a drug appearing under two diseases (e.g. Imatinib) cannot inflate provider-level
@@ -215,8 +217,14 @@ def holdout_self_audit(matched_row: Optional[dict[str, Any]]) -> dict[str, Any]:
     """Audit a matched row for holdout integrity.
 
     Requires ``trials_holdout_redacted`` True AND
-    ``score_components.no_failed_trial`` == 0.  Any matched row that fails this
-    is INVALID and must not be counted as generated/valid/hit.
+    ``score_components.no_failed_trial`` is None.  Any matched row that fails
+    this is INVALID and must not be counted as generated/valid/hit.
+
+    None (not 0) is the correct "no credit" value: a redacted trial lookup is
+    an unmade observation, so the Reviewer drops the term from BOTH sides of
+    the composite instead of scoring it as a failed trial.  A literal 0 here
+    would mean the redacted drug was actively penalised for evidence the
+    harness deliberately hid, which is the artifact this audit guards against.
     """
     result = {"ok": False, "trials_holdout_redacted": None,
               "no_failed_trial": None, "reason": None}
@@ -231,13 +239,22 @@ def holdout_self_audit(matched_row: Optional[dict[str, Any]]) -> dict[str, Any]:
     if not redacted:
         result["reason"] = "trials_holdout_redacted is not True"
         return result
-    if no_failed != 0:
+    # An ABSENT key is unverifiable and must fail, which is distinct from an
+    # explicit None (the term was correctly dropped as a coverage gap).
+    if "no_failed_trial" not in components:
+        result["reason"] = "score_components.no_failed_trial is missing"
+        return result
+    if no_failed is not None:
         result["reason"] = (
-            f"score_components.no_failed_trial={no_failed} (expected 0)"
+            f"score_components.no_failed_trial={no_failed} (expected None — an "
+            "unobserved trial lookup must be a coverage gap, never a score)"
         )
         return result
     result["ok"] = True
-    result["reason"] = "holdout redacted; no_failed_trial credit not applied"
+    result["reason"] = (
+        "holdout redacted; trial term dropped as a coverage gap "
+        "(no credit given, no penalty imposed)"
+    )
     return result
 
 
