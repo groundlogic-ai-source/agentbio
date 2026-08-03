@@ -73,6 +73,10 @@ class ReviewerCandidate(TypedDict, total=False):
     ot_association_score: Optional[float]
     tanimoto_score: Optional[float]
     composite_score: Required[float]
+    # Composite BEFORE any cap (unapproved/mechanism/DILI/safety).  Secondary
+    # sort key so strong-but-capped candidates outrank weak ones at the same
+    # cap floor; never used for STRONG_MATCH gating.
+    pre_cap_score: Optional[float]
     strong_match: Required[bool]
     is_approved_drug: Optional[bool]
     unapproved_cap_applied: Required[bool]
@@ -131,6 +135,11 @@ _REVIEWER_REQUIRED_FIELDS: list[tuple[str, str]] = [
     ("uniprot_id",              "error"),   # None is OK; key must be present
     ("target_discovery_method", "error"),
     ("_evidence_ledger",        "error"),
+    # warn-level: old persisted reviewer rows legitimately lack these; a NEW
+    # run dropping them would silently lose the cap-floor tie-break ordering
+    # or the boxed-warning disclosure.
+    ("pre_cap_score",           "warn"),
+    ("black_box_advisory",      "warn"),
 ]
 
 

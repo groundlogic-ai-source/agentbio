@@ -1,6 +1,6 @@
 {
   "label": "engineering_acceptance",
-  "generated_at": "2026-08-03T03:18:09",
+  "generated_at": "2026-08-03T13:19:06",
   "fingerprint": "4050586a254ffc21f1287cf36a55cc373643d95e3f671df1ebb098109b55b317",
   "target_cap": 10,
   "top_n": 10,
@@ -251,7 +251,7 @@
           "tanimoto_score": 0.5424,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DORZOLAMIDE",
-          "rationale": "Brinzolamide is an approved drug with a median pChEMBL affinity of 8.52 against CA2, measured at assay confidence score 9 out of 9, and has a Tanimoto similarity of 0.542 to the nearest approved drug dorzolamide. The CA2 target has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Brinzolamide is an approved drug with a median pChEMBL affinity of 8.52 against CA2, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.542 to the nearest approved drug dorzolamide. The CA2 target has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
           "descriptors": {
             "molecular_weight": 383.52,
             "logp": 0.09,
@@ -540,7 +540,7 @@
           "tanimoto_score": 0.4559,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DRONABINOL",
-          "rationale": "Nabilone has a median pChEMBL affinity of 8.66 against CNR1 at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.456 to the nearest approved drug dronabinol. CNR1 has eight recorded BioGRID interactors\u2014GNAI1, GNAI2, GNAI3, RAP1GAP, SSTR5, NSRP1, ADORA2A, and BECN1P1\u2014and nabilone is an approved drug.",
+          "rationale": "Nabilone has a median pChEMBL affinity of 8.66 against CNR1 at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.456 to the nearest approved drug dronabinol. BioGRID records physical or genetic interactions between CNR1 and the proteins GNAI1, GNAI2, GNAI3, RAP1GAP, SSTR5, NSRP1, ADORA2A, and BECN1P1.",
           "descriptors": {
             "molecular_weight": 372.55,
             "logp": 6.26,
@@ -766,7 +766,7 @@
           "tanimoto_score": 0.5424,
           "is_approved_drug": true,
           "most_similar_approved_drug": "BRINZOLAMIDE",
-          "rationale": "Dorzolamide has a median pChEMBL affinity of 8.05 against CA2, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.542 to the nearest approved drug brinzolamide. The CA2 target has eight recorded BioGRID interactors\u2014SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Dorzolamide has a median pChEMBL affinity of 8.05 against CA2, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.542 to the nearest approved drug brinzolamide. The CA2 target has eight recorded BioGRID interactors\u2014SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A\u2014based on physical and genetic interaction data.",
           "descriptors": {
             "molecular_weight": 324.45,
             "logp": 0.61,
@@ -1055,7 +1055,7 @@
           "tanimoto_score": 0.5833,
           "is_approved_drug": true,
           "most_similar_approved_drug": "PHENOL",
-          "rationale": "Hydroquinone has a median pChEMBL affinity of 4.97 against CA4, measured at assay confidence score 9, and is an approved or known drug with a Tanimoto similarity of 0.583 to the nearest approved drug, phenol. The target CA4 has eight recorded BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
+          "rationale": "Hydroquinone has a median pChEMBL affinity of 4.97 against CA4, measured at assay confidence score 9, and is an approved or known drug with a Tanimoto similarity of 0.583 to the nearest approved drug phenol. The target CA4 has eight recorded BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 110.11,
             "logp": 1.1,
@@ -1301,7 +1301,7 @@
           "tanimoto_score": 0.5417,
           "is_approved_drug": true,
           "most_similar_approved_drug": "MAFENIDE",
-          "rationale": "Sulfanilamide has a median pChEMBL affinity of 6.52 against CA2, measured at assay confidence score 9, and is an approved or known drug with a Tanimoto similarity of 0.542 to the nearest approved drug mafenide. The CA2 target has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Sulfanilamide has a median pChEMBL affinity of 6.52 against CA2, measured at assay confidence score 9, and is an approved or known drug with a Tanimoto similarity of 0.542 to the nearest approved drug mafenide. CA2 has eight recorded BioGRID interactors\u2014SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A\u2014based on physical or genetic interaction data.",
           "descriptors": {
             "molecular_weight": 172.21,
             "logp": -0.08,
@@ -1867,7 +1867,7 @@
           "tanimoto_score": 0.5169,
           "is_approved_drug": true,
           "most_similar_approved_drug": "NILOTINIB",
-          "rationale": "Imatinib has a median pChEMBL affinity of 5.34 against CA4, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.517 to the nearest approved drug nilotinib. BioGRID records physical or genetic interactions between CA4 and the proteins SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
+          "rationale": "Imatinib is an approved drug with a median pChEMBL affinity of 5.34 against CA4, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.517 to the nearest approved drug nilotinib. BioGRID records physical or genetic interactions between CA4 and the proteins SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 493.62,
             "logp": 4.59,
@@ -2103,7 +2103,7 @@
           "tanimoto_score": 0.3721,
           "is_approved_drug": true,
           "most_similar_approved_drug": "METHAZOLAMIDE",
-          "rationale": "Acetazolamide has a median pChEMBL affinity of 7.92 against CA2, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.372 to the nearest approved drug methazolamide. The CA2 target has eight recorded BioGRID physical/genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Acetazolamide has a median pChEMBL affinity of 7.92 against CA2, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.372 to the nearest approved drug methazolamide. The CA2 target has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
           "descriptors": {
             "molecular_weight": 222.25,
             "logp": -0.86,
@@ -2451,7 +2451,7 @@
           "tanimoto_score": 0.3721,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ACETAZOLAMIDE",
-          "rationale": "Methazolamide has a median pChEMBL affinity of 7.85 against CA2, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.372 to the nearest approved drug acetazolamide. CA2 has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Methazolamide has a median pChEMBL affinity of 7.85 against CA2, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.372 to the nearest approved drug acetazolamide. CA2 has eight recorded BioGRID physical/genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
           "descriptors": {
             "molecular_weight": 236.28,
             "logp": -1.42,
@@ -2788,7 +2788,7 @@
           "tanimoto_score": 0.4559,
           "is_approved_drug": true,
           "most_similar_approved_drug": "NABILONE",
-          "rationale": "Dronabinol has a median pChEMBL affinity of 7.39 against CNR1, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.456 (Morgan r2) to the nearest approved drug nabilone. CNR1 has eight recorded BioGRID interactors (physical/genetic): GNAI1, GNAI2, GNAI3, RAP1GAP, SSTR5, NSRP1, ADORA2A, and BECN1P1.",
+          "rationale": "Dronabinol has a median pChEMBL affinity of 7.39 against CNR1, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.456 to the nearest approved drug nabilone. CNR1 has eight recorded BioGRID interactors\u2014GNAI1, GNAI2, GNAI3, RAP1GAP, SSTR5, NSRP1, ADORA2A, and BECN1P1.",
           "descriptors": {
             "molecular_weight": 314.47,
             "logp": 5.74,
@@ -3306,7 +3306,7 @@
           "tanimoto_score": 0.381,
           "is_approved_drug": true,
           "most_similar_approved_drug": "PHENOL",
-          "rationale": "Salicylic acid has a median pChEMBL affinity of 4.96 against CA4, measured at assay confidence score 9, and has a Tanimoto similarity of 0.381 to the nearest approved drug phenol. BioGRID records physical or genetic interactions between CA4 and the proteins SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
+          "rationale": "Salicylic acid has a median pChEMBL affinity of 4.96 against CA4, measured at assay confidence score 9, and has a Tanimoto similarity of 0.381 to the nearest approved drug phenol. The target CA4 has eight recorded BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2\u2014and salicylic acid is itself an approved or known drug.",
           "descriptors": {
             "molecular_weight": 138.12,
             "logp": 1.09,
@@ -3472,7 +3472,7 @@
           "tanimoto_score": 0.3462,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SALICYLIC ACID",
-          "rationale": "Sodium benzoate has a median pChEMBL affinity of 4.13 against CA4, measured at assay confidence score 9, and is an approved or known drug with a Tanimoto similarity of 0.346 to the nearest approved drug salicylic acid. The target CA4 has eight recorded BioGRID physical or genetic interactors: SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
+          "rationale": "Sodium benzoate has a median pChEMBL affinity of 4.13 against CA4, measured at assay confidence score 9, and is a known approved drug with a Tanimoto similarity of 0.346 to the nearest approved drug salicylic acid. The target CA4 has eight recorded BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 144.1,
             "logp": -2.95,
@@ -3638,7 +3638,7 @@
           "tanimoto_score": 0.3333,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SULFANILAMIDE",
-          "rationale": "Dichlorphenamide has a median pChEMBL affinity of 7.42 against CA2, measured at assay confidence score 9 out of 9, and is a known approved drug with a Tanimoto similarity of 0.333 to the nearest approved drug sulfanilamide. The CA2 target has eight recorded BioGRID interactors\u2014SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Dichlorphenamide has a median pChEMBL affinity of 7.42 against CA2, measured at assay confidence score 9 out of 9, and is a known approved drug with a Tanimoto similarity of 0.333 to the nearest approved drug sulfanilamide. The CA2 target has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
           "descriptors": {
             "molecular_weight": 305.16,
             "logp": 0.29,
@@ -4995,7 +4995,7 @@
           "tanimoto_score": 0.3088,
           "is_approved_drug": true,
           "most_similar_approved_drug": "CHLORTHALIDONE",
-          "rationale": "Indapamide has a median pChEMBL affinity of 6.67 against CA4 at assay confidence score 9, and its Tanimoto similarity (Morgan r2) to the nearest approved drug chlorthalidone is 0.309. The target CA4 has eight recorded BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2\u2014and indapamide is an approved drug.",
+          "rationale": "Indapamide has a median pChEMBL affinity of 6.67 against CA4 based on assays with a confidence score of 9 out of 9, and it is an approved drug with a Tanimoto similarity of 0.309 to the nearest approved drug, chlorthalidone. The BioGRID physical and genetic interactors recorded for the target CA4 are SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 365.84,
             "logp": 2.08,
@@ -5883,7 +5883,7 @@
           "tanimoto_score": 0.2727,
           "is_approved_drug": true,
           "most_similar_approved_drug": "LACOSAMIDE",
-          "rationale": "Bortezomib has a median pChEMBL affinity of 5.19 against CA4, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.273 to the nearest approved drug lacosamide. The target CA4 has eight BioGRID interactors recorded\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
+          "rationale": "Bortezomib has a median pChEMBL affinity of 5.19 against CA4, measured at assay confidence score 9, and is a known approved drug with a Tanimoto similarity of 0.273 to the nearest approved drug lacosamide. The BioGRID-recorded physical and genetic interactors of the target CA4 include SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 384.25,
             "logp": 0.36,
@@ -9765,7 +9765,7 @@
           "tanimoto_score": 0.3636,
           "is_approved_drug": true,
           "most_similar_approved_drug": "PROPRANOLOL",
-          "rationale": "Duloxetine has a median pChEMBL affinity of 4.95 against SCN5A measured at assay confidence score 9, and a Tanimoto similarity of 0.364 to the nearest approved drug propranolol. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7\u2014and duloxetine is an approved drug.",
+          "rationale": "Duloxetine has a median pChEMBL affinity of 4.95 against SCN5A measured at assay confidence score 9, and its Tanimoto similarity to the nearest approved drug propranolol is 0.364. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7\u2014and duloxetine is an approved drug.",
           "descriptors": {
             "molecular_weight": 297.42,
             "logp": 4.63,
@@ -10032,7 +10032,7 @@
           "tanimoto_score": 0.3151,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DARIFENACIN",
-          "rationale": "Terfenadine has a median pChEMBL affinity of 6.01 against SCN5A, measured at an assay confidence score of 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.315 to the nearest approved drug darifenacin. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
+          "rationale": "Terfenadine has a median pChEMBL affinity of 6.01 against SCN5A, measured at an assay confidence score of 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.315 to the nearest approved drug darifenacin. SCN5A has eight recorded BioGRID physical or genetic interactors: SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
           "descriptors": {
             "molecular_weight": 471.69,
             "logp": 6.45,
@@ -10299,7 +10299,7 @@
           "tanimoto_score": 0.3559,
           "is_approved_drug": true,
           "most_similar_approved_drug": "PROPRANOLOL",
-          "rationale": "Propafenone has a median pChEMBL affinity of 5.7 against SCN5A at an assay confidence score of 9 out of 9, and it is an approved drug with a Tanimoto similarity of 0.356 to the nearest approved drug propranolol. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
+          "rationale": "Propafenone has a median pChEMBL affinity of 5.7 against SCN5A at an assay confidence score of 9 out of 9, and it is an approved drug with a Tanimoto similarity of 0.356 to the nearest approved drug propranolol. SCN5A has eight recorded BioGRID physical or genetic interactors: SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
           "descriptors": {
             "molecular_weight": 341.45,
             "logp": 3.24,
@@ -10566,7 +10566,7 @@
           "tanimoto_score": 0.1881,
           "is_approved_drug": true,
           "most_similar_approved_drug": "VERAPAMIL",
-          "rationale": "Mibefradil has a median pChEMBL affinity of 6.3 against SCN5A, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.188 to the nearest approved drug verapamil. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
+          "rationale": "Mibefradil has a median pChEMBL affinity of 6.3 against SCN5A, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.188 to the nearest approved drug verapamil. SCN5A has eight recorded BioGRID physical or genetic interactors: SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
           "descriptors": {
             "molecular_weight": 495.64,
             "logp": 5.27,
@@ -11407,7 +11407,7 @@
           "tanimoto_score": 0.234,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SILODOSIN",
-          "rationale": "Flecainide has a median pChEMBL affinity of 5.19 against SCN5A at an assay confidence score of 9, and it is an approved drug with a Tanimoto similarity of 0.234 to the nearest approved drug silodosin. The SCN5A target has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
+          "rationale": "Flecainide has a median pChEMBL affinity of 5.19 against SCN5A at an assay confidence score of 9, and it is an approved drug with a Tanimoto similarity of 0.234 to the nearest approved drug silodosin. The target SCN5A has eight recorded BioGRID interactors: SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
           "descriptors": {
             "molecular_weight": 414.35,
             "logp": 3.44,
@@ -11674,7 +11674,7 @@
           "tanimoto_score": 0.2333,
           "is_approved_drug": true,
           "most_similar_approved_drug": "VERNAKALANT HYDROCHLORIDE",
-          "rationale": "Cisapride is an approved drug with a median pChEMBL affinity of 4.83 against SCN5A, measured at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.233 to the nearest approved drug, vernakalant hydrochloride. SCN5A has eight recorded BioGRID physical or genetic interactors: SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
+          "rationale": "Cisapride is an approved drug with a median pChEMBL affinity of 4.83 against SCN5A, measured at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.233 to the nearest approved drug, vernakalant hydrochloride. SCN5A has eight recorded physical or genetic interactors in BioGRID: SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
           "descriptors": {
             "molecular_weight": 465.95,
             "logp": 3.36,
@@ -11941,7 +11941,7 @@
           "tanimoto_score": 0.2113,
           "is_approved_drug": true,
           "most_similar_approved_drug": "LIDOCAINE",
-          "rationale": "Sunitinib has a median pChEMBL affinity of 4.6 against SCN5A, measured at assay confidence score 9, and has a Tanimoto similarity of 0.211 to the nearest approved drug lidocaine. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7\u2014and sunitinib is an approved drug.",
+          "rationale": "Sunitinib has a median pChEMBL affinity of 4.6 against SCN5A, measured at assay confidence score 9 out of 9, and has a Tanimoto similarity of 0.211 to the nearest approved drug lidocaine. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7\u2014and sunitinib is an approved drug.",
           "descriptors": {
             "molecular_weight": 398.48,
             "logp": 3.33,
@@ -12208,7 +12208,7 @@
           "tanimoto_score": 0.2105,
           "is_approved_drug": true,
           "most_similar_approved_drug": "THIORIDAZINE",
-          "rationale": "Quetiapine has a median pChEMBL affinity of 4.77 against SCN5A measured at assay confidence score 9, and its Tanimoto similarity (Morgan r2) to the nearest approved drug thioridazine is 0.211. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7\u2014and quetiapine is an approved drug.",
+          "rationale": "Quetiapine has a median pChEMBL affinity of 4.77 against SCN5A measured at assay confidence score 9, and its Tanimoto similarity (Morgan r2) to the nearest approved drug thioridazine is 0.211. BioGRID lists eight physical or genetic interactors of SCN5A: SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
           "descriptors": {
             "molecular_weight": 383.52,
             "logp": 2.86,
@@ -13718,7 +13718,7 @@
           "tanimoto_score": 0.4559,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DRONABINOL",
-          "rationale": "Nabilone has a median pChEMBL affinity of 8.66 against CNR1 at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.456 to the nearest approved drug dronabinol. CNR1 has eight recorded BioGRID interactors\u2014GNAI1, GNAI2, GNAI3, RAP1GAP, SSTR5, NSRP1, ADORA2A, and BECN1P1\u2014and nabilone is an approved drug.",
+          "rationale": "Nabilone has a median pChEMBL affinity of 8.66 against CNR1 at an assay confidence score of 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.456 to the nearest approved drug dronabinol. CNR1 has eight recorded BioGRID interactors\u2014GNAI1, GNAI2, GNAI3, RAP1GAP, SSTR5, NSRP1, ADORA2A, and BECN1P1.",
           "descriptors": {
             "molecular_weight": 372.55,
             "logp": 6.26,
@@ -13944,7 +13944,7 @@
           "tanimoto_score": 0.5424,
           "is_approved_drug": true,
           "most_similar_approved_drug": "BRINZOLAMIDE",
-          "rationale": "Dorzolamide has a median pChEMBL affinity of 8.05 against CA2, measured at assay confidence score 9, and is a known approved drug with a Tanimoto similarity of 0.542 to the nearest approved drug brinzolamide. CA2 has eight recorded BioGRID interactors\u2014SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A\u2014based on physical and genetic interaction data.",
+          "rationale": "Dorzolamide has a median pChEMBL affinity of 8.05 against CA2, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.542 to the nearest approved drug brinzolamide. CA2 has eight recorded BioGRID interactors\u2014SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A\u2014based on physical and genetic interaction data.",
           "descriptors": {
             "molecular_weight": 324.45,
             "logp": 0.61,
@@ -14233,7 +14233,7 @@
           "tanimoto_score": 0.5833,
           "is_approved_drug": true,
           "most_similar_approved_drug": "PHENOL",
-          "rationale": "Hydroquinone has a median pChEMBL affinity of 4.97 against CA4, measured at assay confidence score 9, and is an approved or known drug with a Tanimoto similarity of 0.583 to the nearest approved drug, phenol. The target CA4 has eight recorded BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
+          "rationale": "Hydroquinone has a median pChEMBL affinity of 4.97 against CA4, measured at assay confidence score 9, and is an approved or known drug with a Tanimoto similarity of 0.583 to the nearest approved drug phenol. The target CA4 has eight recorded BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 110.11,
             "logp": 1.1,
@@ -14479,7 +14479,7 @@
           "tanimoto_score": 0.5417,
           "is_approved_drug": true,
           "most_similar_approved_drug": "MAFENIDE",
-          "rationale": "Sulfanilamide has a median pChEMBL affinity of 6.52 against CA2, measured at assay confidence score 9, and is recorded as an approved or known drug with a Tanimoto similarity of 0.542 to the nearest approved drug mafenide. CA2 has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Sulfanilamide has a median pChEMBL affinity of 6.52 against CA2, measured at assay confidence score 9, and is an approved or known drug with a Tanimoto similarity of 0.542 to the nearest approved drug mafenide. The target CA2 has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
           "descriptors": {
             "molecular_weight": 172.21,
             "logp": -0.08,
@@ -14768,7 +14768,7 @@
           "tanimoto_score": 0.5417,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SULFANILAMIDE",
-          "rationale": "Mafenide has a median pChEMBL affinity of 6.77 against CA2, measured at an assay confidence score of 8 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.542 to the nearest approved drug sulfanilamide. CA2 has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Mafenide has a median pChEMBL affinity of 6.77 against CA2, measured at an assay confidence score of 8 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.542 to the nearest approved drug sulfanilamide. The BioGRID physical and genetic interactors recorded for the target CA2 are SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
           "descriptors": {
             "molecular_weight": 186.24,
             "logp": -0.21,
@@ -15045,7 +15045,7 @@
           "tanimoto_score": 0.5169,
           "is_approved_drug": true,
           "most_similar_approved_drug": "NILOTINIB",
-          "rationale": "Imatinib has a median pChEMBL affinity of 5.34 against CA4, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.517 to the nearest approved drug nilotinib. BioGRID lists eight physical or genetic interactors of CA4: SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
+          "rationale": "Imatinib has a median pChEMBL affinity of 5.34 against CA4, measured at assay confidence score 9, and is a approved drug with a Tanimoto similarity of 0.517 to the nearest approved drug nilotinib. BioGRID records physical or genetic interactions between CA4 and the following proteins: SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 493.62,
             "logp": 4.59,
@@ -15281,7 +15281,7 @@
           "tanimoto_score": 0.3721,
           "is_approved_drug": true,
           "most_similar_approved_drug": "METHAZOLAMIDE",
-          "rationale": "Acetazolamide has a median pChEMBL affinity of 7.92 against CA2, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.372 to the nearest approved drug methazolamide. The CA2 target has eight recorded BioGRID physical/genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Acetazolamide has a median pChEMBL affinity of 7.92 against CA2, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.372 to the nearest approved drug methazolamide. The CA2 target has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
           "descriptors": {
             "molecular_weight": 222.25,
             "logp": -0.86,
@@ -15629,7 +15629,7 @@
           "tanimoto_score": 0.3721,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ACETAZOLAMIDE",
-          "rationale": "Methazolamide has a median pChEMBL affinity of 7.85 against CA2, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.372 to the nearest approved drug acetazolamide. CA2 has eight recorded BioGRID physical/genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Methazolamide is an approved drug with a median pChEMBL affinity of 7.85 against CA2, measured at assay confidence score 9, and a Tanimoto similarity of 0.372 to the nearest approved drug acetazolamide. The CA2 target has eight recorded BioGRID interactors\u2014SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
           "descriptors": {
             "molecular_weight": 236.28,
             "logp": -1.42,
@@ -15966,7 +15966,7 @@
           "tanimoto_score": 0.4559,
           "is_approved_drug": true,
           "most_similar_approved_drug": "NABILONE",
-          "rationale": "Dronabinol has a median pChEMBL affinity of 7.39 against CNR1, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.456 (Morgan r2) to the nearest approved drug nabilone. CNR1 has eight recorded BioGRID interactors\u2014GNAI1, GNAI2, GNAI3, RAP1GAP, SSTR5, NSRP1, ADORA2A, and BECN1P1\u2014based on physical or genetic interactions.",
+          "rationale": "Dronabinol has a median pChEMBL affinity of 7.39 against CNR1, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.456 to the nearest approved drug nabilone. CNR1 has eight recorded BioGRID interactors\u2014GNAI1, GNAI2, GNAI3, RAP1GAP, SSTR5, NSRP1, ADORA2A, and BECN1P1.",
           "descriptors": {
             "molecular_weight": 314.47,
             "logp": 5.74,
@@ -16207,7 +16207,7 @@
           "tanimoto_score": 0.2549,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ACETAZOLAMIDE",
-          "rationale": "Ethoxzolamide has a median pChEMBL affinity of 8.1 against CA2, measured at an assay confidence score of 8 out of 9, and is a known approved drug with a Tanimoto similarity of 0.255 to the nearest approved drug acetazolamide. CA2 has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Ethoxzolamide has a median pChEMBL affinity of 8.1 against CA2, measured at an assay confidence score of 8 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.255 to the nearest approved drug, acetazolamide. CA2 has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
           "descriptors": {
             "molecular_weight": 258.32,
             "logp": 1.34,
@@ -16484,7 +16484,7 @@
           "tanimoto_score": 0.381,
           "is_approved_drug": true,
           "most_similar_approved_drug": "PHENOL",
-          "rationale": "Salicylic acid has a median pChEMBL affinity of 4.96 against CA4 based on assays with a confidence score of 9 out of 9, and a Tanimoto similarity of 0.381 to the nearest approved drug phenol. The target CA4 has eight recorded BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2\u2014and salicylic acid is itself an approved or known drug.",
+          "rationale": "Salicylic acid has a median pChEMBL affinity of 4.96 against CA4, measured at assay confidence score 9, and is recorded as an approved or known drug with a Tanimoto similarity of 0.381 to the nearest approved drug phenol. The target CA4 has eight BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2\u2014recorded as physical or genetic interactions.",
           "descriptors": {
             "molecular_weight": 138.12,
             "logp": 1.09,
@@ -16816,7 +16816,7 @@
           "tanimoto_score": 0.3333,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SULFANILAMIDE",
-          "rationale": "Dichlorphenamide has a median pChEMBL affinity of 7.42 against CA2, measured at assay confidence score 9 out of 9, and is a known approved drug with a Tanimoto similarity of 0.333 to the nearest approved drug sulfanilamide. The CA2 target has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Dichlorphenamide has a median pChEMBL affinity of 7.42 against CA2, measured at assay confidence score 9 out of 9, and is a known approved drug with a Tanimoto similarity of 0.333 to the nearest approved drug sulfanilamide. The CA2 target has eight recorded BioGRID interactors\u2014SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
           "descriptors": {
             "molecular_weight": 305.16,
             "logp": 0.29,
@@ -17123,7 +17123,7 @@
           "tanimoto_score": 0.1268,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DORZOLAMIDE",
-          "rationale": "Topiramate has a median pChEMBL affinity of 8.3 against CA2, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.127 to the nearest approved drug dorzolamide. CA2 has eight recorded BioGRID physical or genetic interactors: SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
+          "rationale": "Topiramate has a median pChEMBL affinity of 8.3 against CA2 at an assay confidence score of 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.127 to the nearest approved drug dorzolamide. CA2 has eight recorded BioGRID interactors\u2014SLC4A8, SLC9A1, HSPD1, SLC4A1, NONO, USP42, PCNA, and CUL4A.",
           "descriptors": {
             "molecular_weight": 339.37,
             "logp": -0.4,
@@ -17949,7 +17949,7 @@
           "tanimoto_score": 0.3088,
           "is_approved_drug": true,
           "most_similar_approved_drug": "INDAPAMIDE",
-          "rationale": "Chlorthalidone has a median pChEMBL affinity of 6.71 against CA4, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.309 to the nearest approved drug indapamide. The target CA4 has eight recorded BioGRID interactors: SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
+          "rationale": "Chlorthalidone has a median pChEMBL affinity of 6.71 against CA4 based on assays with a confidence score of 9 out of 9, and it is an approved drug with a Tanimoto similarity of 0.309 to the nearest approved drug, indapamide. The target CA4 has eight recorded BioGRID physical or genetic interactors: SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 338.77,
             "logp": 0.92,
@@ -18213,7 +18213,7 @@
           "tanimoto_score": 0.3088,
           "is_approved_drug": true,
           "most_similar_approved_drug": "CHLORTHALIDONE",
-          "rationale": "Indapamide has a median pChEMBL affinity of 6.67 against CA4 measured at assay confidence score 9, and a Tanimoto similarity of 0.309 to the nearest approved drug chlorthalidone. The CA4 target has eight recorded BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2\u2014and indapamide is an approved drug.",
+          "rationale": "Indapamide has a median pChEMBL affinity of 6.67 against CA4 based on assays with a confidence score of 9 out of 9, and it is an approved drug with a Tanimoto similarity of 0.309 to the nearest approved drug, chlorthalidone. The BioGRID-recorded physical and genetic interactors of CA4 include SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 365.84,
             "logp": 2.08,
@@ -18447,7 +18447,7 @@
           "tanimoto_score": 0.2979,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DICHLORPHENAMIDE",
-          "rationale": "Trichlormethiazide has a median pChEMBL affinity of 6.35 against CA4, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.298 to the nearest approved drug dichlorphenamide. The CA4 target has eight recorded BioGRID physical/genetic interactors: SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
+          "rationale": "Trichlormethiazide has a median pChEMBL affinity of 6.35 against CA4, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.298 to the nearest approved drug dichlorphenamide. The BioGRID physical and genetic interactors recorded for the target CA4 are SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 380.66,
             "logp": 0.82,
@@ -19101,7 +19101,7 @@
           "tanimoto_score": 0.2727,
           "is_approved_drug": true,
           "most_similar_approved_drug": "LACOSAMIDE",
-          "rationale": "Bortezomib has a median pChEMBL affinity of 5.19 against CA4, measured at assay confidence score 9, and is a known approved drug with a Tanimoto similarity of 0.273 to the nearest approved drug lacosamide. The BioGRID-recorded physical and genetic interactors of the target CA4 include SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
+          "rationale": "Bortezomib has a median pChEMBL affinity of 5.19 against CA4, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.273 to the nearest approved drug lacosamide. The CA4 target has eight recorded BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 384.25,
             "logp": 0.36,
@@ -22926,7 +22926,7 @@
           "tanimoto_score": 0.5169,
           "is_approved_drug": true,
           "most_similar_approved_drug": "IMATINIB",
-          "rationale": "Nilotinib has a median pChEMBL affinity of 6.35 against CA4, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.517 to the nearest approved drug imatinib. The target CA4 has eight recorded BioGRID interactors\u2014SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
+          "rationale": "Nilotinib has a median pChEMBL affinity of 6.35 against CA4, measured at assay confidence score 9, and has a Tanimoto similarity of 0.517 to the nearest approved drug imatinib. The target CA4 has eight recorded BioGRID interactors: SLC4A1, PRDX2, PIH1D1, WTAP, CDK18, TEX101, CDK6, and ALDH1A2.",
           "descriptors": {
             "molecular_weight": 529.53,
             "logp": 6.36,
@@ -23095,7 +23095,7 @@
           "tanimoto_score": 0.3636,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DULOXETINE",
-          "rationale": "Propranolol has a median pChEMBL affinity of 5.68 against SCN5A at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.364 to the nearest approved drug, duloxetine. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7\u2014and propranolol is an approved drug.",
+          "rationale": "Propranolol has a median pChEMBL affinity of 5.68 against SCN5A at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.364 to the nearest approved drug duloxetine. BioGRID records physical or genetic interactions between SCN5A and the proteins SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
           "descriptors": {
             "molecular_weight": 259.35,
             "logp": 2.58,
@@ -23362,7 +23362,7 @@
           "tanimoto_score": 0.3636,
           "is_approved_drug": true,
           "most_similar_approved_drug": "PROPRANOLOL",
-          "rationale": "Duloxetine has a median pChEMBL affinity of 4.95 against SCN5A measured at assay confidence score 9, and has a Tanimoto similarity of 0.364 to the nearest approved drug propranolol. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7\u2014and duloxetine is an approved drug.",
+          "rationale": "Duloxetine has a median pChEMBL affinity of 4.95 against SCN5A measured at assay confidence score 9, and its Tanimoto similarity to the nearest approved drug propranolol is 0.364. The target SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7\u2014and duloxetine is an approved drug.",
           "descriptors": {
             "molecular_weight": 297.42,
             "logp": 4.63,
@@ -23629,7 +23629,7 @@
           "tanimoto_score": 0.3151,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DARIFENACIN",
-          "rationale": "Terfenadine has a median pChEMBL affinity of 6.01 against SCN5A, measured at an assay confidence score of 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.315 to the nearest approved drug darifenacin. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
+          "rationale": "Terfenadine has a median pChEMBL affinity of 6.01 against SCN5A, measured at an assay confidence score of 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.315 to the nearest approved drug darifenacin. SCN5A has eight recorded BioGRID physical or genetic interactors: SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
           "descriptors": {
             "molecular_weight": 471.69,
             "logp": 6.45,
@@ -23896,7 +23896,7 @@
           "tanimoto_score": 0.3559,
           "is_approved_drug": true,
           "most_similar_approved_drug": "PROPRANOLOL",
-          "rationale": "Propafenone has a median pChEMBL affinity of 5.7 against SCN5A, measured at an assay confidence score of 9 out of 9, and has a Tanimoto similarity of 0.356 to the nearest approved drug propranolol. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7\u2014and propafenone is an approved drug.",
+          "rationale": "Propafenone has a median pChEMBL affinity of 5.7 against SCN5A, measured at an assay confidence score of 9 out of 9, and has a Tanimoto similarity (Morgan r2) of 0.356 to the nearest approved drug, propranolol. SCN5A has eight recorded BioGRID physical/genetic interactors: SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
           "descriptors": {
             "molecular_weight": 341.45,
             "logp": 3.24,
@@ -24697,7 +24697,7 @@
           "tanimoto_score": 0.2644,
           "is_approved_drug": true,
           "most_similar_approved_drug": "IBRUTINIB",
-          "rationale": "Ritlecitinib is an approved drug with a median pChEMBL affinity of 4.6 against ERBB4 measured at assay confidence score 9 (out of 9), and a Tanimoto similarity (Morgan r2) of 0.264 to the nearest approved drug ibrutinib. ERBB4 has eight recorded BioGRID physical/genetic interactors: AKAP5, PRKCA, PRKACA, UBQLN1, MEOX2, MCOLN3, GABRB2, and GABRA6.",
+          "rationale": "Ritlecitinib is an approved drug with a median pChEMBL affinity of 4.6 against ERBB4 measured at assay confidence score 9, and a Tanimoto similarity (Morgan r2) of 0.264 to the nearest approved drug ibrutinib. ERBB4 has eight recorded BioGRID interactors\u2014AKAP5, PRKCA, PRKACA, UBQLN1, MEOX2, MCOLN3, GABRB2, and GABRA6.",
           "descriptors": {
             "molecular_weight": 285.35,
             "logp": 1.94,
@@ -25024,7 +25024,7 @@
           "tanimoto_score": 0.234,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SILODOSIN",
-          "rationale": "Flecainide has a median pChEMBL affinity of 5.19 against SCN5A at an assay confidence score of 9 out of 9, and it is an approved drug with a Tanimoto similarity of 0.234 to the nearest approved drug silodosin. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
+          "rationale": "Flecainide has a median pChEMBL affinity of 5.19 against SCN5A at an assay confidence score of 9, and it is an approved drug with a Tanimoto similarity of 0.234 to the nearest approved drug silodosin. The SCN5A target has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
           "descriptors": {
             "molecular_weight": 414.35,
             "logp": 3.44,
@@ -25291,7 +25291,7 @@
           "tanimoto_score": 0.2333,
           "is_approved_drug": true,
           "most_similar_approved_drug": "VERNAKALANT HYDROCHLORIDE",
-          "rationale": "Cisapride is an approved drug with a median pChEMBL affinity of 4.83 against SCN5A, measured at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.233 to the nearest approved drug, vernakalant hydrochloride. SCN5A has the following BioGRID physical/genetic interactors on record: SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
+          "rationale": "Cisapride is an approved drug with a median pChEMBL affinity of 4.83 against SCN5A, measured at an assay confidence score of 9 out of 9, and a Tanimoto similarity (Morgan r2) of 0.233 to the nearest approved drug, vernakalant hydrochloride. SCN5A has eight recorded BioGRID physical/genetic interactors: SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7.",
           "descriptors": {
             "molecular_weight": 465.95,
             "logp": 3.36,
@@ -25825,7 +25825,7 @@
           "tanimoto_score": 0.2105,
           "is_approved_drug": true,
           "most_similar_approved_drug": "THIORIDAZINE",
-          "rationale": "Quetiapine has a median pChEMBL affinity of 4.77 against SCN5A, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.211 to the nearest approved drug thioridazine. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7\u2014and quetiapine is an approved drug.",
+          "rationale": "Quetiapine has a median pChEMBL affinity of 4.77 against SCN5A measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.211 to the nearest approved drug thioridazine. SCN5A has eight recorded BioGRID interactors\u2014SNTA1, PSEN1, GAN, LARP7, SCN1B, SCN4B, CALM1, and CDK7\u2014and quetiapine is an approved drug.",
           "descriptors": {
             "molecular_weight": 383.52,
             "logp": 2.86,
@@ -27377,7 +27377,7 @@
             "veber_pass": true,
             "valid_structure": true
           },
-          "pubchem_xlogp": null,
+          "pubchem_xlogp": -1.2,
           "high_lipophilicity_flag": false,
           "strong_match": true,
           "composite_score": 0.8113,
@@ -27561,7 +27561,7 @@
           "tanimoto_score": 0.398,
           "is_approved_drug": true,
           "most_similar_approved_drug": "IMATINIB",
-          "rationale": "Ponatinib has a median pChEMBL affinity of 8.54 against KIT, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.398 to the nearest approved drug imatinib. The KIT protein has BioGRID-recorded physical or genetic interactors comprising BCR, CD9, CD63, CD81, GRB2, PIK3R1, PIK3R2, and SOCS1.",
+          "rationale": "Ponatinib has a median pChEMBL affinity of 8.54 against KIT, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.398 to the nearest approved drug imatinib. The KIT protein has the following BioGRID-recorded physical or genetic interactors: BCR, CD9, CD63, CD81, GRB2, PIK3R1, PIK3R2, and SOCS1.",
           "descriptors": {
             "molecular_weight": 532.57,
             "logp": 4.46,
@@ -27811,7 +27811,7 @@
           "tanimoto_score": 0.5169,
           "is_approved_drug": true,
           "most_similar_approved_drug": "NILOTINIB",
-          "rationale": "Imatinib has a median pChEMBL affinity of 7.0 against KIT at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.517 to the nearest approved drug nilotinib. BioGRID lists the following physical/genetic interactors of KIT: BCR, CD9, CD63, CD81, GRB2, PIK3R1, PIK3R2, and SOCS1.",
+          "rationale": "Imatinib has a median pChEMBL affinity of 7.0 against KIT, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.517 to the nearest approved drug nilotinib. BioGRID records physical or genetic interactions between KIT and the following proteins: BCR, CD9, CD63, CD81, GRB2, PIK3R1, PIK3R2, and SOCS1.",
           "descriptors": {
             "molecular_weight": 493.62,
             "logp": 4.59,
@@ -28059,7 +28059,7 @@
           "tanimoto_score": 0.2963,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ENTRECTINIB",
-          "rationale": "Gilteritinib has a median pChEMBL affinity of 8.34 against AXL at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.296 to the nearest approved drug entrectinib. The AXL target has eight recorded BioGRID interactors\u2014TENC1, GRB2, LCK, SRC, PIK3R1, PIK3R2, GAS6, and CBL.",
+          "rationale": "Gilteritinib is an approved drug with a median pChEMBL affinity of 8.34 against AXL at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.296 to the nearest approved drug entrectinib. The BioGRID-recorded physical or genetic interactors of AXL are TENC1, GRB2, LCK, SRC, PIK3R1, PIK3R2, GAS6, and CBL.",
           "descriptors": {
             "molecular_weight": 552.72,
             "logp": 2.7,
@@ -28331,7 +28331,7 @@
           "tanimoto_score": 0.2718,
           "is_approved_drug": true,
           "most_similar_approved_drug": "IMATINIB",
-          "rationale": "Dasatinib has a median pChEMBL affinity of 8.34 against KIT, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.272 to the nearest approved drug imatinib. KIT has seven recorded BioGRID interactors (BCR, CD9, CD63, CD81, GRB2, PIK3R1, PIK3R2, and SOCS1).",
+          "rationale": "Dasatinib has a median pChEMBL affinity of 8.34 against KIT, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.272 to the nearest approved drug imatinib. KIT has seven recorded BioGRID interactors\u2014BCR, CD9, CD63, CD81, GRB2, PIK3R1, PIK3R2, and SOCS1\u2014based on physical or genetic interaction data.",
           "descriptors": {
             "molecular_weight": 506.03,
             "logp": 2.49,
@@ -28590,7 +28590,7 @@
           "tanimoto_score": 0.5,
           "is_approved_drug": true,
           "most_similar_approved_drug": "BEXAROTENE",
-          "rationale": "Tamibarotene is an approved drug with a median pChEMBL affinity of 7.65 against RARA at assay confidence score 9, and a Tanimoto similarity of 0.500 to the nearest approved drug bexarotene. BioGRID records physical or genetic interactions between RARA and the proteins NRBF2, ZBTB16, MECR, RXRG, RXRB, NCOA6, GADD45G, and GADD45A.",
+          "rationale": "Tamibarotene is an approved drug with a median pChEMBL affinity of 7.65 against RARA at assay confidence score 9, and a Tanimoto similarity of 0.500 to the nearest approved drug bexarotene. BioGRID records physical or genetic interactions between RARA and the following proteins: NRBF2, ZBTB16, MECR, RXRG, RXRB, NCOA6, GADD45G, and GADD45A.",
           "descriptors": {
             "molecular_weight": 351.45,
             "logp": 4.99,
@@ -29112,7 +29112,7 @@
           "tanimoto_score": 0.2111,
           "is_approved_drug": true,
           "most_similar_approved_drug": "VISMODEGIB",
-          "rationale": "Sonidegib has a median pChEMBL affinity of 8.22 against SMO, measured at assay confidence score 9 out of 9, and is a known approved drug with a Tanimoto similarity of 0.211 to the nearest approved drug vismodegib. The BioGRID interactors recorded for the target SMO are PTCH1, PTCH2, BCL6, NEDD4, CHEK1, ATM, KIT, and FAM189B.",
+          "rationale": "Sonidegib has a median pChEMBL affinity of 8.22 against SMO, measured at assay confidence score 9 out of 9, and is a approved drug with a Tanimoto similarity of 0.211 to the nearest approved drug vismodegib. The BioGRID-recorded physical and genetic interactors of SMO include PTCH1, PTCH2, BCL6, NEDD4, CHEK1, ATM, KIT, and FAM189B.",
           "descriptors": {
             "molecular_weight": 485.51,
             "logp": 5.82,
@@ -29735,7 +29735,7 @@
           "tanimoto_score": 0.2111,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SONIDEGIB",
-          "rationale": "Vismodegib has a median pChEMBL affinity of 7.895 against SMO at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.211 to the nearest approved drug sonidegib. The BioGRID interactors recorded for the target SMO are PTCH1, PTCH2, BCL6, NEDD4, CHEK1, ATM, KIT, and FAM189B.",
+          "rationale": "Vismodegib has a median pChEMBL affinity of 7.895 against SMO at assay confidence score 9, and a Tanimoto similarity of 0.211 to the nearest approved drug sonidegib. The SMO target has eight BioGRID interactors recorded\u2014PTCH1, PTCH2, BCL6, NEDD4, CHEK1, ATM, KIT, and FAM189B\u2014and vismodegib is an approved drug.",
           "descriptors": {
             "molecular_weight": 421.31,
             "logp": 4.71,
@@ -29931,7 +29931,7 @@
           "tanimoto_score": 0.3077,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ENASIDENIB",
-          "rationale": "Vorasidenib is an approved drug with a median pChEMBL affinity of 6.89 against IDH2 measured at assay confidence score 9, and a Tanimoto similarity (Morgan r2) of 0.308 to the nearest approved drug enasidenib. BioGRID records physical or genetic interactors of IDH2 as CDK2, HDAC1, ADRB2, PYGL, EGFR, KCMF1, IDH1, and G6PD.",
+          "rationale": "Vorasidenib is an approved drug with a median pChEMBL affinity of 6.89 against IDH2 at assay confidence score 9, and a Tanimoto similarity of 0.308 to the nearest approved drug enasidenib. The BioGRID physical/genetic interactors recorded for the IDH2 target are CDK2, HDAC1, ADRB2, PYGL, EGFR, KCMF1, IDH1, and G6PD.",
           "descriptors": {
             "molecular_weight": 414.74,
             "logp": 4.31,
@@ -30177,7 +30177,7 @@
           "tanimoto_score": 0.1489,
           "is_approved_drug": true,
           "most_similar_approved_drug": "CABOZANTINIB",
-          "rationale": "Sunitinib has a median pChEMBL affinity of 8.05 against AXL, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.149 to the nearest approved drug cabozantinib. AXL has eight recorded BioGRID interactors\u2014TENC1, GRB2, LCK, SRC, PIK3R1, PIK3R2, GAS6, and CBL.",
+          "rationale": "Sunitinib has a median pChEMBL affinity of 8.05 against AXL at assay confidence score 9, and a Tanimoto similarity of 0.149 to the nearest approved drug cabozantinib. AXL has eight recorded BioGRID interactors\u2014TENC1, GRB2, LCK, SRC, PIK3R1, PIK3R2, GAS6, and CBL.",
           "descriptors": {
             "molecular_weight": 398.48,
             "logp": 3.33,
@@ -30604,7 +30604,7 @@
           "tanimoto_score": 0.2632,
           "is_approved_drug": true,
           "most_similar_approved_drug": "GEFITINIB",
-          "rationale": "Vandetanib has a median pChEMBL affinity of 6.6 against AXL, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.263 to the nearest approved drug gefitinib. AXL has eight recorded BioGRID interactors\u2014TENC1, GRB2, LCK, SRC, PIK3R1, PIK3R2, GAS6, and CBL.",
+          "rationale": "Vandetanib has a median pChEMBL affinity of 6.6 against AXL, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.263 to the nearest approved drug gefitinib. BioGRID records physical or genetic interactions between AXL and the proteins TENC1, GRB2, LCK, SRC, PIK3R1, PIK3R2, GAS6, and CBL.",
           "descriptors": {
             "molecular_weight": 475.36,
             "logp": 5.0,
@@ -31151,7 +31151,7 @@
           "tanimoto_score": 0.213,
           "is_approved_drug": true,
           "most_similar_approved_drug": "INFIGRATINIB PHOSPHATE",
-          "rationale": "Nintedanib is an approved drug with a median pChEMBL affinity of 7.58 against FLT3, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.213 to the nearest approved drug, infigratinib phosphate. The FLT3 target has eight recorded BioGRID physical or genetic interactors: SOCS1, GRB2, HSP90AA1, IKBKG, UBE2L6, SIAH1, PIK3R1, and SLA.",
+          "rationale": "Nintedanib is an approved drug with a median pChEMBL affinity of 7.58 against FLT3, measured at assay confidence score 9 out of 9. Its Tanimoto similarity (Morgan r2) to the nearest approved drug, infigratinib phosphate, is 0.213, and FLT3 has eight recorded BioGRID physical/genetic interactors: SOCS1, GRB2, HSP90AA1, IKBKG, UBE2L6, SIAH1, PIK3R1, and SLA.",
           "descriptors": {
             "molecular_weight": 539.64,
             "logp": 3.62,
@@ -31317,7 +31317,7 @@
           "tanimoto_score": 0.1818,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ACYCLOVIR",
-          "rationale": "Forodesine hydrochloride has a median pChEMBL affinity of 9.32 against PNP, measured at an assay confidence score of 9 out of 9, and is recorded as an approved or known drug with a Tanimoto similarity of 0.182 to the nearest approved drug acyclovir. The BioGRID physical and genetic interactors associated with PNP include RBM48, CCDC90B, TP53, ZHX1, APLP1, LRIF1, UCHL5, and SIRT7.",
+          "rationale": "Forodesine hydrochloride has a median pChEMBL affinity of 9.32 against PNP, measured at an assay confidence score of 9 out of 9, and is a known approved drug with a Tanimoto similarity of 0.182 to the nearest approved drug acyclovir. The PNP target has eight recorded BioGRID interactors\u2014RBM48, CCDC90B, TP53, ZHX1, APLP1, LRIF1, UCHL5, and SIRT7.",
           "descriptors": {
             "molecular_weight": 302.72,
             "logp": -1.6,
@@ -31537,7 +31537,7 @@
           "tanimoto_score": 0.2453,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DASATINIB",
-          "rationale": "Infigratinib phosphate is an approved drug with a median pChEMBL affinity of 5.86 against KIT, measured at assay confidence score 8 out of 9, and a Tanimoto similarity of 0.245 to the nearest approved drug dasatinib. The BioGRID interactors recorded for KIT are BCR, CD9, CD63, CD81, GRB2, PIK3R1, PIK3R2, and SOCS1.",
+          "rationale": "Infigratinib phosphate is an approved drug with a median pChEMBL affinity of 5.86 against KIT, measured at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.245 to the nearest approved drug dasatinib. KIT has seven recorded BioGRID interactors\u2014BCR, CD9, CD63, CD81, GRB2, PIK3R1, PIK3R2, and SOCS1\u2014based on physical or genetic interaction data.",
           "descriptors": {
             "molecular_weight": 658.48,
             "logp": 4.43,
@@ -31781,7 +31781,7 @@
           "tanimoto_score": 0.2424,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ACYCLOVIR",
-          "rationale": "Cladribine is an approved drug with a median pChEMBL affinity of 8.64 against PNP at assay confidence score 9, and a Tanimoto similarity of 0.242 to the nearest approved drug acyclovir. The target PNP has eight BioGRID interactors recorded\u2014RBM48, CCDC90B, TP53, ZHX1, APLP1, LRIF1, UCHL5, and SIRT7.",
+          "rationale": "Cladribine is an approved drug with a median pChEMBL affinity of 8.64 against PNP at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.242 to the nearest approved drug acyclovir. The target PNP has eight recorded BioGRID physical or genetic interactors: RBM48, CCDC90B, TP53, ZHX1, APLP1, LRIF1, UCHL5, and SIRT7.",
           "descriptors": {
             "molecular_weight": 285.69,
             "logp": -0.3,
@@ -32001,7 +32001,7 @@
           "tanimoto_score": 0.1967,
           "is_approved_drug": true,
           "most_similar_approved_drug": "BEXAROTENE",
-          "rationale": "Tretinoin has a median pChEMBL affinity of 8.15 against RARA, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.197 to the nearest approved drug bexarotene. BioGRID records physical or genetic interactions between RARA and the following proteins: NRBF2, ZBTB16, MECR, RXRG, RXRB, NCOA6, GADD45G, and GADD45A.",
+          "rationale": "Tretinoin is an approved drug with a median pChEMBL affinity of 8.15 against RARA at assay confidence score 9, and a Tanimoto similarity of 0.197 to the nearest approved drug bexarotene. BioGRID records physical or genetic interactions between RARA and the following proteins: NRBF2, ZBTB16, MECR, RXRG, RXRB, NCOA6, GADD45G, and GADD45A.",
           "descriptors": {
             "molecular_weight": 300.44,
             "logp": 5.6,
@@ -32013,8 +32013,8 @@
             "veber_pass": true,
             "valid_structure": true
           },
-          "pubchem_xlogp": null,
-          "high_lipophilicity_flag": false,
+          "pubchem_xlogp": 6.3,
+          "high_lipophilicity_flag": true,
           "strong_match": true,
           "composite_score": 0.7494,
           "score_components": {
@@ -32318,7 +32318,7 @@
           "tanimoto_score": 0.1765,
           "is_approved_drug": true,
           "most_similar_approved_drug": "GEFITINIB",
-          "rationale": "Crizotinib is an approved drug with a median pChEMBL affinity of 6.53 against AXL, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.176 to the nearest approved drug gefitinib. BioGRID records physical or genetic interactions between AXL and the proteins TENC1, GRB2, LCK, SRC, PIK3R1, PIK3R2, GAS6, and CBL.",
+          "rationale": "Crizotinib is an approved drug with a median pChEMBL affinity of 6.53 against AXL at assay confidence score 9 out of 9, and its nearest approved drug comparator is gefitinib at a Tanimoto similarity of 0.176. The AXL target has eight recorded BioGRID interactors\u2014TENC1, GRB2, LCK, SRC, PIK3R1, PIK3R2, GAS6, and CBL.",
           "descriptors": {
             "molecular_weight": 450.35,
             "logp": 5.04,
@@ -34310,7 +34310,7 @@
           "tanimoto_score": 0.617,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DECITABINE",
-          "rationale": "Azacitidine has a median pChEMBL affinity of 6.52 against DNMT1 at an assay confidence score of 9, and it is an approved drug with a Tanimoto similarity of 0.617 to the nearest approved drug decitabine. DNMT1 has eight recorded BioGRID interactors\u2014RGS6, DNMT3B, CBX5, SUV39H1, CBX1, PCNA, HDAC2, and DMAP1.",
+          "rationale": "Azacitidine has a median pChEMBL affinity of 6.52 against DNMT1 at an assay confidence score of 9, and it is an approved drug with a Tanimoto similarity of 0.617 to the nearest approved drug decitabine. DNMT1 has the following BioGRID physical/genetic interactors listed: RGS6, DNMT3B, CBX5, SUV39H1, CBX1, PCNA, HDAC2, and DMAP1.",
           "descriptors": {
             "molecular_weight": 244.21,
             "logp": -3.17,
@@ -34806,7 +34806,7 @@
           "tanimoto_score": 0.2157,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SORAFENIB",
-          "rationale": "Quizartinib is an approved drug with a median pChEMBL affinity of 8.83 against FLT3, measured at assay confidence score 9 out of 9, and has a Tanimoto similarity of 0.216 to the nearest approved drug sorafenib. The FLT3 target has eight recorded BioGRID physical or genetic interactors: SOCS1, GRB2, HSP90AA1, IKBKG, UBE2L6, SIAH1, PIK3R1, and SLA.",
+          "rationale": "Quizartinib is an approved drug with a median pChEMBL affinity of 8.83 against FLT3, measured at assay confidence score 9 out of 9, and has a Tanimoto similarity of 0.216 to the nearest approved drug sorafenib. The BioGRID-recorded physical and genetic interactors of FLT3 include SOCS1, GRB2, HSP90AA1, IKBKG, UBE2L6, SIAH1, PIK3R1, and SLA.",
           "descriptors": {
             "molecular_weight": 560.68,
             "logp": 5.86,
@@ -34818,8 +34818,8 @@
             "veber_pass": true,
             "valid_structure": true
           },
-          "pubchem_xlogp": null,
-          "high_lipophilicity_flag": false,
+          "pubchem_xlogp": 5.6,
+          "high_lipophilicity_flag": true,
           "strong_match": false,
           "composite_score": 0.5421,
           "score_components": {
@@ -35109,7 +35109,7 @@
           "tanimoto_score": 0.2043,
           "is_approved_drug": true,
           "most_similar_approved_drug": "VISMODEGIB",
-          "rationale": "Sonidegib phosphate has a median pChEMBL affinity of 8.6 against SMO at assay confidence score 9, and is a known approved drug with a Tanimoto similarity of 0.204 to the nearest approved drug vismodegib. The BioGRID physical and genetic interactors recorded for the target SMO are PTCH1, PTCH2, BCL6, NEDD4, CHEK1, ATM, KIT, and FAM189B.",
+          "rationale": "Sonidegib phosphate has a median pChEMBL affinity of 8.6 against SMO at assay confidence score 9, and is a known approved drug with a Tanimoto similarity of 0.204 to the nearest approved drug vismodegib. BioGRID records physical or genetic interactions between SMO and the following proteins: PTCH1, PTCH2, BCL6, NEDD4, CHEK1, ATM, KIT, and FAM189B.",
           "descriptors": {
             "molecular_weight": 681.49,
             "logp": 3.96,
@@ -35275,7 +35275,7 @@
           "tanimoto_score": 0.2963,
           "is_approved_drug": true,
           "most_similar_approved_drug": "GILTERITINIB",
-          "rationale": "Entrectinib has a median pChEMBL affinity of 7.4 against AXL, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.296 to the nearest approved drug gilteritinib. BioGRID records physical or genetic interactions between AXL and the proteins TENC1, GRB2, LCK, SRC, PIK3R1, PIK3R2, GAS6, and CBL.",
+          "rationale": "Entrectinib has a median pChEMBL affinity of 7.4 against AXL, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.296 to the nearest approved drug gilteritinib. AXL has eight recorded BioGRID physical or genetic interactors: TENC1, GRB2, LCK, SRC, PIK3R1, PIK3R2, GAS6, and CBL.",
           "descriptors": {
             "molecular_weight": 560.65,
             "logp": 5.03,
@@ -36155,7 +36155,7 @@
           "tanimoto_score": 0.2018,
           "is_approved_drug": true,
           "most_similar_approved_drug": "IMATINIB",
-          "rationale": "Ceritinib is an approved drug with a median pChEMBL affinity of 5.715 against KIT, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.202 to the nearest approved drug imatinib. KIT has seven recorded BioGRID interactors\u2014BCR, CD9, CD63, CD81, GRB2, PIK3R1, PIK3R2, and SOCS1\u2014based on physical or genetic interaction data.",
+          "rationale": "Ceritinib is an approved drug with a median pChEMBL affinity of 5.715 against KIT, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.202 to the nearest approved drug imatinib. KIT has the following BioGRID interactors (physical/genetic): BCR, CD9, CD63, CD81, GRB2, PIK3R1, PIK3R2, and SOCS1.",
           "descriptors": {
             "molecular_weight": 558.15,
             "logp": 6.36,
@@ -36386,7 +36386,7 @@
           "tanimoto_score": 0.1714,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SONIDEGIB",
-          "rationale": "Infigratinib has a median pChEMBL affinity of 7.33 against SMO at assay confidence score 9, and a Tanimoto similarity of 0.171 to the nearest approved drug sonidegib. The target SMO has eight BioGRID interactors recorded\u2014PTCH1, PTCH2, BCL6, NEDD4, CHEK1, ATM, KIT, and FAM189B\u2014and infigratinib is an approved drug.",
+          "rationale": "Infigratinib has a median pChEMBL affinity of 7.33 against SMO at assay confidence score 9, and it is an approved or known drug with a Tanimoto similarity of 0.171 to the nearest approved drug sonidegib. The SMO target has eight recorded BioGRID interactors: PTCH1, PTCH2, BCL6, NEDD4, CHEK1, ATM, KIT, and FAM189B.",
           "descriptors": {
             "molecular_weight": 560.49,
             "logp": 5.35,
@@ -38056,7 +38056,7 @@
           "tanimoto_score": 0.4167,
           "is_approved_drug": true,
           "most_similar_approved_drug": "RIBOCICLIB",
-          "rationale": "Trilaciclib is an approved drug with a median pChEMBL affinity of 8.3 against CDK6, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.417 to the nearest approved drug ribociclib. CDK6 has eight recorded BioGRID interactors\u2014WWOX, CDC14A, MAGEB18, DVL2, TP53BP1, BAK1, BLM, and BRCA1.",
+          "rationale": "Trilaciclib is an approved drug with a median pChEMBL affinity of 8.3 against CDK6, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.417 to the nearest approved drug ribociclib. CDK6 has eight recorded BioGRID physical or genetic interactors: WWOX, CDC14A, MAGEB18, DVL2, TP53BP1, BAK1, BLM, and BRCA1.",
           "descriptors": {
             "molecular_weight": 446.56,
             "logp": 2.72,
@@ -38620,7 +38620,7 @@
           "tanimoto_score": 0.1533,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SOTORASIB",
-          "rationale": "Adagrasib is an approved drug with a median pChEMBL affinity of 7.925 against KRAS at an assay confidence score of 9, and a Tanimoto similarity of 0.153 to the nearest approved drug sotorasib. The KRAS target has eight BioGRID interactors recorded\u2014HRAS, SMARCA4, POLR2A, TIRAP, SIRT7, VCP, NSFL1C, and CAV1.",
+          "rationale": "Adagrasib is an approved drug with a median pChEMBL affinity of 7.925 against KRAS at assay confidence score 9, and a Tanimoto similarity of 0.153 to the nearest approved drug sotorasib. BioGRID records physical or genetic interactions between KRAS and the following proteins: HRAS, SMARCA4, POLR2A, TIRAP, SIRT7, VCP, NSFL1C, and CAV1.",
           "descriptors": {
             "molecular_weight": 604.13,
             "logp": 4.73,
@@ -38789,7 +38789,7 @@
           "tanimoto_score": 0.1786,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DABRAFENIB",
-          "rationale": "Sotorasib is an approved drug with a median pChEMBL affinity of 7.17 against KRAS at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.179 to the nearest approved drug dabrafenib. The KRAS target has eight recorded BioGRID interactors\u2014HRAS, SMARCA4, POLR2A, TIRAP, SIRT7, VCP, NSFL1C, and CAV1.",
+          "rationale": "Sotorasib is an approved drug with a median pChEMBL affinity of 7.17 against KRAS at assay confidence score 9, and a Tanimoto similarity of 0.179 to the nearest approved drug dabrafenib. The KRAS target has eight BioGRID interactors recorded\u2014HRAS, SMARCA4, POLR2A, TIRAP, SIRT7, VCP, NSFL1C, and CAV1.",
           "descriptors": {
             "molecular_weight": 560.61,
             "logp": 4.48,
@@ -38958,7 +38958,7 @@
           "tanimoto_score": 0.125,
           "is_approved_drug": true,
           "most_similar_approved_drug": "CERITINIB",
-          "rationale": "Sorafenib has a median pChEMBL affinity of 6.89 against CDK6, measured at assay confidence score 9 out of 9, and is an approved drug with a Tanimoto similarity of 0.125 to the nearest approved drug ceritinib. CDK6 has eight recorded BioGRID interactors\u2014WWOX, CDC14A, MAGEB18, DVL2, TP53BP1, BAK1, BLM, and BRCA1.",
+          "rationale": "Sorafenib has a median pChEMBL affinity of 6.89 against CDK6, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.125 to the nearest approved drug ceritinib. CDK6 has eight recorded BioGRID interactors\u2014WWOX, CDC14A, MAGEB18, DVL2, TP53BP1, BAK1, BLM, and BRCA1.",
           "descriptors": {
             "molecular_weight": 464.83,
             "logp": 5.55,
@@ -39294,7 +39294,7 @@
           "tanimoto_score": 0.6053,
           "is_approved_drug": true,
           "most_similar_approved_drug": "PALBOCICLIB",
-          "rationale": "Ribociclib has a median pChEMBL affinity of 8.0 against CDK4 at assay confidence score 9, is an approved drug, and has a Tanimoto similarity of 0.605 to the nearest approved drug palbociclib. CDK4 has the following BioGRID-recorded physical or genetic interactors: WWOX, CDC14A, MAGEB18, DVL2, TP53BP1, BAK1, BLM, and BRCA1.",
+          "rationale": "Ribociclib has a median pChEMBL affinity of 8.0 against CDK4, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.605 to the nearest approved drug palbociclib. BioGRID records physical or genetic interactions between CDK4 and the following proteins: WWOX, CDC14A, MAGEB18, DVL2, TP53BP1, BAK1, BLM, and BRCA1.",
           "descriptors": {
             "molecular_weight": 434.55,
             "logp": 2.8,
@@ -39541,7 +39541,7 @@
           "tanimoto_score": 0.0581,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DITHIAZANINE IODIDE",
-          "rationale": "Famotidine has a median pChEMBL affinity of 4.17 against POU5F1 measured at assay confidence score 9, and a Tanimoto similarity of 0.058 to the nearest approved drug, dithiazanine iodide. POU5F1 has recorded physical or genetic interactors in BioGRID comprising WDR5, ASH2L, TRIM27, MYOD1, NEDD4, CSNK2A1, HOMER3, and MAGOHB.",
+          "rationale": "Famotidine has a median pChEMBL affinity of 4.17 against POU5F1 measured at assay confidence score 9, and it is an approved drug with a Tanimoto similarity of 0.058 to the nearest approved drug dithiazanine iodide. POU5F1 has physical or genetic interactors in BioGRID recorded as WDR5, ASH2L, TRIM27, MYOD1, NEDD4, CSNK2A1, HOMER3, and MAGOHB.",
           "descriptors": {
             "molecular_weight": 337.46,
             "logp": -0.77,
@@ -41085,7 +41085,7 @@
           "tanimoto_score": 0.136,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ADAGRASIB",
-          "rationale": "Lonafarnib has a median pChEMBL affinity of 7.4 against KRAS at assay confidence score 9, is an approved or known drug, and has a Tanimoto similarity of 0.136 to the nearest approved drug adagrasib. The KRAS target has eight recorded BioGRID interactors\u2014HRAS, SMARCA4, POLR2A, TIRAP, SIRT7, VCP, NSFL1C, and CAV1.",
+          "rationale": "Lonafarnib has a median pChEMBL affinity of 7.4 against KRAS at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.136 to the nearest approved drug adagrasib. The KRAS target has eight BioGRID interactors recorded\u2014HRAS, SMARCA4, POLR2A, TIRAP, SIRT7, VCP, NSFL1C, and CAV1.",
           "descriptors": {
             "molecular_weight": 638.83,
             "logp": 5.91,
@@ -42555,7 +42555,7 @@
           "tanimoto_score": 0.5577,
           "is_approved_drug": true,
           "most_similar_approved_drug": "LOXAPINE",
-          "rationale": "Clozapine has a median pChEMBL affinity of 7.39 against DRD2, measured at assay confidence score 9 out of 9, and is a approved drug with a Tanimoto similarity of 0.558 to the nearest approved drug loxapine. BioGRID records physical or genetic interactions between DRD2 and eight proteins\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6.",
+          "rationale": "Clozapine has a median pChEMBL affinity of 7.39 against DRD2, measured at assay confidence score 9 out of 9, and is a approved drug with a Tanimoto similarity of 0.558 to the nearest approved drug loxapine. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6\u2014based on physical and genetic interaction data.",
           "descriptors": {
             "molecular_weight": 326.83,
             "logp": 3.72,
@@ -43027,7 +43027,7 @@
           "tanimoto_score": 0.3291,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SERTINDOLE",
-          "rationale": "Domperidone is an approved drug with a median pChEMBL affinity of 8.46 against DRD3 measured at assay confidence score 9, and a Tanimoto similarity (Morgan r2) of 0.329 to the nearest approved drug sertindole. BioGRID records physical and genetic interactors of DRD3 as FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2.",
+          "rationale": "Domperidone is an approved drug with a median pChEMBL affinity of 8.46 against DRD3 measured at assay confidence score 9 out of 9, and a Tanimoto similarity (Morgan r2) of 0.329 to the nearest approved drug sertindole. DRD3 has the following BioGRID physical/genetic interactors on record: FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2.",
           "descriptors": {
             "molecular_weight": 425.92,
             "logp": 3.35,
@@ -43384,7 +43384,7 @@
           "tanimoto_score": 0.2644,
           "is_approved_drug": true,
           "most_similar_approved_drug": "KETANSERIN",
-          "rationale": "Risperidone has a median pChEMBL affinity of 8.48 against DRD2 measured at assay confidence score 8 (on a 0\u20139 scale), and it is a known approved drug with a Tanimoto similarity (Morgan r2) of 0.264 to the nearest approved drug ketanserin. The DRD2 target has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6\u2014based on physical and genetic interaction data.",
+          "rationale": "Risperidone has a median pChEMBL affinity of 8.48 against DRD2 measured at assay confidence score 8 (on a 0\u20139 scale), and it is a known approved drug with a Tanimoto similarity of 0.264 (Morgan r2) to the nearest approved drug ketanserin. The DRD2 target has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6\u2014based on physical and genetic interaction data.",
           "descriptors": {
             "molecular_weight": 410.49,
             "logp": 3.59,
@@ -43781,7 +43781,7 @@
           "tanimoto_score": 0.1549,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ROTIGOTINE",
-          "rationale": "Pramipexole is an approved drug with a median pChEMBL affinity of 9.06 against DRD3 at an assay confidence score of 8 out of 9, and a Tanimoto similarity (Morgan r2) of 0.155 to the nearest approved drug rotigotine. DRD3 has eight recorded BioGRID interactors\u2014FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2.",
+          "rationale": "Pramipexole is an approved drug with a median pChEMBL affinity of 9.06 against DRD3 at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.155 to the nearest approved drug rotigotine. The BioGRID-recorded physical and genetic interactors of DRD3 include FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2.",
           "descriptors": {
             "molecular_weight": 211.33,
             "logp": 1.58,
@@ -44159,7 +44159,7 @@
           "tanimoto_score": 0.3,
           "is_approved_drug": true,
           "most_similar_approved_drug": "METOCLOPRAMIDE",
-          "rationale": "Sulpiride is an approved drug with a median pChEMBL affinity of 8.1 against DRD3, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.300 to the nearest approved drug metoclopramide. BioGRID records physical or genetic interactions between DRD3 and the following proteins: FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2.",
+          "rationale": "Sulpiride is an approved drug with a median pChEMBL affinity of 8.1 against DRD3, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.300 to the nearest approved drug metoclopramide. DRD3 has eight recorded BioGRID physical or genetic interactors: FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2.",
           "descriptors": {
             "molecular_weight": 341.43,
             "logp": 0.56,
@@ -44557,7 +44557,7 @@
           "tanimoto_score": 0.2206,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ROPINIROLE",
-          "rationale": "Rotigotine is an approved drug with a median pChEMBL affinity of 8.4 against DRD3 measured at an assay confidence score of 8 out of 9, and a Tanimoto similarity (Morgan r2) of 0.221 to the nearest approved drug ropinirole. DRD3 has eight recorded BioGRID physical/genetic interactors: FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2.",
+          "rationale": "Rotigotine is an approved drug with a median pChEMBL affinity of 8.4 against DRD3 at an assay confidence score of 8 out of 9, and a Tanimoto similarity (Morgan r2) of 0.221 to the nearest approved drug ropinirole. DRD3 has eight recorded BioGRID physical or genetic interactors: FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2.",
           "descriptors": {
             "molecular_weight": 315.48,
             "logp": 4.27,
@@ -44911,7 +44911,7 @@
           "tanimoto_score": 0.28,
           "is_approved_drug": true,
           "most_similar_approved_drug": "CLOZAPINE",
-          "rationale": "Ziprasidone has a median pChEMBL affinity of 8.06 against DRD3 from assays with a confidence score of 8 out of 9, and a Tanimoto similarity of 0.280 to the nearest approved drug clozapine. The target DRD3 has eight recorded BioGRID interactors\u2014FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2.",
+          "rationale": "Ziprasidone has a median pChEMBL affinity of 8.06 against DRD3 from assays with a confidence score of 8 out of 9, and a Tanimoto similarity of 0.280 to the nearest approved drug clozapine. The DRD3 target has eight recorded BioGRID interactors\u2014FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2\u2014and ziprasidone is an approved drug.",
           "descriptors": {
             "molecular_weight": 412.95,
             "logp": 3.81,
@@ -45281,7 +45281,7 @@
           "tanimoto_score": 0.2297,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ZIPRASIDONE",
-          "rationale": "Ropinirole is an approved drug with a median pChEMBL affinity of 8.14 against DRD2 at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.230 to the nearest approved drug ziprasidone. DRD2 has eight recorded BioGRID physical/genetic interactors: CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6.",
+          "rationale": "Ropinirole is an approved drug with a median pChEMBL affinity of 8.14 against DRD2 at assay confidence score 9 out of 9, and a Tanimoto similarity (Morgan r2) of 0.230 to the nearest approved drug ziprasidone. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6.",
           "descriptors": {
             "molecular_weight": 260.38,
             "logp": 2.85,
@@ -45678,7 +45678,7 @@
           "tanimoto_score": 0.2203,
           "is_approved_drug": true,
           "most_similar_approved_drug": "MIANSERIN",
-          "rationale": "Apomorphine has a median pChEMBL affinity of 8.11 against DRD3, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.220 to the nearest approved drug mianserin. DRD3 has eight recorded BioGRID interactors\u2014FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2\u2014based on physical or genetic interaction data.",
+          "rationale": "Apomorphine has a median pChEMBL affinity of 8.11 against DRD3, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.220 to the nearest approved drug mianserin. DRD3 has eight recorded BioGRID physical or genetic interactors: FLNA, CLIC6, MPDZ, GIPC1, RDX, NCS1, EPB41L1, and GRB2.",
           "descriptors": {
             "molecular_weight": 267.33,
             "logp": 2.85,
@@ -46475,7 +46475,7 @@
           "tanimoto_score": 0.2319,
           "is_approved_drug": true,
           "most_similar_approved_drug": "QUETIAPINE",
-          "rationale": "Buspirone has a median pChEMBL affinity of 7.89 against DRD2 from assays with a confidence score of 9 out of 9, and it is an approved drug with a Tanimoto similarity of 0.232 to the nearest approved drug quetiapine. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6.",
+          "rationale": "Buspirone has a median pChEMBL affinity of 7.89 against DRD2 at assay confidence score 9 (out of 9), and is an approved drug with a Tanimoto similarity of 0.232 to the nearest approved drug quetiapine. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6.",
           "descriptors": {
             "molecular_weight": 385.51,
             "logp": 2.09,
@@ -46816,7 +46816,7 @@
           "tanimoto_score": 0.3231,
           "is_approved_drug": true,
           "most_similar_approved_drug": "CLOZAPINE",
-          "rationale": "Quetiapine has a median pChEMBL affinity of 6.855 against DRD2 at assay confidence score 8 (on a 0\u20139 scale), and it is a known approved drug with a Tanimoto similarity of 0.323 to the nearest approved drug clozapine. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6.",
+          "rationale": "Quetiapine has a median pChEMBL affinity of 6.855 against DRD2 at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.323 to the nearest approved drug clozapine. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6\u2014and quetiapine is an approved drug.",
           "descriptors": {
             "molecular_weight": 383.52,
             "logp": 2.86,
@@ -47186,7 +47186,7 @@
           "tanimoto_score": 0.1858,
           "is_approved_drug": true,
           "most_similar_approved_drug": "REMOXIPRIDE",
-          "rationale": "Bromocriptine has a median pChEMBL affinity of 8.0 against DRD2 measured at assay confidence score 9 (out of 9), and it is a known approved drug with a Tanimoto similarity of 0.186 to the nearest approved drug remoxipride. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6.",
+          "rationale": "Bromocriptine has a median pChEMBL affinity of 8.0 against DRD2 measured at assay confidence score 9 (out of 9), and it is a known approved drug with a Tanimoto similarity of 0.186 (Morgan r2) to the nearest approved drug remoxipride. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6\u2014based on physical and genetic interaction data.",
           "descriptors": {
             "molecular_weight": 654.61,
             "logp": 3.19,
@@ -47633,7 +47633,7 @@
           "tanimoto_score": 0.3,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SERTINDOLE",
-          "rationale": "Ketanserin, an approved drug, has a median pChEMBL affinity of 6.62 against DRD2 measured at assay confidence score 8 out of 9, and a Tanimoto similarity (Morgan r2) of 0.300 to the nearest approved drug sertindole. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6.",
+          "rationale": "Ketanserin, an approved drug, has a median pChEMBL affinity of 6.62 against DRD2 measured at an assay confidence score of 8 out of 9, and a Tanimoto similarity (Morgan r2) of 0.300 to the nearest approved drug sertindole. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6.",
           "descriptors": {
             "molecular_weight": 395.43,
             "logp": 2.42,
@@ -48131,7 +48131,7 @@
           "tanimoto_score": 0.6023,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DACOMITINIB ANHYDROUS",
-          "rationale": "Afatinib has a median pChEMBL affinity of 9.0 against ERBB4, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.602 to the nearest approved drug dacomitinib anhydrous. The ERBB4 target has eight recorded BioGRID physical or genetic interactors: GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
+          "rationale": "Afatinib has a median pChEMBL affinity of 9.0 against ERBB4, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.602 to the nearest approved drug dacomitinib anhydrous. The ERBB4 target has eight recorded BioGRID interactors: GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
           "descriptors": {
             "molecular_weight": 485.95,
             "logp": 4.39,
@@ -48771,7 +48771,7 @@
           "tanimoto_score": 0.1667,
           "is_approved_drug": true,
           "most_similar_approved_drug": "APOMORPHINE",
-          "rationale": "Fenoldopam is an approved drug with a median pChEMBL affinity of 6.09 against DRD2, measured at an assay confidence score of 8 out of 9, and has a Tanimoto similarity (Morgan r2) of 0.167 to the nearest approved drug apomorphine. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6\u2014based on physical and genetic interaction data.",
+          "rationale": "Fenoldopam is an approved drug with a median pChEMBL affinity of 6.09 against DRD2, measured at an assay confidence score of 8 out of 9, and a Tanimoto similarity (Morgan r2) of 0.167 to the nearest approved drug apomorphine. DRD2 has eight recorded BioGRID interactors\u2014CLIC6, ADORA2A, PPP1R9B, NCS1, EPB41L1, FLNA, KCNJ3, and KCNJ6.",
           "descriptors": {
             "molecular_weight": 305.76,
             "logp": 2.73,
@@ -50590,7 +50590,7 @@
           "tanimoto_score": 0.2114,
           "is_approved_drug": true,
           "most_similar_approved_drug": "DASATINIB",
-          "rationale": "Adagrasib is an approved drug with a median pChEMBL affinity of 7.925 against KRAS at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.211 to the nearest approved drug dasatinib. The KRAS target has eight recorded BioGRID interactors\u2014GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX\u2014based on physical or genetic interaction data.",
+          "rationale": "Adagrasib is an approved drug with a median pChEMBL affinity of 7.925 against KRAS at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.211 to the nearest approved drug dasatinib. The KRAS target has eight recorded BioGRID interactors\u2014GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
           "descriptors": {
             "molecular_weight": 604.13,
             "logp": 4.73,
@@ -50820,7 +50820,7 @@
           "tanimoto_score": 0.2188,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ESZOPICLONE",
-          "rationale": "Dasatinib has a median pChEMBL affinity of 7.4 against ERBB4 from assays with a confidence score of 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.219 to the nearest approved drug eszopiclone. ERBB4 has eight recorded BioGRID interactors\u2014GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
+          "rationale": "Dasatinib has a median pChEMBL affinity of 7.4 against ERBB4 at an assay confidence score of 8 out of 9, and it is an approved drug with a Tanimoto similarity of 0.219 to the nearest approved drug eszopiclone. The ERBB4 target has eight recorded BioGRID interactors\u2014GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
           "descriptors": {
             "molecular_weight": 506.03,
             "logp": 2.49,
@@ -51050,7 +51050,7 @@
           "tanimoto_score": 0.3077,
           "is_approved_drug": true,
           "most_similar_approved_drug": "ENASIDENIB",
-          "rationale": "Vorasidenib is an approved drug with a median pChEMBL affinity of 6.89 against IDH2 at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.308 to the nearest approved drug enasidenib. BioGRID records physical or genetic interactions between IDH2 and the proteins SRRM2, PSMD4, ATXN1L, APP, AK3, ACAT1, SIN3A, and ACAA2.",
+          "rationale": "Vorasidenib is an approved drug with a median pChEMBL affinity of 6.89 against IDH2 at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.308 to the nearest approved drug enasidenib. BioGRID records physical or genetic interactions between IDH2 and eight proteins: SRRM2, PSMD4, ATXN1L, APP, AK3, ACAT1, SIN3A, and ACAA2.",
           "descriptors": {
             "molecular_weight": 414.74,
             "logp": 4.31,
@@ -51218,7 +51218,7 @@
           "tanimoto_score": 0.24,
           "is_approved_drug": true,
           "most_similar_approved_drug": "RITLECITINIB",
-          "rationale": "Sotorasib is an approved drug with a median pChEMBL affinity of 7.17 against KRAS at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.240 to the nearest approved drug ritlecitinib. The KRAS target has eight recorded BioGRID interactors\u2014GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
+          "rationale": "Sotorasib is an approved drug with a median pChEMBL affinity of 7.17 against KRAS at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.240 to the nearest approved drug ritlecitinib. The KRAS target has eight recorded BioGRID interactors\u2014GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
           "descriptors": {
             "molecular_weight": 560.61,
             "logp": 4.48,
@@ -51448,7 +51448,7 @@
           "tanimoto_score": 0.47,
           "is_approved_drug": true,
           "most_similar_approved_drug": "SAQUINAVIR",
-          "rationale": "Nelfinavir has a median pChEMBL affinity of 4.9 against ABCG2, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.470 to the nearest approved drug saquinavir. ABCG2 has eight recorded BioGRID physical or genetic interactors: APP, RANBP9, ZDHHC17, GABRE, HNRNPA1, NPEPL1, PDIA3, and SAR1A.",
+          "rationale": "Nelfinavir has a median pChEMBL affinity of 4.9 against ABCG2, measured at an assay confidence score of 8 out of 9, and has a Tanimoto similarity of 0.470 to the nearest approved drug saquinavir. The target ABCG2 has eight recorded BioGRID physical or genetic interactors: APP, RANBP9, ZDHHC17, GABRE, HNRNPA1, NPEPL1, PDIA3, and SAR1A.",
           "descriptors": {
             "molecular_weight": 567.8,
             "logp": 4.75,
@@ -51614,7 +51614,7 @@
           "tanimoto_score": 0.4138,
           "is_approved_drug": true,
           "most_similar_approved_drug": "IBRUTINIB",
-          "rationale": "Tirabrutinib is an approved drug with a median pChEMBL affinity of 6.0 against ERBB4, measured at assay confidence score 9, and a Tanimoto similarity of 0.414 to the nearest approved drug ibrutinib. The ERBB4 target has eight recorded BioGRID physical/genetic interactors: GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
+          "rationale": "Tirabrutinib is an approved drug with a median pChEMBL affinity of 6.0 against ERBB4, measured at assay confidence score 9 out of 9, and a Tanimoto similarity of 0.414 to the nearest approved drug ibrutinib. ERBB4 has eight recorded BioGRID physical/genetic interactors: GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
           "descriptors": {
             "molecular_weight": 454.49,
             "logp": 2.75,
@@ -51841,7 +51841,7 @@
           "tanimoto_score": 0.4079,
           "is_approved_drug": true,
           "most_similar_approved_drug": "GEFITINIB",
-          "rationale": "Erlotinib has a median pChEMBL affinity of 5.925 against ERBB4 measured at assay confidence score 9, and it is an approved drug with a Tanimoto similarity of 0.408 to the nearest approved drug gefitinib. The ERBB4 target has eight recorded BioGRID interactors\u2014GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
+          "rationale": "Erlotinib has a median pChEMBL affinity of 5.925 against ERBB4 measured at assay confidence score 9, and it is an approved drug with a Tanimoto similarity of 0.408 to gefitinib. The ERBB4 target has eight BioGRID interactors recorded\u2014GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
           "descriptors": {
             "molecular_weight": 393.44,
             "logp": 3.41,
@@ -52150,7 +52150,7 @@
           "tanimoto_score": 0.1111,
           "is_approved_drug": true,
           "most_similar_approved_drug": "RITLECITINIB",
-          "rationale": "Cannabidiol has a median pChEMBL affinity of 6.89 against GABRB2, measured at assay confidence score 9 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.111 to the nearest approved drug ritlecitinib. BioGRID records physical or genetic interactions between GABRB2 and the following proteins: GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
+          "rationale": "Cannabidiol has a median pChEMBL affinity of 6.89 against GABRB2, measured at assay confidence score 9 out of 9, and is an approved or known drug with a Tanimoto similarity of 0.111 to the nearest approved drug ritlecitinib. The GABRB2 target has eight recorded BioGRID interactors\u2014GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
           "descriptors": {
             "molecular_weight": 314.47,
             "logp": 5.85,
@@ -52377,7 +52377,7 @@
           "tanimoto_score": 0.211,
           "is_approved_drug": true,
           "most_similar_approved_drug": "LAPATINIB",
-          "rationale": "Vemurafenib has a median pChEMBL affinity of 4.78 against KRAS, measured at assay confidence score 9, and is an approved drug with a Tanimoto similarity of 0.211 to the nearest approved drug lapatinib. The KRAS target has eight recorded BioGRID interactors\u2014GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
+          "rationale": "Vemurafenib has a median pChEMBL affinity of 4.78 against KRAS, measured at assay confidence score 9, and has a Tanimoto similarity (Morgan r2) of 0.211 to the nearest approved drug lapatinib. The KRAS target has eight recorded BioGRID interactors\u2014GABARAP, DRD5, GABRG1, TUBB1, DNAJC18, BSCL2, B4GALT5, and CANX.",
           "descriptors": {
             "molecular_weight": 489.93,
             "logp": 5.54,
@@ -52608,7 +52608,7 @@
           "tanimoto_score": 0.1792,
           "is_approved_drug": true,
           "most_similar_approved_drug": "RESERPINE",
-          "rationale": "Pantoprazole has a median pChEMBL affinity of 5.0 against ABCG2, measured at assay confidence score 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.179 to the nearest approved drug reserpine. ABCG2 has eight recorded BioGRID physical or genetic interactors: APP, RANBP9, ZDHHC17, GABRE, HNRNPA1, NPEPL1, PDIA3, and SAR1A.",
+          "rationale": "Pantoprazole has a median pChEMBL affinity of 5.0 against ABCG2, measured at an assay confidence score of 8 out of 9, and is an approved drug with a Tanimoto similarity of 0.179 to the nearest approved drug reserpine. The ABCG2 target has the following physical or genetic interactors recorded in BioGRID: APP, RANBP9, ZDHHC17, GABRE, HNRNPA1, NPEPL1, PDIA3, and SAR1A.",
           "descriptors": {
             "molecular_weight": 383.38,
             "logp": 2.88,
@@ -52942,7 +52942,7 @@
           "tanimoto_score": 0.1652,
           "is_approved_drug": true,
           "most_similar_approved_drug": "RITONAVIR",
-          "rationale": "Nicardipine has a median pChEMBL affinity of 4.78 against ABCG2, measured at assay confidence score 9, and has a Tanimoto similarity (Morgan r2) of 0.165 to the nearest approved drug ritonavir. ABCG2 has eight recorded BioGRID physical/genetic interactors: APP, RANBP9, ZDHHC17, GABRE, HNRNPA1, NPEPL1, PDIA3, and SAR1A.",
+          "rationale": "Nicardipine has a median pChEMBL affinity of 4.78 against ABCG2 measured at assay confidence score 9, and a Tanimoto similarity (Morgan r2) of 0.165 to the nearest approved drug ritonavir. BioGRID lists the following physical/genetic interactors of ABCG2: APP, RANBP9, ZDHHC17, GABRE, HNRNPA1, NPEPL1, PDIA3, and SAR1A.",
           "descriptors": {
             "molecular_weight": 479.53,
             "logp": 3.68,
@@ -53274,7 +53274,7 @@
           "tanimoto_score": 0.1607,
           "is_approved_drug": true,
           "most_similar_approved_drug": "NELFINAVIR",
-          "rationale": "Dolutegravir is an approved drug with a median pChEMBL affinity of 4.17 against ABCG2, measured at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.161 to the nearest approved drug nelfinavir. The ABCG2 target has the following BioGRID-recorded physical or genetic interactors: APP, RANBP9, ZDHHC17, GABRE, HNRNPA1, NPEPL1, PDIA3, and SAR1A.",
+          "rationale": "Dolutegravir is an approved drug with a median pChEMBL affinity of 4.17 against ABCG2, measured at an assay confidence score of 9 out of 9, and a Tanimoto similarity of 0.161 to the nearest approved drug nelfinavir. The ABCG2 target has eight recorded BioGRID interactors\u2014APP, RANBP9, ZDHHC17, GABRE, HNRNPA1, NPEPL1, PDIA3, and SAR1A.",
           "descriptors": {
             "molecular_weight": 419.38,
             "logp": 1.35,
@@ -53440,7 +53440,7 @@
           "tanimoto_score": 0.1596,
           "is_approved_drug": true,
           "most_similar_approved_drug": "IMATINIB",
-          "rationale": "Etravirine, an approved drug, has a median pChEMBL affinity of 5.22 against ABCG2 measured at an assay confidence score of 8 out of 9, and a Tanimoto similarity of 0.160 to the nearest approved drug imatinib. BioGRID records physical or genetic interactions between ABCG2 and the proteins APP, RANBP9, ZDHHC17, GABRE, HNRNPA1, NPEPL1, PDIA3, and SAR1A.",
+          "rationale": "Etravirine, an approved drug, has a median pChEMBL affinity of 5.22 against ABCG2 measured at assay confidence score 8 out of 9, and a Tanimoto similarity of 0.160 to the nearest approved drug imatinib. The ABCG2 target has eight recorded BioGRID physical or genetic interactors: APP, RANBP9, ZDHHC17, GABRE, HNRNPA1, NPEPL1, PDIA3, and SAR1A.",
           "descriptors": {
             "molecular_weight": 435.29,
             "logp": 4.72,

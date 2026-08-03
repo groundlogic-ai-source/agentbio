@@ -3,11 +3,16 @@ Layer 2 market-safety disclosure — web-search supplementary check.
 
 Uses Anthropic claude-sonnet-4-6 with the built-in web_search tool to query
 for drug market-withdrawal / black-box-warning history, then runs ONE
-constrained classification call (temperature=0, no tools) to render a
-YES / NO / UNCLEAR verdict.
+constrained classification call (temperature=0, no tools) answering TWO
+separate questions: WITHDRAWAL and BLACK_BOX, each YES / NO / UNCLEAR.
 
 Design constraints from spec:
-  - Only a YES may trigger the cap+badge gate.
+  - Only WITHDRAWAL: YES may trigger the cap+badge gate.  A black-box warning
+    alone NEVER caps — >30% of marketed drugs carry one; it feeds the
+    disclosure-only advisory (mirroring Layer 1 ChEMBL semantics).  The v1
+    classifier conflated the two in a single question, letting boxed-warning
+    drugs (e.g. lamotrigine) inherit the hard cap; that regression is guarded
+    by validation/test_safety_layer2_split.py — do not re-merge the questions.
   - NO or UNCLEAR must NEVER be treated as a positive safety signal.
   - The report ALWAYS includes the explicit disclaimer:
       "No market-withdrawal information found in this search;
@@ -39,9 +44,12 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
         "Has [drug name] ever been withdrawn from any market, received a
         black box warning, or been discontinued for safety reasons? Cite sources."
 
-    Step 2 — constrained classification (temperature=0, no tools):
-        "Does this result confirm a market withdrawal or black-box warning for
-        safety reasons: YES / NO / UNCLEAR. Cite the specific source."
+    Step 2 — constrained classification (temperature=0, no tools), TWO
+        separate questions on the same search text:
+        "1. WITHDRAWAL: withdrawn from any market or discontinued for safety
+            reasons? (a black-box warning alone is NOT a withdrawal)
+         2. BLACK_BOX: carries a regulatory black-box (boxed) warning?
+         Answer each YES / NO / UNCLEAR. Cite the specific source."
 
     Only YES → confirmed=True.  NO or UNCLEAR → confirmed=False, and
     disclosure_text ALWAYS contains the mandatory "does not confirm safe" note.
@@ -50,15 +58,25 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
 
     Returns:
         {
-          "confirmed"      : bool   — True ONLY on explicit YES verdict
-          "layer"          : "web_search"
-          "verdict"        : "YES" | "NO" | "UNCLEAR" | "SKIPPED" | "ERROR"
-          "citation"       : str | None   — source cited by the classifier
-          "search_summary" : str          — full text extracted from Step 1 response
-          "disclosure_text": str          — what to surface in the report
+          "confirmed"          : bool — True ONLY on WITHDRAWAL: YES (a boxed
+                                        warning alone NEVER sets this)
+          "black_box_advisory" : bool — True on BLACK_BOX: YES when no
+                                        withdrawal is confirmed (disclosure only)
+          "layer"              : "web_search"
+          "verdict"            : withdrawal verdict — "YES" | "NO" | "UNCLEAR" |
+                                        "SKIPPED" | "ERROR"
+          "black_box_verdict"  : black-box verdict — same value set
+          "citation"           : str | None   — source cited by the classifier
+          "search_summary"     : str  — full text extracted from Step 1 response
+          "disclosure_text"    : str  — what to surface in the report
         }
     """
-    cache_key = make_key("web_safety_check_v1", drug_name)
+    # v2 key: v1 asked ONE conflated question ("withdrawal OR black-box
+    # warning?"), so a black-box-only drug (e.g. lamotrigine) rendered a YES
+    # and inherited the hard safety cap — bypassing the Layer 1 separation of
+    # boxed warnings from genuine withdrawals.  v2 asks the two questions
+    # separately; only WITHDRAWAL: YES may set confirmed=True.
+    cache_key = make_key("web_safety_check_v2", drug_name)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -68,8 +86,10 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
 
     result: dict[str, Any] = {
         "confirmed": False,
+        "black_box_advisory": False,
         "layer": "web_search",
         "verdict": "SKIPPED",
+        "black_box_verdict": "SKIPPED",
         "citation": None,
         "search_summary": "",
         "disclosure_text": _NO_INFO_TEXT,
@@ -120,15 +140,24 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
             return result
 
         # ── Step 2: constrained classification (temperature=0, no tools) ─────
+        # Two SEPARATE questions.  A black-box warning is NOT a withdrawal:
+        # >30% of approved drugs carry one and remain fully marketed.  Only a
+        # WITHDRAWAL: YES may trigger the hard cap; BLACK_BOX: YES feeds the
+        # disclosure advisory instead.
         classification_prompt = (
             f"The following is a web search result about the drug {drug_name!r} "
             f"and any market withdrawal, black-box warning, or safety "
             f"discontinuation:\n\n"
             f"---\n{search_text}\n---\n\n"
-            f"Based ONLY on the above text, answer: does this result confirm a "
-            f"market withdrawal or black-box warning for safety reasons?\n\n"
-            f"Reply in this EXACT format (two lines only, nothing else):\n"
-            f"VERDICT: YES | NO | UNCLEAR\n"
+            f"Based ONLY on the above text, answer BOTH questions:\n"
+            f"1. WITHDRAWAL: Was the drug withdrawn from any market, or "
+            f"discontinued FOR SAFETY REASONS? (A black-box warning alone is "
+            f"NOT a withdrawal.)\n"
+            f"2. BLACK_BOX: Does the drug carry a regulatory black-box "
+            f"(boxed) warning?\n\n"
+            f"Reply in this EXACT format (three lines only, nothing else):\n"
+            f"WITHDRAWAL: YES | NO | UNCLEAR\n"
+            f"BLACK_BOX: YES | NO | UNCLEAR\n"
             f"CITATION: <the specific source URL or citation, or 'none'>"
         )
         classify_response = client.messages.create(
@@ -144,33 +173,44 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
                 classify_text += block.text
         classify_text = classify_text.strip()
 
-        # Parse verdict and citation from the two-line classifier output
-        verdict = "UNCLEAR"
+        # Parse the three-line classifier output.  Backward compatibility: if
+        # the model ignores the two-question format and replies with a bare
+        # "VERDICT: ..." line (old format), treat it as the WITHDRAWAL answer.
+        withdrawal = "UNCLEAR"
+        black_box = "UNCLEAR"
         citation = None
+
+        def _parse_verdict(raw: str) -> str:
+            raw = raw.strip().upper()
+            if "YES" in raw:
+                return "YES"
+            if "NO" in raw and "UNCLEAR" not in raw:
+                return "NO"
+            return "UNCLEAR"
+
         for line in classify_text.splitlines():
             line = line.strip()
             upper = line.upper()
-            if upper.startswith("VERDICT:"):
-                raw = line.split(":", 1)[1].strip().upper()
-                if "YES" in raw:
-                    verdict = "YES"
-                elif "NO" in raw and "UNCLEAR" not in raw:
-                    verdict = "NO"
-                else:
-                    verdict = "UNCLEAR"
+            if upper.startswith("WITHDRAWAL:"):
+                withdrawal = _parse_verdict(line.split(":", 1)[1])
+            elif upper.startswith("BLACK_BOX:") or upper.startswith("BLACK BOX:"):
+                black_box = _parse_verdict(line.split(":", 1)[1])
+            elif upper.startswith("VERDICT:"):
+                withdrawal = _parse_verdict(line.split(":", 1)[1])
             elif upper.startswith("CITATION:"):
                 raw_cite = line.split(":", 1)[1].strip()
                 if raw_cite and raw_cite.lower() not in ("none", "n/a", ""):
                     citation = raw_cite
 
-        result["verdict"] = verdict
+        result["verdict"] = withdrawal
+        result["black_box_verdict"] = black_box
         result["citation"] = citation
 
-        if verdict == "YES":
+        if withdrawal == "YES":
             result["confirmed"] = True
             result["disclosure_text"] = (
-                f"MARKET WITHDRAWAL / BLACK-BOX WARNING CONFIRMED by web search "
-                f"for {drug_name}. "
+                f"MARKET WITHDRAWAL / SAFETY DISCONTINUATION CONFIRMED by web "
+                f"search for {drug_name}. "
                 f"Source: {citation or 'see search_summary field'}"
             )
         else:
@@ -178,6 +218,10 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
             # Mandatory disclaimer is always present.
             result["confirmed"] = False
             result["disclosure_text"] = _NO_INFO_TEXT
+            if black_box == "YES":
+                # Disclosure-only advisory, mirroring the Layer 1 semantics:
+                # boxed warning present, drug still marketed — never a cap.
+                result["black_box_advisory"] = True
 
         cache_set(cache_key, result, ttl_days=30)
 
