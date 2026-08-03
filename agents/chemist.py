@@ -37,8 +37,12 @@ from agents.mutation_disclosure import detect_mutation_specificity
 from agents.biologist import get_pathway_neighbor_targets
 from data_sources.chembl import get_target_candidate_compounds, get_drug_indications
 from data_sources.pubchem import get_compound_data, get_drug_classification
-from data_sources.openfda import get_label_indications
+from data_sources.openfda import get_label_indications, get_label_mechanism
 from data_sources.multisource_candidates import collect_target_candidates
+from data_sources import holdout as _holdout
+from data_sources.evidence_ledger import (
+    EvidenceRecord, EvidenceRole, QualificationStatus, SourceType,
+)
 
 MODEL = "claude-sonnet-4-6"
 FP_RADIUS = 2
@@ -188,6 +192,41 @@ def _mutation_disclosure_for(drug_name: str, molecule_chembl_id: str) -> dict[st
     disc = detect_mutation_specificity(label.get("indications_text", ""), chembl_terms)
     disc["indication_source"] = label.get("source")
     return disc
+
+
+def _label_mechanism_record(candidate: dict[str, Any]) -> Optional[EvidenceRecord]:
+    """Create one qualified, quoted FDA-label mechanism record for a candidate.
+
+    Drug-name label queries are intentionally disabled while a benchmark holdout
+    is active: target-first candidate discovery remains valid under holdout, but
+    fetching the held-out drug's own label would inject direct identity evidence.
+    """
+    drug_name = str(candidate.get("drug_name") or "").strip()
+    if not drug_name or _holdout.is_active() or not candidate.get("is_approved_drug"):
+        return None
+    label = get_label_mechanism(drug_name)
+    text = str(label.get("mechanism_text") or "").strip()
+    if not text or label.get("error"):
+        return None
+    return EvidenceRecord(
+        provider="openfda",
+        source_type=SourceType.DRUG_LABEL,
+        evidence_role=EvidenceRole.EFFICACY,
+        source_id=f"openfda-label-mechanism:{label.get('label_id') or drug_name}",
+        label_id=str(label.get("label_id") or ""),
+        molecule_id=str(candidate.get("molecule_chembl_id") or ""),
+        molecule_name=drug_name,
+        inchikey=str(candidate.get("inchikey") or ""),
+        smiles=str(candidate.get("smiles") or ""),
+        target_symbol=str(candidate.get("target_symbol") or ""),
+        target_accession=str(candidate.get("uniprot_id") or ""),
+        target_species="Homo sapiens",
+        action="label_mechanism",
+        measurement_type="label_mechanism_class",
+        phenotype=str(candidate.get("mechanism_class") or "label_declared_mechanism"),
+        context=text,
+        qualification_status=QualificationStatus.QUALIFIED,
+    )
 
 
 def _enrich_compounds(
@@ -497,6 +536,24 @@ def run_chemist(biologist_output: dict[str, Any],
         enabled_sources=enabled_sources,
     )
     results = multisource["candidates"]
+    # Regulatory labels are a separate evidence lane for non-binding modalities
+    # (antimetabolites, cofactors, pathway inhibitors).  Add them only after
+    # target-first union, then re-merge once so the label never creates a
+    # standalone candidate or provider-count bonus.
+    label_records = [
+        record for record in (_label_mechanism_record(candidate) for candidate in results)
+        if record is not None
+    ]
+    if label_records:
+        from data_sources.evidence_ledger import merge_candidates
+        results = merge_candidates([*results, *label_records])
+        multisource["source_status"]["openfda_label"] = {
+            "status": "ok", "error": None, "release": None,
+        }
+    elif not _holdout.is_active():
+        multisource["source_status"]["openfda_label"] = {
+            "status": "empty", "error": None, "release": None,
+        }
     for candidate in results:
         candidate.setdefault("atc_codes", [])
         candidate.setdefault("most_similar_approved_drug", None)

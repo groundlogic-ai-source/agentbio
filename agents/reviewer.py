@@ -68,6 +68,10 @@ COMPOSITE_WEIGHTS: dict[str, float] = {
     "tanimoto": 0.15,         # tanimoto_score direct [0, 1] — no pool normalization
     "no_failed_trial": 0.15,  # 1 if no prior failed trial and query succeeded; 0 otherwise
 }
+# A small, bounded evidence-resolution term.  It only distinguishes candidates
+# whose normalized evidence otherwise lands on the same floor; it is not a
+# substitute for target or disease evidence.
+QUALIFIED_DIRECTIONAL_BONUS = 0.05
 LIPINSKI_PENALTY = 0.25       # flat, soft — subtracted if Lipinski violations > 1
 STRONG_MATCH_THRESHOLD = 0.70
 # Safety gate: withdrawn / black-box-warning compounds are capped at the same
@@ -306,6 +310,19 @@ def _coverage_aware_composite(
     return numerator / coverage, coverage
 
 
+def _has_qualified_directional_evidence(candidate: dict[str, Any]) -> bool:
+    """True when a qualified ledger record states a concrete drug action."""
+    directional = {"agonist", "antagonist", "inhibitor", "activator", "modulator"}
+    for record in (candidate.get("_evidence_ledger") or {}).get("records", []):
+        if str(record.get("qualification_status", "")).lower() != "qualified":
+            continue
+        action = str(record.get("action", "")).strip().lower()
+        direction = str(record.get("direction", "")).strip().lower()
+        if action in directional or direction in directional:
+            return True
+    return False
+
+
 def run_reviewer(chemist_output: dict[str, Any],
                  biologist_output: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
     candidates = chemist_output.get("candidates", [])
@@ -373,6 +390,9 @@ def run_reviewer(chemist_output: dict[str, Any],
             n_tanimoto,
             no_failed_trial,
         )
+        qualified_directional = _has_qualified_directional_evidence(c)
+        directional_bonus = QUALIFIED_DIRECTIONAL_BONUS if qualified_directional else 0.0
+        composite = min(1.0, composite + directional_bonus)
 
         lipinski_violations = desc.get("lipinski_violations")
         penalty_applied = lipinski_violations is not None and lipinski_violations > 1
@@ -487,6 +507,8 @@ def run_reviewer(chemist_output: dict[str, Any],
                 "similarity_available": n_tanimoto is not None,
                 "evidence_weight_coverage": round(evidence_weight_coverage, 4),
                 "no_failed_trial": 1 if no_failed_trial else 0,
+                "qualified_directional": qualified_directional,
+                "qualified_directional_bonus": directional_bonus,
             },
             "composite_score": composite,
             "pre_cap_score": pre_cap_score,
