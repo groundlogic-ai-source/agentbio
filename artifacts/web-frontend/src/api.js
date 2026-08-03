@@ -151,6 +151,27 @@ export function auditDrug(diseaseName, drugName, jobId = null) {
   });
 }
 
+// ── Candidate pool and evidence cards ───────────────────────────────────────
+export function getCandidatePool(params) {
+  const search = new URLSearchParams();
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      search.set(key, String(value));
+    }
+  });
+  return request(`/api/candidates?${search.toString()}`);
+}
+
+export function getCandidateEvidence({ disease_name, drug_name, job_id }) {
+  const search = new URLSearchParams({ disease_name, drug_name });
+  if (job_id) search.set("job_id", job_id);
+  return request(`/api/candidates/evidence?${search.toString()}`);
+}
+
+export function getResearchBenchmarks() {
+  return request("/api/research/benchmarks");
+}
+
 // ── Saved reports ──────────────────────────────────────────────────────────
 // Freeze a generated report as a permanent snapshot. Returns the stored row.
 export function saveReport(payload) {

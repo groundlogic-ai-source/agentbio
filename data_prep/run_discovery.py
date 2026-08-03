@@ -156,6 +156,10 @@ No prose outside the JSON.
 """.strip() % DSL_DOC
 
 
+HISTORY_PROMPT_MAX_ITEMS = 80
+HISTORY_PROMPT_MAX_CHARS = 12000
+
+
 def _history_blurb() -> str:
     hist = R.load_history()
     if hist.empty:
@@ -173,14 +177,34 @@ def _history_blurb() -> str:
             status = "salvageable (good rationale, needs different feature_spec)"
         else:
             status = "did not survive"
-        lines.append(f"- {dom} [{status}] {note}")
+        lines.append((dom.casefold(), f"- {dom} [{status}] {note}"))
     # de-dup identical lines, keep order
     seen, out = set(), []
-    for ln in lines:
-        if ln not in seen:
-            seen.add(ln)
+    for domain_key, ln in reversed(lines):
+        if domain_key not in seen:
+            seen.add(domain_key)
             out.append(ln)
-    return "\n".join(out)
+        if len(out) >= HISTORY_PROMPT_MAX_ITEMS:
+            break
+    out.reverse()
+    text = "\n".join(out)
+    omitted = max(0, len(lines) - len(out))
+    if len(text) > HISTORY_PROMPT_MAX_CHARS:
+        kept: list[str] = []
+        used = 0
+        for ln in reversed(out):
+            if used + len(ln) + 1 > HISTORY_PROMPT_MAX_CHARS:
+                omitted += 1
+                continue
+            kept.append(ln)
+            used += len(ln) + 1
+        text = "\n".join(reversed(kept))
+    if omitted:
+        text += (
+            f"\n\n[History bounded: {omitted} older or duplicate entries omitted. "
+            "Do not infer novelty from omission; avoid near-duplicates.]"
+        )
+    return text
 
 
 _STOP = {"in", "of", "and", "the", "a", "an", "on", "under", "into", "to", "for", "with", "as"}

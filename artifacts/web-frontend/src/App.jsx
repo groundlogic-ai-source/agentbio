@@ -6,6 +6,7 @@ import NewCaseDialog from "./components/NewCaseDialog.jsx";
 import ResearchTab from "./components/ResearchTab.jsx";
 import SavedReportsTab from "./components/SavedReportsTab.jsx";
 import AuditTab from "./components/AuditTab.jsx";
+import CandidatePoolTab from "./components/CandidatePoolTab.jsx";
 import {
   listRuns,
   getRun,
@@ -238,13 +239,14 @@ export default function App() {
             // (Case Files + Audit) and the research module (Research + Saved).
             { id: "dashboard", label: "Case Files", group: "case" },
             { id: "audit", label: "Audit", group: "case" },
+            { id: "candidates", label: "Candidates", group: "case" },
             { id: "research", label: "Research", group: "research" },
             { id: "saved", label: "Saved Reports", group: "research" },
           ].map(({ id, label, group }, idx) => {
             const active = view === id;
             return (
               <span key={id} style={{ display: "inline-flex", alignItems: "center" }}>
-                {idx === 2 && <span className="nav-group-divider" aria-hidden="true" />}
+                {idx === 3 && <span className="nav-group-divider" aria-hidden="true" />}
                 <button
                   onClick={() => setView(id)}
                   className={`nav-tab nav-tab--${group}${active ? " nav-tab--active" : ""}`}
@@ -288,6 +290,8 @@ export default function App() {
           }}
         />
       )}
+
+      {view === "candidates" && <CandidatePoolTab />}
 
       {view === "case" && (
         <CaseView

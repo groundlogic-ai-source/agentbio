@@ -12,6 +12,7 @@ import {
   stopContinuousDiscovery,
   generateHypothesisReport,
   saveReport,
+  getResearchBenchmarks,
 } from "../api.js";
 
 const POLL_MS = 3000;
@@ -670,6 +671,48 @@ function DiscoveryBatch({ onCompleted }) {
   );
 }
 
+function BenchmarkPanel() {
+  const [state, setState] = useState({ loading: true, error: null, data: null });
+  useEffect(() => {
+    getResearchBenchmarks()
+      .then((data) => setState({ loading: false, error: null, data }))
+      .catch((error) => setState({ loading: false, error: error.message, data: null }));
+  }, []);
+  if (state.loading) return <div className="benchmark-panel"><span className="pool-muted">Loading historical validation artifacts…</span></div>;
+  if (state.error) return <div className="benchmark-panel pool-error">Could not load benchmark artifacts: {state.error}</div>;
+  const data = state.data || {};
+  return (
+    <section className="benchmark-panel">
+      <div className="eyebrow">Validation reporting</div>
+      <h3>Historical benchmark artifacts</h3>
+      <p className="benchmark-note">{data.pilot_note}</p>
+      <div className="benchmark-grid">
+        {(data.benchmarks || []).map((bench) => (
+          <article className="benchmark-card" key={bench.label}>
+            <div className="benchmark-card-title">{bench.label}</div>
+            <div className="benchmark-metrics">
+              <span><b>{bench.total_cases}</b> cases</span>
+              <span><b>{bench.top10}</b> Top-10</span>
+              <span><b>{bench.top25}</b> Top-25</span>
+            </div>
+            <p>{bench.limitations}</p>
+            {Object.keys(bench.miss_reasons || {}).length > 0 && (
+              <details><summary>Miss reasons</summary>
+                <ul>{Object.entries(bench.miss_reasons).map(([reason, n]) => <li key={reason}>{reason}: {n}</li>)}</ul>
+              </details>
+            )}
+            <details><summary>Fixture results</summary>
+              <div className="benchmark-fixture-wrap"><table className="benchmark-fixtures"><thead><tr><th>Disease</th><th>Drug</th><th>Rank</th><th>Outcome</th></tr></thead>
+                <tbody>{(bench.fixtures || []).map((row, i) => <tr key={i}><td>{row.disease || "—"}</td><td>{row.drug || "—"}</td><td>{row.rank ?? "—"}</td><td>{row.outcome}</td></tr>)}</tbody>
+              </table></div>
+            </details>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function ResearchTab({ onRefresh }) {
   const [allHypotheses, setAllHypotheses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -781,7 +824,8 @@ export default function ResearchTab({ onRefresh }) {
         </div>
       </div>
 
-      <DiscoveryBatch onCompleted={fetchHypotheses} />
+       <BenchmarkPanel />
+       <DiscoveryBatch onCompleted={fetchHypotheses} />
       <HypothesisTable hypotheses={visibleHypotheses} loading={loading} onArchive={fetchHypotheses} />
       <SubmitHypothesis onSubmitted={fetchHypotheses} />
     </div>

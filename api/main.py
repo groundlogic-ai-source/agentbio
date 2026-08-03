@@ -14,6 +14,7 @@ Run:
 """
 
 import hashlib
+import json
 import os
 import subprocess
 import sys
@@ -421,6 +422,124 @@ def audit_drug(req: AuditRequest) -> dict[str, Any]:
         req.drug_name.strip(),
         job_id_hint=req.job_id,
     )
+
+
+@app.get("/api/candidates")
+def get_candidate_pool(
+    disease_name: str,
+    job_id: Optional[str] = None,
+    query: str = "",
+    safety: Optional[str] = None,
+    evidence: Optional[str] = None,
+    xlogp: Optional[str] = None,
+    sort: str = "rank",
+    order: str = "asc",
+    page: int = 1,
+    page_size: int = 25,
+) -> dict[str, Any]:
+    """Paginated reviewed candidates for a completed case; no pipeline rerun."""
+    if not disease_name.strip():
+        raise HTTPException(status_code=400, detail="disease_name is required")
+    return _audit.candidate_pool(
+        disease_name.strip(), job_id_hint=job_id, query=query, safety=safety,
+        evidence=evidence, xlogp=xlogp, sort=sort, order=order,
+        page=page, page_size=page_size,
+    )
+
+
+@app.get("/api/candidates/evidence")
+def get_candidate_evidence(
+    disease_name: str,
+    drug_name: str,
+    job_id: Optional[str] = None,
+) -> dict[str, Any]:
+    """Normalized per-source evidence for a candidate in a completed case."""
+    if not disease_name.strip() or not drug_name.strip():
+        raise HTTPException(
+            status_code=400, detail="disease_name and drug_name are required"
+        )
+    return _audit.candidate_evidence(
+        disease_name.strip(), drug_name.strip(), job_id_hint=job_id
+    )
+
+
+_VALIDATION_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "validation"
+)
+
+
+def _load_validation_artifact(filename: str) -> Optional[dict[str, Any]]:
+    path = os.path.join(_VALIDATION_DIR, filename)
+    try:
+        with open(path, encoding="utf-8") as fh:
+            value = json.load(fh)
+        return value if isinstance(value, dict) else None
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def _benchmark_summary(artifact: dict[str, Any], label: str) -> dict[str, Any]:
+    cases = artifact.get("cases") or []
+    total = len(cases)
+    ranked = [c for c in cases if isinstance(c, dict) and c.get("rank") is not None]
+    top10 = sum(1 for c in ranked if c.get("rank", 10**9) <= 10)
+    top25 = sum(1 for c in ranked if c.get("rank", 10**9) <= 25)
+    misses: dict[str, int] = {}
+    fixture_rows: list[dict[str, Any]] = []
+    for row in cases:
+        if not isinstance(row, dict):
+            continue
+        reason = row.get("miss_reason") or row.get("reason") or (
+            "recovered" if row.get("rank") is not None else "unclassified"
+        )
+        if row.get("rank") is None:
+            misses[str(reason)] = misses.get(str(reason), 0) + 1
+        fixture_rows.append({
+            "disease": row.get("disease_name") or row.get("disease"),
+            "drug": row.get("drug_name") or row.get("drug"),
+            "rank": row.get("rank"),
+            "target": row.get("target_symbol") or row.get("selected_target"),
+            "outcome": "Top 10" if row.get("rank") is not None and row["rank"] <= 10
+                else ("Top 25" if row.get("rank") is not None and row["rank"] <= 25
+                      else str(reason)),
+        })
+    return {
+        "label": label, "generated_at": artifact.get("generated_at"),
+        "total_cases": total, "ranked_cases": len(ranked),
+        "top10": top10, "top25": top25,
+        "top10_rate": (top10 / total) if total else None,
+        "top25_rate": (top25 / total) if total else None,
+        "miss_reasons": misses, "fixtures": fixture_rows,
+        "limitations": (
+            "Retrospective engineering evidence only. These artifacts predate the "
+            "planned frozen post-upgrade pilot and must not be interpreted as "
+            "prospective discovery accuracy."
+        ),
+    }
+
+
+@app.get("/api/research/benchmarks")
+def get_research_benchmarks() -> dict[str, Any]:
+    """Expose existing validation artifacts with their provenance and limits."""
+    artifacts = [
+        ("Engineering acceptance", "engineering_acceptance_results.json"),
+        ("Small-molecule retrospective", "repodb_results_smallmol.json"),
+        ("Top-K retrospective", "repodb_results_topk.json"),
+    ]
+    summaries = [
+        _benchmark_summary(artifact, label)
+        for label, filename in artifacts
+        if (artifact := _load_validation_artifact(filename)) is not None
+    ]
+    return {
+        "benchmarks": summaries,
+        "pilot_status": "not_run",
+        "pilot_note": (
+            "No fresh upgraded pilot has been frozen or run. The displayed figures "
+            "are historical validation artifacts and are separated from future "
+            "post-upgrade results."
+        ),
+    }
 
 
 # --------------------------------------------------------------------------- #

@@ -261,6 +261,175 @@ def run_audit(
     return result
 
 
+def candidate_pool(
+    disease_name: str,
+    *,
+    job_id_hint: Optional[str] = None,
+    query: str = "",
+    safety: Optional[str] = None,
+    evidence: Optional[str] = None,
+    xlogp: Optional[str] = None,
+    sort: str = "rank",
+    order: str = "asc",
+    page: int = 1,
+    page_size: int = 25,
+) -> dict[str, Any]:
+    """Return a filterable, paginated, review-ready candidate pool.
+
+    This intentionally reuses the persisted reviewed-candidate output rather
+    than recomputing a run.  Each returned row is a compact index record; the
+    full normalized ledger is exposed only by :func:`candidate_evidence`.
+    """
+    job = jobs_db.get_job(job_id_hint) if job_id_hint else (
+        jobs_db.find_completed_job_by_disease(disease_name)
+    )
+    if job is None:
+        return {"status": "no_case", "disease_name": disease_name, "candidates": []}
+    canonical_disease = job.get("disease_name") or disease_name
+    rows = _load_candidates(job["job_id"], canonical_disease)
+    if rows is None:
+        return {
+            "status": "no_candidates", "job_id": job["job_id"],
+            "disease_name": canonical_disease, "candidates": [],
+        }
+
+    needle = query.strip().casefold()
+    filtered: list[dict[str, Any]] = []
+    for rank, candidate in enumerate(rows, start=1):
+        if needle and needle not in " ".join(str(candidate.get(k) or "") for k in (
+            "drug_name", "molecule_chembl_id", "target_symbol",
+        )).casefold():
+            continue
+        safety_capped = bool(candidate.get("safety_cap_applied"))
+        if safety == "capped" and not safety_capped:
+            continue
+        if safety == "advisory" and not candidate.get("black_box_advisory"):
+            continue
+        if safety == "clear" and (safety_capped or candidate.get("black_box_advisory")):
+            continue
+        coverage = (candidate.get("score_components") or {}).get(
+            "evidence_weight_coverage"
+        )
+        if evidence == "complete" and (coverage is None or float(coverage) < 0.999):
+            continue
+        if evidence == "partial" and (coverage is None or float(coverage) >= 0.999):
+            continue
+        if xlogp == "flagged" and not candidate.get("high_lipophilicity_flag"):
+            continue
+        if xlogp == "unresolved" and candidate.get("pubchem_xlogp") is not None:
+            continue
+
+        components = candidate.get("score_components") or {}
+        filtered.append({
+            "rank": rank,
+            "drug_name": candidate.get("drug_name"),
+            "molecule_chembl_id": candidate.get("molecule_chembl_id"),
+            "target_symbol": candidate.get("target_symbol"),
+            "composite_score": candidate.get("composite_score"),
+            "pre_cap_score": candidate.get("pre_cap_score"),
+            "strong_match": candidate.get("strong_match"),
+            "is_approved_drug": candidate.get("is_approved_drug"),
+            "pubchem_xlogp": candidate.get("pubchem_xlogp"),
+            "high_lipophilicity_flag": candidate.get("high_lipophilicity_flag"),
+            "xlogp_status": (
+                "flagged" if candidate.get("high_lipophilicity_flag")
+                else ("unresolved" if candidate.get("pubchem_xlogp") is None else "clear")
+            ),
+            "evidence_weight_coverage": components.get("evidence_weight_coverage"),
+            "source_types": candidate.get("source_types") or [],
+            "safety_cap_applied": safety_capped,
+            "mechanism_cap_applied": bool(candidate.get("mechanism_cap_applied")),
+            "unapproved_cap_applied": bool(candidate.get("unapproved_cap_applied")),
+            "black_box_advisory": bool(candidate.get("black_box_advisory")),
+            "status_badge": candidate.get("status_badge"),
+            "target_discovery_method": candidate.get("target_discovery_method"),
+        })
+
+    reverse = order.lower() == "desc"
+    sort_keys = {
+        "rank": lambda row: row["rank"],
+        "score": lambda row: row.get("composite_score") or 0.0,
+        "coverage": lambda row: row.get("evidence_weight_coverage") or 0.0,
+        "drug": lambda row: (row.get("drug_name") or "").casefold(),
+        "xlogp": lambda row: row.get("pubchem_xlogp") if row.get("pubchem_xlogp") is not None else -999.0,
+    }
+    if sort not in sort_keys:
+        sort = "rank"
+    filtered.sort(key=sort_keys[sort], reverse=reverse)
+    page = max(1, page)
+    page_size = max(5, min(100, page_size))
+    start = (page - 1) * page_size
+    return {
+        "status": "ok",
+        "job_id": job["job_id"],
+        "disease_name": canonical_disease,
+        "total": len(filtered),
+        "page": page,
+        "page_size": page_size,
+        "candidates": filtered[start:start + page_size],
+        "filter_options": {
+            "safety": ["clear", "advisory", "capped"],
+            "evidence": ["complete", "partial"],
+            "xlogp": ["flagged", "unresolved"],
+        },
+    }
+
+
+def candidate_evidence(
+    disease_name: str,
+    drug_name: str,
+    *,
+    job_id_hint: Optional[str] = None,
+) -> dict[str, Any]:
+    """Return one candidate with normalized, human-readable evidence cards."""
+    job = jobs_db.get_job(job_id_hint) if job_id_hint else (
+        jobs_db.find_completed_job_by_disease(disease_name)
+    )
+    if job is None:
+        return {"status": "no_case", "disease_name": disease_name, "drug_name": drug_name}
+    canonical_disease = job.get("disease_name") or disease_name
+    rows = _load_candidates(job["job_id"], canonical_disease)
+    if rows is None:
+        return {"status": "no_candidates", "job_id": job["job_id"]}
+    rank, candidate = _find_drug_in_pool(rows, drug_name, None)
+    if candidate is None:
+        return {"status": "not_found", "job_id": job["job_id"], "drug_name": drug_name}
+
+    cards: list[dict[str, Any]] = []
+    for record in (candidate.get("_evidence_ledger") or {}).get("records") or []:
+        if not isinstance(record, dict):
+            continue
+        provider = record.get("provider") or "unknown"
+        source_id = record.get("source_id") or ""
+        publication = record.get("publication_id")
+        identifier = publication or record.get("assay_id") or source_id
+        url = None
+        if publication:
+            url = f"https://pubmed.ncbi.nlm.nih.gov/{publication}/"
+        elif str(provider).lower() == "chembl" and candidate.get("molecule_chembl_id"):
+            url = f"https://www.ebi.ac.uk/chembl/compound_report_card/{candidate['molecule_chembl_id']}/"
+        cards.append({
+            "source": provider,
+            "claim": record.get("evidence_role") or record.get("source_type"),
+            "measurement_type": record.get("measurement_type"),
+            "measurement_value": record.get("measurement_value"),
+            "measurement_unit": record.get("measurement_unit"),
+            "identifier": identifier,
+            "url": url,
+            "retrieved_at": record.get("retrieved_at"),
+            "confidence": record.get("qualification_status"),
+            "limitations": record.get("context") or (
+                "Source-level evidence; it does not independently establish clinical benefit."
+            ),
+            "action": record.get("action"),
+            "direction": record.get("direction"),
+        })
+    return {
+        "status": "ok", "job_id": job["job_id"], "disease_name": canonical_disease,
+        "rank": rank, "candidate": candidate, "evidence": cards,
+    }
+
+
 # ── Narration ─────────────────────────────────────────────────────────────────
 
 def _narrate(result: dict) -> str:
