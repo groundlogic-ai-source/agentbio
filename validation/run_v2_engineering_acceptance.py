@@ -100,6 +100,12 @@ DEFAULT_TARGET_CAP = 10
 # Top-N ranking window used only to REPORT the separate `top10` outcome level.
 TOP_N = 10
 
+# Offline diagnostic context.  This is deliberately a report-only snapshot:
+# it does not change Reviewer scoring, gates, or the acceptance outcome.  Keep
+# both the global leaders and the local neighborhood immediately above a known
+# drug so a rank such as 217/223 remains diagnosable without another run.
+RANK_CONTEXT_LIMIT = 20
+
 # The five archived v1 genuine-miss fixtures (from benchmark_v1_partial_report.md
 # and v2_upgrade_readiness_audit.md).  These are regression fixtures, exactly as
 # archived — never the design population, never tuned against.
@@ -441,6 +447,88 @@ def _source_health_from_target_results(
     return health
 
 
+def _rank_context_ledger(ledger: dict[str, Any]) -> dict[str, Any]:
+    """Return a compact, JSON-safe evidence summary for offline diagnostics.
+
+    Raw provider payloads are intentionally excluded.  The summary preserves
+    the fields needed to distinguish qualified mechanism evidence from
+    unqualified/name-only records without making another source request.
+    """
+    records = ledger.get("records") or []
+    public_records = []
+    for rec in records:
+        public_records.append({
+            key: rec.get(key)
+            for key in (
+                "provider", "source_type", "source_id", "lineage_id",
+                "evidence_role", "target_symbol", "action", "direction",
+                "measurement_type", "measurement_value",
+                "qualification_status", "contradiction_status",
+            )
+            if rec.get(key) is not None
+        })
+    return {
+        "identity": ledger.get("identity"),
+        "providers": sorted(set(ledger.get("providers") or [])),
+        "target_symbols": sorted(set(ledger.get("target_symbols") or [])),
+        "source_health": dict(ledger.get("source_health") or {}),
+        "efficacy_confidence": ledger.get("efficacy_confidence"),
+        "safety_confidence": ledger.get("safety_confidence"),
+        "record_count": len(records),
+        "records": public_records,
+    }
+
+
+def _public_rank_context_row(row: dict[str, Any], rank: int) -> dict[str, Any]:
+    """Make one final Reviewer row safe and useful for offline analysis."""
+    ledger = row.get("_evidence_ledger") or {}
+    fields = (
+        "drug_name", "molecule_chembl_id", "target_symbol", "disease_name",
+        "pchembl_value", "confidence_score", "efficacy_confidence",
+        "ot_association_score", "tanimoto_score", "is_approved_drug",
+        "most_similar_approved_drug", "rationale", "descriptors",
+        "pubchem_xlogp", "high_lipophilicity_flag", "strong_match",
+        "composite_score", "score_components", "unapproved_cap_applied",
+        "lipinski_penalty_applied", "trials_query_failed",
+        "trials_holdout_redacted", "mutation_specificity",
+        "target_discovery_method", "mechanism_class", "therapeutic_role",
+        "process_memberships", "mechanism_direction",
+        "mechanism_cap_applied", "safety_cap_applied", "black_box_advisory",
+        "source_chembl_ids", "source_activity_ids", "source_types",
+        "target_memberships", "uniprot_id",
+    )
+    public = {"rank": rank}
+    for key in fields:
+        if key in row:
+            public[key] = row[key]
+    public["evidence_ledger"] = _rank_context_ledger(ledger)
+    return public
+
+
+def _rank_context_snapshot(
+    reviewed: list[dict[str, Any]],
+    known_rank: Optional[int],
+) -> list[dict[str, Any]]:
+    """Capture global leaders plus the local window above the known drug.
+
+    The known row is retained as the anchor for score deltas; the local window
+    contains exactly ``RANK_CONTEXT_LIMIT`` rows strictly above it.
+    """
+    if not reviewed:
+        return []
+    keep: set[int] = set(range(min(RANK_CONTEXT_LIMIT, len(reviewed))))
+    if known_rank is not None:
+        start = max(1, known_rank - RANK_CONTEXT_LIMIT)
+        keep.update(range(start - 1, min(known_rank, len(reviewed) - 1)))
+        if known_rank <= len(reviewed):
+            keep.add(known_rank - 1)
+    return [
+        _public_rank_context_row(row, index + 1)
+        for index, row in enumerate(reviewed)
+        if index in keep
+    ]
+
+
 def _run_one_target(row: dict[str, Any]) -> dict[str, Any]:
     """Run biologist -> chemist for one disease-selected target row.
 
@@ -522,6 +610,9 @@ def run_fixture(drug_name: str, disease_name: str, cap: int) -> dict[str, Any]:
         "source_providers": [],
         "source_lineages": [],
         "source_health": {},
+        # Populated after the final Reviewer run.  This is a report-only
+        # snapshot; private reviewer payloads never leave the process.
+        "rank_context": [],
         # holdout audit
         "holdout_active": None,
         "holdout_drugs": None,
@@ -631,6 +722,11 @@ def run_fixture(drug_name: str, disease_name: str, cap: int) -> dict[str, Any]:
     confirmed_block = _resolve_confirmed_inchikey_block(drug_name)
     rank, matched, method = match_active_moiety(
         drug_name, pooled_candidates, final_reviewed, confirmed_block)
+    # Preserve enough of the already-computed final ranking to answer the
+    # inexpensive diagnostic question later.  No Reviewer/API call occurs
+    # here; the known drug is used only to choose which already-ranked rows
+    # are retained for context.
+    result["rank_context"] = _rank_context_snapshot(final_reviewed, rank)
 
     # ── 3. Record outcome levels (each SEPARATE) ─────────────────────────────
     if rank is None or matched is None:
