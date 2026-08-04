@@ -4,6 +4,7 @@ import TriagePanel from "./TriagePanel";
 import DossierPanel from "./DossierPanel";
 import DomainFindings from "./DomainFindings";
 import ModalityModeToggle from "./ModalityModeToggle";
+import InlineCaseRunner from "./InlineCaseRunner";
 import { useModalityMode } from "../modalityMode";
 
 // Modality finding card, hidden when the user disengages the mode. Wrapper
@@ -330,36 +331,38 @@ function AbsentResult({ data }) {
   );
 }
 
-function NoCaseResult({ diseaseName, drugName, onNewCase }) {
+function NoCaseResult({ diseaseName, onRunHere, onNewCase }) {
   return (
     <div
-      className="rounded-xl border px-6 py-8 text-center space-y-4"
+      className="rounded-xl border px-6 py-6 space-y-4"
       style={{
         borderColor: "var(--border)",
         backgroundColor: "var(--surface)",
         boxShadow: "var(--shadow-soft)",
       }}
     >
-      <div className="text-4xl" style={{ color: "var(--steel)" }}>◆</div>
       <div>
         <p className="font-semibold" style={{ color: "var(--ink)" }}>No case found for this disease</p>
         <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
-          AgentBio hasn't run a drug-repurposing analysis for
-          <span className="font-medium" style={{ color: "var(--ink-base)" }}> {diseaseName}</span> yet.
-          Submit a new case to generate a candidate pool, then re-run the audit.
+          AgentBio hasn't built a candidate pool for
+          <span className="font-medium" style={{ color: "var(--ink-base)" }}> {diseaseName}</span> yet,
+          and an audit can only report against a pool the machine produced independently.
+          Run it here and the audit repeats itself the moment the pool exists.
         </p>
       </div>
-      <button
-        onClick={onNewCase}
-        className="btn btn-primary"
-      >
-        Submit new case
-      </button>
+
+      <InlineCaseRunner disease={diseaseName} onReady={onRunHere} />
+
+      {onNewCase && (
+        <button onClick={onNewCase} className="btn btn-ghost btn-sm">
+          Or open it in Case Files instead
+        </button>
+      )}
     </div>
   );
 }
 
-function NoCandidatesResult({ jobId, onNewCase }) {
+function NoCandidatesResult({ jobId, diseaseName, onRunHere, onNewCase }) {
   return (
     <div
       className="rounded-xl border px-6 py-6 space-y-3"
@@ -371,15 +374,18 @@ function NoCandidatesResult({ jobId, onNewCase }) {
       <p className="font-medium" style={{ color: "#9b7e1f" }}>Candidates file unavailable</p>
       <p className="text-sm" style={{ color: "#9b7e1f" }}>
         The case <code className="text-xs">{jobId}</code> predates per-job candidate
-        persistence. Re-run the disease to generate a fresh candidates file, then
-        repeat the audit.
+        persistence, so there is no pool to audit against. A fresh run fixes it.
       </p>
+
+      <InlineCaseRunner
+        disease={diseaseName}
+        onReady={onRunHere}
+        verb="Re-run this case now"
+      />
+
       {onNewCase && (
-        <button
-          onClick={onNewCase}
-          className="btn btn-primary"
-        >
-          Re-run this disease
+        <button onClick={onNewCase} className="btn btn-ghost btn-sm">
+          Or open it in Case Files instead
         </button>
       )}
     </div>
@@ -418,8 +424,7 @@ function SingleDrugAudit({ onNavigate }) {
   const [result, setResult]   = useState(null);
   const [error, setError]     = useState(null);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function runAudit() {
     if (!disease.trim() || !drug.trim()) return;
     setLoading(true);
     setResult(null);
@@ -432,6 +437,11 @@ function SingleDrugAudit({ onNavigate }) {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    return runAudit();
   }
 
   function handleNewCase() {
@@ -533,12 +543,17 @@ function SingleDrugAudit({ onNavigate }) {
           {result.status === "no_case" && (
             <NoCaseResult
               diseaseName={disease}
-              drugName={drug}
+              onRunHere={runAudit}
               onNewCase={handleNewCase}
             />
           )}
           {result.status === "no_candidates" && (
-            <NoCandidatesResult jobId={result.job_id} onNewCase={handleNewCase} />
+            <NoCandidatesResult
+              jobId={result.job_id}
+              diseaseName={disease}
+              onRunHere={runAudit}
+              onNewCase={handleNewCase}
+            />
           )}
         </div>
       )}
