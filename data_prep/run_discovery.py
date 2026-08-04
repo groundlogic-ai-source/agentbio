@@ -30,6 +30,7 @@ import datetime as dt
 import json
 import math
 import os
+import time
 import uuid
 
 import pandas as pd
@@ -85,13 +86,51 @@ with a "needs" string naming the exact missing data.
   {"op": "global_max_phase_threshold", "params": {"k": <float>}}
       binary = global_max_phase >= k  (e.g. k=4 = ever-approved, k=3 = Phase 3+)
 
-=== INTERACTION OP ===
+=== BOOLEAN COMPOSITION OPS (build multi-part CONDITIONAL features) ===
+  {"op": "all_of", "params": {"terms": [<BINARY op>, <BINARY op>, ...]}}
+      binary = 1 when EVERY term is true (logical AND). 2-4 terms.
+  {"op": "any_of", "params": {"terms": [<BINARY op>, <BINARY op>, ...]}}
+      binary = 1 when AT LEAST ONE term is true (logical OR). 2-4 terms.
+  {"op": "not_op", "params": {"term": <BINARY op>}}
+      binary = logical negation of the term.
+
+      These compose into ONE binary column, so they are tested with Fisher's exact
+      on a 2x2 table. THIS IS THE PREFERRED WAY TO EXPRESS A RADICAL, MULTI-PART,
+      CONDITIONAL CLAIM, because it costs only one parameter and therefore stays
+      statistically powered on this dataset. Example — "lipophilic non-oral small
+      molecules aimed at neurological indications":
+        {"op": "all_of", "params": {"terms": [
+           {"op": "xlogp_threshold", "params": {"k": 5}},
+           {"op": "not_op", "params": {"term": {"op": "is_oral"}}},
+           {"op": "is_small_molecule"},
+           {"op": "ind_keyword", "params": {"keywords": ["brain","cerebral","epilep"]}}
+        ]}}
+      Composition ops may be nested (depth <= 3) and may also be used as the base
+      or moderator of an interaction.
+
+=== INTERACTION OPS ===
   {"op": "interaction", "params": {"base": <any op above>, "moderator": <BINARY op above>}}
       Tests whether the `base` predictor's effect on repurposing success DIFFERS across
       the two levels of the binary `moderator`. Fits
       y ~ base + moderator + base:moderator and reports the interaction term's OR/CI/p.
       The moderator MUST be a binary op; the base may be any op. Use for
       "the effect of X is stronger/weaker among Y" hypotheses.
+
+  {"op": "interaction3", "params": {"base": <any op>, "moderator": <BINARY op>,
+                                    "moderator2": <BINARY op>}}
+      THREE-WAY conditional. Fits
+      y ~ b + m1 + m2 + b:m1 + b:m2 + m1:m2 + b:m1:m2 and reports the THREE-WAY term.
+      Use for the shape: "X behaves this way under Y WHEN Z is happening, but NOT
+      when Z is absent" — i.e. the moderation of X by Y is itself conditional on Z.
+      base, moderator and moderator2 must all be DIFFERENT specs.
+
+      POWER WARNING — read before choosing this op: interaction3 fits 8 parameters
+      and needs at least 80 minority-class outcomes. The strict ("narrow") outcome
+      framing on this dataset has only ~51, so an interaction3 hypothesis WILL BE
+      REFUSED AS UNDERPOWERED in that framing and will only ever be testable in the
+      permissive framing, which is the one prone to labeling artifacts. If you can
+      express your multi-part idea as an `all_of` subgroup instead, DO THAT — it is
+      the version that can actually be confirmed.
 
 WARNING: prior_repurposing_count is definitionally tied to the outcome label
 (a repurposing success requires prior_repurposing_count >= 1). Features built on
@@ -123,6 +162,32 @@ strange, or goes against received wisdom. The only legitimate reasons to skip a
 hypothesis: (1) it cannot be reduced to a computable statistic from this dataset,
 or (2) it has no real one-sentence mechanistic justification (a genuine causal or
 structural argument, not "this sounds plausible").
+
+SHAPE REQUIREMENT — PREFER MULTI-PART CONDITIONAL CLAIMS: A flat main-effect claim
+("X has lower repurposing success") is the WEAKEST useful hypothesis shape and is
+usually either already known or a labeling artifact. The shape that carries real
+scientific content is CONDITIONAL and MULTI-PART:
+
+    "X has lower repurposing success UNDER Y, WHEN Z is happening,
+     but NOT when Z is absent."
+
+At least HALF of your proposed hypotheses must have this conditional shape. Say the
+boundary condition out loud in hypothesis_text — name the regime where the effect
+should appear AND the contrasting regime where it should vanish or reverse. A
+hypothesis that predicts where it FAILS is far more informative than one that
+predicts everywhere, and it is much harder to satisfy by chance.
+
+Two ways to encode that shape, in order of preference:
+  (a) `all_of` / `any_of` / `not_op` composition — define the conditional SUBGROUP
+      as a single binary feature ("lipophilic AND not-oral AND neurological"). This
+      costs one parameter and stays statistically powered. PREFER THIS.
+  (b) `interaction3` — a genuine three-way term, when the claim is specifically that
+      a moderation REVERSES across a third variable. This costs 8 parameters and is
+      underpowered in the strict outcome framing on this dataset (see the POWER
+      WARNING in the DSL); it will often be refused as not-testable.
+
+Being bold about the SHAPE of a hypothesis is as valuable as being bold about the
+domain it comes from.
 
 Task:
 1. Propose 4-5 SPECIFIC, NARROW phenomena (not broad category names like "ecology"
@@ -385,9 +450,20 @@ REVIEW RULES (applied per-hypothesis):
    defines the outcome label); (b) Tanimoto structural similarity or Open Targets
    association score (already in the pipeline baseline).
 
-7. INTERACTION HYPOTHESES: Actively propose at least one interaction-effect hypothesis
-   if a plausible moderator exists — "the effect of X on repurposing success differs
-   across levels of binary Y". Encode with the "interaction" op in the DSL.
+7. CONDITIONAL / MULTI-PART HYPOTHESES: Actively prefer conditional shapes over flat
+   main effects. "The effect of X on repurposing success differs across levels of
+   binary Y" → the "interaction" op. "X fails under Y when Z is happening but not
+   when Z is absent" → either an "all_of" composed subgroup (PREFERRED — one
+   parameter, stays powered) or "interaction3" (8 parameters, underpowered in the
+   narrow framing on this dataset and usually refused there).
+
+   When a proposal is a flat main effect but its mechanistic justification implies a
+   BOUNDARY CONDITION ("this should only hold for oral drugs", "…only in chronic
+   indications"), that is a SALVAGEABLE hypothesis: rewrite the feature_spec as the
+   corresponding conditional subgroup rather than discarding or passing it through
+   flat. Prefer sharpening a vague claim into a conditional one over discarding it.
+   Do NOT, however, invent a boundary condition the justification does not support —
+   an unmotivated conjunction is just a smaller sample.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 GOAL: Maximize READY hypotheses across BOTH LLMs. Prefer SALVAGEABLE over DISCARDED
@@ -572,8 +648,13 @@ def _run_single_test(sub: pd.DataFrame, spec: dict, kind: str):
     subset. Returns (TestResult | None, why). `None` means the test was not run
     because of degenerate separation; `why` explains it.
 
-    Handles all three predictor kinds: binary (Fisher), continuous (logistic), and
-    interaction (logistic with a base:moderator term, reporting the interaction OR).
+    Handles four predictor kinds: binary (Fisher), continuous (logistic),
+    interaction (logistic with a base:moderator term), and interaction3
+    (logistic with a three-way base:moderator:moderator2 term).
+
+    Every logistic kind is gated by the pre-registered events-per-parameter
+    rule from radical_hypotheses_preregistration.md — an underpowered fit is
+    reported as NOT TESTED rather than emitting a p-value.
     """
     if kind == "interaction":
         base, mod = F.compute_interaction(sub, spec)
@@ -584,6 +665,9 @@ def _run_single_test(sub: pd.DataFrame, spec: dict, kind: str):
             return None, "moderator is constant in this subset"
         if chk["b"].nunique() < 2:
             return None, "base is constant in this subset"
+        pok, pwhy = F.events_per_parameter_ok(chk["y"], F._N_PARAMS["interaction"])
+        if not pok:
+            return None, pwhy
         for _, g in chk.groupby("m"):
             if g["y"].nunique() < 2:
                 return None, "perfect separation within a moderator level"
@@ -596,11 +680,59 @@ def _run_single_test(sub: pd.DataFrame, spec: dict, kind: str):
                    (res.odds_ratio, res.ci_low, res.ci_high, res.p_value)):
             return None, "interaction fit did not converge (non-finite statistics)"
         return res, ""
+
+    if kind == "interaction3":
+        base, m1, m2 = F.compute_interaction3(sub, spec)
+        chk = pd.DataFrame(
+            {"b": base, "m1": m1, "m2": m2, "y": sub["y"]}
+        ).dropna()
+        if chk["y"].nunique() < 2:
+            return None, "outcome has <2 classes in this subset"
+        if chk["m1"].nunique() < 2 or chk["m2"].nunique() < 2:
+            return None, "a moderator is constant in this subset"
+        if chk["b"].nunique() < 2:
+            return None, "base is constant in this subset"
+        pok, pwhy = F.events_per_parameter_ok(chk["y"], F._N_PARAMS["interaction3"])
+        if not pok:
+            return None, pwhy
+        # All four moderator strata must be populated and informative, or the
+        # three-way term is carried by one nearly empty corner of the design.
+        for (v1, v2), g in chk.groupby(["m1", "m2"]):
+            if len(g) < F.MIN_INTERACTION_STRATUM_N:
+                return None, (
+                    f"stratum (moderator={int(v1)}, moderator2={int(v2)}) has "
+                    f"{len(g)} rows (need >= {F.MIN_INTERACTION_STRATUM_N})"
+                )
+            if g["y"].nunique() < 2:
+                return None, (
+                    f"perfect separation within stratum "
+                    f"(moderator={int(v1)}, moderator2={int(v2)})"
+                )
+            if g["b"].nunique() < 2:
+                return None, (
+                    f"base is constant within stratum "
+                    f"(moderator={int(v1)}, moderator2={int(v2)})"
+                )
+        if chk.groupby(["m1", "m2"]).ngroups < 4:
+            return None, "three-way design has an empty moderator stratum"
+        res = S.logistic_interaction3(base, m1, m2, sub["y"])
+        if not all(math.isfinite(v) for v in
+                   (res.odds_ratio, res.ci_low, res.ci_high, res.p_value)):
+            return None, "three-way fit did not converge (non-finite statistics)"
+        return res, ""
+
     feat = F.compute(sub, spec)
     ok, why = F.separation_ok(feat, sub["y"])
     if not ok:
         return None, why
     if kind == "binary":
+        # A composed subgroup ("X and Y and not Z") can be satisfied by a
+        # handful of rows; require the pre-registered minimum before reporting
+        # an odds ratio for it.
+        if spec.get("op") in F._COMPOSITION_OPS:
+            sok, swhy = F.composite_support_ok(feat, sub["y"])
+            if not sok:
+                return None, swhy
         return S.fisher_binary(feat, sub["y"]), ""
     return S.logistic_continuous(feat, sub["y"]), ""
 
@@ -843,9 +975,20 @@ def confirm_surviving(hist_rows: list[dict], conf: pd.DataFrame, test_meta: dict
     For each hist_row where discovery_pass is True, replay the same test on the
     holdout confirmation half and fill confirmation_pass / confirmation_raw_p in-place.
 
-    Uses a simple uncorrected p < 0.05 threshold (one pre-specified follow-up test
-    per confirmed hypothesis; no additional multiple-comparison correction needed).
+    A confirmation PASSES only if its BH q-value, corrected over the CUMULATIVE
+    confirmation family (every confirmation test ever recorded, across all runs),
+    is below CONFIRMATION_ALPHA.
+
+    This correction is what makes "keep running batches until something confirms"
+    statistically legitimate. Under a bare uncorrected p < 0.05, chaining batches
+    until a confirmation lands is textbook optional stopping: run long enough and
+    a false confirmation is guaranteed. Correcting over the cumulative family
+    means each additional attempt raises the bar for all of them, so searching
+    longer cannot manufacture a hit.
     """
+    pending: list[tuple[str, float]] = []
+    pending_rows: list[dict] = []
+
     for hr in hist_rows:
         disc_pass = hr.get("discovery_pass")
         if disc_pass is not True and str(disc_pass).lower() != "true":
@@ -858,19 +1001,42 @@ def confirm_surviving(hist_rows: list[dict], conf: pd.DataFrame, test_meta: dict
         spec, kind = meta["spec"], meta["kind"]
         sub = _framed(conf, framing)
         try:
-            res, _ = _run_single_test(sub, spec, kind)
+            res, why = _run_single_test(sub, spec, kind)
             if res is None:
+                hr["confirmation_pass"] = False
+                hr["confirmation_raw_p"] = ""
+                print(
+                    f"[confirm] {hr.get('test_id','')} {framing}: not tested — {why}",
+                    flush=True,
+                )
+                continue
+            if not math.isfinite(res.p_value):
                 hr["confirmation_pass"] = False
                 hr["confirmation_raw_p"] = ""
                 continue
             hr["confirmation_raw_p"] = res.p_value
-            hr["confirmation_pass"] = bool(res.p_value < 0.05)
-            verdict = "PASS" if res.p_value < 0.05 else "fail"
-            print(f"[confirm] {hr.get('test_id','')} {framing}: p={res.p_value:.4g} {verdict}", flush=True)
+            hr["confirmation_pass"] = False  # provisional until BH below
+            pending.append((str(hr.get("test_id", "")), float(res.p_value)))
+            pending_rows.append(hr)
         except Exception as e:  # noqa: BLE001
             hr["confirmation_pass"] = False
             hr["confirmation_raw_p"] = ""
             print(f"[confirm] ERROR on {hr.get('test_id', '')}: {e}", flush=True)
+
+    if not pending:
+        return
+
+    qvals = R.confirmation_q_for(pending)
+    family_size = len(R._confirmation_prior_pvalues({t for t, _ in pending})) + len(pending)
+    for hr, (_tid, p), q in zip(pending_rows, pending, qvals):
+        passed = bool(q < R.CONFIRMATION_ALPHA)
+        hr["confirmation_pass"] = passed
+        verdict = "PASS" if passed else "fail"
+        print(
+            f"[confirm] {hr.get('test_id','')} {hr.get('outcome_framing','')}: "
+            f"p={p:.4g} q={q:.4g} (confirmation family n={family_size}) {verdict}",
+            flush=True,
+        )
 
 
 def confound_check_surviving(
@@ -1118,36 +1284,80 @@ def run_batch(run_id: str | None = None) -> dict:
     }
 
 
+# Absolute safety bounds for "run until double pass". These are NOT search
+# budgets — they exist so a runaway loop cannot burn unbounded API spend. When
+# one of them ends the run, the summary says so explicitly and reports
+# double_pass_achieved=False; the result must never look like a completed search.
+HARD_MAX_BATCHES = 40
+HARD_MAX_SECONDS = 6 * 60 * 60
+MAX_CONSECUTIVE_FAILURES = 3
+
+
 def run_continuous_batch(
     stop_flag: dict,
     max_domains: int = 20,
     max_hypotheses: int = 50,
     progress_callback=None,
+    hard_max_batches: int = HARD_MAX_BATCHES,
+    hard_max_seconds: float = HARD_MAX_SECONDS,
 ) -> dict:
     """
-    Chain autonomous discovery batches until EITHER:
-      (a) at least one hypothesis achieves BOTH discovery_pass AND
-          confirmation_pass (a double-pass hit), OR
-      (b) the cumulative domain count across all batches >= max_domains, OR
-      (c) the cumulative hypothesis count >= max_hypotheses, OR
-      (d) stop_flag["stop"] is set True by the caller (manual stop).
+    Chain autonomous discovery batches until a DOUBLE PASS is achieved — at least
+    one hypothesis with both discovery_pass and confirmation_pass.
 
-    Every single test in every batch is logged to the cumulative FDR registry
-    exactly as a single-batch run — no change to logging discipline.
+    `max_domains` / `max_hypotheses` are SOFT BUDGETS. They are reported once
+    exceeded but they do NOT end the run. Previously they were hard stops, so the
+    button routinely returned "finished" having never found anything — the search
+    quietly gave up and the summary could not distinguish that from success.
 
-    After each batch, calls progress_callback(progress_dict) if provided so
-    the caller can persist live status (e.g. to the research_jobs table).
+    The run ends only on:
+      (a) a double pass  -> stopped_reason="double_pass_achieved"
+      (b) manual stop    -> stopped_reason="stopped_by_user"
+      (c) hard batch bound  -> stopped_reason="hard_batch_limit"
+      (d) hard time bound   -> stopped_reason="time_limit"
+      (e) repeated batch failures -> stopped_reason="repeated_batch_failures"
 
-    Returns a summary dict suitable for storing in the research_job result_json.
+    Searching longer is only statistically safe because the confirmation stage is
+    BH-corrected over its cumulative family (see confirm_surviving) — each extra
+    attempt raises the bar for every attempt, so a longer search cannot
+    manufacture a confirmation.
+
+    Every test in every batch is logged to the cumulative FDR registry exactly as
+    a single-batch run — no change to logging discipline.
     """
     total_domains: set[str] = set()
     total_hypotheses = 0
     total_tests = 0
     total_confirmed = 0
     batch_num = 0
+    consecutive_failures = 0
     run_ids: list[str] = []
+    errors: list[str] = []
+    started = time.monotonic()
+    stopped_reason = "unknown"
 
-    while not stop_flag.get("stop"):
+    while True:
+        if stop_flag.get("stop"):
+            stopped_reason = "stopped_by_user"
+            break
+        if batch_num >= hard_max_batches:
+            stopped_reason = "hard_batch_limit"
+            print(
+                f"[continuous] ABSOLUTE batch bound ({hard_max_batches}) reached "
+                f"WITHOUT a double pass. This is a safety stop, not a completed search.",
+                flush=True,
+            )
+            break
+        elapsed = time.monotonic() - started
+        if elapsed >= hard_max_seconds:
+            stopped_reason = "time_limit"
+            print(
+                f"[continuous] ABSOLUTE time bound ({hard_max_seconds / 3600:.1f}h) "
+                f"reached WITHOUT a double pass. Safety stop, not a completed search.",
+                flush=True,
+            )
+            break
+
         batch_num += 1
         run_id = "run-" + uuid.uuid4().hex[:8]
         run_ids.append(run_id)
@@ -1159,14 +1369,32 @@ def run_continuous_batch(
 
         try:
             summary = run_batch(run_id=run_id)
+            consecutive_failures = 0
         except Exception as exc:  # noqa: BLE001
-            print(f"[continuous] batch {batch_num} failed: {exc}", flush=True)
-            break
+            consecutive_failures += 1
+            msg = f"batch {batch_num} ({run_id}) failed: {exc}"
+            errors.append(msg)
+            print(f"[continuous] {msg}", flush=True)
+            # A single transient failure (LLM timeout, upstream 5xx) must not end
+            # a "run until found" search — but a persistent one must not spin.
+            if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                stopped_reason = "repeated_batch_failures"
+                print(
+                    f"[continuous] {consecutive_failures} consecutive batch failures "
+                    f"— stopping.",
+                    flush=True,
+                )
+                break
+            continue
 
         total_domains.update(summary.get("domains") or [])
         total_hypotheses += summary.get("hypotheses_reviewed", 0)
         total_tests += summary.get("tests_run", 0)
         total_confirmed += summary.get("confirmed", 0)
+
+        over_budget = (
+            len(total_domains) >= max_domains or total_hypotheses >= max_hypotheses
+        )
 
         progress = {
             "batch_num": batch_num,
@@ -1176,6 +1404,9 @@ def run_continuous_batch(
             "confirmed": total_confirmed,
             "mode": "continuous",
             "run_ids": run_ids,
+            "soft_budget_exceeded": over_budget,
+            "double_pass_achieved": total_confirmed > 0,
+            "batch_errors": len(errors),
         }
         if progress_callback is not None:
             try:
@@ -1184,6 +1415,7 @@ def run_continuous_batch(
                 pass
 
         if total_confirmed > 0:
+            stopped_reason = "double_pass_achieved"
             print(
                 f"[continuous] double-pass found after {batch_num} batch(es), "
                 f"{len(total_domains)} domain(s), {total_hypotheses} hypothesis(es). Stopping.",
@@ -1191,13 +1423,14 @@ def run_continuous_batch(
             )
             break
 
-        if len(total_domains) >= max_domains:
-            print(f"[continuous] domain cap ({max_domains}) reached. Stopping.", flush=True)
-            break
-
-        if total_hypotheses >= max_hypotheses:
-            print(f"[continuous] hypothesis cap ({max_hypotheses}) reached. Stopping.", flush=True)
-            break
+        if over_budget:
+            print(
+                f"[continuous] soft budget exceeded "
+                f"({len(total_domains)}/{max_domains} domains, "
+                f"{total_hypotheses}/{max_hypotheses} hypotheses) with no double pass "
+                f"— CONTINUING, because the run was asked to search until one is found.",
+                flush=True,
+            )
 
     return {
         "mode": "continuous",
@@ -1206,7 +1439,15 @@ def run_continuous_batch(
         "hypotheses_reviewed": total_hypotheses,
         "tests_run": total_tests,
         "confirmed": total_confirmed,
-        "stopped_by_user": bool(stop_flag.get("stop")),
+        "double_pass_achieved": total_confirmed > 0,
+        "stopped_reason": stopped_reason,
+        "stopped_by_user": stopped_reason == "stopped_by_user",
+        "soft_budget_exceeded": (
+            len(total_domains) >= max_domains or total_hypotheses >= max_hypotheses
+        ),
+        "soft_budget": {"max_domains": max_domains, "max_hypotheses": max_hypotheses},
+        "batch_errors": errors,
+        "elapsed_seconds": round(time.monotonic() - started, 1),
         "run_ids": run_ids,
     }
 

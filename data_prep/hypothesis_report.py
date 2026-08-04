@@ -141,6 +141,9 @@ def collect_facts(hypothesis_id: str) -> dict | None:
     hist = R.load_history_full()
     fdr = R.cumulative_fdr()
     qmap = {row["test_id"]: row["fdr_q"] for _, row in fdr.iterrows()}
+    # Confirmation status is recomputed at read time for the same reason discovery
+    # q-values are: the cumulative confirmation family grows with every attempt.
+    cqmap = R.confirmation_qmap()
 
     rows = hist[hist["hypothesis_id"] == hypothesis_id]
     if rows.empty:
@@ -157,7 +160,8 @@ def collect_facts(hypothesis_id: str) -> dict | None:
         tid = r.get("test_id")
         q = qmap.get(tid)
         disc_pass = q is not None and float(q) < R.SIGNIFICANCE_THRESHOLD
-        conf_pass = _truthy(r.get("confirmation_pass"))
+        cq = cqmap.get(tid)
+        conf_pass = cq is not None and float(cq) < R.CONFIRMATION_ALPHA
         if disc_pass and conf_pass:
             passed_both = True
 
@@ -179,7 +183,9 @@ def collect_facts(hypothesis_id: str) -> dict | None:
             "discovery_fdr_q": _to_float(q),
             "discovery_pass": disc_pass,
             "confirmation_raw_p": _to_float(r.get("confirmation_raw_p")),
+            "confirmation_fdr_q": _to_float(cq),
             "confirmation_pass": conf_pass,
+            "confirmation_pass_at_test_time": _truthy(r.get("confirmation_pass")),
             "effect_size": _parse_effect(r.get("outcome_note")),
         })
 
