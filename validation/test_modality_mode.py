@@ -85,6 +85,30 @@ class TestModalityMatching(unittest.TestCase):
         self.assertIsNone(DF.modality_match("Antibody", None))
         self.assertIsNone(DF.modality_match(None, None))
 
+    def test_methodology_is_surfaced_and_honest(self):
+        m = DF.modality_finding_for("Antibody", False)[0]["methodology"]
+        # The tested predicate, not the metaphor, must be stated.
+        self.assertIn("NOT small molecule", m["predicate"])
+        self.assertEqual(m["records_tested"], 2642)
+        self.assertTrue(m["steps"])
+        # The analogy must be explicitly labelled as carrying no evidence.
+        self.assertIn("no evidentiary weight", m["analogy_status"])
+        # Prior art must not be overclaimed as novel, and must be citable.
+        self.assertIn("Not a novel claim", m["prior_art"])
+        self.assertTrue(m["prior_art_citation"]["url"].startswith("https://"))
+        self.assertTrue(m["prior_art_citation"]["label"])
+
+    def test_methodology_n_matches_headline_stats(self):
+        """Guard against the narrative drifting from the quoted statistics."""
+        f = DF.modality_finding_for("Antibody", False)[0]
+        self.assertEqual(f["methodology"]["records_tested"], f["stats"]["n"])
+
+    def test_methodology_deepcopied_per_call(self):
+        a = DF.modality_finding_for("Antibody", False)[0]
+        a["methodology"]["steps"].append("mutated")
+        b = DF.modality_finding_for("Antibody", False)[0]
+        self.assertNotIn("mutated", b["methodology"]["steps"])
+
     def test_finding_payload_shape_and_copy(self):
         out = DF.modality_finding_for("Antibody", False)
         self.assertEqual(len(out), 1)

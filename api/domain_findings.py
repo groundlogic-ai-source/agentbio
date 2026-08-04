@@ -192,6 +192,67 @@ MODALITY_REPURPOSING_PENALTY: dict[str, Any] = {
             "(q=4.7e-2) and independent holdout confirmation (p=2.8e-4)"
         ),
     },
+    # Full research provenance, surfaced in-product so the caution can be
+    # audited rather than taken on trust.
+    "methodology": {
+        "dataset": (
+            "repoDB historical repurposing outcomes, enriched with ChEMBL "
+            "molecule attributes"
+        ),
+        "records_tested": 2642,
+        "base_rate": (
+            "713 of 8,374 modality-resolved dataset rows (8.5%; 175 distinct "
+            "drugs) are non-oral biologics"
+        ),
+        "predicate": (
+            "NOT small molecule AND NOT orally administered — evaluated from "
+            "ChEMBL molecule_type and the oral route flag"
+        ),
+        "generated_by": (
+            "Claude Opus, from the bisociation source domain “wildfire "
+            "fuel-load accumulation and prescribed-burn suppression cycles”"
+        ),
+        "analogy": (
+            "Fire spreads through cheaply connected fuel; fuel that cannot "
+            "ignite merely accumulates. Oral small molecules spread across "
+            "indications at low cost, while formulation-locked biologics act "
+            "as a firebreak against opportunistic redeployment."
+        ),
+        "analogy_status": (
+            "The source-domain metaphor only determined which question was "
+            "asked. It carries no evidentiary weight — only the literal "
+            "predicate above was tested."
+        ),
+        "steps": [
+            "Predicate evaluated per drug-indication pair and crossed with "
+            "the recorded repurposing outcome in a 2x2 table (n=2,642).",
+            "Fisher's exact test on the discovery split: raw p=1.49e-2.",
+            "Benjamini-Hochberg FDR applied across the entire cumulative "
+            "hypothesis log — every previously failed test counts against "
+            "it — giving q=4.69e-2.",
+            "Independent confirmation on a holdout split untouched during "
+            "discovery: p=2.80e-4.",
+            "Three candidate confounds were pre-registered by the model "
+            "before adjustment; one was testable and the effect survived it, "
+            "two hit perfect separation and remain unruled-out.",
+        ],
+        "prior_art": (
+            "Not a novel claim to the field. Published analyses of "
+            "repurposing databases report the same directional pattern "
+            "(RepurposeDB is ~74% small molecules vs ~16% protein/biotech "
+            "drugs), and the delivery constraints of biologics are well "
+            "documented. The value here is internal calibration — a blind "
+            "statistical pipeline recovered a known field-level pattern — "
+            "not new knowledge. Cite it as a base rate, never as a discovery."
+        ),
+        "prior_art_citation": {
+            "label": (
+                "Shameer et al., Systematic analyses of drugs and disease "
+                "indications in RepurposeDB, Briefings in Bioinformatics"
+            ),
+            "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6192146/",
+        },
+    },
 }
 
 
