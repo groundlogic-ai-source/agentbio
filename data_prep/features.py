@@ -42,14 +42,22 @@ perfectly separates the outcome (which also breaks Fisher/logistic).
 """
 from __future__ import annotations
 
+import re
+
 import pandas as pd
 
 SUPPORTED_OPS = {
     "prc_raw", "prc_threshold", "established", "ind_keyword", "drug_keyword",
     "mw_raw", "xlogp_raw", "mw_threshold", "xlogp_threshold",
     "is_small_molecule", "is_oral", "global_max_phase_raw", "global_max_phase_threshold",
+    "phase_threshold",
 }
-CONFOUNDED_OPS = {"prc_raw", "prc_threshold"}
+# Label-confounded: prc is definitionally tied to the label; phase_threshold is
+# structurally tied to it (only UNAPPROVED pairs carry a repoDB trial phase, so
+# the feature exists almost exclusively among failures). phase_threshold is a
+# legitimate CONFOUND COVARIATE (e.g. phase-mix adjustment) but never a valid
+# hypothesis predictor.
+CONFOUNDED_OPS = {"prc_raw", "prc_threshold", "phase_threshold"}
 # Enriched ops that require pubchem/chembl columns — graceful error if absent.
 ENRICHED_OPS = {
     "mw_raw", "xlogp_raw", "mw_threshold", "xlogp_threshold",
@@ -61,7 +69,7 @@ ENRICHED_OPS = {
 _BINARY_OPS = {
     "prc_threshold", "established", "ind_keyword", "drug_keyword",
     "mw_threshold", "xlogp_threshold", "is_small_molecule", "is_oral",
-    "global_max_phase_threshold",
+    "global_max_phase_threshold", "phase_threshold",
 }
 
 # Disease-stage terminology stems that near-tautologically proxy administrative-exclude
@@ -73,6 +81,23 @@ _STAGE_PROXY_STEMS = frozenset({"refract", "resist", "relaps", "salvage"})
 
 class FeatureError(ValueError):
     pass
+
+
+_PHASE_NUM_RE = re.compile(r"(\d+(?:\.\d+)?)")
+
+
+def _indication_phase_num(s: pd.Series) -> pd.Series:
+    """
+    Map repoDB indication-level phase strings to the HIGHEST phase number
+    reached: "Phase 1" -> 1.0, "Phase 1/Phase 2" -> 2.0, "Phase 2/Phase 3" ->
+    3.0. NaN (approved pairs) and unparseable values stay NaN.
+    """
+    def one(v) -> float:
+        if not isinstance(v, str):
+            return float("nan")
+        nums = [float(x) for x in _PHASE_NUM_RE.findall(v)]
+        return max(nums) if nums else float("nan")
+    return s.map(one)
 
 
 def is_interaction(spec: dict) -> bool:
@@ -194,6 +219,16 @@ def compute(df: pd.DataFrame, spec: dict) -> pd.Series:
         k = float(params["k"])
         col = _require_col(df, "chembl_max_phase", op).astype(float)
         return (col >= k).astype(int)
+
+    # Indication-level trial phase from repoDB (NOT the ChEMBL drug-global
+    # max phase above). Only unapproved pairs carry a phase value; approved
+    # pairs are NaN and code as 0, so this reads "reached phase >= k WITHOUT
+    # being approved" — structurally tied to the failure label (CONFOUNDED_OPS).
+    # Intended for confound adjustment (e.g. the phase-mix confound on the
+    # oncology finding), not for hypothesis prediction.
+    if op == "phase_threshold":
+        k = float(params["k"])
+        return (_indication_phase_num(df["phase"]) >= k).astype(int)
 
     if op == "interaction":
         raise FeatureError("interaction specs must be evaluated via compute_interaction")

@@ -36,6 +36,11 @@ established_product, phase, status.
   {"op": "established"}                               binary
   {"op": "ind_keyword",  "params": {"keywords": [...]}} binary
   {"op": "drug_keyword", "params": {"keywords": [...]}} binary
+  {"op": "phase_threshold", "params": {"k": <float>}} binary
+      Indication-level trial phase (repoDB 'phase' column) reached >= k WITHOUT
+      the pair being approved — approved pairs carry no phase and code as 0.
+      Use for phase-mix confounds (e.g. "oncology attempts skew to later
+      trial stages"). k in {1, 2, 3}; k=2 or k=3 capture late-stage mix.
 
 Anything else → set feature_spec to null and computable to false.
 """.strip()
