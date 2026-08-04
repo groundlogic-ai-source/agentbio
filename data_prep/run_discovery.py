@@ -278,6 +278,34 @@ def _history_blurb() -> str:
 _STOP = {"in", "of", "and", "the", "a", "an", "on", "under", "into", "to", "for", "with", "as"}
 
 
+def _as_proposals(parsed: list[dict], label: str) -> list[dict]:
+    """
+    Keep only elements that actually look like DOMAIN PROPOSALS.
+
+    Guards against a malformed/truncated reply being parsed into the wrong level
+    of the schema — e.g. a single domain's `hypotheses` array arriving in place of
+    the proposal array. Those elements carry no "domain" key, so they contribute no
+    hypotheses AND are skipped by _fill_missing_domains(), meaning a generator's
+    entire contribution can vanish without a single error. Fail loudly instead.
+    """
+    good = [p for p in parsed if isinstance(p, dict) and ("domain" in p or "hypotheses" in p)]
+    if len(good) != len(parsed):
+        print(
+            f"[gen]   WARNING: {label} returned {len(parsed) - len(good)} element(s) that "
+            f"are not domain proposals (no 'domain'/'hypotheses' key) — most likely a "
+            f"truncated reply parsed at the wrong nesting level. Dropping them.",
+            flush=True,
+        )
+    unnamed = [p for p in good if not str(p.get("domain", "")).strip()]
+    if unnamed:
+        print(
+            f"[gen]   WARNING: {label} returned {len(unnamed)} proposal(s) with an empty "
+            f"domain name; these cannot be de-duplicated or excluded in future batches.",
+            flush=True,
+        )
+    return good
+
+
 def _domain_names(proposals: list[dict]) -> list[str]:
     return [str(p.get("domain", "")).strip().lower() for p in proposals]
 
@@ -322,7 +350,7 @@ def generate() -> tuple[list[dict], list[dict]]:
         f"first 500 chars):\n{(a_raw or '')[:500]!r}",
         flush=True,
     )
-    a = L.extract_json_list(a_raw)
+    a = _as_proposals(L.extract_json_list(a_raw), "A")
     print(f"[gen]   A proposed {len(a)} domains: {_domain_names(a)}", flush=True)
 
     print("[gen] LLM B (GPT-5.6 Sol) proposing domains...", flush=True)
@@ -336,7 +364,7 @@ def generate() -> tuple[list[dict], list[dict]]:
             f"first 3000 chars):\n{(b_raw or '')[:3000]!r}",
             flush=True,
         )
-        b = L.extract_json_list(b_raw)
+        b = _as_proposals(L.extract_json_list(b_raw), "B")
         if not b:
             # Parseable JSON but empty — Sol returned [] or all elements were filtered.
             # This is a genuine zero-domain response, NOT an API error. Log it clearly
@@ -378,7 +406,7 @@ def generate() -> tuple[list[dict], list[dict]]:
                 f"first 3000 chars):\n{(b_raw or '')[:3000]!r}",
                 flush=True,
             )
-            b = L.extract_json_list(b_raw)
+            b = _as_proposals(L.extract_json_list(b_raw), "B")
             print(f"[gen]   B re-proposed: {_domain_names(b)}", flush=True)
         except Exception as _sol_err2:
             print(
