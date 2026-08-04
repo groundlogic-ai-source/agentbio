@@ -19,20 +19,29 @@ run-518207db-H26, verified against the live registry 2026-08-04).
 """
 from __future__ import annotations
 
+import copy
 import re
 from typing import Any, Optional
 
 # Word-anchored keyword matcher. "malignan" intentionally lacks a trailing
-# boundary so it covers malignant/malignancy; everything else is a full term.
-_ONCOLOGY_TERMS = (
+# boundary so it covers malignant/malignancy; every other term is anchored on
+# BOTH sides so inflections of longer words can't false-positive
+# (e.g. "tumorous", "carcinomatosis", "sarcoidosis" must not match).
+_ONCOLOGY_STEM_TERMS = ("malignan",)
+_ONCOLOGY_FULL_TERMS = (
     "cancer", "carcinoma", "adenocarcinoma", "sarcoma", "myeloma",
     "leukemia", "leukaemia", "lymphoma", "melanoma", "glioma",
     "glioblastoma", "astrocytoma", "neuroblastoma", "medulloblastoma",
     "mesothelioma", "meningioma", "blastoma", "neoplasm",
-    "tumor", "tumour", "malignan",
+    "tumor", "tumour",
 )
 _ONCOLOGY_RE = re.compile(
-    r"\b(" + "|".join(_ONCOLOGY_TERMS) + r")", re.IGNORECASE
+    r"\b("
+    + "|".join(_ONCOLOGY_STEM_TERMS)
+    + "|"
+    + "|".join(t + r"\b" for t in _ONCOLOGY_FULL_TERMS)
+    + r")",
+    re.IGNORECASE,
 )
 
 ONCOLOGY_REPURPOSING_PENALTY: dict[str, Any] = {
@@ -126,7 +135,10 @@ def domain_findings_for(disease_name: str) -> list[dict[str, Any]]:
     term = oncology_match(disease_name)
     if term is None:
         return []
-    finding = dict(ONCOLOGY_REPURPOSING_PENALTY)
+    # Deep copy: nested stats/confounds/cautions/provenance dicts must never
+    # be shared references, or a downstream mutation would poison the
+    # module-level constant for every future request.
+    finding = copy.deepcopy(ONCOLOGY_REPURPOSING_PENALTY)
     finding["matched_term"] = term
     finding["disease_name"] = disease_name
     return [finding]

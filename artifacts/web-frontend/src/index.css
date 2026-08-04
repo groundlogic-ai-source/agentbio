@@ -655,7 +655,15 @@ textarea:focus-visible,
 }
 
 /* ── Print / PDF stylesheet ─────────────────────────────────────────────────── */
+.print-only {
+  display: none !important;
+}
+
 @media print {
+  .print-only {
+    display: block !important;
+  }
+
   *,
   *::before,
   *::after {
@@ -786,7 +794,10 @@ textarea:focus-visible,
     padding: 7px 10px !important;
     color: var(--ink) !important;
     background: white !important;
-    white-space: nowrap !important;
+    /* Long audit text (cap reasons, flags, disclosures) must wrap in PDF —
+       nowrap here once clipped content out of the printed audit pack. */
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
     text-align: left !important;
     font-variant-numeric: tabular-nums !important;
   }

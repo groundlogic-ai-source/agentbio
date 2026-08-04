@@ -306,6 +306,89 @@ def _c4_resolved_absent_not_unresolved() -> bool:
     return result["status"] == "absent" and result["resolved_chembl_id"] == "CHEMBL_OTHER"
 
 
+def _t11_degraded_200_empty_pool_not_cached() -> bool:
+    """A degraded 200-with-empty-payload must NEVER be cached as an empty pool.
+
+    Reproduces the 2026-07 incident class: ChEMBL returns HTTP 200 with an
+    empty activities payload during an outage; caching that emptiness would
+    zero the target's pool for 7 days. Drives the real public pool builder
+    with only the transport seams mocked; asserts the cache gate refuses the
+    write and the returned pool is honestly (not authoritatively) empty.
+    """
+    import data_sources.chembl as chembl
+
+    writes: list[tuple] = []
+    with mock.patch.object(chembl, "get", return_value=None), \
+         mock.patch.object(chembl, "cache_set",
+                           lambda *a, **k: writes.append(a)), \
+         mock.patch.object(chembl, "_resolve_target_chembl_id",
+                           return_value=["CHEMBL_T11"]), \
+         mock.patch.object(chembl, "_fetch_activities_full",
+                           return_value=([], False)):
+        result = chembl.get_target_candidate_compounds("P0T11X")
+    return result["compounds"] == [] and writes == []
+
+
+def _t12_holdout_name_no_api_leak() -> bool:
+    """Under an active benchmark holdout, the precedent-target path must not
+    leak the held-out drug — by exact name, by salt/ester shared parent, or
+    via the ChEMBL drug_indication EFO fallback rediscovering it after
+    redaction empties the list. A naive tool falls through to the fallback
+    and re-discovers the drug it was supposed to hide.
+    """
+    import data_sources.chembl as chembl
+    from data_sources import holdout
+
+    def _resolve_stub():
+        holdout.register_molecules({"CHEMBL_HELD"}, {"CHEMBL_PARENT"})
+        holdout.mark_resolved()
+
+    mol_table = {
+        "TrapHeldOutDrug citrate": "CHEMBL_SALT",
+        "CleanDrug": "CHEMBL_CLEAN",
+    }
+    meta = {
+        "CHEMBL_SALT": {"parent_chembl_id": "CHEMBL_PARENT"},
+        "CHEMBL_CLEAN": {"parent_chembl_id": "CHEMBL_CLEANP"},
+    }
+    fallback_calls: list = []
+    sentinel_writes: list = []
+
+    def _cache_set_spy(key, value, **kw):
+        # make_key() hashes its arguments, so the sentinel name is NOT
+        # string-matchable in the key — assert by VALUE: the sentinel path
+        # is the only cache_set in this function that writes an empty list.
+        if value == []:
+            sentinel_writes.append((key, value))
+
+    with holdout.holdout_active(["TrapHeldOutDrug"]):
+        with mock.patch.object(chembl, "_ensure_holdout_resolved", _resolve_stub), \
+             mock.patch.object(chembl, "_find_molecule_chembl_id",
+                               lambda name: mol_table.get(name)), \
+             mock.patch.object(chembl, "_fetch_molecule_meta",
+                               lambda ids: {i: meta.get(i, {}) for i in ids}), \
+             mock.patch.object(chembl, "_get_json",
+                               lambda *a, **k: fallback_calls.append(a) or {"drug_indications": []}), \
+             mock.patch.object(chembl, "get", return_value=None), \
+             mock.patch.object(chembl, "cache_set", _cache_set_spy):
+            # 1. Exact-name redaction empties the list -> sentinel, no fallback
+            r1 = chembl.get_pharmacological_targets_for_disease(
+                "EFO_0000001", ["TrapHeldOutDrug"])
+            # 2. Salt form redacted via shared parent -> same short-circuit
+            r2 = chembl.get_pharmacological_targets_for_disease(
+                "EFO_0000001", ["TrapHeldOutDrug citrate"])
+            # 3. Mixed list: clean drug survives; held-out name + salt removed
+            kept = chembl.redact_holdout_names(
+                ["TrapHeldOutDrug", "TrapHeldOutDrug citrate", "CleanDrug"])
+
+    return (
+        r1 == [] and r2 == []
+        and fallback_calls == []
+        and len(sentinel_writes) >= 1
+        and kept == ["CleanDrug"]
+    )
+
+
 TRAPS: list[tuple[str, str, Callable[[], bool]]] = [
     ("T1", "safety_cap_disclosure", _t1_safety_cap_disclosure),
     ("T2", "blackbox_not_withdrawal", _t2_blackbox_not_withdrawal),
@@ -317,6 +400,10 @@ TRAPS: list[tuple[str, str, Callable[[], bool]]] = [
     ("T8", "degraded_source_honesty", _t8_degraded_source_honesty),
     ("T9", "unobserved_not_zero", _t9_unobserved_not_zero),
     ("T10", "xlogp_unresolved_disclosure", _t10_xlogp_unresolved_disclosure),
+    # v1.1 (2026-08-04): pre-registered in audit_traps_preregistration.md
+    # addendum BEFORE implementation; thresholds unchanged.
+    ("T11", "degraded_200_empty_pool_not_cached", _t11_degraded_200_empty_pool_not_cached),
+    ("T12", "holdout_name_no_api_leak", _t12_holdout_name_no_api_leak),
 ]
 
 CONTROLS: list[tuple[str, str, Callable[[], bool]]] = [

@@ -74,7 +74,22 @@ function ClaimLedger({ hypothesisId, onClose }) {
   const d = state.data;
 
   return (
-    <div className="space-y-5 mt-4">
+    <div className="space-y-5 mt-4 printable-report">
+      {/* Print header — visible only in the PDF/print output */}
+      <div className="print-only">
+        <div style={{
+          fontFamily: "monospace", fontSize: "0.58rem", textTransform: "uppercase",
+          letterSpacing: "0.14em", color: "var(--brass-deep)", marginBottom: "0.4rem",
+        }}>
+          AgentBio — Dossier Audit Pack
+        </div>
+        <p style={{ fontSize: "0.75rem", color: "var(--ink-muted)", margin: "0 0 1rem" }}>
+          {d.hypothesis_id} · facts fingerprint {d.fingerprint || "—"} ·
+          re-verified against the live registry at {new Date().toISOString().slice(0, 19)}Z ·
+          audit status below reflects the registry at print time, not the saved narrative.
+        </p>
+      </div>
+
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <StatusBadge status={d.audit_status} />
@@ -83,12 +98,18 @@ function ClaimLedger({ hypothesisId, onClose }) {
             {d.hypothesis_id} · facts fingerprint <code>{(d.fingerprint || "").slice(0, 12)}…</code>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 no-print">
           <button
             onClick={() => downloadJson(`agentbio-audit-pack-${d.hypothesis_id}.json`, d)}
             className="audit-chip text-xs px-3 py-1.5 rounded-full"
           >
             Download audit pack (JSON)
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="audit-chip text-xs px-3 py-1.5 rounded-full"
+          >
+            Print / Save as PDF
           </button>
           <button onClick={onClose} className="audit-chip text-xs px-3 py-1.5 rounded-full">Close</button>
         </div>

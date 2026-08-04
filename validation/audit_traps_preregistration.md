@@ -57,3 +57,30 @@ other label.
 
 Thresholds are set before the first scored run. A failure is a product defect
 to fix, not a threshold to move.
+
+---
+
+## Addendum v1.1 (2026-08-04) — two trap classes added
+
+Registered BEFORE the cases were implemented, per protocol. Thresholds are
+unchanged (trap recall ≥ 0.90, control false-flag rate ≤ 0.25); the recall
+denominator becomes 12. Prior v1 artifacts remain comparable per-class.
+
+| # | Class | What a naive tool does | Required behavior |
+|---|-------|------------------------|-------------------|
+| T11 | degraded_200_empty_pool_not_cached | caches a degraded 200-with-empty-payload as an authoritative empty pool, zeroing a target's pool for the cache TTL | empty payload = failure; no cache write unless a non-empty raw activity payload was seen |
+| T12 | holdout_name_no_api_leak | precedent-target path leaks the held-out drug by exact name, salt/ester shared parent, or ChEMBL drug_indication EFO fallback rediscovery after redaction | name + parent redaction; redacted-to-empty short-circuits to a holdout sentinel; fallback never fires |
+
+Both classes are driven offline at the cache/redaction seam with transport
+stubbed, per the offline-first convention (results must be reproducible
+during a ChEMBL outage). Their fully live counterparts require a stable
+ChEMBL window and stay out of the frozen set; adjacent behavior is also
+pinned by `validation/test_cache_failures.py` and the holdout guard suites.
+
+Harness defect note (2026-08-04): T12's first implementation spied on the
+sentinel cache write by string-matching `"__holdout_redacted__"` in the
+cache key, but `make_key()` hashes its arguments, so the write was invisible
+to the spy and T12 recorded a false MISS on its first run (production
+redaction behaved correctly throughout). The spy was fixed to assert by
+written VALUE, per the one-fix-one-rerun rule in Protocol, and the run was
+repeated exactly once.
