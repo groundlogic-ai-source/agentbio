@@ -506,6 +506,7 @@ def get_candidate_pool(
     safety: Optional[str] = None,
     evidence: Optional[str] = None,
     xlogp: Optional[str] = None,
+    modality: Optional[str] = None,
     sort: str = "rank",
     order: str = "asc",
     page: int = 1,
@@ -516,7 +517,7 @@ def get_candidate_pool(
         raise HTTPException(status_code=400, detail="disease_name is required")
     return _audit.candidate_pool(
         disease_name.strip(), job_id_hint=job_id, query=query, safety=safety,
-        evidence=evidence, xlogp=xlogp, sort=sort, order=order,
+        evidence=evidence, xlogp=xlogp, modality=modality, sort=sort, order=order,
         page=page, page_size=page_size,
     )
 
@@ -762,6 +763,78 @@ def clear_registry() -> dict:
             rj = cur.rowcount
         conn.commit()
     return {"deleted": {"bisociation_history": bh, "hypothesis_log": hl, "research_jobs": rj}}
+
+
+@app.post("/internal/delete-archived")
+def delete_archived_registry(dry_run: bool = True) -> dict:
+    """
+    Permanently delete ARCHIVED bisociation_history rows, plus the hypothesis_log
+    rows of hypotheses left with no surviving history row.
+
+    One protective exception: rows that passed BOTH discovery and confirmation
+    (confirmation_pass = true) are never deleted, even when archived — a
+    double-gate pass is a confirmed finding (e.g. the oncology penalty the
+    product actively discloses), not resettable noise. Everything else archived
+    is pre-debug history the owner asked to remove.
+
+    Scope note: the confirmation FDR family lives on history rows
+    (confirmation_raw_p) and the discovery family on log rows, so both shrink
+    together — remaining hypotheses keep every test that belongs to them.
+    Deleted rows are first copied into registry_reset_backup (full JSONB
+    payload) so the reset stays recoverable and auditable. Deleting tests can
+    only shrink the BH families, so no surviving pass can be demoted by this
+    reset — but it must still be disclosed (see registry_reset_backup).
+
+    dry_run=true (the default) only counts what would be deleted.
+    """
+    import psycopg2
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        raise HTTPException(status_code=500, detail="DATABASE_URL not set")
+    _DEL = "archived = TRUE AND confirmation_pass IS NOT TRUE"
+    _SURVIVES = "(archived = FALSE OR confirmation_pass = TRUE)"
+    _LOG_ORPHAN = (
+        "hypothesis_id NOT IN (SELECT DISTINCT hypothesis_id FROM bisociation_history)"
+    )
+    with psycopg2.connect(database_url) as conn:
+        with conn.cursor() as cur:
+            cur.execute(f"SELECT COUNT(*) FROM bisociation_history WHERE {_DEL}")
+            n_hist = cur.fetchone()[0]
+            cur.execute(
+                "SELECT COUNT(*) FROM hypothesis_log hl WHERE NOT EXISTS ("
+                "  SELECT 1 FROM bisociation_history bh"
+                f"  WHERE bh.hypothesis_id = hl.hypothesis_id AND {_SURVIVES})"
+            )
+            n_log = cur.fetchone()[0]
+            if dry_run:
+                return {
+                    "dry_run": True,
+                    "would_delete": {
+                        "bisociation_history": n_hist,
+                        "hypothesis_log": n_log,
+                    },
+                }
+            cur.execute(
+                "INSERT INTO registry_reset_backup (source_table, row_key, payload) "
+                "SELECT 'bisociation_history', "
+                "  hypothesis_id || '/' || outcome_framing || '#' || id, to_jsonb(t) "
+                f"FROM bisociation_history t WHERE {_DEL}"
+            )
+            cur.execute(f"DELETE FROM bisociation_history WHERE {_DEL}")
+            bh = cur.rowcount
+            cur.execute(
+                "INSERT INTO registry_reset_backup (source_table, row_key, payload) "
+                "SELECT 'hypothesis_log', test_id, to_jsonb(t) "
+                "FROM hypothesis_log t WHERE " + _LOG_ORPHAN
+            )
+            cur.execute("DELETE FROM hypothesis_log WHERE " + _LOG_ORPHAN)
+            hl = cur.rowcount
+        conn.commit()
+    return {
+        "dry_run": False,
+        "deleted": {"bisociation_history": bh, "hypothesis_log": hl},
+        "backed_up_to": "registry_reset_backup",
+    }
 
 
 # --------------------------------------------------------------------------- #

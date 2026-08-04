@@ -3,6 +3,16 @@ import { auditDrug } from "../api";
 import TriagePanel from "./TriagePanel";
 import DossierPanel from "./DossierPanel";
 import DomainFindings from "./DomainFindings";
+import ModalityModeToggle from "./ModalityModeToggle";
+import { useModalityMode } from "../modalityMode";
+
+// Modality finding card, hidden when the user disengages the mode. Wrapper
+// keeps the hook out of AuditTab's own state list.
+function ModalityFindings({ findings }) {
+  const [engaged] = useModalityMode();
+  if (!engaged) return null;
+  return <DomainFindings findings={findings} />;
+}
 
 // ── Tiny shared primitives ────────────────────────────────────────────────────
 
@@ -515,6 +525,8 @@ function SingleDrugAudit({ onNavigate }) {
       {result && (
         <div className="space-y-4">
           <DomainFindings findings={result.domain_findings} />
+          <ModalityFindings findings={result.modality_findings} />
+          <ModalityModeToggle />
           {result.status === "found" && <FoundResult data={result} />}
           {result.status === "absent" && <AbsentResult data={result} />}
           {result.status === "unresolved" && <UnresolvedResult data={result} />}

@@ -13,6 +13,7 @@ import {
   generateHypothesisReport,
   saveReport,
   getResearchBenchmarks,
+  deleteArchivedRegistry,
 } from "../api.js";
 
 const POLL_MS = 3000;
@@ -687,6 +688,82 @@ function DiscoveryBatch({ onCompleted }) {
   );
 }
 
+function RegistryResetPanel() {
+  const [state, setState] = useState({ preview: null, busy: false, done: null, error: null });
+
+  const runPreview = async () => {
+    setState({ preview: null, busy: true, done: null, error: null });
+    try {
+      const data = await deleteArchivedRegistry(true);
+      setState({ preview: data, busy: false, done: null, error: null });
+    } catch (err) {
+      setState({ preview: null, busy: false, done: null, error: err.message });
+    }
+  };
+
+  const runDelete = async () => {
+    setState((s) => ({ ...s, busy: true, error: null }));
+    try {
+      const data = await deleteArchivedRegistry(false);
+      setState({ preview: null, busy: false, done: data, error: null });
+    } catch (err) {
+      setState((s) => ({ ...s, busy: false, error: err.message }));
+    }
+  };
+
+  return (
+    <div style={{
+      marginBottom: "2rem", padding: "1.5rem 1.75rem",
+      border: "1px solid var(--border)", borderRadius: "8px",
+      backgroundColor: "var(--surface-raised)",
+    }}>
+      <div className="eyebrow" style={{ marginBottom: "0.5rem" }}>Registry reset</div>
+      <p style={{ fontSize: "0.75rem", color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: "1rem", maxWidth: "52rem" }}>
+        Permanently deletes every <strong style={{ color: "var(--ink)" }}>archived</strong> registry entry that never
+        confirmed — mostly pre-debug runs — plus the test-ledger rows of hypotheses with no surviving entry. Entries
+        that passed both discovery and confirmation (e.g. the oncology finding) are kept even if archived — confirmed
+        findings are never deleted. Every deleted row is first backed up server-side
+        (<code>registry_reset_backup</code>) so the reset stays auditable. This cannot be undone from the UI.
+      </p>
+      {state.error && (
+        <p style={{ color: "var(--oxide)", fontSize: "0.72rem", marginBottom: "0.5rem" }}>{state.error}</p>
+      )}
+      {state.done && (
+        <p style={{ fontSize: "0.72rem", fontFamily: "monospace", color: "var(--brass-deep)", marginBottom: "0.5rem" }}>
+          ✓ Deleted {state.done.deleted?.bisociation_history ?? 0} archived entries and{" "}
+          {state.done.deleted?.hypothesis_log ?? 0} orphaned ledger rows (backed up to registry_reset_backup).
+        </p>
+      )}
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+        {!state.preview && !state.done && (
+          <button type="button" onClick={runPreview} disabled={state.busy} className="btn btn-ghost-brass btn-sm">
+            {state.busy ? "Counting…" : "Preview reset"}
+          </button>
+        )}
+        {state.preview && (
+          <>
+            <span style={{ fontSize: "0.72rem", fontFamily: "monospace", color: "var(--ink)" }}>
+              This will permanently delete {state.preview.would_delete?.bisociation_history ?? 0} archived entries
+              and {state.preview.would_delete?.hypothesis_log ?? 0} ledger rows.
+            </span>
+            <button type="button" onClick={runDelete} disabled={state.busy} className="btn btn-danger btn-sm">
+              {state.busy ? "Deleting…" : "Delete permanently"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setState({ preview: null, busy: false, done: null, error: null })}
+              disabled={state.busy}
+              className="btn btn-ghost btn-sm"
+            >
+              Cancel
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function BenchmarkPanel() {
   const [state, setState] = useState({ loading: true, error: null, data: null });
   useEffect(() => {
@@ -861,6 +938,7 @@ export default function ResearchTab({ onRefresh }) {
 
        <BenchmarkPanel />
        <DiscoveryBatch onCompleted={fetchHypotheses} />
+       <RegistryResetPanel />
       <HypothesisTable hypotheses={visibleHypotheses} loading={loading} onArchive={fetchHypotheses} />
       <SubmitHypothesis onSubmitted={fetchHypotheses} />
     </div>

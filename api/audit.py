@@ -18,10 +18,11 @@ import re
 from typing import Any, Optional
 
 import api.jobs_db as jobs_db
-from api.domain_findings import domain_findings_for
+from api.domain_findings import domain_findings_for, modality_finding_for
 from data_sources.chembl import (
     _find_molecule_chembl_id,
     get_drug_mechanism_targets_for_audit,
+    get_molecule_data,
 )
 
 # ── Candidate storage ─────────────────────────────────────────────────────────
@@ -129,6 +130,29 @@ def _cap_reason(c: dict) -> Optional[str]:
 
 # ── Main audit function ───────────────────────────────────────────────────────
 
+def _modality_payload(drug_name: str) -> dict[str, Any]:
+    """Modality finding fields for a drug, via the cached ChEMBL lookup.
+
+    Applies to the DRUG, not the indication, so it is attached on every audit
+    path — including early returns where no case or candidate pool exists.
+    Unresolved lookups are stated, never silently "clear". Disclosure only.
+    """
+    mol = get_molecule_data(drug_name)
+    mtype = mol.get("molecule_type")
+    oral_raw = mol.get("oral")
+    oral = None if oral_raw is None else bool(oral_raw)
+    findings = modality_finding_for(mtype, oral)
+    return {
+        "chembl_molecule_type": mtype,
+        "chembl_oral": oral,
+        "modality_findings": findings,
+        "modality_status": (
+            "flagged" if findings
+            else ("unresolved" if (mtype is None or oral is None) else "clear")
+        ),
+    }
+
+
 def run_audit(
     disease_name: str,
     drug_name: str,
@@ -157,6 +181,7 @@ def run_audit(
             "status": "no_case",
             "disease_name": disease_name,
             "drug_name": drug_name,
+            **_modality_payload(drug_name),
         }
 
     job_id = job["job_id"]
@@ -174,6 +199,7 @@ def run_audit(
                 "This job predates per-job candidate persistence. "
                 "Re-run the disease to generate a fresh candidates file."
             ),
+            **_modality_payload(drug_name),
         }
 
     # 3. Resolve queried drug via the existing ChEMBL best-match function
@@ -268,6 +294,11 @@ def run_audit(
     # (base-rate context — disclosure only, never a score or verdict change).
     result["domain_findings"] = domain_findings_for(canonical_disease)
 
+    # 8. Modality finding: applies to the DRUG, not the indication. Live cached
+    # lookup so out-of-pool drugs get the same disclosure as reviewed
+    # candidates; unresolved lookups are stated, never silently "clear".
+    result.update(_modality_payload(drug_name))
+
     return result
 
 
@@ -279,6 +310,7 @@ def candidate_pool(
     safety: Optional[str] = None,
     evidence: Optional[str] = None,
     xlogp: Optional[str] = None,
+    modality: Optional[str] = None,
     sort: str = "rank",
     order: str = "asc",
     page: int = 1,
@@ -328,6 +360,10 @@ def candidate_pool(
             continue
         if xlogp == "unresolved" and candidate.get("pubchem_xlogp") is not None:
             continue
+        if modality == "flagged" and not candidate.get("nonoral_biologic_flag"):
+            continue
+        if modality == "unresolved" and candidate.get("nonoral_biologic_flag") is not None:
+            continue
 
         components = candidate.get("score_components") or {}
         filtered.append({
@@ -344,6 +380,14 @@ def candidate_pool(
             "xlogp_status": (
                 "flagged" if candidate.get("high_lipophilicity_flag")
                 else ("unresolved" if candidate.get("pubchem_xlogp") is None else "clear")
+            ),
+            "chembl_molecule_type": candidate.get("chembl_molecule_type"),
+            "chembl_oral": candidate.get("chembl_oral"),
+            "nonoral_biologic_flag": candidate.get("nonoral_biologic_flag"),
+            "modality_status": (
+                "flagged" if candidate.get("nonoral_biologic_flag")
+                else ("unresolved" if candidate.get("nonoral_biologic_flag") is None
+                      else "clear")
             ),
             "evidence_weight_coverage": components.get("evidence_weight_coverage"),
             "source_types": candidate.get("source_types") or [],

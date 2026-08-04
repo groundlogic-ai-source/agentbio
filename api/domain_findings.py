@@ -117,12 +117,118 @@ ONCOLOGY_REPURPOSING_PENALTY: dict[str, Any] = {
 }
 
 
+MODALITY_REPURPOSING_PENALTY: dict[str, Any] = {
+    "id": "modality_repurposing_penalty",
+    "domain": "modality",
+    "severity": "caution",
+    "title": "Non-oral biologics have lower repurposing success",
+    "statement": (
+        "Non-oral, non-small-molecule (biologic) agents have lower "
+        "repurposing success than oral small molecules."
+    ),
+    "stats": {
+        "framing": "narrow (genuine-outcome controls only)",
+        "test": "fisher_exact",
+        "odds_ratio": 0.3004,
+        "ci95": [0.121, 0.657],
+        "n": 2642,
+        "discovery_raw_p": 1.49e-2,
+        "discovery_fdr_q": 4.69e-2,
+        "confirmation_raw_p": 2.80e-4,
+    },
+    "confounds": [
+        {
+            "name": "established-product maturity",
+            "status": "survives",
+            "detail": (
+                "Adjusted OR 0.3154 [0.1314, 0.7572], adj. p=9.8e-3 — the "
+                "penalty persists after accounting for product tenure."
+            ),
+        },
+        {
+            "name": "prior repurposing base rate",
+            "status": "not_testable",
+            "detail": (
+                "Perfect separation in the 2x2 — this candidate explanation "
+                "could not be ruled out."
+            ),
+        },
+        {
+            "name": "oncology late-stage phase mix",
+            "status": "not_testable",
+            "detail": (
+                "Perfect separation in the 2x2 — this candidate explanation "
+                "could not be ruled out."
+            ),
+        },
+    ],
+    "cautions": [
+        (
+            "Under broad outcome framing the same association is "
+            "LABEL_ARTIFACT_SUSPECT: an admin-only replay reproduces it "
+            "(admin OR 0.174, p=7.8e-49; broad OR 0.177 [0.139, 0.227], "
+            "n=3843), meaning the broad effect lives in the administrative-"
+            "exclude class. Only the narrow, genuine-outcome framing above "
+            "should be cited."
+        ),
+    ],
+    "implication": (
+        "The historical odds of repurposing success for non-oral biologics "
+        "are roughly 3x lower than for other agents. Treat within-case ranks "
+        "as relative to each other — even a top-ranked biologic candidate "
+        "carries a higher external-validation burden than an equivalent oral "
+        "small molecule."
+    ),
+    "provenance": {
+        "hypothesis_id": "run-704c0cb4-H05",
+        "run_id": "run-704c0cb4",
+        "source_domain": (
+            "wildfire fuel-load accumulation and prescribed-burn suppression "
+            "cycles"
+        ),
+        "proposing_llm": "Opus",
+        "registry": (
+            "Bisociation hypothesis registry — passed discovery FDR "
+            "(q=4.7e-2) and independent holdout confirmation (p=2.8e-4)"
+        ),
+    },
+}
+
+
 def oncology_match(disease_name: str) -> Optional[str]:
     """Return the matched oncology term in the disease name, else None."""
     if not disease_name:
         return None
     m = _ONCOLOGY_RE.search(disease_name)
     return m.group(1) if m else None
+
+
+def modality_match(
+    molecule_type: Optional[str], oral: Optional[bool]
+) -> Optional[str]:
+    """Return the matched molecule_type when the drug is a non-oral biologic.
+
+    Mirrors the tested feature_spec all_of[NOT is_small_molecule, NOT is_oral]:
+    missingness propagates — an unknown molecule_type or unknown oral flag means
+    no match (the caller surfaces 'unresolved', never a silent False).
+    """
+    if molecule_type is None or oral is None:
+        return None
+    if molecule_type != "Small molecule" and not oral:
+        return molecule_type
+    return None
+
+
+def modality_finding_for(
+    molecule_type: Optional[str], oral: Optional[bool]
+) -> list[dict[str, Any]]:
+    """Confirmed modality finding applicable to this drug, or []."""
+    matched = modality_match(molecule_type, oral)
+    if matched is None:
+        return []
+    finding = copy.deepcopy(MODALITY_REPURPOSING_PENALTY)
+    finding["matched_term"] = matched
+    return [finding]
 
 
 def domain_findings_for(disease_name: str) -> list[dict[str, Any]]:
