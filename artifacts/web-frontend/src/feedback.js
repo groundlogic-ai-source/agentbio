@@ -12,7 +12,7 @@
 // If FEEDBACK_FORM_URL is empty, every feedback affordance hides itself — the
 // app must never render a dead link.
 
-export const FEEDBACK_FORM_URL = "";
+export const FEEDBACK_FORM_URL = "https://forms.gle/654BYdQiC55xuPVg8";
 
 export function isFeedbackEnabled() {
   return Boolean(FEEDBACK_FORM_URL);
