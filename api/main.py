@@ -817,6 +817,15 @@ DSL ops (only these):
   {{"op":"ind_keyword","params":{{"keywords":[...]}}}}      binary
   {{"op":"drug_keyword","params":{{"keywords":[...]}}}}     binary
 
+Boolean composition (use these for MULTI-PART CONDITIONAL hypotheses of the form
+"X fails under Y when Z but not when F" — they stay a single binary column):
+  {{"op":"all_of","params":{{"terms":[<binary op>, ...]}}}}  binary (logical AND, 2-4 terms)
+  {{"op":"any_of","params":{{"terms":[<binary op>, ...]}}}}  binary (logical OR, 2-4 terms)
+  {{"op":"not_op","params":{{"term":<binary op>}}}}          binary (logical NOT)
+
+Interaction ops are NOT available in this single-hypothesis tester — express a
+conditional claim as an all_of / not_op subgroup instead.
+
 DISCARD if: trivially redundant or built on prior_repurposing_count (label-confounded).
 
 Return ONLY a JSON object:
@@ -870,6 +879,19 @@ def _run_research_job(job_id: str, hypothesis_text: str) -> None:
                  "message": "label-confounded: built on prior_repurposing_count"}))
             return
 
+        # This tester runs a single feature column (Fisher or logistic). Interaction
+        # specs need the multi-term fitting path in run_discovery and would raise
+        # inside compute(); refuse them explicitly instead of erroring the job.
+        if kind in ("interaction", "interaction3"):
+            research_db.update_job(job_id, status="completed", result_json=_json.dumps(
+                {"tag": "NEEDS_ENRICHMENT", "parsed": parsed,
+                 "message": (
+                     "interaction hypotheses are not supported in the single-hypothesis "
+                     "tester — express the conditional claim as an all_of/not_op subgroup, "
+                     "or run it through an autonomous discovery batch"
+                 )}))
+            return
+
         # 2. Test on discovery split (methodology locked at job creation time)
         if not os.path.exists(_LABELED_CSV):
             raise FileNotFoundError(f"labeled_dataset.csv not found at {_LABELED_CSV}")
@@ -891,6 +913,10 @@ def _run_research_job(job_id: str, hypothesis_text: str) -> None:
 
             feat = _F.compute(sub, spec)
             ok, why = _F.separation_ok(feat, sub["y"])
+            if ok and spec.get("op") in _F._COMPOSITION_OPS:
+                # A composed subgroup can be satisfied by a handful of rows; apply
+                # the same pre-registered minimum the autonomous pipeline uses.
+                ok, why = _F.composite_support_ok(feat, sub["y"])
             tc[0] += 1
             tid = f"{run_id}-T{tc[0]:04d}"
 
@@ -1072,6 +1098,21 @@ def get_research_hypotheses(include_archived: bool = False) -> list[dict]:
                 q = qmap[tid]
                 hist.at[i, "discovery_fdr_p"] = q
                 hist.at[i, "discovery_pass"] = bool(q < _R.SIGNIFICANCE_THRESHOLD)
+
+    # The CONFIRMATION stage gets the identical treatment. Its stored
+    # confirmation_pass is the verdict against the confirmation family as it stood
+    # when that test ran; the family grows with every later attempt, so a stored
+    # True can go stale. Serve the recomputed status and keep the at-test-time
+    # boolean alongside it for audit provenance.
+    cqmap = _R.confirmation_qmap()
+    hist["confirmation_pass_at_test_time"] = hist["confirmation_pass"]
+    hist["confirmation_fdr_q"] = None
+    if cqmap:
+        for i, tid in hist["test_id"].items():
+            if tid in cqmap:
+                q = cqmap[tid]
+                hist.at[i, "confirmation_fdr_q"] = q
+                hist.at[i, "confirmation_pass"] = bool(q < _R.CONFIRMATION_ALPHA)
 
     # return as records, coercing NaN → None for JSON-serialisability
     records = hist.where(hist.notna(), other=None).to_dict("records")

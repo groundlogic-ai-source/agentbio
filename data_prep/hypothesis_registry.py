@@ -533,3 +533,91 @@ def cumulative_fdr() -> pd.DataFrame:
         qvals.loc[valid] = corrected
     df["fdr_q"] = qvals.values
     return df
+
+
+# ── Confirmation-stage multiplicity ──────────────────────────────────────────
+# The discovery family (hypothesis_log) is BH-corrected above. The CONFIRMATION
+# stage historically used a bare uncorrected p < 0.05, which is defensible for a
+# single pre-specified follow-up test but NOT when batches are chained until a
+# confirmation happens to pass — that is optional stopping, and it inflates the
+# false-confirmation rate without bound. The confirmation stage therefore gets
+# its own cumulative BH family: every confirmation p-value ever recorded.
+CONFIRMATION_ALPHA = 0.05
+
+
+def _confirmation_prior_pvalues(exclude_test_ids: set[str]) -> list[float]:
+    """Persisted confirmation p-values, excluding rows being re-tested right now."""
+    df = load_history()
+    if df.empty or "confirmation_raw_p" not in df.columns:
+        return []
+    raw = pd.to_numeric(df["confirmation_raw_p"], errors="coerce")
+    tids = (
+        df["test_id"].astype(str)
+        if "test_id" in df.columns
+        else pd.Series([""] * len(df), index=df.index)
+    )
+    out: list[float] = []
+    for tid, v in zip(tids, raw):
+        if str(tid) in exclude_test_ids:
+            continue
+        if pd.notna(v) and math.isfinite(v):
+            out.append(float(v))
+    return out
+
+
+def confirmation_q_for(pending: list[tuple[str, float]]) -> list[float]:
+    """
+    BH q-values for a batch of NEW confirmation p-values, corrected over the
+    cumulative confirmation family (every confirmation test ever recorded plus
+    this batch). Returned in the same order as `pending`.
+
+    Rows whose test_id is already in the registry are excluded from the prior
+    family so a re-run does not count the same test twice.
+    """
+    if not pending:
+        return []
+    prior = _confirmation_prior_pvalues({str(t) for t, _ in pending})
+    allp = prior + [float(p) for _, p in pending]
+    q = benjamini_hochberg(allp)
+    return q[len(prior):]
+
+
+def cumulative_confirmation_fdr() -> pd.DataFrame:
+    """
+    Recompute BH-FDR across the entire cumulative CONFIRMATION family and return
+    the history with an added `confirmation_fdr_q` column. Like cumulative_fdr(),
+    this is authoritative at read time — a stored confirmation_pass reflects the
+    family as it stood when the test ran and goes stale as the family grows.
+    """
+    df = load_history().copy()
+    if df.empty or "confirmation_raw_p" not in df.columns:
+        df["confirmation_fdr_q"] = []
+        return df
+    raw = pd.to_numeric(df["confirmation_raw_p"], errors="coerce")
+    valid = raw.apply(lambda v: pd.notna(v) and math.isfinite(v))
+    qvals = pd.Series(float("nan"), index=df.index)
+    if valid.any():
+        qvals.loc[valid] = benjamini_hochberg([float(p) for p in raw[valid]])
+    df["confirmation_fdr_q"] = qvals.values
+    return df
+
+
+def confirmation_qmap() -> dict[str, float]:
+    """
+    {test_id: cumulative confirmation BH q-value}, for consumers that must show
+    CURRENT confirmation status rather than the boolean frozen at test time.
+
+    A stored confirmation_pass records the verdict against the family as it stood
+    when that test ran. Every later confirmation attempt enlarges the family, so a
+    stored True can go stale — exactly the way stored discovery q-values do. Read
+    paths must therefore recompute, or the cumulative correction is cosmetic.
+    """
+    df = cumulative_confirmation_fdr()
+    if df.empty or "test_id" not in df.columns:
+        return {}
+    out: dict[str, float] = {}
+    for _, r in df.iterrows():
+        q = r.get("confirmation_fdr_q")
+        if pd.notna(q):
+            out[str(r["test_id"])] = float(q)
+    return out

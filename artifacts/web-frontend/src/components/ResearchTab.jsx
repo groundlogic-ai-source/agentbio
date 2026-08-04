@@ -581,14 +581,30 @@ function DiscoveryBatch({ onCompleted }) {
     if (jobState.status === "running") {
       const prog = jobState.result?.progress;
       if (prog)
-        return `⟳ Batch ${prog.batch_num} — ${prog.domains_explored} domain(s), ${prog.hypotheses_reviewed} hypothesis(es) reviewed…`;
+        return `⟳ Batch ${prog.batch_num} — ${prog.domains_explored} domain(s), `
+          + `${prog.hypotheses_reviewed} hypothesis(es) reviewed`
+          + `${prog.soft_budget_exceeded ? " — past the usual budget, still searching…" : "…"}`;
       return "⟳ Opus 4.8 + GPT-5.6 Sol generating domains → lead review → testing…";
     }
     if (jobState.status === "completed") {
       const s = jobState.result?.summary;
-      if (s?.mode === "continuous")
-        return `✓ Done — ${s.batches_run} batch(es), ${s.domains_explored} domain(s), `
-          + `${s.hypotheses_reviewed} hypothesis(es)${s.confirmed ? `; ${s.confirmed} confirmed` : ""}`;
+      if (s?.mode === "continuous") {
+        // Never render a bare "Done" for a continuous run: a search that stopped
+        // on a safety bound without confirming anything is NOT a completed search,
+        // and reporting it as one is how the earlier run looked successful.
+        const scope = `${s.batches_run} batch(es), ${s.domains_explored} domain(s), `
+          + `${s.hypotheses_reviewed} hypothesis(es)`;
+        if (s.double_pass_achieved)
+          return `✓ Double pass found — ${scope}; ${s.confirmed} confirmed`;
+        const reason = {
+          stopped_by_user: "stopped by you",
+          hard_batch_limit: `hit the absolute safety bound of ${s.batches_run} batches`,
+          time_limit: "hit the absolute time bound",
+          repeated_batch_failures: "stopped after repeated batch failures",
+        }[s.stopped_reason] || `stopped (${s.stopped_reason})`;
+        return `⚠ No double pass — ${reason}. Searched ${scope}. `
+          + `Nothing was confirmed; this is not a negative result, the search did not finish.`;
+      }
       if (s)
         return `✓ Done — ${s.tests_run} test(s) across ${s.domains?.length ?? 0} domain(s); `
           + `${s.surviving_discovery} passed discovery, ${s.confirmed} confirmed`;

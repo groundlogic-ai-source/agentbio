@@ -114,6 +114,54 @@ def logistic_interaction(
     )
 
 
+def logistic_interaction3(
+    base: pd.Series, moderator: pd.Series, moderator2: pd.Series, outcome: pd.Series
+) -> TestResult:
+    """
+    Three-way conditional interaction. Fits
+        y ~ b + m1 + m2 + b:m1 + b:m2 + m1:m2 + b:m1:m2
+    and reports the OR/CI/p of the THREE-WAY term (b:m1:m2).
+
+    That term answers "is the moderation of `base` by `moderator` itself
+    different depending on `moderator2`?" — i.e. the claim "X behaves this way
+    under Y when Z is happening, but not when Z is absent".
+
+    The returned odds_ratio is the ratio of the two-way (base x moderator)
+    interaction odds ratio at moderator2=1 versus moderator2=0. It is NOT a
+    main effect and must not be read as one.
+
+    Power is NOT checked here — the pre-registered events-per-parameter and
+    per-stratum guards run in the caller before this is invoked.
+    """
+    df = pd.DataFrame({
+        "b": base.astype(float),
+        "m1": moderator.astype(float),
+        "m2": moderator2.astype(float),
+        "y": outcome,
+    }).dropna()
+    df = df.copy()
+    df["y"] = df["y"].astype(int)
+    df["b_m1"] = df["b"] * df["m1"]
+    df["b_m2"] = df["b"] * df["m2"]
+    df["m1_m2"] = df["m1"] * df["m2"]
+    df["b_m1_m2"] = df["b"] * df["m1"] * df["m2"]
+    X = sm.add_constant(df[["b", "m1", "m2", "b_m1", "b_m2", "m1_m2", "b_m1_m2"]])
+    model = sm.Logit(df["y"], X)
+    res = model.fit(disp=0, method="bfgs", maxiter=400)
+    coef = res.params["b_m1_m2"]
+    ci = res.conf_int().loc["b_m1_m2"]
+    p = res.pvalues["b_m1_m2"]
+    return TestResult(
+        "logistic_interaction3",
+        float(np.exp(coef)), float(np.exp(ci[0])), float(np.exp(ci[1])),
+        float(p), int(len(df)),
+        note=(
+            "OR of the three-way term (base x moderator interaction ratio when "
+            "moderator2=1 vs 0)"
+        ),
+    )
+
+
 def logistic_continuous(feature: pd.Series, outcome: pd.Series) -> TestResult:
     df = pd.DataFrame({"f": feature.astype(float), "y": outcome}).dropna()
     df = df.copy()
