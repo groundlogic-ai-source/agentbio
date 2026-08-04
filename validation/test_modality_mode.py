@@ -16,6 +16,7 @@ sys.path.insert(0, _ROOT)
 
 import hypothesis_report as HR  # noqa: E402
 from api import domain_findings as DF  # noqa: E402
+from api import dossier as Dossier  # noqa: E402
 from agents.reviewer import _modality_flag  # noqa: E402
 
 # The exact feature_spec of confirmed hypothesis run-704c0cb4-H05.
@@ -116,6 +117,45 @@ class TestModalityMatching(unittest.TestCase):
         self.assertEqual(out[0]["provenance"]["hypothesis_id"], "run-704c0cb4-H05")
         out[0]["stats"]["odds_ratio"] = 999
         self.assertNotEqual(DF.MODALITY_REPURPOSING_PENALTY["stats"]["odds_ratio"], 999)
+
+    def test_saved_h05_dossier_can_recompute_claims(self):
+        """A historical saved H05 dossier opens even after its registry reset."""
+        import hypothesis_registry as R  # noqa: E402
+        saved = {
+            "id": "saved-h05",
+            "hypothesis_id": "run-704c0cb4-H05",
+            "hypothesis_text": "Historical modality finding",
+            "facts": {"passed_both": True, "framings": []},
+            "report_markdown": "# Frozen report",
+            "saved_at": None,
+            "generated_at": None,
+        }
+        ledger = Dossier.dossier_claims("run-704c0cb4-H05", R, HR, saved)
+        self.assertIsNotNone(ledger)
+        self.assertEqual(ledger["hypothesis_id"], "run-704c0cb4-H05")
+        self.assertEqual(ledger["audit_status"], "unverifiable")
+        self.assertIn("no longer", ledger["status_reasons"][0])
+
+    def test_dossier_claims_route_returns_snapshot_for_reset_hypothesis(self):
+        """The actual FastAPI route must not turn a historical card into 500."""
+        from fastapi.testclient import TestClient
+        from api.main import app
+
+        saved = {
+            "id": "saved-h05",
+            "hypothesis_id": "run-704c0cb4-H05",
+            "hypothesis_text": "Historical modality finding",
+            "facts": {"passed_both": True, "framings": []},
+            "report_markdown": "# Frozen report",
+            "saved_at": None,
+            "generated_at": None,
+        }
+        with mock.patch("api.main.saved_reports_db.list_reports", return_value=[saved]):
+            response = TestClient(app).get(
+                "/api/audit/dossiers/run-704c0cb4-H05/claims"
+            )
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.json()["audit_status"], "unverifiable")
 
     def test_reviewer_flag_matches_finding_logic(self):
         self.assertTrue(_modality_flag("Antibody", False))
