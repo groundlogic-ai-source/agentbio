@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { auditDrug } from "../api";
 import TriagePanel from "./TriagePanel";
 import DossierPanel from "./DossierPanel";
+import DomainFindings from "./DomainFindings";
 
 // ── Tiny shared primitives ────────────────────────────────────────────────────
 
@@ -512,7 +513,8 @@ function SingleDrugAudit({ onNavigate }) {
 
       {/* Results */}
       {result && (
-        <div>
+        <div className="space-y-4">
+          <DomainFindings findings={result.domain_findings} />
           {result.status === "found" && <FoundResult data={result} />}
           {result.status === "absent" && <AbsentResult data={result} />}
           {result.status === "unresolved" && <UnresolvedResult data={result} />}

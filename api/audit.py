@@ -18,6 +18,7 @@ import re
 from typing import Any, Optional
 
 import api.jobs_db as jobs_db
+from api.domain_findings import domain_findings_for
 from data_sources.chembl import (
     _find_molecule_chembl_id,
     get_drug_mechanism_targets_for_audit,
@@ -262,6 +263,10 @@ def run_audit(
         "candidate — it may reflect a gap in public bioactivity or disease-association "
         "data, not a real biological judgment against it."
     )
+
+    # 7. Confirmed research findings applicable to this indication class
+    # (base-rate context — disclosure only, never a score or verdict change).
+    result["domain_findings"] = domain_findings_for(canonical_disease)
 
     return result
 

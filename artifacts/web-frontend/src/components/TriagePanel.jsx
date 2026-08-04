@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { triageCandidates } from "../api";
+import DomainFindings from "./DomainFindings";
 
 // ── Flag presentation ─────────────────────────────────────────────────────────
 const FLAG_META = {
@@ -194,6 +195,7 @@ export default function TriagePanel({ onNavigate }) {
 
       {result && result.status === "ok" && (
         <div className="space-y-4">
+          <DomainFindings findings={result.domain_findings || result.summary?.domain_findings} />
           <SummaryBar summary={result.summary} />
 
           <div className="rounded-xl border overflow-x-auto" style={{ borderColor: "var(--border)" }}>
