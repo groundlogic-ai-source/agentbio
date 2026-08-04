@@ -11,7 +11,6 @@ import { PUBLICATIONS, hasPublications } from "../publications.js";
 
 export const TAB_GUIDES = {
   dashboard: {
-    surface: "dashboard",
     title: "Case Files",
     role: "Discovery — the machine proposes the drugs",
     what:
@@ -27,7 +26,6 @@ export const TAB_GUIDES = {
     notThis: "It will not evaluate a list you already have — that is Audit.",
   },
   audit: {
-    surface: "audit_triage",
     title: "Audit",
     role: "Verification — you supply the drugs",
     what:
@@ -46,7 +44,6 @@ export const TAB_GUIDES = {
       "reasoning, not evidence that a drug does not work.",
   },
   candidates: {
-    surface: "candidates",
     title: "Candidates",
     role: "The full pool behind a case",
     what:
@@ -61,7 +58,6 @@ export const TAB_GUIDES = {
       "they never change rank.",
   },
   research: {
-    surface: "research",
     title: "Research",
     role: "What the system has learned about repurposing in general",
     what:
@@ -81,7 +77,6 @@ export const TAB_GUIDES = {
       "context for a reviewer, never a reason to move a candidate up or down.",
   },
   saved: {
-    surface: "saved",
     title: "Saved Reports",
     role: "Pinned write-ups of registry findings",
     what:
@@ -103,7 +98,7 @@ function GuideBlock({ guide }) {
           <h3>{guide.title}</h3>
           <p className="tab-guide-role">{guide.role}</p>
         </div>
-        <FeedbackLink surface={guide.surface} />
+        <FeedbackLink />
       </div>
 
       <p className="tab-guide-what">{guide.what}</p>
