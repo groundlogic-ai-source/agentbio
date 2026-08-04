@@ -1,19 +1,15 @@
-import { feedbackUrl, isFeedbackEnabled } from "../feedback.js";
+import { FEEDBACK_FORM_URL, isFeedbackEnabled } from "../feedback.js";
 
 /**
- * Contextual "report an issue" link. Renders nothing until a form URL is
- * configured, so there is never a dead link in the UI.
- *
- * @param {string}  surface  key of FEEDBACK_SURFACES — pre-fills the form
- * @param {string} [context] reference id (job/run/hypothesis) — pre-fills too
- * @param {string} [label]
+ * "Send feedback" link. Renders nothing until a form URL is configured, so
+ * there is never a dead link in the UI.
  */
-export default function FeedbackLink({ surface, context, label = "Report an issue with this screen" }) {
+export default function FeedbackLink({ label = "Send feedback" }) {
   if (!isFeedbackEnabled()) return null;
   return (
     <a
       className="feedback-link"
-      href={feedbackUrl({ surface, context })}
+      href={FEEDBACK_FORM_URL}
       target="_blank"
       rel="noopener noreferrer"
     >

@@ -1,7 +1,7 @@
-import { feedbackUrl, isFeedbackEnabled } from "../feedback.js";
+import { FEEDBACK_FORM_URL, isFeedbackEnabled } from "../feedback.js";
 
 // Global beta disclaimer. Shown on every view (mounted at App root).
-// The "Report an issue" link appears once the form URL is set in src/feedback.js.
+// The "Send feedback" link appears once the form URL is set in src/feedback.js.
 
 export default function BetaBanner() {
   return (
@@ -31,7 +31,7 @@ export default function BetaBanner() {
       </span>
       {isFeedbackEnabled() && (
         <a
-          href={feedbackUrl({ surface: "other" })}
+          href={FEEDBACK_FORM_URL}
           target="_blank"
           rel="noopener noreferrer"
           style={{
@@ -41,7 +41,7 @@ export default function BetaBanner() {
             textUnderlineOffset: "2px",
           }}
         >
-          Report an issue →
+          Send feedback →
         </a>
       )}
     </div>
