@@ -101,6 +101,10 @@ class ReviewerCandidate(TypedDict, total=False):
     # High-lipophilicity disclosure (XLogP >= 5 from PubChem). Disclosure only.
     pubchem_xlogp: Optional[float]
     high_lipophilicity_flag: Optional[bool]
+    # Modality disclosure (ChEMBL molecule_type + oral route). Disclosure only.
+    chembl_molecule_type: Optional[str]
+    chembl_oral: Optional[bool]
+    nonoral_biologic_flag: Optional[bool]
     source_types: list[str]
     source_health: dict
     target_memberships: list[dict]

@@ -123,6 +123,25 @@ def render_spec(spec: dict | None) -> str:
             f"DIFFERS across the two groups defined by [{mod}] "
             "(logistic base:moderator term)"
         )
+    if op == "interaction3":
+        base = render_spec(params.get("base")) or "(unspecified base)"
+        m1 = render_spec(params.get("moderator")) or "(unspecified moderator)"
+        m2 = render_spec(params.get("moderator2")) or "(unspecified moderator2)"
+        return (
+            f"three-way interaction: whether the effect of [{base}] on repurposing "
+            f"success differs across the JOINT groups defined by [{m1}] AND [{m2}] "
+            "(logistic base:mod1:mod2 term)"
+        )
+    if op == "not_op":
+        term = render_spec(params.get("term")) or "(unspecified term)"
+        return f"NOT ({term})"
+    if op in ("all_of", "any_of"):
+        terms = [
+            render_spec(t) or "(unspecified term)"
+            for t in (params.get("terms") or [])
+        ]
+        joiner = " AND " if op == "all_of" else " OR "
+        return "(" + joiner.join(terms) + ")"
     return f"unrecognized op: {op!r}"
 
 

@@ -119,6 +119,15 @@ export function stopContinuousDiscovery(jobId) {
   );
 }
 
+// Registry reset: permanently delete archived bisociation history plus the
+// test-ledger rows of hypotheses left with no surviving entry. dryRun=true
+// only counts. Deleted rows are backed up server-side (registry_reset_backup).
+export function deleteArchivedRegistry(dryRun = true) {
+  return request(`/internal/delete-archived?dry_run=${dryRun ? "true" : "false"}`, {
+    method: "POST",
+  });
+}
+
 // Generate (or fetch cached) the full auditable write-up for a hypothesis that
 // passed BOTH discovery and confirmation. Triggers a single Opus 4.8 call the
 // first time, so expect a few seconds. Returns { hypothesis_id, facts,

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { triageCandidates } from "../api";
 import DomainFindings from "./DomainFindings";
+import ModalityModeToggle from "./ModalityModeToggle";
+import { useModalityMode } from "../modalityMode";
 
 // ── Flag presentation ─────────────────────────────────────────────────────────
 const FLAG_META = {
@@ -10,6 +12,8 @@ const FLAG_META = {
   BLACK_BOX_ADVISORY:  { label: "Black-box advisory",tone: "warning" },
   XLOGP_CAUTION:       { label: "XLogP ≥5 caution",  tone: "warning" },
   XLOGP_UNRESOLVED:    { label: "XLogP unresolved",  tone: "neutral" },
+  MODALITY_CAUTION:    { label: "Non-oral biologic", tone: "warning" },
+  MODALITY_UNRESOLVED: { label: "Modality unresolved", tone: "neutral" },
   EVIDENCE_PARTIAL:    { label: "Partial evidence",  tone: "info"    },
   ABSENT_FROM_POOL:    { label: "Absent from pool",  tone: "neutral" },
   UNRESOLVED_NAME:     { label: "Name unresolved",   tone: "neutral" },
@@ -24,6 +28,8 @@ const TONE_STYLE = {
 };
 
 function FlagBadge({ code }) {
+  const [modalityEngaged] = useModalityMode();
+  if (!modalityEngaged && code.startsWith("MODALITY")) return null;
   const meta = FLAG_META[code] || { label: code, tone: "neutral" };
   const t = TONE_STYLE[meta.tone];
   return (
@@ -214,6 +220,8 @@ export default function TriagePanel({ onNavigate }) {
           </div>
 
           <DomainFindings findings={result.domain_findings || result.summary?.domain_findings} />
+          {/* Disengage control lives in-context wherever modality cautions can be hidden */}
+          <ModalityModeToggle />
           <SummaryBar summary={result.summary} />
 
           <div className="rounded-xl border overflow-x-auto" style={{ borderColor: "var(--border)" }}>

@@ -237,6 +237,25 @@ def _mutation_specificity_cell(candidate: dict[str, Any]) -> str:
     return f"⚠ YES — indication names: {terms}"
 
 
+def _modality_cell(candidate: dict[str, Any]) -> str:
+    """
+    Render the ChEMBL modality DISCLOSURE (molecule type / route) for the
+    evidence table. Disclosure only — never affects any score. An unresolved
+    lookup is stated plainly, never silently rendered as "clear".
+    """
+    mtype = candidate.get("chembl_molecule_type")
+    oral = candidate.get("chembl_oral")
+    # Missingness must stay unresolved: an unknown route must never be
+    # rendered as a concrete "non-oral" (or vice versa).
+    if mtype is None or oral is None:
+        return "unresolved (ChEMBL molecule lookup unavailable)"
+    route = "oral" if oral else "non-oral"
+    base = f"{mtype} / {route}"
+    if candidate.get("nonoral_biologic_flag"):
+        return f"⚠ {base} (non-oral biologic — empirical caution flag; see modality disclosure above)"
+    return base
+
+
 def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
     cx = (struct or {}).get("complex") or {}
     adme = (struct or {}).get("adme") or {}
@@ -272,6 +291,7 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
           f"see high-lipophilicity disclosure above)"
           if candidate.get("high_lipophilicity_flag")
           else _fmt(candidate.get("pubchem_xlogp"), 2))),
+        ("ChEMBL modality (type / route)", _modality_cell(candidate)),
         ("AFDB apo structure mean pLDDT (free protein, no ligand)",
          _fmt(afdb.get("mean_plddt"), 1)),
         ("Boltz structure confidence (0-1)", _fmt(cx.get("structure_confidence"))),
@@ -567,6 +587,27 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     # to the original hypothesis — lipophilic drugs are LESS likely to succeed.
     # An incumbency-confound caveat is unresolved (Task 14 confirmation run).
     # This banner is disclosure only — it does NOT affect any score.
+    # Modality DISCLOSURE — surfaced when the candidate is a non-oral biologic.
+    # Confirmed registry finding run-704c0cb4-H05: non-oral, non-small-molecule
+    # agents have ~0.30x odds of repurposing success (narrow framing, discovery
+    # q=4.7e-2, holdout confirmation p=2.8e-4, survives established-maturity
+    # adjustment; broad framing LABEL_ARTIFACT_SUSPECT). Disclosure only.
+    if candidate.get("nonoral_biologic_flag"):
+        _mtype = candidate.get("chembl_molecule_type") or "biologic"
+        parts.append(
+            f"> ⚠ **Non-oral biologic ({_mtype}) — empirical modality caution.** "
+            f"**{drug}** is a non-orally-administered {_mtype}. A registry-confirmed "
+            f"analysis (hypothesis run-704c0cb4-H05, narrow genuine-outcome framing) "
+            f"found that non-oral, non-small-molecule agents have **0.30× the odds of "
+            f"repurposing success** (95% CI [0.121, 0.657], n=2,642; discovery FDR "
+            f"q = 4.7×10⁻²; independent holdout confirmation p = 2.8×10⁻⁴; survives "
+            f"adjustment for established-product maturity). Two candidate confounds "
+            f"(prior repurposing base rate, oncology phase mix) were not testable. "
+            f"The delivery constraints of this modality class historically suppress "
+            f"cross-indication spread — treat this candidate's rank as carrying a "
+            f"higher external-validation burden, not as a disqualifier. "
+            f"**This flag does not affect the composite score.** "
+        )
     if candidate.get("high_lipophilicity_flag"):
         _xlogp_val = candidate.get("pubchem_xlogp")
         _xlogp_str = f"{_xlogp_val:.2f}" if _xlogp_val is not None else "≥ 5"

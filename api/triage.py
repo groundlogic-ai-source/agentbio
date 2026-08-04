@@ -30,6 +30,8 @@ F_UNAPPROVED_CAP = "UNAPPROVED_CAP"
 F_BLACK_BOX = "BLACK_BOX_ADVISORY"
 F_XLOGP_CAUTION = "XLOGP_CAUTION"
 F_XLOGP_UNRESOLVED = "XLOGP_UNRESOLVED"
+F_MODALITY_CAUTION = "MODALITY_CAUTION"
+F_MODALITY_UNRESOLVED = "MODALITY_UNRESOLVED"
 F_EVIDENCE_PARTIAL = "EVIDENCE_PARTIAL"
 F_ABSENT = "ABSENT_FROM_POOL"
 F_UNRESOLVED = "UNRESOLVED_NAME"
@@ -94,6 +96,13 @@ def _verdict(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
                 "flagged" if cand.get("high_lipophilicity_flag")
                 else ("unresolved" if cand.get("pubchem_xlogp") is None else "clear")
             ),
+            "chembl_molecule_type": cand.get("chembl_molecule_type"),
+            "chembl_oral": cand.get("chembl_oral"),
+            "modality_status": (
+                "flagged" if cand.get("nonoral_biologic_flag")
+                else ("unresolved" if cand.get("nonoral_biologic_flag") is None
+                      else "clear")
+            ),
             "evidence_weight_coverage": coverage,
             "black_box_advisory": bool(cand.get("black_box_advisory")),
             "status_badge": cand.get("status_badge"),
@@ -110,6 +119,10 @@ def _verdict(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
             flags.append(F_XLOGP_CAUTION)
         elif cand.get("pubchem_xlogp") is None:
             flags.append(F_XLOGP_UNRESOLVED)
+        if cand.get("nonoral_biologic_flag"):
+            flags.append(F_MODALITY_CAUTION)
+        elif cand.get("nonoral_biologic_flag") is None:
+            flags.append(F_MODALITY_UNRESOLVED)
         if coverage is not None and float(coverage) < 0.999:
             flags.append(F_EVIDENCE_PARTIAL)
 
