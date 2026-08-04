@@ -2,6 +2,7 @@ import { useState } from "react";
 import { triageCandidates } from "../api";
 import DomainFindings from "./DomainFindings";
 import ModalityModeToggle from "./ModalityModeToggle";
+import InlineCaseRunner from "./InlineCaseRunner";
 import { useModalityMode } from "../modalityMode";
 
 // ── Flag presentation ─────────────────────────────────────────────────────────
@@ -95,8 +96,7 @@ export default function TriagePanel({ onNavigate }) {
 
   const drugs = parseList(listText);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function runTriage() {
     if (!disease.trim() || drugs.length === 0) return;
     setLoading(true);
     setResult(null);
@@ -109,6 +109,11 @@ export default function TriagePanel({ onNavigate }) {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    return runTriage();
   }
 
   return (
@@ -170,30 +175,33 @@ export default function TriagePanel({ onNavigate }) {
       )}
 
       {result && result.status === "no_case" && (
-        <div className="rounded-lg border px-4 py-4 text-sm space-y-2" style={{ borderColor: "var(--border)", color: "var(--ink)" }}>
-          <p>No completed case exists for <strong>{disease}</strong>. Triage audits against a
-          completed case's persisted pool — run the case first.</p>
+        <div className="rounded-lg border px-4 py-4 text-sm space-y-3" style={{ borderColor: "var(--border)", color: "var(--ink)" }}>
+          <p>No completed case exists for <strong>{disease}</strong>. Triage reports against a pool
+          the machine built independently of your list, so that pool has to exist first. Run it
+          here and your list is re-audited automatically — nothing needs re-entering.</p>
+          <InlineCaseRunner disease={disease} onReady={runTriage} />
           {onNavigate && (
             <button
               onClick={() => onNavigate("dashboard", { prefill: disease })}
               className="audit-chip text-xs px-3 py-1.5 rounded-full"
             >
-              Start a case for {disease}
+              Or open it in Case Files instead
             </button>
           )}
         </div>
       )}
 
       {result && result.status === "no_candidates" && (
-        <div className="rounded-lg border px-4 py-4 text-sm space-y-2" style={{ borderColor: "var(--border)", color: "var(--ink)" }}>
+        <div className="rounded-lg border px-4 py-4 text-sm space-y-3" style={{ borderColor: "var(--border)", color: "var(--ink)" }}>
           <p>The case for <strong>{disease}</strong> predates per-job candidate persistence, so its
-          pool cannot be audited. Re-run the case to generate a fresh candidates file.</p>
+          pool cannot be audited. A fresh run fixes it.</p>
+          <InlineCaseRunner disease={disease} onReady={runTriage} verb="Re-run this case now" />
           {onNavigate && (
             <button
               onClick={() => onNavigate("dashboard", { prefill: disease })}
               className="audit-chip text-xs px-3 py-1.5 rounded-full"
             >
-              Re-run {disease}
+              Or open it in Case Files instead
             </button>
           )}
         </div>

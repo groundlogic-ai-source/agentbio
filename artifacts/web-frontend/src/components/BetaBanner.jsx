@@ -1,7 +1,7 @@
+import { feedbackUrl, isFeedbackEnabled } from "../feedback.js";
+
 // Global beta disclaimer. Shown on every view (mounted at App root).
-// The "Report an issue" link appears once the Google Form URL is set —
-// replace the empty string with the published form link.
-export const BETA_FEEDBACK_FORM_URL = "";
+// The "Report an issue" link appears once the form URL is set in src/feedback.js.
 
 export default function BetaBanner() {
   return (
@@ -29,9 +29,9 @@ export default function BetaBanner() {
         {" — "}AgentBio is a research preview. Dossiers are machine-generated
         hypotheses for expert review, not medical advice.
       </span>
-      {BETA_FEEDBACK_FORM_URL && (
+      {isFeedbackEnabled() && (
         <a
-          href={BETA_FEEDBACK_FORM_URL}
+          href={feedbackUrl({ surface: "other" })}
           target="_blank"
           rel="noopener noreferrer"
           style={{

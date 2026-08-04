@@ -7,6 +7,7 @@ import ResearchTab from "./components/ResearchTab.jsx";
 import SavedReportsTab from "./components/SavedReportsTab.jsx";
 import AuditTab from "./components/AuditTab.jsx";
 import CandidatePoolTab from "./components/CandidatePoolTab.jsx";
+import TabGuide from "./components/TabGuide.jsx";
 import {
   listRuns,
   getRun,
@@ -20,6 +21,22 @@ import {
 import { isTerminal } from "./lib/stages.js";
 
 const POLL_MS = 4000;
+
+// Single source of truth for the top-level tabs. `isTopLevel` is derived from
+// this list rather than hand-maintained — a tab missing from that check
+// unmounts the whole nav and strands the user on the tab they just opened.
+const TABS = [
+  // Two product surfaces, visually grouped: the case pipeline
+  // (Case Files + Audit + Candidates) and the research module.
+  { id: "dashboard", label: "Case Files", group: "case" },
+  { id: "audit", label: "Audit", group: "case" },
+  { id: "candidates", label: "Candidates", group: "case" },
+  { id: "research", label: "Research", group: "research" },
+  { id: "saved", label: "Saved Reports", group: "research" },
+];
+
+const TAB_IDS = new Set(TABS.map((t) => t.id));
+const FIRST_RESEARCH_TAB = TABS.findIndex((t) => t.group === "research");
 
 export default function App() {
   const [runs, setRuns] = useState([]);
@@ -207,7 +224,7 @@ export default function App() {
     [refreshList],
   );
 
-  const isTopLevel = view === "dashboard" || view === "research" || view === "saved" || view === "audit";
+  const isTopLevel = TAB_IDS.has(view);
 
   return (
     <div className="min-h-full">
@@ -234,19 +251,11 @@ export default function App() {
           backgroundColor: "var(--surface)",
           padding: "0 1.5rem",
         }}>
-          {[
-            // Two product surfaces, visually grouped: the case pipeline
-            // (Case Files + Audit) and the research module (Research + Saved).
-            { id: "dashboard", label: "Case Files", group: "case" },
-            { id: "audit", label: "Audit", group: "case" },
-            { id: "candidates", label: "Candidates", group: "case" },
-            { id: "research", label: "Research", group: "research" },
-            { id: "saved", label: "Saved Reports", group: "research" },
-          ].map(({ id, label, group }, idx) => {
+          {TABS.map(({ id, label, group }, idx) => {
             const active = view === id;
             return (
               <span key={id} style={{ display: "inline-flex", alignItems: "center" }}>
-                {idx === 3 && <span className="nav-group-divider" aria-hidden="true" />}
+                {idx === FIRST_RESEARCH_TAB && <span className="nav-group-divider" aria-hidden="true" />}
                 <button
                   onClick={() => setView(id)}
                   className={`nav-tab nav-tab--${group}${active ? " nav-tab--active" : ""}`}
@@ -302,6 +311,9 @@ export default function App() {
           resuming={resuming}
         />
       )}
+
+      {/* Orientation for first-time visitors, always below the working UI. */}
+      {isTopLevel && <TabGuide id={view} />}
 
       <NewCaseDialog
         open={dialogOpen}
