@@ -66,13 +66,28 @@ def opus(prompt: str, max_tokens: int = 8000) -> str:
     return resp.content[0].text
 
 
-def sol(prompt: str, max_output_tokens: int = 8000) -> str:
-    """Call GPT-5.6 Sol via the OpenAI Responses API (temperature not specifiable)."""
+def sol(prompt: str, max_output_tokens: int = 16000) -> str:
+    """Call GPT-5.6 Sol via the OpenAI Responses API (temperature not specifiable).
+
+    Sol is a reasoning model, so max_output_tokens covers reasoning tokens too and
+    the visible JSON can be cut off well before the nominal budget looks spent.
+    """
     resp = _oc().responses.create(
         model=SOL_MODEL,
         input=prompt,
         max_output_tokens=max_output_tokens,
     )
+    # Mirror the Opus truncation guard: a silently truncated array used to be
+    # "recovered" as one nested object, which is indistinguishable from a real
+    # (but tiny) response downstream.
+    if getattr(resp, "status", None) == "incomplete":
+        reason = getattr(getattr(resp, "incomplete_details", None), "reason", "unknown")
+        print(
+            f"[llm_clients] WARNING: Sol response INCOMPLETE (reason={reason}) at "
+            f"max_output_tokens={max_output_tokens} — output JSON is cut off and "
+            f"elements WILL be lost. Raise max_output_tokens or chunk the request.",
+            flush=True,
+        )
     return resp.output_text
 
 
@@ -106,6 +121,63 @@ def opus_with_search(prompt: str, max_tokens: int = 2000) -> str:
         )
 
 
+def _salvage_array_objects(t: str, start: int):
+    """
+    Parse a top-level JSON array starting at `start`.
+
+    Returns (complete object elements, array_was_closed). Only depth-0 elements of
+    THIS array are collected, so a nested object can never be promoted to the top
+    level.
+    """
+    objs: list = []
+    in_string = False
+    escape = False
+    depth = 0
+    obj_start = None
+    closed = False
+    j = start + 1
+    while j < len(t):
+        ch = t[j]
+        if escape:
+            escape = False
+            j += 1
+            continue
+        if ch == "\\" and in_string:
+            escape = True
+            j += 1
+            continue
+        if ch == '"':
+            in_string = not in_string
+            j += 1
+            continue
+        if in_string:
+            j += 1
+            continue
+        if ch == "{":
+            if depth == 0:
+                obj_start = j
+            depth += 1
+        elif ch == "}":
+            if depth > 0:
+                depth -= 1
+                if depth == 0 and obj_start is not None:
+                    try:
+                        objs.append(json.loads(t[obj_start : j + 1]))
+                    except json.JSONDecodeError:
+                        pass
+                    obj_start = None
+        elif ch == "[":
+            depth += 1
+        elif ch == "]":
+            if depth == 0:
+                closed = True
+                break
+            depth -= 1
+        j += 1
+
+    return objs, closed
+
+
 def extract_json(text: str):
     """
     Pull the first top-level JSON array or object out of an LLM reply. Tolerates
@@ -126,6 +198,32 @@ def extract_json(text: str):
             if p.startswith("[") or p.startswith("{"):
                 t = p
                 break
+
+    # A TRUNCATED top-level array never reaches its matching ']', so the balanced
+    # scan below finds no match for it and falls through to the first INNER object.
+    # extract_json_list() would then unwrap that object's first list-valued field —
+    # silently substituting one domain's `hypotheses` for the entire proposal array.
+    # The substitution is type-correct and completely invisible downstream, so
+    # intercept it here and salvage the elements that DID arrive intact.
+    _first = next((k for k, c in enumerate(t) if c in "[{"), None)
+    if _first is not None and t[_first] == "[":
+        objs, closed = _salvage_array_objects(t, _first)
+        if not closed:
+            if objs:
+                print(
+                    f"[llm_clients] WARNING: top-level JSON array was TRUNCATED — "
+                    f"salvaged {len(objs)} complete element(s); an unknown number were "
+                    f"lost. This is a PARTIAL result, not the model's full output. "
+                    f"Raise max_tokens.",
+                    flush=True,
+                )
+                return objs
+            # Falling through here would match an inner object and silently return
+            # data from the wrong nesting level. Fail instead.
+            raise ValueError(
+                "top-level JSON array was truncated with no complete elements: "
+                f"{text[:200]!r}"
+            )
 
     _openers = {"[", "{"}
     _closers = {"]": "[", "}": "{"}
@@ -186,10 +284,16 @@ def extract_json_list(text: str) -> list:
     parsed = extract_json(text)
 
     if isinstance(parsed, dict):
-        # Unwrap the first list-valued field (the wrapped array); otherwise treat
-        # the dict itself as a single element.
-        wrapped = next((v for v in parsed.values() if isinstance(v, list)), None)
-        parsed = wrapped if wrapped is not None else [parsed]
+        # Unwrap ONLY a true wrapper: a dict whose sole key holds the array
+        # (e.g. {"domains": [...]}). A content object such as a single domain
+        # proposal has several keys, one of which is its own `hypotheses` list —
+        # unwrapping that would return the element's children in place of the
+        # element itself, at the wrong nesting level.
+        if len(parsed) == 1:
+            only = next(iter(parsed.values()))
+            parsed = only if isinstance(only, list) else [parsed]
+        else:
+            parsed = [parsed]
 
     if not isinstance(parsed, list):
         raise ValueError(f"expected a JSON array in LLM reply: {text[:200]!r}")
