@@ -96,6 +96,9 @@ with a "needs" string naming the exact missing data.
 WARNING: prior_repurposing_count is definitionally tied to the outcome label
 (a repurposing success requires prior_repurposing_count >= 1). Features built on
 prc_raw / prc_threshold are label-confounded and will likely be discarded by review.
+Likewise, indication-level trial phase (the repoDB 'phase' column) is recorded
+ONLY for unapproved pairs, so it is structurally tied to failure: it exists
+solely as a confound-adjustment covariate and is NOT a valid hypothesis feature.
 Prefer enriched chemical/biological features (mw, xlogp, molecule type, max phase,
 oral flag) or indication-text features.
 """.strip().replace(
