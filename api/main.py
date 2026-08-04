@@ -482,7 +482,11 @@ def list_audit_dossiers() -> list[dict[str, Any]]:
     from the frozen snapshot), so a dossier whose claims stop confirming
     flips status here even though the saved narrative stays frozen.
     """
-    return _dossier.list_dossiers()
+    _ensure_research_modules()
+    return _dossier.list_dossiers(
+        _RESEARCH_MODULES["R"],
+        _RESEARCH_MODULES["HR"],
+    )
 
 
 @app.get("/api/audit/dossiers/{hypothesis_id}/claims")
@@ -490,7 +494,21 @@ def get_dossier_claims(hypothesis_id: str) -> dict[str, Any]:
     """Claim ledger for one dossier: framings, effect sizes, confirmation,
     confound checks, provenance, reviewer tags, and the facts fingerprint
     matching the report-cache re-gating scheme."""
-    ledger = _dossier.dossier_claims(hypothesis_id)
+    _ensure_research_modules()
+    saved_report = next(
+        (
+            report
+            for report in saved_reports_db.list_reports()
+            if report.get("hypothesis_id") == hypothesis_id
+        ),
+        None,
+    )
+    ledger = _dossier.dossier_claims(
+        hypothesis_id,
+        _RESEARCH_MODULES["R"],
+        _RESEARCH_MODULES["HR"],
+        saved_report,
+    )
     if ledger is None:
         raise HTTPException(
             status_code=404, detail=f"hypothesis_id {hypothesis_id!r} not found"

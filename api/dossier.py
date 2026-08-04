@@ -34,13 +34,6 @@ _STATUS_VERIFIED = "verified"
 _STATUS_NOT_TESTED = "not_tested"
 
 
-def _research_modules():
-    """Lazy import matching api/main.py's _ensure_research_modules pattern."""
-    import hypothesis_registry as R  # noqa: N812
-    import hypothesis_report as HR  # noqa: N812
-    return R, HR
-
-
 def parse_reviewer_tag(note: str, has_result: bool) -> str:
     """Extract the lead reviewer's per-hypothesis tag from outcome_note.
 
@@ -205,30 +198,79 @@ def _verification_notes(facts: dict, status: str) -> list[str]:
     return notes
 
 
-def dossier_claims(hypothesis_id: str) -> Optional[dict[str, Any]]:
+def dossier_claims(
+    hypothesis_id: str,
+    R,  # noqa: N803
+    HR,  # noqa: N803
+    saved_report: Optional[dict[str, Any]] = None,
+) -> Optional[dict[str, Any]]:
     """Claim ledger + current audit status for one dossier.
 
     Returns None if the hypothesis_id is unknown to the registry. Never raises
     409 semantics: the workspace must show failed/artifact dossiers too — that
     is what an audit tool is for.
     """
-    R, HR = _research_modules()  # noqa: N806
     facts = HR.collect_facts(hypothesis_id)
     if facts is None:
-        return None
+        # Saved reports deliberately outlive the registry that generated them.
+        # A reset or data migration must not make their audit cards crash or
+        # pretend the frozen snapshot can still be live-verified.
+        if saved_report is None:
+            return None
+        snapshot = saved_report.get("facts")
+        return {
+            "status": "unverifiable",
+            "hypothesis_id": hypothesis_id,
+            "hypothesis_text": saved_report.get("hypothesis_text"),
+            "audit_status": "unverifiable",
+            "status_reasons": [
+                "This saved report's hypothesis is no longer in the live registry, "
+                "so it cannot be re-verified. Its frozen report is retained below."
+            ],
+            "reviewer_tags": [],
+            "framings": (snapshot or {}).get("framings") or [],
+            "confound_check": (snapshot or {}).get("confound_check"),
+            "confounds": _confound_entries((snapshot or {}).get("confound_check")),
+            "provenance": (snapshot or {}).get("provenance"),
+            "novelty_tag": (snapshot or {}).get("novelty_tag"),
+            "passed_both": bool((snapshot or {}).get("passed_both")),
+            "fingerprint": _facts_fingerprint(snapshot or {}),
+            "verification_notes": [
+                "The live registry no longer contains this hypothesis, so no current "
+                "FDR or confirmation verdict can be computed.",
+                "The fields below are the frozen evidence snapshot saved with the report.",
+            ],
+            "saved_report": {
+                "id": saved_report.get("id"),
+                "saved_at": (
+                    saved_report.get("saved_at").isoformat()
+                    if saved_report.get("saved_at") else None
+                ),
+                "generated_at": (
+                    saved_report.get("generated_at").isoformat()
+                    if saved_report.get("generated_at") else None
+                ),
+                "report_markdown": saved_report.get("report_markdown"),
+            },
+        }
     tags = _reviewer_tags_for(R, hypothesis_id)
     status, reasons = audit_status_for(facts, tags)
 
-    saved = None
-    for row in saved_reports_db.list_reports():
-        if row.get("hypothesis_id") == hypothesis_id:
-            saved = {
-                "id": row.get("id"),
-                "saved_at": row.get("saved_at").isoformat() if row.get("saved_at") else None,
-                "generated_at": row.get("generated_at").isoformat() if row.get("generated_at") else None,
-                "report_markdown": row.get("report_markdown"),
-            }
-            break
+    saved = (
+        {
+            "id": saved_report.get("id"),
+            "saved_at": (
+                saved_report.get("saved_at").isoformat()
+                if saved_report.get("saved_at") else None
+            ),
+            "generated_at": (
+                saved_report.get("generated_at").isoformat()
+                if saved_report.get("generated_at") else None
+            ),
+            "report_markdown": saved_report.get("report_markdown"),
+        }
+        if saved_report is not None else None
+    )
 
     return {
         "status": "ok",
@@ -249,9 +291,8 @@ def dossier_claims(hypothesis_id: str) -> Optional[dict[str, Any]]:
     }
 
 
-def list_dossiers() -> list[dict[str, Any]]:
+def list_dossiers(R, HR) -> list[dict[str, Any]]:  # noqa: N803
     """All saved reports with their current read-time audit status."""
-    R, HR = _research_modules()  # noqa: N806
     out: list[dict[str, Any]] = []
     for row in saved_reports_db.list_reports():
         hid = row.get("hypothesis_id")
