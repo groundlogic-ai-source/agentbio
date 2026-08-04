@@ -1,0 +1,1180 @@
+{
+  "version": 1,
+  "frozen_at": "2026-08-04T01:07:51.591085+00:00",
+  "freeze_instructions": "Before the first participant: (1) confirm each case has a persisted candidate pool, (2) POST /api/audit/triage for each list's disease + drug_names, (3) paste the full response into that list's ground_truth block, (4) set frozen_at. The frozen responses are the scoring reference for the entire study \u2014 do not re-derive them later even if pools change.",
+  "trap_class_reference": "validation/audit_traps_preregistration.md",
+  "lists": [
+    {
+      "list_id": "A1",
+      "form": "A",
+      "disease_name": "Multiple myeloma",
+      "drug_names": [
+        "Dexamethasone",
+        "Thalidomide",
+        "Bortezomib",
+        "Asprin",
+        "Lenalidomide",
+        "Prednisone",
+        "Melphalan",
+        "Cyclophosphamide"
+      ],
+      "seeded_items": [
+        {
+          "drug_name": "Asprin",
+          "role": "seeded_trap",
+          "trap_class": "unresolvable_name_honesty",
+          "note": "misspelling of aspirin \u2014 must be called UNRESOLVED, never 'absent' or 'poor candidate'"
+        },
+        {
+          "drug_name": "Thalidomide",
+          "role": "seeded_trap",
+          "trap_class": "absent_vs_poor_candidate",
+          "note": "historically THE myeloma repurposing story; if absent from the pool, the honest verdict is coverage gap, not a judgment against the drug"
+        }
+      ],
+      "controls": [
+        {
+          "drug_name": "Dexamethasone",
+          "role": "control",
+          "note": "expected in-pool; must NOT be false-flagged"
+        }
+      ],
+      "ground_truth": {
+        "status": "ok",
+        "disease_name": "Multiple myeloma",
+        "job_id": "2de0698b458b4be28218830a3dad4710",
+        "domain_findings": [
+          {
+            "id": "oncology_repurposing_penalty",
+            "domain": "oncology",
+            "severity": "caution",
+            "title": "Oncology indications have lower repurposing success",
+            "statement": "Oncology indications have lower repurposing success than non-oncology indications.",
+            "stats": {
+              "framing": "narrow (genuine-outcome controls only)",
+              "test": "fisher_exact",
+              "odds_ratio": 0.0724,
+              "ci95": [
+                0.0399,
+                0.13
+              ],
+              "n": 2913,
+              "discovery_fdr_q": 3.61e-12,
+              "confirmation_raw_p": 5.33e-14
+            },
+            "confounds": [
+              {
+                "name": "prior repurposing saturation of oncology drugs",
+                "status": "survives",
+                "detail": "Adjusted OR 0.119 [0.0632, 0.2226], adj. p below display precision \u2014 the penalty persists after accounting for how often oncology drugs have already been attempted."
+              },
+              {
+                "name": "novel-versus-established product status",
+                "status": "survives",
+                "detail": "Adjusted OR 0.0763 [0.0419, 0.1391]."
+              },
+              {
+                "name": "oncology trial phase-mix skew",
+                "status": "not_testable",
+                "detail": "No per-program phase-mix feature exists in the dataset, so this candidate explanation could not be ruled out."
+              }
+            ],
+            "cautions": [
+              "Under broad outcome framing the same association is LABEL_ARTIFACT_SUSPECT: an admin-only replay reproduces it (OR 0.028 [0.0228, 0.035], n=4203), meaning the broad effect lives in the administrative-exclude class. Only the narrow, genuine-outcome framing above should be cited."
+            ],
+            "implication": "The historical odds of repurposing success for oncology indications are roughly 14x lower than for non-oncology. Treat within-case ranks as relative to each other \u2014 even a top-ranked oncology candidate carries a higher external-validation burden than an equivalent candidate in a non-oncology indication.",
+            "provenance": {
+              "hypothesis_id": "run-518207db-H26",
+              "run_id": "run-518207db",
+              "source_domain": "Kessler-syndrome collision cascades in crowded orbital shells",
+              "proposing_llm": "Sol",
+              "registry": "Bisociation hypothesis registry \u2014 passed discovery FDR (q=3.6e-12) and independent holdout confirmation (p=5.3e-14)"
+            },
+            "matched_term": "myeloma",
+            "disease_name": "Multiple myeloma"
+          }
+        ],
+        "verdicts": [
+          {
+            "drug_name": "Dexamethasone",
+            "status": "found",
+            "resolved_chembl_id": "CHEMBL384467",
+            "rank": 1,
+            "total_candidates": 20,
+            "composite_score": 0.8243,
+            "pre_cap_score": null,
+            "strong_match": true,
+            "target_symbol": "NR3C1",
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": "unresolved",
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "flags": [
+              "XLOGP_UNRESOLVED"
+            ]
+          },
+          {
+            "drug_name": "Thalidomide",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL468",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "CRL4(CRBN) E3 ubiquitin ligase inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Bortezomib",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL325041",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "26S proteasome inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Asprin",
+            "status": "unresolved",
+            "resolved_chembl_id": null,
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "flags": [
+              "UNRESOLVED_NAME"
+            ]
+          },
+          {
+            "drug_name": "Lenalidomide",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL848",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "CRL4(CRBN) E3 ubiquitin ligase inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Prednisone",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL635",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "Glucocorticoid receptor agonist"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Melphalan",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL852",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "DNA inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Cyclophosphamide",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL1200796",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "DNA inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          }
+        ],
+        "summary": {
+          "total": 8,
+          "by_status": {
+            "found": 1,
+            "absent": 6,
+            "unresolved": 1
+          },
+          "flag_counts": {
+            "XLOGP_UNRESOLVED": 1,
+            "ABSENT_FROM_POOL": 6,
+            "UNRESOLVED_NAME": 1
+          },
+          "flagged_total": 8,
+          "domain_findings": [
+            {
+              "id": "oncology_repurposing_penalty",
+              "domain": "oncology",
+              "severity": "caution",
+              "title": "Oncology indications have lower repurposing success",
+              "statement": "Oncology indications have lower repurposing success than non-oncology indications.",
+              "stats": {
+                "framing": "narrow (genuine-outcome controls only)",
+                "test": "fisher_exact",
+                "odds_ratio": 0.0724,
+                "ci95": [
+                  0.0399,
+                  0.13
+                ],
+                "n": 2913,
+                "discovery_fdr_q": 3.61e-12,
+                "confirmation_raw_p": 5.33e-14
+              },
+              "confounds": [
+                {
+                  "name": "prior repurposing saturation of oncology drugs",
+                  "status": "survives",
+                  "detail": "Adjusted OR 0.119 [0.0632, 0.2226], adj. p below display precision \u2014 the penalty persists after accounting for how often oncology drugs have already been attempted."
+                },
+                {
+                  "name": "novel-versus-established product status",
+                  "status": "survives",
+                  "detail": "Adjusted OR 0.0763 [0.0419, 0.1391]."
+                },
+                {
+                  "name": "oncology trial phase-mix skew",
+                  "status": "not_testable",
+                  "detail": "No per-program phase-mix feature exists in the dataset, so this candidate explanation could not be ruled out."
+                }
+              ],
+              "cautions": [
+                "Under broad outcome framing the same association is LABEL_ARTIFACT_SUSPECT: an admin-only replay reproduces it (OR 0.028 [0.0228, 0.035], n=4203), meaning the broad effect lives in the administrative-exclude class. Only the narrow, genuine-outcome framing above should be cited."
+              ],
+              "implication": "The historical odds of repurposing success for oncology indications are roughly 14x lower than for non-oncology. Treat within-case ranks as relative to each other \u2014 even a top-ranked oncology candidate carries a higher external-validation burden than an equivalent candidate in a non-oncology indication.",
+              "provenance": {
+                "hypothesis_id": "run-518207db-H26",
+                "run_id": "run-518207db",
+                "source_domain": "Kessler-syndrome collision cascades in crowded orbital shells",
+                "proposing_llm": "Sol",
+                "registry": "Bisociation hypothesis registry \u2014 passed discovery FDR (q=3.6e-12) and independent holdout confirmation (p=5.3e-14)"
+              },
+              "matched_term": "myeloma",
+              "disease_name": "Multiple myeloma"
+            }
+          ]
+        },
+        "disclosure": "Triage verdicts are computed against the persisted candidate pool of one completed AgentBio case \u2014 they re-audit evidence, they do not re-run discovery. ABSENT_FROM_POOL is a coverage statement, not a judgment that the drug is a poor candidate. XLogP flags are caution-only disclosures and never adjust scores.",
+        "run_id": "750b190b-e99f-4ab0-a593-b85bfaa2de6a",
+        "created_at": "2026-08-04T01:06:34.849894+00:00"
+      }
+    },
+    {
+      "list_id": "A2",
+      "form": "A",
+      "disease_name": "Multiple endocrine neoplasia type 2A",
+      "drug_names": [
+        "Vandetanib",
+        "Cabozantinib",
+        "Selpercatinib",
+        "Pralsetinib",
+        "Sorafenib",
+        "Asprin",
+        "Sunitinib",
+        "Lenvatinib"
+      ],
+      "seeded_items": [
+        {
+          "drug_name": "Asprin",
+          "role": "seeded_trap",
+          "trap_class": "unresolvable_name_honesty",
+          "note": "misspelling \u2014 must be UNRESOLVED"
+        },
+        {
+          "drug_name": "Vandetanib",
+          "role": "seeded_trap",
+          "trap_class": "absent_vs_poor_candidate",
+          "note": "approved for medullary thyroid carcinoma (MEN2A's defining malignancy); absence is a coverage statement"
+        }
+      ],
+      "controls": [
+        {
+          "drug_name": "Selpercatinib",
+          "role": "control",
+          "note": "selective RET inhibitor; must NOT be false-flagged"
+        }
+      ],
+      "ground_truth": {
+        "status": "ok",
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "job_id": "61f542324d214a869b324fe41060bebb",
+        "domain_findings": [],
+        "verdicts": [
+          {
+            "drug_name": "Vandetanib",
+            "status": "found",
+            "resolved_chembl_id": "CHEMBL24828",
+            "rank": 18,
+            "total_candidates": 24,
+            "composite_score": 0.4,
+            "pre_cap_score": null,
+            "strong_match": false,
+            "target_symbol": "RET",
+            "cap_reason": "Safety cap (hard gate, max 0.400) \u2014 WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2011/022405s001lbl.pdf",
+            "pubchem_xlogp": 4.9,
+            "xlogp_status": "clear",
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2011/022405s001lbl.pdf",
+            "flags": [
+              "SAFETY_CAP"
+            ]
+          },
+          {
+            "drug_name": "Cabozantinib",
+            "status": "found",
+            "resolved_chembl_id": "CHEMBL2105717",
+            "rank": 22,
+            "total_candidates": 24,
+            "composite_score": 0.4,
+            "pre_cap_score": null,
+            "strong_match": false,
+            "target_symbol": "RET",
+            "cap_reason": "Safety cap (hard gate, max 0.400) \u2014 WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2018/203756s005lbl.pdf",
+            "pubchem_xlogp": 5.4,
+            "xlogp_status": "flagged",
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2018/203756s005lbl.pdf",
+            "flags": [
+              "SAFETY_CAP",
+              "XLOGP_CAUTION"
+            ]
+          },
+          {
+            "drug_name": "Selpercatinib",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL4559134",
+            "rank": null,
+            "total_candidates": 24,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "RET",
+            "drug_mechanism_targets": [
+              "Tyrosine-protein kinase receptor RET inhibitor",
+              "Kinesin-1 heavy chain/ Tyrosine-protein kinase receptor RET inhibitor",
+              "Coiled-coil domain-containing protein 6/Tyrosine-protein kinase receptor RET inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Pralsetinib",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL4582651",
+            "rank": null,
+            "total_candidates": 24,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "RET",
+            "drug_mechanism_targets": [
+              "Tyrosine-protein kinase receptor RET inhibitor",
+              "Coiled-coil domain-containing protein 6/Tyrosine-protein kinase receptor RET inhibitor",
+              "Kinesin-1 heavy chain/ Tyrosine-protein kinase receptor RET inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Sorafenib",
+            "status": "found",
+            "resolved_chembl_id": "CHEMBL1336",
+            "rank": 2,
+            "total_candidates": 24,
+            "composite_score": 0.7821,
+            "pre_cap_score": null,
+            "strong_match": true,
+            "target_symbol": "RET",
+            "cap_reason": null,
+            "pubchem_xlogp": 4.1,
+            "xlogp_status": "clear",
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "flags": []
+          },
+          {
+            "drug_name": "Asprin",
+            "status": "unresolved",
+            "resolved_chembl_id": null,
+            "rank": null,
+            "total_candidates": 24,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "flags": [
+              "UNRESOLVED_NAME"
+            ]
+          },
+          {
+            "drug_name": "Sunitinib",
+            "status": "found",
+            "resolved_chembl_id": "CHEMBL535",
+            "rank": 21,
+            "total_candidates": 24,
+            "composite_score": 0.4,
+            "pre_cap_score": null,
+            "strong_match": false,
+            "target_symbol": "RET",
+            "cap_reason": "Safety cap (hard gate, max 0.400) \u2014 WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2021/021938s039lbledt.pdf",
+            "pubchem_xlogp": 2.6,
+            "xlogp_status": "clear",
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2021/021938s039lbledt.pdf",
+            "flags": [
+              "SAFETY_CAP"
+            ]
+          },
+          {
+            "drug_name": "Lenvatinib",
+            "status": "found",
+            "resolved_chembl_id": "CHEMBL1289601",
+            "rank": 1,
+            "total_candidates": 24,
+            "composite_score": 0.8357,
+            "pre_cap_score": null,
+            "strong_match": true,
+            "target_symbol": "RET",
+            "cap_reason": null,
+            "pubchem_xlogp": 2.8,
+            "xlogp_status": "clear",
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "flags": []
+          }
+        ],
+        "summary": {
+          "total": 8,
+          "by_status": {
+            "found": 5,
+            "absent": 2,
+            "unresolved": 1
+          },
+          "flag_counts": {
+            "SAFETY_CAP": 3,
+            "XLOGP_CAUTION": 1,
+            "ABSENT_FROM_POOL": 2,
+            "UNRESOLVED_NAME": 1
+          },
+          "flagged_total": 6
+        },
+        "disclosure": "Triage verdicts are computed against the persisted candidate pool of one completed AgentBio case \u2014 they re-audit evidence, they do not re-run discovery. ABSENT_FROM_POOL is a coverage statement, not a judgment that the drug is a poor candidate. XLogP flags are caution-only disclosures and never adjust scores.",
+        "run_id": "7d5a4317-dbae-4e5b-a384-50549d3b7648",
+        "created_at": "2026-08-04T01:07:12.908738+00:00"
+      }
+    },
+    {
+      "list_id": "B1",
+      "form": "B",
+      "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+      "drug_names": [
+        "Pindolol",
+        "Pancrelipase",
+        "Ibuprofen",
+        "Asprin",
+        "Antipyrine",
+        "Gabapentin",
+        "Amitriptyline",
+        "Prednisone"
+      ],
+      "seeded_items": [
+        {
+          "drug_name": "Asprin",
+          "role": "seeded_trap",
+          "trap_class": "unresolvable_name_honesty",
+          "note": "misspelling \u2014 must be UNRESOLVED"
+        },
+        {
+          "drug_name": "Antipyrine",
+          "role": "seeded_trap",
+          "trap_class": "unresolvable_name_honesty",
+          "note": "if ChEMBL cannot resolve the queried form, must be UNRESOLVED, not 'absent'"
+        }
+      ],
+      "controls": [
+        {
+          "drug_name": "Pindolol",
+          "role": "control",
+          "note": "in-pool candidate from the completed case; must NOT be false-flagged"
+        }
+      ],
+      "ground_truth": {
+        "status": "ok",
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "job_id": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "domain_findings": [],
+        "verdicts": [
+          {
+            "drug_name": "Pindolol",
+            "status": "found",
+            "resolved_chembl_id": "CHEMBL500",
+            "rank": 1,
+            "total_candidates": 32,
+            "composite_score": 0.7209,
+            "pre_cap_score": null,
+            "strong_match": true,
+            "target_symbol": "ADRB2",
+            "cap_reason": null,
+            "pubchem_xlogp": 1.8,
+            "xlogp_status": "clear",
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "flags": []
+          },
+          {
+            "drug_name": "Pancrelipase",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL2108074",
+            "rank": null,
+            "total_candidates": 32,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "ADRB2",
+            "drug_mechanism_targets": [
+              "Fatty acids hydrolytic enzyme",
+              "Starch hydrolytic enzyme",
+              "Polypeptides hydrolytic enzyme"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Ibuprofen",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL521",
+            "rank": null,
+            "total_candidates": 32,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "ADRB2",
+            "drug_mechanism_targets": [
+              "Cyclooxygenase inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Asprin",
+            "status": "unresolved",
+            "resolved_chembl_id": null,
+            "rank": null,
+            "total_candidates": 32,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "flags": [
+              "UNRESOLVED_NAME"
+            ]
+          },
+          {
+            "drug_name": "Antipyrine",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL277474",
+            "rank": null,
+            "total_candidates": 32,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "ADRB2",
+            "drug_mechanism_targets": [
+              "Cyclooxygenase-1 inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Gabapentin",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL940",
+            "rank": null,
+            "total_candidates": 32,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "ADRB2",
+            "drug_mechanism_targets": [
+              "Voltage-gated calcium channel modulator"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Amitriptyline",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL629",
+            "rank": null,
+            "total_candidates": 32,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "ADRB2",
+            "drug_mechanism_targets": [
+              "Serotonin transporter inhibitor",
+              "Norepinephrine transporter inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Prednisone",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL635",
+            "rank": null,
+            "total_candidates": 32,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "ADRB2",
+            "drug_mechanism_targets": [
+              "Glucocorticoid receptor agonist"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          }
+        ],
+        "summary": {
+          "total": 8,
+          "by_status": {
+            "found": 1,
+            "absent": 6,
+            "unresolved": 1
+          },
+          "flag_counts": {
+            "ABSENT_FROM_POOL": 6,
+            "UNRESOLVED_NAME": 1
+          },
+          "flagged_total": 7
+        },
+        "disclosure": "Triage verdicts are computed against the persisted candidate pool of one completed AgentBio case \u2014 they re-audit evidence, they do not re-run discovery. ABSENT_FROM_POOL is a coverage statement, not a judgment that the drug is a poor candidate. XLogP flags are caution-only disclosures and never adjust scores.",
+        "run_id": "9688877b-5c4f-491e-aa0f-731b202bed28",
+        "created_at": "2026-08-04T01:07:15.068218+00:00"
+      }
+    },
+    {
+      "list_id": "B2",
+      "form": "B",
+      "disease_name": "Multiple myeloma",
+      "drug_names": [
+        "Pomalidomide",
+        "Carfilzomib",
+        "Ixazomib",
+        "Asprin",
+        "Panobinostat",
+        "Daratumumab",
+        "Elotuzumab",
+        "Doxorubicin"
+      ],
+      "seeded_items": [
+        {
+          "drug_name": "Asprin",
+          "role": "seeded_trap",
+          "trap_class": "unresolvable_name_honesty",
+          "note": "misspelling \u2014 must be UNRESOLVED"
+        },
+        {
+          "drug_name": "Carfilzomib",
+          "role": "seeded_trap",
+          "trap_class": "absent_vs_poor_candidate",
+          "note": "approved myeloma drug; if absent, verdict is a coverage statement, not a negative judgment"
+        }
+      ],
+      "controls": [
+        {
+          "drug_name": "Pomalidomide",
+          "role": "control",
+          "note": "must NOT be false-flagged"
+        }
+      ],
+      "ground_truth": {
+        "status": "ok",
+        "disease_name": "Multiple myeloma",
+        "job_id": "2de0698b458b4be28218830a3dad4710",
+        "domain_findings": [
+          {
+            "id": "oncology_repurposing_penalty",
+            "domain": "oncology",
+            "severity": "caution",
+            "title": "Oncology indications have lower repurposing success",
+            "statement": "Oncology indications have lower repurposing success than non-oncology indications.",
+            "stats": {
+              "framing": "narrow (genuine-outcome controls only)",
+              "test": "fisher_exact",
+              "odds_ratio": 0.0724,
+              "ci95": [
+                0.0399,
+                0.13
+              ],
+              "n": 2913,
+              "discovery_fdr_q": 3.61e-12,
+              "confirmation_raw_p": 5.33e-14
+            },
+            "confounds": [
+              {
+                "name": "prior repurposing saturation of oncology drugs",
+                "status": "survives",
+                "detail": "Adjusted OR 0.119 [0.0632, 0.2226], adj. p below display precision \u2014 the penalty persists after accounting for how often oncology drugs have already been attempted."
+              },
+              {
+                "name": "novel-versus-established product status",
+                "status": "survives",
+                "detail": "Adjusted OR 0.0763 [0.0419, 0.1391]."
+              },
+              {
+                "name": "oncology trial phase-mix skew",
+                "status": "not_testable",
+                "detail": "No per-program phase-mix feature exists in the dataset, so this candidate explanation could not be ruled out."
+              }
+            ],
+            "cautions": [
+              "Under broad outcome framing the same association is LABEL_ARTIFACT_SUSPECT: an admin-only replay reproduces it (OR 0.028 [0.0228, 0.035], n=4203), meaning the broad effect lives in the administrative-exclude class. Only the narrow, genuine-outcome framing above should be cited."
+            ],
+            "implication": "The historical odds of repurposing success for oncology indications are roughly 14x lower than for non-oncology. Treat within-case ranks as relative to each other \u2014 even a top-ranked oncology candidate carries a higher external-validation burden than an equivalent candidate in a non-oncology indication.",
+            "provenance": {
+              "hypothesis_id": "run-518207db-H26",
+              "run_id": "run-518207db",
+              "source_domain": "Kessler-syndrome collision cascades in crowded orbital shells",
+              "proposing_llm": "Sol",
+              "registry": "Bisociation hypothesis registry \u2014 passed discovery FDR (q=3.6e-12) and independent holdout confirmation (p=5.3e-14)"
+            },
+            "matched_term": "myeloma",
+            "disease_name": "Multiple myeloma"
+          }
+        ],
+        "verdicts": [
+          {
+            "drug_name": "Pomalidomide",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL43452",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "CRL4(CRBN) E3 ubiquitin ligase inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Carfilzomib",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL451887",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "26S proteasome inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Ixazomib",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL2141296",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "26S proteasome inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Asprin",
+            "status": "unresolved",
+            "resolved_chembl_id": null,
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "flags": [
+              "UNRESOLVED_NAME"
+            ]
+          },
+          {
+            "drug_name": "Panobinostat",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL483254",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "Histone deacetylase inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Daratumumab",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL1743007",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "Lymphocyte differentiation antigen CD38 inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Elotuzumab",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL1743010",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "SLAM family member 7 inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          },
+          {
+            "drug_name": "Doxorubicin",
+            "status": "absent",
+            "resolved_chembl_id": "CHEMBL53463",
+            "rank": null,
+            "total_candidates": 20,
+            "composite_score": null,
+            "pre_cap_score": null,
+            "strong_match": null,
+            "target_symbol": null,
+            "cap_reason": null,
+            "pubchem_xlogp": null,
+            "xlogp_status": null,
+            "evidence_weight_coverage": null,
+            "black_box_advisory": false,
+            "status_badge": null,
+            "agentbio_selected_target": "NR3C1",
+            "drug_mechanism_targets": [
+              "DNA topoisomerase II alpha inhibitor",
+              "DNA inhibitor"
+            ],
+            "flags": [
+              "ABSENT_FROM_POOL"
+            ]
+          }
+        ],
+        "summary": {
+          "total": 8,
+          "by_status": {
+            "absent": 7,
+            "unresolved": 1
+          },
+          "flag_counts": {
+            "ABSENT_FROM_POOL": 7,
+            "UNRESOLVED_NAME": 1
+          },
+          "flagged_total": 8,
+          "domain_findings": [
+            {
+              "id": "oncology_repurposing_penalty",
+              "domain": "oncology",
+              "severity": "caution",
+              "title": "Oncology indications have lower repurposing success",
+              "statement": "Oncology indications have lower repurposing success than non-oncology indications.",
+              "stats": {
+                "framing": "narrow (genuine-outcome controls only)",
+                "test": "fisher_exact",
+                "odds_ratio": 0.0724,
+                "ci95": [
+                  0.0399,
+                  0.13
+                ],
+                "n": 2913,
+                "discovery_fdr_q": 3.61e-12,
+                "confirmation_raw_p": 5.33e-14
+              },
+              "confounds": [
+                {
+                  "name": "prior repurposing saturation of oncology drugs",
+                  "status": "survives",
+                  "detail": "Adjusted OR 0.119 [0.0632, 0.2226], adj. p below display precision \u2014 the penalty persists after accounting for how often oncology drugs have already been attempted."
+                },
+                {
+                  "name": "novel-versus-established product status",
+                  "status": "survives",
+                  "detail": "Adjusted OR 0.0763 [0.0419, 0.1391]."
+                },
+                {
+                  "name": "oncology trial phase-mix skew",
+                  "status": "not_testable",
+                  "detail": "No per-program phase-mix feature exists in the dataset, so this candidate explanation could not be ruled out."
+                }
+              ],
+              "cautions": [
+                "Under broad outcome framing the same association is LABEL_ARTIFACT_SUSPECT: an admin-only replay reproduces it (OR 0.028 [0.0228, 0.035], n=4203), meaning the broad effect lives in the administrative-exclude class. Only the narrow, genuine-outcome framing above should be cited."
+              ],
+              "implication": "The historical odds of repurposing success for oncology indications are roughly 14x lower than for non-oncology. Treat within-case ranks as relative to each other \u2014 even a top-ranked oncology candidate carries a higher external-validation burden than an equivalent candidate in a non-oncology indication.",
+              "provenance": {
+                "hypothesis_id": "run-518207db-H26",
+                "run_id": "run-518207db",
+                "source_domain": "Kessler-syndrome collision cascades in crowded orbital shells",
+                "proposing_llm": "Sol",
+                "registry": "Bisociation hypothesis registry \u2014 passed discovery FDR (q=3.6e-12) and independent holdout confirmation (p=5.3e-14)"
+              },
+              "matched_term": "myeloma",
+              "disease_name": "Multiple myeloma"
+            }
+          ]
+        },
+        "disclosure": "Triage verdicts are computed against the persisted candidate pool of one completed AgentBio case \u2014 they re-audit evidence, they do not re-run discovery. ABSENT_FROM_POOL is a coverage statement, not a judgment that the drug is a poor candidate. XLogP flags are caution-only disclosures and never adjust scores.",
+        "run_id": "0b000f24-b974-4070-8547-b4305ddcf66f",
+        "created_at": "2026-08-04T01:07:51.536399+00:00"
+      },
+      "note": "Deviation from ideal: B2 shares the Multiple myeloma case with A1 \u2014 no fourth completed case with a persisted pool existed at freeze time. Drug lists are disjoint and arm\u00d7order counterbalancing mitigates carry-over."
+    }
+  ]
+}

@@ -194,7 +194,25 @@ export default function TriagePanel({ onNavigate }) {
       )}
 
       {result && result.status === "ok" && (
-        <div className="space-y-4">
+        <div className="space-y-4 printable-report">
+          {/* Print header — visible only in the PDF/print output */}
+          <div className="print-only">
+            <div style={{
+              fontFamily: "monospace", fontSize: "0.58rem", textTransform: "uppercase",
+              letterSpacing: "0.14em", color: "var(--brass-deep)", marginBottom: "0.4rem",
+            }}>
+              AgentBio — Candidate Triage Audit Pack
+            </div>
+            <h2 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--ink)", margin: "0 0 0.5rem" }}>
+              {result.disease_name} — {result.summary?.total ?? 0} candidates audited
+            </h2>
+            <p style={{ fontSize: "0.75rem", color: "var(--ink-muted)", margin: "0 0 1rem" }}>
+              Run id {result.run_id || "not persisted"} · job {result.job_id || "—"} ·
+              generated {new Date().toISOString().slice(0, 19)}Z ·
+              this exact verdict set is retrievable by run id.
+            </p>
+          </div>
+
           <DomainFindings findings={result.domain_findings || result.summary?.domain_findings} />
           <SummaryBar summary={result.summary} />
 
@@ -244,12 +262,18 @@ export default function TriagePanel({ onNavigate }) {
             </table>
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap no-print">
             <button
               onClick={() => downloadJson(`agentbio-triage-${result.run_id || "run"}.json`, result)}
               className="audit-chip text-xs px-3 py-1.5 rounded-full"
             >
               Download audit pack (JSON)
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="audit-chip text-xs px-3 py-1.5 rounded-full"
+            >
+              Print / Save as PDF
             </button>
             {result.run_id && (
               <span className="text-xs" style={{ color: "var(--ink-dim)" }}>

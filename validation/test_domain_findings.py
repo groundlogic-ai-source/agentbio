@@ -60,6 +60,14 @@ class OncologyClassifierTest(unittest.TestCase):
         # Regression guard: naive substring matching would flag sarcoidosis.
         self.assertIsNone(oncology_match("sarcoidosis"))
 
+    def test_trailing_boundary_blocks_longer_tokens(self):
+        # Terms are anchored on both sides: inflections of longer words must
+        # not match. Only the explicit "malignan" stem may prefix-match.
+        self.assertIsNone(oncology_match("tumorous parotid disease"))
+        self.assertIsNone(oncology_match("peritoneal carcinomatosis mimic"))
+        self.assertIsNotNone(oncology_match("malignant hypertension"))
+        self.assertIsNotNone(oncology_match("malignancy of unknown origin"))
+
 
 class FindingPayloadTest(unittest.TestCase):
     def test_payload_is_fresh_copy_with_provenance(self):
@@ -73,6 +81,26 @@ class FindingPayloadTest(unittest.TestCase):
         # Caller mutation must not leak into the module constant
         f["title"] = "mutated"
         self.assertNotEqual(ONCOLOGY_REPURPOSING_PENALTY["title"], "mutated")
+
+    def test_nested_mutation_cannot_poison_constant(self):
+        # Regression guard for the shallow-copy defect: nested dicts/lists in
+        # the returned payload must be independent of the module constant.
+        f = domain_findings_for("lung cancer")[0]
+        f["stats"]["odds_ratio"] = 999.0
+        f["confounds"][0]["detail"] = "tampered"
+        f["cautions"].append("injected")
+        f["provenance"]["hypothesis_id"] = "forged"
+        self.assertNotEqual(
+            ONCOLOGY_REPURPOSING_PENALTY["stats"]["odds_ratio"], 999.0
+        )
+        self.assertNotEqual(
+            ONCOLOGY_REPURPOSING_PENALTY["confounds"][0]["detail"], "tampered"
+        )
+        self.assertNotIn("injected", ONCOLOGY_REPURPOSING_PENALTY["cautions"])
+        self.assertEqual(
+            ONCOLOGY_REPURPOSING_PENALTY["provenance"]["hypothesis_id"],
+            "run-518207db-H26",
+        )
 
     def test_confound_record_is_honest(self):
         f = domain_findings_for("lung cancer")[0]

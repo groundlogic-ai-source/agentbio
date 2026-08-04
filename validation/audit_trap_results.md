@@ -1,12 +1,12 @@
 # Audit Trap Benchmark — Results
 
-- Generated: 2026-08-03T23:16:42.680673+00:00
+- Generated: 2026-08-04T01:09:40.920143+00:00
 - Label: `audit_trap_benchmark` (offline: True)
 - **Verdict: PASS**
 
 ## Metrics
 
-- Trap recall: 10/10 = 1.00 (threshold ≥ 0.9)
+- Trap recall: 12/12 = 1.00 (threshold ≥ 0.9)
 - Control false-flag rate: 0/4 = 0.00 (threshold ≤ 0.25)
 - Precision: 1.00
 
@@ -24,6 +24,8 @@
 | T8 | degraded_source_honesty | CAUGHT |
 | T9 | unobserved_not_zero | CAUGHT |
 | T10 | xlogp_unresolved_disclosure | CAUGHT |
+| T11 | degraded_200_empty_pool_not_cached | CAUGHT |
+| T12 | holdout_name_no_api_leak | CAUGHT |
 
 ## Controls (must NOT be flagged)
 

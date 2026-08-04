@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-03T23:16:42.680673+00:00",
+  "generated_at": "2026-08-04T01:09:40.920143+00:00",
   "label": "audit_trap_benchmark",
   "kind": "audit_traps",
   "preregistration": "validation/audit_traps_preregistration.md",
@@ -64,6 +64,18 @@
       "class": "xlogp_unresolved_disclosure",
       "caught": true,
       "error": null
+    },
+    {
+      "id": "T11",
+      "class": "degraded_200_empty_pool_not_cached",
+      "caught": true,
+      "error": null
+    },
+    {
+      "id": "T12",
+      "class": "holdout_name_no_api_leak",
+      "caught": true,
+      "error": null
     }
   ],
   "controls": [
@@ -93,8 +105,8 @@
     }
   ],
   "metrics": {
-    "traps_total": 10,
-    "traps_caught": 10,
+    "traps_total": 12,
+    "traps_caught": 12,
     "trap_recall": 1.0,
     "controls_total": 4,
     "controls_false_flagged": 0,
