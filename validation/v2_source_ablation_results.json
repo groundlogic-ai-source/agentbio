@@ -27,6 +27,527 @@
   "candidate_precision_statement": "NOT ESTIMABLE: this dataset has no defensible candidate-level negative labels. A candidate not in the confirmed repurposing set is not a proven true negative, so candidate precision and added-false-positive rate are intentionally not reported rather than invented.",
   "target_snapshots": [
     {
+      "case_key": "anagrelide::essentialthrombocythemia",
+      "drug_name": "Anagrelide",
+      "disease_name": "Essential thrombocythemia",
+      "cap": 10,
+      "in_universe": true,
+      "status": "ok",
+      "error": null,
+      "selected_rows": [
+        {
+          "disease_name": "Essential thrombocythemia",
+          "orpha_code": "3318",
+          "disease_source": "orphanet",
+          "icd10": "D47.3",
+          "omim": "187950",
+          "mesh": "D013920",
+          "target_symbol": "PNP",
+          "ensembl_id": null,
+          "uniprot_id": "P00491",
+          "ot_association_score": 0.5,
+          "chembl_activity_count": 496,
+          "median_pchembl": 7.3149999999999995,
+          "chembl_pooled_multi_target": false,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 93.81,
+          "prior_trial_count": 1,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "RUXOLITINIB",
+            "PEGINTERFERON ALFA-2A",
+            "MOMELOTINIB DIHYDROCHLORIDE"
+          ],
+          "prevalence_per_million": 30.0,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.7278,
+          "tractability_score": 0.3639,
+          "unmet_need_score": 0.0746,
+          "target_discovery_method": "literature_mechanism_class",
+          "mechanism_class": "purine_nucleotide_antimetabolite",
+          "therapeutic_role": "disease_modifying",
+          "process_support": [
+            {
+              "pmid": "34527458",
+              "pmcid": "PMC8420994",
+              "title": "Non-melanoma Skin Cancers in Patients on Hydroxyurea for Philadelphia Chromosome-Negative Myeloproliferative Neoplasms: A Systematic Review.",
+              "excerpt": "Hydroxyurea (HU) or hydroxycarbamide is a cytotoxic antimetabolite widely used to treat Philadelphia chromosome-negative Myeloproliferative Neoplasms (Ph-MPN) like Polycythemia Vera (PV), Essential Thrombocythemia (ET), and\u00a0Primary Myelofibrosis (PMF). Patients with Ph-MPN are at an increased risk of Non-melanoma skin cancers (NMSC). The cause of this finding remains uncertain. In this systematic ",
+              "evidence_sentence": "hydroxyurea hu or hydroxycarbamide is a cytotoxic antimetabolite widely used to treat philadelphia chromosome negative myeloproliferative neoplasms ph mpn like polycythemia vera pv essential thrombocythemia et and primary myelofibrosis pmf"
+            },
+            {
+              "pmid": "30159077",
+              "pmcid": "PMC6108816",
+              "title": "Hydroxyurea Associated Cutaneous Lesions: A Case Report.",
+              "excerpt": "<h4>Background</h4>Hydroxyurea (HU) is an antimetabolite agent that interferes with the S-phase of cellular replication and inhibits DNA synthesis, with little or no effect on RNA or protein synthesis. It is used in the treatment of many myeloproliferative disorders (MD) and is particularly a first line treatment drug for intermediate to high-risk essential thrombocythemia. Although safe and very ",
+              "evidence_sentence": "hydroxyurea hu is an antimetabolite agent that interferes with the s phase of cellular replication and inhibits dna synthesis with little or no effect on rna or protein synthesis"
+            }
+          ],
+          "process_query": "(\"Essential thrombocythemia\") AND (\"purine metabolism\" OR \"nucleotide metabolism\" OR \"antimetabolite\")",
+          "process_source_status": "ok",
+          "process_ontology_version": "v6",
+          "process_target_priority": 0,
+          "process_class_priority": 3
+        },
+        {
+          "disease_name": "Essential thrombocythemia",
+          "orpha_code": "3318",
+          "disease_source": "orphanet",
+          "icd10": "D47.3",
+          "omim": "187950",
+          "mesh": "D013920",
+          "target_symbol": "PDE3B",
+          "ensembl_id": "ENSG00000152270",
+          "uniprot_id": "Q13370",
+          "ot_association_score": 0.5771,
+          "chembl_activity_count": 521,
+          "median_pchembl": 6.75,
+          "chembl_pooled_multi_target": true,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 63.72,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "RUXOLITINIB",
+            "PEGINTERFERON ALFA-2A",
+            "MOMELOTINIB DIHYDROCHLORIDE"
+          ],
+          "prevalence_per_million": 30.0,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.623,
+          "tractability_score": 0.3596,
+          "unmet_need_score": 0.0746,
+          "target_discovery_method": "genetic_association",
+          "mechanism_class": null,
+          "therapeutic_role": "disease_modifying",
+          "process_support": [],
+          "process_query": null,
+          "process_source_status": null,
+          "process_ontology_version": null,
+          "process_target_priority": null,
+          "process_class_priority": null
+        },
+        {
+          "disease_name": "Essential thrombocythemia",
+          "orpha_code": "3318",
+          "disease_source": "orphanet",
+          "icd10": "D47.3",
+          "omim": "187950",
+          "mesh": "D013920",
+          "target_symbol": "PDE3A",
+          "ensembl_id": "ENSG00000172572",
+          "uniprot_id": "Q14432",
+          "ot_association_score": 0.5789,
+          "chembl_activity_count": 788,
+          "median_pchembl": 6.68,
+          "chembl_pooled_multi_target": true,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 60.25,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "RUXOLITINIB",
+            "PEGINTERFERON ALFA-2A",
+            "MOMELOTINIB DIHYDROCHLORIDE"
+          ],
+          "prevalence_per_million": 30.0,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.6109,
+          "tractability_score": 0.3537,
+          "unmet_need_score": 0.0746,
+          "target_discovery_method": "genetic_association",
+          "mechanism_class": null,
+          "therapeutic_role": "disease_modifying",
+          "process_support": [],
+          "process_query": null,
+          "process_source_status": null,
+          "process_ontology_version": null,
+          "process_target_priority": null,
+          "process_class_priority": null
+        },
+        {
+          "disease_name": "Essential thrombocythemia",
+          "orpha_code": "3318",
+          "disease_source": "orphanet",
+          "icd10": "D47.3",
+          "omim": "187950",
+          "mesh": "D013920",
+          "target_symbol": "JAK1",
+          "ensembl_id": null,
+          "uniprot_id": "P23458",
+          "ot_association_score": 0.5,
+          "chembl_activity_count": 1000,
+          "median_pchembl": 7.62,
+          "chembl_pooled_multi_target": true,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 85.56,
+          "prior_trial_count": 8,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "RUXOLITINIB",
+            "PEGINTERFERON ALFA-2A",
+            "MOMELOTINIB DIHYDROCHLORIDE"
+          ],
+          "prevalence_per_million": 30.0,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.6995,
+          "tractability_score": 0.3498,
+          "unmet_need_score": 0.0746,
+          "target_discovery_method": "literature_mechanism_class",
+          "mechanism_class": "jak_stat_signaling",
+          "therapeutic_role": "disease_modifying",
+          "process_support": [
+            {
+              "pmid": "42176929",
+              "pmcid": null,
+              "title": "JAK2 V617F as a diagnostic and prognostic biomarker in myeloproliferative neoplasms.",
+              "excerpt": "Molecular analysis of BCR-ABL1-negative myeloproliferative neoplasms has shown a shared codon 617 substitution of JAK2 that leads to a constitutively active tyrosine kinase and a pathogenic lesion that unites all three polycythemia vera, essential thrombocythemia, and primary myelofibrosis. This mutation interferes with the autoinhibitory regulation and results in persistent downstream JAK-STAT si",
+              "evidence_sentence": "this mutation interferes with the autoinhibitory regulation and results in persistent downstream jak stat signaling and thereafter myeloid megakaryocytic and inappropriate erythroid proliferation"
+            },
+            {
+              "pmid": "41982071",
+              "pmcid": null,
+              "title": "Managing myelofibrosis in the frailty era: the expanding role of JAK inhibitors.",
+              "excerpt": "Myelofibrosis (MF) is a clonal myeloproliferative neoplasm that predominantly affects older adults and is frequently complicated by anemia, thrombocytopenia, and multimorbidity. In this setting, therapeutic goals extend beyond disease control to include symptom relief, preservation of functional status, transfusion avoidance, and minimization of treatment-related toxicity. Janus kinase (JAK) inhib",
+              "evidence_sentence": "janus kinase jak inhibitors are the cornerstone of therapy for symptomatic intermediate and high risk mf with four oral agents approved ruxolitinib fedratinib pacritinib and momelotinib"
+            },
+            {
+              "pmid": "42243570",
+              "pmcid": null,
+              "title": "Rovadicitinib: First Approval.",
+              "excerpt": "Rovadicitinib (Anxu<sup>\u00ae</sup>) is a small molecule Janus kinase (JAK)/Rho-associated coiled-coil-containing protein kinase (ROCK) inhibitor being developed by Chia Tai Tianqing Pharmaceutical Group (a subsidiary of Sino Biopharmaceutical) for the treatment of primary myelofibrosis (PMF), post-polycythemia vera myelofibrosis (PPV-MF), post-essential thrombocythemia myelofibrosis (PET-MF), graft-v",
+              "evidence_sentence": "is a small molecule janus kinase jak rho associated coiled coil containing protein kinase rock inhibitor being developed by chia tai tianqing pharmaceutical group a subsidiary of sino biopharmaceutical for the treatment of primary myelofibrosis pmf post polycythemia vera myelofibrosis ppv mf post essential thrombocythemia myelofibrosis pet mf graft versus host disease gvhd and haemophagocytic lymphohistiocytosis hlh"
+            }
+          ],
+          "process_query": "(\"Essential thrombocythemia\") AND (\"JAK-STAT signaling\" OR \"Janus kinase\" OR \"STAT signaling\")",
+          "process_source_status": "ok",
+          "process_ontology_version": "v6",
+          "process_target_priority": 0,
+          "process_class_priority": 7
+        },
+        {
+          "disease_name": "Essential thrombocythemia",
+          "orpha_code": "3318",
+          "disease_source": "orphanet",
+          "icd10": "D47.3",
+          "omim": "187950",
+          "mesh": "D013920",
+          "target_symbol": "STAT3",
+          "ensembl_id": null,
+          "uniprot_id": "P40763",
+          "ot_association_score": 0.5,
+          "chembl_activity_count": 1000,
+          "median_pchembl": 5.34,
+          "chembl_pooled_multi_target": true,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 84.88,
+          "prior_trial_count": 3,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "RUXOLITINIB",
+            "PEGINTERFERON ALFA-2A",
+            "MOMELOTINIB DIHYDROCHLORIDE"
+          ],
+          "prevalence_per_million": 30.0,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.6971,
+          "tractability_score": 0.3486,
+          "unmet_need_score": 0.0746,
+          "target_discovery_method": "literature_mechanism_class",
+          "mechanism_class": "jak_stat_signaling",
+          "therapeutic_role": "disease_modifying",
+          "process_support": [
+            {
+              "pmid": "42176929",
+              "pmcid": null,
+              "title": "JAK2 V617F as a diagnostic and prognostic biomarker in myeloproliferative neoplasms.",
+              "excerpt": "Molecular analysis of BCR-ABL1-negative myeloproliferative neoplasms has shown a shared codon 617 substitution of JAK2 that leads to a constitutively active tyrosine kinase and a pathogenic lesion that unites all three polycythemia vera, essential thrombocythemia, and primary myelofibrosis. This mutation interferes with the autoinhibitory regulation and results in persistent downstream JAK-STAT si",
+              "evidence_sentence": "this mutation interferes with the autoinhibitory regulation and results in persistent downstream jak stat signaling and thereafter myeloid megakaryocytic and inappropriate erythroid proliferation"
+            },
+            {
+              "pmid": "41982071",
+              "pmcid": null,
+              "title": "Managing myelofibrosis in the frailty era: the expanding role of JAK inhibitors.",
+              "excerpt": "Myelofibrosis (MF) is a clonal myeloproliferative neoplasm that predominantly affects older adults and is frequently complicated by anemia, thrombocytopenia, and multimorbidity. In this setting, therapeutic goals extend beyond disease control to include symptom relief, preservation of functional status, transfusion avoidance, and minimization of treatment-related toxicity. Janus kinase (JAK) inhib",
+              "evidence_sentence": "janus kinase jak inhibitors are the cornerstone of therapy for symptomatic intermediate and high risk mf with four oral agents approved ruxolitinib fedratinib pacritinib and momelotinib"
+            },
+            {
+              "pmid": "42243570",
+              "pmcid": null,
+              "title": "Rovadicitinib: First Approval.",
+              "excerpt": "Rovadicitinib (Anxu<sup>\u00ae</sup>) is a small molecule Janus kinase (JAK)/Rho-associated coiled-coil-containing protein kinase (ROCK) inhibitor being developed by Chia Tai Tianqing Pharmaceutical Group (a subsidiary of Sino Biopharmaceutical) for the treatment of primary myelofibrosis (PMF), post-polycythemia vera myelofibrosis (PPV-MF), post-essential thrombocythemia myelofibrosis (PET-MF), graft-v",
+              "evidence_sentence": "is a small molecule janus kinase jak rho associated coiled coil containing protein kinase rock inhibitor being developed by chia tai tianqing pharmaceutical group a subsidiary of sino biopharmaceutical for the treatment of primary myelofibrosis pmf post polycythemia vera myelofibrosis ppv mf post essential thrombocythemia myelofibrosis pet mf graft versus host disease gvhd and haemophagocytic lymphohistiocytosis hlh"
+            }
+          ],
+          "process_query": "(\"Essential thrombocythemia\") AND (\"JAK-STAT signaling\" OR \"Janus kinase\" OR \"STAT signaling\")",
+          "process_source_status": "ok",
+          "process_ontology_version": "v6",
+          "process_target_priority": 1,
+          "process_class_priority": 7
+        },
+        {
+          "disease_name": "Essential thrombocythemia",
+          "orpha_code": "3318",
+          "disease_source": "orphanet",
+          "icd10": "D47.3",
+          "omim": "187950",
+          "mesh": "D013920",
+          "target_symbol": "HPRT1",
+          "ensembl_id": null,
+          "uniprot_id": "P00492",
+          "ot_association_score": 0.5,
+          "chembl_activity_count": 212,
+          "median_pchembl": 5.71,
+          "chembl_pooled_multi_target": false,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 92.56,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "RUXOLITINIB",
+            "PEGINTERFERON ALFA-2A",
+            "MOMELOTINIB DIHYDROCHLORIDE"
+          ],
+          "prevalence_per_million": 30.0,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.6689,
+          "tractability_score": 0.3345,
+          "unmet_need_score": 0.0746,
+          "target_discovery_method": "literature_mechanism_class",
+          "mechanism_class": "purine_nucleotide_antimetabolite",
+          "therapeutic_role": "disease_modifying",
+          "process_support": [
+            {
+              "pmid": "34527458",
+              "pmcid": "PMC8420994",
+              "title": "Non-melanoma Skin Cancers in Patients on Hydroxyurea for Philadelphia Chromosome-Negative Myeloproliferative Neoplasms: A Systematic Review.",
+              "excerpt": "Hydroxyurea (HU) or hydroxycarbamide is a cytotoxic antimetabolite widely used to treat Philadelphia chromosome-negative Myeloproliferative Neoplasms (Ph-MPN) like Polycythemia Vera (PV), Essential Thrombocythemia (ET), and\u00a0Primary Myelofibrosis (PMF). Patients with Ph-MPN are at an increased risk of Non-melanoma skin cancers (NMSC). The cause of this finding remains uncertain. In this systematic ",
+              "evidence_sentence": "hydroxyurea hu or hydroxycarbamide is a cytotoxic antimetabolite widely used to treat philadelphia chromosome negative myeloproliferative neoplasms ph mpn like polycythemia vera pv essential thrombocythemia et and primary myelofibrosis pmf"
+            },
+            {
+              "pmid": "30159077",
+              "pmcid": "PMC6108816",
+              "title": "Hydroxyurea Associated Cutaneous Lesions: A Case Report.",
+              "excerpt": "<h4>Background</h4>Hydroxyurea (HU) is an antimetabolite agent that interferes with the S-phase of cellular replication and inhibits DNA synthesis, with little or no effect on RNA or protein synthesis. It is used in the treatment of many myeloproliferative disorders (MD) and is particularly a first line treatment drug for intermediate to high-risk essential thrombocythemia. Although safe and very ",
+              "evidence_sentence": "hydroxyurea hu is an antimetabolite agent that interferes with the s phase of cellular replication and inhibits dna synthesis with little or no effect on rna or protein synthesis"
+            }
+          ],
+          "process_query": "(\"Essential thrombocythemia\") AND (\"purine metabolism\" OR \"nucleotide metabolism\" OR \"antimetabolite\")",
+          "process_source_status": "ok",
+          "process_ontology_version": "v6",
+          "process_target_priority": 1,
+          "process_class_priority": 3
+        },
+        {
+          "disease_name": "Essential thrombocythemia",
+          "orpha_code": "3318",
+          "disease_source": "orphanet",
+          "icd10": "D47.3",
+          "omim": "187950",
+          "mesh": "D013920",
+          "target_symbol": "DRD3",
+          "ensembl_id": null,
+          "uniprot_id": "P35462",
+          "ot_association_score": 0.5,
+          "chembl_activity_count": 1000,
+          "median_pchembl": 7.305,
+          "chembl_pooled_multi_target": true,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 75.38,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "RUXOLITINIB",
+            "PEGINTERFERON ALFA-2A",
+            "MOMELOTINIB DIHYDROCHLORIDE"
+          ],
+          "prevalence_per_million": 30.0,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.6638,
+          "tractability_score": 0.3319,
+          "unmet_need_score": 0.0746,
+          "target_discovery_method": "literature_mechanism_class",
+          "mechanism_class": "antipsychotic_symptom_management",
+          "therapeutic_role": "symptom_treatment",
+          "process_support": [
+            {
+              "pmid": "40148955",
+              "pmcid": "PMC11948710",
+              "title": "A case of hemichorea-hemiballismus secondary to a subacute hemorrhage in a patient with essential thrombocythemia: a case report.",
+              "excerpt": "<h4>Background</h4>Hemiballismus is a rare movement disorder characterized by violent, involuntary movements, usually resulting from a stroke affecting the subthalamic nucleus. Risperidone, an atypical antipsychotic, has shown effectiveness in managing these symptoms.<h4>Case presentation</h4>We present the case of a 75-year-old Asian female patient of Cambodian origin with hemichorea-hemiballismu",
+              "evidence_sentence": "risperidone an atypical antipsychotic has shown effectiveness in managing these symptoms"
+            }
+          ],
+          "process_query": "(\"Essential thrombocythemia\") AND (\"antipsychotic\" OR \"phenothiazine\" OR \"psychosis\" OR \"neuropsychiatric\")",
+          "process_source_status": "ok",
+          "process_ontology_version": "v6",
+          "process_target_priority": 1,
+          "process_class_priority": 5
+        },
+        {
+          "disease_name": "Essential thrombocythemia",
+          "orpha_code": "3318",
+          "disease_source": "orphanet",
+          "icd10": "D47.3",
+          "omim": "187950",
+          "mesh": "D013920",
+          "target_symbol": "IMPDH1",
+          "ensembl_id": null,
+          "uniprot_id": "P20839",
+          "ot_association_score": 0.5,
+          "chembl_activity_count": 190,
+          "median_pchembl": 6.46,
+          "chembl_pooled_multi_target": true,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 92.69,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "RUXOLITINIB",
+            "PEGINTERFERON ALFA-2A",
+            "MOMELOTINIB DIHYDROCHLORIDE"
+          ],
+          "prevalence_per_million": 30.0,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.6624,
+          "tractability_score": 0.3312,
+          "unmet_need_score": 0.0746,
+          "target_discovery_method": "literature_mechanism_class",
+          "mechanism_class": "purine_nucleotide_antimetabolite",
+          "therapeutic_role": "disease_modifying",
+          "process_support": [
+            {
+              "pmid": "34527458",
+              "pmcid": "PMC8420994",
+              "title": "Non-melanoma Skin Cancers in Patients on Hydroxyurea for Philadelphia Chromosome-Negative Myeloproliferative Neoplasms: A Systematic Review.",
+              "excerpt": "Hydroxyurea (HU) or hydroxycarbamide is a cytotoxic antimetabolite widely used to treat Philadelphia chromosome-negative Myeloproliferative Neoplasms (Ph-MPN) like Polycythemia Vera (PV), Essential Thrombocythemia (ET), and\u00a0Primary Myelofibrosis (PMF). Patients with Ph-MPN are at an increased risk of Non-melanoma skin cancers (NMSC). The cause of this finding remains uncertain. In this systematic ",
+              "evidence_sentence": "hydroxyurea hu or hydroxycarbamide is a cytotoxic antimetabolite widely used to treat philadelphia chromosome negative myeloproliferative neoplasms ph mpn like polycythemia vera pv essential thrombocythemia et and primary myelofibrosis pmf"
+            },
+            {
+              "pmid": "30159077",
+              "pmcid": "PMC6108816",
+              "title": "Hydroxyurea Associated Cutaneous Lesions: A Case Report.",
+              "excerpt": "<h4>Background</h4>Hydroxyurea (HU) is an antimetabolite agent that interferes with the S-phase of cellular replication and inhibits DNA synthesis, with little or no effect on RNA or protein synthesis. It is used in the treatment of many myeloproliferative disorders (MD) and is particularly a first line treatment drug for intermediate to high-risk essential thrombocythemia. Although safe and very ",
+              "evidence_sentence": "hydroxyurea hu is an antimetabolite agent that interferes with the s phase of cellular replication and inhibits dna synthesis with little or no effect on rna or protein synthesis"
+            }
+          ],
+          "process_query": "(\"Essential thrombocythemia\") AND (\"purine metabolism\" OR \"nucleotide metabolism\" OR \"antimetabolite\")",
+          "process_source_status": "ok",
+          "process_ontology_version": "v6",
+          "process_target_priority": 2,
+          "process_class_priority": 3
+        },
+        {
+          "disease_name": "Essential thrombocythemia",
+          "orpha_code": "3318",
+          "disease_source": "orphanet",
+          "icd10": "D47.3",
+          "omim": "187950",
+          "mesh": "D013920",
+          "target_symbol": "DRD2",
+          "ensembl_id": null,
+          "uniprot_id": "P14416",
+          "ot_association_score": 0.5,
+          "chembl_activity_count": 1000,
+          "median_pchembl": 6.61,
+          "chembl_pooled_multi_target": true,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 72.44,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "RUXOLITINIB",
+            "PEGINTERFERON ALFA-2A",
+            "MOMELOTINIB DIHYDROCHLORIDE"
+          ],
+          "prevalence_per_million": 30.0,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.6535,
+          "tractability_score": 0.3267,
+          "unmet_need_score": 0.0746,
+          "target_discovery_method": "literature_mechanism_class",
+          "mechanism_class": "antipsychotic_symptom_management",
+          "therapeutic_role": "symptom_treatment",
+          "process_support": [
+            {
+              "pmid": "40148955",
+              "pmcid": "PMC11948710",
+              "title": "A case of hemichorea-hemiballismus secondary to a subacute hemorrhage in a patient with essential thrombocythemia: a case report.",
+              "excerpt": "<h4>Background</h4>Hemiballismus is a rare movement disorder characterized by violent, involuntary movements, usually resulting from a stroke affecting the subthalamic nucleus. Risperidone, an atypical antipsychotic, has shown effectiveness in managing these symptoms.<h4>Case presentation</h4>We present the case of a 75-year-old Asian female patient of Cambodian origin with hemichorea-hemiballismu",
+              "evidence_sentence": "risperidone an atypical antipsychotic has shown effectiveness in managing these symptoms"
+            }
+          ],
+          "process_query": "(\"Essential thrombocythemia\") AND (\"antipsychotic\" OR \"phenothiazine\" OR \"psychosis\" OR \"neuropsychiatric\")",
+          "process_source_status": "ok",
+          "process_ontology_version": "v6",
+          "process_target_priority": 0,
+          "process_class_priority": 5
+        },
+        {
+          "disease_name": "Essential thrombocythemia",
+          "orpha_code": "3318",
+          "disease_source": "orphanet",
+          "icd10": "D47.3",
+          "omim": "187950",
+          "mesh": "D013920",
+          "target_symbol": "JAK2",
+          "ensembl_id": "ENSG00000096968",
+          "uniprot_id": "O60674",
+          "ot_association_score": 0.6294,
+          "chembl_activity_count": 1000,
+          "median_pchembl": 6.77,
+          "chembl_pooled_multi_target": true,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 86.88,
+          "prior_trial_count": 58,
+          "has_negative_repurposing_result": true,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "RUXOLITINIB",
+            "PEGINTERFERON ALFA-2A",
+            "MOMELOTINIB DIHYDROCHLORIDE"
+          ],
+          "prevalence_per_million": 30.0,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.4541,
+          "tractability_score": 0.2858,
+          "unmet_need_score": 0.0746,
+          "target_discovery_method": "genetic_association",
+          "mechanism_class": null,
+          "therapeutic_role": "disease_modifying",
+          "process_support": [],
+          "process_query": null,
+          "process_source_status": null,
+          "process_ontology_version": null,
+          "process_target_priority": null,
+          "process_class_priority": null
+        }
+      ],
+      "target_input_hash": "a3d07118aae4e9e588ba12be7ad572a3ed3306cb875786abb11cf9f181f653fc",
+      "holdout_drugs": [
+        "Anagrelide"
+      ],
+      "holdout_active": true
+    },
+    {
       "case_key": "dapsone::leprosy",
       "drug_name": "Dapsone",
       "disease_name": "Leprosy",
@@ -649,6 +1170,862 @@
             },
             "drugcentral": {
               "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "label": "source_ablation_control",
+      "condition": "chembl_gtopdb",
+      "enabled_sources": [
+        "chembl",
+        "gtopdb"
+      ],
+      "drug_name": "Dapsone",
+      "drug_key": "dapsone",
+      "disease_name": "Leprosy",
+      "target_cap": 10,
+      "target_input_hash": "4bc31df168256058aa28d5154f4dab8c2e912431ec1e9b0752154d406be3fc6a",
+      "in_universe": true,
+      "status": "miss",
+      "n_targets_run": 8,
+      "n_union_candidates": 47,
+      "generated": false,
+      "mechanistically_valid": false,
+      "mechanistic_validity_detail": {
+        "reason": "not generated in any target pool"
+      },
+      "rank": null,
+      "total_candidates": null,
+      "top10": false,
+      "strong_match": null,
+      "match_method": null,
+      "generated_by_target": null,
+      "trials_holdout_redacted": null,
+      "score_components": null,
+      "holdout_audit": null,
+      "source_providers": [],
+      "source_health": {
+        "gtopdb": true,
+        "drugcentral": false,
+        "chembl": true,
+        "europepmc": true
+      },
+      "holdout_active": true,
+      "holdout_drugs": [
+        "Dapsone"
+      ],
+      "holdout_unresolved": null,
+      "per_target_results": [
+        {
+          "target_symbol": "JAK1",
+          "uniprot_id": "P23458",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 17,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "STAT3",
+          "uniprot_id": "P40763",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 5,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "RIPK2",
+          "uniprot_id": "O43353",
+          "ot_association_score": 0.4423,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 7,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "C5",
+          "uniprot_id": "P01031",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 19,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "LACC1",
+          "uniprot_id": "Q8IV20",
+          "ot_association_score": 0.5121,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "TNFSF15",
+          "uniprot_id": "O95150",
+          "ot_association_score": 0.4511,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "SNX20",
+          "uniprot_id": "Q7Z614",
+          "ot_association_score": 0.4223,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "ADGB",
+          "uniprot_id": "Q8N7X0",
+          "ot_association_score": 0.4141,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "label": "source_ablation_control",
+      "condition": "chembl_drugcentral",
+      "enabled_sources": [
+        "chembl",
+        "drugcentral"
+      ],
+      "drug_name": "Dapsone",
+      "drug_key": "dapsone",
+      "disease_name": "Leprosy",
+      "target_cap": 10,
+      "target_input_hash": "4bc31df168256058aa28d5154f4dab8c2e912431ec1e9b0752154d406be3fc6a",
+      "in_universe": true,
+      "status": "miss",
+      "n_targets_run": 8,
+      "n_union_candidates": 50,
+      "generated": false,
+      "mechanistically_valid": false,
+      "mechanistic_validity_detail": {
+        "reason": "not generated in any target pool"
+      },
+      "rank": null,
+      "total_candidates": null,
+      "top10": false,
+      "strong_match": null,
+      "match_method": null,
+      "generated_by_target": null,
+      "trials_holdout_redacted": null,
+      "score_components": null,
+      "holdout_audit": null,
+      "source_providers": [],
+      "source_health": {
+        "gtopdb": false,
+        "drugcentral": true,
+        "chembl": true,
+        "europepmc": true
+      },
+      "holdout_active": true,
+      "holdout_drugs": [
+        "Dapsone"
+      ],
+      "holdout_unresolved": null,
+      "per_target_results": [
+        {
+          "target_symbol": "JAK1",
+          "uniprot_id": "P23458",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 14,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "STAT3",
+          "uniprot_id": "P40763",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 5,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "RIPK2",
+          "uniprot_id": "O43353",
+          "ot_association_score": 0.4423,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 10,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "C5",
+          "uniprot_id": "P01031",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 23,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "LACC1",
+          "uniprot_id": "Q8IV20",
+          "ot_association_score": 0.5121,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "TNFSF15",
+          "uniprot_id": "O95150",
+          "ot_association_score": 0.4511,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "SNX20",
+          "uniprot_id": "Q7Z614",
+          "ot_association_score": 0.4223,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "ADGB",
+          "uniprot_id": "Q8N7X0",
+          "ot_association_score": 0.4141,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "label": "source_ablation_control",
+      "condition": "all_three",
+      "enabled_sources": [
+        "chembl",
+        "gtopdb",
+        "drugcentral"
+      ],
+      "drug_name": "Dapsone",
+      "drug_key": "dapsone",
+      "disease_name": "Leprosy",
+      "target_cap": 10,
+      "target_input_hash": "4bc31df168256058aa28d5154f4dab8c2e912431ec1e9b0752154d406be3fc6a",
+      "in_universe": true,
+      "status": "miss",
+      "n_targets_run": 8,
+      "n_union_candidates": 56,
+      "generated": false,
+      "mechanistically_valid": false,
+      "mechanistic_validity_detail": {
+        "reason": "not generated in any target pool"
+      },
+      "rank": null,
+      "total_candidates": null,
+      "top10": false,
+      "strong_match": null,
+      "match_method": null,
+      "generated_by_target": null,
+      "trials_holdout_redacted": null,
+      "score_components": null,
+      "holdout_audit": null,
+      "source_providers": [],
+      "source_health": {
+        "gtopdb": true,
+        "drugcentral": true,
+        "chembl": true,
+        "europepmc": true
+      },
+      "holdout_active": true,
+      "holdout_drugs": [
+        "Dapsone"
+      ],
+      "holdout_unresolved": null,
+      "per_target_results": [
+        {
+          "target_symbol": "JAK1",
+          "uniprot_id": "P23458",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 20,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "STAT3",
+          "uniprot_id": "P40763",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 5,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "RIPK2",
+          "uniprot_id": "O43353",
+          "ot_association_score": 0.4423,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 10,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "C5",
+          "uniprot_id": "P01031",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 23,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "LACC1",
+          "uniprot_id": "Q8IV20",
+          "ot_association_score": 0.5121,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "TNFSF15",
+          "uniprot_id": "O95150",
+          "ot_association_score": 0.4511,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "SNX20",
+          "uniprot_id": "Q7Z614",
+          "ot_association_score": 0.4223,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "ADGB",
+          "uniprot_id": "Q8N7X0",
+          "ot_association_score": 0.4141,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
               "error": null,
               "release": null
             },
