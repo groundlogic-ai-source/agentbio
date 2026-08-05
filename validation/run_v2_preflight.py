@@ -32,6 +32,7 @@ FREEZE_TAG = "benchmark-freeze-v2"
 ABLATION_RESULTS = "validation/v2_source_ablation_results.json"
 SCREENED_LIST = "validation/benchmark_case_list_v2.json"
 PIPELINE_DIRS = ["agents/", "data_sources/", "cache/"]
+CONTROL_ROW_STATUSES = frozenset({"hit", "miss"})
 
 
 def _log(msg: str) -> None:
@@ -99,7 +100,10 @@ def _valid_ablation_results(path: str = ABLATION_RESULTS) -> tuple[bool, str]:
     if set(snapshot_by_key) != expected_snapshots:
         return False, "incomplete or unexpected target snapshots"
     for key, snapshot in snapshot_by_key.items():
-        if snapshot.get("status") not in {"ok", "out_of_scope"}:
+        # The pre-registered control suite is deliberately made of fixed,
+        # in-universe small-molecule cases.  Any other selection result is
+        # degraded/incomplete control output, not a scored observation.
+        if snapshot.get("status") != "ok" or snapshot.get("in_universe") is not True:
             return False, f"failed target-selection snapshot: {key}"
         try:
             ablation.validate_snapshot(snapshot, ablation.DEFAULT_TARGET_CAP)
@@ -116,8 +120,10 @@ def _valid_ablation_results(path: str = ABLATION_RESULTS) -> tuple[bool, str]:
         if key in seen_rows:
             return False, "duplicate control row"
         seen_rows.add(key)
-        if row.get("status") == "error":
-            return False, f"failed control row: {key[0]} / {key[1]}"
+        if row.get("status") not in CONTROL_ROW_STATUSES:
+            return False, f"non-terminal control row: {key[0]} / {key[1]}"
+        if row.get("in_universe") is not True:
+            return False, f"out-of-universe control row: {key[0]} / {key[1]}"
         snapshot = snapshot_by_key.get(key[1])
         if snapshot is None or row.get("target_input_hash") != snapshot.get("target_input_hash"):
             return False, "row does not match frozen target-selection snapshot"
@@ -138,9 +144,19 @@ def main() -> int:
     if os.path.exists(ABLATION_RESULTS):
         control_ok, reason = _valid_ablation_results()
         if not control_ok:
-            _log(f"source-ablation control invalid ({reason}) — remove the "
-                 "artifact before retrying; exit 2")
-            return 2
+            # This file is a generated, uncommitted partial control artifact.
+            # It has no analytical value once invalid, and retaining it would
+            # force a stale-resume refusal. Remove it so the next healthy
+            # preflight retries cleanly; never freeze from degraded control.
+            try:
+                os.remove(ABLATION_RESULTS)
+            except OSError as exc:
+                _log(f"source-ablation control invalid ({reason}) and could "
+                     f"not be discarded ({exc}) — exit 2")
+                return 2
+            _log(f"discarded invalid source-ablation control ({reason}) — "
+                 "exit 3 (retry cleanly when sources are healthy)")
+            return 3
     if not control_ok:
         _log("source-ablation control results missing — running one-time "
              "(label source_ablation_control, NOT benchmark v2)")

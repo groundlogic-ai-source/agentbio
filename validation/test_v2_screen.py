@@ -238,6 +238,7 @@ class AblationControlIntegrityTest(unittest.TestCase):
                 rows.append({
                     "condition": condition, "drug_name": drug,
                     "disease_name": disease, "status": "miss",
+                    "in_universe": True,
                     "target_input_hash": snap["target_input_hash"],
                 })
         return {
@@ -265,7 +266,7 @@ class AblationControlIntegrityTest(unittest.TestCase):
                 json.dump(payload, f)
             ok, reason = pf._valid_ablation_results(path)
             self.assertFalse(ok)
-            self.assertIn("failed control row", reason)
+            self.assertIn("non-terminal control row", reason)
 
     def test_missing_row_rejects_control(self):
         with tempfile.TemporaryDirectory() as td:
@@ -289,18 +290,45 @@ class AblationControlIntegrityTest(unittest.TestCase):
             self.assertFalse(ok)
             self.assertIn("failed target-selection snapshot", reason)
 
-    def test_preflight_refuses_existing_invalid_control_without_run(self):
+    def test_unknown_row_status_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["rows"][0]["status"] = "running"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("non-terminal control row", reason)
+
+    def test_out_of_scope_snapshot_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["target_snapshots"][0].update(
+                status="out_of_scope", in_universe=False)
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("failed target-selection snapshot", reason)
+
+    def test_preflight_discards_invalid_control_and_retries(self):
         with tempfile.TemporaryDirectory() as td:
             path = os.path.join(td, "control.json")
             payload = self._payload()
             payload["rows"][0]["status"] = "error"
             with open(path, "w") as f:
                 json.dump(payload, f)
-            with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+            validate_control = pf._valid_ablation_results
+            with mock.patch.object(pf, "_valid_ablation_results",
+                                   side_effect=lambda: validate_control(path)), \
+                    mock.patch.object(pf, "ABLATION_RESULTS", path), \
                     mock.patch.object(pf, "_healthy", return_value=True), \
                     mock.patch.object(pf, "_run_module") as run_module:
-                self.assertEqual(pf.main(), 2)
+                self.assertEqual(pf.main(), 3)
             run_module.assert_not_called()
+            self.assertFalse(os.path.exists(path))
 
 
 if __name__ == "__main__":
