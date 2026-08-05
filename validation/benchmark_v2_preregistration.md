@@ -135,3 +135,36 @@ and multi-source code paths with the confirmed drug fully held out. Rank, Top-10
 are reported separately and are not tuned to 5/5. Any change prompted by a fixture failure must be
 expressed as a general rule, receive positive and negative non-fixture controls, and pass broader
 drug-grouped ablation before the fixture is rerun.
+
+## Amendment 3 (2026-08-05, committed before any v2 case executes) — operationalization + supersessions
+
+Registered after the five-miss engineering acceptance passed 5/5 generated / 5/5 mechanistically
+valid (label `engineering_acceptance`, 2026-08-05) and BEFORE the screened list exists, the freeze
+tag exists, or any v2 case runs.
+
+16. **Item 1 (tiered ChEMBL pools) is SUPERSEDED, not silently dropped.** The Amendment-2 union
+    architecture (items 9–12) widened candidate generation beyond ChEMBL IC50/Ki conf ≥ 8 — the
+    acceptance fixtures generated through drugcentral/europepmc/gtopdb lanes with the ChEMBL
+    approved pool at zero. Tiered ChEMBL pools with the −0.05/−0.10 penalties were never
+    implemented; D1 is addressed by the union lanes instead. v2's improvement attribution must
+    name this substitution plainly.
+17. **Screen operationalization** (frozen in `validation/screen_v2_cases.py`,
+    `SCREEN_VERSION = "v2-screen-1"`, before the screen ever ran). (a) = OT re-resolution of the
+    indication name (unresolved → exclude; drift vs the stored v1 EFO → exclude) + Jaccard ≥ 0.6
+    OT canonical-name match + descendant count ≤ 50 (umbrella guard). (b) = non-empty OT
+    associated-target list after the pipeline's Stage-1 gate (association_score ≥ 0.1).
+    (c) = non-empty PRODUCTION union pool (`collect_target_candidates`,
+    `repurposing_only=True`, default source set) for at least one of the first ≤ 10 gated
+    targets. A lookup failure marks a case INDETERMINATE and the screen exits without writing a
+    list — unavailable data is never read as biological absence (item 14).
+18. **Item 3 (error reclassification) is subsumed by the screen** for its two observed classes
+    (EFO-mismatch, OT-zero-genetic infections); any residual in-run errors are still classified,
+    never counted as genuine misses.
+19. **Results separation.** v2 writes `validation/benchmark_results_v2.json`/`.md`; the v1
+    leftover rows in `benchmark_results.json` are never merged — the runner refuses cross-freeze
+    resume with exit 2.
+20. **Preflight automation.** `validation/run_v2_preflight.py` chains, idempotently: source
+    health probes → the source-ablation control (must complete BEFORE the freeze tag; the
+    harness's post-tag refusal is preserved) → the Amendment-1 screen → creation of
+    `benchmark-freeze-v2` at a clean HEAD. The benchmark-run workflow invokes preflight before
+    every (re)start, so the one v2 run cannot begin on degraded sources or an untagged tree.

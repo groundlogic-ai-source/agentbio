@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-04T01:09:40.920143+00:00",
+  "generated_at": "2026-08-05T02:38:48.600430+00:00",
   "label": "audit_trap_benchmark",
   "kind": "audit_traps",
   "preregistration": "validation/audit_traps_preregistration.md",
@@ -82,7 +82,7 @@
     {
       "id": "C1",
       "class": "clean_candidate_no_flags",
-      "clean": true,
+      "clean": false,
       "error": null
     },
     {
@@ -109,9 +109,9 @@
     "traps_caught": 12,
     "trap_recall": 1.0,
     "controls_total": 4,
-    "controls_false_flagged": 0,
-    "control_false_flag_rate": 0.0,
-    "precision": 1.0,
+    "controls_false_flagged": 1,
+    "control_false_flag_rate": 0.25,
+    "precision": 0.9230769230769231,
     "thresholds": {
       "min_trap_recall": 0.9,
       "max_control_false_flag_rate": 0.25
