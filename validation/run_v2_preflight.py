@@ -33,6 +33,13 @@ ABLATION_RESULTS = "validation/v2_source_ablation_results.json"
 SCREENED_LIST = "validation/benchmark_case_list_v2.json"
 PIPELINE_DIRS = ["agents/", "data_sources/", "cache/"]
 CONTROL_ROW_STATUSES = frozenset({"hit", "miss"})
+# Providers under test in the ablation. A provider that is switched OFF for an
+# arm MUST report "disabled" (that is the manipulation); a provider that is
+# switched ON must have actually answered ("ok"/"empty").  Anything else
+# ("unavailable", "parse_failed", missing) means the arm ran against a degraded
+# source, so its miss/hit is not an observation about source coverage.
+ABLATION_PROVIDERS = ("chembl", "gtopdb", "drugcentral")
+HEALTHY_SOURCE_STATUSES = frozenset({"ok", "empty"})
 
 
 def _log(msg: str) -> None:
@@ -145,6 +152,45 @@ def _valid_ablation_results(path: str = ABLATION_RESULTS) -> tuple[bool, str]:
         snapshot = snapshot_by_key.get(key[1])
         if snapshot is None or row.get("target_input_hash") != snapshot.get("target_input_hash"):
             return False, "row does not match frozen target-selection snapshot"
+        if row.get("error"):
+            return False, (f"degraded control row: {key[0]} / {key[1]} "
+                           f"({row.get('error')})")
+        enabled = artifact_conditions.get(key[0])
+        if not isinstance(enabled, list):
+            return False, f"unknown control row condition: {key[0]}"
+        # A terminal row is only meaningful if EVERY frozen target actually ran
+        # to completion under the arm's intended source manipulation.  A row can
+        # otherwise end as "miss" while individual targets errored out, which is
+        # a source outage wearing the costume of a negative result.
+        targets = row.get("per_target_results")
+        if not isinstance(targets, list):
+            return False, f"malformed per-target results: {key[0]} / {key[1]}"
+        if len(targets) != len(snapshot.get("selected_rows") or []):
+            return False, (f"incomplete per-target results: {key[0]} / {key[1]}")
+        for rec in targets:
+            if not isinstance(rec, dict):
+                return False, f"malformed per-target result: {key[0]} / {key[1]}"
+            symbol = rec.get("target_symbol")
+            if rec.get("status") != "ok" or rec.get("error"):
+                return False, (f"degraded target execution: {key[0]} / "
+                               f"{key[1]} / {symbol}")
+            statuses = rec.get("source_status")
+            if not isinstance(statuses, dict):
+                return False, (f"malformed source status: {key[0]} / "
+                               f"{key[1]} / {symbol}")
+            for provider in ABLATION_PROVIDERS:
+                state = statuses.get(provider)
+                status = (state or {}).get("status") if isinstance(state, dict) else None
+                if provider in enabled:
+                    if status not in HEALTHY_SOURCE_STATUSES:
+                        return False, (f"degraded source {provider} "
+                                       f"({status}): {key[0]} / {key[1]} / "
+                                       f"{symbol}")
+                elif status != "disabled":
+                    # An ablated-away source that still answered would break the
+                    # only manipulation this control exists to measure.
+                    return False, (f"ablated source {provider} not disabled "
+                                   f"({status}): {key[0]} / {key[1]} / {symbol}")
     if seen_rows != expected_rows:
         return False, "incomplete or unexpected control rows"
     return True, "complete and error-free"
