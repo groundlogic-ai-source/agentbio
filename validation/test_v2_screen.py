@@ -24,7 +24,7 @@ def _targets(n=1):
 
 
 def _patch_ot(search="MONDO_1", canonical="some rare disease",
-              descendants=2, targets=None):
+              descendants=2, targets=None, healthy=True):
     return mock.patch.multiple(
         sc,
         search_disease_efo=mock.Mock(return_value=search),
@@ -32,6 +32,7 @@ def _patch_ot(search="MONDO_1", canonical="some rare disease",
         get_disease_descendant_count=mock.Mock(return_value=descendants),
         get_target_disease_score=mock.Mock(
             return_value=_targets() if targets is None else targets),
+        ot_healthy=mock.Mock(return_value=healthy),
     )
 
 
@@ -89,6 +90,49 @@ class ScreenCaseTest(unittest.TestCase):
                 sc.screen_case(CASE)
 
 
+class ScreenOutageDisciplineTest(unittest.TestCase):
+    """OT helpers swallow transport errors and return None/[]; the screen must
+    treat those as unavailable — not absence — whenever OT probes unhealthy."""
+
+    def test_unresolved_during_outage_is_unavailable(self):
+        with _patch_ot(search=None, healthy=False):
+            with self.assertRaises(sc.ScreenDataUnavailable):
+                sc.screen_case(CASE)
+
+    def test_unresolved_when_healthy_is_genuine_exclusion(self):
+        with _patch_ot(search=None, healthy=True):
+            verdict, reason = sc.screen_case(CASE)
+        self.assertEqual((verdict, reason), ("exclude", "efo_unresolved"))
+
+    def test_empty_targets_during_outage_is_unavailable(self):
+        with _patch_ot(targets=[], healthy=False):
+            with self.assertRaises(sc.ScreenDataUnavailable):
+                sc.screen_case(CASE)
+
+    def test_provider_unavailable_is_not_empty_pool(self):
+        pool = {"candidates": [],
+                "source_status": {"drugcentral": {"status": "unavailable"}}}
+        with _patch_ot(), mock.patch.object(
+                sc, "collect_target_candidates", return_value=pool):
+            with self.assertRaises(sc.ScreenDataUnavailable):
+                sc.screen_case(CASE)
+
+    def test_provider_ok_statuses_allow_empty_pool_exclusion(self):
+        pool = {"candidates": [],
+                "source_status": {"gtopdb": {"status": "ok"},
+                                  "chembl": {"status": "empty"},
+                                  "drugcentral": {"status": "disabled"}}}
+        with _patch_ot(), mock.patch.object(
+                sc, "collect_target_candidates", return_value=pool):
+            verdict, reason = sc.screen_case(CASE)
+        self.assertEqual((verdict, reason), ("exclude", "empty_union_pool"))
+
+    def test_metadata_gap_with_healthy_probe_is_unavailable(self):
+        with _patch_ot(descendants=None, healthy=True):
+            with self.assertRaises(sc.ScreenDataUnavailable):
+                sc.screen_case(CASE)
+
+
 class ScreenMainTest(unittest.TestCase):
     def test_indeterminate_exit3_no_partial_list(self):
         with tempfile.TemporaryDirectory() as td:
@@ -123,6 +167,16 @@ class RunnerContaminationGuardTest(unittest.TestCase):
                 with self.assertRaises(SystemExit) as ctx:
                     rb._load_done()
             self.assertEqual(ctx.exception.code, 2)
+
+    def test_head_not_at_tag_refused(self):
+        def fake_run(args, **kwargs):
+            out = mock.Mock(returncode=0)
+            out.stdout = "aaaa1111\n" if args[-1] == "HEAD" else "bbbb2222\n"
+            return out
+        with mock.patch.object(rb.subprocess, "run", side_effect=fake_run):
+            with self.assertRaises(SystemExit) as ctx:
+                rb._check_freeze_integrity()
+        self.assertEqual(ctx.exception.code, 2)
 
 
 if __name__ == "__main__":

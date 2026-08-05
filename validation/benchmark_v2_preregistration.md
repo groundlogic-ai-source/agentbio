@@ -156,7 +156,10 @@ tag exists, or any v2 case runs.
     (c) = non-empty PRODUCTION union pool (`collect_target_candidates`,
     `repurposing_only=True`, default source set) for at least one of the first ≤ 10 gated
     targets. A lookup failure marks a case INDETERMINATE and the screen exits without writing a
-    list — unavailable data is never read as biological absence (item 14).
+    list — unavailable data is never read as biological absence (item 14). Because the OT helpers
+    return None/[] on transport failure, absence verdicts (unresolved EFO, zero targets, empty
+    pool) are accepted ONLY when the source probes healthy at that moment and every contacted
+    union provider reports status ok / empty / disabled; anything else is INDETERMINATE (exit 3).
 18. **Item 3 (error reclassification) is subsumed by the screen** for its two observed classes
     (EFO-mismatch, OT-zero-genetic infections); any residual in-run errors are still classified,
     never counted as genuine misses.
