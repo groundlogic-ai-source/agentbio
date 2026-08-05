@@ -62,3 +62,6 @@ data_prep/output/
 output/structures/
 attached_assets/
 cache.db-journal
+
+# v2 preflight control-discard budget (runtime state)
+validation/.v2_control_attempts

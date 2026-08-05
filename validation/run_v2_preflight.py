@@ -40,10 +40,41 @@ CONTROL_ROW_STATUSES = frozenset({"hit", "miss"})
 # source, so its miss/hit is not an observation about source coverage.
 ABLATION_PROVIDERS = ("chembl", "gtopdb", "drugcentral")
 HEALTHY_SOURCE_STATUSES = frozenset({"ok", "empty"})
+# The control is only valid if every ablated source answered, so a degraded
+# GtoPdb/DrugCentral would let an expensive control run finish and then be
+# discarded. Probe them up front (cheap) and bound how many times we are
+# willing to pay for that discovery (see ATTEMPTS_PATH).
+ATTEMPTS_PATH = "validation/.v2_control_attempts"
+MAX_CONTROL_DISCARDS = 3
 
 
 def _log(msg: str) -> None:
     print(f"[preflight] {msg}", flush=True)
+
+
+def _ablation_sources_healthy() -> bool:
+    """Liveness probes for the two sources the ablation manipulates.
+
+    Control validity requires GtoPdb and DrugCentral to have actually answered
+    in the arms where they are enabled.  Probing them here turns a guaranteed
+    late rejection (after a full, expensive control run) into a cheap retry.
+    """
+    from data_sources import drugcentral_v2, gtopdb
+    probes = (
+        (gtopdb, "/targets", {"accession": "P08183"}),
+        (drugcentral_v2, "/act_table_full/accession/P08183", None),
+    )
+    for module, path, params in probes:
+        try:
+            data = module._get_json(path, params) if params is not None \
+                else module._get_json(path)
+        except Exception as exc:
+            _log(f"{module.__name__.rsplit('.', 1)[-1]} probe failed: {exc}")
+            return False
+        if not isinstance(data, list):
+            _log(f"{module.__name__.rsplit('.', 1)[-1]} probe returned no list")
+            return False
+    return True
 
 
 def _healthy() -> bool:
@@ -53,7 +84,32 @@ def _healthy() -> bool:
     except ImportError:  # direct (non-package) execution
         from run_benchmark import _chembl_healthy
         from screen_v2_cases import ot_healthy
-    return _chembl_healthy() and ot_healthy()
+    return _chembl_healthy() and ot_healthy() and _ablation_sources_healthy()
+
+
+def _discard_attempts() -> int:
+    try:
+        with open(ATTEMPTS_PATH, encoding="utf-8") as f:
+            return int(f.read().strip() or 0)
+    except (OSError, ValueError):
+        return 0
+
+
+def _record_discard() -> int:
+    attempts = _discard_attempts() + 1
+    try:
+        with open(ATTEMPTS_PATH, "w", encoding="utf-8") as f:
+            f.write(str(attempts))
+    except OSError:
+        pass
+    return attempts
+
+
+def _clear_discards() -> None:
+    try:
+        os.remove(ATTEMPTS_PATH)
+    except OSError:
+        pass
 
 
 def _run_module(module: str) -> int:
@@ -196,10 +252,37 @@ def _valid_ablation_results(path: str = ABLATION_RESULTS) -> tuple[bool, str]:
     return True, "complete and error-free"
 
 
+def _discard_control(reason: str, context: str) -> int:
+    """Delete an unusable control artifact and decide retry vs. stop.
+
+    Discarding is right (degraded control must never reach freeze), but an
+    unattended workflow would otherwise re-run an expensive control against a
+    persistently broken source forever.  Budget the attempts and hand back to a
+    human instead of burning the night on a source outage.
+    """
+    try:
+        os.remove(ABLATION_RESULTS)
+    except OSError as exc:
+        _log(f"source-ablation control invalid {context} ({reason}) and could "
+             f"not be discarded ({exc}) — exit 2")
+        return 2
+    attempts = _record_discard()
+    if attempts >= MAX_CONTROL_DISCARDS:
+        _log(f"source-ablation control invalid {context} ({reason}); "
+             f"{attempts} discarded attempts — sources look persistently "
+             "degraded. Stopping instead of re-running the control; manual "
+             "intervention required")
+        return 2
+    _log(f"discarded invalid source-ablation control {context} ({reason}) — "
+         f"attempt {attempts}/{MAX_CONTROL_DISCARDS}; exit 3 (retry cleanly "
+         "when sources are healthy)")
+    return 3
+
+
 def main() -> int:
     # 1. Health gate — never compete cases against degraded sources.
     if not _healthy():
-        _log("ChEMBL/OT unhealthy — exit 4 (workflow retries)")
+        _log("ChEMBL/OT/ablation sources unhealthy — exit 4 (workflow retries)")
         return 4
 
     # 2. Source-ablation control (pre-registered development control; the
@@ -212,15 +295,7 @@ def main() -> int:
             # It has no analytical value once invalid, and retaining it would
             # force a stale-resume refusal. Remove it so the next healthy
             # preflight retries cleanly; never freeze from degraded control.
-            try:
-                os.remove(ABLATION_RESULTS)
-            except OSError as exc:
-                _log(f"source-ablation control invalid ({reason}) and could "
-                     f"not be discarded ({exc}) — exit 2")
-                return 2
-            _log(f"discarded invalid source-ablation control ({reason}) — "
-                 "exit 3 (retry cleanly when sources are healthy)")
-            return 3
+            return _discard_control(reason, "on disk")
     if not control_ok:
         _log("source-ablation control results missing — running one-time "
              "(label source_ablation_control, NOT benchmark v2)")
@@ -234,15 +309,9 @@ def main() -> int:
             return 3
         control_ok, reason = _valid_ablation_results()
         if not control_ok:
-            try:
-                os.remove(ABLATION_RESULTS)
-            except OSError as exc:
-                _log(f"source-ablation control invalid after run ({reason}) "
-                     f"and could not be discarded ({exc}) — exit 2")
-                return 2
-            _log(f"source-ablation control invalid after run ({reason}) — "
-                 "discarded; exit 3 (retry cleanly)")
-            return 3
+            return _discard_control(reason, "after run")
+    # A usable control exists; the outage budget is about consecutive failures.
+    _clear_discards()
 
     # 3. Amendment-1 screened case list.
     if not os.path.exists(SCREENED_LIST):

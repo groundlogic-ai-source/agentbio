@@ -444,6 +444,48 @@ class AblationControlIntegrityTest(unittest.TestCase):
             self.assertFalse(ok)
             self.assertIn("malformed condition mapping", reason)
 
+    def test_degraded_ablation_source_blocks_before_running_control(self):
+        # A doomed control run must never be paid for: if GtoPdb/DrugCentral
+        # are down, every enabled arm would be rejected afterwards anyway.
+        with mock.patch.object(pf, "_ablation_sources_healthy",
+                               return_value=False), \
+                mock.patch("validation.run_benchmark._chembl_healthy",
+                           return_value=True), \
+                mock.patch("validation.screen_v2_cases.ot_healthy",
+                           return_value=True), \
+                mock.patch.object(pf, "_run_module") as run_module:
+            self.assertEqual(pf.main(), 4)
+        run_module.assert_not_called()
+
+    def test_repeated_discards_stop_instead_of_looping(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            attempts = os.path.join(td, "attempts")
+            payload = self._payload()
+            payload["rows"][0]["status"] = "error"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch.object(pf, "ATTEMPTS_PATH", attempts), \
+                    mock.patch.object(pf, "MAX_CONTROL_DISCARDS", 2):
+                self.assertEqual(pf._discard_control("bad", "on disk"), 3)
+                with open(path, "w") as f:
+                    json.dump(payload, f)
+                # Budget exhausted: stop for a human rather than re-running an
+                # expensive control against a persistently degraded source.
+                self.assertEqual(pf._discard_control("bad", "on disk"), 2)
+                self.assertFalse(os.path.exists(path))
+
+    def test_valid_control_clears_discard_budget(self):
+        with tempfile.TemporaryDirectory() as td:
+            attempts = os.path.join(td, "attempts")
+            with open(attempts, "w") as f:
+                f.write("2")
+            with mock.patch.object(pf, "ATTEMPTS_PATH", attempts):
+                self.assertEqual(pf._discard_attempts(), 2)
+                pf._clear_discards()
+                self.assertEqual(pf._discard_attempts(), 0)
+
     def test_preflight_discards_invalid_control_and_retries(self):
         with tempfile.TemporaryDirectory() as td:
             path = os.path.join(td, "control.json")
