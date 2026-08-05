@@ -1,7 +1,7 @@
 {
   "label": "source_ablation_control",
-  "generated_at": "2026-08-05T13:00:47",
-  "fingerprint": "d6b95f4f2e27a60747b1154fbbe3daf4853e37a1d1aefdffdb48973b2b9adb60",
+  "generated_at": "2026-08-05T13:15:54",
+  "fingerprint": "e65a5374477e32c374381a47dfd562981b4733195c1b4c53d00e0b198d5a48b4",
   "target_cap": 10,
   "top_n": 10,
   "strong_match_threshold": 0.7,
