@@ -10,6 +10,7 @@ is NOT run here.
 
 import os
 import sys
+import time
 import unittest
 from unittest.mock import patch
 
@@ -92,6 +93,27 @@ class SourceConditionsTest(unittest.TestCase):
 
     def test_thirteen_cases(self):
         self.assertEqual(len(A.TARGET_CASES), 13)
+
+
+class TargetDeadlineTest(unittest.TestCase):
+    def test_bounded_target_timeout_becomes_explicit_error(self):
+        row = {
+            "target_symbol": "C5",
+            "uniprot_id": "P01031",
+            "ot_association_score": 0.4,
+            "target_discovery_method": "genetic_association",
+        }
+
+        def slow_target(*_args, **_kwargs):
+            time.sleep(0.15)
+            return {"status": "ok"}
+
+        with patch.object(A, "_run_one_target", side_effect=slow_target):
+            result = A._run_one_target_bounded(
+                row, ("chembl",), timeout_seconds=0.01)
+        self.assertEqual(result["status"], "error")
+        self.assertIn("timed out", result["error"])
+        self.assertEqual(result["target_symbol"], "C5")
 
 
 # ── Holdout self-audit ────────────────────────────────────────────────────────

@@ -62,6 +62,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import multiprocessing
 import os
 import sys
 import time
@@ -114,6 +115,12 @@ RESULTS_MD = os.path.join(VALIDATION_DIR, "v2_source_ablation_report.md")
 
 DEFAULT_TARGET_CAP = 10
 TOP_N = 10
+# A source-ablation control is a prerequisite, not a reason to let a single
+# upstream/model call monopolize the benchmark workflow indefinitely.  The
+# deadline is deliberately per target (not for the whole case): a timeout is
+# recorded as an invalid control result and must be retried from its frozen
+# target-selection snapshot before any benchmark freeze is allowed.
+PER_TARGET_TIMEOUT_SECONDS = 15 * 60
 
 # ── Source conditions ────────────────────────────────────────────────────────
 # The four conditions.  ChEMBL is present in EVERY condition and is the baseline
@@ -196,6 +203,7 @@ def config_source_fingerprint(cap: int, conditions: tuple[str, ...]) -> str:
     h.update(f"cap={cap}".encode())
     h.update(f"top_n={TOP_N}".encode())
     h.update(f"strong_match_threshold={STRONG_MATCH_THRESHOLD}".encode())
+    h.update(f"per_target_timeout_seconds={PER_TARGET_TIMEOUT_SECONDS}".encode())
     h.update(("conditions=" + repr(sorted(conditions))).encode())
     for cond in sorted(conditions):
         h.update(f"\x00cond:{cond}={repr(CONDITIONS[cond])}\x00".encode())
@@ -433,6 +441,76 @@ def _run_one_target(row: dict[str, Any], enabled: tuple[str, ...]) -> dict[str, 
     return rec
 
 
+def _run_one_target_bounded(
+    row: dict[str, Any], enabled: tuple[str, ...],
+    timeout_seconds: int = PER_TARGET_TIMEOUT_SECONDS,
+) -> dict[str, Any]:
+    """Run one target with a hard operational deadline.
+
+    The target pipeline makes external calls whose normal request-level
+    timeouts do not protect against a stalled composite operation.  A timeout
+    is data-invalidating, never a synthetic empty pool: it is written as an
+    explicit target error so preflight discards the control rather than
+    freezing or benchmarking from partial results.
+    """
+    # A thread cannot be safely killed in Python and ThreadPoolExecutor waits
+    # for it on shutdown.  Use a process boundary so the timeout is real even
+    # when a library call ignores its own request-level timeout.
+    parent_conn, child_conn = multiprocessing.Pipe(duplex=False)
+
+    def worker() -> None:
+        try:
+            child_conn.send(("ok", _run_one_target(row, enabled)))
+        except BaseException as exc:  # pass unexpected worker crashes upstream
+            child_conn.send(("error", f"{type(exc).__name__}: {exc}"))
+        finally:
+            child_conn.close()
+
+    process = multiprocessing.Process(target=worker, daemon=True)
+    process.start()
+    child_conn.close()
+    if parent_conn.poll(timeout_seconds):
+        state, payload = parent_conn.recv()
+        process.join(timeout=1)
+        parent_conn.close()
+        if state == "ok":
+            return payload
+        return {
+            "target_symbol": row.get("target_symbol"),
+            "uniprot_id": row.get("uniprot_id"),
+            "ot_association_score": row.get("ot_association_score", 0.0),
+            "target_discovery_method": row.get(
+                "target_discovery_method", "unknown"),
+            "status": "error",
+            "n_chemist_candidates": 0,
+            "error": f"target worker failed: {payload}",
+            "_chemist_candidates": [],
+            "_biologist_output": None,
+            "source_status": {},
+        }
+
+    process.terminate()
+    process.join(timeout=5)
+    parent_conn.close()
+    target_name = row.get("target_symbol") or row.get("uniprot_id")
+    message = (f"target execution timed out after {timeout_seconds}s: "
+               f"{target_name}")
+    _log(f"    ERROR {message}")
+    return {
+        "target_symbol": row.get("target_symbol"),
+        "uniprot_id": row.get("uniprot_id"),
+        "ot_association_score": row.get("ot_association_score", 0.0),
+        "target_discovery_method": row.get(
+            "target_discovery_method", "unknown"),
+        "status": "error",
+        "n_chemist_candidates": 0,
+        "error": message,
+        "_chemist_candidates": [],
+        "_biologist_output": None,
+        "source_status": {},
+    }
+
+
 def run_pair_condition(drug_name: str, disease_name: str, condition: str,
                        cap: int, snapshot: dict[str, Any]) -> dict[str, Any]:
     """Run one (drug, disease) pair under one source condition.
@@ -513,7 +591,7 @@ def run_pair_condition(drug_name: str, disease_name: str, condition: str,
     for k_idx, row in enumerate(run_rows, 1):
         _log(f"  [target {k_idx}/{len(run_rows)}] {row.get('target_symbol')} "
              f"({row.get('uniprot_id')})")
-        rec = _run_one_target(row, enabled)
+        rec = _run_one_target_bounded(row, enabled)
         chem_cands = rec.pop("_chemist_candidates", [])
         bio_output = rec.pop("_biologist_output", None)
         all_chemist.extend(chem_cands)
