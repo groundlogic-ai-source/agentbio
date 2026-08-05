@@ -22,6 +22,7 @@ Exit codes: 0 = ready; 2 = manual intervention; 3 = data unavailable (retry);
 from __future__ import annotations
 
 import os
+import json
 import subprocess
 import sys
 
@@ -51,6 +52,80 @@ def _run_module(module: str) -> int:
     return subprocess.call([sys.executable, "-m", module])
 
 
+def _valid_ablation_results(path: str = ABLATION_RESULTS) -> tuple[bool, str]:
+    """Require a complete, error-free default control before freeze.
+
+    The control harness flushes incrementally so a file existing is not proof
+    that it is usable.  In particular, source outages can leave a full set of
+    persisted error rows that must never be mistaken for a completed control.
+    """
+    try:
+        from validation import run_v2_source_ablations as ablation
+    except ImportError:  # direct (non-package) execution
+        import run_v2_source_ablations as ablation
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, json.JSONDecodeError) as exc:
+        return False, f"unreadable control artifact: {exc}"
+
+    conditions = tuple(ablation.CONDITIONS)
+    expected_cases = [
+        (drug, disease) for _, drug, disease, _ in ablation.TARGET_CASES
+    ]
+    expected_snapshots = {
+        ablation._case_key(drug, disease) for drug, disease in expected_cases
+    }
+    expected_rows = {
+        (condition, ablation._case_key(drug, disease))
+        for condition in conditions for drug, disease in expected_cases
+    }
+    if payload.get("label") != ablation.LABEL:
+        return False, "wrong control label"
+    if payload.get("target_cap") != ablation.DEFAULT_TARGET_CAP:
+        return False, "unexpected target cap"
+    if tuple(payload.get("conditions", {})) != conditions:
+        return False, "unexpected condition set"
+    expected_fingerprint = ablation.config_source_fingerprint(
+        ablation.DEFAULT_TARGET_CAP, conditions)
+    if payload.get("fingerprint") != expected_fingerprint:
+        return False, "stale control fingerprint"
+
+    snapshots = payload.get("target_snapshots")
+    rows = payload.get("rows")
+    if not isinstance(snapshots, list) or not isinstance(rows, list):
+        return False, "missing snapshots or rows"
+    snapshot_by_key = {s.get("case_key"): s for s in snapshots if isinstance(s, dict)}
+    if set(snapshot_by_key) != expected_snapshots:
+        return False, "incomplete or unexpected target snapshots"
+    for key, snapshot in snapshot_by_key.items():
+        if snapshot.get("status") not in {"ok", "out_of_scope"}:
+            return False, f"failed target-selection snapshot: {key}"
+        try:
+            ablation.validate_snapshot(snapshot, ablation.DEFAULT_TARGET_CAP)
+        except RuntimeError as exc:
+            return False, f"invalid target-selection snapshot: {exc}"
+
+    seen_rows = set()
+    for row in rows:
+        if not isinstance(row, dict):
+            return False, "malformed control row"
+        key = (row.get("condition"),
+               ablation._case_key(row.get("drug_name", ""),
+                                  row.get("disease_name", "")))
+        if key in seen_rows:
+            return False, "duplicate control row"
+        seen_rows.add(key)
+        if row.get("status") == "error":
+            return False, f"failed control row: {key[0]} / {key[1]}"
+        snapshot = snapshot_by_key.get(key[1])
+        if snapshot is None or row.get("target_input_hash") != snapshot.get("target_input_hash"):
+            return False, "row does not match frozen target-selection snapshot"
+    if seen_rows != expected_rows:
+        return False, "incomplete or unexpected control rows"
+    return True, "complete and error-free"
+
+
 def main() -> int:
     # 1. Health gate — never compete cases against degraded sources.
     if not _healthy():
@@ -59,7 +134,14 @@ def main() -> int:
 
     # 2. Source-ablation control (pre-registered development control; the
     #    harness refuses to run post-tag, so it must finish first).
-    if not os.path.exists(ABLATION_RESULTS):
+    control_ok = False
+    if os.path.exists(ABLATION_RESULTS):
+        control_ok, reason = _valid_ablation_results()
+        if not control_ok:
+            _log(f"source-ablation control invalid ({reason}) — remove the "
+                 "artifact before retrying; exit 2")
+            return 2
+    if not control_ok:
         _log("source-ablation control results missing — running one-time "
              "(label source_ablation_control, NOT benchmark v2)")
         rc = _run_module("validation.run_v2_source_ablations")
@@ -69,6 +151,11 @@ def main() -> int:
             return 2
         if rc != 0 or not os.path.exists(ABLATION_RESULTS):
             _log(f"ablation control rc={rc} — exit 3 (retry)")
+            return 3
+        control_ok, reason = _valid_ablation_results()
+        if not control_ok:
+            _log(f"source-ablation control invalid after run ({reason}) — "
+                 "exit 3 (retry)")
             return 3
 
     # 3. Amendment-1 screened case list.
