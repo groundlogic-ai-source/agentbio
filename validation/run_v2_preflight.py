@@ -82,6 +82,17 @@ def main() -> int:
     have_tag = subprocess.run(
         ["git", "rev-parse", "-q", "--verify", f"refs/tags/{FREEZE_TAG}"],
         capture_output=True).returncode == 0
+    if have_tag:
+        head = subprocess.run(["git", "rev-parse", "HEAD"],
+                              capture_output=True, text=True).stdout.strip()
+        tagged = subprocess.run(
+            ["git", "rev-parse", f"{FREEZE_TAG}^{{commit}}"],
+            capture_output=True, text=True).stdout.strip()
+        if head != tagged:
+            _log(f"{FREEZE_TAG} points at {tagged[:8]} but HEAD is "
+                 f"{head[:8]} — the frozen run must execute at the tagged "
+                 "commit; manual intervention required")
+            return 2
     if not have_tag:
         dirty = subprocess.run(
             ["git", "status", "--porcelain", "--"] + PIPELINE_DIRS,

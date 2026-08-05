@@ -48,7 +48,17 @@ CHEMBL_PROBE = ("https://www.ebi.ac.uk/chembl/api/data/molecule.json"
 # ── Protocol gates ───────────────────────────────────────────────────────────
 
 def _check_freeze_integrity() -> None:
-    """Pipeline-under-test must be byte-identical to the freeze tag."""
+    """The one v2 run executes AT the tagged commit, with the pipeline dirs
+    byte-identical to the tag."""
+    head = subprocess.run(["git", "rev-parse", "HEAD"],
+                          capture_output=True, text=True).stdout.strip()
+    tagged = subprocess.run(["git", "rev-parse", f"{FREEZE_TAG}^{{commit}}"],
+                            capture_output=True, text=True).stdout.strip()
+    if not tagged or head != tagged:
+        _log(f"FATAL: HEAD ({head[:8] or '?'}) != {FREEZE_TAG} "
+             f"({tagged[:8] or 'missing'}) — the frozen run must execute at "
+             "the tagged commit; amend + re-tag deliberately, never drift.")
+        sys.exit(2)
     diff = subprocess.run(
         ["git", "diff", "--name-only", FREEZE_TAG, "--",
          "agents/", "data_sources/", "cache/"],

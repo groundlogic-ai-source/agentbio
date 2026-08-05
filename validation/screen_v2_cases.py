@@ -61,6 +61,22 @@ class ScreenDataUnavailable(Exception):
     """A source lookup failed transiently — NEVER interpreted as absence."""
 
 
+# Provider statuses that mean the lane answered honestly (empty IS a genuine
+# answer; disabled is an explicit ablation choice). Anything else —
+# unavailable, degraded, parse_failed — is a transient failure, not absence.
+OK_PROVIDER_STATUSES = {"ok", "empty", "disabled"}
+
+
+def _ot_absence(what: str) -> None:
+    """Guard for OT helpers that swallow transport errors and return None/[]
+    on failure: an absence verdict is accepted as genuine only when OT probes
+    healthy right now."""
+    if not ot_healthy():
+        raise ScreenDataUnavailable(
+            f"OT returned absence for {what} while OT is unhealthy — "
+            "treating as unavailable, not absence")
+
+
 def _norm(s: str) -> str:
     return " ".join(
         "".join(ch.lower() if ch.isalnum() else " " for ch in (s or "")).split()
@@ -94,7 +110,9 @@ def _chembl_healthy() -> bool:
 def screen_case(case: dict[str, Any]) -> tuple[str, str]:
     """-> (verdict, reason); verdict in {"pass", "exclude"}.
 
-    Raises ScreenDataUnavailable when a lookup fails transiently."""
+    Raises ScreenDataUnavailable when a lookup fails transiently, when an OT
+    helper returns a biological-looking absence while OT is unhealthy, or when
+    any contacted union provider reports a non-ok status."""
     ind = case["ind_name"]
     stored_efo = case.get("efo_id") or ""
 
@@ -103,6 +121,7 @@ def screen_case(case: dict[str, Any]) -> tuple[str, str]:
     except Exception as e:
         raise ScreenDataUnavailable(f"OT search failed for {ind}: {e}")
     if not resolved:
+        _ot_absence(f"EFO search for {ind}")
         return "exclude", "efo_unresolved"
     if stored_efo and resolved != stored_efo:
         return ("exclude",
@@ -115,13 +134,18 @@ def screen_case(case: dict[str, Any]) -> tuple[str, str]:
     except Exception as e:
         raise ScreenDataUnavailable(f"OT metadata failed for {ind}: {e}")
     if canonical is None or descendants is None or targets is None:
-        raise ScreenDataUnavailable(f"OT metadata incomplete for {ind}")
+        _ot_absence(f"metadata for {ind}")
+        raise ScreenDataUnavailable(
+            f"OT metadata incomplete for {ind} with a healthy probe — "
+            "persistent data gap, never an exclusion")
     if not _name_match(ind, canonical):
         return "exclude", f"efo_name_mismatch (OT canonical: {canonical!r})"
     if descendants > DESCENDANT_CAP:
         return ("exclude",
                 f"umbrella_term ({descendants} descendants > {DESCENDANT_CAP})")
 
+    if not targets:
+        _ot_absence(f"associated targets for {ind}")
     gated = [t for t in targets
              if (t.get("association_score") or 0) >= ASSOC_GATE
              and t.get("uniprot_id")]
@@ -141,6 +165,12 @@ def screen_case(case: dict[str, Any]) -> tuple[str, str]:
         except Exception as e:
             raise ScreenDataUnavailable(
                 f"pool check failed for {ind}/{t.get('target_symbol')}: {e}")
+        for provider, meta in (pool.get("source_status") or {}).items():
+            st = (meta or {}).get("status")
+            if st and st not in OK_PROVIDER_STATUSES:
+                raise ScreenDataUnavailable(
+                    f"provider {provider} status={st} for "
+                    f"{ind}/{t.get('target_symbol')} — unavailable is not absence")
         if pool.get("candidates"):
             return "pass", f"pool via {t.get('target_symbol')}"
     return "exclude", "empty_union_pool"
