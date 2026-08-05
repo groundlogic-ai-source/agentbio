@@ -178,6 +178,18 @@ class RunnerContaminationGuardTest(unittest.TestCase):
                 rb._check_freeze_integrity()
         self.assertEqual(ctx.exception.code, 2)
 
+    def test_preflight_tag_not_at_head_refused(self):
+        from validation import run_v2_preflight as pf
+
+        def fake_run(args, **kwargs):
+            out = mock.Mock(returncode=0)
+            out.stdout = "aaaa1111\n" if args[-1] == "HEAD" else "bbbb2222\n"
+            return out
+        with mock.patch.object(pf.os.path, "exists", return_value=True), \
+                mock.patch.object(pf, "_healthy", return_value=True), \
+                mock.patch.object(pf.subprocess, "run", side_effect=fake_run):
+            self.assertEqual(pf.main(), 2)
+
 
 if __name__ == "__main__":
     unittest.main()
