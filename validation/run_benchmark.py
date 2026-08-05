@@ -36,9 +36,11 @@ from data_sources import holdout as holdout_mod  # noqa: E402
 from data_sources.chembl import get_target_candidate_compounds  # noqa: E402
 
 CASE_LIST = "validation/benchmark_case_list.json"
-RESULTS_JSON = "validation/benchmark_results.json"
-RESULTS_MD = "validation/benchmark_results.md"
-FREEZE_TAG = "benchmark-freeze-v1"
+SCREENED_LIST = "validation/benchmark_case_list_v2.json"
+SCREEN_VERSION = "v2-screen-1"
+RESULTS_JSON = "validation/benchmark_results_v2.json"
+RESULTS_MD = "validation/benchmark_results_v2.md"
+FREEZE_TAG = "benchmark-freeze-v2"
 CHEMBL_PROBE = ("https://www.ebi.ac.uk/chembl/api/data/molecule.json"
                 "?pref_name=SILDENAFIL&limit=1")
 
@@ -98,9 +100,20 @@ def _development_cases() -> list[dict[str, str]]:
 
 
 def _all_cases() -> list[dict[str, str]]:
+    if not os.path.exists(SCREENED_LIST):
+        _log(f"FATAL: {SCREENED_LIST} missing — run "
+             "`python3 -m validation.run_v2_preflight` first (it generates the "
+             "Amendment-1 screened list before the freeze tag).")
+        sys.exit(2)
+    screened = json.load(open(SCREENED_LIST))
+    if screened.get("screen_version") != SCREEN_VERSION:
+        _log(f"FATAL: screened list version "
+             f"{screened.get('screen_version')!r} != {SCREEN_VERSION!r} — "
+             "regenerate via run_v2_preflight.")
+        sys.exit(2)
     primary = [{"drug": c["drug_name"], "disease": c["ind_name"],
                 "subset": "primary", "stratum": c["stratum"]}
-               for c in json.load(open(CASE_LIST))["primary"]]
+               for c in screened["primary"]]
     dev = [{**c, "subset": "development", "stratum": "development"}
            for c in _development_cases()]
     return primary + dev
@@ -116,14 +129,21 @@ def _load_done() -> dict:
     if not os.path.exists(RESULTS_JSON):
         return {}
     with open(RESULTS_JSON) as f:
-        return {_key(c["drug_name"], c["disease_name"]): c
-                for c in json.load(f).get("cases", [])
-                if c.get("holdout_drugs")}
+        payload = json.load(f)
+    if payload.get("freeze_tag") != FREEZE_TAG:
+        _log(f"FATAL: {RESULTS_JSON} belongs to "
+             f"{payload.get('freeze_tag')!r}, not {FREEZE_TAG!r} — refusing to "
+             "resume/merge across freezes (protocol: v1 and v2 never merge).")
+        sys.exit(2)
+    return {_key(c["drug_name"], c["disease_name"]): c
+            for c in payload.get("cases", [])
+            if c.get("holdout_drugs")}
 
 
 def _flush(cases: list[dict[str, Any]]) -> None:
     with open(RESULTS_JSON, "w") as f:
         json.dump({"freeze_tag": FREEZE_TAG, "case_list": CASE_LIST,
+                   "screened_list": SCREENED_LIST,
                    "cases": cases}, f, indent=2)
 
 

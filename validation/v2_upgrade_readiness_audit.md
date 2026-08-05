@@ -144,3 +144,17 @@ Passing the five is necessary evidence that the diagnosed v1 gaps were actually 
 not sufficient evidence of general accuracy. V2 may begin only after the five-case engineering
 test, broader held-out development/negative controls, holdout audit, source-health checks, and a
 new `benchmark-freeze-v2` tag all pass.
+
+## Addendum (2026-08-05) — readiness update
+
+The five-miss engineering acceptance **PASSED** on 2026-08-05: 5/5 generated, 5/5
+mechanistically valid (label `engineering_acceptance`; rank / Top-10 / STRONG_MATCH reported
+separately in `engineering_acceptance_results.md` and not tuned to 5/5 — Top-10 was 0/5, which
+carries into the v2 accuracy forecast). Holdout audit and per-case source health are included in
+that report. Decision upgraded from NOT READY to **READY-PENDING-PREFLIGHT**: the remaining
+pre-freeze items are automated and idempotent in `validation/run_v2_preflight.py` — the
+source-ablation control (13 small-molecule development cases × 4 source conditions, label
+`source_ablation_control`; these are the broader held-out development/negative controls, run
+BEFORE the tag because the harness refuses post-tag), the Amendment-1 screen, and creation of
+`benchmark-freeze-v2` at a clean HEAD. The audit trap benchmark (12 traps + 4 controls,
+label `audit_trap_benchmark`) re-PASSED the same day as the negative-control surface.

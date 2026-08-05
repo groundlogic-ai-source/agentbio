@@ -1,14 +1,14 @@
 # Audit Trap Benchmark — Results
 
-- Generated: 2026-08-04T01:09:40.920143+00:00
+- Generated: 2026-08-05T02:38:48.600430+00:00
 - Label: `audit_trap_benchmark` (offline: True)
 - **Verdict: PASS**
 
 ## Metrics
 
 - Trap recall: 12/12 = 1.00 (threshold ≥ 0.9)
-- Control false-flag rate: 0/4 = 0.00 (threshold ≤ 0.25)
-- Precision: 1.00
+- Control false-flag rate: 1/4 = 0.25 (threshold ≤ 0.25)
+- Precision: 0.92
 
 ## Traps (must be caught)
 
@@ -31,7 +31,7 @@
 
 | ID | Class | Outcome |
 |----|-------|---------|
-| C1 | clean_candidate_no_flags | CLEAN |
+| C1 | clean_candidate_no_flags | **FALSE-FLAGGED** |
 | C2 | verified_hypothesis_not_flagged | CLEAN |
 | C3 | measured_zero_still_counts | CLEAN |
 | C4 | resolved_absent_not_unresolved | CLEAN |
