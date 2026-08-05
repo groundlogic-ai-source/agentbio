@@ -41,8 +41,17 @@ SCREEN_VERSION = "v2-screen-1"
 RESULTS_JSON = "validation/benchmark_results_v2.json"
 RESULTS_MD = "validation/benchmark_results_v2.md"
 FREEZE_TAG = "benchmark-freeze-v2"
-CHEMBL_PROBE = ("https://www.ebi.ac.uk/chembl/api/data/molecule.json"
-                "?pref_name=SILDENAFIL&limit=1")
+# Probe every molecule route the benchmark relies on.  The broad list route can
+# remain healthy while the filtered metadata requests used for holdout redaction
+# and salt/parent normalization return 500s (2026-08-05).  A run must not begin
+# in that partially degraded state.
+CHEMBL_PROBES = (
+    ("https://www.ebi.ac.uk/chembl/api/data/molecule.json"
+     "?pref_name__iexact=SILDENAFIL&limit=1"),
+    ("https://www.ebi.ac.uk/chembl/api/data/molecule.json"
+     "?parent_chembl_id=CHEMBL192&limit=1"),
+    "https://www.ebi.ac.uk/chembl/api/data/molecule/CHEMBL192.json",
+)
 
 
 # ── Protocol gates ───────────────────────────────────────────────────────────
@@ -72,8 +81,17 @@ def _check_freeze_integrity() -> None:
 
 def _chembl_healthy() -> bool:
     try:
-        r = requests.get(CHEMBL_PROBE, timeout=15)
-        return r.status_code == 200 and bool(r.json().get("molecules"))
+        for url in CHEMBL_PROBES:
+            r = requests.get(url, timeout=15)
+            payload = r.json()
+            if r.status_code != 200:
+                return False
+            if isinstance(payload, dict) and "molecules" in payload:
+                if not payload["molecules"]:
+                    return False
+            elif not isinstance(payload, dict) or not payload.get("molecule_chembl_id"):
+                return False
+        return True
     except Exception:
         return False
 

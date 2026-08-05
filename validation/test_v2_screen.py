@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from validation import screen_v2_cases as sc  # noqa: E402
 from validation import run_benchmark as rb  # noqa: E402
+from validation import run_v2_preflight as pf  # noqa: E402
 
 CASE = {"drug_name": "DrugX", "ind_name": "Some Rare Disease",
         "efo_id": "MONDO_1", "stratum": "rare"}
@@ -179,16 +180,127 @@ class RunnerContaminationGuardTest(unittest.TestCase):
         self.assertEqual(ctx.exception.code, 2)
 
     def test_preflight_tag_not_at_head_refused(self):
-        from validation import run_v2_preflight as pf
-
         def fake_run(args, **kwargs):
             out = mock.Mock(returncode=0)
             out.stdout = "aaaa1111\n" if args[-1] == "HEAD" else "bbbb2222\n"
             return out
-        with mock.patch.object(pf.os.path, "exists", return_value=True), \
+        with mock.patch.object(pf, "_valid_ablation_results",
+                               return_value=(True, "complete")), \
+                mock.patch.object(pf.os.path, "exists", return_value=True), \
                 mock.patch.object(pf, "_healthy", return_value=True), \
                 mock.patch.object(pf.subprocess, "run", side_effect=fake_run):
             self.assertEqual(pf.main(), 2)
+
+
+class ChEMBLHealthProbeTest(unittest.TestCase):
+    def test_filtered_molecule_route_failure_is_unhealthy(self):
+        healthy = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value={"molecules": [{"molecule_chembl_id": "CHEMBL192"}]}),
+        )
+        broken = mock.Mock(status_code=500, json=mock.Mock(return_value={}))
+        with mock.patch.object(rb.requests, "get",
+                               side_effect=[healthy, broken]):
+            self.assertFalse(rb._chembl_healthy())
+
+    def test_all_required_molecule_routes_must_be_healthy(self):
+        list_response = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value={"molecules": [{"molecule_chembl_id": "CHEMBL192"}]}),
+        )
+        detail_response = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value={"molecule_chembl_id": "CHEMBL192"}))
+        with mock.patch.object(
+                rb.requests, "get",
+                side_effect=[list_response, list_response, detail_response]):
+            self.assertTrue(rb._chembl_healthy())
+
+
+class AblationControlIntegrityTest(unittest.TestCase):
+    def _payload(self):
+        from validation import run_v2_source_ablations as ablation
+        conditions = tuple(ablation.CONDITIONS)
+        cases = [(drug, disease) for _, drug, disease, _ in ablation.TARGET_CASES]
+        snapshots, rows = [], []
+        for drug, disease in cases:
+            selected = [{"target_symbol": "TGT", "uniprot_id": "P1"}]
+            snap = {
+                "case_key": ablation._case_key(drug, disease),
+                "drug_name": drug, "disease_name": disease,
+                "cap": ablation.DEFAULT_TARGET_CAP, "status": "ok",
+                "in_universe": True, "selected_rows": selected,
+                "target_input_hash": ablation.target_input_hash(
+                    disease, ablation.DEFAULT_TARGET_CAP, selected),
+            }
+            snapshots.append(snap)
+            for condition in conditions:
+                rows.append({
+                    "condition": condition, "drug_name": drug,
+                    "disease_name": disease, "status": "miss",
+                    "target_input_hash": snap["target_input_hash"],
+                })
+        return {
+            "label": ablation.LABEL,
+            "target_cap": ablation.DEFAULT_TARGET_CAP,
+            "conditions": {c: list(ablation.CONDITIONS[c]) for c in conditions},
+            "fingerprint": ablation.config_source_fingerprint(
+                ablation.DEFAULT_TARGET_CAP, conditions),
+            "target_snapshots": snapshots, "rows": rows,
+        }
+
+    def test_complete_error_free_control_is_accepted(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            with open(path, "w") as f:
+                json.dump(self._payload(), f)
+            self.assertTrue(pf._valid_ablation_results(path)[0])
+
+    def test_error_row_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["rows"][0]["status"] = "error"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("failed control row", reason)
+
+    def test_missing_row_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["rows"].pop()
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("incomplete", reason)
+
+    def test_failed_snapshot_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["target_snapshots"][0]["status"] = "error"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("failed target-selection snapshot", reason)
+
+    def test_preflight_refuses_existing_invalid_control_without_run(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["rows"][0]["status"] = "error"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch.object(pf, "_healthy", return_value=True), \
+                    mock.patch.object(pf, "_run_module") as run_module:
+                self.assertEqual(pf.main(), 2)
+            run_module.assert_not_called()
 
 
 if __name__ == "__main__":
