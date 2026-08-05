@@ -235,11 +235,25 @@ class AblationControlIntegrityTest(unittest.TestCase):
             }
             snapshots.append(snap)
             for condition in conditions:
+                enabled = ablation.CONDITIONS[condition]
                 rows.append({
                     "condition": condition, "drug_name": drug,
                     "disease_name": disease, "status": "miss",
                     "in_universe": True,
                     "target_input_hash": snap["target_input_hash"],
+                    "error": None,
+                    "per_target_results": [{
+                        "target_symbol": "TGT", "uniprot_id": "P1",
+                        "status": "ok", "error": None,
+                        "source_status": {
+                            provider: {
+                                "status": ("ok" if provider in enabled
+                                           else "disabled"),
+                                "error": None, "release": None,
+                            }
+                            for provider in pf.ABLATION_PROVIDERS
+                        },
+                    }],
                 })
         return {
             "label": ablation.LABEL,
@@ -289,6 +303,67 @@ class AblationControlIntegrityTest(unittest.TestCase):
             ok, reason = pf._valid_ablation_results(path)
             self.assertFalse(ok)
             self.assertIn("failed target-selection snapshot", reason)
+
+    def test_degraded_target_execution_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["rows"][0]["per_target_results"][0]["status"] = "error"
+            payload["rows"][0]["per_target_results"][0]["error"] = "boom"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("degraded target execution", reason)
+
+    def test_unavailable_enabled_source_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            statuses = payload["rows"][0]["per_target_results"][0]["source_status"]
+            statuses["chembl"] = {"status": "unavailable", "error": "500",
+                                  "release": None}
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("degraded source chembl", reason)
+
+    def test_ablated_source_still_answering_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            row = next(r for r in payload["rows"]
+                       if r["condition"] == "chembl_only")
+            row["per_target_results"][0]["source_status"]["gtopdb"] = {
+                "status": "ok", "error": None, "release": None}
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("ablated source gtopdb not disabled", reason)
+
+    def test_missing_per_target_results_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["rows"][0]["per_target_results"] = []
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("incomplete per-target results", reason)
+
+    def test_row_error_context_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["rows"][0]["error"] = "final pooled reviewer failed"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("degraded control row", reason)
 
     def test_unknown_row_status_rejects_control(self):
         with tempfile.TemporaryDirectory() as td:
