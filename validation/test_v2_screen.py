@@ -486,6 +486,31 @@ class AblationControlIntegrityTest(unittest.TestCase):
                 pf._clear_discards()
                 self.assertEqual(pf._discard_attempts(), 0)
 
+    def test_preflight_resumes_incomplete_checkpoint_without_discarding(self):
+        # The control harness flushes after every completed arm.  That
+        # checkpoint is invalid for final freeze validation, but it is the
+        # correct resume point—not a degraded artifact to delete.
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            with open(path, "w") as f:
+                json.dump(self._payload(), f)
+            with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch.object(pf, "_healthy", return_value=True), \
+                    mock.patch.object(
+                        pf, "_valid_ablation_results",
+                        side_effect=[
+                            (False, "incomplete or duplicate target snapshots"),
+                            (True, "ok"),
+                        ],
+                    ), \
+                    mock.patch.object(pf, "_run_module", return_value=0) as run, \
+                    mock.patch.object(pf, "_clear_discards"):
+                self.assertEqual(pf.main(), 0)
+        self.assertEqual(
+            run.call_args_list[0],
+            mock.call("validation.run_v2_source_ablations"),
+        )
+
     def test_preflight_discards_invalid_control_and_retries(self):
         with tempfile.TemporaryDirectory() as td:
             path = os.path.join(td, "control.json")

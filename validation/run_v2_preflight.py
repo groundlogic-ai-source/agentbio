@@ -291,11 +291,38 @@ def main() -> int:
     if os.path.exists(ABLATION_RESULTS):
         control_ok, reason = _valid_ablation_results()
         if not control_ok:
-            # This file is a generated, uncommitted partial control artifact.
-            # It has no analytical value once invalid, and retaining it would
-            # force a stale-resume refusal. Remove it so the next healthy
-            # preflight retries cleanly; never freeze from degraded control.
-            return _discard_control(reason, "on disk")
+            # The harness deliberately flushes a resumable checkpoint after
+            # every completed arm.  A structurally incomplete checkpoint is
+            # normal while the same harness process is still working through
+            # the 13-case suite; do not delete its completed rows merely
+            # because final-only validation quite correctly refuses to freeze
+            # from them.  The next preflight invocation (after the harness
+            # exits) will either resume this checkpoint or reject a completed
+            # but degraded artifact via the strict path below.
+            if reason in {
+                "incomplete or duplicate target snapshots",
+                "incomplete or unexpected target snapshots",
+            }:
+                _log("source-ablation checkpoint incomplete — resuming the "
+                     "same control; final validation remains required before "
+                     "screening or freeze")
+                rc = _run_module("validation.run_v2_source_ablations")
+                if rc == 2:
+                    _log("ablation control refused (seal violation) — manual "
+                         "intervention required")
+                    return 2
+                if rc != 0:
+                    _log(f"ablation control rc={rc} — exit 3 (retry)")
+                    return 3
+                control_ok, reason = _valid_ablation_results()
+                if not control_ok:
+                    return _discard_control(reason, "after resumed run")
+            else:
+                # This file is a generated, uncommitted partial control artifact.
+                # It has no analytical value once invalid, and retaining it would
+                # force a stale-resume refusal. Remove it so the next healthy
+                # preflight retries cleanly; never freeze from degraded control.
+                return _discard_control(reason, "on disk")
     if not control_ok:
         _log("source-ablation control results missing — running one-time "
              "(label source_ablation_control, NOT benchmark v2)")
