@@ -347,6 +347,28 @@ class AblationControlIntegrityTest(unittest.TestCase):
             self.assertFalse(ok)
             self.assertIn("case key", reason)
 
+    def test_wrong_condition_sources_reject_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["conditions"]["all_three"] = ["chembl"]
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("unexpected sources", reason)
+
+    def test_malformed_condition_mapping_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["conditions"] = ["chembl_only"]
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("malformed condition mapping", reason)
+
     def test_preflight_discards_invalid_control_and_retries(self):
         with tempfile.TemporaryDirectory() as td:
             path = os.path.join(td, "control.json")

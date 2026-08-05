@@ -85,8 +85,15 @@ def _valid_ablation_results(path: str = ABLATION_RESULTS) -> tuple[bool, str]:
         return False, "wrong control label"
     if payload.get("target_cap") != ablation.DEFAULT_TARGET_CAP:
         return False, "unexpected target cap"
-    if tuple(payload.get("conditions", {})) != conditions:
+    artifact_conditions = payload.get("conditions")
+    if not isinstance(artifact_conditions, dict):
+        return False, "malformed condition mapping"
+    if tuple(artifact_conditions) != conditions:
         return False, "unexpected condition set"
+    for condition in conditions:
+        sources = artifact_conditions.get(condition)
+        if not isinstance(sources, list) or tuple(sources) != ablation.CONDITIONS[condition]:
+            return False, f"unexpected sources for condition: {condition}"
     expected_fingerprint = ablation.config_source_fingerprint(
         ablation.DEFAULT_TARGET_CAP, conditions)
     if payload.get("fingerprint") != expected_fingerprint:
