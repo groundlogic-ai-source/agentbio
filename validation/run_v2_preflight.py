@@ -96,7 +96,18 @@ def _valid_ablation_results(path: str = ABLATION_RESULTS) -> tuple[bool, str]:
     rows = payload.get("rows")
     if not isinstance(snapshots, list) or not isinstance(rows, list):
         return False, "missing snapshots or rows"
-    snapshot_by_key = {s.get("case_key"): s for s in snapshots if isinstance(s, dict)}
+    if len(snapshots) != len(expected_snapshots):
+        return False, "incomplete or duplicate target snapshots"
+    snapshot_by_key = {}
+    for snapshot in snapshots:
+        if not isinstance(snapshot, dict):
+            return False, "malformed target-selection snapshot"
+        key = snapshot.get("case_key")
+        if not isinstance(key, str) or not key:
+            return False, "target-selection snapshot missing case key"
+        if key in snapshot_by_key:
+            return False, f"duplicate target-selection snapshot: {key}"
+        snapshot_by_key[key] = snapshot
     if set(snapshot_by_key) != expected_snapshots:
         return False, "incomplete or unexpected target snapshots"
     for key, snapshot in snapshot_by_key.items():
@@ -170,8 +181,14 @@ def main() -> int:
             return 3
         control_ok, reason = _valid_ablation_results()
         if not control_ok:
+            try:
+                os.remove(ABLATION_RESULTS)
+            except OSError as exc:
+                _log(f"source-ablation control invalid after run ({reason}) "
+                     f"and could not be discarded ({exc}) — exit 2")
+                return 2
             _log(f"source-ablation control invalid after run ({reason}) — "
-                 "exit 3 (retry)")
+                 "discarded; exit 3 (retry cleanly)")
             return 3
 
     # 3. Amendment-1 screened case list.

@@ -313,6 +313,40 @@ class AblationControlIntegrityTest(unittest.TestCase):
             self.assertFalse(ok)
             self.assertIn("failed target-selection snapshot", reason)
 
+    def test_duplicate_snapshot_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["target_snapshots"].append(
+                dict(payload["target_snapshots"][0]))
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("duplicate", reason)
+
+    def test_non_dict_snapshot_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["target_snapshots"][0] = "not-a-snapshot"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("malformed", reason)
+
+    def test_missing_snapshot_case_key_rejects_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            del payload["target_snapshots"][0]["case_key"]
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            ok, reason = pf._valid_ablation_results(path)
+            self.assertFalse(ok)
+            self.assertIn("case key", reason)
+
     def test_preflight_discards_invalid_control_and_retries(self):
         with tempfile.TemporaryDirectory() as td:
             path = os.path.join(td, "control.json")
