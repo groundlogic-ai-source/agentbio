@@ -379,5 +379,290 @@
       "holdout_active": true
     }
   ],
-  "rows": []
+  "rows": [
+    {
+      "label": "source_ablation_control",
+      "condition": "chembl_only",
+      "enabled_sources": [
+        "chembl"
+      ],
+      "drug_name": "Dapsone",
+      "drug_key": "dapsone",
+      "disease_name": "Leprosy",
+      "target_cap": 10,
+      "target_input_hash": "4bc31df168256058aa28d5154f4dab8c2e912431ec1e9b0752154d406be3fc6a",
+      "in_universe": true,
+      "status": "miss",
+      "n_targets_run": 8,
+      "n_union_candidates": 40,
+      "generated": false,
+      "mechanistically_valid": false,
+      "mechanistic_validity_detail": {
+        "reason": "not generated in any target pool"
+      },
+      "rank": null,
+      "total_candidates": null,
+      "top10": false,
+      "strong_match": null,
+      "match_method": null,
+      "generated_by_target": null,
+      "trials_holdout_redacted": null,
+      "score_components": null,
+      "holdout_audit": null,
+      "source_providers": [],
+      "source_health": {
+        "gtopdb": false,
+        "drugcentral": false,
+        "chembl": true,
+        "europepmc": true
+      },
+      "holdout_active": true,
+      "holdout_drugs": [
+        "Dapsone"
+      ],
+      "holdout_unresolved": null,
+      "per_target_results": [
+        {
+          "target_symbol": "JAK1",
+          "uniprot_id": "P23458",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 10,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "STAT3",
+          "uniprot_id": "P40763",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 5,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "RIPK2",
+          "uniprot_id": "O43353",
+          "ot_association_score": 0.4423,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 7,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "C5",
+          "uniprot_id": "P01031",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 19,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "LACC1",
+          "uniprot_id": "Q8IV20",
+          "ot_association_score": 0.5121,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "TNFSF15",
+          "uniprot_id": "O95150",
+          "ot_association_score": 0.4511,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "SNX20",
+          "uniprot_id": "Q7Z614",
+          "ot_association_score": 0.4223,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "ADGB",
+          "uniprot_id": "Q8N7X0",
+          "ot_association_score": 0.4141,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "disabled",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        }
+      ],
+      "error": null
+    }
+  ]
 }
