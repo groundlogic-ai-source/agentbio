@@ -763,6 +763,88 @@ def enrichment_status() -> dict:
     return {"status": "error", "returncode": rc, "log": _ENRICH_LOG}
 
 
+# --------------------------------------------------------------------------- #
+# Benchmark v2 24/7 supervisor (Reserved VM; read-only progress endpoints)
+# --------------------------------------------------------------------------- #
+
+_BENCH_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "validation")
+_BENCH_LOG = os.path.join(_BENCH_DIR, "prod_benchmark.log")
+_BENCH_CONTROL_JSON = os.path.join(_BENCH_DIR, "v2_source_ablation_results.json")
+_BENCH_RESULTS_JSON = os.path.join(_BENCH_DIR, "benchmark_results_v2.json")
+_BENCH_CASE_LIST = os.path.join(_BENCH_DIR, "benchmark_case_list_v2.json")
+
+
+def _bench_file_meta(path: str) -> dict:
+    import time as _time
+    if not os.path.exists(path):
+        return {"exists": False}
+    st = os.stat(path)
+    return {
+        "exists": True,
+        "mtime_utc": _time.strftime("%Y-%m-%dT%H:%M:%SZ", _time.gmtime(st.st_mtime)),
+        "bytes": st.st_size,
+    }
+
+
+@app.get("/internal/benchmark-status")
+def benchmark_status() -> dict:
+    """Read-only progress of the 24/7 v2 benchmark chain (control -> screen -> run)."""
+    status: dict[str, Any] = {"supervisor_log": _BENCH_LOG}
+    try:
+        with open(_BENCH_CONTROL_JSON) as f:
+            control = json.load(f)
+        rows = control.get("rows", [])
+        status["control"] = {
+            "rows_completed": len(rows),
+            "rows_expected": 52,
+            "snapshots": len(control.get("target_snapshots", [])),
+            "snapshots_expected": 13,
+            "hits": sum(1 for r in rows if r.get("generated")),
+            **_bench_file_meta(_BENCH_CONTROL_JSON),
+        }
+    except (OSError, json.JSONDecodeError):
+        status["control"] = {"exists": False}
+    status["case_list"] = _bench_file_meta(_BENCH_CASE_LIST)
+    try:
+        with open(_BENCH_RESULTS_JSON) as f:
+            results = json.load(f)
+        cases = results.get("cases", results.get("results", []))
+        status["benchmark"] = {
+            "cases_completed": len(cases) if isinstance(cases, list) else None,
+            **_bench_file_meta(_BENCH_RESULTS_JSON),
+        }
+    except (OSError, json.JSONDecodeError):
+        status["benchmark"] = {"exists": False}
+    tail: list[str] = []
+    try:
+        with open(_BENCH_LOG) as f:
+            tail = [ln for ln in f.read().splitlines() if "MorganGenerator" not in ln][-15:]
+    except OSError:
+        pass
+    status["log_tail"] = tail
+    return status
+
+
+@app.get("/internal/benchmark-results")
+def benchmark_results() -> JSONResponse:
+    """Return the newest benchmark artifact so progress can be pulled back to dev.
+
+    The Reserved VM disk is wiped on restart/redeploy; pull this BEFORE any
+    republish so the next snapshot resumes from the latest checkpoint.
+    """
+    for path, label in (
+        (_BENCH_RESULTS_JSON, "benchmark_v2"),
+        (_BENCH_CONTROL_JSON, "source_ablation_control"),
+    ):
+        if os.path.exists(path):
+            try:
+                with open(path) as f:
+                    return JSONResponse({"artifact": label, "data": json.load(f)})
+            except (OSError, json.JSONDecodeError) as exc:
+                raise HTTPException(status_code=500, detail=f"unreadable artifact {label}: {exc}")
+    raise HTTPException(status_code=404, detail="no benchmark artifacts yet")
+
+
 @app.post("/internal/clear-registry")
 def clear_registry() -> dict:
     """Delete ALL rows from bisociation_history, hypothesis_log, and research_jobs.

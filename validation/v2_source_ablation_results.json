@@ -1,6 +1,6 @@
 {
   "label": "source_ablation_control",
-  "generated_at": "2026-08-06T05:20:33",
+  "generated_at": "2026-08-06T13:20:50",
   "fingerprint": "e65a5374477e32c374381a47dfd562981b4733195c1b4c53d00e0b198d5a48b4",
   "target_cap": 10,
   "top_n": 10,
@@ -896,6 +896,461 @@
       "target_input_hash": "4bc31df168256058aa28d5154f4dab8c2e912431ec1e9b0752154d406be3fc6a",
       "holdout_drugs": [
         "Dapsone"
+      ],
+      "holdout_active": true
+    },
+    {
+      "case_key": "miglustat::gaucherdisease",
+      "drug_name": "Miglustat",
+      "disease_name": "Gaucher Disease",
+      "cap": 10,
+      "in_universe": true,
+      "status": "ok",
+      "error": null,
+      "selected_rows": [
+        {
+          "disease_name": "Gaucher disease",
+          "orpha_code": "355",
+          "disease_source": "orphanet",
+          "icd10": "E75.2",
+          "omim": "230800",
+          "mesh": "D005776",
+          "target_symbol": "GBA1",
+          "ensembl_id": "ENSG00000177628",
+          "uniprot_id": "P04062",
+          "ot_association_score": 0.8786,
+          "chembl_activity_count": 1000,
+          "median_pchembl": 5.92,
+          "chembl_pooled_multi_target": true,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 93.25,
+          "prior_trial_count": 89,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "ELIGLUSTAT",
+            "ELIGLUSTAT TARTRATE",
+            "IMIGLUCERASE",
+            "VELAGLUCERASE ALFA",
+            "TALIGLUCERASE ALFA",
+            "OLIPUDASE ALFA"
+          ],
+          "prevalence_per_million": 7.5,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.7264,
+          "tractability_score": 0.6382,
+          "unmet_need_score": 0.0465,
+          "target_discovery_method": "genetic_association",
+          "mechanism_class": "glucocerebrosidase_lysosomal",
+          "therapeutic_role": "disease_modifying",
+          "process_support": [
+            {
+              "pmid": "42229236",
+              "pmcid": null,
+              "title": "Multivalent C2-alkyl trihydroxypiperidine architectures modulate \u03b2-glucocerebrosidase activity.",
+              "excerpt": "Multivalent systems based on C2-alkylated (3R,4R,5R)-3,4,5-trihydroxypiperidines, members of the iminosugar family, were developed as modulators of the lysosomal enzyme \u03b2-glucocerebrosidase (GCase), whose deficiency causes Gaucher disease and is also related to Parkinson disease. The iminosugar units were successfully multimerized onto tri- and tetrapodal scaffolds and gold nanoparticles, enabling",
+              "evidence_sentence": "multivalent c2 alkyl trihydroxypiperidine architectures modulate \u03b2 glucocerebrosidase activity"
+            },
+            {
+              "pmid": "41725574",
+              "pmcid": null,
+              "title": "Development of Nickel Prussian Blue Analogue Nanoparticles Stabilizing the Glucocerebrosidase in the Treatment of Gaucher Disease (GD).",
+              "excerpt": "The stabilization of mutated glucocerebrosidase (GCase) in Gaucher disease (GD) remains an unresolved challenge in conventional therapies like enzyme replacement therapy (ERT) and substrate reduction therapy (SRT), which are expensive and fail to treat neurological GD (nGD) forms. The misfolded enzyme fails to reach the lysosome and form aggregates, contributing to cellular stress. In the present ",
+              "evidence_sentence": "development of nickel prussian blue analogue nanoparticles stabilizing the glucocerebrosidase in the treatment of gaucher disease gd"
+            },
+            {
+              "pmid": "42091637",
+              "pmcid": null,
+              "title": "A sensitive LC\u2011MS/MS method for the simultaneous quantification of hexosylceramides and hexosylsphingosines, their precursors and metabolites in cells, plasma, and tissue homogenates.",
+              "excerpt": "Hexosylceramides (HexCers) and hexosylsphingosines (HexSphs) are bioactive glycosphingolipids implicated in neurodegenerative diseases such as Parkinson's disease (PD), Gaucher disease, and Krabbe disease. Despite their biological relevance, no existing method enables the simultaneous quantification of both HexCers and HexSphs across multiple biological matrices. In this study, we report the devel",
+              "evidence_sentence": "proof of concept applications included wild type wt skmel28 cells treated and non treated with the glucocerebrosidase inhibitor cbe as well as wt mouse plasma and brain regions cortex hippocampus midbrain cerebellum establishing baseline levels for future pharmacokinetic studies"
+            },
+            {
+              "pmid": "42546980",
+              "pmcid": null,
+              "title": "Peripheral neuropathy in a mouse model lacking GBA1 in Schwann cells.",
+              "excerpt": "Peripheral neuropathic symptoms have been reported in Gaucher disease (GD), a rare lysosomal storage disorder caused by mutations in \u03b2-glucocerebrosidase gene (GBA1), albeit poorly investigated only in clinical settings. To shed light on the involvement of peripheral myelination by Schwann cells (SCs) in GD, we generated a conditional knockout mouse line in which \u03b2-glucocerebrosidase is depleted i",
+              "evidence_sentence": "consistently when in vitro nerve degeneration was induced in presence of the \u03b2 glucocerebrosidase inhibitor conduritol b epoxide cbe a block in the autophagic flux was observed"
+            },
+            {
+              "pmid": "41151113",
+              "pmcid": null,
+              "title": "Selenoureido-N-alkyl-3,4,5-trihydroxypiperidines: probing their dual-target role in Gaucher disease.",
+              "excerpt": "The design and synthesis of a novel class of selenoureido-iminosugar compounds that uniquely combine antioxidant properties with pharmacological chaperone activity are reported. These derivatives feature a 3,4,5-trihydroxypiperidine iminosugar core linked via nine- or twelve\u2011carbon alkyl chains to N-aryl selenoureido groups. By simultaneously targeting oxidative stress and lysosomal \u03b2-glucocerebro",
+              "evidence_sentence": "by simultaneously targeting oxidative stress and lysosomal \u03b2 glucocerebrosidase gcase dysfunction this dual action strategy addresses two key pathological hallmarks of gaucher disease"
+            },
+            {
+              "pmid": "42280207",
+              "pmcid": "PMC13258179",
+              "title": "Establishment of an N-Glycan Profiling Method for Three ERT Enzymes Used in Gaucher Disease Therapy.",
+              "excerpt": "N-glycosylation, particularly terminal mannose exposure, is a critical quality attribute affecting macrophage targeting and the clinical efficacy of enzyme replacement therapy for Gaucher disease. This study developed a universal, sensitive, and quantitative method to compare the N-glycan profiles of three recombinant human glucocerebrosidase products from different expression systems: imigluceras",
+              "evidence_sentence": "this study developed a universal sensitive and quantitative method to compare the n glycan profiles of three recombinant human glucocerebrosidase products from different expression systems imiglucerase velaglucerase alfa and velaglucerase beta"
+            },
+            {
+              "pmid": "41675236",
+              "pmcid": "PMC12886469",
+              "title": "Case Report: Progressive myoclonus epilepsy as an early manifestation of neuronopathic Gaucher disease.",
+              "excerpt": "Gaucher disease (GD) is a lysosomal storage disorder caused by biallelic GBA1 variants. Epilepsy is uncommon in GD and rarely manifests as progressive myoclonus epilepsy (PME), making early recognition difficult. We describe a 20-year-old man with childhood-onset myoclonus that progressed to drug-resistant generalized seizures and cognitive decline. Video-electroencephalography (VEEG) showed gener",
+              "evidence_sentence": "glucocerebrosidase activity was markedly reduced and a targeted myoclonic epilepsy gene panel identified two gba1 variants c 907c a p"
+            },
+            {
+              "pmid": "40383015",
+              "pmcid": null,
+              "title": "Light-responsive glycosidase inhibitors: Tuning enzyme selectivity and switching factors through integrated chemical and optoglycomic strategies.",
+              "excerpt": "Photopharmacology leverages light-responsive drugs to achieve spatiotemporal control over their activation and interactions with biological targets. This high level of precision is particularly crucial for therapeutic strategies that require sequential drug-target binding and dissociation, such as pharmacological chaperones (PCs) for lysosomal storage disorders (LSDs). PCs must tightly bind misfol",
+              "evidence_sentence": "this approach yielded derivatives capable of selectively switching between \u03b1 and \u03b2 glucosidase inhibition as well as conjugates exhibiting reversible nanomolar inhibition of human glucocerebrosidase the dysfunctional enzyme in gaucher disease with remarkable switching factors under conditions that mirror the scenario at the er and the lysosome"
+            },
+            {
+              "pmid": "40058976",
+              "pmcid": null,
+              "title": "Effect of LRRK2 Inhibition on the Activity of Glucocerebrosidase in Patient-Specific Cells from Patients with Gaucher Disease.",
+              "excerpt": "Biallelic mutations in the <i>GBA1</i> gene encoding lysosomal enzyme glucocerebrosidase (GCase), lead to the development of the Gaucher disease (GD) and also represent a significant risk factor for the Parkinson's disease (PD). In most cases, mutations in the <i>GBA1</i> gene are located outside the region coding for the enzyme active site and cause a decrease in the GCase activity due to the red",
+              "evidence_sentence": "effect of lrrk2 inhibition on the activity of glucocerebrosidase in patient specific cells from patients with gaucher disease"
+            },
+            {
+              "pmid": "41659982",
+              "pmcid": "PMC12877786",
+              "title": "Exploring the long-term use of ambroxol in Gaucher disease type 2: insights from two pediatric cases.",
+              "excerpt": "Gaucher disease 2 (GD2) is a rare and rapidly progressive neuropathic lysosomal storage disorder with an average survival of 11-19\u202fmonths. To date, no approved therapy is available, but the variant-dependent pharmacological chaperone ambroxol (ABX) has emerged as a promising off-label therapy. This long-term observational study encompasses 2 GD2 patients treated with high-dose ABX from the age of ",
+              "evidence_sentence": "previously published data of patient 1 demonstrated a significant increase in \u03b2 glucocerebrosidase activity in abx treated patient fibroblasts alongside nearly age appropriate neurocognitive and motor development after 3 years of abx therapy"
+            }
+          ],
+          "process_query": "(\"Gaucher disease\") AND (\"glucocerebrosidase\" OR \"GBA enzyme\" OR \"beta-glucosidase\")",
+          "process_source_status": "ok",
+          "process_ontology_version": "v6",
+          "process_target_priority": 0,
+          "process_class_priority": 8
+        },
+        {
+          "disease_name": "Gaucher disease",
+          "orpha_code": "355",
+          "disease_source": "orphanet",
+          "icd10": "E75.2",
+          "omim": "230800",
+          "mesh": "D005776",
+          "target_symbol": "UGCG",
+          "ensembl_id": "ENSG00000148154",
+          "uniprot_id": "Q16739",
+          "ot_association_score": 0.5905,
+          "chembl_activity_count": 397,
+          "median_pchembl": 7.5,
+          "chembl_pooled_multi_target": false,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 93.19,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "ELIGLUSTAT",
+            "ELIGLUSTAT TARTRATE",
+            "IMIGLUCERASE",
+            "VELAGLUCERASE ALFA",
+            "TALIGLUCERASE ALFA",
+            "OLIPUDASE ALFA"
+          ],
+          "prevalence_per_million": 7.5,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.7114,
+          "tractability_score": 0.4201,
+          "unmet_need_score": 0.0465,
+          "target_discovery_method": "genetic_association",
+          "mechanism_class": null,
+          "therapeutic_role": "disease_modifying",
+          "process_support": [],
+          "process_query": null,
+          "process_source_status": null,
+          "process_ontology_version": null,
+          "process_target_priority": null,
+          "process_class_priority": null
+        },
+        {
+          "disease_name": "Gaucher disease",
+          "orpha_code": "355",
+          "disease_source": "orphanet",
+          "icd10": "E75.2",
+          "omim": "230800",
+          "mesh": "D005776",
+          "target_symbol": "GABRA1",
+          "ensembl_id": null,
+          "uniprot_id": "P14867",
+          "ot_association_score": 0.5,
+          "chembl_activity_count": 329,
+          "median_pchembl": 7.78,
+          "chembl_pooled_multi_target": true,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 81.69,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "ELIGLUSTAT",
+            "ELIGLUSTAT TARTRATE",
+            "IMIGLUCERASE",
+            "VELAGLUCERASE ALFA",
+            "TALIGLUCERASE ALFA",
+            "OLIPUDASE ALFA"
+          ],
+          "prevalence_per_million": 7.5,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.6591,
+          "tractability_score": 0.3296,
+          "unmet_need_score": 0.0465,
+          "target_discovery_method": "literature_mechanism_class",
+          "mechanism_class": "inhibitory_neurotransmission_gaba_a",
+          "therapeutic_role": "symptom_treatment",
+          "process_support": [
+            {
+              "pmid": "37573956",
+              "pmcid": "PMC10480493",
+              "title": "The involvement of Purkinje cells in progressive myoclonic epilepsy: Focus on neuronal ceroid lipofuscinosis.",
+              "excerpt": "The progressive myoclonic epilepsies (PMEs) are a group of rare neurodegenerative diseases characterized by myoclonus, epileptic seizures, and progressive neurological deterioration with cerebellar involvement. They include storage diseases like Gaucher disease, Lafora disease, and forms of neuronal ceroid lipofuscinosis (NCL). To date, 13 NCLs have been reported (CLN1-CLN8, CLN10-CLN14), associat",
+              "evidence_sentence": "pcs being gabaergic have an inhibitory effect on their target neurons and provide the only inhibitory output of the cerebellum"
+            }
+          ],
+          "process_query": "(\"Gaucher disease\") AND (\"GABA-A receptor\" OR \"inhibitory neurotransmission\" OR \"GABAergic\")",
+          "process_source_status": "ok",
+          "process_ontology_version": "v6",
+          "process_target_priority": 0,
+          "process_class_priority": 0
+        },
+        {
+          "disease_name": "Gaucher disease",
+          "orpha_code": "355",
+          "disease_source": "orphanet",
+          "icd10": "E75.2",
+          "omim": "230800",
+          "mesh": "D005776",
+          "target_symbol": "C5",
+          "ensembl_id": null,
+          "uniprot_id": "P01031",
+          "ot_association_score": 0.5,
+          "chembl_activity_count": 3,
+          "median_pchembl": 6.36,
+          "chembl_pooled_multi_target": false,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 81.56,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "ELIGLUSTAT",
+            "ELIGLUSTAT TARTRATE",
+            "IMIGLUCERASE",
+            "VELAGLUCERASE ALFA",
+            "TALIGLUCERASE ALFA",
+            "OLIPUDASE ALFA"
+          ],
+          "prevalence_per_million": 7.5,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.3747,
+          "tractability_score": 0.1873,
+          "unmet_need_score": 0.0465,
+          "target_discovery_method": "literature_mechanism_class",
+          "mechanism_class": "complement_cascade",
+          "therapeutic_role": "disease_modifying",
+          "process_support": [
+            {
+              "pmid": "28225753",
+              "pmcid": null,
+              "title": "Complement drives glucosylceramide accumulation and tissue inflammation in Gaucher disease.",
+              "excerpt": "Gaucher disease is caused by mutations in GBA1, which encodes the lysosomal enzyme glucocerebrosidase (GCase). GBA1 mutations drive extensive accumulation of glucosylceramide (GC) in multiple innate and adaptive immune cells in the spleen, liver, lung and bone marrow, often leading to chronic inflammation. The mechanisms that connect excess GC to tissue inflammation remain unknown. Here we show th",
+              "evidence_sentence": "marked local and systemic complement activation occurred in gcase deficient mice or after pharmacological inhibition of gcase and was associated with gc storage tissue inflammation and proinflammatory cytokine production"
+            }
+          ],
+          "process_query": "(\"Gaucher disease\") AND (\"complement cascade\" OR \"complement activation\" OR \"complement C5\")",
+          "process_source_status": "ok",
+          "process_ontology_version": "v6",
+          "process_target_priority": 0,
+          "process_class_priority": 6
+        },
+        {
+          "disease_name": "Gaucher disease",
+          "orpha_code": "355",
+          "disease_source": "orphanet",
+          "icd10": "E75.2",
+          "omim": "230800",
+          "mesh": "D005776",
+          "target_symbol": "GABRG2",
+          "ensembl_id": null,
+          "uniprot_id": "P18507",
+          "ot_association_score": 0.5,
+          "chembl_activity_count": 0,
+          "median_pchembl": null,
+          "chembl_pooled_multi_target": true,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 77.19,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "ELIGLUSTAT",
+            "ELIGLUSTAT TARTRATE",
+            "IMIGLUCERASE",
+            "VELAGLUCERASE ALFA",
+            "TALIGLUCERASE ALFA",
+            "OLIPUDASE ALFA"
+          ],
+          "prevalence_per_million": 7.5,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.2702,
+          "tractability_score": 0.1351,
+          "unmet_need_score": 0.0465,
+          "target_discovery_method": "literature_mechanism_class",
+          "mechanism_class": "inhibitory_neurotransmission_gaba_a",
+          "therapeutic_role": "symptom_treatment",
+          "process_support": [
+            {
+              "pmid": "37573956",
+              "pmcid": "PMC10480493",
+              "title": "The involvement of Purkinje cells in progressive myoclonic epilepsy: Focus on neuronal ceroid lipofuscinosis.",
+              "excerpt": "The progressive myoclonic epilepsies (PMEs) are a group of rare neurodegenerative diseases characterized by myoclonus, epileptic seizures, and progressive neurological deterioration with cerebellar involvement. They include storage diseases like Gaucher disease, Lafora disease, and forms of neuronal ceroid lipofuscinosis (NCL). To date, 13 NCLs have been reported (CLN1-CLN8, CLN10-CLN14), associat",
+              "evidence_sentence": "pcs being gabaergic have an inhibitory effect on their target neurons and provide the only inhibitory output of the cerebellum"
+            }
+          ],
+          "process_query": "(\"Gaucher disease\") AND (\"GABA-A receptor\" OR \"inhibitory neurotransmission\" OR \"GABAergic\")",
+          "process_source_status": "ok",
+          "process_ontology_version": "v6",
+          "process_target_priority": 1,
+          "process_class_priority": 0
+        },
+        {
+          "disease_name": "Gaucher disease",
+          "orpha_code": "355",
+          "disease_source": "orphanet",
+          "icd10": "E75.2",
+          "omim": "230800",
+          "mesh": "D005776",
+          "target_symbol": "PSAP",
+          "ensembl_id": "ENSG00000197746",
+          "uniprot_id": "P07602",
+          "ot_association_score": 0.5085,
+          "chembl_activity_count": 0,
+          "median_pchembl": null,
+          "chembl_pooled_multi_target": false,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 73.75,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "ELIGLUSTAT",
+            "ELIGLUSTAT TARTRATE",
+            "IMIGLUCERASE",
+            "VELAGLUCERASE ALFA",
+            "TALIGLUCERASE ALFA",
+            "OLIPUDASE ALFA"
+          ],
+          "prevalence_per_million": 7.5,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.2581,
+          "tractability_score": 0.1312,
+          "unmet_need_score": 0.0465,
+          "target_discovery_method": "genetic_association",
+          "mechanism_class": null,
+          "therapeutic_role": "disease_modifying",
+          "process_support": [],
+          "process_query": null,
+          "process_source_status": null,
+          "process_ontology_version": null,
+          "process_target_priority": null,
+          "process_class_priority": null
+        },
+        {
+          "disease_name": "Gaucher disease",
+          "orpha_code": "355",
+          "disease_source": "orphanet",
+          "icd10": "E75.2",
+          "omim": "230800",
+          "mesh": "D005776",
+          "target_symbol": "SCARB2",
+          "ensembl_id": "ENSG00000138760",
+          "uniprot_id": "Q14108",
+          "ot_association_score": 0.3837,
+          "chembl_activity_count": 0,
+          "median_pchembl": null,
+          "chembl_pooled_multi_target": false,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 92.75,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "ELIGLUSTAT",
+            "ELIGLUSTAT TARTRATE",
+            "IMIGLUCERASE",
+            "VELAGLUCERASE ALFA",
+            "TALIGLUCERASE ALFA",
+            "OLIPUDASE ALFA"
+          ],
+          "prevalence_per_million": 7.5,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.3246,
+          "tractability_score": 0.1246,
+          "unmet_need_score": 0.0465,
+          "target_discovery_method": "genetic_association",
+          "mechanism_class": null,
+          "therapeutic_role": "disease_modifying",
+          "process_support": [],
+          "process_query": null,
+          "process_source_status": null,
+          "process_ontology_version": null,
+          "process_target_priority": null,
+          "process_class_priority": null
+        },
+        {
+          "disease_name": "Gaucher disease",
+          "orpha_code": "355",
+          "disease_source": "orphanet",
+          "icd10": "E75.2",
+          "omim": "230800",
+          "mesh": "D005776",
+          "target_symbol": "PRX",
+          "ensembl_id": "ENSG00000105227",
+          "uniprot_id": "Q9BXM0",
+          "ot_association_score": 0.3505,
+          "chembl_activity_count": 0,
+          "median_pchembl": null,
+          "chembl_pooled_multi_target": false,
+          "afdb_has_structure": true,
+          "afdb_mean_plddt": 35.75,
+          "prior_trial_count": 0,
+          "has_negative_repurposing_result": false,
+          "has_approved_treatment": true,
+          "approved_drug_names": [
+            "ELIGLUSTAT",
+            "ELIGLUSTAT TARTRATE",
+            "IMIGLUCERASE",
+            "VELAGLUCERASE ALFA",
+            "TALIGLUCERASE ALFA",
+            "OLIPUDASE ALFA"
+          ],
+          "prevalence_per_million": 7.5,
+          "treatment_status_needs_review": false,
+          "ot_treatment_unconfirmed": false,
+          "raw_tractability_score": 0.1251,
+          "tractability_score": 0.0438,
+          "unmet_need_score": 0.0465,
+          "target_discovery_method": "genetic_association",
+          "mechanism_class": null,
+          "therapeutic_role": "disease_modifying",
+          "process_support": [],
+          "process_query": null,
+          "process_source_status": null,
+          "process_ontology_version": null,
+          "process_target_priority": null,
+          "process_class_priority": null
+        }
+      ],
+      "target_input_hash": "da44d1816b8e24ebdaa58f55753320697c8dbf1ceda1f30c24a04b0aff0b24a1",
+      "holdout_drugs": [
+        "Miglustat"
       ],
       "holdout_active": true
     },
@@ -4850,6 +5305,326 @@
             "drugcentral": {
               "status": "unavailable",
               "error": "https://uxn2ycvimg.us-east-2.awsapprunner.com/structures/id/89 returned transient HTTP 500",
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "label": "source_ablation_control",
+      "condition": "all_three",
+      "enabled_sources": [
+        "chembl",
+        "gtopdb",
+        "drugcentral"
+      ],
+      "drug_name": "Sapropterin",
+      "drug_key": "sapropterin",
+      "disease_name": "Phenylketonuria",
+      "target_cap": 10,
+      "target_input_hash": "8007cbfeb47c1a1316eaa6faed07177e6dbffcef168f849358891ab7edcf1a63",
+      "in_universe": true,
+      "status": "hit",
+      "n_targets_run": 8,
+      "n_union_candidates": 113,
+      "generated": true,
+      "mechanistically_valid": true,
+      "mechanistic_validity_detail": {
+        "mechanistically_valid": true,
+        "reason": "4 qualified record(s); efficacy_confidence=0.8894; direction compatible; explicit therapeutic action",
+        "qualified_evidence_count": 4,
+        "efficacy_confidence": 0.8894,
+        "direction_compatible": true,
+        "name_mention_only": false
+      },
+      "rank": 11,
+      "total_candidates": 113,
+      "top10": false,
+      "strong_match": true,
+      "match_method": "inchikey_block",
+      "generated_by_target": {
+        "target_symbol": "PAH",
+        "uniprot_id": "P00439",
+        "target_rank": 1,
+        "target_discovery_method": "genetic_association"
+      },
+      "trials_holdout_redacted": true,
+      "score_components": {
+        "normalized_pchembl": 0.0,
+        "confidence_term": 0.0,
+        "efficacy_evidence": 0.8894,
+        "efficacy_evidence_source": "multisource_ledger",
+        "normalized_ot_association": null,
+        "ot_association_available": false,
+        "ot_association_basis": "precedent_stamped_constant",
+        "normalized_tanimoto": 0.0,
+        "similarity_available": true,
+        "evidence_weight_coverage": 0.65,
+        "no_failed_trial": null,
+        "trial_evidence_observed": false,
+        "trial_evidence_basis": "holdout_redacted",
+        "qualified_directional": true,
+        "qualified_directional_bonus": 0.05
+      },
+      "holdout_audit": {
+        "ok": true,
+        "trials_holdout_redacted": true,
+        "no_failed_trial": null,
+        "reason": "holdout redacted; trial term dropped as a coverage gap (no credit given, no penalty imposed)"
+      },
+      "source_providers": [
+        "drugcentral",
+        "gtopdb"
+      ],
+      "source_health": {
+        "gtopdb": true,
+        "drugcentral": true,
+        "chembl": true,
+        "europepmc": true
+      },
+      "holdout_active": true,
+      "holdout_drugs": [
+        "Sapropterin"
+      ],
+      "holdout_unresolved": null,
+      "per_target_results": [
+        {
+          "target_symbol": "PAH",
+          "uniprot_id": "P00439",
+          "ot_association_score": 0.8975,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 2,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": true,
+          "match_method": "name"
+        },
+        {
+          "target_symbol": "GABRA1",
+          "uniprot_id": "P14867",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 54,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "C5",
+          "uniprot_id": "P01031",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 23,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "NSUN2",
+          "uniprot_id": "Q08J23",
+          "ot_association_score": 0.4702,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "GABRG2",
+          "uniprot_id": "P18507",
+          "ot_association_score": 0.5,
+          "target_discovery_method": "literature_mechanism_class",
+          "status": "ok",
+          "n_chemist_candidates": 70,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            },
+            "europepmc": {
+              "status": "ok",
+              "error": null,
+              "release": "v6"
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "COL1A1",
+          "uniprot_id": "P02452",
+          "ot_association_score": 0.2739,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 0,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "FDXR",
+          "uniprot_id": "P22570",
+          "ot_association_score": 0.2661,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 15,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "chembl": {
+              "status": "ok",
+              "error": null,
+              "release": null
+            }
+          },
+          "found": false,
+          "match_method": null
+        },
+        {
+          "target_symbol": "PI4KA",
+          "uniprot_id": "P42356",
+          "ot_association_score": 0.1386,
+          "target_discovery_method": "genetic_association",
+          "status": "ok",
+          "n_chemist_candidates": 1,
+          "error": null,
+          "source_status": {
+            "gtopdb": {
+              "status": "empty",
+              "error": null,
+              "release": null
+            },
+            "drugcentral": {
+              "status": "empty",
+              "error": null,
               "release": null
             },
             "chembl": {
