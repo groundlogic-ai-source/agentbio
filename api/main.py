@@ -773,6 +773,7 @@ _BENCH_CONTROL_JSON = os.path.join(_BENCH_DIR, "v2_source_ablation_results.json"
 _BENCH_RESULTS_JSON = os.path.join(_BENCH_DIR, "benchmark_results_v2.json")
 _BENCH_CASE_LIST = os.path.join(_BENCH_DIR, "benchmark_case_list_v2.json")
 _BENCH_DONE = os.path.join(_BENCH_DIR, ".prod_benchmark_done")
+_BENCH_PAUSE = os.path.join(_BENCH_DIR, ".prod_benchmark_pause")
 
 
 def _bench_file_meta(path: str) -> dict:
@@ -819,6 +820,7 @@ def benchmark_status() -> dict:
     status: dict[str, Any] = {
         "supervisor_log": _BENCH_LOG,
         "supervisor_alive": _bench_supervisor_alive(),
+        "paused_before_benchmark": os.path.exists(_BENCH_PAUSE),
     }
     if os.path.exists(_BENCH_DONE):
         try:
@@ -876,6 +878,23 @@ def benchmark_results() -> JSONResponse:
                 raise HTTPException(status_code=503, detail=f"artifact {label} is mid-write; retry")
             return JSONResponse({"artifact": label, "data": data})
     raise HTTPException(status_code=404, detail="no benchmark artifacts yet")
+
+
+@app.post("/internal/benchmark-greenlight")
+def benchmark_greenlight() -> dict:
+    """Clear the pre-benchmark pause so the supervisor proceeds to the v2 run.
+
+    Used after the source-ablation control finishes and the final source set
+    for the benchmark has been decided. The supervisor picks this up on its
+    next cycle (<=60s). No-op if not paused.
+    """
+    if not os.path.exists(_BENCH_PAUSE):
+        return {"status": "not_paused"}
+    try:
+        os.remove(_BENCH_PAUSE)
+    except OSError as exc:
+        raise HTTPException(status_code=500, detail=f"could not clear pause: {exc}")
+    return {"status": "greenlit", "note": "supervisor proceeds to the benchmark on its next cycle (<=60s)"}
 
 
 @app.post("/internal/clear-registry")

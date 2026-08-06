@@ -23,6 +23,7 @@ cd "$(dirname "$0")/.." || exit 1
 LOCK=/tmp/prod_benchmark_supervisor.lock
 DONE=validation/.prod_benchmark_done
 HEAD_FILE=validation/.prod_freeze_head
+PAUSE=validation/.prod_benchmark_pause
 LOG=validation/prod_benchmark.log
 
 # Terminal state from a previous boot: do not restart the chain.
@@ -67,6 +68,13 @@ while true; do
   python3 -m validation.run_v2_preflight >> "$LOG" 2>&1
   pf=$?
   if [ $pf -eq 0 ]; then
+    # Decision gate: control + screen + freeze tag are done, but the 50-case
+    # benchmark (the expensive, one-shot run) waits for a human greenlight on
+    # the final source set. POST /internal/benchmark-greenlight clears this.
+    if [ -f "$PAUSE" ]; then
+      echo "[supervisor] $(date -u +%Y-%m-%dT%H:%M:%SZ) preflight READY — paused before benchmark ($PAUSE present); awaiting greenlight" >> "$LOG"
+      exit 0
+    fi
     python3 -m validation.run_benchmark >> "$LOG" 2>&1
     rc=$?
   else
