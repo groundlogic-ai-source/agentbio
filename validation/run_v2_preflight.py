@@ -252,14 +252,174 @@ def _valid_ablation_results(path: str = ABLATION_RESULTS) -> tuple[bool, str]:
     return True, "complete and error-free"
 
 
-def _discard_control(reason: str, context: str) -> int:
-    """Delete an unusable control artifact and decide retry vs. stop.
+def _row_defect(row, snapshot, enabled):
+    """Row-level replica of the per-row checks in _valid_ablation_results().
 
-    Discarding is right (degraded control must never reach freeze), but an
-    unattended workflow would otherwise re-run an expensive control against a
-    persistently broken source forever.  Budget the attempts and hand back to a
-    human instead of burning the night on a source outage.
+    A defect means the row must be re-run — not that the whole control is
+    unusable.  Kept deliberately separate from the validator so the strict
+    first-failure reasons (pinned by tests) stay byte-identical.
     """
+    if row.get("status") not in CONTROL_ROW_STATUSES:
+        return "non-terminal status"
+    if row.get("in_universe") is not True:
+        return "out-of-universe"
+    if snapshot is None or row.get("target_input_hash") != snapshot.get(
+            "target_input_hash"):
+        return "no matching frozen snapshot"
+    if row.get("error"):
+        return "row error"
+    targets = row.get("per_target_results")
+    if not isinstance(targets, list):
+        return "malformed per-target results"
+    if len(targets) != len(snapshot.get("selected_rows") or []):
+        return "incomplete per-target results"
+    for rec in targets:
+        if not isinstance(rec, dict):
+            return "malformed per-target result"
+        if rec.get("status") != "ok" or rec.get("error"):
+            return "degraded target execution"
+        statuses = rec.get("source_status")
+        if not isinstance(statuses, dict):
+            return "malformed source status"
+        for provider in ABLATION_PROVIDERS:
+            state = statuses.get(provider)
+            status = (state or {}).get("status") if isinstance(state, dict) else None
+            if provider in enabled:
+                if status not in HEALTHY_SOURCE_STATUSES:
+                    return f"degraded source {provider}"
+            elif status != "disabled":
+                return f"ablated source {provider} not disabled"
+    return None
+
+
+def _defective_row_keys(payload):
+    """Full scan: keys of every row that would fail _valid_ablation_results().
+
+    Returns None when the artifact's failure is STRUCTURAL (label, fingerprint,
+    condition mapping, snapshots) — then nothing row-level can be salvaged and
+    the caller must discard the whole file.  Otherwise returns a (possibly
+    empty) list of ((condition, case_key), defect) pairs.
+    """
+    try:
+        from validation import run_v2_source_ablations as ablation
+    except ImportError:  # direct (non-package) execution
+        import run_v2_source_ablations as ablation
+    if payload.get("label") != ablation.LABEL:
+        return None
+    if payload.get("target_cap") != ablation.DEFAULT_TARGET_CAP:
+        return None
+    conditions = tuple(ablation.CONDITIONS)
+    artifact_conditions = payload.get("conditions")
+    if (not isinstance(artifact_conditions, dict)
+            or tuple(artifact_conditions) != conditions):
+        return None
+    for condition in conditions:
+        sources = artifact_conditions.get(condition)
+        if (not isinstance(sources, list)
+                or tuple(sources) != ablation.CONDITIONS[condition]):
+            return None
+    expected_fingerprint = ablation.config_source_fingerprint(
+        ablation.DEFAULT_TARGET_CAP, conditions)
+    if payload.get("fingerprint") != expected_fingerprint:
+        return None
+    snapshots = payload.get("target_snapshots")
+    rows = payload.get("rows")
+    if not isinstance(snapshots, list) or not isinstance(rows, list):
+        return None
+    snapshot_by_key = {}
+    for snapshot in snapshots:
+        if (not isinstance(snapshot, dict)
+                or not isinstance(snapshot.get("case_key"), str)
+                or snapshot["case_key"] in snapshot_by_key):
+            return None
+        snapshot_by_key[snapshot["case_key"]] = snapshot
+    defective = []
+    seen = set()
+    for row in rows:
+        if not isinstance(row, dict):
+            return None
+        key = (row.get("condition"),
+               ablation._case_key(row.get("drug_name", ""),
+                                  row.get("disease_name", "")))
+        if key in seen:
+            defective.append((key, "duplicate row"))
+            continue
+        seen.add(key)
+        enabled = artifact_conditions.get(key[0])
+        if not isinstance(enabled, list):
+            defective.append((key, "unknown condition"))
+            continue
+        defect = _row_defect(row, snapshot_by_key.get(key[1]), enabled)
+        if defect:
+            defective.append((key, defect))
+    return defective
+
+
+def _quarantine_defective_rows():
+    """Strip defective rows from the control artifact, keeping healthy rows.
+
+    Returns the number of rows removed, or 0 when the artifact is not
+    quarantinable (structural failure, or nothing defective at row level).
+    """
+    try:
+        from validation import run_v2_source_ablations as ablation
+    except ImportError:  # direct (non-package) execution
+        import run_v2_source_ablations as ablation
+    try:
+        with open(ABLATION_RESULTS, encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return 0
+    defective = _defective_row_keys(payload)
+    if not defective:
+        return 0
+    bad = {key for key, _ in defective}
+    kept, seen, removed = [], set(), 0
+    for row in payload["rows"]:
+        key = (row.get("condition"),
+               ablation._case_key(row.get("drug_name", ""),
+                                  row.get("disease_name", "")))
+        if key in bad or key in seen:
+            removed += 1
+            continue
+        seen.add(key)
+        kept.append(row)
+    payload["rows"] = kept
+    tmp_path = ABLATION_RESULTS + ".quarantine.tmp"
+    try:
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2)
+        os.replace(tmp_path, ABLATION_RESULTS)
+    except OSError:
+        return 0
+    return removed
+
+
+def _discard_control(reason: str, context: str) -> int:
+    """Quarantine degraded rows; delete only structurally unusable artifacts.
+
+    A mid-run source flake poisons individual rows, not the whole control:
+    stripping just those rows lets the resume re-run only the affected arms
+    instead of repeating dozens of healthy ones (the 2026-08-06 GtoPdb /
+    DrugCentral flake cost a complete 52-arm control to whole-file deletion).
+    Structural failures (fingerprint drift, malformed snapshots) still discard
+    everything because no row can be trusted.  Either way the attempt budget
+    bounds repeated flakes and hands back to a human instead of burning the
+    night on a source outage.
+    """
+    quarantined = _quarantine_defective_rows()
+    if quarantined:
+        attempts = _record_discard()
+        if attempts >= MAX_CONTROL_DISCARDS:
+            _log(f"source-ablation control invalid {context} ({reason}); "
+                 f"{attempts} attempts — sources look persistently degraded. "
+                 "Stopping instead of resuming the control; manual "
+                 "intervention required")
+            return 2
+        _log(f"quarantined {quarantined} defective control row(s) {context} "
+             f"({reason}) — attempt {attempts}/{MAX_CONTROL_DISCARDS}; healthy "
+             "rows kept, exit 3 (resume re-runs only the removed arms)")
+        return 3
     try:
         os.remove(ABLATION_RESULTS)
     except OSError as exc:
@@ -302,6 +462,10 @@ def main() -> int:
             if reason in {
                 "incomplete or duplicate target snapshots",
                 "incomplete or unexpected target snapshots",
+                # Valid-but-row-incomplete is also a resume point: this is the
+                # state a quarantine leaves behind after stripping degraded
+                # rows — resume re-runs only the missing arms.
+                "incomplete or unexpected control rows",
             }:
                 _log("source-ablation checkpoint incomplete — resuming the "
                      "same control; final validation remains required before "
