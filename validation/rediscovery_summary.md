@@ -1,6 +1,6 @@
 # Rediscovery-rate summary — repoDB retrospective
 
-_Generated: 2026-08-06 17:12:27 — computed by validation/miss_classifier.py_
+_Generated: 2026-08-06 17:49:24 — computed by validation/miss_classifier.py_
 
 ## repoDB first-10 (biologic-leaning, top-3 targets)
 
