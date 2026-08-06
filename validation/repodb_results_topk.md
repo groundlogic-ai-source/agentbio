@@ -1,6 +1,6 @@
 # repoDB Retrospective — 10 In-Universe Cases (Top-3 Targets)
 
-_Generated: 2026-08-06 21:51:35_
+_Generated: 2026-08-06 22:54:58_
 
 _Each disease runs the Biologist→Chemist→Reviewer pipeline against the top 3 OT-associated targets. A case is HIT if the approved drug is found in ANY of the 3 pools._
 
