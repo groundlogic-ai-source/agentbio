@@ -1,0 +1,5 @@
+Decision gate: the production supervisor stops before the 50-case v2 benchmark
+while this file exists (control + case screen + freeze tag still complete
+normally). Cleared via POST /internal/benchmark-greenlight once the final
+source set for the benchmark has been decided from the control results.
+Delete this file in dev too if the pause should not return on the next redeploy.
