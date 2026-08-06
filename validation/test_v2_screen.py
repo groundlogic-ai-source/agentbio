@@ -499,8 +499,14 @@ class AblationControlIntegrityTest(unittest.TestCase):
             path = os.path.join(td, "control.json")
             with open(path, "w") as f:
                 json.dump(self._payload(), f)
+            # git must NEVER run for real in tests: an unmocked tag step
+            # creates a genuine benchmark-freeze-v2 tag in the dev repo,
+            # which then deadlocks the real control (twice observed).
+            fake_git = mock.MagicMock()
+            fake_git.run.return_value = mock.Mock(returncode=1, stdout="")
             with mock.patch.object(pf, "ABLATION_RESULTS", path), \
                     mock.patch.object(pf, "_healthy", return_value=True), \
+                    mock.patch.object(pf, "subprocess", fake_git), \
                     mock.patch.object(
                         pf, "_valid_ablation_results",
                         side_effect=[
@@ -562,8 +568,11 @@ class AblationControlIntegrityTest(unittest.TestCase):
             path = os.path.join(td, "control.json")
             with open(path, "w") as f:
                 json.dump(self._payload(), f)
+            fake_git = mock.MagicMock()
+            fake_git.run.return_value = mock.Mock(returncode=1, stdout="")
             with mock.patch.object(pf, "ABLATION_RESULTS", path), \
                     mock.patch.object(pf, "_healthy", return_value=True), \
+                    mock.patch.object(pf, "subprocess", fake_git), \
                     mock.patch.object(
                         pf, "_valid_ablation_results",
                         side_effect=[
