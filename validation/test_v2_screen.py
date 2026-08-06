@@ -468,13 +468,18 @@ class AblationControlIntegrityTest(unittest.TestCase):
             with mock.patch.object(pf, "ABLATION_RESULTS", path), \
                     mock.patch.object(pf, "ATTEMPTS_PATH", attempts), \
                     mock.patch.object(pf, "MAX_CONTROL_DISCARDS", 2):
+                # Row-level failure: quarantine strips the degraded row and
+                # keeps the healthy rows instead of deleting the control.
                 self.assertEqual(pf._discard_control("bad", "on disk"), 3)
+                self.assertTrue(os.path.exists(path))
+                with open(path) as f:
+                    self.assertEqual(len(json.load(f)["rows"]),
+                                     len(payload["rows"]) - 1)
                 with open(path, "w") as f:
                     json.dump(payload, f)
                 # Budget exhausted: stop for a human rather than re-running an
                 # expensive control against a persistently degraded source.
                 self.assertEqual(pf._discard_control("bad", "on disk"), 2)
-                self.assertFalse(os.path.exists(path))
 
     def test_valid_control_clears_discard_budget(self):
         with tempfile.TemporaryDirectory() as td:
@@ -526,7 +531,51 @@ class AblationControlIntegrityTest(unittest.TestCase):
                     mock.patch.object(pf, "_run_module") as run_module:
                 self.assertEqual(pf.main(), 3)
             run_module.assert_not_called()
-            self.assertFalse(os.path.exists(path))
+            # Quarantine keeps the healthy rows; only the degraded row is
+            # removed (resume re-runs it instead of repeating all arms).
+            self.assertTrue(os.path.exists(path))
+            with open(path) as f:
+                self.assertEqual(len(json.load(f)["rows"]),
+                                 len(payload["rows"]) - 1)
+
+    def test_structural_failure_still_discards_whole_control(self):
+        # Fingerprint drift means no row can be trusted: whole-artifact
+        # discard (no quarantine) still applies.
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            attempts = os.path.join(td, "attempts")
+            payload = self._payload()
+            payload["fingerprint"] = "stale"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch.object(pf, "ATTEMPTS_PATH", attempts):
+                self.assertEqual(
+                    pf._discard_control("stale control fingerprint",
+                                        "on disk"), 3)
+                self.assertFalse(os.path.exists(path))
+
+    def test_preflight_resumes_row_incomplete_checkpoint(self):
+        # The state a quarantine leaves behind: all present rows valid, some
+        # arms missing.  That is a resume point, not a discard.
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            with open(path, "w") as f:
+                json.dump(self._payload(), f)
+            with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch.object(pf, "_healthy", return_value=True), \
+                    mock.patch.object(
+                        pf, "_valid_ablation_results",
+                        side_effect=[
+                            (False, "incomplete or unexpected control rows"),
+                            (True, "ok"),
+                        ]), \
+                    mock.patch.object(pf, "_run_module",
+                                      return_value=0) as run, \
+                    mock.patch.object(pf, "_clear_discards"):
+                self.assertEqual(pf.main(), 0)
+        self.assertEqual(run.call_args_list[0],
+                         mock.call("validation.run_v2_source_ablations"))
 
 
 if __name__ == "__main__":
