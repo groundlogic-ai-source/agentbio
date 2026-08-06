@@ -772,6 +772,7 @@ _BENCH_LOG = os.path.join(_BENCH_DIR, "prod_benchmark.log")
 _BENCH_CONTROL_JSON = os.path.join(_BENCH_DIR, "v2_source_ablation_results.json")
 _BENCH_RESULTS_JSON = os.path.join(_BENCH_DIR, "benchmark_results_v2.json")
 _BENCH_CASE_LIST = os.path.join(_BENCH_DIR, "benchmark_case_list_v2.json")
+_BENCH_DONE = os.path.join(_BENCH_DIR, ".prod_benchmark_done")
 
 
 def _bench_file_meta(path: str) -> dict:
@@ -786,13 +787,47 @@ def _bench_file_meta(path: str) -> dict:
     }
 
 
+def _bench_read_json(path: str) -> Optional[dict]:
+    """Read a checkpoint the supervisor may be mid-write on; one short retry."""
+    import time as _time
+    for attempt in range(2):
+        try:
+            with open(path) as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            if attempt == 0:
+                _time.sleep(0.5)
+        except OSError:
+            return None
+    return None
+
+
+def _bench_supervisor_alive() -> bool:
+    try:
+        out = subprocess.run(
+            ["pgrep", "-f", "prod_benchmark_supervisor.sh"],
+            capture_output=True, text=True, timeout=5,
+        )
+        return bool(out.stdout.strip())
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
 @app.get("/internal/benchmark-status")
 def benchmark_status() -> dict:
     """Read-only progress of the 24/7 v2 benchmark chain (control -> screen -> run)."""
-    status: dict[str, Any] = {"supervisor_log": _BENCH_LOG}
-    try:
-        with open(_BENCH_CONTROL_JSON) as f:
-            control = json.load(f)
+    status: dict[str, Any] = {
+        "supervisor_log": _BENCH_LOG,
+        "supervisor_alive": _bench_supervisor_alive(),
+    }
+    if os.path.exists(_BENCH_DONE):
+        try:
+            with open(_BENCH_DONE) as f:
+                status["terminal_state"] = f.read().strip()
+        except OSError:
+            status["terminal_state"] = "unknown"
+    control = _bench_read_json(_BENCH_CONTROL_JSON)
+    if control is not None:
         rows = control.get("rows", [])
         status["control"] = {
             "rows_completed": len(rows),
@@ -802,19 +837,18 @@ def benchmark_status() -> dict:
             "hits": sum(1 for r in rows if r.get("generated")),
             **_bench_file_meta(_BENCH_CONTROL_JSON),
         }
-    except (OSError, json.JSONDecodeError):
-        status["control"] = {"exists": False}
+    else:
+        status["control"] = _bench_file_meta(_BENCH_CONTROL_JSON)
     status["case_list"] = _bench_file_meta(_BENCH_CASE_LIST)
-    try:
-        with open(_BENCH_RESULTS_JSON) as f:
-            results = json.load(f)
+    results = _bench_read_json(_BENCH_RESULTS_JSON)
+    if results is not None:
         cases = results.get("cases", results.get("results", []))
         status["benchmark"] = {
             "cases_completed": len(cases) if isinstance(cases, list) else None,
             **_bench_file_meta(_BENCH_RESULTS_JSON),
         }
-    except (OSError, json.JSONDecodeError):
-        status["benchmark"] = {"exists": False}
+    else:
+        status["benchmark"] = _bench_file_meta(_BENCH_RESULTS_JSON)
     tail: list[str] = []
     try:
         with open(_BENCH_LOG) as f:
@@ -837,11 +871,10 @@ def benchmark_results() -> JSONResponse:
         (_BENCH_CONTROL_JSON, "source_ablation_control"),
     ):
         if os.path.exists(path):
-            try:
-                with open(path) as f:
-                    return JSONResponse({"artifact": label, "data": json.load(f)})
-            except (OSError, json.JSONDecodeError) as exc:
-                raise HTTPException(status_code=500, detail=f"unreadable artifact {label}: {exc}")
+            data = _bench_read_json(path)
+            if data is None:
+                raise HTTPException(status_code=503, detail=f"artifact {label} is mid-write; retry")
+            return JSONResponse({"artifact": label, "data": data})
     raise HTTPException(status_code=404, detail="no benchmark artifacts yet")
 
 
