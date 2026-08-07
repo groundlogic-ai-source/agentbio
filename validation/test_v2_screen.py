@@ -624,6 +624,42 @@ class AblationControlIntegrityTest(unittest.TestCase):
                     self.assertEqual(json.load(f)["fingerprint"],
                                      "unknown-prior-fingerprint")
 
+    def test_blessing_refused_when_snapshot_failed(self):
+        # Row checks alone are not enough: a failed target-selection snapshot
+        # must never be transitioned even if every row matches its hash.
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["fingerprint"] = "blessed-prior-fingerprint"
+            payload["target_snapshots"][0]["status"] = "error"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch.object(
+                        pf, "_BLESSED_FINGERPRINT_TRANSITIONS",
+                        {"blessed-prior-fingerprint"}):
+                pf._bless_fingerprint_transition()
+                with open(path) as f:
+                    self.assertEqual(json.load(f)["fingerprint"],
+                                     "blessed-prior-fingerprint")
+
+    def test_blessing_refused_when_snapshot_out_of_universe(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["fingerprint"] = "blessed-prior-fingerprint"
+            payload["target_snapshots"][0]["in_universe"] = False
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch.object(
+                        pf, "_BLESSED_FINGERPRINT_TRANSITIONS",
+                        {"blessed-prior-fingerprint"}):
+                pf._bless_fingerprint_transition()
+                with open(path) as f:
+                    self.assertEqual(json.load(f)["fingerprint"],
+                                     "blessed-prior-fingerprint")
+
     def test_blessing_refused_when_rows_defective(self):
         # The blessing is row-verified: a defective checkpoint under a blessed
         # fingerprint must NOT be transitioned (strict discard path intact).
@@ -648,6 +684,22 @@ class RunModuleWatchdogTest(unittest.TestCase):
     def test_run_module_returns_child_exit_code(self):
         self.assertEqual(
             pf._run_argv([sys.executable, "-c", "print('hello-watchdog')"]), 0)
+
+    def test_run_module_preserves_child_exit_code(self):
+        with mock.patch.object(pf, "_WATCHDOG_POLL_SECONDS", 0.05):
+            self.assertEqual(
+                pf._run_argv([sys.executable, "-c",
+                              "import sys; sys.exit(7)"]), 7)
+
+    def test_exit_during_silence_window_reports_child_code_not_stall(self):
+        # The child goes silent past the limit but exits during the
+        # watchdog's sleep — its real code must win over the stall verdict.
+        with mock.patch.object(pf, "_SILENCE_LIMIT_SECONDS", 0.15), \
+                mock.patch.object(pf, "_WATCHDOG_POLL_SECONDS", 0.6):
+            rc = pf._run_argv([sys.executable, "-c",
+                               "import sys, time; time.sleep(0.1); "
+                               "sys.exit(5)"])
+            self.assertEqual(rc, 5)
 
     def test_run_module_kills_silent_wedged_child(self):
         # A child that goes silent past the limit is killed (whole process

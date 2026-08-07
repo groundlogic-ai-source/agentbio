@@ -160,11 +160,20 @@ def _run_argv(argv) -> int:
                 offset = size
                 last_change = time.monotonic()
             elif time.monotonic() - last_change > _SILENCE_LIMIT_SECONDS:
+                if proc.poll() is not None:
+                    break  # exited during the sleep — report its real code
                 try:
                     os.killpg(proc.pid, signal.SIGKILL)
                 except (ProcessLookupError, PermissionError, OSError):
-                    proc.kill()
+                    try:
+                        proc.kill()
+                    except (ProcessLookupError, OSError):
+                        pass  # leader already gone; honor its real code below
                 proc.wait()
+                if (proc.returncode or 0) >= 0:
+                    # Exited on its own in the silence window before the kill
+                    # landed — that is a completion, not a stall.
+                    break
                 _log(f"{' '.join(map(str, argv))} produced no output for "
                      f"{_SILENCE_LIMIT_SECONDS // 60} min — killed wedged "
                      "process group; exit 3 (resume replays from the last "
@@ -512,6 +521,26 @@ def _bless_fingerprint_transition() -> None:
         _log("blessed-fingerprint candidate failed row-level verification — "
              "NOT blessing; strict discard path preserved")
         return
+    # Snapshot-level checks mirror _valid_ablation_results (minus the
+    # completeness requirement — a mid-run checkpoint is the intended bless
+    # target).  A failed/out-of-universe/invalid snapshot must never be
+    # transitioned even when every row happens to match its hash.
+    for snapshot in payload.get("target_snapshots") or []:
+        key = snapshot.get("case_key") if isinstance(snapshot, dict) else None
+        if (not isinstance(snapshot, dict)
+                or snapshot.get("status") != "ok"
+                or snapshot.get("in_universe") is not True):
+            _log("blessed-fingerprint candidate has a failed/out-of-universe "
+                 f"target snapshot ({key}) — NOT blessing; strict discard "
+                 "path preserved")
+            return
+        try:
+            ablation.validate_snapshot(snapshot, ablation.DEFAULT_TARGET_CAP)
+        except RuntimeError as exc:
+            _log("blessed-fingerprint candidate has an invalid target "
+                 f"snapshot ({exc}) — NOT blessing; strict discard path "
+                 "preserved")
+            return
     payload["fingerprint"] = current
     tmp_path = ABLATION_RESULTS + ".bless.tmp"
     try:
@@ -522,7 +551,8 @@ def _bless_fingerprint_transition() -> None:
         return
     _log(f"Amendment 4: blessed control fingerprint transition "
          f"{stored[:12]}… → {current[:12]}… ({len(payload.get('rows') or [])} "
-         "completed rows verified unaffected by the gtopdb structure-204 fix)")
+         "rows + all snapshots verified unaffected by the gtopdb "
+         "structure-204 fix)")
 
 
 def _discard_control(reason: str, context: str) -> int:
