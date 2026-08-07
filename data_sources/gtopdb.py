@@ -64,13 +64,20 @@ def _envelope(status: str, candidates: list[dict[str, Any]],
     }
 
 
-def _get_json(path: str, params: Optional[dict] = None) -> Any:
+def _get_json(path: str, params: Optional[dict] = None,
+              allow_no_content: bool = False) -> Any:
     """GET {BASE_URL}{path} and return parsed JSON.
 
     Raises _SourceUnavailable on transient HTTP, timeout, connection error, or
     a non-JSON body. Callers translate that into an 'unavailable' envelope and
     skip caching. A 404 is returned to the caller as None (a legitimate
     "no such resource" answer, distinct from an outage).
+
+    With allow_no_content, HTTP 204 is likewise returned as None: on the
+    /ligands/{id}/structure endpoint a 204 means the ligand has NO deposited
+    structure (approved biologics — olaratumab, tositumomab, efgartigimod
+    alfa — have no SMILES), which is a data absence, not a source failure.
+    Every other endpoint keeps the strict behavior: a 204 there still raises.
     """
     url = f"{BASE_URL}{path}"
     try:
@@ -80,6 +87,8 @@ def _get_json(path: str, params: Optional[dict] = None) -> Any:
         raise _SourceUnavailable(f"request to {url} failed: {e}") from e
 
     if resp.status_code == 404:
+        return None
+    if resp.status_code == 204 and allow_no_content:
         return None
     if resp.status_code in _TRANSIENT_STATUSES:
         raise _SourceUnavailable(
@@ -147,8 +156,13 @@ def _fetch_ligand(ligand_id: int) -> Optional[dict[str, Any]]:
 
 
 def _fetch_structure(ligand_id: int) -> Optional[dict[str, Any]]:
-    """/ligands/{id}/structure — SMILES / InChI / InChIKey."""
-    data = _get_json(f"/ligands/{ligand_id}/structure")
+    """/ligands/{id}/structure — SMILES / InChI / InChIKey.
+
+    Biologics have no deposited structure — the endpoint answers HTTP 204 —
+    so the candidate is kept with structure fields None rather than failing
+    the whole target's GtoPdb pull (benchmark v2 Amendment 4).
+    """
+    data = _get_json(f"/ligands/{ligand_id}/structure", allow_no_content=True)
     if data is None:
         return None
     if not isinstance(data, dict):

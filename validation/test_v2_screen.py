@@ -6,6 +6,7 @@ import json
 import os
 import sys
 import tempfile
+import time
 import unittest
 from unittest import mock
 
@@ -186,6 +187,7 @@ class RunnerContaminationGuardTest(unittest.TestCase):
             return out
         with mock.patch.object(pf, "_valid_ablation_results",
                                return_value=(True, "complete")), \
+                mock.patch.object(pf, "_bless_fingerprint_transition"), \
                 mock.patch.object(pf.os.path, "exists", return_value=True), \
                 mock.patch.object(pf, "_healthy", return_value=True), \
                 mock.patch.object(pf.subprocess, "run", side_effect=fake_run):
@@ -585,6 +587,79 @@ class AblationControlIntegrityTest(unittest.TestCase):
                 self.assertEqual(pf.main(), 0)
         self.assertEqual(run.call_args_list[0],
                          mock.call("validation.run_v2_source_ablations"))
+
+    def test_blessed_fingerprint_transition_preserves_checkpoint(self):
+        # Amendment 4: a documented, row-verified code fix may bless a prior
+        # fingerprint instead of forcing a full re-run.
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["fingerprint"] = "blessed-prior-fingerprint"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch.object(
+                        pf, "_BLESSED_FINGERPRINT_TRANSITIONS",
+                        {"blessed-prior-fingerprint"}):
+                pf._bless_fingerprint_transition()
+                with open(path) as f:
+                    rewritten = json.load(f)
+                self.assertNotEqual(rewritten["fingerprint"],
+                                    "blessed-prior-fingerprint")
+                self.assertTrue(pf._valid_ablation_results(path)[0])
+
+    def test_unblessed_fingerprint_is_never_transitioned(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["fingerprint"] = "unknown-prior-fingerprint"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch.object(
+                        pf, "_BLESSED_FINGERPRINT_TRANSITIONS",
+                        {"blessed-prior-fingerprint"}):
+                pf._bless_fingerprint_transition()
+                with open(path) as f:
+                    self.assertEqual(json.load(f)["fingerprint"],
+                                     "unknown-prior-fingerprint")
+
+    def test_blessing_refused_when_rows_defective(self):
+        # The blessing is row-verified: a defective checkpoint under a blessed
+        # fingerprint must NOT be transitioned (strict discard path intact).
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "control.json")
+            payload = self._payload()
+            payload["fingerprint"] = "blessed-prior-fingerprint"
+            payload["rows"][0]["status"] = "error"
+            with open(path, "w") as f:
+                json.dump(payload, f)
+            with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch.object(
+                        pf, "_BLESSED_FINGERPRINT_TRANSITIONS",
+                        {"blessed-prior-fingerprint"}):
+                pf._bless_fingerprint_transition()
+                with open(path) as f:
+                    self.assertEqual(json.load(f)["fingerprint"],
+                                     "blessed-prior-fingerprint")
+
+
+class RunModuleWatchdogTest(unittest.TestCase):
+    def test_run_module_returns_child_exit_code(self):
+        self.assertEqual(
+            pf._run_argv([sys.executable, "-c", "print('hello-watchdog')"]), 0)
+
+    def test_run_module_kills_silent_wedged_child(self):
+        # A child that goes silent past the limit is killed (whole process
+        # group) and reported as rc 3 so the supervisor retries from the last
+        # checkpoint instead of hanging forever.
+        with mock.patch.object(pf, "_SILENCE_LIMIT_SECONDS", 0.3), \
+                mock.patch.object(pf, "_WATCHDOG_POLL_SECONDS", 0.05):
+            start = time.monotonic()
+            rc = pf._run_argv([sys.executable, "-c",
+                               "import time; time.sleep(60)"])
+            self.assertEqual(rc, 3)
+            self.assertLess(time.monotonic() - start, 20)
 
 
 if __name__ == "__main__":

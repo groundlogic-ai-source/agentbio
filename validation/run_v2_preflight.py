@@ -23,8 +23,11 @@ from __future__ import annotations
 
 import os
 import json
+import signal
 import subprocess
 import sys
+import tempfile
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -112,8 +115,70 @@ def _clear_discards() -> None:
         pass
 
 
+# Stall watchdog for child modules.  A wedged child can stall indefinitely on
+# an external call without a timeout in ROW FINALIZATION (observed 2026-08-07:
+# the control froze at 38/52 for over an hour inside one arm with the
+# supervisor still alive — the per-target process bound does not cover the
+# post-target reviewer/matching phase).  Healthy modules emit output at least
+# every per-target bound (~15 min), so 30 min of silence is definitively
+# wedged: kill the whole process group and return 3 so the supervisor
+# retries — the harness resumes from its last per-arm flush, losing at most
+# the wedged in-flight arm.
+_SILENCE_LIMIT_SECONDS = 30 * 60
+_WATCHDOG_POLL_SECONDS = 30
+
+
 def _run_module(module: str) -> int:
-    return subprocess.call([sys.executable, "-m", module])
+    return _run_argv([sys.executable, "-m", module])
+
+
+def _forward(chunk: bytes) -> None:
+    buf = getattr(sys.stdout, "buffer", None)
+    if buf is not None:
+        buf.write(chunk)
+        buf.flush()
+    else:  # exotic stdout wrappers
+        sys.stdout.write(chunk.decode("utf-8", "replace"))
+        sys.stdout.flush()
+
+
+def _run_argv(argv) -> int:
+    """Run a child with output tee'd to stdout under the stall watchdog."""
+    tmp = tempfile.NamedTemporaryFile(mode="w+b", prefix="preflight_watchdog_",
+                                      delete=False)
+    try:
+        proc = subprocess.Popen(argv, stdout=tmp, stderr=subprocess.STDOUT,
+                                start_new_session=True)
+        offset = 0
+        last_change = time.monotonic()
+        while proc.poll() is None:
+            time.sleep(_WATCHDOG_POLL_SECONDS)
+            size = os.fstat(tmp.fileno()).st_size
+            if size > offset:
+                tmp.seek(offset)
+                _forward(tmp.read())
+                offset = size
+                last_change = time.monotonic()
+            elif time.monotonic() - last_change > _SILENCE_LIMIT_SECONDS:
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except (ProcessLookupError, PermissionError, OSError):
+                    proc.kill()
+                proc.wait()
+                _log(f"{' '.join(map(str, argv))} produced no output for "
+                     f"{_SILENCE_LIMIT_SECONDS // 60} min — killed wedged "
+                     "process group; exit 3 (resume replays from the last "
+                     "checkpoint)")
+                return 3
+        tmp.seek(offset)
+        _forward(tmp.read())
+        return proc.returncode
+    finally:
+        tmp.close()
+        try:
+            os.unlink(tmp.name)
+        except OSError:
+            pass
 
 
 def _valid_ablation_results(path: str = ABLATION_RESULTS) -> tuple[bool, str]:
@@ -292,13 +357,17 @@ def _row_defect(row, snapshot, enabled):
     return None
 
 
-def _defective_row_keys(payload):
+def _defective_row_keys(payload, check_fingerprint=True):
     """Full scan: keys of every row that would fail _valid_ablation_results().
 
     Returns None when the artifact's failure is STRUCTURAL (label, fingerprint,
     condition mapping, snapshots) — then nothing row-level can be salvaged and
     the caller must discard the whole file.  Otherwise returns a (possibly
     empty) list of ((condition, case_key), defect) pairs.
+
+    check_fingerprint=False is used ONLY by the Amendment-4 blessing path,
+    which must row-verify a checkpoint whose fingerprint is the blessed prior
+    one before rewriting it.
     """
     try:
         from validation import run_v2_source_ablations as ablation
@@ -318,10 +387,11 @@ def _defective_row_keys(payload):
         if (not isinstance(sources, list)
                 or tuple(sources) != ablation.CONDITIONS[condition]):
             return None
-    expected_fingerprint = ablation.config_source_fingerprint(
-        ablation.DEFAULT_TARGET_CAP, conditions)
-    if payload.get("fingerprint") != expected_fingerprint:
-        return None
+    if check_fingerprint:
+        expected_fingerprint = ablation.config_source_fingerprint(
+            ablation.DEFAULT_TARGET_CAP, conditions)
+        if payload.get("fingerprint") != expected_fingerprint:
+            return None
     snapshots = payload.get("target_snapshots")
     rows = payload.get("rows")
     if not isinstance(snapshots, list) or not isinstance(rows, list):
@@ -395,6 +465,66 @@ def _quarantine_defective_rows():
     return removed
 
 
+# Amendment 4 (2026-08-07): data_sources/gtopdb.py now tolerates HTTP 204 on
+# /ligands/{id}/structure (approved biologics — olaratumab, tositumomab,
+# efgartigimod alfa — have no deposited small-molecule structure, so the 204
+# is a data absence, not a source failure).  The code fix changes the control
+# fingerprint, which the stale-resume guard would (correctly) treat as a new
+# run, forcing a full 52-arm re-run.  Before blessing, every completed row of
+# this checkpoint was re-verified defect-free under the row-level checks
+# (zero degraded/error source stamps): the fix is behavior-identical for all
+# completed rows, and only re-run arms observe the new behavior.  Blessing is
+# a loud, one-time, row-verified fingerprint transition — NOT a weakening of
+# the guard for unknown drift.
+_BLESSED_FINGERPRINT_TRANSITIONS = {
+    "e65a5374477e32c374381a47dfd562981b4733195c1b4c53d00e0b198d5a48b4",
+}
+
+
+def _bless_fingerprint_transition() -> None:
+    """Apply a blessed fingerprint transition to the on-disk checkpoint.
+
+    Verifies the checkpoint row-by-row first (any defect or structural
+    problem → no blessing), then rewrites the fingerprint to the current one
+    so the harness's stale-resume guard accepts the resume.  Unrecognized
+    fingerprints keep the strict mismatch → discard path.
+    """
+    if not os.path.exists(ABLATION_RESULTS):
+        return
+    try:
+        with open(ABLATION_RESULTS, encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return
+    stored = payload.get("fingerprint")
+    if stored not in _BLESSED_FINGERPRINT_TRANSITIONS:
+        return
+    try:
+        from validation import run_v2_source_ablations as ablation
+    except ImportError:  # direct (non-package) execution
+        import run_v2_source_ablations as ablation
+    current = ablation.config_source_fingerprint(
+        ablation.DEFAULT_TARGET_CAP, tuple(ablation.CONDITIONS))
+    if stored == current:
+        return
+    defects = _defective_row_keys(payload, check_fingerprint=False)
+    if defects is None or defects:
+        _log("blessed-fingerprint candidate failed row-level verification — "
+             "NOT blessing; strict discard path preserved")
+        return
+    payload["fingerprint"] = current
+    tmp_path = ABLATION_RESULTS + ".bless.tmp"
+    try:
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2)
+        os.replace(tmp_path, ABLATION_RESULTS)
+    except OSError:
+        return
+    _log(f"Amendment 4: blessed control fingerprint transition "
+         f"{stored[:12]}… → {current[:12]}… ({len(payload.get('rows') or [])} "
+         "completed rows verified unaffected by the gtopdb structure-204 fix)")
+
+
 def _discard_control(reason: str, context: str) -> int:
     """Quarantine degraded rows; delete only structurally unusable artifacts.
 
@@ -449,6 +579,7 @@ def main() -> int:
     #    harness refuses to run post-tag, so it must finish first).
     control_ok = False
     if os.path.exists(ABLATION_RESULTS):
+        _bless_fingerprint_transition()
         control_ok, reason = _valid_ablation_results()
         if not control_ok:
             # The harness deliberately flushes a resumable checkpoint after
