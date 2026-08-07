@@ -192,7 +192,8 @@ tag exists or any v2 case executes.
     degraded/error source stamp, so the fix is behavior-identical for every completed row; only
     re-run arms (the quarantined/stripped ones plus the not-yet-run Everolimus case) observe the
     new behavior. `run_v2_preflight.py` blesses exactly one fingerprint transition
-    (e65a5374477e…), row-verified again at runtime; unrecognized drift still discards.
+    (e65a5374477e…), row- AND snapshot-verified again at runtime (a failed, out-of-universe,
+    or invalid snapshot is never transitioned); unrecognized drift still discards.
     Rationale: preserving 38 verified rows (~5 h of healthy compute) without mixing semantics —
     a full re-run would produce equivalent rows for all completed arms.
 23. **Stall watchdog (operational, not analytical).** The control was found wedged >1 h in
