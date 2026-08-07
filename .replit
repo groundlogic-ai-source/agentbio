@@ -26,10 +26,6 @@ args = "repodb-smallmol-validation"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "benchmark-run"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "v2-engineering-acceptance"
 
 [[workflows.workflow]]
@@ -47,17 +43,6 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd /home/runner/workspace && python3 -m validation.run_repodb_cases_smallmol 2>&1 | tee /tmp/smallmol_val.log"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow]]
-name = "benchmark-run"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace && while true; do python3 -m validation.run_v2_preflight 2>&1 | tee -a /tmp/benchmark_run.log; pf=${PIPESTATUS[0]}; if [ $pf -eq 0 ]; then python3 -m validation.run_benchmark 2>&1 | tee -a /tmp/benchmark_run.log; rc=${PIPESTATUS[0]}; else rc=$pf; fi; if [ $rc -eq 0 ]; then echo 'BENCHMARK COMPLETE' | tee -a /tmp/benchmark_run.log; break; fi; if [ $rc -eq 2 ]; then echo 'FREEZE VIOLATION — manual intervention required' | tee -a /tmp/benchmark_run.log; break; fi; echo \"halted rc=$rc — health-gated retry in 5 min\" | tee -a /tmp/benchmark_run.log; sleep 300; done"
 
 [workflows.workflow.metadata]
 outputType = "console"
