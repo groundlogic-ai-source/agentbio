@@ -201,3 +201,25 @@ tag exists or any v2 case executes.
     process bound does not cover. Preflight now kills any child module after 30 min of output
     silence and exits 3; the supervisor retries and the harness resumes from its last per-arm
     flush. This changes no data semantics.
+
+## Amendment 5 (2026-08-07, after control+screen completion, before any v2 case executes) — deployment freeze attestation
+
+Registered after the control completed (52/52 arms, 33 hits) and the screen wrote the case list,
+BEFORE the freeze is sealed or any v2 case executes.
+
+24. **Freeze in the published deployment.** The production deployment ships without a git
+    repository, so `git tag benchmark-freeze-v2` cannot be created or verified there. In a
+    deployment, the freeze is sealed by `validation/benchmark_freeze_v2_attestation.json`,
+    which pins: the pipeline source fingerprint (the same fingerprint the control resume-guard
+    uses — any byte change to fingerprinted pipeline code is drift), the SHA-256 of the
+    completed control artifact, and the SHA-256 of the screened case list. A published
+    deployment is immutable per publish, so redeploying different code necessarily fails the
+    attestation check. In a git checkout (dev), the tag path is unchanged and remains
+    authoritative. Results record `freeze_mode` ("git-tag" | "deployment-attestation").
+25. **Post-freeze re-run refusal without git.** The ablation harness's git-tag hard-refusal
+    cannot fire in a deployment; instead preflight refuses (exit 2) to run or resume the
+    control or the screen whenever a freeze marker (tag or attestation) exists and the
+    corresponding artifact is missing/invalid.
+26. **Benchmark integrity parity.** `run_benchmark._check_freeze_integrity` verifies the
+    attestation (fingerprint + both artifact hashes) when git is unavailable, with identical
+    refusal semantics (exit 2) to the tag path.

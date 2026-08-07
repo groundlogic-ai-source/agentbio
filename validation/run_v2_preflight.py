@@ -11,7 +11,9 @@ Chain, in order:
   3. Amendment-1 screened case list exists (runs screen_v2_cases if missing;
      its exit 3/2 propagate).
   4. `benchmark-freeze-v2` tag exists — created at HEAD only after steps 1-3
-     pass and the pipeline dirs are clean.
+     pass and the pipeline dirs are clean.  In a published deployment (no
+     .git), a freeze ATTESTATION replaces the tag (Amendment 5) — identical
+     refusal semantics.
 
 Usage:
     python3 -m validation.run_v2_preflight
@@ -22,6 +24,7 @@ Exit codes: 0 = ready; 2 = manual intervention; 3 = data unavailable (retry);
 from __future__ import annotations
 
 import os
+import hashlib
 import json
 import signal
 import subprocess
@@ -34,6 +37,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 FREEZE_TAG = "benchmark-freeze-v2"
 ABLATION_RESULTS = "validation/v2_source_ablation_results.json"
 SCREENED_LIST = "validation/benchmark_case_list_v2.json"
+FREEZE_ATTESTATION = "validation/benchmark_freeze_v2_attestation.json"
 PIPELINE_DIRS = ["agents/", "data_sources/", "cache/"]
 CONTROL_ROW_STATUSES = frozenset({"hit", "miss"})
 # Providers under test in the ablation. A provider that is switched OFF for an
@@ -188,6 +192,95 @@ def _run_argv(argv) -> int:
             os.unlink(tmp.name)
         except OSError:
             pass
+
+
+def _git_available() -> bool:
+    """Published deployments ship without a .git directory (and git itself may
+    be absent) — freeze operations need a no-git path there (Amendment 5)."""
+    try:
+        return subprocess.run(["git", "rev-parse", "HEAD"],
+                              capture_output=True).returncode == 0
+    except OSError:
+        return False
+
+
+def _sha256(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _current_fingerprint() -> str:
+    try:
+        from validation import run_v2_source_ablations as ablation
+    except ImportError:  # direct (non-package) execution
+        import run_v2_source_ablations as ablation
+    return ablation.config_source_fingerprint(
+        ablation.DEFAULT_TARGET_CAP, tuple(ablation.CONDITIONS))
+
+
+def _freeze_marker_exists() -> bool:
+    """True once the freeze is sealed — git tag (checkout) or attestation
+    (deployment).  Post-freeze, the control and the screen must never re-run:
+    they are pre-freeze-only artifacts."""
+    if os.path.exists(FREEZE_ATTESTATION):
+        return True
+    if not _git_available():
+        return False
+    return subprocess.run(
+        ["git", "rev-parse", "-q", "--verify", f"refs/tags/{FREEZE_TAG}"],
+        capture_output=True).returncode == 0
+
+
+def _ensure_freeze_attestation() -> int:
+    """Deployment freeze (Amendment 5): no git in a published app, so the
+    freeze pins the pipeline source fingerprint plus the SHA-256 of the sealed
+    control artifact and screened case list instead of a tag.  A published
+    deployment is immutable per publish, so any code or artifact drift shows
+    up here as a mismatch and refuses (exit 2) with tag-path semantics."""
+    current = _current_fingerprint()
+    control_hash = _sha256(ABLATION_RESULTS)
+    case_hash = _sha256(SCREENED_LIST)
+    if os.path.exists(FREEZE_ATTESTATION):
+        try:
+            with open(FREEZE_ATTESTATION, encoding="utf-8") as f:
+                att = json.load(f)
+        except (OSError, json.JSONDecodeError) as exc:
+            _log(f"freeze attestation unreadable ({exc}) — manual "
+                 "intervention required")
+            return 2
+        problems = []
+        if att.get("fingerprint") != current:
+            problems.append("pipeline fingerprint drifted since freeze")
+        if att.get("control_sha256") != control_hash:
+            problems.append("control artifact changed post-freeze")
+        if att.get("case_list_sha256") != case_hash:
+            problems.append("screened case list changed post-freeze")
+        if problems:
+            _log("freeze attestation MISMATCH: " + "; ".join(problems) +
+                 " — manual intervention required")
+            return 2
+        _log("freeze attestation verified (deployment mode — no git)")
+        return 0
+    payload = {
+        "freeze_tag": FREEZE_TAG,
+        "mode": "deployment-attestation",
+        "amendment": 5,
+        "fingerprint": current,
+        "control_sha256": control_hash,
+        "case_list_sha256": case_hash,
+        "created_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    }
+    tmp = FREEZE_ATTESTATION + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2)
+    os.replace(tmp, FREEZE_ATTESTATION)
+    _log("no git in deployment — created freeze ATTESTATION pinning pipeline "
+         f"fingerprint {current[:12]}… + control/case-list SHA-256 "
+         "(Amendment 5)")
+    return 0
 
 
 def _valid_ablation_results(path: str = ABLATION_RESULTS) -> tuple[bool, str]:
@@ -512,8 +605,7 @@ def _bless_fingerprint_transition() -> None:
         from validation import run_v2_source_ablations as ablation
     except ImportError:  # direct (non-package) execution
         import run_v2_source_ablations as ablation
-    current = ablation.config_source_fingerprint(
-        ablation.DEFAULT_TARGET_CAP, tuple(ablation.CONDITIONS))
+    current = _current_fingerprint()
     if stored == current:
         return
     defects = _defective_row_keys(payload, check_fingerprint=False)
@@ -631,6 +723,11 @@ def main() -> int:
                 _log("source-ablation checkpoint incomplete — resuming the "
                      "same control; final validation remains required before "
                      "screening or freeze")
+                if _freeze_marker_exists():
+                    _log("control checkpoint resumable but the freeze is "
+                         "already sealed — the control must never re-run "
+                         "post-freeze; exit 2 (manual intervention)")
+                    return 2
                 rc = _run_module("validation.run_v2_source_ablations")
                 if rc == 2:
                     _log("ablation control refused (seal violation) — manual "
@@ -649,6 +746,11 @@ def main() -> int:
                 # preflight retries cleanly; never freeze from degraded control.
                 return _discard_control(reason, "on disk")
     if not control_ok:
+        if _freeze_marker_exists():
+            _log("control results missing/invalid but the freeze is already "
+                 "sealed — cannot create the control post-freeze; exit 2 "
+                 "(manual intervention)")
+            return 2
         _log("source-ablation control results missing — running one-time "
              "(label source_ablation_control, NOT benchmark v2)")
         rc = _run_module("validation.run_v2_source_ablations")
@@ -667,12 +769,24 @@ def main() -> int:
 
     # 3. Amendment-1 screened case list.
     if not os.path.exists(SCREENED_LIST):
+        if _freeze_marker_exists():
+            _log("screened case list missing but the freeze is already "
+                 "sealed — cannot re-screen post-freeze; exit 2 (manual "
+                 "intervention)")
+            return 2
         _log("screened case list missing — running Amendment-1 screen")
         rc = _run_module("validation.screen_v2_cases")
         if rc != 0:
             return 2 if rc == 2 else 3
 
-    # 4. Freeze tag — only now, at a clean HEAD.
+    # 4. Freeze — git tag at a clean HEAD in a checkout; a deployment
+    #    attestation when the published app has no git (Amendment 5).
+    if not _git_available():
+        rc = _ensure_freeze_attestation()
+        if rc != 0:
+            return rc
+        _log("READY — benchmark v2 may start")
+        return 0
     have_tag = subprocess.run(
         ["git", "rev-parse", "-q", "--verify", f"refs/tags/{FREEZE_TAG}"],
         capture_output=True).returncode == 0
