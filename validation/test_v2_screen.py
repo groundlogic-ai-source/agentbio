@@ -509,6 +509,7 @@ class AblationControlIntegrityTest(unittest.TestCase):
             with mock.patch.object(pf, "ABLATION_RESULTS", path), \
                     mock.patch.object(pf, "_healthy", return_value=True), \
                     mock.patch.object(pf, "subprocess", fake_git), \
+                    mock.patch.object(pf, "_git_available", return_value=True), \
                     mock.patch.object(
                         pf, "_valid_ablation_results",
                         side_effect=[
@@ -575,6 +576,7 @@ class AblationControlIntegrityTest(unittest.TestCase):
             with mock.patch.object(pf, "ABLATION_RESULTS", path), \
                     mock.patch.object(pf, "_healthy", return_value=True), \
                     mock.patch.object(pf, "subprocess", fake_git), \
+                    mock.patch.object(pf, "_git_available", return_value=True), \
                     mock.patch.object(
                         pf, "_valid_ablation_results",
                         side_effect=[
@@ -678,6 +680,105 @@ class AblationControlIntegrityTest(unittest.TestCase):
                 with open(path) as f:
                     self.assertEqual(json.load(f)["fingerprint"],
                                      "blessed-prior-fingerprint")
+
+
+class FreezeAttestationTest(unittest.TestCase):
+    """Amendment 5: in a published deployment (no git), the freeze is sealed by
+    an attestation pinning the pipeline fingerprint + sealed artifact hashes."""
+
+    def _seal(self, td):
+        paths = {"control": os.path.join(td, "control.json"),
+                 "cases": os.path.join(td, "cases.json"),
+                 "att": os.path.join(td, "attestation.json")}
+        with open(paths["control"], "w") as f:
+            json.dump({"rows": []}, f)
+        with open(paths["cases"], "w") as f:
+            json.dump({"cases": []}, f)
+        return paths
+
+    def _patches(self, p):
+        return (mock.patch.object(pf, "ABLATION_RESULTS", p["control"]),
+                mock.patch.object(pf, "SCREENED_LIST", p["cases"]),
+                mock.patch.object(pf, "FREEZE_ATTESTATION", p["att"]),
+                mock.patch.object(pf, "_git_available", return_value=False))
+
+    def test_attestation_created_then_verified(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = self._seal(td)
+            p1, p2, p3, p4 = self._patches(p)
+            with p1, p2, p3, p4:
+                self.assertEqual(pf._ensure_freeze_attestation(), 0)
+                self.assertTrue(os.path.exists(p["att"]))
+                # Second invocation verifies instead of rewriting.
+                self.assertEqual(pf._ensure_freeze_attestation(), 0)
+
+    def test_attestation_fingerprint_drift_refused(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = self._seal(td)
+            p1, p2, p3, p4 = self._patches(p)
+            with p1, p2, p3, p4:
+                self.assertEqual(pf._ensure_freeze_attestation(), 0)
+                with mock.patch.object(pf, "_current_fingerprint",
+                                       return_value="drifted"):
+                    self.assertEqual(pf._ensure_freeze_attestation(), 2)
+
+    def test_attestation_control_drift_refused(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = self._seal(td)
+            p1, p2, p3, p4 = self._patches(p)
+            with p1, p2, p3, p4:
+                self.assertEqual(pf._ensure_freeze_attestation(), 0)
+                with open(p["control"], "w") as f:
+                    json.dump({"rows": ["tampered"]}, f)
+                self.assertEqual(pf._ensure_freeze_attestation(), 2)
+
+    def test_control_rerun_refused_post_freeze(self):
+        # Freeze sealed (attestation present) + control artifact missing →
+        # preflight must refuse (exit 2), never re-run the control post-freeze.
+        with tempfile.TemporaryDirectory() as td:
+            p = self._seal(td)
+            with open(p["att"], "w") as f:
+                json.dump({"sealed": True}, f)
+            missing = os.path.join(td, "missing.json")
+            with mock.patch.object(pf, "ABLATION_RESULTS", missing), \
+                    mock.patch.object(pf, "FREEZE_ATTESTATION", p["att"]), \
+                    mock.patch.object(pf, "_git_available", return_value=False), \
+                    mock.patch.object(pf, "_healthy", return_value=True), \
+                    mock.patch.object(pf, "_run_module") as run:
+                self.assertEqual(pf.main(), 2)
+                run.assert_not_called()
+
+
+class BenchmarkAttestationIntegrityTest(unittest.TestCase):
+    def test_missing_attestation_refused_in_deployment(self):
+        with tempfile.TemporaryDirectory() as td:
+            with mock.patch.object(pf, "FREEZE_ATTESTATION",
+                                   os.path.join(td, "att.json")), \
+                    mock.patch.object(pf, "_git_available", return_value=False):
+                with self.assertRaises(SystemExit) as ctx:
+                    rb._check_freeze_integrity()
+                self.assertEqual(ctx.exception.code, 2)
+
+    def test_attestation_integrity_pass_then_drift_refused(self):
+        with tempfile.TemporaryDirectory() as td:
+            control = os.path.join(td, "control.json")
+            cases = os.path.join(td, "cases.json")
+            att = os.path.join(td, "att.json")
+            with open(control, "w") as f:
+                json.dump({"rows": []}, f)
+            with open(cases, "w") as f:
+                json.dump({"cases": []}, f)
+            with mock.patch.object(pf, "ABLATION_RESULTS", control), \
+                    mock.patch.object(pf, "SCREENED_LIST", cases), \
+                    mock.patch.object(pf, "FREEZE_ATTESTATION", att), \
+                    mock.patch.object(pf, "_git_available", return_value=False):
+                self.assertEqual(pf._ensure_freeze_attestation(), 0)
+                rb._check_freeze_integrity()  # passes — no SystemExit
+                with open(control, "w") as f:
+                    json.dump({"rows": ["tampered"]}, f)
+                with self.assertRaises(SystemExit) as ctx:
+                    rb._check_freeze_integrity()
+                self.assertEqual(ctx.exception.code, 2)
 
 
 class RunModuleWatchdogTest(unittest.TestCase):

@@ -57,8 +57,13 @@ CHEMBL_PROBES = (
 # ── Protocol gates ───────────────────────────────────────────────────────────
 
 def _check_freeze_integrity() -> None:
-    """The one v2 run executes AT the tagged commit, with the pipeline dirs
-    byte-identical to the tag."""
+    """The one v2 run executes AT the freeze: tagged-commit integrity in a git
+    checkout; deployment-attestation integrity where git is absent (Amendment
+    5 — published apps ship without a .git directory)."""
+    from validation import run_v2_preflight as pf
+    if not pf._git_available():
+        _check_attestation_integrity(pf)
+        return
     head = subprocess.run(["git", "rev-parse", "HEAD"],
                           capture_output=True, text=True).stdout.strip()
     tagged = subprocess.run(["git", "rev-parse", f"{FREEZE_TAG}^{{commit}}"],
@@ -77,6 +82,39 @@ def _check_freeze_integrity() -> None:
     if diff.returncode != 0 or dirty:
         _log(f"FATAL: pipeline differs from {FREEZE_TAG}: {dirty}")
         sys.exit(2)
+
+
+def _check_attestation_integrity(pf) -> None:
+    """Deployment freeze verification (Amendment 5): the attestation pins the
+    pipeline fingerprint + sealed control/case-list hashes.  Identical refusal
+    semantics (exit 2) to the git-tag path."""
+    if not os.path.exists(pf.FREEZE_ATTESTATION):
+        _log(f"FATAL: no git repo and no freeze attestation at "
+             f"{pf.FREEZE_ATTESTATION} — preflight must seal the freeze "
+             "before the benchmark runs")
+        sys.exit(2)
+    try:
+        with open(pf.FREEZE_ATTESTATION, encoding="utf-8") as f:
+            att = json.load(f)
+    except (OSError, json.JSONDecodeError) as exc:
+        _log(f"FATAL: freeze attestation unreadable: {exc}")
+        sys.exit(2)
+    problems = []
+    if att.get("fingerprint") != pf._current_fingerprint():
+        problems.append("pipeline fingerprint drifted since freeze")
+    if att.get("control_sha256") != pf._sha256(pf.ABLATION_RESULTS):
+        problems.append("control artifact changed post-freeze")
+    if att.get("case_list_sha256") != pf._sha256(pf.SCREENED_LIST):
+        problems.append("screened case list changed post-freeze")
+    if problems:
+        _log("FATAL: freeze attestation mismatch: " + "; ".join(problems))
+        sys.exit(2)
+    _log("freeze integrity verified via deployment attestation (no git)")
+
+
+def _freeze_mode() -> str:
+    from validation import run_v2_preflight as pf
+    return "git-tag" if pf._git_available() else "deployment-attestation"
 
 
 def _chembl_healthy() -> bool:
@@ -170,7 +208,8 @@ def _load_done() -> dict:
 
 def _flush(cases: list[dict[str, Any]]) -> None:
     with open(RESULTS_JSON, "w") as f:
-        json.dump({"freeze_tag": FREEZE_TAG, "case_list": CASE_LIST,
+        json.dump({"freeze_tag": FREEZE_TAG, "freeze_mode": _freeze_mode(),
+                   "case_list": CASE_LIST,
                    "screened_list": SCREENED_LIST,
                    "cases": cases}, f, indent=2)
 
