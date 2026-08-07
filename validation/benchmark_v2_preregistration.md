@@ -171,3 +171,32 @@ tag exists, or any v2 case runs.
     harness's post-tag refusal is preserved) → the Amendment-1 screen → creation of
     `benchmark-freeze-v2` at a clean HEAD. The benchmark-run workflow invokes preflight before
     every (re)start, so the one v2 run cannot begin on degraded sources or an untagged tree.
+
+## Amendment 4 (2026-08-07, committed before the freeze tag exists) — GtoPdb structure-204 tolerance + blessed fingerprint transition
+
+Registered while the source-ablation control was mid-run (38/52 arms persisted), BEFORE the freeze
+tag exists or any v2 case executes.
+
+21. **GtoPdb ligand-structure HTTP 204 is a data absence, not a source failure.** The
+    /ligands/{id}/structure endpoint returns 204 No Content for approved biologics with no
+    deposited small-molecule structure (observed: olaratumab 9172, tositumomab 6781,
+    efgartigimod alfa 9777 — none of them a benchmark confirmed drug). Previously a single such
+    204 raised source-unavailable for the whole target, deterministically poisoning any arm whose
+    frozen snapshot contained MS4A1, PDGFRA, or FCGRT (8 of 52 arms could never validate under
+    the strict final validation). `data_sources/gtopdb.py` now tolerates 204 on the structure
+    endpoint ONLY (candidate kept, structure fields None); every other endpoint keeps the strict
+    unexpected-status behavior.
+22. **Blessed fingerprint transition (one-time).** Because the fix is in fingerprinted pipeline
+    code, the stale-resume guard would otherwise force a full 52-arm re-run. Before registration,
+    the persisted 38-row checkpoint was re-verified row-by-row: ZERO completed rows carry a
+    degraded/error source stamp, so the fix is behavior-identical for every completed row; only
+    re-run arms (the quarantined/stripped ones plus the not-yet-run Everolimus case) observe the
+    new behavior. `run_v2_preflight.py` blesses exactly one fingerprint transition
+    (e65a5374477e…), row-verified again at runtime; unrecognized drift still discards.
+    Rationale: preserving 38 verified rows (~5 h of healthy compute) without mixing semantics —
+    a full re-run would produce equivalent rows for all completed arms.
+23. **Stall watchdog (operational, not analytical).** The control was found wedged >1 h in
+    row finalization (the post-target reviewer/matching phase), which the per-target 15-minute
+    process bound does not cover. Preflight now kills any child module after 30 min of output
+    silence and exits 3; the supervisor retries and the harness resumes from its last per-arm
+    flush. This changes no data semantics.

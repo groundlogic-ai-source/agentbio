@@ -547,5 +547,27 @@ class ChemistPassthroughTests(unittest.TestCase):
         self.assertIsNone(captured["enabled_sources"])
 
 
+class GtopdbStructure204Tests(unittest.TestCase):
+    """Amendment 4: /ligands/{id}/structure returning HTTP 204 (no deposited
+    structure — approved biologics like olaratumab/tositumomab/efgartigimod)
+    is a data absence, never a source failure.  Other endpoints stay strict.
+    """
+
+    def test_structure_204_returns_none_not_unavailable(self):
+        from unittest import mock
+        from data_sources import gtopdb
+        with mock.patch.object(gtopdb.requests, "get",
+                               return_value=mock.Mock(status_code=204)):
+            self.assertIsNone(gtopdb._fetch_structure(9172))
+
+    def test_204_on_other_endpoints_still_raises(self):
+        from unittest import mock
+        from data_sources import gtopdb
+        with mock.patch.object(gtopdb.requests, "get",
+                               return_value=mock.Mock(status_code=204)):
+            with self.assertRaises(gtopdb._SourceUnavailable):
+                gtopdb._get_json("/targets", {"accession": "P11836"})
+
+
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()
