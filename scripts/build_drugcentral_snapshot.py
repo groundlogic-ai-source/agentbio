@@ -136,34 +136,51 @@ def _sha256_file(path: str) -> str:
 def _extract_copy_blocks(fh, wanted: dict):
     """Yield (table, cols, row_dict) for COPY blocks of wanted tables.
 
-    Fail-closed (code-review hardening): a COPY header missing a retained
-    column, a row whose field count differs from its header, and invalid
-    UTF-8 inside a wanted block all RAISE. A fidelity builder must never
-    silently emit substituted NULLs or mojibake. Lines outside wanted blocks
-    (including megabyte-scale unwanted table data) are never decoded.
+    Fail-closed (code-review hardening, round 2): block state is tracked in
+    raw bytes. Between blocks, only COPY-header lines are inspected and an
+    unparseable one raises. UNWANTED blocks are skipped byte-for-byte until
+    the exact `\.` terminator — their data is never decoded, so non-UTF-8
+    payloads or data lines that merely look like COPY headers can neither
+    crash the build nor inject spurious rows. Inside a WANTED block, a
+    field-count mismatch, a header missing retained columns, or invalid
+    UTF-8 all raise. (pg_dump escapes backslashes in data, so a literal `\.`
+    data value is dumped as `\\.` and can never alias the block terminator.)
     """
-    table = None
+    IN_UNWANTED = ""  # sentinel: inside a COPY block we do not extract
+    table = None      # None = between blocks; IN_UNWANTED; or wanted name
     cols = None
     keep_idx = None
     keep_cols = None
     lineno = 0
     for bline in fh:
         lineno += 1
+        if table == IN_UNWANTED and table is not None:
+            # Raw skip: never decode, never pattern-match — only the exact
+            # terminator line ends the block.
+            if bline.rstrip(b"\n") == b"\\.":
+                table = None
+            continue
         if table is None:
             if not bline.startswith(b"COPY public."):
                 continue
             line = bline.decode("ascii").rstrip("\n")  # SQL header; strict
             m = _COPY_RE.match(line)
-            if m and m.group(1) in wanted:
-                table = m.group(1)
-                cols = [c.strip() for c in m.group(2).split(",")]
-                keep_cols = wanted[table]
-                missing = [c for c in keep_cols if c not in cols]
-                if missing:
-                    raise RuntimeError(
-                        f"COPY header for {table} lacks retained columns: "
-                        f"{missing}")
-                keep_idx = [(cols.index(c), c) for c in keep_cols]
+            if not m:
+                raise RuntimeError(
+                    f"unparseable COPY header at dump line {lineno}: "
+                    f"{line[:120]!r}")
+            if m.group(1) not in wanted:
+                table = IN_UNWANTED
+                continue
+            table = m.group(1)
+            cols = [c.strip() for c in m.group(2).split(",")]
+            keep_cols = wanted[table]
+            missing = [c for c in keep_cols if c not in cols]
+            if missing:
+                raise RuntimeError(
+                    f"COPY header for {table} lacks retained columns: "
+                    f"{missing}")
+            keep_idx = [(cols.index(c), c) for c in keep_cols]
             continue
         if bline.rstrip(b"\n") == b"\\.":
             yield (table, keep_cols, None)  # end marker

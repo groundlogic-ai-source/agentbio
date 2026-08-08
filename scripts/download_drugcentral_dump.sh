@@ -7,16 +7,20 @@
 # Wayback honors HTTP Range (verified 206), so resume is safe — but ONLY with
 # a single writer. Exactly one instance of this script must run at a time.
 set -u
-OUT=/tmp/drugcentral_dump_11012023.sql.gz
-URL="https://web.archive.org/web/20260301100338id_/https://unmtid-dbs.net/download/drugcentral.dump.11012023.sql.gz"
+# Env overrides exist ONLY so the pin gate is unit-testable; the defaults
+# below are the pinned production values.
+OUT="${DRUGCENTRAL_DL_OUT:-/tmp/drugcentral_dump_11012023.sql.gz}"
+URL="${DRUGCENTRAL_DL_URL:-https://web.archive.org/web/20260301100338id_/https://unmtid-dbs.net/download/drugcentral.dump.11012023.sql.gz}"
 # Pinned at first retrieval (2026-08-08); the download is rejected if the
 # bytes ever differ.
-EXPECTED_SHA256="055904d152d6c8eef4ee872b25f6476019682df8b5f49bcdf7cc018204f3e04f"
-EXPECTED=1400714190
-rm -f /tmp/drugcentral_download.done
+EXPECTED_SHA256="${DRUGCENTRAL_DL_SHA256:-055904d152d6c8eef4ee872b25f6476019682df8b5f49bcdf7cc018204f3e04f}"
+EXPECTED="${DRUGCENTRAL_DL_SIZE:-1400714190}"
+DONE_MARKER="${DRUGCENTRAL_DL_DONE:-/tmp/drugcentral_download.done}"
+SHA_OUT="${DRUGCENTRAL_DL_SHA_OUT:-/tmp/drugcentral_dump.sha256}"
+rm -f "$DONE_MARKER"
 
 # Single-writer lock (best-effort; the workflow manager restarts cleanly).
-exec 9>/tmp/drugcentral_download.lock
+exec 9>"${DRUGCENTRAL_DL_LOCK:-/tmp/drugcentral_download.lock}"
 if ! flock -n 9; then
   echo "[dl] another instance holds the lock — exiting"
   exit 0
@@ -36,11 +40,11 @@ done
 size=$(stat -c%s "$OUT" 2>/dev/null || echo 0)
 if [ "$size" -ge "$EXPECTED" ]; then
   if ! echo "$EXPECTED_SHA256  $OUT" | sha256sum -c -; then
-    echo "FAILED sha256-mismatch" > /tmp/drugcentral_download.done
+    echo "FAILED sha256-mismatch" > "$DONE_MARKER"
     exit 1
   fi
-  sha256sum "$OUT" | tee /tmp/drugcentral_dump.sha256
-  echo "DONE" > /tmp/drugcentral_download.done
+  sha256sum "$OUT" | tee "$SHA_OUT"
+  echo "DONE" > "$DONE_MARKER"
 else
-  echo "FAILED size=$size" > /tmp/drugcentral_download.done
+  echo "FAILED size=$size" > "$DONE_MARKER"
 fi

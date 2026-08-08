@@ -14,6 +14,7 @@ import hashlib
 import importlib.util
 import os
 import sqlite3
+import subprocess
 import tempfile
 import unittest
 from unittest import mock
@@ -66,7 +67,9 @@ def _good_dump(path):
         + b"\n",
         b"\\.\n",
         b"COPY public.lincs_signature (x) FROM stdin;\n",
-        "café-naïve-binary-ish-row\n".encode("utf-16-le"),  # never decoded
+        # Never decoded. utf-16-le's trailing \x00 plus an explicit newline
+        # keeps the block terminator on its own line, as in a real dump.
+        "café-naïve-binary-ish-row\n".encode("utf-16-le") + b"\n",
         b"\\.\n",
         _STRUCT_HEADER.encode() + b"\n",
         _struct_line().encode() + b"\n",
@@ -81,7 +84,8 @@ class BuilderParserTest(unittest.TestCase):
             out = os.path.join(td, "s.sqlite")
             rep = os.path.join(td, "r.json")
             _good_dump(dump)
-            digest = hashlib.sha256(open(dump, "rb").read()).hexdigest()
+            with open(dump, "rb") as fh:
+                digest = hashlib.sha256(fh.read()).hexdigest()
             with mock.patch.multiple(
                     bds, DUMP=dump, OUT=out, REPORT=rep,
                     EXPECTED_DUMP_SHA256=digest,
@@ -140,6 +144,89 @@ class BuilderParserTest(unittest.TestCase):
                     bds, DUMP=dump,
                     EXPECTED_DUMP_SHA256="0" * 64):
                 self.assertEqual(bds.main(), 2)
+
+
+class UnwantedBlockIsolationTest(unittest.TestCase):
+    """Regression: unwanted COPY blocks are skipped byte-for-byte (review
+    round 2). Data inside them must never be decoded or pattern-matched."""
+
+    def _parse(self, chunks):
+        with tempfile.TemporaryDirectory() as td:
+            dump = os.path.join(td, "d.sql.gz")
+            _write_gz(dump, chunks)
+            with gzip.open(dump, "rb") as fh:
+                return [(t, r) for t, _, r in
+                        bds._extract_copy_blocks(fh, bds_wanted())]
+
+    def test_copy_like_data_and_binary_garbage_inside_unwanted_block(self):
+        events = self._parse([
+            b"COPY public.lincs_signature (x) FROM stdin;\n",
+            # A data line byte-identical to a WANTED-table header — must not
+            # hijack the parser:
+            b"COPY public.act_table_full (act_id) FROM stdin;\n",
+            b"\xff\xfe binary garbage that must never be decoded\n",
+            b"\\\\.\n",           # escaped backslash-dot DATA, not terminator
+            b"still unwanted data\n",
+            b"\\.\n",             # real terminator for lincs_signature
+            _ACT_HEADER.encode() + b"\n",
+            _act_line().encode() + b"\n",
+            b"\\.\n",
+            _STRUCT_HEADER.encode() + b"\n",
+            _struct_line().encode() + b"\n",
+            b"\\.\n",
+        ])
+        rows = [r for _, r in events if r is not None]
+        self.assertEqual(len(rows), 2)  # exactly the real act + struct rows
+        self.assertEqual(rows[0]["accession"], "P08183")
+        self.assertEqual(rows[1]["name"], "thapsigargin")
+
+    def test_unparseable_copy_header_raises(self):
+        with self.assertRaisesRegex(RuntimeError, "unparseable COPY header"):
+            self._parse([b"COPY public.broken unbalanced FROM stdin\n"])
+
+
+class DownloaderPinTest(unittest.TestCase):
+    """The downloader's pinned-digest gate, exercised end-to-end via its
+    env overrides (file:// fixture instead of the Wayback URL)."""
+
+    _SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           "..", "scripts", "download_drugcentral_dump.sh")
+    _DATA = b"tiny-fixture-payload"
+
+    def _run_dl(self, digest: str):
+        with tempfile.TemporaryDirectory() as td:
+            payload = os.path.join(td, "payload.bin")
+            with open(payload, "wb") as f:
+                f.write(self._DATA)
+            done = os.path.join(td, "done")
+            env = dict(os.environ)
+            env.update({
+                "DRUGCENTRAL_DL_OUT": os.path.join(td, "out.bin"),
+                "DRUGCENTRAL_DL_URL": "file://" + payload,
+                "DRUGCENTRAL_DL_SIZE": str(len(self._DATA)),
+                "DRUGCENTRAL_DL_SHA256": digest,
+                "DRUGCENTRAL_DL_DONE": done,
+                "DRUGCENTRAL_DL_LOCK": os.path.join(td, "lock"),
+                "DRUGCENTRAL_DL_SHA_OUT": os.path.join(td, "sha"),
+            })
+            proc = subprocess.run(["bash", self._SCRIPT], env=env,
+                                  capture_output=True, text=True, timeout=120)
+            marker = ""
+            if os.path.exists(done):
+                with open(done) as fh:
+                    marker = fh.read()
+            return proc.returncode, marker
+
+    def test_matching_pin_completes(self):
+        rc, marker = self._run_dl(
+            hashlib.sha256(self._DATA).hexdigest())
+        self.assertEqual(rc, 0)
+        self.assertIn("DONE", marker)
+
+    def test_mismatched_pin_is_rejected(self):
+        rc, marker = self._run_dl("0" * 64)
+        self.assertNotEqual(rc, 0)
+        self.assertIn("FAILED sha256-mismatch", marker)
 
 
 def bds_wanted():
