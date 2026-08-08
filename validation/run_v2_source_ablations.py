@@ -153,6 +153,8 @@ _FINGERPRINT_SOURCES = [
     "data_sources/multisource_candidates.py",
     "data_sources/gtopdb.py",
     "data_sources/drugcentral_v2.py",
+    "data_sources/drugcentral_local.py",
+    "data_sources/drugcentral_2023_snapshot.sqlite",
     "data_sources/europepmc_mechanisms.py",
     "data_sources/clinicaltrials.py",
     "data_sources/mechanism_direction.py",

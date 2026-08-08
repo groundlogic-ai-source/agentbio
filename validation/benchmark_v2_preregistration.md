@@ -223,3 +223,50 @@ BEFORE the freeze is sealed or any v2 case executes.
 26. **Benchmark integrity parity.** `run_benchmark._check_freeze_integrity` verifies the
     attestation (fingerprint + both artifact hashes) when git is unavailable, with identical
     refusal semantics (exit 2) to the tag path.
+
+## Amendment 6 (2026-08-08, after control completion, before the production screen/freeze or any v2 case executes) — DrugCentral local-lane snapshot
+
+Registered after the control completed (52/52 arms, 33 hits) and BEFORE the production screen
+writes the case list or any v2 case executes. Trigger: a 25+ h full backend outage of the
+DrugCentral DRS API (UNM's own AWS App Runner deployment — app server responsive while its
+backing database hung; the public Postgres instance unmtid-dbs.net:5433 simultaneously
+unreachable). The pre-registered health gate correctly refused to start (exit 4) throughout:
+no case ran, no partial results exist, nothing was contaminated.
+
+27. **Access mode: live API → versioned local snapshot.** Per the standing source-portfolio
+    policy ("Prefer the versioned dump/official API over brittle undocumented endpoints" —
+    production_evidence_source_portfolio.md, DrugCentral row), `data_sources/drugcentral_v2.py`
+    now serves every query from `data_sources/drugcentral_2023_snapshot.sqlite`
+    (6,115,328 bytes): a two-table extract (`act_table_full` 20,978 rows; `structures`
+    4,995 rows incl. 1,503 OFP/OFM established products) of the OFFICIAL DrugCentral
+    11/01/2023 PostgreSQL dump, obtained from the Internet Archive Wayback snapshot of
+    unmtid-dbs.net (capture 2026-03-01). Dump SHA-256
+    055904d152d6c8eef4ee872b25f6476019682df8b5f49bcdf7cc018204f3e04f; build provenance in
+    validation/drugcentral_snapshot_build.json; builder scripts/build_drugcentral_snapshot.py.
+28. **Version identity.** The DRS API queries the public DrugCentral Postgres instance
+    (its own source: github.com/unmtransinfo/CFDE_IDG_DRS, app/database.py →
+    postgresql://unmtid-dbs.net:5433/drugcentral) — i.e. the same 2023 release the dump
+    snapshots, and DrugCentral 2023 is the current release per drugcentral.org/download.
+    The snapshot is therefore content-identical to what the live API served during the
+    control. This is a change of ACCESS MODE, not of data version.
+29. **Query-semantics equivalence.** The local lane (data_sources/drugcentral_local.py)
+    reproduces the API's exact filters — trim(accession)/trim(gene) case-insensitive
+    substring (ILIKE '%x%'), structures.id exact match, empty result → 404 → None —
+    verified against the API source and pinned by validation/test_drugcentral_local_lane.py.
+    One intentional difference: the live API's intermittent accession-route 500 (a
+    server-side bug worked around via the gene fallback) cannot occur locally, so the
+    fallback simply never triggers. Cache namespace bumped v1→v2 so live-derived and
+    snapshot-derived entries never mix.
+30. **Blessed fingerprint transition (one-time).** The change touches fingerprinted pipeline
+    code, so the stale-resume guard would otherwise force a full 52-arm re-run. Evidence for
+    blessing instead: (a) the control is COMPLETE (52/52) — no partial row resumes under the
+    new code; (b) conformance replay — every DrugCentral-enabled control target reproduces
+    its recorded ok/empty per-target source status exactly through the local lane
+    (ControlConformanceTest, 0 mismatches); (c) the Amendment-4 runtime row+snapshot
+    re-verification executed and passed ("complete and error-free", 52 rows + 13 snapshots).
+    Transition 324995c9f824…→a8dac633aea9… is blessed and the blessed artifact ships
+    committed; unrecognized drift still discards.
+31. **Data pinning + escape hatch.** The snapshot file and the local-lane module are added
+    to the pipeline fingerprint source list, so the freeze attestation pins the dataset
+    bytes alongside the code. DRUGCENTRAL_FORCE_LIVE=1 restores live-API mode as a
+    deployment-fixed debugging escape hatch — never to be toggled mid-run.

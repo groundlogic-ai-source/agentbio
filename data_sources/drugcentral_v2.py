@@ -34,14 +34,30 @@ NOTE: this adapter never queries by drug NAME. It is target-first only, so a
 retrospective benchmark's held-out drug cannot leak in via a name lookup.
 """
 
+import os
+
 import requests
 from typing import Any, Optional
 
 from cache.cache import get, set as cache_set, make_key
+from data_sources import drugcentral_local
 
 BASE_URL = "https://uxn2ycvimg.us-east-2.awsapprunner.com"
 
-_CACHE_VERSION = "v1"
+
+def _use_local_lane() -> bool:
+    """Amendment 6: serve queries from the committed official 11/01/2023 dump
+    snapshot (DRS-identical semantics) whenever it is present. The live App
+    Runner endpoint (UNM, no SLA) is only used when no snapshot exists.
+    DRUGCENTRAL_FORCE_LIVE=1 overrides for debugging — set per deployment,
+    never mid-run."""
+    if os.environ.get("DRUGCENTRAL_FORCE_LIVE"):
+        return False
+    return drugcentral_local.available()
+
+# v2: Amendment 6 local-lane snapshot — never mix live-API-derived cache
+# entries with snapshot-derived ones (data provenance differs by source).
+_CACHE_VERSION = "v2"
 _TTL_DAYS = 7
 
 # Transient statuses that must render the source unavailable (never cached).
@@ -84,6 +100,12 @@ def _get_json(path: str, *, accession_route: bool = False) -> Any:
                                error / non-JSON body.
     A 404 returns None (legitimate "no such resource").
     """
+    if _use_local_lane():
+        try:
+            return drugcentral_local.get_json(path)
+        except drugcentral_local.SnapshotCorrupt as e:
+            raise _SourceUnavailable(str(e)) from e
+
     url = f"{BASE_URL}{path}"
     try:
         resp = requests.get(url, headers={"Accept": "application/json"},

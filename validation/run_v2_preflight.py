@@ -579,7 +579,12 @@ def _quarantine_defective_rows():
 # a loud, one-time, row-verified fingerprint transition — NOT a weakening of
 # the guard for unknown drift.
 _BLESSED_FINGERPRINT_TRANSITIONS = {
+    # Amendment 4: GtoPdb structure-204 fix (row-verified benign).
     "e65a5374477e32c374381a47dfd562981b4733195c1b4c53d00e0b198d5a48b4",
+    # Amendment 6: DrugCentral local-lane snapshot (official 11/01/2023 dump;
+    # DRS-identical query semantics; conformance-verified against the control's
+    # recorded per-target source statuses).
+    "324995c9f8243fa6708d5d0f3fba94eb4b09c4532fb3dfb390ef15159cbfbef8",
 }
 
 
@@ -641,10 +646,10 @@ def _bless_fingerprint_transition() -> None:
         os.replace(tmp_path, ABLATION_RESULTS)
     except OSError:
         return
-    _log(f"Amendment 4: blessed control fingerprint transition "
+    _log(f"blessed control fingerprint transition "
          f"{stored[:12]}… → {current[:12]}… ({len(payload.get('rows') or [])} "
-         "rows + all snapshots verified unaffected by the gtopdb "
-         "structure-204 fix)")
+         "rows + all snapshots verified unaffected — see pre-registration "
+         "amendments)")
 
 
 def _discard_control(reason: str, context: str) -> int:
