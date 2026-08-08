@@ -309,6 +309,12 @@ class TestDrugCentral(unittest.TestCase):
     GENE = "GSK3B"
 
     def setUp(self):
+        # These tests pin LIVE-API-lane behavior (timeouts, 500s, payload
+        # validation). Force that lane even when the Amendment-6 local
+        # snapshot is present in the checkout.
+        self._lane = mock.patch.object(dc, "_use_local_lane",
+                                       return_value=False)
+        self._lane.start()
         self.key = make_key(
             f"drugcentral_get_target_interactions_{dc._CACHE_VERSION}",
             self.UID, None)
@@ -318,6 +324,7 @@ class TestDrugCentral(unittest.TestCase):
         _purge(self.key, self.key_gene)
 
     def tearDown(self):
+        self._lane.stop()
         _purge(self.key, self.key_gene)
 
     def _act_row(self, struct_id=1548, act_id=100, act_value=8.0,

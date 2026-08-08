@@ -1,0 +1,12 @@
+{
+  "source_dump": "http://web.archive.org/web/20260301100338id_/https://unmtid-dbs.net/download/drugcentral.dump.11012023.sql.gz",
+  "source_dump_sha256": "055904d152d6c8eef4ee872b25f6476019682df8b5f49bcdf7cc018204f3e04f",
+  "release": "DrugCentral 2023 (dump dated 11/01/2023)",
+  "rows": {
+    "act_table_full": 20978,
+    "structures": 4995,
+    "established_product_structures": 1503
+  },
+  "probe_accession_P08183_rows": 95,
+  "snapshot_bytes": 6115328
+}
