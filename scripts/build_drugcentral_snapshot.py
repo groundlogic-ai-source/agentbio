@@ -15,6 +15,7 @@ preserved so the local lane reproduces DRS API responses field-for-field.
 Writes a build report to validation/drugcentral_snapshot_build.json.
 """
 import gzip
+import hashlib
 import json
 import os
 import re
@@ -23,6 +24,17 @@ import sys
 
 DUMP = "/tmp/drugcentral_dump_11012023.sql.gz"
 DUMP_SHA256_FILE = "/tmp/drugcentral_dump.sha256"
+# Pinned at first retrieval (2026-08-08) from the Wayback capture; the builder
+# refuses any other bytes. Content authenticity is further cross-validated by
+# the conformance replay against statuses recorded from the live API during
+# the control (Amendment 6, items 28-30).
+EXPECTED_DUMP_SHA256 = ("055904d152d6c8eef4ee872b25f6476019682df8b5f49bcdf"
+                        "7cc018204f3e04f")
+# Minimum-row tripwires for the verified 11/01/2023 census (module constants
+# so tests can relax them for synthetic fixtures).
+_MIN_ACT_ROWS = 15000
+_MIN_STRUCT_ROWS = 4000
+_MIN_ESTABLISHED = 1000
 OUT = "data_sources/drugcentral_2023_snapshot.sqlite"
 REPORT = "validation/drugcentral_snapshot_build.json"
 
@@ -113,29 +125,60 @@ def _col_type(col: str) -> str:
     return "TEXT"
 
 
+def _sha256_file(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def _extract_copy_blocks(fh, wanted: dict):
-    """Yield (table, cols, row_dict) for COPY blocks of wanted tables."""
+    """Yield (table, cols, row_dict) for COPY blocks of wanted tables.
+
+    Fail-closed (code-review hardening): a COPY header missing a retained
+    column, a row whose field count differs from its header, and invalid
+    UTF-8 inside a wanted block all RAISE. A fidelity builder must never
+    silently emit substituted NULLs or mojibake. Lines outside wanted blocks
+    (including megabyte-scale unwanted table data) are never decoded.
+    """
     table = None
     cols = None
     keep_idx = None
     keep_cols = None
-    for line in fh:
+    lineno = 0
+    for bline in fh:
+        lineno += 1
         if table is None:
-            m = _COPY_RE.match(line.rstrip("\n"))
+            if not bline.startswith(b"COPY public."):
+                continue
+            line = bline.decode("ascii").rstrip("\n")  # SQL header; strict
+            m = _COPY_RE.match(line)
             if m and m.group(1) in wanted:
                 table = m.group(1)
                 cols = [c.strip() for c in m.group(2).split(",")]
                 keep_cols = wanted[table]
-                keep_idx = [(cols.index(c), c) for c in keep_cols if c in cols]
+                missing = [c for c in keep_cols if c not in cols]
+                if missing:
+                    raise RuntimeError(
+                        f"COPY header for {table} lacks retained columns: "
+                        f"{missing}")
+                keep_idx = [(cols.index(c), c) for c in keep_cols]
             continue
-        if line.rstrip("\n") == r"\.":
+        if bline.rstrip(b"\n") == b"\\.":
             yield (table, keep_cols, None)  # end marker
             table = None
             continue
-        fields = line.rstrip("\n").split("\t")
+        line = bline.decode("utf-8").rstrip("\n")  # strict: no silent replace
+        fields = line.split("\t")
+        if len(fields) != len(cols):
+            raise RuntimeError(
+                f"{table} COPY row at dump line {lineno} has {len(fields)} "
+                f"fields; header declares {len(cols)} — refusing to emit "
+                "substituted NULLs")
         row = {}
         for idx, c in keep_idx:
-            raw = fields[idx] if idx < len(fields) else "\\N"
+            raw = fields[idx]
             val = None if raw == "\\N" else _unescape_pg_text(raw)
             row[c] = _coerce(c, val)
         yield (table, keep_cols, row)
@@ -145,6 +188,12 @@ def main() -> int:
     if not os.path.exists(DUMP):
         print(f"[snapshot] dump not found at {DUMP}")
         return 1
+    digest = _sha256_file(DUMP)
+    if digest != EXPECTED_DUMP_SHA256:
+        print(f"[snapshot] dump SHA-256 {digest} != pinned "
+              f"{EXPECTED_DUMP_SHA256} — refusing to build from an "
+              "unverified dump")
+        return 2
 
     wanted = {"act_table_full": ACT_KEEP, "structures": STRUCT_KEEP}
     counts = {"act_table_full": 0, "structures": 0}
@@ -159,7 +208,7 @@ def main() -> int:
     cur.execute("CREATE TABLE structures (%s)" % ", ".join(
         f"{c} {_col_type(c)}" for c in STRUCT_KEEP))
 
-    with gzip.open(DUMP, "rt", encoding="utf-8", errors="replace") as fh:
+    with gzip.open(DUMP, "rb") as fh:
         table = None
         batch = []
         for t, keep_cols, row in _extract_copy_blocks(fh, wanted):
@@ -208,19 +257,18 @@ def main() -> int:
     # of the dump's COPY blocks): act_table_full is a *curated* table —
     # 20,978 rows; structures: 4,995 rows, of which 1,503 are OFP/OFM
     # established products (1,090 OFP + 413 OFM).
-    assert n_act == counts["act_table_full"] and n_act > 15000, n_act
-    assert n_struct == counts["structures"] and n_struct > 4000, n_struct
-    assert n_established > 1000, n_established
+    assert n_act == counts["act_table_full"] and n_act > _MIN_ACT_ROWS, n_act
+    assert n_struct == counts["structures"] and n_struct > _MIN_STRUCT_ROWS, \
+        n_struct
+    assert n_established > _MIN_ESTABLISHED, n_established
     assert n_probe > 0, "probe accession P08183 missing — snapshot unusable"
 
     os.replace(tmp, OUT)
 
-    sha256 = None
-    if os.path.exists(DUMP_SHA256_FILE):
-        sha256 = open(DUMP_SHA256_FILE).read().split()[0]
     report = {
         "source_dump": WAYBACK_URL,
-        "source_dump_sha256": sha256,
+        "source_dump_sha256": digest,
+        "source_dump_sha256_verified_against_pin": True,
         "release": "DrugCentral 2023 (dump dated 11/01/2023)",
         "rows": {"act_table_full": n_act, "structures": n_struct,
                  "established_product_structures": n_established},

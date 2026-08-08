@@ -8,7 +8,10 @@
 # a single writer. Exactly one instance of this script must run at a time.
 set -u
 OUT=/tmp/drugcentral_dump_11012023.sql.gz
-URL="http://web.archive.org/web/20260301100338id_/https://unmtid-dbs.net/download/drugcentral.dump.11012023.sql.gz"
+URL="https://web.archive.org/web/20260301100338id_/https://unmtid-dbs.net/download/drugcentral.dump.11012023.sql.gz"
+# Pinned at first retrieval (2026-08-08); the download is rejected if the
+# bytes ever differ.
+EXPECTED_SHA256="055904d152d6c8eef4ee872b25f6476019682df8b5f49bcdf7cc018204f3e04f"
 EXPECTED=1400714190
 rm -f /tmp/drugcentral_download.done
 
@@ -32,6 +35,10 @@ for i in $(seq 1 30); do
 done
 size=$(stat -c%s "$OUT" 2>/dev/null || echo 0)
 if [ "$size" -ge "$EXPECTED" ]; then
+  if ! echo "$EXPECTED_SHA256  $OUT" | sha256sum -c -; then
+    echo "FAILED sha256-mismatch" > /tmp/drugcentral_download.done
+    exit 1
+  fi
   sha256sum "$OUT" | tee /tmp/drugcentral_dump.sha256
   echo "DONE" > /tmp/drugcentral_download.done
 else
