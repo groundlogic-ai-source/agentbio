@@ -75,7 +75,10 @@ while true; do
       echo "[supervisor] $(date -u +%Y-%m-%dT%H:%M:%SZ) preflight READY — paused before benchmark ($PAUSE present); awaiting greenlight" >> "$LOG"
       exit 0
     fi
-    python3 -m validation.run_benchmark >> "$LOG" 2>&1
+    # Guarded: the benchmark runs under the preflight's 30-min output-silence
+    # watchdog so a wedged process is killed and retried (resume-safe) instead
+    # of stalling the chain forever (observed wedge at case 1 on 2026-08-07).
+    python3 -m validation.run_benchmark_guarded >> "$LOG" 2>&1
     rc=$?
   else
     rc=$pf
