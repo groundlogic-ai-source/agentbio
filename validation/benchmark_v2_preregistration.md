@@ -248,7 +248,13 @@ no case ran, no partial results exist, nothing was contaminated.
     postgresql://unmtid-dbs.net:5433/drugcentral) — i.e. the same 2023 release the dump
     snapshots, and DrugCentral 2023 is the current release per drugcentral.org/download.
     The snapshot is therefore content-identical to what the live API served during the
-    control. This is a change of ACCESS MODE, not of data version.
+    control. This is a change of ACCESS MODE, not of data version. Dump integrity is
+    pinned three ways: (i) downloader and builder both refuse bytes whose SHA-256 differs
+    from the recorded pin; (ii) the parser is fail-closed (COPY field-arity check,
+    required retained columns, strict UTF-8 — no substituted NULLs, no mojibake);
+    (iii) content was independently cross-validated: the conformance replay reproduced
+    every recorded live-API per-target status (0 mismatches), and a fail-closed rebuild
+    produced byte-content-identical tables to the shipped snapshot.
 29. **Query-semantics equivalence.** The local lane (data_sources/drugcentral_local.py)
     reproduces the API's exact filters — trim(accession)/trim(gene) case-insensitive
     substring (ILIKE '%x%'), structures.id exact match, empty result → 404 → None —
