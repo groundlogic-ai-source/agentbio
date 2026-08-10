@@ -28,6 +28,10 @@ args = "repodb-smallmol-validation"
 task = "workflow.run"
 args = "v2-engineering-acceptance"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "build-audit-claimset-v2"
+
 [[workflows.workflow]]
 name = "repodb-validation"
 author = "agent"
@@ -57,6 +61,17 @@ outputType = "console"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd /home/runner/workspace && python3 -m validation.run_v2_engineering_acceptance --fresh --cap 10 2>&1 | tee /tmp/v2_engineering_acceptance.log"
+
+[[workflows.workflow]]
+name = "build-audit-claimset-v2"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && python3 -m validation.build_audit_claim_set_v2 2>&1 | tee /tmp/build_v2.log"
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [agent]
 stack = "PNPM_WORKSPACE"

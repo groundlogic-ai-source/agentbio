@@ -41,6 +41,7 @@ import json
 import os
 import random
 import sys
+import time
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -191,14 +192,26 @@ def chembl_resolves(name: str) -> bool:
     """Raw ChEMBL resolution probe for the repaired E4 gate: any molecule
     returned by the public name/synonym full-text search counts as
     resolvable. Conservative (fuzzy false-positives exclude a brand), which
-    only ever shrinks E4 — never invents an invalid claim. Aborts on probe
-    failure rather than guessing."""
-    data = b._get_json(
-        "https://www.ebi.ac.uk/chembl/api/data/molecule.json",
-        params={"q": name, "limit": 1})
+    only ever shrinks E4 — never invents an invalid claim.
+
+    Fail-closed: retries 3x against transient ChEMBL flapping (observed
+    2026-08-10: status.json oscillating 200/500 with HTML error pages on
+    API endpoints), then aborts construction rather than guessing."""
+    data = None
+    for attempt in range(3):
+        data = b._get_json(
+            "https://www.ebi.ac.uk/chembl/api/data/molecule.json",
+            params={"q": name, "limit": 1})
+        if data is not None:
+            break
+        if attempt < 2:
+            log(f"  ChEMBL probe retry for '{name}' (attempt "
+                f"{attempt + 1} failed)")
+            time.sleep(8)
     if data is None:
         raise SystemExit(f"[build-v2] ChEMBL resolution probe failed for "
-                         f"'{name}' — refusing to construct E4 on a guess")
+                         f"'{name}' after 3 attempts — refusing to "
+                         f"construct E4 on a guess")
     return bool((data.get("page_meta") or {}).get("total_count"))
 
 
