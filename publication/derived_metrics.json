@@ -1,0 +1,245 @@
+{
+  "v2_primary": {
+    "executed": 32,
+    "out_of_scope": 10,
+    "errors": 0,
+    "scorable": 22,
+    "hits": 6,
+    "hit_rate": 0.2727272727272727,
+    "hit_ranks": [
+      3,
+      4,
+      4,
+      5,
+      5,
+      8
+    ],
+    "top10": 6,
+    "strong": 2,
+    "miss_classes": {
+      "unresolved_no_mechanism": 3,
+      "wrong_target": 13
+    },
+    "strata": {
+      "less_rare_gt10": {
+        "hits": 0,
+        "n": 6
+      },
+      "rare_1_10": {
+        "hits": 0,
+        "n": 6
+      },
+      "ultra_rare_lt1": {
+        "hits": 6,
+        "n": 9
+      },
+      "unknown": {
+        "hits": 0,
+        "n": 1
+      }
+    }
+  },
+  "v2_development": {
+    "executed": 15,
+    "out_of_scope": 2,
+    "errors": 1,
+    "scorable": 12,
+    "hits": 2,
+    "hit_rate": 0.16666666666666666,
+    "hit_ranks": [
+      7,
+      254
+    ],
+    "top10": 1,
+    "strong": 0,
+    "miss_classes": {
+      "wrong_target": 1,
+      "biologic_not_addressable": 9
+    },
+    "strata": {
+      "development": {
+        "hits": 2,
+        "n": 12
+      }
+    }
+  },
+  "v2_freeze_mode": "deployment-attestation",
+  "chance_baseline": {
+    "n_with_probability": 34,
+    "all_saturated": true,
+    "expected_hits": 34.0,
+    "note": "baseline saturates at 1.0 per case because reviewed lists cover the recorded per-target pools; the Poisson-binomial test is therefore uninformative and is reported as computed, not used."
+  },
+  "v1_partial": {
+    "executed": 14,
+    "admin_excluded": 3,
+    "errors": 5,
+    "hits": 1,
+    "genuine_misses": 5
+  },
+  "funnel": [
+    [
+      "repoDB rows",
+      9057
+    ],
+    [
+      "approved repurposed-success",
+      5582
+    ],
+    [
+      "small molecule",
+      4866
+    ],
+    [
+      "dev-suite drugs excluded",
+      4823
+    ],
+    [
+      "in Orphanet universe",
+      237
+    ],
+    [
+      "one case per drug",
+      111
+    ],
+    [
+      "EFO resolved",
+      103
+    ],
+    [
+      "target in universe",
+      96
+    ],
+    [
+      "selected (seed 20260731)",
+      50
+    ],
+    [
+      "passed v2 screen",
+      32
+    ],
+    [
+      "in-scope at runtime",
+      22
+    ],
+    [
+      "rediscovered",
+      6
+    ]
+  ],
+  "ablation": {
+    "arms_total": 52,
+    "hits_total": 33,
+    "by_condition": {
+      "all_three": {
+        "generated": 10,
+        "n": 13
+      },
+      "chembl_drugcentral": {
+        "generated": 10,
+        "n": 13
+      },
+      "chembl_gtopdb": {
+        "generated": 8,
+        "n": 13
+      },
+      "chembl_only": {
+        "generated": 5,
+        "n": 13
+      }
+    }
+  },
+  "audit": {
+    "verdict": "FAIL",
+    "defect": "32/60 = 0.533 (95% CI 0.400\u20130.663)",
+    "defect_cp_lower": 0.41969560452417876,
+    "control": "7/40 = 0.175 (95% CI 0.073\u20130.328)",
+    "control_cp_upper": 0.3037056670034146,
+    "novel": "29/30 = 0.967 (95% CI 0.828\u20130.999)",
+    "novel_cp_lower": 0.8514039313408869,
+    "abstained": 0,
+    "excluded": 0,
+    "per_class": {
+      "none": {
+        "caught": 0,
+        "miss": 0,
+        "false_flag": 7,
+        "clean": 33,
+        "abstain": 0,
+        "excluded": 0,
+        "total": 40
+      },
+      "E1_safety_withdrawal": {
+        "caught": 2,
+        "miss": 0,
+        "false_flag": 0,
+        "clean": 0,
+        "abstain": 0,
+        "excluded": 0,
+        "total": 2
+      },
+      "E2_boxed_warning_not_withdrawal": {
+        "caught": 0,
+        "miss": 19,
+        "false_flag": 0,
+        "clean": 0,
+        "abstain": 0,
+        "excluded": 0,
+        "total": 19
+      },
+      "E3_direction_incompatible": {
+        "caught": 1,
+        "miss": 0,
+        "false_flag": 0,
+        "clean": 0,
+        "abstain": 0,
+        "excluded": 0,
+        "total": 1
+      },
+      "E4_unresolved_name_honesty": {
+        "caught": 0,
+        "miss": 8,
+        "false_flag": 0,
+        "clean": 0,
+        "abstain": 0,
+        "excluded": 0,
+        "total": 8
+      },
+      "N1_combination_product_splitting": {
+        "caught": 8,
+        "miss": 0,
+        "false_flag": 0,
+        "clean": 0,
+        "abstain": 0,
+        "excluded": 0,
+        "total": 8
+      },
+      "N2_biologic_modality_mis_scope": {
+        "caught": 13,
+        "miss": 0,
+        "false_flag": 0,
+        "clean": 0,
+        "abstain": 0,
+        "excluded": 0,
+        "total": 13
+      },
+      "N4_dose_route_implausibility": {
+        "caught": 8,
+        "miss": 1,
+        "false_flag": 0,
+        "clean": 0,
+        "abstain": 0,
+        "excluded": 0,
+        "total": 9
+      }
+    },
+    "contradicted_disclosures": 0
+  },
+  "trap": {
+    "verdict": "PASS",
+    "traps": "12/12",
+    "trap_recall": 1.0,
+    "control_ffr": "1/4 = 0.25",
+    "precision": 0.9230769230769231
+  }
+}
