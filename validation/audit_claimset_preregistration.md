@@ -171,3 +171,17 @@ unforeseen class and an unseen instance.
   requirements). Construction log: `validation/audit_claimset_construction_log.md`.
 - Exactly one scored run follows this freeze. No detector, threshold,
   claim, or source configuration changes after results are seen.
+
+## Amendment 3 (2026-08-10): one-fix-one-rerun allowance exercised
+
+The first scored run executed all 100 audits under the frozen code and
+archived every raw output, then crashed in harness plumbing BEFORE any metric
+was computed or seen (KeyError between the in-memory run dict and the on-disk
+archive envelope in `score_from_archive`). No results artifact exists from
+that attempt. Per the pre-registered one-fix-one-rerun allowance for a proven
+harness defect: the plumbing was fixed (metrics now load strictly from the
+on-disk archive; crash recovery scores the existing archive rather than
+re-measuring), regression tests were added, and the freeze manifest's code
+commit was advanced to f41d7661. The re-run scores the ORIGINAL archived
+outputs — the audits were not re-executed. No claim, detector, threshold, or
+source configuration was touched.
