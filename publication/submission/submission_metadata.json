@@ -1,0 +1,37 @@
+{
+  "title": "Frozen benchmark and external audit validation of an evidence-audited drug-repurposing prioritization pipeline for rare diseases",
+  "short_title": "Frozen benchmark and external audit validation of a repurposing pipeline",
+  "authors": [
+    {
+      "name": "[AUTHOR NAME — fill before submission]",
+      "affiliation": "Independent Researcher, [City, Country]",
+      "orcid": "[0000-0000-0000-0000]",
+      "email": "[email]",
+      "corresponding": true
+    }
+  ],
+  "article_type": "Research article (methods + validation)",
+  "preprint_server": "bioRxiv",
+  "biorxiv_category": "Bioinformatics",
+  "biorxiv_doi": "[to add after posting]",
+  "license": "CC-BY 4.0",
+  "keywords": ["drug repurposing", "rare disease", "benchmark",
+               "pre-registration", "audit", "validation", "negative results"],
+  "declarations": {
+    "competing_interests": "The author develops the evaluated system. No external funding. No other competing interests.",
+    "funding": "No external funding.",
+    "ai_use": "LLMs are components of the evaluated system at enumerated bounded touchpoints; all scored paths are deterministic. AI assistance was used in software development and manuscript preparation.",
+    "ethics": "No human or animal subjects; all data are public databases and published literature.",
+    "clinical_scope_disclaimer": "Research-prioritization and evidence-audit system; no clinical efficacy is claimed; no output is a treatment recommendation."
+  },
+  "submission_sequence": [
+    {"venue": "bioRxiv", "status": "prepared, not posted (author action)"},
+    {"venue": "Journal of Cheminformatics", "status": "planned first"},
+    {"venue": "PLOS Computational Biology", "status": "fallback 1"},
+    {"venue": "PLOS ONE", "status": "fallback 2"},
+    {"venue": "PeerJ", "status": "fallback 3"},
+    {"venue": "F1000Research", "status": "fallback 4"}
+  ],
+  "one_journal_at_a_time": true,
+  "prepared": "2026-08-10"
+}
