@@ -124,4 +124,21 @@ pipeline, and v2 claims are eligible material for it.
 
 ## Amendments
 
-(none yet — any amendment lands here, dated, before the event it governs)
+## Amendment 1 (2026-08-10, before claim construction): reporting posture
+
+1. **The pre-fix arithmetic is a diagnostic, not a prediction.** v1's
+   failure analysis ("19 of 28 misses and 5 of 7 control false-flags are
+   attributable to the two fixed defects") was computed by looking backward
+   at v1's specific claims. It justified WHICH bugs to fix first; it must
+   never be reported as a predicted v2 outcome. v2 is instance-disjoint
+   from v1 precisely so the fixes can still fail on new claims (a narrower
+   than diagnosed root cause, or a third, unobserved defect). The result is
+   genuinely uncertain at registration time; before the score is revealed,
+   the results report must restate this paragraph.
+2. **The pool refresh fixed stale DATA, not a too-strict STANDARD.** v1's
+   E2 misses came from outdated persisted snapshots wrongly badging
+   marketed drugs as withdrawn — the safety logic itself was unchanged and
+   the conservative direction (cap retained whenever a withdrawal flag is
+   unrefuted) was preserved end-to-end. Every v2-facing writeup (results
+   report, technical appendix, outreach letters) must frame this as "our
+   safety data was stale", never as "we made the detector less aggressive".
