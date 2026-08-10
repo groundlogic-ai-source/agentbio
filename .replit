@@ -68,4 +68,4 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
-packages = ["cairo", "catch2", "comic-neue", "coordgenlibs", "eigen", "glibcLocales", "inchi", "maeparser", "rapidjson"]
+packages = ["cairo", "catch2", "comic-neue", "coordgenlibs", "eigen", "ffmpeg-full", "freetype", "ghostscript", "glibcLocales", "gobject-introspection", "gtk3", "inchi", "maeparser", "pkg-config", "qhull", "rapidjson", "tcl", "tk"]
