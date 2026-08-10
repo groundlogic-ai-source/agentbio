@@ -231,7 +231,8 @@ def run_one_claim(claim: dict) -> dict:
 
 def run_all_claims(claims: list[dict]) -> dict:
     """Run every claim, checkpointing raw outputs to disk as we go. The raw
-    archive is complete BEFORE any metric is computed."""
+    archive is complete BEFORE any metric is computed. Returns the archive
+    ENVELOPE exactly as written to disk."""
     raw: dict[str, Any] = {}
     tmp = RAW_OUTPUTS_JSON + ".partial"
     for i, claim in enumerate(claims, 1):
@@ -242,7 +243,26 @@ def run_all_claims(claims: list[dict]) -> dict:
                            "outputs": raw}, fh)
             print(f"[harness] audited {i}/{len(claims)}", flush=True)
     os.replace(tmp, RAW_OUTPUTS_JSON)
-    return raw
+    return json.load(open(RAW_OUTPUTS_JSON))
+
+
+def load_or_run_archive(claims: list[dict]) -> dict:
+    """Crash recovery: if a COMPLETE raw archive exists but no results were
+    ever written (a harness crash between archiving and scoring), score the
+    archived outputs instead of re-running the audits. The archive is the
+    frozen-code observation; re-running would be a second measurement."""
+    if os.path.exists(RAW_OUTPUTS_JSON):
+        existing = json.load(open(RAW_OUTPUTS_JSON))
+        all_ids = {c["claim_id"] for c in claims}
+        if set(existing.get("claim_ids") or []) == all_ids and \
+                set((existing.get("outputs") or {}).keys()) == all_ids:
+            print("[harness] complete raw archive found — scoring the "
+                  "archived frozen-code outputs (audits NOT re-run)",
+                  flush=True)
+            return existing
+        refuse("incomplete raw archive exists alongside no results; refusing "
+               "to guess — inspect validation/audit_claimset_raw_outputs.json")
+    return run_all_claims(claims)
 
 
 # --------------------------------------------------------------------------- #
@@ -739,7 +759,10 @@ def main() -> None:
     health_gate()
     check_pool_jobs(claim_set)
 
-    raw = run_all_claims(claim_set["claims"])
+    raw = load_or_run_archive(claim_set["claims"])
+    # Metrics are computed from the on-disk archive, never from in-memory
+    # run outputs (protocol §8: archived BEFORE metric computation).
+    raw = json.load(open(RAW_OUTPUTS_JSON))
 
     # Health gate immediately before scoring (construction protocol §8).
     health = health_gate()

@@ -447,6 +447,64 @@ class TestCitationRevalidation(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------- #
+# Raw-archive envelope round-trip (regression: first scored run crashed with
+# KeyError when the in-memory bare dict met the on-disk envelope)
+# --------------------------------------------------------------------------- #
+
+class TestArchiveRoundTrip(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.raw_path = os.path.join(self.tmp.name, "raw.json")
+
+    def test_run_all_claims_envelope_feeds_scorer(self):
+        claims = [_claim("control", "none", {"no_finding_flagged": True},
+                         cid="C-01"),
+                  _claim("novel", "N1_combination_product_splitting",
+                         {"finding": {"code": "N1", "status": "flagged"}},
+                         cid="N1-01", drug="COMBO DRUG")]
+        outputs = {"C-01": {"status": "no_case", **_ctx()},
+                   "N1-01": {"status": "no_case",
+                             **_ctx(findings=[{"code": "N1",
+                                               "status": "flagged"}])}}
+        with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path), \
+                mock.patch.object(H, "run_one_claim",
+                                  side_effect=lambda c: outputs[c["claim_id"]]):
+            raw = H.run_all_claims(claims)
+        self.assertEqual(set(raw), {"claim_ids", "outputs"})
+        scored = H.score_from_archive({"claims": claims}, raw,
+                                      revalidate=False)
+        self.assertEqual(scored["outcomes"]["C-01"]["outcome"], "clean")
+        self.assertEqual(scored["outcomes"]["N1-01"]["outcome"], "caught")
+
+    def test_load_or_run_recovers_complete_archive_without_rerunning(self):
+        claims = [_claim("control", "none", {"no_finding_flagged": True},
+                         cid="C-01")]
+        envelope = {"claim_ids": ["C-01"],
+                    "outputs": {"C-01": {"status": "no_case", **_ctx()}}}
+        with open(self.raw_path, "w") as fh:
+            json.dump(envelope, fh)
+        with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path), \
+                mock.patch.object(H, "run_one_claim",
+                                  side_effect=AssertionError(
+                                      "audits must NOT re-run")):
+            raw = H.load_or_run_archive(claims)
+        self.assertEqual(raw, envelope)
+
+    def test_load_or_run_refuses_incomplete_archive(self):
+        claims = [_claim("control", "none", {"no_finding_flagged": True},
+                         cid="C-01"),
+                  _claim("control", "none", {"no_finding_flagged": True},
+                         cid="C-02", drug="OTHER")]
+        with open(self.raw_path, "w") as fh:
+            json.dump({"claim_ids": ["C-01", "C-02"],
+                       "outputs": {"C-01": {"status": "no_case"}}}, fh)
+        with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path):
+            with self.assertRaises(SystemExit):
+                H.load_or_run_archive(claims)
+
+
+# --------------------------------------------------------------------------- #
 # score_from_archive plumbing
 # --------------------------------------------------------------------------- #
 
