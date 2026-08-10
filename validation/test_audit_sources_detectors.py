@@ -365,6 +365,82 @@ class DetectorContractTest(unittest.TestCase):
         self.assertEqual(n3[0]["status"], "flagged")
         self.assertIn("preclinical-only", n3[0]["title"])
 
+    def test_incidental_clinical_wording_does_not_clear_n3(self):
+        # Regression: "clinical drug ... in mice" previously classified as
+        # clinical_or_human_in_vivo, suppressing the N3 flag.
+        species, setting, _ = pubtator._context(
+            "The clinical drug Velunadine inhibited QRX1 in mice.")
+        self.assertEqual(species, "animal")
+        self.assertEqual(setting, "animal_in_vivo")
+
+        findings = detect_audit_findings(
+            {"status": "empty", "products": []},
+            {
+                "status": "ok",
+                "assertions": [{
+                    "citation_eligible": True,
+                    "pmid": "99000007",
+                    "species": species,
+                    "experimental_setting": setting,
+                    "experimental_context": "human, animal",
+                    "direction": "inhibitor",
+                    "evidence_sentence": (
+                        "The clinical drug Velunadine inhibited QRX1 "
+                        "in mice."),
+                    "lineage_id": "development-lineage-clinical-drug",
+                }],
+            },
+        )
+        n3 = [f for f in findings if f["code"] == "N3"]
+        self.assertEqual(len(n3), 1)
+        self.assertEqual(n3[0]["status"], "flagged")
+
+    def test_patient_derived_xenograft_is_preclinical(self):
+        # Regression: "patient-derived mouse xenograft" is an animal model;
+        # the word "patient" must not clear N3.
+        species, setting, _ = pubtator._context(
+            "Velunadine suppressed QRX1 in a patient-derived mouse "
+            "xenograft model.")
+        self.assertEqual(species, "animal")
+        self.assertEqual(setting, "animal_in_vivo")
+
+    def test_background_clinical_mention_does_not_clear_n3(self):
+        # Regression: a background clinical mention ("clinical candidate")
+        # alongside animal evidence stays preclinical.
+        species, setting, _ = pubtator._context(
+            "Velunadine, a clinical candidate, inhibited QRX1 in rats.")
+        self.assertEqual(species, "animal")
+        self.assertEqual(setting, "animal_in_vivo")
+
+    def test_direct_human_setting_clears_n3(self):
+        # Only direct human experimental/clinical evidence clears N3.
+        species, setting, _ = pubtator._context(
+            "Velunadine inhibited QRX1 in patients treated for Zeta "
+            "syndrome.")
+        self.assertEqual(species, "human")
+        self.assertEqual(setting, "clinical_or_human_in_vivo")
+
+        findings = detect_audit_findings(
+            {"status": "empty", "products": []},
+            {
+                "status": "ok",
+                "assertions": [{
+                    "citation_eligible": True,
+                    "pmid": "99000008",
+                    "species": species,
+                    "experimental_setting": setting,
+                    "experimental_context": "human",
+                    "direction": "inhibitor",
+                    "evidence_sentence": (
+                        "Velunadine inhibited QRX1 in patients treated "
+                        "for Zeta syndrome."),
+                    "lineage_id": "development-lineage-direct-human",
+                }],
+            },
+        )
+        n3 = [f for f in findings if f["code"] == "N3"]
+        self.assertEqual(len(n3), 0)
+
     def test_failure_states_are_unresolved_not_clear(self):
         findings = detect_audit_findings(
             {"status": "unavailable", "products": []},
