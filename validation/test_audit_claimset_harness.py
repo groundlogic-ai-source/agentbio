@@ -475,6 +475,29 @@ class TestFreezeAndIdempotency(unittest.TestCase):
                 H.verify_freeze()
         self.assertEqual(cm.exception.code, 2)
 
+    def test_completed_study_state_refuses_allowance_without_marker(self):
+        """Regression for the exact completed-study state: results exist and
+        the freeze manifest records the allowance as consumed, but the
+        marker file is absent (e.g. a fresh clone). The manifest record
+        alone must seal the allowance."""
+        json.dump({"verdict": "FAIL"}, open(self.results, "w"))
+        marker = os.path.join(self.tmp.name, "absent_marker.json")
+        argv = ["prog", "--label", "audit_claimset_v1",
+                "--allow-rerun-after-harness-defect", "second attempt"]
+        with mock.patch.object(H, "RESULTS_JSON", self.results), \
+                mock.patch.object(H, "RERUN_CONSUMED_JSON", marker), \
+                mock.patch.object(H, "CLAIM_SET_JSON", self.claim_set), \
+                mock.patch.object(H, "verify_freeze",
+                                  return_value={"claim_set_file_sha256": "x",
+                                                "code_commit": "y",
+                                                "rerun_allowance":
+                                                    {"consumed": True}}), \
+                mock.patch.object(__import__("sys"), "argv", argv):
+            with self.assertRaises(SystemExit) as cm:
+                H.main()
+        self.assertEqual(cm.exception.code, 2)
+        self.assertFalse(os.path.exists(marker))
+
     def test_recalc_only_is_exempt_from_idempotency(self):
         """The independent recalculation path exists to verify a COMPLETED
         run; it must not be blocked by the re-run guard (regression: first
