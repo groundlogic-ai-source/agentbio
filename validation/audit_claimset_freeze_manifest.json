@@ -1,0 +1,25 @@
+{
+  "study": "audit_claimset_v1",
+  "frozen_at": "2026-08-10T20:45:00Z",
+  "claim_set_file_sha256": "32efd7d965f62e2cd0900578e6ab2f78b0585d65f33095a651faf6be796523c4",
+  "code_commit": "6ed2e4e0997a3af79726f06ad3974c84c3a198f3",
+  "harness_config": {
+    "label": "audit_claimset_v1",
+    "citation_cutoff": "2026-08-10",
+    "pass_min_defect_recall": 0.8,
+    "pass_min_recall_cp_lower": 0.65,
+    "pass_max_control_ffr": 0.15,
+    "pass_max_ffr_cp_upper": 0.3,
+    "max_group_abstention_frac": 0.1
+  },
+  "cache_policy": "Production caches as-is (cache/cache.db, 7-30 day TTLs by source). Degraded states are never cached by design. No cache clearing, pinning, or special treatment for the scored run.",
+  "health_requirements": [
+    "ChEMBL status.json readable",
+    "openFDA drug/label.json query succeeds",
+    "Europe PMC search succeeds",
+    "PubTator3 search succeeds",
+    "All three pool jobs resolvable via api.jobs_db in completed/awaiting_review state with persisted candidates files"
+  ],
+  "scored_runs_allowed": 1,
+  "rerun_allowance": "one-fix-one-rerun for a proven harness defect, recorded in results"
+}
