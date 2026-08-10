@@ -990,17 +990,24 @@ def delete_archived_registry(dry_run: bool = True) -> dict:
                         "hypothesis_log": n_log,
                     },
                 }
+            # row_key must be NULL-safe: outcome_framing (and, defensively,
+            # hypothesis_id) can be NULL on pre-debug rows, and registry_reset_backup
+            # .row_key is NOT NULL — a bare || chain produced NULL and 500'd the reset.
             cur.execute(
                 "INSERT INTO registry_reset_backup (source_table, row_key, payload) "
                 "SELECT 'bisociation_history', "
-                "  hypothesis_id || '/' || outcome_framing || '#' || id, to_jsonb(t) "
+                "  COALESCE(hypothesis_id, 'no-hypothesis') || '/' "
+                "  || COALESCE(outcome_framing, 'no-framing') || '#' || id, "
+                "  to_jsonb(t) "
                 f"FROM bisociation_history t WHERE {_DEL}"
             )
             cur.execute(f"DELETE FROM bisociation_history WHERE {_DEL}")
             bh = cur.rowcount
             cur.execute(
                 "INSERT INTO registry_reset_backup (source_table, row_key, payload) "
-                "SELECT 'hypothesis_log', test_id, to_jsonb(t) "
+                "SELECT 'hypothesis_log', "
+                "  COALESCE(test_id, hypothesis_id, md5(to_jsonb(t)::text)), "
+                "  to_jsonb(t) "
                 "FROM hypothesis_log t WHERE " + _LOG_ORPHAN
             )
             cur.execute("DELETE FROM hypothesis_log WHERE " + _LOG_ORPHAN)
