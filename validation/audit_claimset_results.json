@@ -10,7 +10,7 @@
     "europepmc": true,
     "pubtator": true
   },
-  "rerun_after_harness_defect": null,
+  "rerun_after_harness_defect": "Amendment 3: first scored run crashed after archiving all 100 raw outputs, before any metric was computed (envelope KeyError). Harness fixed under the pre-registered one-fix-one-rerun allowance; this artifact scores the ORIGINAL archived outputs \u2014 audits were not re-executed.",
   "metrics": {
     "defect_recall": 0.5333333333333333,
     "defect_recall_cp_lower_95": 0.41969560452417876,
