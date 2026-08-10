@@ -116,3 +116,40 @@ claim set is being built:
    substitute after seeing pipeline behavior.
 5. Any claim whose citation fails this rule at audit time is excluded and
    reported as a construction defect, not scored as a miss.
+
+## Amendment 2 (2026-08-10, before detector implementation or claim construction):
+## held-out instances of pre-registered novel classes
+
+The original freeze correctly states that N1–N4 had no prior fix, test, or
+trap in the codebase on 2026-08-10.  It did not state whether general defenses
+could be implemented before the real claim instances were constructed.  This
+amendment resolves that ambiguity before either event:
+
+1. **What remains novel.** N1–N4 remain novel *classes at the original
+   pre-registration snapshot*.  The study will not describe their eventual
+   recall as spontaneous discovery of wholly unforeseen defect classes.
+2. **Development is class-level only.** General N1–N4 detectors may be
+   implemented against synthetic and non-scored development fixtures.  Those
+   fixtures may encode the class definitions above, but must not contain a
+   future scored claim's drug, disease, product, citation, source-record ID, or
+   expected result.
+3. **Real instances stay sealed.** The 30 real N1–N4 claims are constructed
+   only after detector and source scope is settled.  Their identities,
+   citations, labels, expected flags, and ground-truth fields cannot be read by
+   detector development, tests, prompts, source queries, or the scored runtime.
+4. **No tuning on the claim set.** A detector, threshold, source configuration,
+   or fixture may not be changed after inspecting a scored claim or its output.
+   The one-fix-one-rerun rule remains limited to a demonstrated harness defect;
+   a detector miss is a result, not a harness defect.
+5. **Reporting language.** `novel_recall` is reported as **held-out
+   generalization to real instances from four pre-registered classes**.  It
+   retains no PASS threshold and cannot be used alone to declare the audit
+   benchmark PASS.
+6. **Scope-settlement gate.** Before claim construction, a committed
+   scope-settlement record must name every admitted source and detector and
+   every deferred lane.  Claim construction begins only after that record;
+   later source or detector additions require a new future study version.
+
+This design tests whether class-level defenses generalize beyond their
+development fixtures while preserving an honest distinction between an
+unforeseen class and an unseen instance.
