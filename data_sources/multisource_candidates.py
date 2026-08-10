@@ -46,7 +46,7 @@ from __future__ import annotations
 
 from typing import Any, Iterable, Optional
 
-from data_sources import gtopdb, drugcentral_v2
+from data_sources import gtopdb, drugcentral_v2, bindingdb
 from data_sources.evidence_ledger import (
     ContradictionStatus,
     Direction,
@@ -64,6 +64,7 @@ __all__ = [
     "normalize_chembl_enriched",
     "records_from_gtopdb_envelope",
     "records_from_drugcentral_envelope",
+    "records_from_bindingdb_envelope",
     "merge_chemist_candidates",
     "SUPPORTED_SOURCES",
     "DEFAULT_ENABLED_SOURCES",
@@ -72,8 +73,9 @@ __all__ = [
 
 # Supported target-first provider identifiers at the collection boundary.
 # ``chembl`` is folded in via the ``chembl_enriched`` passthrough, while
-# ``gtopdb`` and ``drugcentral`` are fanned out to their target-first adapters.
-SUPPORTED_SOURCES = ("chembl", "gtopdb", "drugcentral")
+# ``gtopdb``, ``drugcentral`` and ``bindingdb`` are fanned out to their
+# target-first adapters.
+SUPPORTED_SOURCES = ("chembl", "gtopdb", "drugcentral", "bindingdb")
 
 # Default: every currently supported source is enabled (backward compatible).
 DEFAULT_ENABLED_SOURCES = frozenset(SUPPORTED_SOURCES)
@@ -498,6 +500,95 @@ def records_from_drugcentral_envelope(
 
 
 # ---------------------------------------------------------------------------
+# BindingDB converter
+# ---------------------------------------------------------------------------
+
+def records_from_bindingdb_envelope(
+    envelope: dict[str, Any],
+    *,
+    uniprot_id: str = "",
+    gene: str = "",
+    disease_name: str = "",
+    ot_score: Optional[float] = None,
+    target_discovery_method: str = "",
+) -> list[EvidenceRecord]:
+    """Convert a BindingDB ``get_target_interactions`` envelope into records.
+
+    Each candidate row yields:
+      * a BIOACTIVITY_ASSAY efficacy record anchored on
+        monomer+affinity-type+publication (exact re-imports collapse on that
+        lineage key), and
+      * when the lane verified the moiety against the DrugCentral
+        established-product set, a REGULATORY_APPROVAL record under the
+        DrugCentral lane's own ``drugcentral-approval:{struct_id}`` source id,
+        so approval evidence collapses onto the same lineage instead of
+        counting twice.
+
+    The BindingDB REST response carries no organism field, so
+    ``target_species`` is left blank rather than asserted human — the UniProt
+    accession identifies the queried protein, not every assay's species.
+    """
+    if not isinstance(envelope, dict):
+        return []
+    records: list[EvidenceRecord] = []
+    for cand in envelope.get("candidates") or []:
+        if not isinstance(cand, dict):
+            continue
+        monomer = _clean(cand.get("monomer_id"))
+        affinity_type = _clean(cand.get("affinity_type"))
+        pub = (_clean(cand.get("pmid")) or _clean(cand.get("doi"))
+               or "norefs")
+        anchor = f"bindingdb:{monomer}:{affinity_type}:{pub}"
+
+        base = dict(
+            provider="bindingdb",
+            molecule_id=_clean(cand.get("provider_molecule_id")),
+            molecule_name=_clean(cand.get("name")),
+            inchikey=_clean(cand.get("inchikey")),
+            smiles=_clean(cand.get("smiles")),
+            target_symbol=gene,
+            target_accession=uniprot_id,
+            target_species="",
+            disease_name=disease_name,
+        )
+
+        records.append(EvidenceRecord(
+            source_type=SourceType.BIOACTIVITY_ASSAY,
+            evidence_role=EvidenceRole.EFFICACY,
+            source_id=anchor,
+            assay_id=anchor,
+            measurement_type="pchembl",
+            measurement_value=_to_float(cand.get("pchembl")),
+            measurement_unit="pchembl",
+            context=(
+                f"affinity_type={affinity_type};"
+                f"relation={_clean(cand.get('relation'))};"
+                f"raw_affinity_nm={cand.get('affinity_nm')};"
+                f"doi={_clean(cand.get('doi'))}"),
+            publication_id="" if pub == "norefs" else pub,
+            qualification_status=QualificationStatus.QUALIFIED,
+            **base,
+        ))
+
+        struct_id = cand.get("approved_struct_id")
+        if struct_id is not None:
+            dc_base = dict(base)
+            dc_base["provider"] = "drugcentral"
+            records.append(_approval_record(
+                provider="drugcentral",
+                source_id=f"drugcentral-approval:{struct_id}",
+                base=dc_base,
+                withdrawn=False,
+            ))
+
+    if ot_score is not None:
+        records.extend(_genetic_link_records(
+            records, uniprot_id, disease_name, ot_score,
+            provider="bindingdb"))
+    return records
+
+
+# ---------------------------------------------------------------------------
 # legacy ChEMBL enriched -> ledger
 # ---------------------------------------------------------------------------
 
@@ -758,8 +849,9 @@ def collect_target_candidates(
 ) -> dict[str, Any]:
     """Target-first multi-source candidate collection.
 
-    Calls the GtoPdb and DrugCentral target-first adapters (by UniProt
-    accession, with a gene fallback for DrugCentral — NEVER by drug name),
+    Calls the GtoPdb, DrugCentral and BindingDB target-first adapters (by
+    UniProt accession, with a gene fallback for DrugCentral — NEVER by drug
+    name),
     converts every returned candidate/evidence blob into normalized
     EvidenceRecord objects, adds explicit regulatory-approval records, folds in
     the legacy ChEMBL enriched candidates when supplied, and merges the whole
@@ -778,11 +870,11 @@ def collect_target_candidates(
 
     ``enabled_sources`` selects which providers are contacted at this collection
     boundary. ``None`` (the default) enables every supported source, preserving
-    the historical behavior. Supported values are ``chembl``, ``gtopdb`` and
-    ``drugcentral``. A DISABLED provider's target-first adapter is NEVER called
-    and surfaces in ``source_status`` with ``status == "disabled"`` — which is
-    an explicit ablation choice, NOT a source failure and NOT the same as
-    "unavailable".
+    the historical behavior. Supported values are ``chembl``, ``gtopdb``,
+    ``drugcentral`` and ``bindingdb``. A DISABLED provider's target-first
+    adapter is NEVER called and surfaces in ``source_status`` with
+    ``status == "disabled"`` — which is an explicit ablation choice, NOT a
+    source failure and NOT the same as "unavailable".
     """
     enabled = normalize_enabled_sources(enabled_sources)
 
@@ -815,6 +907,18 @@ def collect_target_candidates(
         source_status["drugcentral"] = _source_status(drugcentral_env)
     else:
         source_status["drugcentral"] = dict(_disabled)
+
+    # BindingDB target-first fan-out (skipped entirely when disabled).
+    if "bindingdb" in enabled:
+        bindingdb_env = bindingdb.get_target_interactions(
+            uniprot_id, repurposing_only=repurposing_only)
+        records.extend(records_from_bindingdb_envelope(
+            bindingdb_env, uniprot_id=uniprot_id, gene=gene,
+            disease_name=disease_name, ot_score=ot_score,
+            target_discovery_method=target_discovery_method))
+        source_status["bindingdb"] = _source_status(bindingdb_env)
+    else:
+        source_status["bindingdb"] = dict(_disabled)
 
     # ChEMBL enters via the enriched passthrough. When ChEMBL is disabled the
     # caller-supplied enriched rows are NOT folded into the ledger.

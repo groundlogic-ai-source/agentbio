@@ -52,6 +52,35 @@ def available() -> bool:
     return os.path.exists(SNAPSHOT_PATH)
 
 
+# DrugCentral structure.status values denoting an established marketed product
+# (mirrors drugcentral_v2._ESTABLISHED_STATUSES exactly; ONP / null excluded).
+_ESTABLISHED_STATUSES = ("OFP", "OFM")
+
+
+def approved_moiety_rows() -> list[dict[str, Any]]:
+    """Raw identity rows for established products (status OFP/OFM).
+
+    Returns ``[{struct_id, name, smiles, inchikey}]`` UNNORMALIZED.  Callers
+    needing an active-moiety key apply their own structural normalization to
+    ``smiles`` (e.g. the BindingDB lane's fragment-parent + neutralized
+    canonical SMILES), keeping this module free of third-party chemistry deps.
+    The ``struct_id`` lets callers anchor lineage on the same
+    ``drugcentral-approval:{struct_id}`` identity the DrugCentral lane uses,
+    instead of double-counting approval evidence.
+    """
+    rows = _query(
+        "SELECT id, name, smiles, inchikey FROM structures "
+        f"WHERE status IN ({','.join('?' * len(_ESTABLISHED_STATUSES))})",
+        _ESTABLISHED_STATUSES, ["id", "name", "smiles", "inchikey"])
+    return [
+        {"struct_id": int(r["id"]),
+         "name": str(r.get("name") or "").strip(),
+         "smiles": str(r.get("smiles") or "").strip(),
+         "inchikey": str(r.get("inchikey") or "").strip().upper()}
+        for r in rows
+    ]
+
+
 def _query(sql: str, params: tuple, cols: list[str]) -> list[dict[str, Any]]:
     if not available():
         raise SnapshotCorrupt(f"snapshot missing at {SNAPSHOT_PATH}")
