@@ -15,9 +15,11 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 from typing import Any, Optional
 
 import api.jobs_db as jobs_db
+from api.audit_context import build_audit_context
 from api.domain_findings import domain_findings_for, modality_finding_for
 from data_sources.chembl import (
     _find_molecule_chembl_id,
@@ -153,12 +155,41 @@ def _modality_payload(drug_name: str) -> dict[str, Any]:
     }
 
 
+def _attach_audit_context(
+    result: dict[str, Any],
+    drug_name: str,
+    *,
+    mechanism_symbol: str = "",
+    claimed_route: str = "",
+    claimed_dose: str = "",
+    claimed_modality: str = "",
+    claimed_context: str = "",
+    source_deadline_monotonic: Optional[float] = None,
+) -> dict[str, Any]:
+    """Attach the shared source/detector envelope without changing verdicts."""
+    result["audit_context"] = build_audit_context(
+        drug_name,
+        mechanism_symbol=mechanism_symbol,
+        claimed_route=claimed_route,
+        claimed_dose=claimed_dose,
+        claimed_modality=claimed_modality,
+        claimed_context=claimed_context,
+        deadline_monotonic=source_deadline_monotonic,
+    )
+    return result
+
+
 def run_audit(
     disease_name: str,
     drug_name: str,
     *,
     job_id_hint: Optional[str] = None,
     narrate: bool = True,
+    claimed_route: str = "",
+    claimed_dose: str = "",
+    claimed_modality: str = "",
+    claimed_context: str = "",
+    source_deadline_monotonic: Optional[float] = None,
 ) -> dict[str, Any]:
     """
     Core audit function. Returns a structured dict. Status values:
@@ -170,6 +201,9 @@ def run_audit(
       "no_case"       — no completed/awaiting_review job for this disease
       "no_candidates" — job exists but candidates file unavailable (pre-persistence)
     """
+    if source_deadline_monotonic is None:
+        source_deadline_monotonic = time.monotonic() + 30.0
+
     # 1. Find an existing completed or awaiting_review job
     if job_id_hint:
         job = jobs_db.get_job(job_id_hint)
@@ -177,12 +211,20 @@ def run_audit(
         job = jobs_db.find_completed_job_by_disease(disease_name)
 
     if job is None:
-        return {
+        result = {
             "status": "no_case",
             "disease_name": disease_name,
             "drug_name": drug_name,
             **_modality_payload(drug_name),
         }
+        return _attach_audit_context(
+            result, drug_name,
+            claimed_route=claimed_route,
+            claimed_dose=claimed_dose,
+            claimed_modality=claimed_modality,
+            claimed_context=claimed_context,
+            source_deadline_monotonic=source_deadline_monotonic,
+        )
 
     job_id = job["job_id"]
     canonical_disease = job.get("disease_name") or disease_name
@@ -190,7 +232,7 @@ def run_audit(
     # 2. Load candidates
     candidates = _load_candidates(job_id, canonical_disease)
     if candidates is None:
-        return {
+        result = {
             "status": "no_candidates",
             "job_id": job_id,
             "disease_name": canonical_disease,
@@ -201,6 +243,14 @@ def run_audit(
             ),
             **_modality_payload(drug_name),
         }
+        return _attach_audit_context(
+            result, drug_name,
+            claimed_route=claimed_route,
+            claimed_dose=claimed_dose,
+            claimed_modality=claimed_modality,
+            claimed_context=claimed_context,
+            source_deadline_monotonic=source_deadline_monotonic,
+        )
 
     # 3. Resolve queried drug via the existing ChEMBL best-match function
     chembl_id: Optional[str] = None
@@ -298,6 +348,26 @@ def run_audit(
     # lookup so out-of-pool drugs get the same disclosure as reviewed
     # candidates; unresolved lookups are stated, never silently "clear".
     result.update(_modality_payload(drug_name))
+
+    # 9. Structured regulatory + entity-linked literature context. This uses
+    # the already-selected target as the bounded mechanism entity where one is
+    # available. It is disclosure-only and cannot modify the result above.
+    mechanism_symbol = ""
+    if result["status"] == "found":
+        mechanism_symbol = str(
+            (result.get("candidate") or {}).get("target_symbol") or "")
+    elif result["status"] == "absent":
+        mechanism_symbol = str(
+            result.get("agentbio_selected_target") or "")
+    _attach_audit_context(
+        result, drug_name,
+        mechanism_symbol=mechanism_symbol,
+        claimed_route=claimed_route,
+        claimed_dose=claimed_dose,
+        claimed_modality=claimed_modality,
+        claimed_context=claimed_context,
+        source_deadline_monotonic=source_deadline_monotonic,
+    )
 
     return result
 

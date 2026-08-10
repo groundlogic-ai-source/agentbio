@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { triageCandidates } from "../api";
 import DomainFindings from "./DomainFindings";
+import AuditContextFindings from "./AuditContextFindings";
 import ModalityModeToggle from "./ModalityModeToggle";
 import InlineCaseRunner from "./InlineCaseRunner";
 import { useModalityMode } from "../modalityMode";
@@ -87,14 +88,43 @@ export default function TriagePanel({ onNavigate }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  function parseList(text) {
-    return text
-      .split(/[\n,;]+/)
-      .map((s) => s.trim())
-      .filter(Boolean);
+  function parseRows(text) {
+    const rows = [];
+    text.split(/\n+/).forEach((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+      if (trimmed.includes("\t")) {
+        const [drug, route = "", dose = "", modality = "", context = ""] =
+          trimmed.split("\t").map((value) => value.trim());
+        if (drug) rows.push({ drug, route, dose, modality, context });
+        return;
+      }
+      trimmed
+        .split(/[,;]+/)
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .forEach((drug) => rows.push({
+          drug, route: "", dose: "", modality: "", context: "",
+        }));
+    });
+    return rows;
   }
 
-  const drugs = parseList(listText);
+  const parsedRows = parseRows(listText);
+  const drugs = parsedRows.map((row) => row.drug);
+  const claimContexts = Object.fromEntries(
+    parsedRows
+      .filter((row) => row.route || row.dose || row.modality || row.context)
+      .map((row) => [
+        row.drug,
+        {
+          route: row.route,
+          dose: row.dose,
+          modality: row.modality,
+          context: row.context,
+        },
+      ]),
+  );
 
   async function runTriage() {
     if (!disease.trim() || drugs.length === 0) return;
@@ -102,7 +132,8 @@ export default function TriagePanel({ onNavigate }) {
     setResult(null);
     setError(null);
     try {
-      const data = await triageCandidates(disease.trim(), drugs);
+      const data = await triageCandidates(
+        disease.trim(), drugs, null, claimContexts);
       setResult(data);
     } catch (err) {
       setError(err.message || "Unexpected error");
@@ -146,15 +177,20 @@ export default function TriagePanel({ onNavigate }) {
         </div>
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wide mb-1.5" style={{ color: "var(--ink-muted)" }}>
-            Candidate drugs — one per line (or comma-separated)
+            Candidate drugs and optional claim context
           </label>
           <textarea
             value={listText}
             onChange={(e) => setListText(e.target.value)}
             rows={7}
-            placeholder={"Sildenafil\nTadalafil\nPhenobarbital"}
+            placeholder={"Velunadine\toral\t10 mg daily\tsmall molecule\tsystemic plasma exposure\nQuorazene"}
             className="audit-input w-full border rounded-lg px-3 py-2 text-sm focus:outline-none font-mono"
           />
+          <p className="text-xs mt-2 leading-relaxed" style={{ color: "var(--ink-dim)" }}>
+            Optional tab-separated columns: Drug → Route → Dose → Modality →
+            Exposure/context. Paste rows from a spreadsheet. Name-only lines and
+            comma-separated names still work.
+          </p>
           <div className="text-xs mt-1" style={{ color: "var(--ink-dim)" }}>
             {drugs.length} drug{drugs.length === 1 ? "" : "s"} parsed{drugs.length > 25 ? " — cap is 25 per run" : ""}
           </div>
@@ -271,6 +307,9 @@ export default function TriagePanel({ onNavigate }) {
                       {v.cap_reason && (
                         <div className="text-xs mt-1" style={{ color: "var(--ink-muted)" }}>{v.cap_reason}</div>
                       )}
+                      <div className="mt-2 min-w-[18rem]">
+                        <AuditContextFindings context={v.audit_context} compact />
+                      </div>
                     </td>
                   </tr>
                 ))}
