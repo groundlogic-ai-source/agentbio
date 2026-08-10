@@ -73,6 +73,25 @@ CUTOFF = "2026-08-10"
 GROUP_TOTALS = {"existing_fix": 30, "novel": 30, "control": 40}
 DEFECT_GROUPS = ("existing_fix", "novel")
 
+# Limitations prose recorded verbatim into the results artifact. These are
+# v1's; a later study's wrapper (e.g. run_audit_claimset_v2) overrides this
+# module constant before calling main() — it is module state, resolved at
+# results-write time.
+RESULTS_LIMITATIONS = [
+    "N3 (species/preclinical-only) has ZERO claims: all externally "
+    "verifiable candidates failed construction verification and the "
+    "shortfall was reallocated per protocol §2. The N3 detector is "
+    "untested by this study (synthetic unit coverage only).",
+    "Persisted candidate pools predate the black-box/withdrawal "
+    "classifier fix; E1/E2 disclosure TEXT may contradict external "
+    "artifacts. This is measured by the non-scored disclosure "
+    "annotation and never changes scored metrics.",
+    "The citation cutoff (2026-08-10) is a mechanical artifact-date "
+    "rule, not a judgment of evidence currency.",
+    "Pool-context coverage is limited to three persisted cases; "
+    "novel-lane claims are pool-free by design.",
+]
+
 HTTP_TIMEOUT = 20.0
 PACE_SECONDS = 0.15
 
@@ -635,20 +654,7 @@ def write_results(metrics: dict, outcomes: dict, annotations: dict,
         "per_group": metrics["per_group"],
         "outcomes": outcomes,
         "disclosure_annotations": annotations,
-        "limitations": [
-            "N3 (species/preclinical-only) has ZERO claims: all externally "
-            "verifiable candidates failed construction verification and the "
-            "shortfall was reallocated per protocol §2. The N3 detector is "
-            "untested by this study (synthetic unit coverage only).",
-            "Persisted candidate pools predate the black-box/withdrawal "
-            "classifier fix; E1/E2 disclosure TEXT may contradict external "
-            "artifacts. This is measured by the non-scored disclosure "
-            "annotation and never changes scored metrics.",
-            "The citation cutoff (2026-08-10) is a mechanical artifact-date "
-            "rule, not a judgment of evidence currency.",
-            "Pool-context coverage is limited to three persisted cases; "
-            "novel-lane claims are pool-free by design.",
-        ],
+        "limitations": RESULTS_LIMITATIONS,
     }
     with open(RESULTS_JSON, "w") as fh:
         json.dump(results, fh, indent=2)
@@ -658,7 +664,8 @@ def write_results(metrics: dict, outcomes: dict, annotations: dict,
 def _write_results_md(results: dict) -> None:
     m = results["metrics"]
     lines = [
-        "# Frozen audit claim-set v1 — scored results",
+        f"# Frozen audit claim-set {REQUIRED_LABEL.split('_')[-1]} — "
+        "scored results",
         "",
         f"- Label: `{results['label']}` · scored {results['scored_at']}",
         f"- Claim set sha256: `{results['claim_set_sha256'][:16]}…`",
