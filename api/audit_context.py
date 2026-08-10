@@ -216,21 +216,43 @@ def detect_audit_findings(
             for a in assertions
         }
         if "clinical_or_human_in_vivo" not in settings:
-            findings.append(_finding(
-                "N3", "flagged",
-                "Admitted mechanism evidence is preclinical-only or species-unresolved",
-                "No admitted entity-linked assertion in this bounded search "
-                "establishes a human experimental or clinical context.",
-                [{
-                    "pmid": a.get("pmid"), "pmcid": a.get("pmcid"),
-                    "species": a.get("species"),
-                    "experimental_setting": a.get("experimental_setting"),
-                    "experimental_context": a.get("experimental_context"),
-                    "direction": a.get("direction"),
-                    "evidence_sentence": a.get("evidence_sentence"),
-                    "lineage_id": a.get("lineage_id"),
-                } for a in assertions],
-            ))
+            assertion_evidence = [{
+                "pmid": a.get("pmid"), "pmcid": a.get("pmcid"),
+                "species": a.get("species"),
+                "experimental_setting": a.get("experimental_setting"),
+                "experimental_context": a.get("experimental_context"),
+                "direction": a.get("direction"),
+                "evidence_sentence": a.get("evidence_sentence"),
+                "lineage_id": a.get("lineage_id"),
+            } for a in assertions]
+            if products:
+                # Approved-label guard (audit-context-v2): cutoff-eligible
+                # marketed label evidence establishes human use of the drug
+                # itself, so its evidence base must not be asserted to be
+                # preclinical-only.  The mechanism-specific human gap is
+                # still disclosed, but as an unresolved state rather than a
+                # defect flag.  (Fixes the control false-flag failure mode
+                # found by audit claim-set v1.)
+                findings.append(_finding(
+                    "N3", "unresolved",
+                    "Marketed drug: mechanism-specific human evidence "
+                    "unconfirmed",
+                    "Cutoff-eligible marketed label evidence exists for this "
+                    "drug, so its evidence base is not asserted to be "
+                    "preclinical-only.  No admitted entity-linked assertion "
+                    "in this bounded search establishes a human experimental "
+                    "or clinical context for this mechanism.",
+                    assertion_evidence,
+                ))
+            else:
+                findings.append(_finding(
+                    "N3", "flagged",
+                    "Admitted mechanism evidence is preclinical-only or species-unresolved",
+                    "No admitted entity-linked assertion in this bounded "
+                    "search establishes a human experimental or clinical "
+                    "context.",
+                    assertion_evidence,
+                ))
     else:
         findings.append(_finding(
             "N3", "unresolved",
@@ -283,7 +305,7 @@ def build_audit_context(
         claimed_context=claimed_context,
     )
     return {
-        "contract_version": "audit-context-v1",
+        "contract_version": "audit-context-v2",
         "purpose": "research_evidence_audit",
         "effect": "disclosure_only",
         "citation_cutoff": "2026-08-10",
@@ -296,5 +318,6 @@ def build_audit_context(
             "No finding changes an AgentBio score, rank, cap, or verdict.",
             "N4 route/context findings require formulation, dose, PK, and tissue-distribution review.",
             "A healthy empty source result is distinct from filtered, malformed, degraded, or unavailable evidence.",
+            "N3 preclinical-only is not asserted for drugs with cutoff-eligible marketed label evidence; the mechanism-specific human evidence gap is disclosed as unresolved instead.",
         ],
     }

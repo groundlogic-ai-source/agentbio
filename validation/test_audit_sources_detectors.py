@@ -337,7 +337,9 @@ class DetectorContractTest(unittest.TestCase):
         self.assertEqual(set(by_code), {"N1", "N2", "N3", "N4"})
         self.assertTrue(any(f["status"] == "flagged" for f in by_code["N1"]))
         self.assertTrue(any(f["status"] == "flagged" for f in by_code["N2"]))
-        self.assertTrue(any(f["status"] == "flagged" for f in by_code["N3"]))
+        # audit-context-v2: cutoff-eligible marketed label evidence suppresses
+        # the N3 flag to an unresolved disclosure (approved-label guard).
+        self.assertTrue(all(f["status"] == "unresolved" for f in by_code["N3"]))
         self.assertTrue(any(f["status"] == "flagged" for f in by_code["N4"]))
         n4_text = " ".join(f["rationale"] for f in by_code["N4"])
         self.assertIn("does not by itself prove", n4_text)
@@ -440,6 +442,68 @@ class DetectorContractTest(unittest.TestCase):
         )
         n3 = [f for f in findings if f["code"] == "N3"]
         self.assertEqual(len(n3), 0)
+
+    def test_approved_label_products_suppress_n3_flag(self):
+        # audit-context-v2 guard: a drug with cutoff-eligible marketed label
+        # evidence must not be flagged preclinical-only even when every
+        # admitted mechanism assertion is animal-only.
+        findings = detect_audit_findings(
+            {
+                "status": "ok",
+                "products": [{
+                    "citation_eligible": True,
+                    "spl": {"set_id": "development-set-b",
+                            "version": "3",
+                            "effective_date": "20240201"},
+                    "regulatory": {"combination": False,
+                                   "product_modality": "small_molecule",
+                                   "routes": ["oral"],
+                                   "dosage_forms": ["tablet"]},
+                }],
+            },
+            {
+                "status": "ok",
+                "assertions": [{
+                    "citation_eligible": True,
+                    "pmid": "99000009",
+                    "species": "animal",
+                    "experimental_setting": "animal_in_vivo",
+                    "experimental_context": "animal",
+                    "direction": "inhibitor",
+                    "evidence_sentence": (
+                        "Velunadine inhibited QRX1 in rats."),
+                    "lineage_id": "development-lineage-approved-guard",
+                }],
+            },
+        )
+        n3 = [f for f in findings if f["code"] == "N3"]
+        self.assertEqual(len(n3), 1)
+        self.assertEqual(n3[0]["status"], "unresolved")
+        self.assertIn("marketed label evidence", n3[0]["rationale"])
+
+    def test_no_label_products_keeps_n3_flagged(self):
+        # Without any cutoff-eligible label evidence the preclinical-only
+        # flag must still fire.
+        findings = detect_audit_findings(
+            {"status": "ok", "products": []},
+            {
+                "status": "ok",
+                "assertions": [{
+                    "citation_eligible": True,
+                    "pmid": "99000010",
+                    "species": "animal",
+                    "experimental_setting": "animal_in_vivo",
+                    "experimental_context": "animal",
+                    "direction": "inhibitor",
+                    "evidence_sentence": (
+                        "Velunadine inhibited QRX1 in mice."),
+                    "lineage_id": "development-lineage-no-label",
+                }],
+            },
+        )
+        n3 = [f for f in findings if f["code"] == "N3"]
+        self.assertEqual(len(n3), 1)
+        self.assertEqual(n3[0]["status"], "flagged")
 
     def test_failure_states_are_unresolved_not_clear(self):
         findings = detect_audit_findings(

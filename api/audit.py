@@ -21,6 +21,7 @@ from typing import Any, Optional
 import api.jobs_db as jobs_db
 from api.audit_context import build_audit_context
 from api.domain_findings import domain_findings_for, modality_finding_for
+from agents.reviewer import SAFETY_SCHEMA_VERSION
 from data_sources.chembl import (
     _find_molecule_chembl_id,
     get_drug_mechanism_targets_for_audit,
@@ -67,7 +68,12 @@ def _load_candidates(job_id: str, canonical_disease: str) -> Optional[list[dict]
     path = candidates_path(job_id)
     if os.path.exists(path):
         with open(path, encoding="utf-8") as fh:
-            return json.load(fh).get("candidates", [])
+            payload = json.load(fh)
+        cands = payload.get("candidates", [])
+        if payload.get("safety_schema_version") != SAFETY_SCHEMA_VERSION:
+            for c in cands:
+                c["pool_safety_stale"] = True
+        return cands
 
     if os.path.exists(_SHARED_PATH):
         with open(_SHARED_PATH, encoding="utf-8") as fh:
@@ -77,6 +83,9 @@ def _load_candidates(job_id: str, canonical_disease: str) -> Optional[list[dict]
             # Safe to use only if the last run was for this same disease
             sample_disease = (cands[0].get("disease_name") or "").lower()
             if sample_disease == canonical_disease.lower():
+                if data.get("safety_schema_version") != SAFETY_SCHEMA_VERSION:
+                    for c in cands:
+                        c["pool_safety_stale"] = True
                 return cands
 
     return None
@@ -108,6 +117,13 @@ def _find_drug_in_pool(
 def _cap_reason(c: dict) -> Optional[str]:
     """Plain-English cap explanation using the exact same cap fields as writer.py."""
     parts: list[str] = []
+
+    if c.get("pool_safety_stale"):
+        parts.append(
+            "Safety status UNVERIFIED — this pool snapshot predates the "
+            "current withdrawal/black-box classifier semantics; re-run or "
+            "refresh the pool to verify the badge."
+        )
 
     if c.get("safety_cap_applied"):
         badge = c.get("status_badge") or "safety signal detected"
