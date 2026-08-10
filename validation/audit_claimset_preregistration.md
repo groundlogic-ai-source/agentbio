@@ -90,3 +90,29 @@ reported, not papered over.
   Reported as engineering acceptance only.
 - This study: external audit validation (real claims, live sources).
 - Benchmark v2: discovery accuracy. Separate number, separate paper section.
+
+## Amendment 1 (2026-08-10, before any claim construction): citation-validity rule
+
+"External ground truth that predates the study" is defined by a MECHANICAL
+rule so that no judgment call about citation validity is ever made while the
+claim set is being built:
+
+1. **Cutoff date.** The study cutoff is **2026-08-10** (this amendment's
+   commit date). A citation is valid only if the cited artifact's own date —
+   publication date, label revision date, or database release date — is
+   strictly earlier than the cutoff. "Before the study" means the artifact's
+   date, NEVER the date we happened to retrieve it.
+2. **Pinned releases.** Database citations must name a specific versioned
+   release with a verifiable release date before the cutoff (e.g. "ChEMBL 35,
+   released 2024-12"; "DrugCentral 2023 snapshot"; "FDA label, label-history
+   revision date YYYY-MM-DD"; "Orphanet 2025 release"). A bare "current
+   database" reference is invalid.
+3. **Retrieval date is not validity.** Every citation records its retrieval
+   date for reproducibility, but retrieval date never counts toward the
+   cutoff rule.
+4. **Unverifiable dates exclude the claim.** If a citation's date cannot be
+   verified, the claim is dropped during construction and recorded in the
+   construction log — never silently repaired or swapped for a convenient
+   substitute after seeing pipeline behavior.
+5. Any claim whose citation fails this rule at audit time is excluded and
+   reported as a construction defect, not scored as a miss.
