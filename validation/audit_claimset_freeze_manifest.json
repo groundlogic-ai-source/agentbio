@@ -2,7 +2,7 @@
   "study": "audit_claimset_v1",
   "frozen_at": "2026-08-10T20:45:00Z",
   "claim_set_file_sha256": "32efd7d965f62e2cd0900578e6ab2f78b0585d65f33095a651faf6be796523c4",
-  "code_commit": "6ed2e4e0997a3af79726f06ad3974c84c3a198f3",
+  "code_commit": "f41d76613ac8dac0cba511dff286493968acb112",
   "harness_config": {
     "label": "audit_claimset_v1",
     "citation_cutoff": "2026-08-10",
@@ -21,5 +21,6 @@
     "All three pool jobs resolvable via api.jobs_db in completed/awaiting_review state with persisted candidates files"
   ],
   "scored_runs_allowed": 1,
-  "rerun_allowance": "one-fix-one-rerun for a proven harness defect, recorded in results"
+  "rerun_allowance": "one-fix-one-rerun for a proven harness defect, recorded in results",
+  "harness_defect_record": "First scored run 2026-08-10 crashed after archiving all 100 raw outputs, before any metric was computed (KeyError: in-memory bare dict vs on-disk envelope). No results were produced or seen. Fixed under the pre-registered one-fix-one-rerun allowance; regression tests added; re-run scores the ORIGINAL archived outputs (audits not re-run)."
 }
