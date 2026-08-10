@@ -203,7 +203,7 @@ def run_triage(
     findings = domain_findings_for(disease_name)
     if findings:
         summary["domain_findings"] = findings
-    summary["audit_context_contract_version"] = "audit-context-v1"
+    summary["audit_context_contract_version"] = "audit-context-v2"
     summary["audit_context_source_states"] = {
         drug: {
             name: (source or {}).get("status")

@@ -78,6 +78,11 @@ STRONG_MATCH_THRESHOLD = 0.70
 # Safety gate: withdrawn / black-box-warning compounds are capped at the same
 # ceiling as unapproved compounds so they cannot reach STRONG_MATCH.
 SAFETY_CAP = 0.40
+# Pool-snapshot safety schema version.  Bump whenever withdrawal/black-box
+# verdict semantics change; snapshots stamped with an older version are
+# treated as unverified by the audit layer (api/audit.py) until refreshed
+# (scripts/refresh_pool_safety.py).
+SAFETY_SCHEMA_VERSION = "safety-v2"
 # Mechanism-direction gate uses the same cap as the safety gate:
 # a DIRECTIONALLY_INCOMPATIBLE verdict prevents STRONG_MATCH just as a
 # safety flag does. COMPATIBLE and INSUFFICIENT_INFO never trigger the cap.
@@ -992,78 +997,91 @@ def run_reviewer(chemist_output: dict[str, Any],
         ) else None
         r["safety_layer2"] = layer2
 
-        # A lone structured withdrawal signal is retained when the independent
-        # check is unavailable/unclear (conservative safety default).  An
-        # explicit Layer-2 NO is a source disagreement: disclose it and do not
-        # hard-cap until a withdrawal is independently corroborated.
-        l1_hit = (
-            l1_withdrawn
-            and (layer2 is None or layer2.get("verdict") != "NO")
-        )
-        l2_hit = layer2 is not None and layer2.get("confirmed", False)
-        safety_triggered = l1_hit or l2_hit
-        if l1_withdrawn and layer2 is not None and layer2.get("verdict") == "NO":
-            r["safety_reconciliation"] = {
-                "status": "disputed",
-                "reason": (
-                    "ChEMBL structured data reports withdrawn_flag=True, but "
-                    "the independent web safety check returned WITHDRAWAL: NO. "
-                    "No hard cap was applied; this conflict requires review."
-                ),
-                "layer1_source": layer1.get("source_url"),
-                "layer2_citation": layer2.get("citation"),
-            }
-        else:
-            r["safety_reconciliation"] = None
-
-        # Black-box advisory: a boxed warning was found (by L1 structured data
-        # or by L2's separate BLACK_BOX verdict) but NO withdrawal was
-        # confirmed.  Surface as a disclosure note; do NOT apply the hard cap.
-        r["black_box_advisory"] = (
-            (
-                layer1.get("black_box_advisory", False)
-                or (layer2 or {}).get("black_box_advisory", False)
-            )
-            and not safety_triggered
-        )
-
-        if safety_triggered:
-            r["composite_score"] = min(r["composite_score"], SAFETY_CAP)
-            r["safety_cap_applied"] = True
-            r["strong_match"] = r["composite_score"] >= STRONG_MATCH_THRESHOLD
-
-            # Badge names every layer that independently confirmed the signal
-            layer_parts: list[str] = []
-            cite_parts: list[str] = []
-            if l1_hit:
-                layer_parts.append("ChEMBL structured data")
-                cite_parts.append(
-                    layer1.get("source_url") or layer1.get("chembl_id") or ""
-                )
-            if l2_hit:
-                layer_parts.append("web search")
-                cite_parts.append(
-                    layer2.get("citation") or "see safety_layer2.search_summary"
-                )
-            layer_str = " + ".join(layer_parts)
-            cite_str = "; ".join(c for c in cite_parts if c)
-            r["status_badge"] = (
-                f"WITHDRAWN FROM MARKET ({layer_str}) — {cite_str}"
-            )
+        if _reconcile_safety(r, layer1, layer2):
             needs_resort = True
-        else:
-            r["safety_cap_applied"] = False
-            # Unapproved-compound badge (existing gate, unchanged)
-            r["status_badge"] = (
-                "EXPERIMENTAL COMPOUND — NOT YET APPROVED"
-                if r.get("unapproved_cap_applied") else None
-            )
     # ── End safety-disclosure pass ────────────────────────────────────────────
 
     if needs_resort:
         _sort_reviewed(reviewed)
 
     return reviewed
+
+
+def _reconcile_safety(r: dict[str, Any], layer1: dict[str, Any],
+                      layer2: Optional[dict[str, Any]]) -> bool:
+    """Apply withdrawal / black-box reconciliation to one reviewed candidate.
+
+    Shared by the reviewer safety pass and the pool-safety refresh script so
+    badge/cap semantics can never drift between live runs and refreshed
+    snapshots.  Returns True when the safety cap fired (caller re-sorts).
+    """
+    # A lone structured withdrawal signal is retained when the independent
+    # check is unavailable/unclear (conservative safety default).  An
+    # explicit Layer-2 NO is a source disagreement: disclose it and do not
+    # hard-cap until a withdrawal is independently corroborated.
+    l1_withdrawn = layer1.get("confirmed", False)
+    l1_hit = (
+        l1_withdrawn
+        and (layer2 is None or layer2.get("verdict") != "NO")
+    )
+    l2_hit = layer2 is not None and layer2.get("confirmed", False)
+    safety_triggered = l1_hit or l2_hit
+    if l1_withdrawn and layer2 is not None and layer2.get("verdict") == "NO":
+        r["safety_reconciliation"] = {
+            "status": "disputed",
+            "reason": (
+                "ChEMBL structured data reports withdrawn_flag=True, but "
+                "the independent web safety check returned WITHDRAWAL: NO. "
+                "No hard cap was applied; this conflict requires review."
+            ),
+            "layer1_source": layer1.get("source_url"),
+            "layer2_citation": layer2.get("citation"),
+        }
+    else:
+        r["safety_reconciliation"] = None
+
+    # Black-box advisory: a boxed warning was found (by L1 structured data
+    # or by L2's separate BLACK_BOX verdict) but NO withdrawal was
+    # confirmed.  Surface as a disclosure note; do NOT apply the hard cap.
+    r["black_box_advisory"] = (
+        (
+            layer1.get("black_box_advisory", False)
+            or (layer2 or {}).get("black_box_advisory", False)
+        )
+        and not safety_triggered
+    )
+
+    if safety_triggered:
+        r["composite_score"] = min(r["composite_score"], SAFETY_CAP)
+        r["safety_cap_applied"] = True
+        r["strong_match"] = r["composite_score"] >= STRONG_MATCH_THRESHOLD
+
+        # Badge names every layer that independently confirmed the signal
+        layer_parts: list[str] = []
+        cite_parts: list[str] = []
+        if l1_hit:
+            layer_parts.append("ChEMBL structured data")
+            cite_parts.append(
+                layer1.get("source_url") or layer1.get("chembl_id") or ""
+            )
+        if l2_hit:
+            layer_parts.append("web search")
+            cite_parts.append(
+                layer2.get("citation") or "see safety_layer2.search_summary"
+            )
+        layer_str = " + ".join(layer_parts)
+        cite_str = "; ".join(c for c in cite_parts if c)
+        r["status_badge"] = (
+            f"WITHDRAWN FROM MARKET ({layer_str}) — {cite_str}"
+        )
+    else:
+        r["safety_cap_applied"] = False
+        # Unapproved-compound badge (existing gate, unchanged)
+        r["status_badge"] = (
+            "EXPERIMENTAL COMPOUND — NOT YET APPROVED"
+            if r.get("unapproved_cap_applied") else None
+        )
+    return safety_triggered
 
 
 def _sort_reviewed(reviewed: list[dict[str, Any]]) -> None:

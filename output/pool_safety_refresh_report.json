@@ -1,0 +1,590 @@
+{
+ "safety_schema_version": "safety-v2",
+ "files": [
+  {
+   "file": "2de0698b458b4be28218830a3dad4710.json",
+   "candidates": 20,
+   "changed": [
+    {
+     "drug": "SORAFENIB",
+     "before": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": false,
+      "composite_score": 0.5118,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": false,
+      "composite_score": 0.5119,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "DASATINIB",
+     "before": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": false,
+      "composite_score": 0.4475,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": false,
+      "composite_score": 0.4476,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "LIOTHYRONINE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://fda.report/DailyMed/57744c7c-af44-4bc4-a5a8-79f05710f469",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.4918,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "PAZOPANIB",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2009/022465lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.4795,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "VANDETANIB",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2011/022405s001lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.4637,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "MILTEFOSINE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2014/204684s000lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.4316,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "MEDROXYPROGESTERONE ACETATE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.researchgate.net/publication/51573408_Removing_the_black_box_warning_for_depot_medroxyprogesterone_acetate",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.4,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "PROGESTERONE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.fda.gov/news-events/press-announcements/hhs-advances-womens-health-removes-misleading-fda-warnings-hormone-replacement-therapy",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.4,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "MIFEPRISTONE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2016/020687s020lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.4,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "LAPATINIB",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2010/022059s3s6lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.235,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.235,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "AMIODARONE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.drugs.com/pro/amiodarone.html",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.1804,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.1804,
+      "strong_match": false
+     }
+    }
+   ],
+   "errors": [],
+   "n_strong_matches": 2
+  },
+  {
+   "file": "61f542324d214a869b324fe41060bebb.json",
+   "candidates": 24,
+   "changed": [
+    {
+     "drug": "CYCLOBENZAPRINE",
+     "before": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": false,
+      "composite_score": 0.7671,
+      "strong_match": true
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": false,
+      "composite_score": 0.7672,
+      "strong_match": true
+     }
+    },
+    {
+     "drug": "INFIGRATINIB PHOSPHATE",
+     "before": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": false,
+      "composite_score": 0.6446,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": false,
+      "composite_score": 0.6447,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "GILTERITINIB",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.xospatahcp.com/important-safety-information",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.8009,
+      "strong_match": true
+     }
+    },
+    {
+     "drug": "AMITRIPTYLINE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2025/085968s112lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.7449,
+      "strong_match": true
+     }
+    },
+    {
+     "drug": "FEDRATINIB",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2019/212327s000lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.7446,
+      "strong_match": true
+     }
+    },
+    {
+     "drug": "VANDETANIB",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2011/022405s001lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.7331,
+      "strong_match": true
+     }
+    },
+    {
+     "drug": "NORTRIPTYLINE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2012/018012s029,018013s061lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.7234,
+      "strong_match": true
+     }
+    },
+    {
+     "drug": "PAZOPANIB",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2009/022465lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.713,
+      "strong_match": true
+     }
+    },
+    {
+     "drug": "SUNITINIB",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2021/021938s039lbledt.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.7008,
+      "strong_match": true
+     }
+    },
+    {
+     "drug": "CABOZANTINIB",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2018/203756s005lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.5506,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "MITOTANE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/016885s033lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.4801,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "LAPATINIB",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2010/022059s3s6lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.4216,
+      "strong_match": false
+     }
+    }
+   ],
+   "errors": [],
+   "n_strong_matches": 12
+  },
+  {
+   "file": "cddaa8e1fbe84309854e7dc6cdd8a71a.json",
+   "candidates": 32,
+   "changed": [
+    {
+     "drug": "ISOPROTERENOL",
+     "before": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": false,
+      "composite_score": 0.6126,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": false,
+      "composite_score": 0.6125,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "PROPRANOLOL",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2013/021438s016lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.7053,
+      "strong_match": true
+     }
+    },
+    {
+     "drug": "SALMETEROL",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 FDA Public Health Advisory, November 2005; SMART trial data (1996\u20132003); 21 CFR \u00a7 216.24",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.657,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "PROPAFENONE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2018/019151s015lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.5698,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "SOTALOL",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=bcbc1624-283e-732f-e053-2995a90a8f11",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.5504,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "METOPROLOL",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/019962s050s052lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.5355,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "ATENOLOL",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=f36d4ed3-dcbb-4465-9fa6-1da811f555e6&type=display",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.5032,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "NOREPINEPHRINE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.accessdata.fda.gov/drugsatfda_docs/label/2020/007513s045lbl.pdf",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.4804,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "LOPERAMIDE",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://en.wikipedia.org/wiki/Loperamide; https://www.ncbi.nlm.nih.gov/books/NBK557885/",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.4,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.4725,
+      "strong_match": false
+     }
+    },
+    {
+     "drug": "MONTELUKAST",
+     "before": {
+      "status_badge": "WITHDRAWN FROM MARKET (web search) \u2014 https://www.fda.gov/drugs/drug-safety-communications/fda-requires-boxed-warning-about-serious-mental-health-side-effects-asthma-and-allergy-drug",
+      "safety_cap_applied": true,
+      "black_box_advisory": false,
+      "composite_score": 0.2169,
+      "strong_match": false
+     },
+     "after": {
+      "status_badge": null,
+      "safety_cap_applied": false,
+      "black_box_advisory": true,
+      "composite_score": 0.2169,
+      "strong_match": false
+     }
+    }
+   ],
+   "errors": [],
+   "n_strong_matches": 2
+  }
+ ]
+}

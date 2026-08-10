@@ -52,6 +52,7 @@ from agents.reviewer import (
     COMPOSITE_WEIGHTS,
     LIPINSKI_PENALTY,
     STRONG_MATCH_THRESHOLD,
+    SAFETY_SCHEMA_VERSION,
     PCHEMBL_NORM_MIN,
     PCHEMBL_NORM_MAX,
 )
@@ -558,6 +559,7 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
         "n_candidates": len(reviewed),
         "n_strong_matches": sum(1 for r in reviewed if r["strong_match"]),
         "repurposing_only": state["chemist_output"].get("repurposing_only", False),
+        "safety_schema_version": SAFETY_SCHEMA_VERSION,
         "candidates": reviewed,
     }
     # Thread the K-target evaluation summary through to the writer so it can

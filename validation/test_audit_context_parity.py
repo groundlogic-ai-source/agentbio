@@ -9,7 +9,7 @@ from api import triage
 
 
 _CONTEXT = {
-    "contract_version": "audit-context-v1",
+    "contract_version": "audit-context-v2",
     "purpose": "research_evidence_audit",
     "effect": "disclosure_only",
     "sources": {
@@ -94,7 +94,7 @@ class AuditContextWiringTest(unittest.TestCase):
         self.assertIs(verdict["audit_context"], _CONTEXT)
         self.assertEqual(
             result["summary"]["audit_context_contract_version"],
-            "audit-context-v1",
+            "audit-context-v2",
         )
         self.assertEqual(
             result["summary"]["audit_context_source_states"]["Velunadine"],
