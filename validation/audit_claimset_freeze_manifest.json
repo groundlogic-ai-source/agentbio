@@ -2,7 +2,7 @@
   "study": "audit_claimset_v1",
   "frozen_at": "2026-08-10T20:45:00Z",
   "claim_set_file_sha256": "32efd7d965f62e2cd0900578e6ab2f78b0585d65f33095a651faf6be796523c4",
-  "code_commit": "38d1c5ff36ed604dc41062d944857488fc978f8a",
+  "code_commit": "c8d981afb09626284111c5d62ca5562efa24e6cb",
   "harness_config": {
     "label": "audit_claimset_v1",
     "citation_cutoff": "2026-08-10",
@@ -25,6 +25,12 @@
   "harness_defect_record": "First scored run 2026-08-10 crashed after archiving all 100 raw outputs, before any metric was computed (KeyError: in-memory bare dict vs on-disk envelope). No results were produced or seen. Fixed under the pre-registered one-fix-one-rerun allowance; regression tests added; re-run scores the ORIGINAL archived outputs (audits not re-run).",
   "post_freeze_harness_fixes": [
     "f41d7661: score strictly from on-disk archive envelope; crash recovery never re-runs audits (Amendment 3, one-fix-one-rerun)",
-    "38d1c5f: recalc-only verification path exempted from idempotency guard; no scoring/claim/detector/threshold change"
-  ]
+    "38d1c5f: recalc-only verification path exempted from idempotency guard; no scoring/claim/detector/threshold change",
+    "c8d981af: rerun allowance sealed (single-use consumption marker, archive-only binding, results-hash drift refusal) per architect review; no scoring/claim/detector/threshold change"
+  ],
+  "scored_results": {
+    "results_sha256": "cf3068456b296708492ca03e3b267e89d6043ccdd64dca734964628351e2372c",
+    "results_recorded_freeze_code_commit": "f41d76613ac8dac0cba511dff286493968acb112",
+    "note": "results artifact hash binds the published outcome; replacing it without a documented manifest amendment refuses any further run. results_recorded_freeze_code_commit (f41d7661) is the code commit the scoring run itself verified against \u2014 historically accurate."
+  }
 }
