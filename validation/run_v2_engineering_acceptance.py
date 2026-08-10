@@ -589,7 +589,11 @@ def _run_one_target(row: dict[str, Any]) -> dict[str, Any]:
     }
     try:
         bio = run_biologist(target)
-        chem = run_chemist(bio, repurposing_only=True)
+        # Frozen v2 engineering source set: this suite verifies the v2
+        # fix-set, so post-v2 lanes (e.g. bindingdb) stay out of it.
+        chem = run_chemist(bio, repurposing_only=True,
+                           enabled_sources=("chembl", "gtopdb",
+                                            "drugcentral"))
     except Exception as e:  # pragma: no cover - network/runtime variance
         rec.update(status="error", error=str(e))
         _log(f"    ERROR pipeline: {e}")

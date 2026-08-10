@@ -161,6 +161,10 @@ def screen_case(case: dict[str, Any]) -> tuple[str, str]:
                 ot_score=t.get("association_score"),
                 target_discovery_method="genetic_association",
                 repurposing_only=True,
+                # Frozen v2 screen source set: the screen ran with exactly
+                # these three lanes. Post-v2 lanes (e.g. bindingdb) must NOT
+                # change a rerun of the frozen screen.
+                enabled_sources=("chembl", "gtopdb", "drugcentral"),
             )
         except Exception as e:
             raise ScreenDataUnavailable(

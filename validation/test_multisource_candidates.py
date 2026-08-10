@@ -198,10 +198,18 @@ class ChemblEnrichedTests(unittest.TestCase):
 
 class UnionTests(unittest.TestCase):
     def _collect(self, gtop_env, dc_env, chembl=None):
+        # bindingdb is mocked to a healthy-empty envelope: these tests are
+        # about gtopdb/drugcentral/chembl union semantics and must never hit
+        # the network through the default-enabled BindingDB lane.
         with mock.patch.object(msc.gtopdb, "get_target_interactions",
                                return_value=gtop_env) as g, \
              mock.patch.object(msc.drugcentral_v2, "get_target_interactions",
-                               return_value=dc_env) as d:
+                               return_value=dc_env) as d, \
+             mock.patch.object(msc.bindingdb, "get_target_interactions",
+                               return_value={"source": "bindingdb",
+                                             "status": "empty",
+                                             "candidates": [], "error": None,
+                                             "release": None, "stats": {}}):
             result = msc.collect_target_candidates(
                 uniprot_id="P23219", gene="PTGS1",
                 disease_name="inflammation", ot_score=0.42,
@@ -387,10 +395,17 @@ class EnabledSourcesTests(unittest.TestCase):
     """
 
     def _collect(self, gtop_env, dc_env, chembl=None, enabled_sources=None):
+        # bindingdb mocked healthy-empty (see UnionTests._collect): the
+        # enabled/disabled semantics are observable via source_status.
         with mock.patch.object(msc.gtopdb, "get_target_interactions",
                                return_value=gtop_env) as g, \
              mock.patch.object(msc.drugcentral_v2, "get_target_interactions",
-                               return_value=dc_env) as d:
+                               return_value=dc_env) as d, \
+             mock.patch.object(msc.bindingdb, "get_target_interactions",
+                               return_value={"source": "bindingdb",
+                                             "status": "empty",
+                                             "candidates": [], "error": None,
+                                             "release": None, "stats": {}}):
             result = msc.collect_target_candidates(
                 uniprot_id="P23219", gene="PTGS1",
                 disease_name="inflammation", ot_score=0.42,
@@ -408,7 +423,7 @@ class EnabledSourcesTests(unittest.TestCase):
         d.assert_called_once()
         providers = result["candidates"][0]["_evidence_ledger"]["providers"]
         self.assertEqual(set(providers), {"gtopdb", "drugcentral", "chembl"})
-        for prov in ("gtopdb", "drugcentral", "chembl"):
+        for prov in ("gtopdb", "drugcentral", "chembl", "bindingdb"):
             self.assertNotEqual(
                 result["source_status"][prov]["status"], "disabled")
 
