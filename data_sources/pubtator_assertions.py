@@ -47,10 +47,17 @@ _REJECT = re.compile(
 _REVIEW = re.compile(r"\b(?:review|meta-analysis|systematic review)\b", re.I)
 _ANIMAL = re.compile(
     r"\b(?:mouse|mice|murine|rat|rats|zebrafish|drosophila|rabbit|canine|"
-    r"porcine|animal model|in vivo)\b", re.I)
+    r"porcine|xenograft|animal model|in vivo)\b", re.I)
 _HUMAN = re.compile(
     r"\b(?:human|patient|patients|participant|participants|clinical|"
     r"volunteer|homo sapiens)\b", re.I)
+# Direct evidence of a human experimental/clinical setting. Incidental
+# wording such as "clinical drug", "clinical candidate", or
+# "patient-derived" (xenograft) must NOT clear N3.
+_HUMAN_DIRECT = re.compile(
+    r"\b(?:in humans?|in patients?|human subjects|healthy volunteers|"
+    r"patients? (?:treated|receiving|enrolled)|clinical (?:trial|trials|"
+    r"study|studies))\b", re.I)
 _IN_VITRO = re.compile(
     r"\b(?:in vitro|cell line|cells|culture|organoid|isolated protein|"
     r"biochemical assay|primary cells)\b", re.I)
@@ -299,24 +306,31 @@ def _publication_date(value: Any) -> tuple[Optional[str], bool]:
 def _context(sentence: str) -> tuple[str, str, str]:
     animal = _ANIMAL.search(sentence)
     human = _HUMAN.search(sentence)
+    human_direct = _HUMAN_DIRECT.search(sentence)
     vitro = _IN_VITRO.search(sentence)
-    if human:
-        species = "human"
-    elif animal:
+    # Conservative precedence: explicit animal/preclinical context is not
+    # overridden by incidental human wording ("clinical drug",
+    # "patient-derived xenograft"). Only direct evidence of a human
+    # experimental/clinical setting clears the preclinical flag, and never
+    # when the same sentence also reports an animal model.
+    if animal:
         species = "animal"
+    elif human:
+        species = "human"
     else:
         species = "unknown"
     if vitro:
         setting = "in_vitro"
-    elif human:
-        setting = "clinical_or_human_in_vivo"
     elif animal:
         setting = "animal_in_vivo"
+    elif human_direct:
+        setting = "clinical_or_human_in_vivo"
     else:
         setting = "unknown"
     observed = [
         label for label, match in (
-            ("human", human), ("animal", animal), ("in_vitro", vitro)
+            ("human", human), ("animal", animal), ("in_vitro", vitro),
+            ("human_direct", human_direct),
         ) if match
     ]
     return (
