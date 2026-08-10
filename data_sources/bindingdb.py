@@ -164,7 +164,24 @@ def _fetch_affinities(uniprot_id: str, cutoff_nm: int) -> list[dict[str, Any]]:
         raise _SourceUnavailable(
             f"{url} returned a payload that does not match the verified "
             "getLigandsByUniprots contract")
-    return inner["affinities"]
+    rows = inner["affinities"]
+    # A NON-EMPTY list in which NO row matches the verified row contract is a
+    # malformed payload, not a genuine "no binders" — failing closed here is
+    # what keeps a contract change from being cached as a healthy empty.
+    if rows and not any(_row_shape_ok(r) for r in rows):
+        raise _SourceUnavailable(
+            f"{url} returned {len(rows)} affinity rows, none matching the "
+            "verified row contract")
+    return rows
+
+
+def _row_shape_ok(row: Any) -> bool:
+    """Minimal verified row contract: a dict carrying monomerid, smile and an
+    affinity value (fields the live API always emits)."""
+    return (isinstance(row, dict)
+            and bool(str(row.get("monomerid") or "").strip())
+            and bool(str(row.get("smile") or "").strip())
+            and bool(str(row.get("affinity") or "").strip()))
 
 
 def parse_affinity(raw: Any) -> Optional[tuple[str, float]]:
@@ -198,9 +215,10 @@ def _moiety_key(smiles: str) -> str:
     isomeric SMILES instead.  Applied identically to BindingDB rows and to the
     DrugCentral snapshot's structures, it collapses salt/ionization variants
     (sodium acetate == acetic acid) while keeping esters and stereo distinct.
-    Returns '' for anything that won't parse (the row is skipped, never
-    coerced).  A missing RDKit is an environment failure and must degrade the
-    whole lane VISIBLY (unavailable), never silently pass rows unfiltered.
+    Returns '' ONLY for SMILES that won't parse (the row is skipped, never
+    coerced).  A missing RDKit — or any standardization failure — is an
+    environment failure and must degrade the whole lane VISIBLY (unavailable,
+    never cached), never silently skip every row.
     """
     try:
         from rdkit import Chem
@@ -216,8 +234,12 @@ def _moiety_key(smiles: str) -> str:
         parent = rdMolStandardize.FragmentParent(mol)
         parent = rdMolStandardize.Uncharger().uncharge(parent)
         return Chem.MolToSmiles(parent, isomericSmiles=True)
-    except Exception:
-        return ""
+    except Exception as e:
+        # The molecule PARSED, so this is a toolchain failure, not bad data:
+        # fail the lane visibly instead of quietly skipping every row into a
+        # cacheable "empty".
+        raise _SourceUnavailable(
+            f"rdkit standardization failed for a parsed molecule: {e}") from e
 
 
 def get_target_interactions(

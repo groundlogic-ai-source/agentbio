@@ -162,6 +162,37 @@ class LaneTests(unittest.TestCase):
         self.assertIn("gone", env["error"])
         cset_m.assert_not_called()
 
+    def test_malformed_rows_unavailable_and_never_cached(self):
+        # A non-empty affinities list where NO row matches the verified row
+        # contract is a malformed payload, not a genuine "no binders".
+        http, cget, cset, ik, appr = self._mocks(["garbage", {"foo": 1}])
+        with http, cget, cset as cset_m, ik, appr:
+            env = bindingdb.get_target_interactions("P00519")
+        self.assertEqual(env["status"], "unavailable")
+        self.assertIn("row contract", env["error"])
+        cset_m.assert_not_called()
+
+    def test_standardization_failure_unavailable_and_never_cached(self):
+        http, cget, cset, _, appr = self._mocks([_row()])
+        with http, cget, cset as cset_m, appr:
+            with mock.patch.object(
+                    bindingdb, "_moiety_key",
+                    side_effect=bindingdb._SourceUnavailable("rdkit broke")):
+                env = bindingdb.get_target_interactions("P00519")
+        self.assertEqual(env["status"], "unavailable")
+        self.assertIn("rdkit broke", env["error"])
+        cset_m.assert_not_called()
+
+    def test_moiety_key_raises_on_standardization_failure(self):
+        # Parse-succeeds / standardize-fails must raise, never return ''.
+        with mock.patch(
+                "rdkit.Chem.MolStandardize.rdMolStandardize.FragmentParent",
+                side_effect=RuntimeError("boom")):
+            with self.assertRaises(bindingdb._SourceUnavailable):
+                bindingdb._moiety_key("CCO")
+        # A genuinely unparseable SMILES still returns '' (per-row skip).
+        self.assertEqual(bindingdb._moiety_key("not-a-smiles"), "")
+
     def test_cache_hit_skips_network(self):
         cached = {"status": "ok", "candidates": [{"monomer_id": "1"}],
                   "error": None, "release": None, "stats": {}}
