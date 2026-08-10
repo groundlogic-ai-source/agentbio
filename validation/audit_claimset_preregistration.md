@@ -153,3 +153,21 @@ amendment resolves that ambiguity before either event:
 This design tests whether class-level defenses generalize beyond their
 development fixtures while preserving an honest distinction between an
 unforeseen class and an unseen instance.
+
+## Freeze record (2026-08-10)
+
+- Claim set: `validation/audit_claim_set_v1.json` — 100 claims
+  (existing_fix 30 [E1=2, E2=19, E3=1, E4=8], novel 30 [N1=8, N2=13,
+  N3=0, N4=9], control 40 [32 pool-free + 8 pool-context]).
+  File sha256: `32efd7d965f62e2cd0900578e6ab2f78b0585d65f33095a651faf6be796523c4`.
+- N3 closed at zero claims: all seven externally verifiable candidates
+  failed construction verification (no cutoff-eligible primary paper, or
+  clinical-trial evidence found). Shortfall reallocated per the fixed order
+  N1→N4→N2 (construction protocol §2). The N3 detector is therefore NOT
+  tested by this study; it retains synthetic unit coverage only. This is a
+  registered limitation, not a post-hoc change.
+- Freeze manifest: `validation/audit_claimset_freeze_manifest.json`
+  (code commit 6ed2e4e0, harness config, cache policy, health
+  requirements). Construction log: `validation/audit_claimset_construction_log.md`.
+- Exactly one scored run follows this freeze. No detector, threshold,
+  claim, or source configuration changes after results are seen.

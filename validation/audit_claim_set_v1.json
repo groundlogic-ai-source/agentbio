@@ -1,0 +1,2983 @@
+{
+  "version": "audit-claim-set-v1",
+  "created_at": "2026-08-10T20:32:37.257633+00:00",
+  "citation_cutoff": "2026-08-10",
+  "construction_protocol": "validation/audit_claimset_construction_protocol.md",
+  "seed": 20260810,
+  "pools_used_for_reachability": {
+    "2de0698b458b4be28218830a3dad4710": {
+      "disease": "Multiple myeloma",
+      "top_target": "NR3C1"
+    },
+    "61f542324d214a869b324fe41060bebb": {
+      "disease": "Multiple endocrine neoplasia type 2A",
+      "top_target": "RET"
+    },
+    "cddaa8e1fbe84309854e7dc6cdd8a71a": {
+      "disease": "Autosomal recessive hereditary chronic pancreatitis",
+      "top_target": "ADRB2"
+    }
+  },
+  "claims": [
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Alcoholic Intoxication, Chronic",
+        "drug_name": "Acamprosate",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "91769a96-3182-4e38-90c3-b22c1beae398",
+          "artifact_date": "2026-05-18",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=91769a96-3182-4e38-90c3-b22c1beae398",
+          "application_numbers": [
+            "ANDA205995"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-01"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Malignant glaucoma",
+        "drug_name": "Acetazolamide",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "268db224-d5db-457c-86bc-972c9fe07917",
+          "artifact_date": "2026-07-07",
+          "release": "spl_version:12",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=268db224-d5db-457c-86bc-972c9fe07917",
+          "application_numbers": [
+            "ANDA209734"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-02"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Toxic effect of cyanide",
+        "drug_name": "Amyl Nitrite",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "6a103131-036a-7173-e053-2991aa0a4e87",
+          "artifact_date": "2024-05-03",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=6a103131-036a-7173-e053-2991aa0a4e87",
+          "application_numbers": []
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-03"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "ARFORMOTEROL",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "f1005878-0c48-4b9a-843e-b6cf6b8bb251",
+          "artifact_date": "2026-04-14",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f1005878-0c48-4b9a-843e-b6cf6b8bb251",
+          "application_numbers": [
+            "ANDA215385"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-04"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Obesity",
+        "drug_name": "Benzphetamine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "14d4589d-7f1c-4b6e-9557-59dad39b0960",
+          "artifact_date": "2026-07-29",
+          "release": "spl_version:10",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=14d4589d-7f1c-4b6e-9557-59dad39b0960",
+          "application_numbers": [
+            "ANDA090968"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-05"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Urinary tract infection",
+        "drug_name": "Cefadroxil",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "57eebea5-28b6-44a3-888b-76950f6038f4",
+          "artifact_date": "2026-06-01",
+          "release": "spl_version:6",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=57eebea5-28b6-44a3-888b-76950f6038f4",
+          "application_numbers": [
+            "ANDA065392"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-06"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "CICLESONIDE",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "9f6112fb-78ef-43cf-8ae3-36370eb45468",
+          "artifact_date": "2025-02-28",
+          "release": "spl_version:8",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=9f6112fb-78ef-43cf-8ae3-36370eb45468",
+          "application_numbers": [
+            "NDA021658"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-07"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Acute maxillary sinusitis",
+        "drug_name": "Clarithromycin",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "0cb2ee04-8581-46c8-a781-7be170ab5c86",
+          "artifact_date": "2026-07-16",
+          "release": "spl_version:17",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0cb2ee04-8581-46c8-a781-7be170ab5c86",
+          "application_numbers": [
+            "NDA215153",
+            "NDA215152"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-08"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Non-infective diarrhea",
+        "drug_name": "Crofelemer",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "45584fba-8081-4cd1-a21e-3ea8237f62ff",
+          "artifact_date": "2025-12-22",
+          "release": "spl_version:7",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=45584fba-8081-4cd1-a21e-3ea8237f62ff",
+          "application_numbers": [
+            "NDA202292"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-09"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "DEFLAZACORT",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "40a833a4-e029-a99e-e063-6394a90afd50",
+          "artifact_date": "2026-07-29",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=40a833a4-e029-a99e-e063-6394a90afd50",
+          "application_numbers": [
+            "ANDA220042"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-10"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Irritable Bowel Syndrome",
+        "drug_name": "Dicyclomine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "141d3818-7a87-aaa0-e063-6294a90a4866",
+          "artifact_date": "2026-06-23",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=141d3818-7a87-aaa0-e063-6294a90a4866",
+          "application_numbers": [
+            "ANDA217054"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-11"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Ventricular arrhythmia",
+        "drug_name": "Disopyramide",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "31e79459-107f-4d69-a163-90014f1c4772",
+          "artifact_date": "2026-03-18",
+          "release": "spl_version:5",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=31e79459-107f-4d69-a163-90014f1c4772",
+          "application_numbers": [
+            "NDA017447"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-12"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Herpes zoster disease",
+        "drug_name": "Famciclovir",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "5723f50e-b0fa-65f0-e063-6294a90a350f",
+          "artifact_date": "2026-07-21",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=5723f50e-b0fa-65f0-e063-6294a90a350f",
+          "application_numbers": [
+            "ANDA202438"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-13"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Rheumatoid Arthritis",
+        "drug_name": "Fenoprofen",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "56b07659-1fd8-4c3e-e063-6294a90a8908",
+          "artifact_date": "2026-07-15",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=56b07659-1fd8-4c3e-e063-6294a90a8908",
+          "application_numbers": [
+            "ANDA215548"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-14"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Multiple Sclerosis, Relapsing-Remitting",
+        "drug_name": "Fingolimod",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "cc9e1c8c-0e2b-44e2-878b-27057f786be9",
+          "artifact_date": "2026-07-22",
+          "release": "spl_version:40",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=cc9e1c8c-0e2b-44e2-878b-27057f786be9",
+          "application_numbers": [
+            "NDA022527"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-15"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "FLUNISOLIDE",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "50d87523-e1fb-4342-825f-9dba972c6a25",
+          "artifact_date": "2025-05-02",
+          "release": "spl_version:7",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=50d87523-e1fb-4342-825f-9dba972c6a25",
+          "application_numbers": [
+            "ANDA074805"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-16"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Schizophrenia",
+        "drug_name": "Fluphenazine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "1842a678-c32b-4e81-998e-597fc370fb9e",
+          "artifact_date": "2026-07-14",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1842a678-c32b-4e81-998e-597fc370fb9e",
+          "application_numbers": [
+            "ANDA215509"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-17"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Chronic Lymphocytic Leukemia",
+        "drug_name": "Idelalisib",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "efbdafa9-d18c-4e85-b4a2-1e620fc74e50",
+          "artifact_date": "2025-02-20",
+          "release": "spl_version:12",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=efbdafa9-d18c-4e85-b4a2-1e620fc74e50",
+          "application_numbers": [
+            "NDA205858"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-18"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Angina Pectoris",
+        "drug_name": "Isosorbide Mononitrate",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "55f240e1-3056-38cc-e063-6294a90a814e",
+          "artifact_date": "2026-07-06",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=55f240e1-3056-38cc-e063-6294a90a814e",
+          "application_numbers": [
+            "ANDA075147"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-19"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Hypertensive disease",
+        "drug_name": "Isotretinoin",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "c2917c3d-3499-48a0-ba53-120cb979195d",
+          "artifact_date": "2026-07-29",
+          "release": "spl_version:30",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=c2917c3d-3499-48a0-ba53-120cb979195d",
+          "application_numbers": [
+            "ANDA207792"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-20"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Duodenal Ulcer",
+        "drug_name": "Lansoprazole",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "15e05eda-48aa-a4b7-4b8a-4ee1cf110120",
+          "artifact_date": "2026-07-09",
+          "release": "spl_version:13",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=15e05eda-48aa-a4b7-4b8a-4ee1cf110120",
+          "application_numbers": [
+            "ANDA202194"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-21"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Familial hypercholesterolemia - heterozygous",
+        "drug_name": "Lovastatin",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "22c9f2d8-7bcd-4415-bbc8-505720033966",
+          "artifact_date": "2026-06-03",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=22c9f2d8-7bcd-4415-bbc8-505720033966",
+          "application_numbers": [
+            "ANDA078296"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-22"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Muscle Spasticity",
+        "drug_name": "Metaxalone",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "01199953-8124-4ace-947f-7b11989b44c3",
+          "artifact_date": "2026-07-24",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=01199953-8124-4ace-947f-7b11989b44c3",
+          "application_numbers": [
+            "ANDA207466"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-23"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Psoriasis",
+        "drug_name": "Methotrexate",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "757d6cef-6696-7a1c-8074-01258aaa8bdd",
+          "artifact_date": "2026-07-23",
+          "release": "spl_version:6",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=757d6cef-6696-7a1c-8074-01258aaa8bdd",
+          "application_numbers": [
+            "ANDA081099"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-24"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Hypertensive disease",
+        "drug_name": "Methyldopa",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "9e22e1d8-04ec-4b67-92ea-b09c706f2703",
+          "artifact_date": "2025-03-28",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=9e22e1d8-04ec-4b67-92ea-b09c706f2703",
+          "application_numbers": [
+            "ANDA070076"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-25"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Fibromyalgia",
+        "drug_name": "Milnacipran",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "e39b4890-99e4-4e48-9f45-978d5ac9f402",
+          "artifact_date": "2026-07-24",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=e39b4890-99e4-4e48-9f45-978d5ac9f402",
+          "application_numbers": [
+            "ANDA205071"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-26"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Hamman-Rich syndrome",
+        "drug_name": "Nintedanib",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "9925b305-c1fb-43b6-a5fd-e03f14f28e6c",
+          "artifact_date": "2026-08-03",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=9925b305-c1fb-43b6-a5fd-e03f14f28e6c",
+          "application_numbers": [
+            "ANDA219926"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-27"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Giardiasis",
+        "drug_name": "Nitazoxanide",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "40a7cc30-76cd-49fe-965a-7823c4140d0f",
+          "artifact_date": "2026-06-18",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=40a7cc30-76cd-49fe-965a-7823c4140d0f",
+          "application_numbers": [
+            "ANDA214844"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-28"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Ulcerative colitis in remission",
+        "drug_name": "Olsalazine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "8512d0c6-db4e-4673-b3b4-28975c18413f",
+          "artifact_date": "2024-07-18",
+          "release": "spl_version:16",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=8512d0c6-db4e-4673-b3b4-28975c18413f",
+          "application_numbers": [
+            "NDA019715"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-29"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Epidermal growth factor receptor positive non-small cell lung cancer",
+        "drug_name": "Osimertinib",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "5e81b4a7-b971-45e1-9c31-29cea8c87ce7",
+          "artifact_date": "2024-09-25",
+          "release": "spl_version:36",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=5e81b4a7-b971-45e1-9c31-29cea8c87ce7",
+          "application_numbers": [
+            "NDA208065"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-30"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Increased frequency of micturition",
+        "drug_name": "Oxybutynin",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "1a08a16a-f16d-4ef1-95bb-6943bcae0737",
+          "artifact_date": "2026-07-28",
+          "release": "spl_version:10",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1a08a16a-f16d-4ef1-95bb-6943bcae0737",
+          "application_numbers": [
+            "ANDA209335"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-31"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Nausea and vomiting",
+        "drug_name": "Perphenazine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "9588d223-41e4-4bb2-9306-f082498404c5",
+          "artifact_date": "2026-07-21",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=9588d223-41e4-4bb2-9306-f082498404c5",
+          "application_numbers": [
+            "ANDA089685"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-32"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Pheochromocytoma",
+        "drug_name": "Phenoxybenzamine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "48a047c0-f409-420b-990a-2cab953a96cd",
+          "artifact_date": "2026-07-09",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=48a047c0-f409-420b-990a-2cab953a96cd",
+          "application_numbers": [
+            "ANDA215600"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-33"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "PRALSETINIB",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "16edd46e-28b8-f06d-e063-6394a90ae31b",
+          "artifact_date": "2025-12-30",
+          "release": "spl_version:8",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=16edd46e-28b8-f06d-e063-6394a90ae31b",
+          "application_numbers": [
+            "NDA213721"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-34"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Hypertensive disease",
+        "drug_name": "Prazosin",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "2f86fc8e-71c1-4749-b67e-86d86cf1d984",
+          "artifact_date": "2026-08-05",
+          "release": "spl_version:8",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=2f86fc8e-71c1-4749-b67e-86d86cf1d984",
+          "application_numbers": [
+            "NDA017442"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-35"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "PREDNISONE",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "1349a022-639b-4494-99a2-1594c7c0f0e9",
+          "artifact_date": "2026-07-21",
+          "release": "spl_version:18",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1349a022-639b-4494-99a2-1594c7c0f0e9",
+          "application_numbers": [
+            "ANDA211575"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-36"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "SELPERCATINIB",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "7fa848ba-a59c-4144-9f52-64d090f4d828",
+          "artifact_date": "2026-07-14",
+          "release": "spl_version:23",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7fa848ba-a59c-4144-9f52-64d090f4d828",
+          "application_numbers": [
+            "NDA213246",
+            "NDA218160"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-37"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "TERBUTALINE",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "859267c6-3d14-4123-9b9d-4fc248f09726",
+          "artifact_date": "2025-12-10",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=859267c6-3d14-4123-9b9d-4fc248f09726",
+          "application_numbers": [
+            "ANDA077152"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-38"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Inappropriate ADH Syndrome",
+        "drug_name": "Tolvaptan",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "5526617c-c7b9-4556-886d-729bbabbc566",
+          "artifact_date": "2026-05-07",
+          "release": "spl_version:23",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=5526617c-c7b9-4556-886d-729bbabbc566",
+          "application_numbers": [
+            "NDA022275"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-39"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Sleeplessness",
+        "drug_name": "Triazolam",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "5add318e-11b9-42f8-b052-0d8cebb32fcf",
+          "artifact_date": "2026-07-10",
+          "release": "spl_version:26",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=5add318e-11b9-42f8-b052-0d8cebb32fcf",
+          "application_numbers": [
+            "NDA017892"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-40"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E1_safety_withdrawal",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "ERGOTAMINE",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "cap_applied": true,
+          "cap_reason_contains": "Safety cap"
+        },
+        "citation": {
+          "source": "chembl_molecule",
+          "identifier": "CHEMBL442",
+          "artifact_date": "2026-05-01",
+          "release": "ChEMBL_37",
+          "url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL442/"
+        },
+        "note": "Withdrawn from market (None None) per ChEMBL_37; the audit must disclose the safety cap."
+      },
+      "claim_id": "E1-01"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E1_safety_withdrawal",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "FENOTEROL",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "cap_applied": true,
+          "cap_reason_contains": "Safety cap"
+        },
+        "citation": {
+          "source": "chembl_molecule",
+          "identifier": "CHEMBL32800",
+          "artifact_date": "2026-05-01",
+          "release": "ChEMBL_37",
+          "url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL32800/"
+        },
+        "note": "Withdrawn from market (None None) per ChEMBL_37; the audit must disclose the safety cap."
+      },
+      "claim_id": "E1-02"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "AMIODARONE",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "4c149392-a4f0-4e2d-a13f-2b94810005de",
+          "artifact_date": "2026-08-05",
+          "release": "spl_version:8",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=4c149392-a4f0-4e2d-a13f-2b94810005de",
+          "application_numbers": [
+            "ANDA213446"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-01"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "AMITRIPTYLINE",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "35aa7ab3-321a-97f7-e063-6294a90a91e2",
+          "artifact_date": "2026-06-30",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=35aa7ab3-321a-97f7-e063-6294a90a91e2",
+          "application_numbers": [
+            "ANDA212654"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-02"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "ATENOLOL",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "0fadc652-b075-46ec-ae05-beaf7d91ae13",
+          "artifact_date": "2026-07-20",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0fadc652-b075-46ec-ae05-beaf7d91ae13",
+          "application_numbers": [
+            "ANDA073457"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-03"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "FEDRATINIB",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "f0f55a2a-4e0c-4cba-8571-03e1424486d7",
+          "artifact_date": "2026-07-20",
+          "release": "spl_version:12",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f0f55a2a-4e0c-4cba-8571-03e1424486d7",
+          "application_numbers": [
+            "NDA212327"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-04"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "GILTERITINIB",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "b5ff59aa-9c0d-49a8-9053-1f179b482383",
+          "artifact_date": "2022-01-01",
+          "release": "spl_version:10",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=b5ff59aa-9c0d-49a8-9053-1f179b482383",
+          "application_numbers": [
+            "NDA211349"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-05"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "LAPATINIB",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "eee37f88-ec6a-4c30-b8aa-e2c71f93088c",
+          "artifact_date": "2026-01-27",
+          "release": "spl_version:14",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=eee37f88-ec6a-4c30-b8aa-e2c71f93088c",
+          "application_numbers": [
+            "NDA022059"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-06"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "LIOTHYRONINE",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "115a84c2-0126-4dd7-816e-1873875f1e49",
+          "artifact_date": "2026-06-04",
+          "release": "spl_version:9",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=115a84c2-0126-4dd7-816e-1873875f1e49",
+          "application_numbers": [
+            "NDA010379"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-07"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "LOPERAMIDE",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "0b1f8d41-51b3-4362-8de7-46bca5caff12",
+          "artifact_date": "2026-05-28",
+          "release": "spl_version:6",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0b1f8d41-51b3-4362-8de7-46bca5caff12",
+          "application_numbers": [
+            "ANDA091292"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-08"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "MEDROXYPROGESTERONE ACETATE",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "987496bf-b4b0-409b-b745-f52ed0871f4e",
+          "artifact_date": "2026-07-21",
+          "release": "spl_version:11",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=987496bf-b4b0-409b-b745-f52ed0871f4e",
+          "application_numbers": [
+            "NDA020246"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-09"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "MITOTANE",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "4046a224-8832-daa2-e063-6294a90a11d7",
+          "artifact_date": "2026-03-03",
+          "release": "spl_version:18",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=4046a224-8832-daa2-e063-6294a90a11d7",
+          "application_numbers": [
+            "NDA016885"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-10"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "MONTELUKAST",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "583a9499-97f0-2ebf-e063-6394a90a35af",
+          "artifact_date": "2026-08-04",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=583a9499-97f0-2ebf-e063-6394a90a35af",
+          "application_numbers": [
+            "ANDA203366"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-11"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "PAZOPANIB",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d3e8dd09-d7d2-43da-8f63-bdf0ea0fcdf5",
+          "artifact_date": "2026-05-19",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d3e8dd09-d7d2-43da-8f63-bdf0ea0fcdf5",
+          "application_numbers": [
+            "ANDA215837"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-12"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "PONATINIB",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "16d804b6-4957-43ee-b18c-3b36ec37c5ac",
+          "artifact_date": "2026-04-29",
+          "release": "spl_version:19",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=16d804b6-4957-43ee-b18c-3b36ec37c5ac",
+          "application_numbers": [
+            "NDA203469"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-13"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "PROGESTERONE",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "2ba50fa9-b349-40cb-9a4b-1af8faa4ec09",
+          "artifact_date": "2026-07-29",
+          "release": "spl_version:27",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=2ba50fa9-b349-40cb-9a4b-1af8faa4ec09",
+          "application_numbers": [
+            "NDA022057"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-14"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "PROPAFENONE",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "2ecd6452-ccc3-493f-9a4a-69f0fbf67a42",
+          "artifact_date": "2026-06-04",
+          "release": "spl_version:5",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=2ecd6452-ccc3-493f-9a4a-69f0fbf67a42",
+          "application_numbers": [
+            "ANDA205268"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-15"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "PROPRANOLOL",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "1cd914b6-b250-4b11-8404-41db3589361e",
+          "artifact_date": "2026-08-05",
+          "release": "spl_version:9",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1cd914b6-b250-4b11-8404-41db3589361e",
+          "application_numbers": [
+            "ANDA071972"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-16"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "SALMETEROL",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "7fecae39-f966-4da5-99f6-4d9428d1b147",
+          "artifact_date": "2026-06-11",
+          "release": "spl_version:6",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7fecae39-f966-4da5-99f6-4d9428d1b147",
+          "application_numbers": [
+            "ANDA203433"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-17"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "SOTALOL",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "4614480b-b36e-4dbd-9fc0-d083890d297d",
+          "artifact_date": "2026-05-20",
+          "release": "spl_version:9",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=4614480b-b36e-4dbd-9fc0-d083890d297d",
+          "application_numbers": [
+            "ANDA076140"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-18"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "SUNITINIB",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "7579e3d0-2de6-4239-a7a8-118ed92075f5",
+          "artifact_date": "2026-07-08",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7579e3d0-2de6-4239-a7a8-118ed92075f5",
+          "application_numbers": [
+            "ANDA213914"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-19"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E3_direction_incompatible",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "MIFEPRISTONE",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "cap_reason_contains": "Mechanism-direction cap"
+        },
+        "citation": {
+          "source": "chembl_mechanism",
+          "identifier": "CHEMBL1276308|CHEMBL2034|821",
+          "artifact_date": "2026-05-01",
+          "release": "ChEMBL_37",
+          "url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1276308/"
+        },
+        "note": "ChEMBL records action_type=ANTAGONIST on NR3C1; a glucocorticoid-agonist indication is directionally incompatible."
+      },
+      "claim_id": "E3-01"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E4_unresolved_name_honesty",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "Alecensa",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "unresolved"
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "42c49deb-713b-427a-9670-08af08adcffb",
+          "artifact_date": "2026-06-18",
+          "release": "spl_version:28",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=42c49deb-713b-427a-9670-08af08adcffb",
+          "application_numbers": [
+            "NDA208434"
+          ]
+        },
+        "note": "Brand name of ALECTINIB per FDA label; a name that does not resolve must read UNRESOLVED, never a false authoritative ABSENT."
+      },
+      "claim_id": "E4-01"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E4_unresolved_name_honesty",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "Cardura",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "unresolved"
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "5e1f5e49-2da1-43ab-9795-228a8bcc5a82",
+          "artifact_date": "2023-10-15",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=5e1f5e49-2da1-43ab-9795-228a8bcc5a82",
+          "application_numbers": [
+            "NDA019668"
+          ]
+        },
+        "note": "Brand name of DOXAZOSIN per FDA label; a name that does not resolve must read UNRESOLVED, never a false authoritative ABSENT."
+      },
+      "claim_id": "E4-02"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E4_unresolved_name_honesty",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "Coreg",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "unresolved"
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "07c619c6-4a0c-445e-94fa-664a54f68a39",
+          "artifact_date": "2026-07-31",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=07c619c6-4a0c-445e-94fa-664a54f68a39",
+          "application_numbers": [
+            "NDA020297"
+          ]
+        },
+        "note": "Brand name of CARVEDILOL per FDA label; a name that does not resolve must read UNRESOLVED, never a false authoritative ABSENT."
+      },
+      "claim_id": "E4-03"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E4_unresolved_name_honesty",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "Ibrance",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "unresolved"
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "89a142d5-7e61-48bf-9e77-e2cd124c4792",
+          "artifact_date": "2026-07-06",
+          "release": "spl_version:11",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=89a142d5-7e61-48bf-9e77-e2cd124c4792",
+          "application_numbers": [
+            "NDA212436"
+          ]
+        },
+        "note": "Brand name of PALBOCICLIB per FDA label; a name that does not resolve must read UNRESOLVED, never a false authoritative ABSENT."
+      },
+      "claim_id": "E4-04"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E4_unresolved_name_honesty",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "Nexavar",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "unresolved"
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "b50667e4-5ebc-4968-a646-d605058dbef0",
+          "artifact_date": "2023-08-28",
+          "release": "spl_version:40",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=b50667e4-5ebc-4968-a646-d605058dbef0",
+          "application_numbers": [
+            "NDA021923"
+          ]
+        },
+        "note": "Brand name of SORAFENIB per FDA label; a name that does not resolve must read UNRESOLVED, never a false authoritative ABSENT."
+      },
+      "claim_id": "E4-05"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E4_unresolved_name_honesty",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "Pamelor",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "unresolved"
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "e17dc299-f52d-414d-ab6e-e809bd6f8acb",
+          "artifact_date": "2024-12-04",
+          "release": "spl_version:24",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=e17dc299-f52d-414d-ab6e-e809bd6f8acb",
+          "application_numbers": [
+            "NDA018013"
+          ]
+        },
+        "note": "Brand name of NORTRIPTYLINE per FDA label; a name that does not resolve must read UNRESOLVED, never a false authoritative ABSENT."
+      },
+      "claim_id": "E4-06"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E4_unresolved_name_honesty",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "Sprycel",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "unresolved"
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "4764f37b-c9e6-4ede-bcc2-8a03b7c521df",
+          "artifact_date": "2024-07-31",
+          "release": "spl_version:47",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=4764f37b-c9e6-4ede-bcc2-8a03b7c521df",
+          "application_numbers": [
+            "NDA021986"
+          ]
+        },
+        "note": "Brand name of DASATINIB per FDA label; a name that does not resolve must read UNRESOLVED, never a false authoritative ABSENT."
+      },
+      "claim_id": "E4-07"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E4_unresolved_name_honesty",
+      "input": {
+        "disease_name": "Multiple endocrine neoplasia type 2A",
+        "drug_name": "Zyvox",
+        "job_id_hint": "61f542324d214a869b324fe41060bebb",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "unresolved"
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "3e5e9975-6f36-42e4-ab46-0e75dda83592",
+          "artifact_date": "2026-07-09",
+          "release": "spl_version:24",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=3e5e9975-6f36-42e4-ab46-0e75dda83592",
+          "application_numbers": [
+            "NDA021131"
+          ]
+        },
+        "note": "Brand name of LINEZOLID per FDA label; a name that does not resolve must read UNRESOLVED, never a false authoritative ABSENT."
+      },
+      "claim_id": "E4-08"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "HIV-1 infection",
+        "drug_name": "Abacavir and lamivudine",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d12e80eb-906c-4932-bb03-b4060ba1d31c",
+          "artifact_date": "2026-01-12",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d12e80eb-906c-4932-bb03-b4060ba1d31c",
+          "application_numbers": [
+            "ANDA216332"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-01"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Asthma",
+        "drug_name": "Budesonide and formoterol",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d6cc66c9-6f97-4ea8-a787-30a048004c77",
+          "artifact_date": "2026-04-24",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d6cc66c9-6f97-4ea8-a787-30a048004c77",
+          "application_numbers": [
+            "NDA021929"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-02"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "HIV-1 infection",
+        "drug_name": "Emtricitabine and tenofovir disoproxil fumarate",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "41bd03ea-b92e-459c-968b-c9095ae90aef",
+          "artifact_date": "2026-08-05",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=41bd03ea-b92e-459c-968b-c9095ae90aef",
+          "application_numbers": [
+            "ANDA203442"
+          ]
+        },
+        "note": "FDA label lists 4 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-03"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Hypercholesterolemia",
+        "drug_name": "Ezetimibe and simvastatin",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "2ce219a2-1eeb-4ece-bb87-3810e593ca51",
+          "artifact_date": "2026-02-06",
+          "release": "spl_version:7",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=2ce219a2-1eeb-4ece-bb87-3810e593ca51",
+          "application_numbers": [
+            "ANDA209222"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-04"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Asthma",
+        "drug_name": "Fluticasone propionate and salmeterol",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "7fecae39-f966-4da5-99f6-4d9428d1b147",
+          "artifact_date": "2026-06-11",
+          "release": "spl_version:6",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7fecae39-f966-4da5-99f6-4d9428d1b147",
+          "application_numbers": [
+            "ANDA203433"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-05"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Hepatitis C",
+        "drug_name": "Ledipasvir and sofosbuvir",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "46f4a73b-0cd6-4902-9092-3ac79e882c1a",
+          "artifact_date": "2025-01-10",
+          "release": "spl_version:8",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=46f4a73b-0cd6-4902-9092-3ac79e882c1a",
+          "application_numbers": [
+            "NDA205834"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-06"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Hepatitis C",
+        "drug_name": "Sofosbuvir and velpatasvir",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d0c1a945-4440-4b5c-81aa-693ed3db597c",
+          "artifact_date": "2025-03-06",
+          "release": "spl_version:9",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d0c1a945-4440-4b5c-81aa-693ed3db597c",
+          "application_numbers": [
+            "NDA208341"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-07"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Bacterial infections",
+        "drug_name": "Sulfamethoxazole and trimethoprim",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "08500fcb-dbec-4ac2-91c3-189d27907ec0",
+          "artifact_date": "2026-07-17",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=08500fcb-dbec-4ac2-91c3-189d27907ec0",
+          "application_numbers": [
+            "ANDA090624"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-08"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Alopecia Areata",
+        "drug_name": "Abatacept",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "0836c6ac-ee37-5640-2fed-a3185a0b16eb",
+          "artifact_date": "2025-11-13",
+          "release": "spl_version:35",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0836c6ac-ee37-5640-2fed-a3185a0b16eb",
+          "application_numbers": [
+            "BLA125118"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-01"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Inflammatory disease of mucous membrane",
+        "drug_name": "Adalimumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "526d626f-8c9f-496c-b838-00a73bb36383",
+          "artifact_date": "2026-07-15",
+          "release": "spl_version:16",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=526d626f-8c9f-496c-b838-00a73bb36383",
+          "application_numbers": [
+            "BLA761219"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-02"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Metastasis from malignant tumor of colon",
+        "drug_name": "Aflibercept",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "7d69a7b0-9511-c030-3b85-13b23f9d2980",
+          "artifact_date": "2026-07-28",
+          "release": "spl_version:16",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7d69a7b0-9511-c030-3b85-13b23f9d2980",
+          "application_numbers": [
+            "BLA761274"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-03"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Fabry Disease",
+        "drug_name": "Agalsidase beta",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "988513ab-b06f-4dd0-93f7-d2d4531dcce4",
+          "artifact_date": "2025-08-22",
+          "release": "spl_version:35",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=988513ab-b06f-4dd0-93f7-d2d4531dcce4",
+          "application_numbers": [
+            "BLA103979"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-04"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Multiple Sclerosis",
+        "drug_name": "Alemtuzumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "4f5f7255-7abc-4328-bd1a-ceaf139ef3e0",
+          "artifact_date": "2025-11-05",
+          "release": "spl_version:21",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=4f5f7255-7abc-4328-bd1a-ceaf139ef3e0",
+          "application_numbers": [
+            "BLA103948"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-05"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Generalized glycogen storage disease of infants",
+        "drug_name": "Alglucosidase alfa",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d6bfbc45-2d34-439e-8aad-59ee2d53d4df",
+          "artifact_date": "2025-01-10",
+          "release": "spl_version:21",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d6bfbc45-2d34-439e-8aad-59ee2d53d4df",
+          "application_numbers": [
+            "BLA125291"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-06"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Atherosclerosis",
+        "drug_name": "Alirocumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "7bcfbac2-e8ac-4569-8edc-bcde3b1fd172",
+          "artifact_date": "2026-07-16",
+          "release": "spl_version:10",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7bcfbac2-e8ac-4569-8edc-bcde3b1fd172",
+          "application_numbers": [
+            "BLA125559"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-07"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Pulmonary Embolism",
+        "drug_name": "Alteplase",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "91ecdef2-95ff-42dd-a31c-c8a09cab3ad9",
+          "artifact_date": "2026-01-20",
+          "release": "spl_version:18",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=91ecdef2-95ff-42dd-a31c-c8a09cab3ad9",
+          "application_numbers": [
+            "BLA103172"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-08"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Chronic Infantile Neurological, Cutaneous, and Articular Syndrome",
+        "drug_name": "Anakinra",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d9d74915-6606-4570-9c52-c4001d3177de",
+          "artifact_date": "2026-04-03",
+          "release": "spl_version:24",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d9d74915-6606-4570-9c52-c4001d3177de",
+          "application_numbers": [
+            "BLA103950"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-09"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Hypophosphatasia",
+        "drug_name": "Asfotase Alfa",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "3387574f-5eaa-4501-a71d-4cbfbd563031",
+          "artifact_date": "2025-12-12",
+          "release": "spl_version:18",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=3387574f-5eaa-4501-a71d-4cbfbd563031",
+          "application_numbers": [
+            "BLA125513"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-10"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "T-cell lymphoma refractory",
+        "drug_name": "Asparaginase",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "857e53aa-1098-4dad-b654-0276cdd43e03",
+          "artifact_date": "2025-07-01",
+          "release": "spl_version:7",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=857e53aa-1098-4dad-b654-0276cdd43e03",
+          "application_numbers": [
+            "BLA761179"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-11"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Carcinoma, Transitional Cell",
+        "drug_name": "Atezolizumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "6fa682c9-a312-4932-9831-f286908660ee",
+          "artifact_date": "2026-05-20",
+          "release": "spl_version:45",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=6fa682c9-a312-4932-9831-f286908660ee",
+          "application_numbers": [
+            "BLA761034"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-12"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Renal transplant rejection",
+        "drug_name": "Basiliximab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "1af01887-b69d-444b-91ed-ebfe12784440",
+          "artifact_date": "2025-12-12",
+          "release": "spl_version:18",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1af01887-b69d-444b-91ed-ebfe12784440",
+          "application_numbers": [
+            "BLA103764"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-13"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Major depressive disorder",
+        "drug_name": "Brimonidine",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "b54e5bee-2329-4cc2-bed1-8eef11ee488c",
+          "artifact_date": "2026-06-18",
+          "release": "spl_version:6",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=b54e5bee-2329-4cc2-bed1-8eef11ee488c",
+          "application_numbers": [
+            "ANDA215598"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic', 'topical']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-01"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Migraine",
+        "drug_name": "Brinzolamide",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "fb7229d4-522e-4cb2-b513-9d34f3ded591",
+          "artifact_date": "2026-04-20",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=fb7229d4-522e-4cb2-b513-9d34f3ded591",
+          "application_numbers": [
+            "ANDA204884"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-02"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Systemic arterial hypertension",
+        "drug_name": "Dorzolamide",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "8417d162-65a1-4266-bca7-707af1193bf3",
+          "artifact_date": "2026-06-29",
+          "release": "spl_version:13",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=8417d162-65a1-4266-bca7-707af1193bf3",
+          "application_numbers": [
+            "ANDA090143"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-03"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Irritable bowel syndrome",
+        "drug_name": "Ketotifen",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "52c62397-58f1-d34d-e063-6294a90a6faf",
+          "artifact_date": "2026-05-27",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=52c62397-58f1-d34d-e063-6294a90a6faf",
+          "application_numbers": [
+            "NDA021996"
+          ]
+        },
+        "note": "All labeled routes local ['ophthalmic'] (reallocation)."
+      },
+      "claim_id": "N4-04"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Systemic arterial hypertension",
+        "drug_name": "Latanoprost",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "be74d517-7f73-a74c-e053-2a95a90a3819",
+          "artifact_date": "2026-03-02",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=be74d517-7f73-a74c-e053-2a95a90a3819",
+          "application_numbers": [
+            "ANDA201786"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic', 'topical']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-05"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Systemic lupus erythematosus",
+        "drug_name": "Lifitegrast",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "8589d376-ac10-4ddb-9c53-2e0c8d5675c4",
+          "artifact_date": "2025-08-18",
+          "release": "spl_version:6",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=8589d376-ac10-4ddb-9c53-2e0c8d5675c4",
+          "application_numbers": [
+            "NDA208073"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-06"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Generalized anxiety disorder",
+        "drug_name": "Olopatadine",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "04c7b08c-52c1-427c-8b8f-fe67444fbca4",
+          "artifact_date": "2026-04-22",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=04c7b08c-52c1-427c-8b8f-fe67444fbca4",
+          "application_numbers": [
+            "ANDA209995"
+          ]
+        },
+        "note": "All labeled routes are local ['nasal', 'ophthalmic']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-07"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Attention deficit hyperactivity disorder",
+        "drug_name": "Oxymetazoline",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "21cfa71c-7a8f-4100-a42e-9190260653d1",
+          "artifact_date": "2026-06-09",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=21cfa71c-7a8f-4100-a42e-9190260653d1",
+          "application_numbers": [
+            "M012"
+          ]
+        },
+        "note": "All labeled routes are local ['nasal']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-08"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Migraine",
+        "drug_name": "Tafluprost",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "db529b54-2ac7-4020-9791-7333bbe6c90f",
+          "artifact_date": "2026-04-23",
+          "release": "spl_version:7",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=db529b54-2ac7-4020-9791-7333bbe6c90f",
+          "application_numbers": [
+            "NDA202514"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-09"
+    }
+  ],
+  "claim_set_sha256": "f660cc3e6a62f8ef0a91d38cee304e4c37302758a9dcb099ffc97f69e916ba0f"
+}
