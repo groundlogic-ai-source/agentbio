@@ -753,9 +753,15 @@ def main() -> None:
                    "(validation/audit_claimset_results.json). The only "
                    "exception is the pre-registered one-fix-one-rerun "
                    "allowance: --allow-rerun-after-harness-defect '<reason>'")
-        if os.path.exists(RERUN_CONSUMED_JSON):
+        # Consumption is recorded in BOTH the marker file and the freeze
+        # manifest; either record alone seals the allowance (the marker
+        # could be absent on a fresh clone of a completed study).
+        manifest_consumed = bool(
+            (manifest.get("rerun_allowance") or {}).get("consumed"))
+        if os.path.exists(RERUN_CONSUMED_JSON) or manifest_consumed:
             refuse("the one-fix-one-rerun allowance has already been "
-                   f"consumed (see {os.path.basename(RERUN_CONSUMED_JSON)})")
+                   "consumed (consumption marker and/or freeze manifest "
+                   "record); no further rerun is permitted")
         if not _archive_complete(claim_set):
             refuse("the rerun allowance is archive-only: it re-scores the "
                    "frozen raw archive and never re-executes audits; no "
