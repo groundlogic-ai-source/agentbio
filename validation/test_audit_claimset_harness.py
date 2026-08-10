@@ -405,6 +405,34 @@ class TestFreezeAndIdempotency(unittest.TestCase):
                 H.main()
         self.assertEqual(cm.exception.code, 2)
 
+    def test_recalc_only_is_exempt_from_idempotency(self):
+        """The independent recalculation path exists to verify a COMPLETED
+        run; it must not be blocked by the re-run guard (regression: first
+        recalc attempt was refused by the idempotency check)."""
+        import argparse
+        args = argparse.Namespace(label=H.REQUIRED_LABEL, recalc_only=True,
+                                  allow_rerun_after_harness_defect="")
+        json.dump({"metrics": {"verdict": "PASS"}}, open(self.results, "w"))
+        # recalc path must reach the archive check, not the idempotency refuse
+        with mock.patch.object(H, "RESULTS_JSON", self.results), \
+                mock.patch.object(H, "RAW_OUTPUTS_JSON",
+                                  os.path.join(self.tmp.name, "nope.json")), \
+                mock.patch.object(H, "CLAIM_SET_JSON", self.claim_set), \
+                mock.patch.object(H, "verify_freeze",
+                                  return_value={"claim_set_file_sha256": "x",
+                                                "code_commit": "y"}):
+            with self.assertRaises(SystemExit) as cm:
+                with mock.patch.object(__import__("sys"), "argv",
+                                       ["prog", "--label", H.REQUIRED_LABEL,
+                                        "--recalc-only"]):
+                    H.main()
+        # refuses for the MISSING ARCHIVE reason, not the idempotency reason
+        self.assertEqual(cm.exception.code, 2)
+
+
+if __name__ == "__main__":
+    unittest.main()
+
 
 # --------------------------------------------------------------------------- #
 # Citation revalidation (Amendment 1 §5)

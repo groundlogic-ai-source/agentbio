@@ -717,21 +717,22 @@ def main() -> None:
     manifest = verify_freeze()
     claim_set = json.load(open(CLAIM_SET_JSON))
 
-    # Idempotency: a completed scored artifact refuses re-run.
+    # Idempotency: a completed scored artifact refuses re-run. The
+    # --recalc-only verification path is exempt: it is read-only over the
+    # archive and results, and exists precisely to check a completed run.
     rerun_reason = ""
-    if os.path.exists(RESULTS_JSON):
+    if os.path.exists(RESULTS_JSON) and not args.recalc_only:
         if not args.allow_rerun_after_harness_defect:
             refuse("a completed scored artifact exists "
                    "(validation/audit_claimset_results.json). The only "
                    "exception is the pre-registered one-fix-one-rerun "
                    "allowance: --allow-rerun-after-harness-defect '<reason>'")
-        if not args.recalc_only:
-            rerun_reason = args.allow_rerun_after_harness_defect
-            ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-            os.replace(RESULTS_JSON,
-                       RESULTS_JSON + f".superseded-{ts}")
-            print(f"[harness] one-fix-one-rerun allowance used: "
-                  f"{rerun_reason}")
+        rerun_reason = args.allow_rerun_after_harness_defect
+        ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        os.replace(RESULTS_JSON,
+                   RESULTS_JSON + f".superseded-{ts}")
+        print(f"[harness] one-fix-one-rerun allowance used: "
+              f"{rerun_reason}")
 
     if args.recalc_only:
         if not os.path.exists(RAW_OUTPUTS_JSON) or \
