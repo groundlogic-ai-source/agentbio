@@ -150,9 +150,13 @@ export function generateHypothesisReport(hypothesisId, { refresh = false } = {})
  *   "no_case"       — no completed case for this disease; start one first
  *   "no_candidates" — job exists but predates per-job persistence; re-run case
  */
-export function auditDrug(diseaseName, drugName, jobId = null) {
+export function auditDrug(diseaseName, drugName, jobId = null, claim = {}) {
   const body = { disease_name: diseaseName, drug_name: drugName };
   if (jobId) body.job_id = jobId;
+  if (claim.route) body.claimed_route = claim.route;
+  if (claim.dose) body.claimed_dose = claim.dose;
+  if (claim.modality) body.claimed_modality = claim.modality;
+  if (claim.context) body.claimed_context = claim.context;
   return request("/api/audit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -184,9 +188,10 @@ export function getResearchBenchmarks() {
 // ── Audit mode: list triage + dossier workspace ─────────────────────────────
 // Triage audits a caller-supplied drug list against one completed case's
 // persisted pool. The run is persisted server-side and retrievable by run id.
-export function triageCandidates(diseaseName, drugNames, jobId = null) {
+export function triageCandidates(diseaseName, drugNames, jobId = null, claimContexts = {}) {
   const body = { disease_name: diseaseName, drug_names: drugNames };
   if (jobId) body.job_id = jobId;
+  if (Object.keys(claimContexts).length > 0) body.claim_contexts = claimContexts;
   return request("/api/audit/triage", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

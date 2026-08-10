@@ -13,6 +13,7 @@ caller saw can be retrieved later by run id — the audit trail is the product.
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+import time
 from typing import Any, Optional
 
 import api.triage_db as triage_db
@@ -70,6 +71,9 @@ def _verdict(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
         "evidence_weight_coverage": None,
         "black_box_advisory": False,
         "status_badge": None,
+        # The exact object produced by run_audit. Triage never reinterprets
+        # N1–N4 findings, which guarantees single/batch parity by construction.
+        "audit_context": audit.get("audit_context"),
     }
 
     if status == "no_case":
@@ -152,6 +156,7 @@ def run_triage(
     *,
     job_id_hint: Optional[str] = None,
     persist: bool = True,
+    claim_contexts: Optional[dict[str, dict[str, str]]] = None,
 ) -> dict[str, Any]:
     """Audit a list of drugs against one case's persisted pool.
 
@@ -164,10 +169,23 @@ def run_triage(
     if not drugs:
         return {"status": "empty_list", "verdicts": [], "summary": _summary([])}
 
+    contexts = {
+        str(name).casefold(): value
+        for name, value in (claim_contexts or {}).items()
+        if isinstance(value, dict)
+    }
+    source_deadline = time.monotonic() + 30.0
+
     def _audit_one(name: str) -> dict[str, Any]:
         try:
+            claim = contexts.get(name.casefold(), {})
             return run_audit(disease_name, name, job_id_hint=job_id_hint,
-                             narrate=False)
+                             narrate=False,
+                             claimed_route=str(claim.get("route") or ""),
+                             claimed_dose=str(claim.get("dose") or ""),
+                             claimed_modality=str(claim.get("modality") or ""),
+                             claimed_context=str(claim.get("context") or ""),
+                             source_deadline_monotonic=source_deadline)
         except Exception as exc:  # noqa: BLE001 — per-drug failure must not sink the batch
             return {"status": "error", "drug_name": name, "error": str(exc)[:200]}
 
@@ -185,6 +203,16 @@ def run_triage(
     findings = domain_findings_for(disease_name)
     if findings:
         summary["domain_findings"] = findings
+    summary["audit_context_contract_version"] = "audit-context-v1"
+    summary["audit_context_source_states"] = {
+        drug: {
+            name: (source or {}).get("status")
+            for name, source in (
+                ((audit.get("audit_context") or {}).get("sources") or {}).items()
+            )
+        }
+        for drug, audit in zip(drugs, audits)
+    }
 
     pool_status = next(
         (a.get("status") for a in audits

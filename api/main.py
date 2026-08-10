@@ -103,12 +103,24 @@ class AuditRequest(BaseModel):
     disease_name: str
     drug_name: str
     job_id: Optional[str] = None  # hint an existing job to bypass DB search
+    claimed_route: Optional[str] = None
+    claimed_dose: Optional[str] = None
+    claimed_modality: Optional[str] = None
+    claimed_context: Optional[str] = None
+
+
+class ClaimContext(BaseModel):
+    route: Optional[str] = None
+    dose: Optional[str] = None
+    modality: Optional[str] = None
+    context: Optional[str] = None
 
 
 class TriageRequest(BaseModel):
     disease_name: str
     drug_names: list[str]
     job_id: Optional[str] = None  # hint an existing job to bypass DB search
+    claim_contexts: Optional[dict[str, ClaimContext]] = None
 
 
 # In-memory batch progress registry.  Survives for the lifetime of the server
@@ -431,6 +443,10 @@ def audit_drug(req: AuditRequest) -> dict[str, Any]:
         req.disease_name.strip(),
         req.drug_name.strip(),
         job_id_hint=req.job_id,
+        claimed_route=(req.claimed_route or "").strip(),
+        claimed_dose=(req.claimed_dose or "").strip(),
+        claimed_modality=(req.claimed_modality or "").strip(),
+        claimed_context=(req.claimed_context or "").strip(),
     )
 
 
@@ -456,6 +472,10 @@ def triage_candidate_list(req: TriageRequest) -> dict[str, Any]:
         )
     return _triage.run_triage(
         req.disease_name.strip(), req.drug_names, job_id_hint=req.job_id,
+        claim_contexts={
+            name: context.model_dump()
+            for name, context in (req.claim_contexts or {}).items()
+        },
     )
 
 

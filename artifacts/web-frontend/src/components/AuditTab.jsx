@@ -3,6 +3,7 @@ import { auditDrug } from "../api";
 import TriagePanel from "./TriagePanel";
 import DossierPanel from "./DossierPanel";
 import DomainFindings from "./DomainFindings";
+import AuditContextFindings from "./AuditContextFindings";
 import ModalityModeToggle from "./ModalityModeToggle";
 import InlineCaseRunner from "./InlineCaseRunner";
 import { useModalityMode } from "../modalityMode";
@@ -420,6 +421,10 @@ function UnresolvedResult({ data }) {
 function SingleDrugAudit({ onNavigate }) {
   const [disease, setDisease] = useState("");
   const [drug, setDrug]       = useState("");
+  const [claimedRoute, setClaimedRoute] = useState("");
+  const [claimedDose, setClaimedDose] = useState("");
+  const [claimedModality, setClaimedModality] = useState("");
+  const [claimedContext, setClaimedContext] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult]   = useState(null);
   const [error, setError]     = useState(null);
@@ -430,7 +435,12 @@ function SingleDrugAudit({ onNavigate }) {
     setResult(null);
     setError(null);
     try {
-      const data = await auditDrug(disease.trim(), drug.trim());
+      const data = await auditDrug(disease.trim(), drug.trim(), null, {
+        route: claimedRoute.trim(),
+        dose: claimedDose.trim(),
+        modality: claimedModality.trim(),
+        context: claimedContext.trim(),
+      });
       setResult(data);
     } catch (err) {
       setError(err.message || "Unexpected error");
@@ -517,6 +527,59 @@ function SingleDrugAudit({ onNavigate }) {
             className="audit-input w-full border rounded-lg px-3 py-2 text-sm focus:outline-none"
           />
         </div>
+        <details
+          className="rounded-lg border px-3 py-2"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <summary
+            className="cursor-pointer text-sm font-medium"
+            style={{ color: "var(--ink)" }}
+          >
+            Optional claim context for N2/N4
+          </summary>
+          <div className="grid sm:grid-cols-2 gap-3 mt-3">
+            <label className="text-xs" style={{ color: "var(--ink-muted)" }}>
+              Claimed route
+              <input
+                value={claimedRoute}
+                onChange={e => setClaimedRoute(e.target.value)}
+                placeholder="e.g. oral"
+                className="audit-input mt-1 w-full border rounded-lg px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="text-xs" style={{ color: "var(--ink-muted)" }}>
+              Claimed dose
+              <input
+                value={claimedDose}
+                onChange={e => setClaimedDose(e.target.value)}
+                placeholder="e.g. 10 mg daily"
+                className="audit-input mt-1 w-full border rounded-lg px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="text-xs" style={{ color: "var(--ink-muted)" }}>
+              Claimed modality
+              <input
+                value={claimedModality}
+                onChange={e => setClaimedModality(e.target.value)}
+                placeholder="e.g. small molecule"
+                className="audit-input mt-1 w-full border rounded-lg px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="text-xs" style={{ color: "var(--ink-muted)" }}>
+              Exposure / experimental context
+              <input
+                value={claimedContext}
+                onChange={e => setClaimedContext(e.target.value)}
+                placeholder="e.g. systemic plasma exposure"
+                className="audit-input mt-1 w-full border rounded-lg px-3 py-2 text-sm"
+              />
+            </label>
+          </div>
+          <p className="text-xs mt-2" style={{ color: "var(--ink-dim)" }}>
+            Optional. These fields enable route, dose, modality, and exposure-context
+            review; they never change the AgentBio rank or verdict.
+          </p>
+        </details>
         <button
           type="submit"
           disabled={loading || !disease.trim() || !drug.trim()}
@@ -536,6 +599,7 @@ function SingleDrugAudit({ onNavigate }) {
         <div className="space-y-4">
           <DomainFindings findings={result.domain_findings} />
           <ModalityFindings findings={result.modality_findings} />
+          <AuditContextFindings context={result.audit_context} />
           <ModalityModeToggle />
           {result.status === "found" && <FoundResult data={result} />}
           {result.status === "absent" && <AbsentResult data={result} />}
