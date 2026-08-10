@@ -276,6 +276,20 @@ class TestDeleteArchivedRegistry(unittest.TestCase):
         self.assertIn("NOT IN", log_delete)
         self.assertEqual(out["deleted"]["hypothesis_log"], 7)
 
+    def test_backup_row_keys_are_null_safe(self):
+        """Regression: pre-debug rows can have NULL outcome_framing / hypothesis_id /
+        test_id, and registry_reset_backup.row_key is NOT NULL — a bare || chain
+        500'd the reset (observed in prod 2026-08-10). Every nullable component of
+        both backup keys must be COALESCE-wrapped."""
+        _, cursor, _ = self._run(dry_run=False)
+        backups = [s for s in cursor.statements if "registry_reset_backup" in s]
+        self.assertEqual(len(backups), 2)
+        hist_backup = [s for s in backups if "bisociation_history" in s][0]
+        self.assertIn("COALESCE(hypothesis_id", hist_backup)
+        self.assertIn("COALESCE(outcome_framing", hist_backup)
+        log_backup = [s for s in backups if "hypothesis_log" in s][0]
+        self.assertIn("COALESCE(test_id", log_backup)
+
 
 if __name__ == "__main__":
     unittest.main()
