@@ -405,6 +405,76 @@ class TestFreezeAndIdempotency(unittest.TestCase):
                 H.main()
         self.assertEqual(cm.exception.code, 2)
 
+    def test_second_allowance_refuses(self):
+        """The one-fix-one-rerun allowance is single-use: a consumption
+        marker makes any further flagged re-run refuse."""
+        json.dump({"verdict": "PASS"}, open(self.results, "w"))
+        consumed = os.path.join(self.tmp.name, "consumed.json")
+        json.dump({"reason": "already used"}, open(consumed, "w"))
+        argv = ["prog", "--label", "audit_claimset_v1",
+                "--allow-rerun-after-harness-defect", "another fix"]
+        with mock.patch.object(H, "RESULTS_JSON", self.results), \
+                mock.patch.object(H, "RERUN_CONSUMED_JSON", consumed), \
+                mock.patch.object(H, "CLAIM_SET_JSON", self.claim_set), \
+                mock.patch.object(H, "verify_freeze",
+                                  return_value={"claim_set_file_sha256": "x",
+                                                "code_commit": "y"}), \
+                mock.patch.object(__import__("sys"), "argv", argv):
+            with self.assertRaises(SystemExit) as cm:
+                H.main()
+        self.assertEqual(cm.exception.code, 2)
+
+    def test_allowance_requires_complete_archive(self):
+        """The allowance re-scores the frozen archive; with no complete
+        archive it must refuse rather than re-measure."""
+        json.dump({"verdict": "PASS"}, open(self.results, "w"))
+        argv = ["prog", "--label", "audit_claimset_v1",
+                "--allow-rerun-after-harness-defect", "fix attempt"]
+        with mock.patch.object(H, "RESULTS_JSON", self.results), \
+                mock.patch.object(H, "RERUN_CONSUMED_JSON",
+                                  os.path.join(self.tmp.name, "none.json")), \
+                mock.patch.object(H, "RAW_OUTPUTS_JSON",
+                                  os.path.join(self.tmp.name,
+                                               "noarchive.json")), \
+                mock.patch.object(H, "CLAIM_SET_JSON", self.claim_set), \
+                mock.patch.object(H, "verify_freeze",
+                                  return_value={"claim_set_file_sha256": "x",
+                                                "code_commit": "y"}), \
+                mock.patch.object(H, "run_one_claim",
+                                  side_effect=AssertionError("must not run")), \
+                mock.patch.object(__import__("sys"), "argv", argv):
+            with self.assertRaises(SystemExit) as cm:
+                H.main()
+        self.assertEqual(cm.exception.code, 2)
+
+    def test_results_hash_drift_refuses(self):
+        """Once the manifest records scored results, a replaced results
+        artifact (hash mismatch) refuses the run."""
+        json.dump({"verdict": "TAMPERED"}, open(self.results, "w"))
+        manifest = {"claim_set_file_sha256": hashlib.sha256(
+                        open(self.claim_set, "rb").read()).hexdigest(),
+                    "code_commit": "0" * 40,
+                    "harness_config": {
+                        "label": H.REQUIRED_LABEL,
+                        "citation_cutoff": H.CUTOFF,
+                        "pass_min_defect_recall": H.PASS_MIN_DEFECT_RECALL,
+                        "pass_min_recall_cp_lower": H.PASS_MIN_RECALL_CP_LOWER,
+                        "pass_max_control_ffr": H.PASS_MAX_CONTROL_FFR,
+                        "pass_max_ffr_cp_upper": H.PASS_MAX_FFR_CP_UPPER,
+                        "max_group_abstention_frac":
+                            H.MAX_GROUP_ABSTENTION_FRAC},
+                    "scored_results": {"results_sha256": "f" * 64}}
+        json.dump(manifest, open(self.manifest, "w"))
+        with mock.patch.object(H, "RESULTS_JSON", self.results), \
+                mock.patch.object(H, "CLAIM_SET_JSON", self.claim_set), \
+                mock.patch.object(H, "FREEZE_MANIFEST_JSON", self.manifest), \
+                mock.patch.object(H.subprocess, "run") as gitmock:
+            gitmock.return_value = type("R", (), {"returncode": 0,
+                                                  "stdout": ""})()
+            with self.assertRaises(SystemExit) as cm:
+                H.verify_freeze()
+        self.assertEqual(cm.exception.code, 2)
+
     def test_recalc_only_is_exempt_from_idempotency(self):
         """The independent recalculation path exists to verify a COMPLETED
         run; it must not be blocked by the re-run guard (regression: first

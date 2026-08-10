@@ -57,6 +57,8 @@ FREEZE_MANIFEST_JSON = os.path.join(_HERE, "audit_claimset_freeze_manifest.json"
 RAW_OUTPUTS_JSON = os.path.join(_HERE, "audit_claimset_raw_outputs.json")
 RESULTS_JSON = os.path.join(_HERE, "audit_claimset_results.json")
 RESULTS_MD = os.path.join(_HERE, "audit_claimset_results.md")
+RERUN_CONSUMED_JSON = os.path.join(
+    _HERE, "audit_claimset_rerun_allowance_consumed.json")
 
 # Pre-registered thresholds (audit_claimset_preregistration.md +
 # construction protocol §6). Never move these after a scored run — a failure
@@ -198,6 +200,19 @@ def verify_freeze() -> dict:
     }
     if cfg != expected_cfg:
         refuse(f"harness config drift: manifest {cfg} != code {expected_cfg}")
+
+    # Bind the scored artifact: once the manifest records scored results, the
+    # results file must match the recorded hash. Replacing the published
+    # outcome without a documented manifest amendment is drift and refuses.
+    scored = manifest.get("scored_results")
+    if scored:
+        if not os.path.exists(RESULTS_JSON):
+            refuse("manifest records scored results but the results artifact "
+                   "is missing")
+        rhash = hashlib.sha256(open(RESULTS_JSON, "rb").read()).hexdigest()
+        if rhash != scored.get("results_sha256"):
+            refuse(f"results artifact drift: {rhash[:16]} != "
+                   f"{str(scored.get('results_sha256'))[:16]}")
     return manifest
 
 
@@ -244,6 +259,15 @@ def run_all_claims(claims: list[dict]) -> dict:
             print(f"[harness] audited {i}/{len(claims)}", flush=True)
     os.replace(tmp, RAW_OUTPUTS_JSON)
     return json.load(open(RAW_OUTPUTS_JSON))
+
+
+def _archive_complete(claim_set: dict) -> bool:
+    if not os.path.exists(RAW_OUTPUTS_JSON):
+        return False
+    existing = json.load(open(RAW_OUTPUTS_JSON))
+    all_ids = {c["claim_id"] for c in claim_set["claims"]}
+    return (set(existing.get("claim_ids") or []) == all_ids
+            and set((existing.get("outputs") or {}).keys()) == all_ids)
 
 
 def load_or_run_archive(claims: list[dict]) -> dict:
@@ -720,6 +744,8 @@ def main() -> None:
     # Idempotency: a completed scored artifact refuses re-run. The
     # --recalc-only verification path is exempt: it is read-only over the
     # archive and results, and exists precisely to check a completed run.
+    # The one-fix-one-rerun allowance is single-use (consumption marker) and
+    # archive-only: it may re-score the frozen archive, NEVER re-measure.
     rerun_reason = ""
     if os.path.exists(RESULTS_JSON) and not args.recalc_only:
         if not args.allow_rerun_after_harness_defect:
@@ -727,11 +753,23 @@ def main() -> None:
                    "(validation/audit_claimset_results.json). The only "
                    "exception is the pre-registered one-fix-one-rerun "
                    "allowance: --allow-rerun-after-harness-defect '<reason>'")
+        if os.path.exists(RERUN_CONSUMED_JSON):
+            refuse("the one-fix-one-rerun allowance has already been "
+                   f"consumed (see {os.path.basename(RERUN_CONSUMED_JSON)})")
+        if not _archive_complete(claim_set):
+            refuse("the rerun allowance is archive-only: it re-scores the "
+                   "frozen raw archive and never re-executes audits; no "
+                   "complete archive is present")
         rerun_reason = args.allow_rerun_after_harness_defect
         ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         os.replace(RESULTS_JSON,
                    RESULTS_JSON + f".superseded-{ts}")
-        print(f"[harness] one-fix-one-rerun allowance used: "
+        with open(RERUN_CONSUMED_JSON, "w") as fh:
+            json.dump({"reason": rerun_reason, "consumed_at": ts,
+                       "superseded_results":
+                           os.path.basename(RESULTS_JSON) +
+                           f".superseded-{ts}"}, fh, indent=2)
+        print(f"[harness] one-fix-one-rerun allowance CONSUMED: "
               f"{rerun_reason}")
 
     if args.recalc_only:
