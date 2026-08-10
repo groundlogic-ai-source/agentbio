@@ -141,22 +141,32 @@ aud = load("audit_claimset_results.json")
 raw = load("audit_claimset_raw_outputs.json")
 cs = load("audit_claim_set_v1.json")
 
-# --- verification: recompute headline metrics from the raw archive ---
+# --- verification: re-derive every outcome from the RAW ARCHIVE through the
+# harness's own scoring path (score_from_archive is the ONLY metric path in
+# validation/run_audit_claimset.py). revalidate=False skips live-network
+# citation revalidation: all 100 citations were valid at score time (stored
+# abstain/excluded counts are zero), so offline re-derivation must match the
+# stored results exactly. The live equivalent (`--recalc-only`) is
+# health-gated and correctly refuses to score during source outages.
+import importlib.util as _ilu
+_spec = _ilu.spec_from_file_location(
+    "run_audit_claimset", os.path.join(VAL, "run_audit_claimset.py"))
+_rac = _ilu.module_from_spec(_spec)
+_spec.loader.exec_module(_rac)
 claims = {c["claim_id"]: c for c in cs["claims"]}
-per_class = Counter()
-caught = Counter()
-for cid, c in claims.items():
-    per_class[c["defect_class"]] += 1
-    oc = aud["outcomes"][cid]
-    if oc["outcome"] == "caught" or oc["outcome"] == "false_flag":
-        caught[c["defect_class"]] += 1
+rescored = _rac.score_from_archive(cs, raw, revalidate=False)
 mm = aud["metrics"]
-assert mm["defect_counts"]["caught"] == sum(
-    v for k, v in caught.items() if not k.startswith("none")), "recalc mismatch"
-assert mm["defect_counts"]["caught"] == 32 and mm["control_counts"]["flagged"] == 7
-assert abs(mm["defect_recall"] - 32 / 60) < 1e-9
-assert abs(mm["control_false_flag_rate"] - 7 / 40) < 1e-9
-assert abs(mm["novel_recall"] - 29 / 30) < 1e-9
+rm = rescored["metrics"]
+for cid, oc in rescored["outcomes"].items():
+    assert oc["outcome"] == aud["outcomes"][cid]["outcome"], \
+        f"outcome drift: {cid} stored={aud['outcomes'][cid]['outcome']} raw={oc['outcome']}"
+assert rm["defect_recall"] == mm["defect_recall"] == 32 / 60
+assert rm["control_false_flag_rate"] == mm["control_false_flag_rate"] == 7 / 40
+assert rm["novel_recall"] == mm["novel_recall"] == 29 / 30
+assert abs(rm["defect_recall_cp_lower_95"]
+           - mm["defect_recall_cp_lower_95"]) < 1e-12
+assert abs(rm["control_false_flag_cp_upper_95"]
+           - mm["control_false_flag_cp_upper_95"]) < 1e-12
 M["audit"] = {
     "verdict": mm["verdict"],
     "defect": ci_str(32, 60), "defect_cp_lower": mm["defect_recall_cp_lower_95"],

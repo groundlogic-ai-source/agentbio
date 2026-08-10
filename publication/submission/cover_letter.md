@@ -30,7 +30,10 @@ contribution:
 
 We report the results as measured, including where they are unfavorable: the
 discovery core rediscovered 6/22 in-scope primary cases (27.3%; 95% CI
-10.7–50.2%) with performance concentrated in ultra-rare monogenic disease,
+10.7–50.2%) on the funnel-feasible subset (screen pass 32/50, 64%; the
+pre-registered mechanical chance baseline saturated and is reported as
+uninformative), with performance concentrated in ultra-rare monogenic
+disease,
 and the audit study **failed** its pre-registered thresholds (defect recall
 0.533; control false-flag rate 0.175) — a failure invisible to the internal
 regression suite, which passed 12/12 traps. The failure analysis (stale-data

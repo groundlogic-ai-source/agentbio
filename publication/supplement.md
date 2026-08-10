@@ -12,6 +12,7 @@ repository.
 | Artifact | Path | Identity |
 |---|---|---|
 | Benchmark v2 results | `validation/benchmark_results_v2.json` | freeze `benchmark-freeze-v2`, mode `deployment-attestation` |
+| Benchmark v2 attestation + screened list | deployment-held: written to `validation/` paths inside the published deployment, **not committed** (disclosed provenance gap; executed primary set in the results artifact = screened list) | Amendment 5 |
 | Benchmark case list (selected 50) | `validation/benchmark_case_list.json` | seed 20260731 |
 | Selection criteria + attrition | `validation/benchmark_case_selection_criteria.md`, `validation/benchmark_attrition.md` | pre-registered 2026-07-31 |
 | Benchmark v2 pre-registration | `validation/benchmark_v2_preregistration.md` | 2026-08-01 + Amendments 1–6 |
@@ -114,7 +115,11 @@ commit (unittest-only environment).
    recomputed from the raw archive match the stored frozen results.
 2. `python3 -m validation.run_audit_claimset --label audit_claimset_v1
    --recalc-only` — independent recomputation of the frozen audit metrics
-   (read-only; refuses if results drift).
+   (read-only; refuses if results drift). Note: citation revalidation queries
+   live sources, so this path is health-gated and correctly refuses during
+   an outage; `make_figures.py` performs the equivalent offline re-derivation
+   through the harness's own scoring path (`score_from_archive`) and asserts
+   exact equality of every outcome and metric with the stored results.
 3. `python3 publication/build_pdf.py` — rebuilds this supplement and the
    manuscript PDFs.
 4. Freeze integrity: claim-set sha256 + code-commit ancestry + `.py` drift +
