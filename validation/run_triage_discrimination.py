@@ -236,16 +236,23 @@ def _score(cohort_a: list[dict], nc1: list[dict], nc2: list[dict]) -> dict:
             "qualified_rate_wilson95": [e3_lo, e3_hi],
             "unresolved_label": n - ne,
         },
+        # Amendment 1: the pre-registered threshold is a RATE of valid
+        # controls (>=80%), not an absolute count -- validity is only known
+        # at runtime, so an absolute bar mis-scores whenever controls drop
+        # out. (Frozen Study A results carry the buggy booleans; the report
+        # recomputes pass/fail from the frozen counts per the pre-reg.)
         "nc1": {"n": len(nc1), "valid": len(nc1_valid),
                 "detected": len(nc1_det),
                 "missed": [r["drug_name"] for r in nc1_valid if r not in nc1_det],
                 "detection_wilson95_lower": e4_lo,
-                "pass": len(nc1_det) >= 12},
+                "pass": bool(nc1_valid)
+                and len(nc1_det) / len(nc1_valid) >= 0.8},
         "nc2": {"n": len(nc2), "valid": len(nc2_valid),
                 "detected": len(nc2_det),
                 "missed": [r["drug_name"] for r in nc2_valid if r not in nc2_det],
                 "detection_wilson95_lower": e5_lo,
-                "pass": len(nc2_det) >= 12},
+                "pass": bool(nc2_valid)
+                and len(nc2_det) / len(nc2_valid) >= 0.8},
         "e2_pass": e2_hi <= 0.05,
     }
 
