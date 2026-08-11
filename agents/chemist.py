@@ -252,8 +252,13 @@ def _enrich_compounds(
         inchikey = None
         pubchem_known = False
         atc: list[str] = []
-        if name:
-            pc = get_compound_data(name)
+        # Structure-first for accession-ID candidates (BindingDB BDBM*, bare
+        # ChEMBL IDs): the name endpoint can never resolve those, and firing
+        # them anyway once drove PubChem into a 503 storm. get_compound_data
+        # routes on identifier shape and refuses offline when neither a real
+        # name nor SMILES is available.
+        if name or smiles:
+            pc = get_compound_data(name or "", smiles=smiles)
             inchikey = pc.get("inchikey")
             if not smiles:
                 smiles = pc.get("canonical_smiles")
