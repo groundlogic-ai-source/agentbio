@@ -1,0 +1,3075 @@
+{
+  "version": "audit-claim-set-v2",
+  "created_at": "2026-08-11T01:48:40.247673+00:00",
+  "citation_cutoff": "2026-08-10",
+  "construction_protocol": "validation/audit_claimset_v2_preregistration.md",
+  "predecessor": "validation/audit_claim_set_v1.json",
+  "seed": 20260811,
+  "group_totals": {
+    "existing_fix": 1,
+    "novel": 59,
+    "control": 40
+  },
+  "pools_used_for_reachability": {
+    "2de0698b458b4be28218830a3dad4710": {
+      "disease": "Multiple myeloma",
+      "top_target": "NR3C1"
+    },
+    "61f542324d214a869b324fe41060bebb": {
+      "disease": "Multiple endocrine neoplasia type 2A",
+      "top_target": "RET"
+    },
+    "cddaa8e1fbe84309854e7dc6cdd8a71a": {
+      "disease": "Autosomal recessive hereditary chronic pancreatitis",
+      "top_target": "ADRB2"
+    }
+  },
+  "claims": [
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Erectile dysfunction",
+        "drug_name": "Avanafil",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "1d04e17d-7399-430a-a8bb-fa1912b155e9",
+          "artifact_date": "2025-12-17",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1d04e17d-7399-430a-a8bb-fa1912b155e9",
+          "application_numbers": [
+            "ANDA209266"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-01"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Coughing",
+        "drug_name": "Benzonatate",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "07018b47-76f5-49d3-b7d3-081f82d382b2",
+          "artifact_date": "2026-08-04",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=07018b47-76f5-49d3-b7d3-081f82d382b2",
+          "application_numbers": [
+            "ANDA202765"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-02"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "Bicalutamide",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "26e30155-a50b-df14-e063-6394a90a9be4",
+          "artifact_date": "2026-04-23",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=26e30155-a50b-df14-e063-6394a90a9be4",
+          "application_numbers": [
+            "NDA020498"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged. (Dynamic fill, Amendment 4.)"
+      },
+      "claim_id": "C-03"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Back Pain",
+        "drug_name": "Carisoprodol",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "26e466be-8066-e562-e063-6394a90a9f81",
+          "artifact_date": "2026-06-22",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=26e466be-8066-e562-e063-6394a90a9f81",
+          "application_numbers": [
+            "ANDA203374"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-04"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Acute Moraxella catarrhalis bronchitis",
+        "drug_name": "Cefaclor",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "2f61354e-bcb0-41aa-955f-51eabc11387b",
+          "artifact_date": "2025-05-01",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=2f61354e-bcb0-41aa-955f-51eabc11387b",
+          "application_numbers": [
+            "ANDA065146"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-05"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Muscle Spasticity",
+        "drug_name": "Chlorzoxazone",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "6c77ca6b-fda6-43ab-8179-3e0bde6aa65f",
+          "artifact_date": "2026-04-13",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=6c77ca6b-fda6-43ab-8179-3e0bde6aa65f",
+          "application_numbers": [
+            "ANDA210961"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-06"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Generalized Anxiety Disorder",
+        "drug_name": "Citalopram",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "25b0d184-2a4c-42b0-9a57-7a00fa3e0cd7",
+          "artifact_date": "2026-07-15",
+          "release": "spl_version:12",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=25b0d184-2a4c-42b0-9a57-7a00fa3e0cd7",
+          "application_numbers": [
+            "ANDA077534"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-07"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Hairy Cell Leukemia",
+        "drug_name": "Cladribine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "e0b363cb-db83-44d6-89d0-1f7176be7459",
+          "artifact_date": "2026-06-19",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=e0b363cb-db83-44d6-89d0-1f7176be7459",
+          "application_numbers": [
+            "ANDA215547"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-08"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Escherichia coli urinary tract infection",
+        "drug_name": "Cycloserine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "8e7e2665-7a3d-3f54-9f92-5fe845f02ef9",
+          "artifact_date": "2024-07-30",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=8e7e2665-7a3d-3f54-9f92-5fe845f02ef9",
+          "application_numbers": [
+            "ANDA060593"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-09"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Depressive disorder",
+        "drug_name": "Desipramine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "dc1601be-e16a-411f-b9b8-01c51abb2441",
+          "artifact_date": "2026-04-28",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=dc1601be-e16a-411f-b9b8-01c51abb2441",
+          "application_numbers": [
+            "ANDA204963"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-10"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "Disulfiram",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d3832a1a-a140-49c1-a7df-134fa81341e3",
+          "artifact_date": "2026-05-27",
+          "release": "spl_version:11",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d3832a1a-a140-49c1-a7df-134fa81341e3",
+          "application_numbers": [
+            "ANDA091681"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged. (Dynamic fill, Amendment 4.)"
+      },
+      "claim_id": "C-11"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Gaucher Disease",
+        "drug_name": "Eliglustat",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "819f828a-b888-4e46-83fc-94d774a28a83",
+          "artifact_date": "2024-03-03",
+          "release": "spl_version:13",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=819f828a-b888-4e46-83fc-94d774a28a83",
+          "application_numbers": [
+            "NDA205494"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-12"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Hypertensive disease",
+        "drug_name": "Eplerenone",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "bcd7595f-700f-48ba-bf83-05a995ce0731",
+          "artifact_date": "2026-06-24",
+          "release": "spl_version:104",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=bcd7595f-700f-48ba-bf83-05a995ce0731",
+          "application_numbers": [
+            "ANDA206922"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-13"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Diphtheria",
+        "drug_name": "Erythromycin",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "49b3ca93-43cc-439c-8f5d-e3ea2e87ad2f",
+          "artifact_date": "2026-06-23",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=49b3ca93-43cc-439c-8f5d-e3ea2e87ad2f",
+          "application_numbers": [
+            "ANDA061905"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-14"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Degenerative polyarthritis",
+        "drug_name": "Flurbiprofen",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "c27f2d57-4b9d-4b78-8d85-3bac84f733b1",
+          "artifact_date": "2026-04-14",
+          "release": "spl_version:6",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=c27f2d57-4b9d-4b78-8d85-3bac84f733b1",
+          "application_numbers": [
+            "ANDA074447"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-15"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Obsessive-Compulsive Disorder",
+        "drug_name": "Fluvoxamine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "1f172569-9110-44df-acc5-0367e37ed784",
+          "artifact_date": "2026-07-22",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1f172569-9110-44df-acc5-0367e37ed784",
+          "application_numbers": [
+            "ANDA220447"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-16"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "GLYCOPYRRONIUM",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "5b372650-e56e-47a5-93e2-c0c292017059",
+          "artifact_date": "2026-05-21",
+          "release": "spl_version:5",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=5b372650-e56e-47a5-93e2-c0c292017059",
+          "application_numbers": [
+            "NDA210361"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-17"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "Hydromorphone",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "4c5c1cc8-c42b-46e3-ad68-8e22f57101f2",
+          "artifact_date": "2026-07-02",
+          "release": "spl_version:29",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=4c5c1cc8-c42b-46e3-ad68-8e22f57101f2",
+          "application_numbers": [
+            "ANDA076855"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged. (Dynamic fill, Amendment 4.)"
+      },
+      "claim_id": "C-18"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Simple Partial Seizures",
+        "drug_name": "Levetiracetam",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "1e3cfafe-5784-4ec6-91dc-cd74b01d0bb4",
+          "artifact_date": "2026-08-03",
+          "release": "spl_version:9",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1e3cfafe-5784-4ec6-91dc-cd74b01d0bb4",
+          "application_numbers": [
+            "ANDA211954"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-19"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Attention deficit hyperactivity disorder",
+        "drug_name": "Lisdexamfetamine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "c32b5dce-2de4-4db0-a4ba-d2ce3b0a32fc",
+          "artifact_date": "2026-07-13",
+          "release": "spl_version:5",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=c32b5dce-2de4-4db0-a4ba-d2ce3b0a32fc",
+          "application_numbers": [
+            "ANDA202802"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-20"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Hypertensive disease",
+        "drug_name": "Mecamylamine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "0b149023-f7a8-442d-ac69-295df8e66ed3",
+          "artifact_date": "2025-02-20",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0b149023-f7a8-442d-ac69-295df8e66ed3",
+          "application_numbers": [
+            "ANDA204054"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-21"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Rheumatoid Arthritis",
+        "drug_name": "Meloxicam",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "385fd779-1be1-49ae-8213-750b96ecc997",
+          "artifact_date": "2026-07-16",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=385fd779-1be1-49ae-8213-750b96ecc997",
+          "application_numbers": [
+            "NDA217593"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-22"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Acute Promyelocytic Leukemia",
+        "drug_name": "Mercaptopurine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "9c6fc66b-522f-499d-961a-cde6ca0ec2e5",
+          "artifact_date": "2026-07-20",
+          "release": "spl_version:6",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=9c6fc66b-522f-499d-961a-cde6ca0ec2e5",
+          "application_numbers": [
+            "NDA205919"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-23"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "METHYLPREDNISOLONE",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "0cb0ba76-067f-46c4-a5d8-b585d5ecafe3",
+          "artifact_date": "2026-07-23",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0cb0ba76-067f-46c4-a5d8-b585d5ecafe3",
+          "application_numbers": [
+            "NDA011856"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-24"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Ventricular arrhythmia",
+        "drug_name": "Mexiletine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "a61a07f6-0b48-4dcd-ad42-5d90f6e69ab1",
+          "artifact_date": "2026-05-14",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=a61a07f6-0b48-4dcd-ad42-5d90f6e69ab1",
+          "application_numbers": [
+            "ANDA219987"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-25"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Major Depressive Disorder",
+        "drug_name": "Mirtazapine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "10ea9d83-19c3-4f3b-a1cc-cfc48b42507f",
+          "artifact_date": "2026-07-29",
+          "release": "spl_version:11",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=10ea9d83-19c3-4f3b-a1cc-cfc48b42507f",
+          "application_numbers": [
+            "ANDA076921"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-26"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "Naloxegol",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "28596788-b73f-4247-85fc-3105f51fff5a",
+          "artifact_date": "2025-12-22",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=28596788-b73f-4247-85fc-3105f51fff5a",
+          "application_numbers": [
+            "NDA204760"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged. (Dynamic fill, Amendment 4.)"
+      },
+      "claim_id": "C-27"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Metastatic Prostate Carcinoma",
+        "drug_name": "Nilutamide",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d5740b8f-fbb3-4023-9133-9e359a9ab980",
+          "artifact_date": "2026-06-26",
+          "release": "spl_version:6",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d5740b8f-fbb3-4023-9133-9e359a9ab980",
+          "application_numbers": [
+            "ANDA207631"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-28"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Degenerative polyarthritis",
+        "drug_name": "Oxaprozin",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "e881dca6-004e-1c3e-e053-2a95a90a02ab",
+          "artifact_date": "2026-05-22",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=e881dca6-004e-1c3e-e053-2a95a90a02ab",
+          "application_numbers": [
+            "ANDA075855"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-29"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Hypertensive disease",
+        "drug_name": "Perindopril",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "87768fbf-7c63-47da-8925-0316f343d6ef",
+          "artifact_date": "2024-03-13",
+          "release": "spl_version:17",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=87768fbf-7c63-47da-8925-0316f343d6ef",
+          "application_numbers": [
+            "ANDA079070"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-30"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Cerebrovascular accident",
+        "drug_name": "Pravastatin",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "0c4b59f1-92a8-44f8-8b4c-691f35777460",
+          "artifact_date": "2026-07-30",
+          "release": "spl_version:11",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0c4b59f1-92a8-44f8-8b4c-691f35777460",
+          "application_numbers": [
+            "ANDA076056"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-31"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Malaria",
+        "drug_name": "Pyrimethamine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "fdeff3ed-e783-411a-8317-57e8b0e931e0",
+          "artifact_date": "2025-04-17",
+          "release": "spl_version:2",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=fdeff3ed-e783-411a-8317-57e8b0e931e0",
+          "application_numbers": [
+            "ANDA216983"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-32"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "HIV Infections",
+        "drug_name": "Raltegravir",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "46ef8e2e-ae63-6a3c-e054-00144ff8d46c",
+          "artifact_date": "2026-07-13",
+          "release": "spl_version:8",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=46ef8e2e-ae63-6a3c-e054-00144ff8d46c",
+          "application_numbers": [
+            "NDA022145"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-33"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Autosomal recessive hereditary chronic pancreatitis",
+        "drug_name": "REVEFENACIN",
+        "job_id_hint": "cddaa8e1fbe84309854e7dc6cdd8a71a",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "6dfebf04-7c90-436a-9b16-750d3c1ee0a6",
+          "artifact_date": "2022-05-03",
+          "release": "spl_version:15",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=6dfebf04-7c90-436a-9b16-750d3c1ee0a6",
+          "application_numbers": [
+            "NDA210598"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-34"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Major Depressive Disorder",
+        "drug_name": "Selegiline",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "040a97e5-efd1-4a2f-b737-2f13e5366d70",
+          "artifact_date": "2025-11-24",
+          "release": "spl_version:10",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=040a97e5-efd1-4a2f-b737-2f13e5366d70",
+          "application_numbers": [
+            "ANDA074871"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-35"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Premenstrual Dysphoric Disorder",
+        "drug_name": "Sertraline",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "1fcd3f6d-a71f-b131-e063-6394a90a4b26",
+          "artifact_date": "2026-05-14",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1fcd3f6d-a71f-b131-e063-6394a90a4b26",
+          "application_numbers": [
+            "ANDA078403"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-36"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Carbamoyl-Phosphate Synthase I Deficiency Disease",
+        "drug_name": "Sodium phenylbutyrate",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d15f2cbf-4d22-40b5-8ef9-16b9d323a7f9",
+          "artifact_date": "2026-07-17",
+          "release": "spl_version:7",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d15f2cbf-4d22-40b5-8ef9-16b9d323a7f9",
+          "application_numbers": [
+            "NDA216513"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-37"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Rheumatoid Arthritis",
+        "drug_name": "Teriflunomide",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "2d2724f6-8812-4a26-b2ec-936b71f868e1",
+          "artifact_date": "2026-05-06",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=2d2724f6-8812-4a26-b2ec-936b71f868e1",
+          "application_numbers": [
+            "ANDA218663"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-38"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Major Depressive Disorder",
+        "drug_name": "Vortioxetine",
+        "claim": {
+          "route": "oral",
+          "modality": "small molecule",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "239215eb-be32-4286-9677-1e5556c6cccf",
+          "artifact_date": "2026-04-23",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=239215eb-be32-4286-9677-1e5556c6cccf",
+          "application_numbers": [
+            "NDA204447"
+          ]
+        },
+        "note": "Single-ingredient oral small molecule with cutoff-eligible FDA label; no N1-N4 finding may be flagged."
+      },
+      "claim_id": "C-39"
+    },
+    {
+      "group": "control",
+      "defect_class": "none",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "Zoledronic acid",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "no_finding_flagged": true
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "5de65a7f-a219-4b22-9155-61fedc84433b",
+          "artifact_date": "2026-04-13",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=5de65a7f-a219-4b22-9155-61fedc84433b",
+          "application_numbers": [
+            "ANDA209578"
+          ]
+        },
+        "note": "Approved single-ingredient small molecule audited against a real case it is absent from; no N1-N4 finding may be flagged. (Dynamic fill, Amendment 4.)"
+      },
+      "claim_id": "C-40"
+    },
+    {
+      "group": "existing_fix",
+      "defect_class": "E2_boxed_warning_not_withdrawal",
+      "input": {
+        "disease_name": "Multiple myeloma",
+        "drug_name": "VANDETANIB",
+        "job_id_hint": "2de0698b458b4be28218830a3dad4710",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "status": "found",
+          "black_box_advisory": true,
+          "safety_cap_applied": false
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "e5721cb8-4185-47b9-bbb3-1c587e558a03",
+          "artifact_date": "2026-04-23",
+          "release": "spl_version:14",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=e5721cb8-4185-47b9-bbb3-1c587e558a03",
+          "application_numbers": [
+            "NDA022405"
+          ]
+        },
+        "note": "FDA label carries a boxed warning but the drug remains marketed (ChEMBL withdrawn_flag=false): the audit must show a black-box advisory and must NOT raise a market-withdrawal safety cap."
+      },
+      "claim_id": "E2-01"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Hypertension",
+        "drug_name": "Amlodipine and benazepril",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "27b0c628-820a-48bf-a411-86c0ebd4cc8d",
+          "artifact_date": "2026-06-29",
+          "release": "spl_version:6",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=27b0c628-820a-48bf-a411-86c0ebd4cc8d",
+          "application_numbers": [
+            "ANDA091431"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-01"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Opioid dependence",
+        "drug_name": "Buprenorphine and naloxone",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "713db2c6-0544-4633-b874-cfbeaf93db89",
+          "artifact_date": "2026-07-26",
+          "release": "spl_version:32",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=713db2c6-0544-4633-b874-cfbeaf93db89",
+          "application_numbers": [
+            "ANDA203326"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-02"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Glaucoma",
+        "drug_name": "Dorzolamide and timolol",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "c9ae08c5-275d-44b3-9d1e-5d8fedc21b96",
+          "artifact_date": "2024-05-25",
+          "release": "spl_version:7",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=c9ae08c5-275d-44b3-9d1e-5d8fedc21b96",
+          "application_numbers": [
+            "ANDA205295"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-03"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "HIV-1 infection",
+        "drug_name": "Emtricitabine and tenofovir alafenamide",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "06f66e98-e6ee-4538-9506-6c1282cc14c1",
+          "artifact_date": "2026-07-07",
+          "release": "spl_version:13",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=06f66e98-e6ee-4538-9506-6c1282cc14c1",
+          "application_numbers": [
+            "NDA208215"
+          ]
+        },
+        "note": "FDA label lists 4 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-04"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Hepatitis C",
+        "drug_name": "Glecaprevir and pibrentasvir",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "7bf99777-0401-9095-8645-16c6e907fcc0",
+          "artifact_date": "2025-06-25",
+          "release": "spl_version:201",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7bf99777-0401-9095-8645-16c6e907fcc0",
+          "application_numbers": [
+            "NDA215110",
+            "NDA209394"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-05"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Osteoarthritis",
+        "drug_name": "Naproxen and esomeprazole",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "65b892f2-8385-4bb0-8121-a58b01e8d13d",
+          "artifact_date": "2026-07-23",
+          "release": "spl_version:1",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=65b892f2-8385-4bb0-8121-a58b01e8d13d",
+          "application_numbers": [
+            "ANDA213699"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-06"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Heart failure",
+        "drug_name": "Sacubitril and valsartan",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "000dc81d-ab91-450c-8eae-8eb74e72296f",
+          "artifact_date": "2026-07-06",
+          "release": "spl_version:25",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=000dc81d-ab91-450c-8eae-8eb74e72296f",
+          "application_numbers": [
+            "NDA207620",
+            "NDA218591"
+          ]
+        },
+        "note": "FDA label lists 2 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-07"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N1_combination_product_splitting",
+      "input": {
+        "disease_name": "Hypertension",
+        "drug_name": "Valsartan and hydrochlorothiazide",
+        "claim": {}
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N1",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "167f49f0-2d39-49a2-9f9e-1359a7c7ba3d",
+          "artifact_date": "2026-07-30",
+          "release": "spl_version:1016",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=167f49f0-2d39-49a2-9f9e-1359a7c7ba3d",
+          "application_numbers": [
+            "ANDA203145"
+          ]
+        },
+        "note": "FDA label lists 3 active substances; auditing the combination as a single agent must raise N1."
+      },
+      "claim_id": "N1-08"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Neuropathic diabetic ulcer - foot",
+        "drug_name": "Becaplermin",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "377b3021-13d7-96d5-e063-6394a90a8ca3",
+          "artifact_date": "2026-05-08",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=377b3021-13d7-96d5-e063-6394a90a8ca3",
+          "application_numbers": [
+            "BLA103691"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-01"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Renal transplant rejection",
+        "drug_name": "Belatacept",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "c16ac648-d5d2-9f7d-8637-e2328572754e",
+          "artifact_date": "2021-07-28",
+          "release": "spl_version:15",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=c16ac648-d5d2-9f7d-8637-e2328572754e",
+          "application_numbers": [
+            "BLA125288"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-02"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Membranous glomerulonephritis",
+        "drug_name": "Belimumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "2fa3c528-1777-4628-8a55-a69dae2381a3",
+          "artifact_date": "2025-06-20",
+          "release": "spl_version:37",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=2fa3c528-1777-4628-8a55-a69dae2381a3",
+          "application_numbers": [
+            "BLA761043",
+            "BLA125370"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-03"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Respiratory Distress Syndrome, Newborn",
+        "drug_name": "Beractant",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "7ef9e3a5-fc39-4ae1-0dad-6b47a1684635",
+          "artifact_date": "2020-10-15",
+          "release": "spl_version:46",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7ef9e3a5-fc39-4ae1-0dad-6b47a1684635",
+          "application_numbers": [
+            "BLA020032"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-04"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Hereditary hemorrhagic telangiectasia",
+        "drug_name": "Bevacizumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "aa27acbd-d117-4350-aeee-17bc2e2c0ca4",
+          "artifact_date": "2026-07-21",
+          "release": "spl_version:13",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=aa27acbd-d117-4350-aeee-17bc2e2c0ca4",
+          "application_numbers": [
+            "BLA761099"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-05"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Pre B-cell acute lymphoblastic leukemia",
+        "drug_name": "Blinatumomab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "38b482a8-960b-4591-9857-5031ecb830aa",
+          "artifact_date": "2026-04-14",
+          "release": "spl_version:42",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=38b482a8-960b-4591-9857-5031ecb830aa",
+          "application_numbers": [
+            "BLA125557"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-06"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Anaplastic large T-cell systemic malignant lymphoma",
+        "drug_name": "Brentuximab vedotin",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "3904f8dd-1aef-3490-e48f-bd55f32ed67f",
+          "artifact_date": "2025-11-11",
+          "release": "spl_version:38",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=3904f8dd-1aef-3490-e48f-bd55f32ed67f",
+          "application_numbers": [
+            "BLA125388"
+          ]
+        },
+        "note": "FDA application number is a BLA (biologic); a claim framed as a small molecule must raise N2."
+      },
+      "claim_id": "N2-07"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Respiratory Distress Syndrome, Adult",
+        "drug_name": "Calfactant",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "315c128a-272d-4c57-bfbe-1a8b3402af08",
+          "artifact_date": "2026-03-31",
+          "release": "spl_version:14",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=315c128a-272d-4c57-bfbe-1a8b3402af08",
+          "application_numbers": [
+            "BLA020521"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-08"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Ankylosing spondylitis",
+        "drug_name": "Certolizumab pegol",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "b4c2c9dc-a0bb-4d64-a667-a67ebe88392d",
+          "artifact_date": "2026-02-24",
+          "release": "spl_version:47",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=b4c2c9dc-a0bb-4d64-a667-a67ebe88392d",
+          "application_numbers": [
+            "BLA125160"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-09"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Malignant neoplasm of stomach",
+        "drug_name": "Cetuximab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "8bc6397e-4bd8-4d37-a007-a327e4da34d9",
+          "artifact_date": "2026-04-16",
+          "release": "spl_version:58",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=8bc6397e-4bd8-4d37-a007-a327e4da34d9",
+          "application_numbers": [
+            "BLA125084"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-10"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Peyronie Disease",
+        "drug_name": "Collagenase clostridium histolyticum",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "805cecd0-fd1f-11dd-87af-0800200c9a66",
+          "artifact_date": "2026-04-22",
+          "release": "spl_version:46",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=805cecd0-fd1f-11dd-87af-0800200c9a66",
+          "application_numbers": [
+            "BLA125338"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-11"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Multiple Myeloma",
+        "drug_name": "Daratumumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "a4d0efe9-5e54-467e-9eb4-56fa7d53b60b",
+          "artifact_date": "2026-06-05",
+          "release": "spl_version:44",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=a4d0efe9-5e54-467e-9eb4-56fa7d53b60b",
+          "application_numbers": [
+            "BLA761036"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-12"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Fallopian Tube Carcinoma",
+        "drug_name": "Denileukin diftitox",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "ac3613d7-4304-40e7-a3f5-adb8a8adca5d",
+          "artifact_date": "2025-01-23",
+          "release": "spl_version:7",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=ac3613d7-4304-40e7-a3f5-adb8a8adca5d",
+          "application_numbers": [
+            "BLA761312"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-13"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Drug-induced osteoporosis",
+        "drug_name": "Denosumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "e15dfe74-1575-4a2a-895e-323c05613362",
+          "artifact_date": "2026-07-14",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=e15dfe74-1575-4a2a-895e-323c05613362",
+          "application_numbers": [
+            "BLA761424"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-14"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Neuroblastoma",
+        "drug_name": "Dinutuximab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d66bdf0d-9d65-45de-ae5b-a58617c27492",
+          "artifact_date": "2026-07-06",
+          "release": "spl_version:17",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d66bdf0d-9d65-45de-ae5b-a58617c27492",
+          "application_numbers": [
+            "BLA125516"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-15"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Cystic Fibrosis",
+        "drug_name": "Dornase alfa",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d8c78a7e-ff99-48f3-8952-643ec2ea0f86",
+          "artifact_date": "2025-12-17",
+          "release": "spl_version:24",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d8c78a7e-ff99-48f3-8952-643ec2ea0f86",
+          "application_numbers": [
+            "BLA103532"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-16"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Diabetes Mellitus, Non-Insulin-Dependent",
+        "drug_name": "Dulaglutide",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "463050bd-2b1c-40f5-b3c3-0a04bb433309",
+          "artifact_date": "2026-03-12",
+          "release": "spl_version:60",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=463050bd-2b1c-40f5-b3c3-0a04bb433309",
+          "application_numbers": [
+            "BLA125469"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-17"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Angioedemas, Hereditary",
+        "drug_name": "Ecallantide",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "f56aec67-c662-477c-b866-bfc23e8809cf",
+          "artifact_date": "2025-07-01",
+          "release": "spl_version:19",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f56aec67-c662-477c-b866-bfc23e8809cf",
+          "application_numbers": [
+            "BLA125277"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-18"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Congenital hemolytic uremic syndrome",
+        "drug_name": "Eculizumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "ebcd67fa-b4d1-4a22-b33d-ee8bf6b9c722",
+          "artifact_date": "2026-07-08",
+          "release": "spl_version:44",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=ebcd67fa-b4d1-4a22-b33d-ee8bf6b9c722",
+          "application_numbers": [
+            "BLA125166"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-19"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Mucopolysaccharidosis, MPS-IV-A",
+        "drug_name": "Elosulfase alfa",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "0caa2565-12b2-0ad0-1f9a-273e81c3d4cc",
+          "artifact_date": "2025-10-30",
+          "release": "spl_version:38",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0caa2565-12b2-0ad0-1f9a-273e81c3d4cc",
+          "application_numbers": [
+            "BLA125460"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-20"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Multiple Myeloma",
+        "drug_name": "Elotuzumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "80686b7e-f6f4-4154-b5c0-c846425e2d91",
+          "artifact_date": "2022-03-22",
+          "release": "spl_version:13",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=80686b7e-f6f4-4154-b5c0-c846425e2d91",
+          "application_numbers": [
+            "BLA761035"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-21"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Chronic small plaque psoriasis",
+        "drug_name": "Etanercept",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "a002b40c-097d-47a5-957f-7a7b1807af7f",
+          "artifact_date": "2026-05-11",
+          "release": "spl_version:218",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=a002b40c-097d-47a5-957f-7a7b1807af7f",
+          "application_numbers": [
+            "BLA103795"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-22"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Familial hypercholesterolemia - homozygous",
+        "drug_name": "Evolocumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "cd61e902-166d-4aa6-9f3c-a18c1008d07e",
+          "artifact_date": "2026-07-16",
+          "release": "spl_version:30",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=cd61e902-166d-4aa6-9f3c-a18c1008d07e",
+          "application_numbers": [
+            "BLA125522"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-23"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Chronic idiopathic neutropenia",
+        "drug_name": "Filgrastim",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "97cc73cc-b5b7-458a-a933-77b00523e193",
+          "artifact_date": "2026-07-23",
+          "release": "spl_version:166",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=97cc73cc-b5b7-458a-a933-77b00523e193",
+          "application_numbers": [
+            "BLA103353"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-24"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Mucopolysaccharidosis VI",
+        "drug_name": "Galsulfase",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "59341250-deac-ed71-3823-a4f5d64dbd77",
+          "artifact_date": "2024-09-18",
+          "release": "spl_version:39",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=59341250-deac-ed71-3823-a4f5d64dbd77",
+          "application_numbers": [
+            "BLA125117"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-25"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Leukemia, Myelocytic, Acute",
+        "drug_name": "Gemtuzumab ozogamicin",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "32fd2bb2-1cfa-4250-feb8-d7956c794e05",
+          "artifact_date": "2025-12-19",
+          "release": "spl_version:19",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=32fd2bb2-1cfa-4250-feb8-d7956c794e05",
+          "application_numbers": [
+            "BLA761060"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-26"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Lymphoma, Follicular",
+        "drug_name": "Ibritumomab tiuxetan",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "25d367dc-da65-44c9-a844-1bf15339c285",
+          "artifact_date": "2023-04-25",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=25d367dc-da65-44c9-a844-1bf15339c285",
+          "application_numbers": [
+            "BLA125019"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-27"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Drug-induced coagulation inhibitor disorder",
+        "drug_name": "Idarucizumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "c7400f8a-dcf4-a6df-6d07-983081b1bf34",
+          "artifact_date": "2024-01-23",
+          "release": "spl_version:8",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=c7400f8a-dcf4-a6df-6d07-983081b1bf34",
+          "application_numbers": [
+            "BLA761025"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-28"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Mucopolysaccharidosis II",
+        "drug_name": "Idursulfase",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "60cba843-5aab-4dd7-96dc-66648d413be3",
+          "artifact_date": "2025-04-15",
+          "release": "spl_version:25",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=60cba843-5aab-4dd7-96dc-66648d413be3",
+          "application_numbers": [
+            "BLA125151"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-29"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Gaucher Disease",
+        "drug_name": "Imiglucerase",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "df60f030-866b-4374-a31f-8ae3f6b45c38",
+          "artifact_date": "2025-12-22",
+          "release": "spl_version:26",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=df60f030-866b-4374-a31f-8ae3f6b45c38",
+          "application_numbers": [
+            "BLA020367"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-30"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Stevens-Johnson Syndrome",
+        "drug_name": "Infliximab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "37eaca10-d812-48bc-8b8e-b836bfa9968f",
+          "artifact_date": "2026-07-28",
+          "release": "spl_version:24",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=37eaca10-d812-48bc-8b8e-b836bfa9968f",
+          "application_numbers": [
+            "BLA125544"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-31"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Diabetes Mellitus",
+        "drug_name": "Insulin Aspart",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "30c64769-d2f7-4604-ac9e-2a6bc09506c9",
+          "artifact_date": "2026-07-31",
+          "release": "spl_version:9",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=30c64769-d2f7-4604-ac9e-2a6bc09506c9",
+          "application_numbers": [
+            "BLA761497"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-32"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Diabetes Mellitus",
+        "drug_name": "Insulin Degludec",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "21335fe4-d395-4501-ac2a-2f20d7520da9",
+          "artifact_date": "2025-10-14",
+          "release": "spl_version:14",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=21335fe4-d395-4501-ac2a-2f20d7520da9",
+          "application_numbers": [
+            "BLA208583"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-33"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Diabetes Mellitus",
+        "drug_name": "Insulin Detemir",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "82192527-99aa-4b53-8ce9-9173668d309c",
+          "artifact_date": "2024-10-09",
+          "release": "spl_version:24",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=82192527-99aa-4b53-8ce9-9173668d309c",
+          "application_numbers": [
+            "BLA021536"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-34"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Diabetes Mellitus, Non-Insulin-Dependent",
+        "drug_name": "Insulin Glargine",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "5328761e-59d3-ca7a-e063-6394a90ae810",
+          "artifact_date": "2026-06-07",
+          "release": "spl_version:5",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=5328761e-59d3-ca7a-e063-6394a90ae810",
+          "application_numbers": [
+            "BLA761412"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-35"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Diabetes Mellitus",
+        "drug_name": "Insulin Glulisine",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "e7af6a7a-8046-4fb4-9979-4ec4230b23aa",
+          "artifact_date": "2025-11-25",
+          "release": "spl_version:28",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=e7af6a7a-8046-4fb4-9979-4ec4230b23aa",
+          "application_numbers": [
+            "BLA021629"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-36"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Diabetes Mellitus",
+        "drug_name": "Insulin Human",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "29f4637b-e204-425b-b89c-7238008d8c10",
+          "artifact_date": "2026-05-30",
+          "release": "spl_version:17",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=29f4637b-e204-425b-b89c-7238008d8c10",
+          "application_numbers": [
+            "BLA022472"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-37"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Diabetes Mellitus, Non-Insulin-Dependent",
+        "drug_name": "Insulin Lispro",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "616daea1-0b79-4970-a141-6f99f2072f02",
+          "artifact_date": "2026-04-13",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=616daea1-0b79-4970-a141-6f99f2072f02",
+          "application_numbers": [
+            "BLA761109"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-38"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Multiple Sclerosis, Relapsing-Remitting",
+        "drug_name": "Interferon beta-1a",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "d70a39cc-de15-4c12-a1ec-8063b69ea0e1",
+          "artifact_date": "2025-11-19",
+          "release": "spl_version:23",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d70a39cc-de15-4c12-a1ec-8063b69ea0e1",
+          "application_numbers": [
+            "BLA103628"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-39"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Multiple Sclerosis, Relapsing-Remitting",
+        "drug_name": "Interferon beta-1b",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "66311f74-0472-4fa3-848a-06002ca0def5",
+          "artifact_date": "2026-03-03",
+          "release": "spl_version:29",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=66311f74-0472-4fa3-848a-06002ca0def5",
+          "application_numbers": [
+            "BLA103471"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-40"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Malignant melanoma, metastatic",
+        "drug_name": "Ipilimumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "2265ef30-253e-11df-8a39-0800200c9a66",
+          "artifact_date": "2026-06-12",
+          "release": "spl_version:46",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=2265ef30-253e-11df-8a39-0800200c9a66",
+          "application_numbers": [
+            "BLA125377"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-41"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Chronic small plaque psoriasis",
+        "drug_name": "Ixekizumab",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "ac96658a-d7dc-4c7c-8928-2adcdf4318b2",
+          "artifact_date": "2026-01-22",
+          "release": "spl_version:40",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=ac96658a-d7dc-4c7c-8928-2adcdf4318b2",
+          "application_numbers": [
+            "BLA125521"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-42"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N2_biologic_modality_mis_scope",
+      "input": {
+        "disease_name": "Mucopolysaccharidosis I",
+        "drug_name": "Laronidase",
+        "claim": {
+          "modality": "small molecule"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N2",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "a80ac249-cae4-41f3-88bb-344088b20e60",
+          "artifact_date": "2026-07-22",
+          "release": "spl_version:38",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=a80ac249-cae4-41f3-88bb-344088b20e60",
+          "application_numbers": [
+            "BLA125058"
+          ]
+        },
+        "note": "BLA biologic claimed as small molecule (reallocation)."
+      },
+      "claim_id": "N2-43"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Attention deficit hyperactivity disorder",
+        "drug_name": "Alcaftadine",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "22473109-dc9e-45b6-b188-d7d5773f5a14",
+          "artifact_date": "2024-10-07",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=22473109-dc9e-45b6-b188-d7d5773f5a14",
+          "application_numbers": [
+            "ANDA209290"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-01"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Generalized anxiety disorder",
+        "drug_name": "Bepotastine",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "cd6a061d-8ad7-4ad1-b039-1e3aa3435d32",
+          "artifact_date": "2024-10-10",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=cd6a061d-8ad7-4ad1-b039-1e3aa3435d32",
+          "application_numbers": [
+            "ANDA217770"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-02"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Major depressive disorder",
+        "drug_name": "Difluprednate",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "4a3b2649-ee3d-4648-91c8-912a8ba2e73c",
+          "artifact_date": "2026-04-15",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=4a3b2649-ee3d-4648-91c8-912a8ba2e73c",
+          "application_numbers": [
+            "ANDA212566"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-03"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Insomnia",
+        "drug_name": "Epinastine",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "0d4ee45c-e58f-4b7c-b389-898f5c27f54d",
+          "artifact_date": "2025-03-22",
+          "release": "spl_version:7",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0d4ee45c-e58f-4b7c-b389-898f5c27f54d",
+          "application_numbers": [
+            "ANDA090951"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-04"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Major depressive disorder",
+        "drug_name": "Fluorometholone",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "c9cbf06e-5413-4c3c-9ded-174c856a4ce1",
+          "artifact_date": "2026-05-12",
+          "release": "spl_version:3",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=c9cbf06e-5413-4c3c-9ded-174c856a4ce1",
+          "application_numbers": [
+            "ANDA218819"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-05"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Systemic lupus erythematosus",
+        "drug_name": "Loteprednol etabonate",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "36cfd5b8-c892-44e1-aaed-fb32d7aeca7c",
+          "artifact_date": "2026-07-13",
+          "release": "spl_version:4",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=36cfd5b8-c892-44e1-aaed-fb32d7aeca7c",
+          "application_numbers": [
+            "ANDA212450"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic', 'topical']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-06"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Migraine",
+        "drug_name": "Nepafenac",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "10f411d3-a81e-074a-e063-6294a90ab547",
+          "artifact_date": "2026-04-01",
+          "release": "spl_version:5",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=10f411d3-a81e-074a-e063-6294a90ab547",
+          "application_numbers": [
+            "NDA203491"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-07"
+    },
+    {
+      "group": "novel",
+      "defect_class": "N4_dose_route_implausibility",
+      "input": {
+        "disease_name": "Systemic arterial hypertension",
+        "drug_name": "Netarsudil",
+        "claim": {
+          "route": "oral",
+          "context": "systemic plasma exposure"
+        }
+      },
+      "truth": {
+        "expected": {
+          "finding": {
+            "code": "N4",
+            "status": "flagged"
+          }
+        },
+        "citation": {
+          "source": "fda_label",
+          "identifier": "7d4f0e3a-5b86-4c43-982a-813b22ae7e22",
+          "artifact_date": "2026-01-20",
+          "release": "spl_version:17",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7d4f0e3a-5b86-4c43-982a-813b22ae7e22",
+          "application_numbers": [
+            "NDA208254"
+          ]
+        },
+        "note": "All labeled routes are local ['ophthalmic', 'topical']; an oral/systemic exposure claim must raise N4."
+      },
+      "claim_id": "N4-08"
+    }
+  ],
+  "claim_set_sha256": "41d064a75860e0faa1a9cfc028a32f916b0d8008168fa8b58aa661d058641568"
+}
