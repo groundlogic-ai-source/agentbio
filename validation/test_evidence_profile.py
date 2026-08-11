@@ -159,7 +159,12 @@ class RuleIsPinned(unittest.TestCase):
         make a run look better."""
         self.assertEqual(
             RULE_FINGERPRINT,
-            "cf9bb3b9401ed89a5cf8e925ff7dcaee06a5d4e70f677960632a0dd0c7f40d9f")
+            # Amendment 1 (2026-08-11): route_feasibility=FLAGGED surfaced and
+            # added to SOFT_CAUTIONS after NC2 caught the dropout post-freeze.
+            # Original frozen fingerprint: cf9bb3b9…f40d9f. Study A results
+            # remain bound to the original; the change is unreachable under
+            # Study A's claim-free cohort.
+            "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf")
 
 
 if __name__ == "__main__":

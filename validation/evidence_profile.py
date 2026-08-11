@@ -77,6 +77,7 @@ HARD_DISQUALIFIERS = (
     ("human_mechanism_evidence", PRECLINICAL_ONLY),
 )
 SOFT_CAUTIONS = (
+    ("route_feasibility", FLAGGED),  # Amendment 1: detected route contradiction
     ("route_feasibility", REVIEW),
     ("lipophilicity", FLAGGED),
     ("safety", ADVISORY),
@@ -182,8 +183,13 @@ def build_profile(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
             else (UNRESOLVED if ("MODALITY_UNRESOLVED" in flags
                                  or "unresolved" in n2) else CLEAR)),
         "route_feasibility": (
-            REVIEW if "review" in n4
-            else (UNRESOLVED if "unresolved" in n4 else CLEAR)),
+            # Amendment 1: N4 "flagged" (claimed route not among approved
+            # label routes) must surface as FLAGGED. The original mapping
+            # let it fall through to CLEAR, which silently hid every
+            # detected route contradiction (found by NC2 post-freeze).
+            FLAGGED if "flagged" in n4
+            else (REVIEW if "review" in n4
+                  else (UNRESOLVED if "unresolved" in n4 else CLEAR))),
         "safety": (
             CAPPED if "SAFETY_CAP" in flags
             else (ADVISORY if "BLACK_BOX_ADVISORY" in flags else CLEAR)),
