@@ -600,10 +600,13 @@ class TestArchiveRoundTrip(unittest.TestCase):
         self.assertEqual(scored["outcomes"]["C-01"]["outcome"], "clean")
         self.assertEqual(scored["outcomes"]["N1-01"]["outcome"], "caught")
 
+    _FROZEN = "f" * 40
+    _MANIFEST = {"code_commit": _FROZEN}
+
     def test_load_or_run_recovers_complete_archive_without_rerunning(self):
         claims = [_claim("control", "none", {"no_finding_flagged": True},
                          cid="C-01")]
-        envelope = {"claim_ids": ["C-01"],
+        envelope = {"claim_ids": ["C-01"], "code_commit": self._FROZEN,
                     "outputs": {"C-01": {"status": "no_case", **_ctx()}}}
         with open(self.raw_path, "w") as fh:
             json.dump(envelope, fh)
@@ -611,7 +614,7 @@ class TestArchiveRoundTrip(unittest.TestCase):
                 mock.patch.object(H, "run_one_claim",
                                   side_effect=AssertionError(
                                       "audits must NOT re-run")):
-            raw = H.load_or_run_archive(claims)
+            raw = H.load_or_run_archive(claims, self._MANIFEST)
         self.assertEqual(raw, envelope)
 
     def test_load_or_run_refuses_incomplete_archive(self):
@@ -624,7 +627,60 @@ class TestArchiveRoundTrip(unittest.TestCase):
                        "outputs": {"C-01": {"status": "no_case"}}}, fh)
         with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path):
             with self.assertRaises(SystemExit):
-                H.load_or_run_archive(claims)
+                H.load_or_run_archive(claims, self._MANIFEST)
+
+    def test_load_or_run_refuses_archive_from_different_code(self):
+        """A complete archive whose writing commit has .py drift vs the
+        frozen commit is a different measurement — never scored."""
+        claims = [_claim("control", "none", {"no_finding_flagged": True},
+                         cid="C-01")]
+        envelope = {"claim_ids": ["C-01"], "code_commit": "a" * 40,
+                    "outputs": {"C-01": {"status": "no_case", **_ctx()}}}
+        with open(self.raw_path, "w") as fh:
+            json.dump(envelope, fh)
+        with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path), \
+                mock.patch.object(H, "_code_drift_between",
+                                  return_value=["validation/x.py"]), \
+                mock.patch.object(H, "run_one_claim",
+                                  side_effect=AssertionError(
+                                      "foreign archive must not run either")):
+            with self.assertRaises(SystemExit):
+                H.load_or_run_archive(claims, self._MANIFEST)
+
+    def test_load_or_run_accepts_code_equivalent_later_commit(self):
+        """An archive stamped with a later commit that has ZERO .py drift
+        vs the frozen commit (e.g. docs-only commits in between) is the
+        same measurement and is admitted."""
+        claims = [_claim("control", "none", {"no_finding_flagged": True},
+                         cid="C-01")]
+        envelope = {"claim_ids": ["C-01"], "code_commit": "a" * 40,
+                    "outputs": {"C-01": {"status": "no_case", **_ctx()}}}
+        with open(self.raw_path, "w") as fh:
+            json.dump(envelope, fh)
+        with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path), \
+                mock.patch.object(H, "_code_drift_between", return_value=[]), \
+                mock.patch.object(H, "run_one_claim",
+                                  side_effect=AssertionError(
+                                      "audits must NOT re-run")):
+            raw = H.load_or_run_archive(claims, self._MANIFEST)
+        self.assertEqual(raw, envelope)
+
+    def test_archive_complete_requires_freeze_binding(self):
+        claim_set = {"claims": [
+            _claim("control", "none", {"no_finding_flagged": True},
+                   cid="C-01")]}
+        with open(self.raw_path, "w") as fh:
+            json.dump({"claim_ids": ["C-01"], "code_commit": "a" * 40,
+                       "outputs": {"C-01": {"status": "no_case"}}}, fh)
+        with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path), \
+                mock.patch.object(H, "_code_drift_between",
+                                  return_value=["agents/biologist.py"]):
+            self.assertFalse(
+                H._archive_complete(claim_set, self._MANIFEST))
+        with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path), \
+                mock.patch.object(H, "_code_drift_between", return_value=[]):
+            self.assertTrue(
+                H._archive_complete(claim_set, self._MANIFEST))
 
     def test_resume_keeps_completed_and_reruns_crashed(self):
         claims = [_claim("control", "none", {"no_finding_flagged": True},

@@ -321,27 +321,61 @@ def run_all_claims(claims: list[dict]) -> dict:
         return json.load(fh)
 
 
-def _archive_complete(claim_set: dict) -> bool:
+def _code_drift_between(commit_a: str, commit_b: str) -> list:
+    """.py drift over the audited code paths between two commits."""
+    code_paths = ["api", "agents", "data_sources", "cache", "validation"]
+    changed = _git("diff", "--name-only", commit_a, commit_b, "--",
+                   *code_paths)
+    return sorted({p for p in (changed.splitlines() if changed else [])
+                   if p.strip().endswith(".py")})
+
+
+def _archive_bound_to_freeze(existing: dict, manifest: dict) -> bool:
+    """A raw archive is the frozen-code observation ONLY if the commit that
+    wrote it is code-equivalent (zero .py drift over the audited paths) to
+    the freeze manifest's code_commit.  A complete archive produced by
+    different code is a different measurement and must never be scored as
+    the frozen study (post-score code-review hardening, Amendment 5)."""
+    arch_commit = str(existing.get("code_commit") or "")
+    frozen = str(manifest.get("code_commit") or "")
+    if not re.match(r"^[0-9a-f]{40}$", arch_commit):
+        return False
+    if arch_commit == frozen:
+        return True
+    return not _code_drift_between(frozen, arch_commit)
+
+
+def _archive_complete(claim_set: dict, manifest: dict) -> bool:
     if not os.path.exists(RAW_OUTPUTS_JSON):
         return False
     existing = json.load(open(RAW_OUTPUTS_JSON))
     all_ids = {c["claim_id"] for c in claim_set["claims"]}
     return (set(existing.get("claim_ids") or []) == all_ids
-            and set((existing.get("outputs") or {}).keys()) == all_ids)
+            and set((existing.get("outputs") or {}).keys()) == all_ids
+            and _archive_bound_to_freeze(existing, manifest))
 
 
-def load_or_run_archive(claims: list[dict]) -> dict:
+def load_or_run_archive(claims: list[dict], manifest: dict) -> dict:
     """Crash recovery: if a COMPLETE raw archive exists but no results were
     ever written (a harness crash between archiving and scoring), score the
     archived outputs instead of re-running the audits. The archive is the
-    frozen-code observation; re-running would be a second measurement."""
+    frozen-code observation — and is admitted ONLY when the commit that
+    wrote it is code-equivalent to the freeze manifest's code_commit;
+    re-running would be a second measurement, and scoring a foreign-code
+    archive would be a different measurement."""
     if os.path.exists(RAW_OUTPUTS_JSON):
         existing = json.load(open(RAW_OUTPUTS_JSON))
         all_ids = {c["claim_id"] for c in claims}
         if set(existing.get("claim_ids") or []) == all_ids and \
                 set((existing.get("outputs") or {}).keys()) == all_ids:
-            print("[harness] complete raw archive found — scoring the "
-                  "archived frozen-code outputs (audits NOT re-run)",
+            if not _archive_bound_to_freeze(existing, manifest):
+                refuse("complete raw archive was written by code that "
+                       "differs from the frozen commit over the audited .py "
+                       "paths — one archive = one code version; refusing to "
+                       "score a different measurement as the frozen study")
+            print("[harness] complete raw archive found (code-bound to the "
+                  "frozen commit) — scoring the archived frozen-code "
+                  "outputs (audits NOT re-run)",
                   flush=True)
             return existing
         refuse("incomplete raw archive exists alongside no results; refusing "
@@ -810,10 +844,10 @@ def main() -> None:
             refuse("the one-fix-one-rerun allowance has already been "
                    "consumed (consumption marker and/or freeze manifest "
                    "record); no further rerun is permitted")
-        if not _archive_complete(claim_set):
+        if not _archive_complete(claim_set, manifest):
             refuse("the rerun allowance is archive-only: it re-scores the "
                    "frozen raw archive and never re-executes audits; no "
-                   "complete archive is present")
+                   "complete freeze-bound archive is present")
         rerun_reason = args.allow_rerun_after_harness_defect
         ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         os.replace(RESULTS_JSON,
@@ -852,7 +886,7 @@ def main() -> None:
     health_gate()
     check_pool_jobs(claim_set)
 
-    raw = load_or_run_archive(claim_set["claims"])
+    raw = load_or_run_archive(claim_set["claims"], manifest)
     # Metrics are computed from the on-disk archive, never from in-memory
     # run outputs (protocol §8: archived BEFORE metric computation).
     raw = json.load(open(RAW_OUTPUTS_JSON))
