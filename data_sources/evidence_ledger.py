@@ -266,6 +266,44 @@ class EvidenceRecord:
     # Explicit override; if empty, computed by :meth:`lineage_key`.
     lineage_id: str = ""
 
+    def __post_init__(self) -> None:
+        # Boundary hardening: adapters occasionally hand us raw JSON values
+        # or parser objects instead of clean enums/strings (a live audit run
+        # crashed on ``.value`` of a non-enum object in ``source_type`` and
+        # on an unhashable dict in a str field).  Coerce once here so that
+        # lineage keys, serialization, and set membership downstream can
+        # never crash on malformed adapter output.  (Frozen dataclass — all
+        # assignments go through object.__setattr__.)
+        _set = object.__setattr__
+        _set(self, "source_type", _coerce_enum(
+            SourceType, self.source_type, SourceType.OTHER))
+        _set(self, "evidence_role", _coerce_enum(
+            EvidenceRole, self.evidence_role, EvidenceRole.OTHER))
+        _set(self, "direction", _coerce_enum(
+            Direction, self.direction, Direction.UNKNOWN))
+        _set(self, "qualification_status", _coerce_enum(
+            QualificationStatus, self.qualification_status,
+            QualificationStatus.UNKNOWN))
+        _set(self, "contradiction_status", _coerce_enum(
+            ContradictionStatus, self.contradiction_status,
+            ContradictionStatus.NONE))
+        for field_name in (
+                "provider", "source_id", "source_version", "molecule_id",
+                "molecule_name", "inchikey", "smiles", "target_symbol",
+                "target_accession", "target_species", "action",
+                "measurement_type", "measurement_unit", "assay_id",
+                "context", "publication_id", "label_id", "trial_id",
+                "disease_id", "disease_name", "phenotype", "lineage_id"):
+            value = getattr(self, field_name)
+            if value is None:
+                _set(self, field_name, "")
+            elif not isinstance(value, str):
+                # Containers (dict/list/set) are adapter junk — drop them
+                # rather than stringifying garbage into lineage keys.
+                _set(self, field_name,
+                     "" if isinstance(value, (dict, list, set))
+                     else str(value))
+
     def lineage_key(self) -> str:
         """Deterministic key identifying the UNDERLYING evidence artifact.
 

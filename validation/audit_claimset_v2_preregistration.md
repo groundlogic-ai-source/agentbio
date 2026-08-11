@@ -172,3 +172,53 @@ near-universal.
    score, and must not describe the composition change as relaxed
    methodology — the abort-and-amend path itself is the registered
    mechanism working as intended.
+
+## Amendment 3 (2026-08-11, before any scored result exists): freeze #1
+## destroyed by environment failure; pre-freeze engineering fixes
+
+The first frozen claim set (100 claims: E=1, N=59, C=40; claim-set SHA
+a9a7f45f…, freeze commit 0b4d776d, manifest
+validation/audit_claimset_v2_freeze_manifest.json) was **destroyed by a
+Replit environment restart mid-run** that reverted the workspace: the
+claim-set file, freeze manifest, freeze commit, partial raw outputs, and
+run log were all lost and are unrecoverable (git object recovery
+attempted; the commit is not in the object store). The executing run was
+stopped at 75/100 claims executed.
+
+1. **No scoring occurred.** No results file was ever written; no claim was
+   ever classified as caught/missed/clean/false-flag; truth labels were
+   never joined to outputs. The one-scored-run allowance and the
+   one-fix-one-rerun allowance are therefore both **unconsumed**. The
+   only observation made from the lost run was operational, not
+   outcome-level: four claims crashed with harness exceptions
+   (AttributeError on enum-typed fields; one unhashable-dict) and both
+   AI-integration providers were returning sustained HTTP 429s.
+2. **Engineering fixes applied BEFORE the new freeze** (i.e., they are
+   part of the frozen system under test, not a post-hoc patch):
+   (a) `data_sources/evidence_ledger.py` — `EvidenceRecord.__post_init__`
+       coerces enum/string fields at construction so malformed adapter
+       output can never crash `.value` access or set membership (the
+       observed crash class; affected claims would otherwise have been
+       scored as abstentions);
+   (b) `data_sources/llm_failover.py` (new) — text-only LLM calls
+       round-robin across both AI-integration providers with
+       cross-provider failover and exponential backoff on 429/5xx;
+       provider-bound web-search tool calls retry with backoff on the
+       same provider (tool semantics unchanged). Call sites rewired:
+       pubmed relevance gate, clinicaltrials stop-reason classifier,
+       mechanism-direction Step-2 classifier, safety Layer-2 classifier;
+   (c) `validation/run_audit_claimset.py` — per-claim atomic checkpointing
+       (was every-5-claims) with commit-bound resume: a partial archive is
+       reused only if written by the same code commit, completed claims
+       are kept, and crashed/missing claims are re-run. One archive still
+       equals one code version.
+3. **Construction restart.** The claim set is rebuilt from scratch under
+   the identical registered rules (Amendment 2 composition: E honest
+   yield, N to 59, C=40). Because construction involves live sources and
+   LLM classification, the new set is not expected to be byte-identical
+   to the lost one; this is disclosed, and the new freeze manifest binds
+   the new claim-set SHA and the new code commit.
+4. **Reporting:** the v2 results report must disclose this amendment
+   (environment failure, unconsumed allowances, pre-freeze fix list)
+   alongside the score. The lost run's crash patterns informed the fixes
+   but no outcome information carried over.

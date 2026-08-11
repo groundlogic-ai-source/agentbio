@@ -20,6 +20,7 @@ from typing import Any, Optional
 import anthropic
 
 from cache.cache import get, set as cache_set, make_key
+from data_sources.llm_failover import chat_text
 
 BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 MODEL = "claude-sonnet-4-6"
@@ -93,17 +94,10 @@ def _llm_relationship(abstract: str, subject: str, obj: str,
         f"reason.\n\nAbstract:\n{abstract[:4000]}"
     )
     try:
-        msg = client.messages.create(
-            model=MODEL,
-            max_tokens=120,
-            # temperature=0: this is a YES/NO gate that controls which abstracts
-            # enter literature_hits. Non-zero temperature could flip borderline
-            # abstracts across runs, making hit/miss outcomes non-reproducible.
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        block = msg.content[0]
-        text = (block.text if block.type == "text" else str(block)).strip()
+        # Round-robin across AI-integration providers with 429 failover.
+        # llm_failover keeps deterministic (temperature=0) decoding where the
+        # provider supports it, preserving this YES/NO gate's reproducibility.
+        text, _provider = chat_text(prompt, max_tokens=120)
         kept = text.upper().lstrip().startswith("YES")
         reason = text.split("\n", 1)[0].strip()
         return kept, reason

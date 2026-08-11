@@ -27,6 +27,7 @@ from typing import Any
 import anthropic
 
 from cache.cache import get, set as cache_set, make_key
+from data_sources.llm_failover import call_with_backoff, chat_text
 
 _NO_INFO_TEXT = (
     "No market-withdrawal information found in this search; "
@@ -118,11 +119,16 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
             f"received a black box warning, or been discontinued for safety "
             f"reasons? Cite sources with URLs."
         )
-        search_response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=2048,
-            tools=[{"type": "web_search_20250305", "name": "web_search"}],
-            messages=[{"role": "user", "content": search_query}],
+        # Provider-bound web-search tool: retry 429/5xx with backoff (no
+        # cross-provider failover — the tool API is Anthropic-specific).
+        search_response = call_with_backoff(
+            lambda: client.messages.create(
+                model="claude-sonnet-4-6",
+                max_tokens=2048,
+                tools=[{"type": "web_search_20250305", "name": "web_search"}],
+                messages=[{"role": "user", "content": search_query}],
+            ),
+            label="safety-web-search",
         )
 
         # Extract all text from the response (model answer incorporating search results)
@@ -160,17 +166,9 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
             f"BLACK_BOX: YES | NO | UNCLEAR\n"
             f"CITATION: <the specific source URL or citation, or 'none'>"
         )
-        classify_response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=256,
-            temperature=0,
-            messages=[{"role": "user", "content": classification_prompt}],
-        )
-
-        classify_text = ""
-        for block in classify_response.content:
-            if hasattr(block, "text") and block.text:
-                classify_text += block.text
+        # Text-only classification: round-robin providers + 429 failover.
+        classify_text, _provider = chat_text(classification_prompt,
+                                             max_tokens=256)
         classify_text = classify_text.strip()
 
         # Parse the three-line classifier output.  Backward compatibility: if
