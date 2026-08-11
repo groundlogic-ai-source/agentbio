@@ -35,20 +35,27 @@ PASS thresholds.
 pipeline rediscovered the confirmed drug in 6/22 in-scope primary cases
 (27.3%; 95% CI 10.7%–50.2%), all six within the top 10; performance was
 concentrated in ultra-rare monogenic disease (6/9) and absent in rarer-
-mechanism strata (0/12). The audit study **failed** its pre-registered
-thresholds: defect recall 0.533 (CP lower 0.420 vs required ≥0.80/≥0.65) and
-control false-flag rate 0.175 (CP upper 0.304 vs required ≤0.15/≤0.30).
-Novel-class recall was 0.967 (29/30). Failure analysis isolated a stale-data
-disclosure defect (persisted candidate pools carrying pre-fix safety labels),
-a falsified claim-construction assumption (brand names resolve in ChEMBL),
-and a detector precision bug (preclinical-only finding over-firing on
-approved drugs).
+mechanism strata (0/12). The first audit
+study (claim-set v1) **failed** its pre-registered thresholds: defect recall
+0.533 (CP lower 0.420 vs required ≥0.80/≥0.65) and control false-flag rate
+0.175 (CP upper 0.304 vs required ≤0.15/≤0.30); novel-class recall was 0.967
+(29/30). Failure analysis isolated a stale-data disclosure defect (persisted
+candidate pools carrying pre-fix safety labels), a falsified
+claim-construction assumption (brand names resolve in ChEMBL), and a
+detector precision bug (preclinical-only finding over-firing on approved
+drugs). After registered fixes, a fresh frozen claim set (v2) was
+constructed and scored exactly once under the same discipline: the fixed
+layer **passed** all thresholds — defect recall 60/60 = 1.000 (CP lower
+0.951), control false-flag rate 2/40 = 0.050 (CP upper 0.149), and
+novel-class recall 59/59 = 1.000 (classes with no prior defense).
 
-**Conclusions.** Pre-registration plus one-scored-run discipline produced a
-credible, and largely negative, signal about an audit layer that internal
-regression suites had suggested was strong. The system is a research
-prioritization and evidence-audit tool; nothing here is evidence of clinical
-efficacy, and no output constitutes a treatment recommendation.
+**Conclusions.** Pre-registration plus one-scored-run discipline first
+exposed an audit-layer failure that internal regression suites had masked,
+then verified — under a fresh frozen study — that the registered fixes
+hold. The first study's failure is reported alongside the pass, never
+replaced by it. The system is a research prioritization and evidence-audit
+tool; nothing here is evidence of clinical efficacy, and no output
+constitutes a treatment recommendation.
 
 **Keywords:** drug repurposing; rare disease; benchmark; pre-registration;
 audit; validation; negative results
@@ -76,7 +83,8 @@ a pre-registered, frozen rediscovery benchmark with mechanical case selection
 and full identity holdout, and a pre-registered, frozen *external* audit
 study whose claim set includes defect classes with no prior fix, test, or
 trap in the codebase, with exactly one scored run and published thresholds.
-We report both instruments' results — including the audit study's failure —
+We report both instruments' results — including the audit study's failure
+and its fixed layer's pre-registered re-validation —
 plus the engineering regression suite, the development history, and every
 freeze control, so that the evidentiary chain is reproducible end to end.
 
@@ -185,6 +193,14 @@ with lower bound ≥ 0.65; control false-flag rate ≤ 0.15 with upper bound
 measurement of an unknown quantity). INVALID-DATA if abstention exceeded 10%
 of any group.
 
+A second frozen claim set (v2: 100 claims — 60 defect = 1 existing-fix +
+59 novel [N1 8, N2 43, N4 8; N3 0, untested under v2's tightened gates] +
+40 clean controls) was constructed after the v1 failure, under its own
+pre-registration (Amendments 1–4, including registered composition
+amendments after two fail-closed construction aborts and a documented
+freeze-loss/rebuild event before any scoring) with identical thresholds,
+one-scored-run discipline, and scoring code.
+
 ### 3.4 Engineering regression suite (separate instrument)
 
 An offline trap benchmark (12 planted defect traps covering the twelve
@@ -272,7 +288,27 @@ boundary) — yet the external study failed. Internal regression suites measure
 whether yesterday's fixes still work; they cannot measure whether the audit
 catches what nobody anticipated.
 
-### 4.3 Development history (labeled; not pooled)
+### 4.3 Audit claim-set v2 — pre-registered re-validation, PASS
+
+After the v1 failure, the fixes (pool safety refresh, N3 detector
+precision, and pre-freeze robustness work: evidence-record boundary
+coercion, LLM provider failover under rate-limit pressure) were registered,
+and a NEW claim set was constructed, frozen, and scored exactly once under
+the same discipline (v2 pre-registration, Amendments 1–4). The fixed layer
+**passed both thresholded metrics**: defect recall 60/60 = 1.000 (CP lower
+0.951) against ≥0.80/≥0.65; control false-flag rate 2/40 = 0.050 (CP upper
+0.149) against ≤0.15/≤0.30. Novel-class recall was 59/59 = 1.000 (CP lower
+0.950). Zero claims abstained or were excluded; no caught defect carried a
+contradicted safety disclosure. Composition is construction-determined and
+disclosed: E = 1 (E2 only; E4 = 0 is a registered finding — brand names
+resolve in raw ChEMBL), novel = 59 (N1 8, N2 43, N4 8; N3 0 — untested
+under v2's tightened gates), controls = 40. Freeze #1 was destroyed by an
+environment restart before any scoring (no results produced or seen; both
+allowances unconsumed); the scored set is the registered rebuild under
+identical rules (Amendment 3). v1's FAIL is reported alongside this PASS,
+never replaced by it.
+
+### 4.4 Development history (labeled; not pooled)
 
 Reviewer pilot (present-day data, pool unredacted, not pre-registered):
 1/9 rediscovered, true target considered 8/9. repoDB development suites under
@@ -311,7 +347,8 @@ Retrospective rediscovery with disease-side (not pool-side) holdout;
 funnel-feasibility selection underrepresenting sparse-data diseases; wide CIs
 at n=22 in-scope; a saturated chance baseline; concentration of hits in
 ultra-rare monogenic disease; biologics outside the scoring contract; a
-failed audit headline with N3 untested and E4 measuring a falsified
+first audit study that failed (reported unedited) with its fixed-layer
+successor passing — N3 untested in both, E4 measuring a falsified
 assumption; single-universe disease scope; DrugCentral pinned to the 2023
 release; GtoPdb commercial terms a production dependency; and self-evaluation
 by the system's developer, mitigated but not eliminated by pre-registration,
@@ -325,9 +362,13 @@ pipeline found a functional discovery core on funnel-feasible ultra-rare
 disease (27.3% rediscovery on the funnel-feasible subset admitted by the
 screen — 32/50, 64%; the pre-registered mechanical chance baseline saturated
 and is uninformative, so absolute rates and CIs are the evidence) and — more
-importantly — an externally validated *failure* of its audit layer that
-internal regression suites had masked. We publish the full evidentiary chain: case lists, claim
-set, raw outputs, freeze manifests, and recomputation scripts. We hope the
+importantly — an audit layer whose first frozen external study **failed**
+(recall 0.533, false-flag 0.175 — a failure internal regression suites had
+masked) and whose registered fixes then **passed** a fresh pre-registered
+frozen study (v2: defect recall 60/60 = 1.000, control false-flag
+2/40 = 0.050, novel-class 59/59 = 1.000). We publish the full evidentiary
+chain for both studies: case lists, claim
+sets, raw outputs, freeze manifests, and recomputation scripts. We hope the
 instrument designs (screened funnels, novel-class audit claims, one-scored-run
 allowances, hash-bound results) are reusable by any team evaluating
 trustworthiness claims for computational pipelines.
