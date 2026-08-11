@@ -265,7 +265,10 @@ allowances remained unconsumed — so the scored claim set is the registered
 rebuild under identical rules, with the pre-freeze engineering fixes
 (EvidenceRecord boundary coercion, LLM provider round-robin + 429 backoff,
 per-claim checkpoint/resume) part of the frozen system under test
-(Amendment 3).
+(Amendment 3). After the scored run, an independent code review hardened
+archive admission (complete raw archives are now bound to the frozen code
+commit; refusal-path only, scoring untouched — Amendment 5, manifest code
+binding advanced with the results hash unchanged).
 
 ## 5. Engineering regression: audit trap benchmark
 
