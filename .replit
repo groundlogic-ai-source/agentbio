@@ -37,6 +37,28 @@ task = "workflow.run"
 args = "audit-claimset-v2-run"
 
 [[workflows.workflow]]
+name = "triage-discrimination-run"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && python3 -m validation.run_triage_discrimination 2>&1 | tee /tmp/triage_discrimination.log"
+
+[[workflows.workflow]]
+name = "triage-discrimination-studyb"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && python3 -m validation.run_triage_discrimination_studyb 2>&1 | tee /tmp/triage_discrimination_studyb.log"
+
+[[workflows.workflow]]
 name = "repodb-validation"
 author = "agent"
 
