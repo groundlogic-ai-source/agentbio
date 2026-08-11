@@ -644,6 +644,57 @@ def build_controls(pools: dict) -> None:
             "real case it is absent from; no N1-N4 finding may be flagged.")
         added_ctx += 1
     log(f"  pool-context controls: {added_ctx}/8")
+    if added_ctx < 8:
+        # Amendment 4: the fixed pool-context list is structurally small
+        # (in-pool membership and the single-ingredient label rule exclude
+        # most inhaler-class names).  Fill the shortfall from the same
+        # approved single-ingredient small-molecule universe as the
+        # pool-free controls, with an independent seeded RNG so the
+        # pool-free sample sequence is unchanged.  Ground truth is
+        # identical: verifiable cutoff-eligible single-ingredient FDA label
+        # AND absence from the assigned pooled case's pool.
+        log("  pool-context dynamic fill (Amendment 4): seeded sample of "
+            "approved single-ingredient small molecules absent from the "
+            "assigned pooled case")
+        cases = sorted({job for _, job in POOL_CONTEXT_CONTROLS_V2})
+        rng_ctx = random.Random(SEED + 1)
+        dyn = sorted({r["drug_name"] for r in rows_ds
+                      if r["status"] == "Approved"
+                      and r["chembl_molecule_type"] == "Small molecule"
+                      and "+" not in r["drug_name"]
+                      and b._norm(r["drug_name"]) not in dev_drugs})
+        rng_ctx.shuffle(dyn)
+        attempts_ctx = 0
+        for name in dyn:
+            if added_ctx >= 8:
+                break
+            attempts_ctx += 1
+            if attempts_ctx > 120:
+                log("  POOL-CONTEXT SAMPLING BUDGET EXHAUSTED (120 attempts)")
+                break
+            job_id = cases[added_ctx % len(cases)]
+            if not _available(name):
+                continue
+            if name.upper() in pools[job_id]["names"]:
+                continue
+            rows = b.ofda_label_rows(name)
+            cit = b._ofda_citation(rows)
+            n_subs = max((len(b._ofda_substances(r)) for r in rows),
+                         default=0)
+            if not cit or n_subs != 1:
+                continue
+            _add_claim("control", "none", {
+                "disease_name": pools[job_id]["disease"],
+                "drug_name": name,
+                "job_id_hint": job_id,
+                "claim": {"modality": "small molecule"},
+            }, {"no_finding_flagged": True}, cit,
+                "Approved single-ingredient small molecule audited against "
+                "a real case it is absent from; no N1-N4 finding may be "
+                "flagged. (Dynamic fill, Amendment 4.)")
+            added_ctx += 1
+        log(f"  pool-context controls after dynamic fill: {added_ctx}/8 "
+            f"({attempts_ctx} attempts)")
     if added + added_ctx != CONTROL_TOTAL:
         raise SystemExit(
             f"[build-v2] control group quota not met: "
