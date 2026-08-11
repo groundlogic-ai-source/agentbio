@@ -241,5 +241,47 @@
     "trap_recall": 1.0,
     "control_ffr": "1/4 = 0.25",
     "precision": 0.9230769230769231
+  },
+  "audit_claimset_v1": {
+    "defect_recall": 0.533,
+    "defect_recall_cp_lower": 0.42,
+    "defect_caught": 32,
+    "defect_total": 60,
+    "control_ffr": 0.175,
+    "control_ffr_cp_upper": 0.304,
+    "control_flagged": 7,
+    "control_total": 40,
+    "novel_recall": 0.967,
+    "novel_caught": 29,
+    "novel_total": 30,
+    "verdict": "FAIL",
+    "scored": "2026-08-10"
+  },
+  "audit_claimset_v2": {
+    "defect_recall": 1.0,
+    "defect_recall_cp_lower": 0.951,
+    "defect_caught": 60,
+    "defect_total": 60,
+    "control_ffr": 0.05,
+    "control_ffr_cp_upper": 0.149,
+    "control_flagged": 2,
+    "control_total": 40,
+    "novel_recall": 1.0,
+    "novel_caught": 59,
+    "novel_total": 59,
+    "composition": {
+      "E": 1,
+      "N1": 8,
+      "N2": 43,
+      "N3": 0,
+      "N4": 8,
+      "C": 40
+    },
+    "abstentions": 0,
+    "exclusions": 0,
+    "contradicted_disclosures": 0,
+    "verdict": "PASS",
+    "scored": "2026-08-11",
+    "claim_set_sha256": "5013a57aca080e82fd11b20f2a81820fbf0ec01c44ccc3923ccd35e7fd1c52e2"
   }
 }

@@ -25,6 +25,7 @@ Three instruments were run, each pre-registered and frozen, and they answer
 |---|---|---|
 | Benchmark v2 (`benchmark-freeze-v2`) | Discovery accuracy: does a confirmed repurposed drug reappear in the ranked list when all drug-side identity is redacted? | `validation/benchmark_results_v2.json` |
 | Audit claim-set v1 (`audit_claimset_v1`) | External audit validation: does the audit layer catch real, externally-grounded defect claims — including classes nobody pre-fixed for? | `validation/audit_claimset_results.json` |
+| Audit claim-set v2 (`audit_claimset_v2`) | Pre-registered re-validation of the fixed audit layer on a fresh frozen claim set (v1 reported alongside, never replaced) | `validation/audit_claimset_v2_results.json` |
 | Audit trap benchmark | Engineering regression: do the twelve defect classes AgentBio was explicitly fixed for still trip the audit? | `validation/audit_trap_results.json` |
 
 This report also summarizes, clearly labeled, the development instruments:
@@ -236,6 +237,36 @@ inflating the control false-flag rate. The correct next actions are a pool
 staleness/refresh mechanism and N3 precision work — *after* this report is
 frozen, as new studies with their own pre-registrations.
 
+### 4.4 Audit claim-set v2: pre-registered re-validation of the fixed layer — PASS
+
+The promised new study ran: fixes registered (pool safety refresh, N3
+precision, plus pre-freeze robustness work), a NEW claim set constructed,
+frozen, and scored exactly once under the same discipline
+(`validation/audit_claimset_v2_preregistration.md`, Amendments 1–4;
+freeze manifest `validation/audit_claimset_v2_freeze_manifest.json`).
+
+| Metric | Result | PASS threshold | Met? |
+|---|---|---|---|
+| Defect recall | 60/60 = 1.000 (CP lower 0.951) | ≥ 0.80, lower ≥ 0.65 | **Yes** |
+| Control false-flag rate | 2/40 = 0.050 (CP upper 0.149) | ≤ 0.15, upper ≤ 0.30 | **Yes** |
+| Novel-class recall | 59/59 = 1.000 (CP lower 0.950) | none (registered) | — |
+
+Per class: E2 1/1; N1 8/8, N2 43/43, N4 8/8; **N3 untested (zero claims —
+all candidates failed v2's tightened ground-truth gates)**; E1/E3/E4 empty
+(E4 = 0 is a registered finding: brand names resolve in raw ChEMBL). Zero
+abstentions, zero exclusions, zero contradicted safety disclosures.
+v1's FAIL (§4.2) is reported alongside this PASS, never replaced by it.
+
+Registered construction events disclosed with the score: two fail-closed
+construction aborts (E-group floor; control quota) preceded the composition
+amendments (Amendments 2 and 4); freeze #1 was destroyed by an environment
+restart before any scoring — no results were produced or seen and both
+allowances remained unconsumed — so the scored claim set is the registered
+rebuild under identical rules, with the pre-freeze engineering fixes
+(EvidenceRecord boundary coercion, LLM provider round-robin + 429 backoff,
+per-claim checkpoint/resume) part of the frozen system under test
+(Amendment 3).
+
 ## 5. Engineering regression: audit trap benchmark
 
 12/12 planted traps caught (threshold ≥ 0.9), 1/4 controls false-flagged
@@ -297,9 +328,10 @@ above shows why that policing must include *data freshness*, not just logic.
   runtime (screen/runtime scope disagreement is itself a finding).
 3. **Chance baseline saturation** (§3.4).
 4. **Prevalence-stratified failure** (§3.2): 0/12 on rare/less-rare strata.
-5. **Audit FAIL** (§4): defect recall 0.533 and control false-flag 0.175 both
-  miss PASS thresholds; N3 untested (zero claims); E4 tested a falsified
-  construction assumption.
+5. **Audit v1 FAIL / v2 PASS** (§4): the first frozen study failed (recall
+  0.533, false-flag 0.175); the fixed layer passed its fresh pre-registered
+  study (1.000 / 0.050). N3 remains untested in both studies; E4 tested a
+  falsified construction assumption.
 6. **Stale persisted pools** can carry pre-fix safety labels; E2 quantifies
   the consequence (19/19 affected in that class).
 7. **Small samples**: 22 in-scope primary cases; CIs are wide (±~20 points).
@@ -328,19 +360,23 @@ all benchmark and audit scoring paths are deterministic.
 - Code: this repository (see `publication/README.md` for the release
   checklist; the release decision is the author's).
 - Frozen artifacts (all committed): benchmark results v2 + case list +
-  attrition + all pre-registrations and amendments; audit claim set (sha256
-  `32efd7d9…`), construction log, freeze manifest, raw outputs, results;
-  trap results; ablation results; engineering-acceptance artifacts;
-  DrugCentral snapshot (sha256-pinned) + build provenance.
+  attrition + all pre-registrations and amendments; audit claim sets v1
+  (sha256 `32efd7d9…`) and v2 (sha256 `5013a57a…`), construction logs,
+  freeze manifests, raw outputs, results; trap results; ablation results;
+  engineering-acceptance artifacts; DrugCentral snapshot (sha256-pinned) +
+  build provenance.
 - Recompute every number in this report: `python3 publication/make_figures.py`
   (also re-verifies the audit metrics from the raw archive).
-- Re-verify the frozen audit run: `python3 -m validation.run_audit_claimset
-  --label audit_claimset_v1 --recalc-only`.
+- Re-verify the frozen audit runs: `python3 -m validation.run_audit_claimset
+  --label audit_claimset_v1 --recalc-only` and `python3 -m
+  validation.run_audit_claimset_v2 --label audit_claimset_v2 --recalc-only`.
 - Source versions: ChEMBL (live API at freeze; cache preserved), Open Targets
   (live at freeze), Orphanet (live at freeze), DrugCentral 2023 official dump
   (pinned snapshot), GtoPdb versioned downloads, Europe PMC/PubTator3 (bounded
   queries, archived responses), ClinicalTrials.gov API v2, openFDA/DailyMed
   (label assertions with revision dates).
 
-*Report prepared 2026-08-10 from frozen artifacts only. No analysis in this
-report was added after seeing any reviewer preference.*
+*Report prepared 2026-08-10 from frozen artifacts only; §4.4 (audit
+claim-set v2) and its dependent lines added 2026-08-11 from that study's
+own frozen artifacts per its pre-registration. No analysis in this report
+was added after seeing any reviewer preference.*
