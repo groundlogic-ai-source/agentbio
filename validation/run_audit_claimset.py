@@ -264,20 +264,61 @@ def run_one_claim(claim: dict) -> dict:
 
 
 def run_all_claims(claims: list[dict]) -> dict:
-    """Run every claim, checkpointing raw outputs to disk as we go. The raw
-    archive is complete BEFORE any metric is computed. Returns the archive
-    ENVELOPE exactly as written to disk."""
+    """Run every claim, checkpointing EACH raw output to disk immediately.
+    The raw archive is complete BEFORE any metric is computed. Returns the
+    archive ENVELOPE exactly as written to disk.
+
+    Resume semantics (2026-08-11, after an environment restart destroyed a
+    75-claim in-flight run): a leftover ``.partial`` archive is reused ONLY
+    when it was written by the same code commit — mixing code versions in
+    one archive would be two different measurements.  Completed claims are
+    kept; claims whose recorded output is a harness exception (a crash, not
+    a verdict) are re-run; missing claims are run.  The study is still one
+    observation process under one frozen code commit.
+    """
     raw: dict[str, Any] = {}
     tmp = RAW_OUTPUTS_JSON + ".partial"
-    for i, claim in enumerate(claims, 1):
-        raw[claim["claim_id"]] = run_one_claim(claim)
-        if i % 5 == 0 or i == len(claims):
-            with open(tmp, "w") as fh:
-                json.dump({"claim_ids": [c["claim_id"] for c in claims],
-                           "outputs": raw}, fh)
-            print(f"[harness] audited {i}/{len(claims)}", flush=True)
+    head = _git("rev-parse", "HEAD")
+    if os.path.exists(tmp):
+        try:
+            with open(tmp) as fh:
+                prior = json.load(fh)
+            if prior.get("code_commit") == head:
+                for cid, out in (prior.get("outputs") or {}).items():
+                    if (isinstance(out, dict)
+                            and out.get("status") != "__harness_exception__"):
+                        raw[cid] = out
+                print(f"[harness] resuming partial archive: kept "
+                      f"{len(raw)} completed claim(s); crashed/missing "
+                      f"claims will be (re-)run", flush=True)
+            else:
+                print("[harness] ignoring partial archive from a different "
+                      "code commit (one archive = one code version)",
+                      flush=True)
+        except Exception as exc:  # corrupt partial — start clean
+            print(f"[harness] ignoring unreadable partial archive ({exc})",
+                  flush=True)
+
+    total = len(claims)
+    for claim in claims:
+        cid = claim["claim_id"]
+        if cid in raw:
+            continue
+        out = run_one_claim(claim)
+        raw[cid] = out
+        crashed = (isinstance(out, dict)
+                   and out.get("status") == "__harness_exception__")
+        # Atomic per-claim checkpoint: write sibling tmp, then rename.
+        with open(tmp + ".tmp", "w") as fh:
+            json.dump({"claim_ids": [c["claim_id"] for c in claims],
+                       "code_commit": head, "outputs": raw}, fh)
+        os.replace(tmp + ".tmp", tmp)
+        print(f"[harness] audited {len(raw)}/{total} ({cid}"
+              f"{' — HARNESS EXCEPTION, will re-run on resume' if crashed else ''})",
+              flush=True)
     os.replace(tmp, RAW_OUTPUTS_JSON)
-    return json.load(open(RAW_OUTPUTS_JSON))
+    with open(RAW_OUTPUTS_JSON) as fh:
+        return json.load(fh)
 
 
 def _archive_complete(claim_set: dict) -> bool:

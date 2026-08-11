@@ -24,6 +24,7 @@ import requests
 from typing import Any, Optional
 from cache.cache import get, set as cache_set, make_key
 from data_sources import holdout
+from data_sources.llm_failover import chat_text
 
 import anthropic
 
@@ -82,13 +83,9 @@ def _classify_why_stopped(why_stopped: str, client: anthropic.Anthropic) -> str:
         "UNCLEAR — cannot determine from the available text"
     )
     try:
-        resp = client.messages.create(
-            model=HAIKU_MODEL,
-            max_tokens=10,
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        raw = resp.content[0].text.strip().split()[0].upper()
+        # Round-robin across providers + 429 failover (deterministic decoding).
+        raw_text, _provider = chat_text(prompt, max_tokens=10)
+        raw = raw_text.strip().split()[0].upper() if raw_text.strip() else ""
         return raw if raw in VALID_CLASSIFICATIONS else "UNCLEAR"
     except Exception as e:
         print(f"[clinicaltrials] WARNING: LLM classification failed ({e})")

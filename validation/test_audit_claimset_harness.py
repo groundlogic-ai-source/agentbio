@@ -589,10 +589,12 @@ class TestArchiveRoundTrip(unittest.TestCase):
                              **_ctx(findings=[{"code": "N1",
                                                "status": "flagged"}])}}
         with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path), \
+                mock.patch.object(H, "_git", return_value="deadbeef"), \
                 mock.patch.object(H, "run_one_claim",
                                   side_effect=lambda c: outputs[c["claim_id"]]):
             raw = H.run_all_claims(claims)
-        self.assertEqual(set(raw), {"claim_ids", "outputs"})
+        self.assertEqual(set(raw), {"claim_ids", "code_commit", "outputs"})
+        self.assertEqual(raw["code_commit"], "deadbeef")
         scored = H.score_from_archive({"claims": claims}, raw,
                                       revalidate=False)
         self.assertEqual(scored["outcomes"]["C-01"]["outcome"], "clean")
@@ -623,6 +625,49 @@ class TestArchiveRoundTrip(unittest.TestCase):
         with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path):
             with self.assertRaises(SystemExit):
                 H.load_or_run_archive(claims)
+
+    def test_resume_keeps_completed_and_reruns_crashed(self):
+        claims = [_claim("control", "none", {"no_finding_flagged": True},
+                         cid="C-01"),
+                  _claim("control", "none", {"no_finding_flagged": True},
+                         cid="C-02", drug="OTHER")]
+        partial = {"claim_ids": ["C-01", "C-02"], "code_commit": "deadbeef",
+                   "outputs": {
+                       "C-01": {"status": "no_case", **_ctx()},
+                       "C-02": {"status": "__harness_exception__",
+                                "error": "boom"}}}
+        with open(self.raw_path + ".partial", "w") as fh:
+            json.dump(partial, fh)
+        calls: list[str] = []
+
+        def fake_run(c):
+            calls.append(c["claim_id"])
+            return {"status": "no_case", **_ctx()}
+
+        with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path), \
+                mock.patch.object(H, "_git", return_value="deadbeef"), \
+                mock.patch.object(H, "run_one_claim", side_effect=fake_run):
+            raw = H.run_all_claims(claims)
+        self.assertEqual(calls, ["C-02"])  # only the crashed claim re-ran
+        self.assertEqual(set(raw["outputs"]), {"C-01", "C-02"})
+
+    def test_resume_refuses_partial_from_other_commit(self):
+        claims = [_claim("control", "none", {"no_finding_flagged": True},
+                         cid="C-01")]
+        with open(self.raw_path + ".partial", "w") as fh:
+            json.dump({"claim_ids": ["C-01"], "code_commit": "OTHERCOMMIT",
+                       "outputs": {"C-01": {"status": "no_case"}}}, fh)
+        calls: list[str] = []
+
+        def fake_run(c):
+            calls.append(c["claim_id"])
+            return {"status": "no_case", **_ctx()}
+
+        with mock.patch.object(H, "RAW_OUTPUTS_JSON", self.raw_path), \
+                mock.patch.object(H, "_git", return_value="deadbeef"), \
+                mock.patch.object(H, "run_one_claim", side_effect=fake_run):
+            H.run_all_claims(claims)
+        self.assertEqual(calls, ["C-01"])  # stale partial ignored, re-run
 
 
 # --------------------------------------------------------------------------- #

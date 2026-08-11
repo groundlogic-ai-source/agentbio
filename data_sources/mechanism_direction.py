@@ -46,6 +46,7 @@ from openai import OpenAI
 
 from cache.cache import get, set as cache_set, make_key
 from data_sources import holdout
+from data_sources.llm_failover import call_with_backoff, chat_text
 
 VERDICT_INCOMPATIBLE = "DIRECTIONALLY_INCOMPATIBLE"
 VERDICT_COMPATIBLE   = "DIRECTIONALLY_COMPATIBLE"
@@ -251,10 +252,15 @@ def check_mechanism_direction(
             f"{clinical_use_question}"
             f"{dili_question}"
         )
-        search_response = client.responses.create(
-            model="gpt-5.4",
-            tools=[{"type": "web_search_preview"}],
-            input=search_query,
+        # Provider-bound web-search tool: retry 429/5xx with backoff (no
+        # cross-provider failover — the tool API is OpenAI-specific).
+        search_response = call_with_backoff(
+            lambda: client.responses.create(
+                model="gpt-5.4",
+                tools=[{"type": "web_search_preview"}],
+                input=search_query,
+            ),
+            label="mechanism-direction-search",
         )
         search_text = (search_response.output_text or "").strip()
         result["disease_mechanism_summary"] = search_text
@@ -314,14 +320,9 @@ def check_mechanism_direction(
             f"REASON: <one sentence citing a specific source from the retrieved text>\n"
             f"CITATIONS: <comma-separated URLs or citation identifiers, or 'none'>"
         )
-        classify_response = client.chat.completions.create(
-            model="gpt-5.4",
-            max_completion_tokens=512,
-            messages=[{"role": "user", "content": classification_prompt}],
-        )
-        classify_text = ""
-        if classify_response.choices:
-            classify_text = classify_response.choices[0].message.content or ""
+        # Text-only classification: round-robin providers + 429 failover.
+        classify_text, _provider = chat_text(classification_prompt,
+                                             max_tokens=512)
         classify_text = classify_text.strip()
         result["step2_raw"] = classify_text
 
