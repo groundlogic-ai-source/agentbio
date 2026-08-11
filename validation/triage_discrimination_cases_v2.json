@@ -1,0 +1,2119 @@
+{
+  "built_from_commit": "32b4e68f5873c19297cb528beefac4e87024cd62",
+  "cohorts": {
+    "cohort_a": {
+      "cases": [
+        {
+          "drug_name": "Acebutolol",
+          "ind_id": "C0020538",
+          "ind_name": "Hypertensive disease",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Acetylsalicylic acid",
+          "ind_id": "C0003862",
+          "ind_name": "Arthralgia",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Alfacalcidol",
+          "ind_id": "C0020502",
+          "ind_name": "Hyperparathyroidism",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "6.8"
+        },
+        {
+          "drug_name": "Allopurinol",
+          "ind_id": "C0003868",
+          "ind_name": "Arthritis, Gouty",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Amiloride",
+          "ind_id": "C0013604",
+          "ind_name": "Edema",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "-0.7"
+        },
+        {
+          "drug_name": "Amoxicillin",
+          "ind_id": "C0275556",
+          "ind_name": "Acute bacterial sinusitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "-2.0"
+        },
+        {
+          "drug_name": "Amphetamine",
+          "ind_id": "C1263846",
+          "ind_name": "Attention deficit hyperactivity disorder",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.8"
+        },
+        {
+          "drug_name": "Amphotericin B",
+          "ind_id": "C0001144",
+          "ind_name": "Acne Vulgaris",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Aprobarbital",
+          "ind_id": "C0231403",
+          "ind_name": "Severe anxiety (panic)",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "1.1"
+        },
+        {
+          "drug_name": "Astemizole",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "6.0"
+        },
+        {
+          "drug_name": "Azelastine",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Bacitracin",
+          "ind_id": "C0854211",
+          "ind_name": "Bacterial keratitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Bazedoxifene",
+          "ind_id": "C0600142",
+          "ind_name": "Hot flushes",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "6.1"
+        },
+        {
+          "drug_name": "Beclomethasone dipropionate",
+          "ind_id": "C2607914",
+          "ind_name": "Allergic rhinitis (disorder)",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "3.0"
+        },
+        {
+          "drug_name": "Benzathine benzylpenicillin",
+          "ind_id": "C0014733",
+          "ind_name": "Erysipelas",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Benzoic Acid",
+          "ind_id": "C0011633",
+          "ind_name": "Dermatomyositis",
+          "sel_max_phase": "-1.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "1.9"
+        },
+        {
+          "drug_name": "Benzylpenicillin",
+          "ind_id": "C0001263",
+          "ind_name": "Abdominal actinomycosis",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": "1.8"
+        },
+        {
+          "drug_name": "Betamethasone",
+          "ind_id": "C0154301",
+          "ind_name": "Acquired thrombocytopenia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.9"
+        },
+        {
+          "drug_name": "Bimatoprost",
+          "ind_id": "C0017612",
+          "ind_name": "Glaucoma, Open-Angle",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.8"
+        },
+        {
+          "drug_name": "Bleomycin",
+          "ind_id": "C0278996",
+          "ind_name": "Cancer of Head and Neck",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Unknown",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-7.5"
+        },
+        {
+          "drug_name": "Brentuximab vedotin",
+          "ind_id": "C1275317",
+          "ind_name": "Anaplastic large T-cell systemic malignant lymphoma",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody drug conjugate",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Brexpiprazole",
+          "ind_id": "C1269683",
+          "ind_name": "Major Depressive Disorder",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "4.7"
+        },
+        {
+          "drug_name": "Brimonidine",
+          "ind_id": "C0017612",
+          "ind_name": "Glaucoma, Open-Angle",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "0.6"
+        },
+        {
+          "drug_name": "Bromocriptine",
+          "ind_id": "C0001206",
+          "ind_name": "Acromegaly",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "3.8"
+        },
+        {
+          "drug_name": "Brompheniramine",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "3.5"
+        },
+        {
+          "drug_name": "Bumetanide",
+          "ind_id": "C0013604",
+          "ind_name": "Edema",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.8"
+        },
+        {
+          "drug_name": "Cabozantinib",
+          "ind_id": "C0238462",
+          "ind_name": "Medullary carcinoma of thyroid",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "5.4"
+        },
+        {
+          "drug_name": "Calcidiol",
+          "ind_id": "C0020598",
+          "ind_name": "Hypocalcemia",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": "6.2"
+        },
+        {
+          "drug_name": "Calcium carbonate",
+          "ind_id": "C0013395",
+          "ind_name": "Dyspepsia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Camphor",
+          "ind_id": "C0857177",
+          "ind_name": "Arthritic pains",
+          "sel_max_phase": "3.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Canakinumab",
+          "ind_id": "C0003868",
+          "ind_name": "Arthritis, Gouty",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Capreomycin",
+          "ind_id": "C0275959",
+          "ind_name": "Acute tuberculosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Carbetocin",
+          "ind_id": "C0032897",
+          "ind_name": "Prader-Willi Syndrome",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-1.1"
+        },
+        {
+          "drug_name": "Carboprost Tromethamine",
+          "ind_id": "C0032797",
+          "ind_name": "Postpartum Hemorrhage",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Carmustine",
+          "ind_id": "C0079744",
+          "ind_name": "Diffuse Large B-Cell Lymphoma",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "1.5"
+        },
+        {
+          "drug_name": "Cefdinir",
+          "ind_id": "C0339932",
+          "ind_name": "Acute Moraxella catarrhalis bronchitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.0"
+        },
+        {
+          "drug_name": "Cefixime",
+          "ind_id": "C0856695",
+          "ind_name": "Acute exacerbation of chronic bronchitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Cefmetazole",
+          "ind_id": "C0276026",
+          "ind_name": "Haemophilus influenzae pneumonia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Cefotetan",
+          "ind_id": "C0153196",
+          "ind_name": "Acute gonococcal endometritis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "0.1"
+        },
+        {
+          "drug_name": "Cefuroxime",
+          "ind_id": "C0856695",
+          "ind_name": "Acute exacerbation of chronic bronchitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-0.2"
+        },
+        {
+          "drug_name": "Chlorambucil",
+          "ind_id": "C0023434",
+          "ind_name": "Chronic Lymphocytic Leukemia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.7"
+        },
+        {
+          "drug_name": "Chlorcyclizine",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "2.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "4.5"
+        },
+        {
+          "drug_name": "Chlorothiazide",
+          "ind_id": "C0264716",
+          "ind_name": "Chronic heart failure",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "-0.2"
+        },
+        {
+          "drug_name": "Chlortetracycline",
+          "ind_id": "C0029076",
+          "ind_name": "Ophthalmia Neonatorum",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-1.3"
+        },
+        {
+          "drug_name": "Ciclopirox",
+          "ind_id": "C0006846",
+          "ind_name": "Cutaneous Candidiasis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.0"
+        },
+        {
+          "drug_name": "Cinchocaine",
+          "ind_id": "C0033774",
+          "ind_name": "Pruritus",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": "4.4"
+        },
+        {
+          "drug_name": "Cinnarizine",
+          "ind_id": "C0026603",
+          "ind_name": "Motion Sickness",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "5.8"
+        },
+        {
+          "drug_name": "Clemastine",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Corticotropin",
+          "ind_id": "C0581392",
+          "ind_name": "Exacerbation of multiple sclerosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Unknown",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-19.7"
+        },
+        {
+          "drug_name": "Crotamiton",
+          "ind_id": "C0033774",
+          "ind_name": "Pruritus",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Unknown",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Cycloserine",
+          "ind_id": "C0275959",
+          "ind_name": "Acute tuberculosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Daclizumab",
+          "ind_id": "C0751967",
+          "ind_name": "Multiple Sclerosis, Relapsing-Remitting",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Dalbavancin",
+          "ind_id": "C0178299",
+          "ind_name": "Infection of skin AND/OR subcutaneous tissue",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": "3.8"
+        },
+        {
+          "drug_name": "Danazol",
+          "ind_id": "C0016034",
+          "ind_name": "Breast Fibrocystic Disease",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "3.8"
+        },
+        {
+          "drug_name": "Deferoxamine",
+          "ind_id": "C1739382",
+          "ind_name": "Chronic iron overload",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-2.1"
+        },
+        {
+          "drug_name": "Denosumab",
+          "ind_id": "C0264115",
+          "ind_name": "Drug-induced osteoporosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Dexibuprofen",
+          "ind_id": "C0029408",
+          "ind_name": "Degenerative polyarthritis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "3.5"
+        },
+        {
+          "drug_name": "Diflorasone",
+          "ind_id": "C0406317",
+          "ind_name": "Chronic small plaque psoriasis",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Digoxin",
+          "ind_id": "C0004238",
+          "ind_name": "Atrial Fibrillation",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.3"
+        },
+        {
+          "drug_name": "Dihydrotachysterol",
+          "ind_id": "C0020598",
+          "ind_name": "Hypocalcemia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "7.7"
+        },
+        {
+          "drug_name": "Dinoprost Tromethamine",
+          "ind_id": "C0549315",
+          "ind_name": "Hydatidiform mole, benign",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Diphenylpyraline",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "3.9"
+        },
+        {
+          "drug_name": "Dipyridamole",
+          "ind_id": "C0004238",
+          "ind_name": "Atrial Fibrillation",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.7"
+        },
+        {
+          "drug_name": "Drospirenone",
+          "ind_id": "C0001144",
+          "ind_name": "Acne Vulgaris",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Drostanolone",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": "4.2"
+        },
+        {
+          "drug_name": "Dyclonine",
+          "ind_id": "C0235339",
+          "ind_name": "Mouth irritation",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "3.6"
+        },
+        {
+          "drug_name": "Echothiophate",
+          "ind_id": "C0014877",
+          "ind_name": "Esotropia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "1.0"
+        },
+        {
+          "drug_name": "Econazole",
+          "ind_id": "C0006846",
+          "ind_name": "Cutaneous Candidiasis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "5.3"
+        },
+        {
+          "drug_name": "Eculizumab",
+          "ind_id": "C2919522",
+          "ind_name": "Congenital hemolytic uremic syndrome",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Edoxaban",
+          "ind_id": "C0013922",
+          "ind_name": "Embolism",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.4"
+        },
+        {
+          "drug_name": "Eluxadoline",
+          "ind_id": "C1262211",
+          "ind_name": "Diarrhoea predominant irritable bowel syndrome",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.9"
+        },
+        {
+          "drug_name": "Emedastine",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.2"
+        },
+        {
+          "drug_name": "Epinephrine",
+          "ind_id": "C0002792",
+          "ind_name": "anaphylaxis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-1.4"
+        },
+        {
+          "drug_name": "Ergotamine",
+          "ind_id": "C0009088",
+          "ind_name": "Cluster Headache",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.0"
+        },
+        {
+          "drug_name": "Eribulin",
+          "ind_id": "C0278488",
+          "ind_name": "Carcinoma breast stage IV",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "1.1"
+        },
+        {
+          "drug_name": "Erythromycin",
+          "ind_id": "C0001144",
+          "ind_name": "Acne Vulgaris",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.7"
+        },
+        {
+          "drug_name": "Ethambutol",
+          "ind_id": "C0275959",
+          "ind_name": "Acute tuberculosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "-0.1"
+        },
+        {
+          "drug_name": "Ethionamide",
+          "ind_id": "C0275959",
+          "ind_name": "Acute tuberculosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.7"
+        },
+        {
+          "drug_name": "Ezetimibe",
+          "ind_id": "C0342882",
+          "ind_name": "Familial hypercholesterolemia - heterozygous",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "4.0"
+        },
+        {
+          "drug_name": "Famciclovir",
+          "ind_id": "C0019360",
+          "ind_name": "Herpes zoster disease",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.0"
+        },
+        {
+          "drug_name": "Fexofenadine",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "3.0"
+        },
+        {
+          "drug_name": "Finasteride",
+          "ind_id": "C4083212",
+          "ind_name": "Alopecia, Male Pattern",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "3.0"
+        },
+        {
+          "drug_name": "Floxuridine",
+          "ind_id": "C0345904",
+          "ind_name": "Malignant neoplasm of liver",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-1.2"
+        },
+        {
+          "drug_name": "Fluorometholone",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Fluoxetine",
+          "ind_id": "C2267227",
+          "ind_name": "Bulimia Nervosa",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "4.0"
+        },
+        {
+          "drug_name": "Flurandrenolide",
+          "ind_id": "C0406317",
+          "ind_name": "Chronic small plaque psoriasis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "1.4"
+        },
+        {
+          "drug_name": "Fluvastatin",
+          "ind_id": "C0003850",
+          "ind_name": "Arteriosclerosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "3.5"
+        },
+        {
+          "drug_name": "Fondaparinux sodium",
+          "ind_id": "C0149871",
+          "ind_name": "Deep Vein Thrombosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Oligosaccharide",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Fosinopril",
+          "ind_id": "C0264716",
+          "ind_name": "Chronic heart failure",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Fosphenytoin",
+          "ind_id": "C0014544",
+          "ind_name": "Epilepsy",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Furosemide",
+          "ind_id": "C0155919",
+          "ind_name": "Acute pulmonary edema",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.0"
+        },
+        {
+          "drug_name": "Fusidic Acid",
+          "ind_id": "C0001144",
+          "ind_name": "Acne Vulgaris",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "5.5"
+        },
+        {
+          "drug_name": "Gatifloxacin",
+          "ind_id": "C0856695",
+          "ind_name": "Acute exacerbation of chronic bronchitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "-0.7"
+        },
+        {
+          "drug_name": "Gemcitabine",
+          "ind_id": "C0281361",
+          "ind_name": "Adenocarcinoma of pancreas",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-1.5"
+        },
+        {
+          "drug_name": "golimumab",
+          "ind_id": "C0038013",
+          "ind_name": "Ankylosing spondylitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Guaifenesin",
+          "ind_id": "C2607914",
+          "ind_name": "Allergic rhinitis (disorder)",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.4"
+        },
+        {
+          "drug_name": "Halcinonide",
+          "ind_id": "C0406317",
+          "ind_name": "Chronic small plaque psoriasis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "3.6"
+        },
+        {
+          "drug_name": "Hydroflumethiazide",
+          "ind_id": "C0013604",
+          "ind_name": "Edema",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.4"
+        },
+        {
+          "drug_name": "Hydromorphone",
+          "ind_id": "C2215257",
+          "ind_name": "Acute postoperative pain",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.8"
+        },
+        {
+          "drug_name": "Hydroquinone",
+          "ind_id": "C0025218",
+          "ind_name": "Chloasma",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "0.6"
+        },
+        {
+          "drug_name": "Hydroxyzine",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "3.7"
+        },
+        {
+          "drug_name": "Icosapent",
+          "ind_id": "C1623040",
+          "ind_name": "Breastfeeding (mother)",
+          "sel_max_phase": "3.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Iron",
+          "ind_id": "C0158996",
+          "ind_name": "Anemia of prematurity",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Isoniazid",
+          "ind_id": "C0275959",
+          "ind_name": "Acute tuberculosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "-0.7"
+        },
+        {
+          "drug_name": "Isosorbide Dinitrate",
+          "ind_id": "C0002962",
+          "ind_name": "Angina Pectoris",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.3"
+        },
+        {
+          "drug_name": "Isoxsuprine",
+          "ind_id": "C0007820",
+          "ind_name": "Cerebrovascular Disorders",
+          "sel_max_phase": "2.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Ivermectin",
+          "ind_id": "C0029001",
+          "ind_name": "Onchocerciasis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Unknown",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Ixabepilone",
+          "ind_id": "C0678222",
+          "ind_name": "Breast Carcinoma",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "3.6"
+        },
+        {
+          "drug_name": "L-Serine",
+          "ind_id": "C0275959",
+          "ind_name": "Acute tuberculosis",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Lanreotide",
+          "ind_id": "C0001206",
+          "ind_name": "Acromegaly",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.5"
+        },
+        {
+          "drug_name": "Leuprolide",
+          "ind_id": "C0014175",
+          "ind_name": "Endometriosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.7"
+        },
+        {
+          "drug_name": "Levobunolol",
+          "ind_id": "C0017612",
+          "ind_name": "Glaucoma, Open-Angle",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.4"
+        },
+        {
+          "drug_name": "Levothyroxine",
+          "ind_id": "C0010308",
+          "ind_name": "Congenital Hypothyroidism",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.4"
+        },
+        {
+          "drug_name": "Lidocaine",
+          "ind_id": "C0019112",
+          "ind_name": "Hemorrhoids",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.3"
+        },
+        {
+          "drug_name": "Linezolid",
+          "ind_id": "C0032308",
+          "ind_name": "Staphylococcal Pneumonia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.7"
+        },
+        {
+          "drug_name": "Lisdexamfetamine",
+          "ind_id": "C1263846",
+          "ind_name": "Attention deficit hyperactivity disorder",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Lisuride",
+          "ind_id": "C0001206",
+          "ind_name": "Acromegaly",
+          "sel_max_phase": "3.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.7"
+        },
+        {
+          "drug_name": "Lithium",
+          "ind_id": "C0338873",
+          "ind_name": "Bipolar affective disorder, current episode manic",
+          "sel_max_phase": "3.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Loperamide",
+          "ind_id": "C0011991",
+          "ind_name": "Diarrhea",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Loteprednol",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "3.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.6"
+        },
+        {
+          "drug_name": "Lubiprostone",
+          "ind_id": "C0267509",
+          "ind_name": "Chronic idiopathic constipation",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Magnesium salicylate",
+          "ind_id": "C0003862",
+          "ind_name": "Arthralgia",
+          "sel_max_phase": "-1.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Mechlorethamine",
+          "ind_id": "C0023434",
+          "ind_name": "Chronic Lymphocytic Leukemia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Mefenamic acid",
+          "ind_id": "C0013390",
+          "ind_name": "Dysmenorrhea",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "5.1"
+        },
+        {
+          "drug_name": "Meloxicam",
+          "ind_id": "C0029408",
+          "ind_name": "Degenerative polyarthritis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "3.0"
+        },
+        {
+          "drug_name": "Methamphetamine",
+          "ind_id": "C1263846",
+          "ind_name": "Attention deficit hyperactivity disorder",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.1"
+        },
+        {
+          "drug_name": "Methantheline",
+          "ind_id": "C0038358",
+          "ind_name": "Gastric ulcer",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Metronidazole",
+          "ind_id": "C0243001",
+          "ind_name": "Abdominal Abscess",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.0"
+        },
+        {
+          "drug_name": "Midazolam",
+          "ind_id": "C0085631",
+          "ind_name": "Agitation",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.5"
+        },
+        {
+          "drug_name": "Minoxidil",
+          "ind_id": "C0002170",
+          "ind_name": "Alopecia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.2"
+        },
+        {
+          "drug_name": "Nadolol",
+          "ind_id": "C0002962",
+          "ind_name": "Angina Pectoris",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.7"
+        },
+        {
+          "drug_name": "Nafarelin",
+          "ind_id": "C0014175",
+          "ind_name": "Endometriosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Nafcillin",
+          "ind_id": "C2242472",
+          "ind_name": "Infection of bone",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.9"
+        },
+        {
+          "drug_name": "Naloxone",
+          "ind_id": "C0267511",
+          "ind_name": "Drug-induced constipation",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.1"
+        },
+        {
+          "drug_name": "Naproxen",
+          "ind_id": "C0038013",
+          "ind_name": "Ankylosing spondylitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "3.3"
+        },
+        {
+          "drug_name": "Nilotinib",
+          "ind_id": "C0023472",
+          "ind_name": "Leukemia, Myeloid, Accelerated Phase",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "4.9"
+        },
+        {
+          "drug_name": "Nizatidine",
+          "ind_id": "C0013295",
+          "ind_name": "Duodenal Ulcer",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.6"
+        },
+        {
+          "drug_name": "Norethisterone",
+          "ind_id": "C0001144",
+          "ind_name": "Acne Vulgaris",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": "3.0"
+        },
+        {
+          "drug_name": "Norgestimate",
+          "ind_id": "C0001144",
+          "ind_name": "Acne Vulgaris",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "4.1"
+        },
+        {
+          "drug_name": "Ofloxacin",
+          "ind_id": "C0243001",
+          "ind_name": "Abdominal Abscess",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "-0.4"
+        },
+        {
+          "drug_name": "Olanzapine",
+          "ind_id": "C0338873",
+          "ind_name": "Bipolar affective disorder, current episode manic",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.9"
+        },
+        {
+          "drug_name": "Omalizumab",
+          "ind_id": "C0004096",
+          "ind_name": "Asthma",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Oritavancin",
+          "ind_id": "C0162627",
+          "ind_name": "Skin Diseases, Bacterial",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "1.5"
+        },
+        {
+          "drug_name": "Oxacillin",
+          "ind_id": "C2242472",
+          "ind_name": "Infection of bone",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.4"
+        },
+        {
+          "drug_name": "Palifermin",
+          "ind_id": "C1274988",
+          "ind_name": "Drug-induced mucositis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Papaverine",
+          "ind_id": "C0917798",
+          "ind_name": "Cerebral Ischemia",
+          "sel_max_phase": "3.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "3.9"
+        },
+        {
+          "drug_name": "Paramethadione",
+          "ind_id": "C0014553",
+          "ind_name": "Absence Epilepsy",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.8"
+        },
+        {
+          "drug_name": "Pazopanib",
+          "ind_id": "C0007134",
+          "ind_name": "Renal Cell Carcinoma",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Peginterferon alfa-2a",
+          "ind_id": "C0524909",
+          "ind_name": "Hepatitis B, Chronic",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Phenprocoumon",
+          "ind_id": "C0027051",
+          "ind_name": "Myocardial Infarction",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Phensuximide",
+          "ind_id": "C0014553",
+          "ind_name": "Absence Epilepsy",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.8"
+        },
+        {
+          "drug_name": "Phenytoin",
+          "ind_id": "C0270425",
+          "ind_name": "Bipolar disorder in remission",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.5"
+        },
+        {
+          "drug_name": "Physostigmine",
+          "ind_id": "C0237996",
+          "ind_name": "anticholinergic toxicity",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "0.7"
+        },
+        {
+          "drug_name": "Porfimer",
+          "ind_id": "C0546837",
+          "ind_name": "Malignant neoplasm of esophagus",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Potassium Chloride",
+          "ind_id": "C0009806",
+          "ind_name": "Constipation",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Procyclidine",
+          "ind_id": "C0015371",
+          "ind_name": "Extrapyramidal Disorders",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "4.1"
+        },
+        {
+          "drug_name": "Pyridoxine",
+          "ind_id": "C1623040",
+          "ind_name": "Breastfeeding (mother)",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "-0.8"
+        },
+        {
+          "drug_name": "Pyrimethamine",
+          "ind_id": "C0024530",
+          "ind_name": "Malaria",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.7"
+        },
+        {
+          "drug_name": "Ramipril",
+          "ind_id": "C0038454",
+          "ind_name": "Cerebrovascular accident",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Ramucirumab",
+          "ind_id": "C0278701",
+          "ind_name": "Gastric Adenocarcinoma",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Reserpine",
+          "ind_id": "C0020538",
+          "ind_name": "Hypertensive disease",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "4.0"
+        },
+        {
+          "drug_name": "Riboflavin",
+          "ind_id": "C0687148",
+          "ind_name": "Mineral deficiency",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-1.5"
+        },
+        {
+          "drug_name": "Risperidone",
+          "ind_id": "C0004352",
+          "ind_name": "Autistic Disorder",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.7"
+        },
+        {
+          "drug_name": "Ritonavir",
+          "ind_id": "C0524910",
+          "ind_name": "Hepatitis C, Chronic",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "6.0"
+        },
+        {
+          "drug_name": "Rituximab",
+          "ind_id": "C0023434",
+          "ind_name": "Chronic Lymphocytic Leukemia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Roxatidine acetate",
+          "ind_id": "C0038358",
+          "ind_name": "Gastric ulcer",
+          "sel_max_phase": "-1.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.1"
+        },
+        {
+          "drug_name": "Salicylic acid",
+          "ind_id": "C0001144",
+          "ind_name": "Acne Vulgaris",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.3"
+        },
+        {
+          "drug_name": "Selenium Sulfide",
+          "ind_id": "C0423775",
+          "ind_name": "Scurfiness of scalp",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Spironolactone",
+          "ind_id": "C0003962",
+          "ind_name": "Ascites",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "2.9"
+        },
+        {
+          "drug_name": "Sulfadiazine",
+          "ind_id": "C0008513",
+          "ind_name": "Chorioretinitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "-0.1"
+        },
+        {
+          "drug_name": "Sulfamethoxazole",
+          "ind_id": "C0856695",
+          "ind_name": "Acute exacerbation of chronic bronchitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.9"
+        },
+        {
+          "drug_name": "Sulfanilamide",
+          "ind_id": "C0700345",
+          "ind_name": "Candidiasis, Vulvovaginal",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-0.6"
+        },
+        {
+          "drug_name": "Sulfisoxazole",
+          "ind_id": "C0271429",
+          "ind_name": "Acute otitis media",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.0"
+        },
+        {
+          "drug_name": "Sulindac",
+          "ind_id": "C0038013",
+          "ind_name": "Ankylosing spondylitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Tafluprost",
+          "ind_id": "C0017612",
+          "ind_name": "Glaucoma, Open-Angle",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "4.5"
+        },
+        {
+          "drug_name": "Tavaborole",
+          "ind_id": "C0276755",
+          "ind_name": "Onychomycosis due to Trichophyton mentagrophytes",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Tazarotene",
+          "ind_id": "C0001144",
+          "ind_name": "Acne Vulgaris",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "4.9"
+        },
+        {
+          "drug_name": "Tedizolid Phosphate",
+          "ind_id": "C0162627",
+          "ind_name": "Skin Diseases, Bacterial",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.3"
+        },
+        {
+          "drug_name": "Telavancin",
+          "ind_id": "C0004626",
+          "ind_name": "Pneumonia, Bacterial",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-2.1"
+        },
+        {
+          "drug_name": "Tenofovir",
+          "ind_id": "C0524909",
+          "ind_name": "Hepatitis B, Chronic",
+          "sel_max_phase": "3.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Tetracaine",
+          "ind_id": "C0033774",
+          "ind_name": "Pruritus",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "3.7"
+        },
+        {
+          "drug_name": "Tiaprofenic acid",
+          "ind_id": "C0029408",
+          "ind_name": "Degenerative polyarthritis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "3.3"
+        },
+        {
+          "drug_name": "Ticarcillin",
+          "ind_id": "C0032290",
+          "ind_name": "Aspiration Pneumonia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "0.8"
+        },
+        {
+          "drug_name": "Tigecycline",
+          "ind_id": "C0243001",
+          "ind_name": "Abdominal Abscess",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Tinidazole",
+          "ind_id": "C0152499",
+          "ind_name": "Acute amebiasis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "-0.4"
+        },
+        {
+          "drug_name": "Tizanidine",
+          "ind_id": "C0026838",
+          "ind_name": "Muscle Spasticity",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.1"
+        },
+        {
+          "drug_name": "Tobramycin",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-6.2"
+        },
+        {
+          "drug_name": "Tolvaptan",
+          "ind_id": "C0020625",
+          "ind_name": "Hyponatremia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Topotecan",
+          "ind_id": "C1140680",
+          "ind_name": "Malignant neoplasm of ovary",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.5"
+        },
+        {
+          "drug_name": "Tramadol",
+          "ind_id": "C0150055",
+          "ind_name": "Chronic pain",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Triamterene",
+          "ind_id": "C0013604",
+          "ind_name": "Edema",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Tripelennamine",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Triprolidine",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Ursodeoxycholic acid",
+          "ind_id": "C0008350",
+          "ind_name": "Cholelithiasis",
+          "sel_max_phase": "",
+          "sel_molecule_type": "",
+          "sel_oral": "",
+          "sel_xlogp": "4.9"
+        },
+        {
+          "drug_name": "Ustekinumab",
+          "ind_id": "C0003872",
+          "ind_name": "Arthritis, Psoriatic",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Vidarabine",
+          "ind_id": "C0022570",
+          "ind_name": "Keratitis, Dendritic",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-1.1"
+        },
+        {
+          "drug_name": "Vinblastine",
+          "ind_id": "C0278488",
+          "ind_name": "Carcinoma breast stage IV",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "3.7"
+        },
+        {
+          "drug_name": "Voglibose",
+          "ind_id": "C0011860",
+          "ind_name": "Diabetes Mellitus, Non-Insulin-Dependent",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Voriconazole",
+          "ind_id": "C0877445",
+          "ind_name": "Candidemia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "1.0",
+          "sel_xlogp": "1.5"
+        },
+        {
+          "drug_name": "Zoledronic acid",
+          "ind_id": "C0149911",
+          "ind_name": "Humoral hypercalcemia of malignancy (disorder)",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        }
+      ],
+      "claim_mode": "claim_free",
+      "n_target": 200,
+      "unit": "distinct_drug"
+    },
+    "nc1_modality_contradiction": {
+      "cases": [
+        {
+          "drug_name": "Adalimumab",
+          "ind_id": "C0038013",
+          "ind_name": "Ankylosing spondylitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Aflibercept",
+          "ind_id": "C0339507",
+          "ind_name": "Branch retinal vein occlusion with macular edema",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Alirocumab",
+          "ind_id": "C0004153",
+          "ind_name": "Atherosclerosis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Alteplase",
+          "ind_id": "C0155626",
+          "ind_name": "Acute myocardial infarction",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Enzyme",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Bevacizumab",
+          "ind_id": "C0302592",
+          "ind_name": "Cervix carcinoma",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Etanercept",
+          "ind_id": "C0038013",
+          "ind_name": "Ankylosing spondylitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Evolocumab",
+          "ind_id": "C3875286",
+          "ind_name": "Complex dyslipidemia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Insulin Glargine",
+          "ind_id": "C0011854",
+          "ind_name": "Diabetes Mellitus, Insulin-Dependent",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-14.1"
+        },
+        {
+          "drug_name": "Insulin Lispro",
+          "ind_id": "C0011854",
+          "ind_name": "Diabetes Mellitus, Insulin-Dependent",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Polymyxin B Sulfate",
+          "ind_id": "C0009768",
+          "ind_name": "Bacterial conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Theophylline",
+          "ind_id": "C0004096",
+          "ind_name": "Asthma",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "1.0",
+          "sel_xlogp": "0.0"
+        },
+        {
+          "drug_name": "Trastuzumab",
+          "ind_id": "C1960398",
+          "ind_name": "HER2-positive carcinoma of breast",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Vasopressin",
+          "ind_id": "C0270327",
+          "ind_name": "Bedwetting",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Vedolizumab",
+          "ind_id": "C0010346",
+          "ind_name": "Crohn Disease",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Antibody",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Ziconotide",
+          "ind_id": "C0150055",
+          "ind_name": "Chronic pain",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Protein",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-14.0"
+        }
+      ],
+      "claim_mode": "planted_false_claim",
+      "expect_finding": {
+        "code": "N2",
+        "status": "flagged"
+      },
+      "n_target": 15,
+      "planted_claim": {
+        "claimed_modality": "small molecule"
+      },
+      "unit": "control"
+    },
+    "nc2_route_contradiction": {
+      "cases": [
+        {
+          "drug_name": "Antazoline",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.6"
+        },
+        {
+          "drug_name": "Bretylium",
+          "ind_id": "C0085612",
+          "ind_name": "Ventricular arrhythmia",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.8"
+        },
+        {
+          "drug_name": "Bupivacaine",
+          "ind_id": "C0033774",
+          "ind_name": "Pruritus",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "3.4"
+        },
+        {
+          "drug_name": "Cefoxitin",
+          "ind_id": "C0243001",
+          "ind_name": "Abdominal Abscess",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "0.0"
+        },
+        {
+          "drug_name": "Colistimethate",
+          "ind_id": "C0948205",
+          "ind_name": "Enterobacter infection",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Unknown",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Dexpanthenol",
+          "ind_id": "C1444173",
+          "ind_name": "Arthropod bite wound",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-0.9"
+        },
+        {
+          "drug_name": "Dorzolamide",
+          "ind_id": "C0017612",
+          "ind_name": "Glaucoma, Open-Angle",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "0.4"
+        },
+        {
+          "drug_name": "Fluticasone furoate",
+          "ind_id": "C2607914",
+          "ind_name": "Allergic rhinitis (disorder)",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "4.8"
+        },
+        {
+          "drug_name": "Gramicidin D",
+          "ind_id": "C0009768",
+          "ind_name": "Bacterial conjunctivitis",
+          "sel_max_phase": "",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "10.9"
+        },
+        {
+          "drug_name": "Nitroprusside",
+          "ind_id": "C0581377",
+          "ind_name": "Decompensated cardiac failure",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": ""
+        },
+        {
+          "drug_name": "Oxymetazoline",
+          "ind_id": "C0027424",
+          "ind_name": "Nasal congestion (finding)",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "2.9"
+        },
+        {
+          "drug_name": "Pemirolast",
+          "ind_id": "C0009766",
+          "ind_name": "Allergic Conjunctivitis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-0.3"
+        },
+        {
+          "drug_name": "Penciclovir",
+          "ind_id": "C0019345",
+          "ind_name": "Herpes Labialis",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "-1.6"
+        },
+        {
+          "drug_name": "Scopolamine",
+          "ind_id": "C2607914",
+          "ind_name": "Allergic rhinitis (disorder)",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "0.9"
+        },
+        {
+          "drug_name": "Temsirolimus",
+          "ind_id": "C0334634",
+          "ind_name": "Malignant lymphoma, lymphocytic, intermediate differentiation, diffuse",
+          "sel_max_phase": "4.0",
+          "sel_molecule_type": "Small molecule",
+          "sel_oral": "0.0",
+          "sel_xlogp": "5.6"
+        }
+      ],
+      "claim_mode": "planted_false_claim",
+      "expect_finding": {
+        "code": "N4",
+        "status": "flagged"
+      },
+      "n_target": 15,
+      "planted_claim": {
+        "claimed_route": "oral"
+      },
+      "unit": "control"
+    }
+  },
+  "contract": "triage-discrimination-cases-v2",
+  "exclusions": {
+    "dev_suite_drugs_excluded": 14,
+    "eligible_distinct_drugs": 831,
+    "qc_quarantined_names": 0
+  },
+  "seed": 20260811,
+  "source_csv": "data_prep/output/enriched_dataset.csv",
+  "source_csv_sha256": "ca63f14eebd9ab3a20d3a11b28fcb407ef5eb9a3245edefc7f51bb8902b3e85a"
+}

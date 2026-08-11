@@ -36,9 +36,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CSV_PATH = ROOT / "data_prep" / "output" / "enriched_dataset.csv"
 GROUND_TRUTH = ROOT / "validation" / "ground_truth.json"
-OUT_PATH = ROOT / "validation" / "triage_discrimination_cases.json"
+OUT_PATH = ROOT / "validation" / "triage_discrimination_cases_v2.json"
+SCORED_RESULTS = ROOT / "validation" / "triage_discrimination_results_v2.json"
 
-CASESET_CONTRACT = "triage-discrimination-cases-v1"
+CASESET_CONTRACT = "triage-discrimination-cases-v2"
 SEED = 20260811
 N_COHORT_A = 200
 N_NC1 = 15
@@ -107,8 +108,13 @@ def _code_commit() -> str:
 
 
 def build() -> dict:
+    # Confirmed REPURPOSINGS only (Amendment 2): v1 filtered on
+    # status==Approved alone, which admitted ~10% original-approval rows --
+    # drugs approved for their first indication are not repurposings. The
+    # benchmark selection criterion (E-rules) uses the dataset's own label.
     rows = [r for r in csv.DictReader(open(CSV_PATH))
-            if r["status"].strip() == "Approved"]
+            if r["status"].strip() == "Approved"
+            and r["label"].strip() == "repurposed-success"]
 
     # One record per distinct drug, deterministic pair choice.
     by_drug: dict[str, dict] = {}
@@ -201,6 +207,10 @@ def build() -> dict:
 
 
 def main() -> None:
+    if SCORED_RESULTS.exists():
+        raise SystemExit(
+            "[cases] REFUSED: scored results exist for this case-set "
+            "generation. Frozen artifacts are amended, never rebuilt.")
     caseset = build()
     OUT_PATH.write_text(json.dumps(caseset, indent=2, sort_keys=True) + "\n")
     print(f"[cases] wrote {OUT_PATH}")

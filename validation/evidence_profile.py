@@ -110,6 +110,7 @@ DISEASE_INDEPENDENT_DIMS = frozenset({
     "route_feasibility",        # N4 finding (redacted label lane)
     "human_mechanism_evidence", # N3 finding (redacted literature lane)
     "lipophilicity",            # drug-side PubChem XLogP attribute
+    "combination_product",      # N1 finding (redacted label lane)
 })
 DISEASE_DEPENDENT_DIMS = frozenset({
     "pool_presence",            # needs a persisted pool
@@ -163,8 +164,9 @@ def build_profile(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
         round(float(rank) / float(total), 6)
         if pool == POOL_IN and rank and total else None)
 
-    n3 = findings.get("N3", set())
+    n1 = findings.get("N1", set())
     n2 = findings.get("N2", set())
+    n3 = findings.get("N3", set())
     n4 = findings.get("N4", set())
 
     dimensions = {
@@ -178,10 +180,19 @@ def build_profile(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
         "human_mechanism_evidence": (
             PRECLINICAL_ONLY if "flagged" in n3
             else (UNRESOLVED if "unresolved" in n3 else HUMAN_PRESENT)),
+        # Amendment 2: every emitted N1/N2 status has an explicit mapping.
+        # N2 "review" (biologic without a claimed modality) surfaces as
+        # REVIEW — biologics are legitimate repurposings, so it is
+        # deliberately NOT a caution. N1 (combination product) is a
+        # claim-framing fact, not a candidate defect: descriptive only.
         "modality_feasibility": (
             FLAGGED if ("MODALITY_CAUTION" in flags or "flagged" in n2)
-            else (UNRESOLVED if ("MODALITY_UNRESOLVED" in flags
-                                 or "unresolved" in n2) else CLEAR)),
+            else (REVIEW if "review" in n2
+                  else (UNRESOLVED if ("MODALITY_UNRESOLVED" in flags
+                                       or "unresolved" in n2) else CLEAR))),
+        "combination_product": (
+            FLAGGED if "flagged" in n1
+            else (UNRESOLVED if "unresolved" in n1 else CLEAR)),
         "route_feasibility": (
             # Amendment 1: N4 "flagged" (claimed route not among approved
             # label routes) must surface as FLAGGED. The original mapping

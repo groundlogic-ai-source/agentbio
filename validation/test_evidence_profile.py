@@ -119,7 +119,8 @@ class PrimaryIgnoresPool(unittest.TestCase):
         # The genuinely mechanical, pool-free dimensions must be the primary set.
         self.assertEqual(DISEASE_INDEPENDENT_DIMS, {
             "modality_feasibility", "route_feasibility",
-            "human_mechanism_evidence", "lipophilicity"})
+            "human_mechanism_evidence", "lipophilicity",
+            "combination_product"})
         # The pool-derived dimensions must be quarantined as descriptive-only.
         self.assertIn("rank", DISEASE_DEPENDENT_DIMS)
         self.assertIn("mechanism_direction", DISEASE_DEPENDENT_DIMS)
@@ -150,6 +151,33 @@ class PrimaryIgnoresPool(unittest.TestCase):
         self.assertEqual(profile["disposition"], NOT_ASSESSABLE)
         self.assertIn(profile["primary_disposition"],
                       {SUPPORTED, QUALIFIED, DISQUALIFIED})
+
+
+class FindingsMapExhaustively(unittest.TestCase):
+    """Every N1-N4 status the detector vocabulary can emit must surface in a
+    dimension -- never fall through to CLEAR. The N4 'flagged' dropout
+    (Amendment 1) hid every detected route contradiction; this guard makes
+    that failure class impossible for all four finding codes."""
+
+    _CASES = [  # (code, status, dimension, expected value)
+        ("N1", "flagged", "combination_product", "FLAGGED"),
+        ("N1", "unresolved", "combination_product", "UNRESOLVED"),
+        ("N2", "flagged", "modality_feasibility", "FLAGGED"),
+        ("N2", "review", "modality_feasibility", "REVIEW"),
+        ("N2", "unresolved", "modality_feasibility", "UNRESOLVED"),
+        ("N3", "flagged", "human_mechanism_evidence", "PRECLINICAL_ONLY"),
+        ("N3", "unresolved", "human_mechanism_evidence", "UNRESOLVED"),
+        ("N4", "flagged", "route_feasibility", "FLAGGED"),
+        ("N4", "review", "route_feasibility", "REVIEW"),
+        ("N4", "unresolved", "route_feasibility", "UNRESOLVED"),
+    ]
+
+    def test_no_status_falls_through(self):
+        for code, status, dim, expected in self._CASES:
+            with self.subTest(code=code, status=status):
+                profile = build_profile("X", _audit(findings=[(code, status)]))
+                self.assertEqual(profile["dimensions"][dim], expected,
+                                 f"{code}/{status} fell through on {dim}")
 
 
 class RuleIsPinned(unittest.TestCase):
