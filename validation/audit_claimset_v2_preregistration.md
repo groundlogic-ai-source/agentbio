@@ -222,3 +222,31 @@ stopped at 75/100 claims executed.
    (environment failure, unconsumed allowances, pre-freeze fix list)
    alongside the score. The lost run's crash patterns informed the fixes
    but no outcome information carried over.
+
+## Amendment 4 (2026-08-11, after the second construction attempt aborted
+## fail-closed on the control quota, before any scored run): pool-context
+## control dynamic fill
+
+The second construction attempt (post-Amendment-3 code) filled E = 1
+(Amendment 2), novel = 59, and pool-free controls = 32/32, but the
+pool-context control block yielded only 3/8 and construction aborted at
+35/40 controls as designed. Causes, verified at construction: of the 12
+registered pool-context names (8 + 4 spares), 3 were genuinely present in
+the pooled cases' pools and 5 failed the single-ingredient
+cutoff-eligible-label ground-truth rule (mostly inhaler-class drugs whose
+labels are combination products or not cutoff-eligible). The shortfall is
+structural, not transient API flakiness.
+
+1. **Pool-context shortfall is filled dynamically**: after the registered
+   fixed list is exhausted, additional pool-context controls are sampled
+   from the SAME approved single-ingredient small-molecule dataset
+   universe as the pool-free controls, using an independent seeded RNG
+   (SEED+1) so the pool-free sample sequence is unchanged, assigned
+   round-robin between the two pooled cases. Ground truth is identical to
+   the fixed list: verifiable cutoff-eligible single-ingredient FDA label
+   AND absence from the assigned case's pool. A 120-attempt sampling
+   budget applies; the fail-closed quota guard (40 controls) is unchanged.
+2. **All thresholds unchanged** (control false-flag ≤ 0.15 with
+   Clopper-Pearson bounds, abstention caps, one-scored-run discipline).
+3. **Reporting:** the v2 results report must state the pool-context yield
+   (fixed-list vs dynamic fill) and this amendment alongside the score.
