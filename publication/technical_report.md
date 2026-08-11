@@ -25,7 +25,7 @@ Three instruments were run, each pre-registered and frozen, and they answer
 |---|---|---|
 | Benchmark v2 (`benchmark-freeze-v2`) | Discovery accuracy: does a confirmed repurposed drug reappear in the ranked list when all drug-side identity is redacted? | `validation/benchmark_results_v2.json` |
 | Audit claim-set v1 (`audit_claimset_v1`) | External audit validation: does the audit layer catch real, externally-grounded defect claims — including classes nobody pre-fixed for? | `validation/audit_claimset_results.json` |
-| Audit claim-set v2 (`audit_claimset_v2`) | Pre-registered re-validation of the fixed audit layer on a fresh frozen claim set (v1 reported alongside, never replaced) | `validation/audit_claimset_v2_results.json` |
+| Audit claim-set v2 (`audit_claimset_v2`) | **Input hygiene only**: after the v1 fixes, does the layer flag false *drug-attribute* assertions (modality, route, combination status) and stay quiet on clean ones? It does **not** test drug–disease hypothesis judgment (§4.5) | `validation/audit_claimset_v2_results.json` |
 | Audit trap benchmark | Engineering regression: do the twelve defect classes AgentBio was explicitly fixed for still trip the audit? | `validation/audit_trap_results.json` |
 
 This report also summarizes, clearly labeled, the development instruments:
@@ -237,13 +237,76 @@ inflating the control false-flag rate. The correct next actions are a pool
 staleness/refresh mechanism and N3 precision work — *after* this report is
 frozen, as new studies with their own pre-registrations.
 
-### 4.4 Audit claim-set v2: pre-registered re-validation of the fixed layer — PASS
+### 4.4 Audit claim-set v2: input-hygiene re-validation of the fixed layer — PASS
 
 The promised new study ran: fixes registered (pool safety refresh, N3
 precision, plus pre-freeze robustness work), a NEW claim set constructed,
 frozen, and scored exactly once under the same discipline
-(`validation/audit_claimset_v2_preregistration.md`, Amendments 1–4;
+(`validation/audit_claimset_v2_preregistration.md`, Amendments 1–7;
 freeze manifest `validation/audit_claimset_v2_freeze_manifest.json`).
+
+**Freeze-binding incident, disclosed (Amendment 7).** The claim-set builder
+remained wired to a live workflow after the freeze, and that workflow re-ran
+roughly 50 minutes after the freeze and 40 minutes after the single scored
+run, overwriting the frozen claim set and construction log in place. Compared
+field-by-field against the freeze commit, all 100 claims were identical —
+same ids, same content, same class counts — and the only changes were the
+`created_at` timestamp and the derived self-hash, plus the single
+`Constructed:` line in the log. That was still enough to break the manifest's
+file-sha binding. Both artifacts were restored from the freeze commit; the
+claim set again hashes to `5013a57a…` and the results to `b39f7426…`, and
+both bindings verify. Nothing was re-scored and no allowance was touched. The
+builder now fails closed once a scored-results hash is recorded, so the
+rebuild cannot recur. We report this because a freeze that a workflow can
+silently overwrite is a weakness in the method, not a footnote.
+
+**Read the composition before the metric.** v2's defect arm is not evenly
+spread across its classes, and the classes it does test are narrow. Stated
+plainly, and re-derived mechanically from the frozen claim set:
+
+- **One class carries 73% of the arm.** N2 (biologic modality mis-scope) =
+  43 of 59 novel claims, 43 of 60 defect claims. The registered
+  N1 → N4 → N2 reallocation order exhausted N1 and N4 at quota and sent the
+  entire 36-claim shortfall into N2 — the class with the largest universe
+  and the highest v1 recall (13/13). Registered in advance and executed
+  mechanically, so not post-hoc selection; but the foreseeable effect was to
+  load the arm onto the easiest available class. We record that as a design
+  defect in the composition rule (Amendment 6), not as a result.
+- **The claims assert drug attributes, not drug–disease hypotheses.** Each
+  N2 claim asserts one field (`modality: "small molecule"`) against a drug
+  whose label identifies a biologic; each N4 claim asserts `route` +
+  `context`; N1 claims carry no claim fields and exercise label parsing. In
+  all 59 novel claims the `disease_name` field is **inert** — ground truth
+  is a property of the drug's label alone. Detection is, in substance, a
+  regulatory-label lookup and comparison.
+- **Pool context is almost untested.** 59 of 60 defect claims are pool-free.
+  Only the single E2 claim (VANDETANIB) carries a `job_id_hint`; with the 8
+  pool-context controls, 9 of 100 claims touch the pipeline's own candidate
+  pools.
+- **Findings change nothing.** Every N1–N4 finding carries
+  `effect: "disclosure_only"` and alters no score, rank, cap, or verdict.
+  The metric counts whether a disclosure was emitted, not whether a decision
+  changed.
+
+So v2 is a **bounded input-hygiene and regression instrument**. It supports
+a deliberately narrow claim: *on the defect classes v2 actually populated —
+modality, route, and combination assertions checkable against a drug's own
+FDA label — the detectors are reliable on real instances.*
+
+One v1 failure is genuinely re-measured, and it is worth separating from the
+rest. v1's control false-flag failure was driven by the N3 "preclinical-only"
+finding over-firing on approved drugs (5 of 7 false flags; the other 2 were
+the N1 label-parse defect, deliberately left unfixed). v2's control arm fell
+to 2/40 = 0.050, consistent with only that residual N1 contribution — so the
+**N3 precision fix is evidenced, through the control arm**. That is a claim
+about over-firing, not about detection: **N3 as a detection class has zero
+claims in either study and remains untested.**
+
+Everything else is weaker than "fixed". v2 does **not** support "the v1
+defects were fixed" as a general statement: E2, the class of v1's largest
+failure (0/19), is effectively untested at n = 1 (§4.5). And v2 does not
+speak at all to whether the layer can judge whether a repurposing hypothesis
+is any good.
 
 | Metric | Result | PASS threshold | Met? |
 |---|---|---|---|
@@ -269,6 +332,40 @@ per-claim checkpoint/resume) part of the frozen system under test
 archive admission (complete raw archives are now bound to the frozen code
 commit; refusal-path only, scoring untouched — Amendment 5, manifest code
 binding advanced with the results hash unchanged).
+
+### 4.5 What the v2 PASS does not establish
+
+Three gaps bound the claim, all registered in Amendment 6:
+
+1. **Hypothesis judgment is untested.** No claim in either study asks whether
+   a drug is a plausible therapy for a disease. The instrument tests
+   assertions about a drug against that drug's own regulatory label. A
+   system that could only read FDA labels — and had no target ranking,
+   scoring, or evidence pipeline at all — would score comparably on v2's
+   defect arm. Measuring hypothesis discrimination requires a different
+   instrument, with a comparable per-pair output that the disclosure-only
+   findings do not currently provide.
+2. **E2's near-absence is a measurement limitation, not a fix.** E2 produced
+   v1's single largest failure (0/19) and yielded 1 claim in v2. Six
+   candidates were excluded as having no cutoff-eligible boxed-warning
+   label; re-checked against raw openFDA on 2026-08-11, **at least two of
+   those six exclusions are retrieval artifacts** — METOPROLOL (348 labels,
+   ≥4 carrying a pre-cutoff "WARNING: ISCHEMIC HEART DISEASE"; missed
+   because the builder caps label retrieval at 25 rows) and LEVOSALBUTAMOL
+   (HTTP 404 under its INN; the US generic name *levalbuterol* returns 19
+   labels with 3 pre-cutoff boxed warnings). Four exclusions were correct
+   (MILTEFOSINE's boxed-warning label postdates the cutoff; CABOZANTINIB and
+   NOREPINEPHRINE have none; ALBUTEROL's `boxed_warning` fields contain a
+   mis-parsed FEV₁ table). E2 should have carried roughly 3 claims. The
+   frozen set is not edited to correct this — the run is scored — but the
+   class must be read as **effectively untested in v2**, for construction
+   reasons rather than resolution.
+3. **N3 is untested in both studies**, and E4 = 0 remains a finding about
+   external resources (brand names resolve in ChEMBL), not a measurement of
+   the layer.
+
+The successor instrument targeting gap 1 is specified separately and carries
+its own pre-registration; nothing in it may re-score v1 or v2.
 
 ## 5. Engineering regression: audit trap benchmark
 
@@ -331,10 +428,16 @@ above shows why that policing must include *data freshness*, not just logic.
   runtime (screen/runtime scope disagreement is itself a finding).
 3. **Chance baseline saturation** (§3.4).
 4. **Prevalence-stratified failure** (§3.2): 0/12 on rare/less-rare strata.
-5. **Audit v1 FAIL / v2 PASS** (§4): the first frozen study failed (recall
-  0.533, false-flag 0.175); the fixed layer passed its fresh pre-registered
-  study (1.000 / 0.050). N3 remains untested in both studies; E4 tested a
-  falsified construction assumption.
+5. **Audit v1 FAIL / v2 PASS, and v2's narrow scope** (§4): the first frozen
+  study failed (recall 0.533, false-flag 0.175); the fixed layer passed its
+  fresh pre-registered study (1.000 / 0.050). But v2 is an **input-hygiene
+  instrument**: 73% of its defect arm is one class (N2), all 59 novel claims
+  assert drug attributes against the drug's own label with the disease field
+  inert, 59/60 defect claims are pool-free, and every finding is
+  disclosure-only. **Whether the audit layer can judge a drug–disease
+  hypothesis is untested.** N3 remains untested in both studies; E4 tested a
+  falsified construction assumption; E2 is effectively untested in v2 because
+  ≥2 of its 6 exclusions were label-retrieval artifacts (§4.5).
 6. **Stale persisted pools** can carry pre-fix safety labels; E2 quantifies
   the consequence (19/19 affected in that class).
 7. **Small samples**: 22 in-scope primary cases; CIs are wide (±~20 points).
