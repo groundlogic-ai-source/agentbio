@@ -83,9 +83,22 @@ def configure() -> None:
         "registered N1 -> N4 -> N2 reallocation order.",
         "The citation cutoff (2026-08-10) is a mechanical artifact-date "
         "rule, not a judgment of evidence currency.",
-        "Pool-context coverage is limited to the same three persisted "
-        "cases (refreshed to safety-v2); novel-lane claims are pool-free "
-        "by design.",
+        "Pool-context coverage is limited to the two persisted cases "
+        "referenced by job_id_hint in this claim set (refreshed to "
+        "safety-v2); novel-lane claims are pool-free by design.",
+        "N3 (species/preclinical-only) yielded ZERO claims under v2's "
+        "tightened gates (v1 gates PLUS no cutoff-eligible FDA label and "
+        "no human-trial signal): all five candidates failed raw ground "
+        "truth at construction. The N3 defect class is untested in v2 — "
+        "reported as such, not padded. The novel group's 59 claims are "
+        "N1=8, N2=43 (reallocation), N4=8.",
+        "Freeze #1 was destroyed by an environment restart before any "
+        "scoring (Amendment 3); this claim set is the registered rebuild "
+        "under identical rules. Engineering fixes (EvidenceRecord "
+        "coercion, LLM provider round-robin + 429 backoff, per-claim "
+        "checkpoint/resume) were applied BEFORE this freeze and are part "
+        "of the frozen system under test. Both allowances remain "
+        "unconsumed.",
     ]
 
 
