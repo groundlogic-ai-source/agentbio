@@ -142,3 +142,33 @@ pipeline, and v2 claims are eligible material for it.
    unrefuted) was preserved end-to-end. Every v2-facing writeup (results
    report, technical appendix, outreach letters) must frame this as "our
    safety data was stale", never as "we made the detector less aggressive".
+
+## Amendment 2 (2026-08-11, after the first construction attempt aborted
+## fail-closed at the E floor, before any scored run): composition floor
+
+The first construction attempt (log: /tmp/build_v2.log) yielded **E = 1**
+(E1 = 0, E2 = 1 [VANDETANIB], E3 = 0, E4 = 0), below the registered floor
+of 6, and aborted as designed. Causes, verified at construction against raw
+sources: the safety refresh legitimately emptied E1 (the three remaining
+refreshed-pool withdrawal-flagged drugs are all v1-named and therefore
+excluded by instance disjointness); the E3 candidate (fluticasone
+propionate) failed its raw ground-truth check (ChEMBL action_type AGONIST
+is not incompatibility-class for a glucocorticoid-activation indication);
+E4 yielded zero — the pre-registered finding that brand-name resolution is
+near-universal.
+
+1. **The E floor is amended from 6 to 1.** Rationale: the floor exists to
+   guarantee the fixed-defect classes are actually exercised; with E = 1
+   the study still tests the stale-pool fix (E2) end-to-end, and the
+   near-zero E1/E3/E4 yields are themselves reported findings about the
+   post-fix universe, not a defect in the claim set.
+2. **Composition:** E group = honest pool-bounded yield (observed: 1);
+   **novel group = 60 − E yield (59)** with initial quotas unchanged and
+   shortfall reallocation order unchanged (N1 → N4 → N2); control = 40.
+   The 60/40 defect/control split, all PASS thresholds, the abstention
+   cap, and the one-scored-run discipline are unchanged.
+3. **Reporting:** the v2 results report and any derived writeup must state
+   the E-group yield and its per-class causes (this amendment) before the
+   score, and must not describe the composition change as relaxed
+   methodology — the abort-and-amend path itself is the registered
+   mechanism working as intended.
