@@ -39,12 +39,15 @@ from data_sources.chembl import get_drug_mechanism_targets_for_audit  # noqa: E4
 from validation.evidence_profile import (  # noqa: E402
     DISQUALIFIED, QUALIFIED, RULE_FINGERPRINT, build_profile)
 
-CASES_PATH = ROOT / "validation" / "triage_discrimination_cases.json"
-MANIFEST_PATH = ROOT / "validation" / "triage_discrimination_freeze_manifest.json"
+# Amendment 2: v2 artifact set. v1 results/checkpoint/manifest stay frozen
+# and untouched; v2 corrects the cohort definition (repurposed-success only)
+# and computes control validity on citation-eligible products only.
+CASES_PATH = ROOT / "validation" / "triage_discrimination_cases_v2.json"
+MANIFEST_PATH = ROOT / "validation" / "triage_discrimination_freeze_manifest_v2.json"
 PREREG_PATH = ROOT / "validation" / "triage_discrimination_preregistration.md"
-CHECKPOINT_PATH = ROOT / "validation" / "triage_discrimination_checkpoint.jsonl"
-RESULTS_PATH = ROOT / "validation" / "triage_discrimination_results.json"
-REPORT_PATH = ROOT / "validation" / "triage_discrimination_report.md"
+CHECKPOINT_PATH = ROOT / "validation" / "triage_discrimination_checkpoint_v2.jsonl"
+RESULTS_PATH = ROOT / "validation" / "triage_discrimination_results_v2.json"
+REPORT_PATH = ROOT / "validation" / "triage_discrimination_report_v2.md"
 
 PER_CASE_DEADLINE_S = 30.0
 WORKERS = 2
@@ -138,7 +141,10 @@ def _audit_case(case: dict, claim: dict) -> dict:
     profile = build_profile(drug, {"status": "no_case", "audit_context": ctx})
     reg = (ctx.get("sources") or {}).get("regulatory_label") or {}
     lit = (ctx.get("sources") or {}).get("entity_linked_literature") or {}
-    products = [p for p in reg.get("products") or [] if isinstance(p, dict)]
+    # Amendment 2: validity aggregates come from citation-eligible products
+    # only -- exactly the set the detectors score (audit_context.py:49-52).
+    products = [p for p in reg.get("products") or []
+                if isinstance(p, dict) and p.get("citation_eligible")]
     return {
         "drug_name": drug,
         "ind_name": case.get("ind_name"),
@@ -157,17 +163,34 @@ def _audit_case(case: dict, claim: dict) -> dict:
     }
 
 
+_FREEZE: dict = {}
+
+
 def _load_checkpoint() -> dict[str, dict]:
     done: dict[str, dict] = {}
     if CHECKPOINT_PATH.exists():
         for line in CHECKPOINT_PATH.read_text().splitlines():
-            if line.strip():
-                rec = json.loads(line)
-                done[f"{rec['cohort']}::{rec['drug_name'].casefold()}"] = rec
+            if not line.strip():
+                continue
+            rec = json.loads(line)
+            # Amendment 2: checkpoint records are bound to the freeze. A
+            # record from an older case set or scoring rule must never be
+            # silently reused in a later frozen run.
+            if (rec.get("cases_sha256") != _FREEZE.get("cases_sha256")
+                    or rec.get("rule_fingerprint")
+                    != _FREEZE.get("rule_fingerprint")):
+                raise SystemExit(
+                    "[run] REFUSED: checkpoint record predates the freeze "
+                    f"({rec.get('cohort')}::{rec.get('drug_name')}). Move the "
+                    "stale checkpoint aside or amend the freeze deliberately.")
+            done[f"{rec['cohort']}::{rec['drug_name'].casefold()}"] = rec
     return done
 
 
 def _append_checkpoint(rec: dict) -> None:
+    rec = {**rec,
+           "cases_sha256": _FREEZE.get("cases_sha256"),
+           "rule_fingerprint": _FREEZE.get("rule_fingerprint")}
     with open(CHECKPOINT_PATH, "a", encoding="utf-8") as fh:
         fh.write(json.dumps(rec, sort_keys=True) + "\n")
 
@@ -280,6 +303,7 @@ def main() -> None:
             "[run] REFUSED: scored results exist. Frozen studies are amended, "
             "never regenerated.")
     manifest = _verify_freeze()
+    _FREEZE.update(manifest)
     _health_gate()
 
     caseset = json.loads(CASES_PATH.read_text())

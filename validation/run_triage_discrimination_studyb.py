@@ -1,10 +1,13 @@
 """Study B (DESCRIPTIVE ONLY): full-configuration audit against rebuilt pools.
 
 Rebuilds the candidate pools for the 12 in-scope primary benchmark diseases
-via the same in-process per-target harness that produced
-`benchmark_results_v2.json` (biologist -> chemist -> reviewer, top-K targets,
-disease-side holdout active), then computes the evidence profile for each
-disease's confirmed repurposing drug(s) and the pool's top candidates.
+using the production graph semantics (Amendment 2): biologist -> chemist per
+top-K target, `merge_chemist_candidates` union across targets, then ONE
+pooled reviewer pass — the same shape `run_v2_engineering_acceptance.py`
+uses (`pooled_across_k_targets=True`). The v1 draft ran the reviewer per
+target and deduplicated by best composite, which does not reproduce
+production ranks; that code never produced results and was replaced before
+any scoring.
 
 Pre-registered boundaries (triage_discrimination_preregistration.md):
 
@@ -14,7 +17,11 @@ Pre-registered boundaries (triage_discrimination_preregistration.md):
   from disease-linked OT/trial data). Every row carries that caveat.
 * **Non-confirmed candidates are never scored as errors.** Absence of
   approval is not evidence of a wrong hypothesis; they are context rows only.
-* **Fail-closed.** Existing results are never regenerated.
+* **Fail-closed.** Existing results are never regenerated; a disease whose
+  targets did not ALL complete is never profiled from a partial pool —
+  it is left for resume.
+* **Freeze-verified.** The Study B freeze manifest (rule fingerprint, v2
+  benchmark hash) is checked before any case runs.
 
 This run makes LLM calls (the pipeline agents). It is the user-approved
 expensive half of the study (approved 2026-08-11).
@@ -23,7 +30,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import sys
 import time
 from pathlib import Path
@@ -37,15 +43,16 @@ from agents.target_selection import DiseaseNotInUniverse, select_for_disease  # 
 from agents.biologist import run_biologist  # noqa: E402
 from agents.chemist import run_chemist  # noqa: E402
 from agents.reviewer import run_reviewer  # noqa: E402
+from data_sources.multisource_candidates import merge_chemist_candidates  # noqa: E402
 from api.audit import _find_molecule_chembl_id  # noqa: E402
 from api.audit_context import build_audit_context  # noqa: E402
 from data_sources import holdout  # noqa: E402
 from validation.evidence_profile import RULE_FINGERPRINT, build_profile  # noqa: E402
 
 V2_RESULTS = ROOT / "validation" / "benchmark_results_v2.json"
-POOLS_CKPT = ROOT / "validation" / "triage_discrimination_studyb_pools.jsonl"
+MANIFEST_PATH = ROOT / "validation" / "triage_discrimination_studyb_freeze_manifest.json"
+CKPT_PATH = ROOT / "validation" / "triage_discrimination_studyb_checkpoint.jsonl"
 RESULTS_PATH = ROOT / "validation" / "triage_discrimination_studyb_results.json"
-REPORT_PATH = ROOT / "validation" / "triage_discrimination_studyb_report.md"
 
 TOP_K = 3
 TOP_N_AUDIT = 10  # pool candidates profiled per disease, as context rows
@@ -67,9 +74,23 @@ def _health_gate() -> None:
             if resp.status_code >= 500 or resp.status_code == 429:
                 failed.append(f"{name}(HTTP {resp.status_code})")
         except Exception as exc:  # noqa: BLE001
-            failed.append(f"{name}({exc.__class__.__name__})")
+            failed.append(f"{exc.__class__.__name__}: {name}")
     if failed:
         raise SystemExit(f"[studyb] REFUSED: sources unhealthy: {failed}")
+
+
+def _verify_freeze() -> dict:
+    manifest = json.loads(MANIFEST_PATH.read_text())
+    problems = []
+    if manifest.get("rule_fingerprint") != RULE_FINGERPRINT:
+        problems.append(
+            f"rule fingerprint {RULE_FINGERPRINT[:12]}… != manifest "
+            f"{str(manifest.get('rule_fingerprint'))[:12]}…")
+    if manifest.get("v2_results_sha256") != _sha256_file(V2_RESULTS):
+        problems.append("benchmark_results_v2.json hash mismatch")
+    if problems:
+        raise SystemExit(f"[studyb] FREEZE VIOLATION: {problems}")
+    return manifest
 
 
 def _disease_cases() -> dict[str, list[str]]:
@@ -83,70 +104,114 @@ def _disease_cases() -> dict[str, list[str]]:
     return out
 
 
-def _load_pools_checkpoint() -> dict[str, dict]:
-    done: dict[str, dict] = {}
-    if POOLS_CKPT.exists():
-        for line in POOLS_CKPT.read_text().splitlines():
-            if line.strip():
-                rec = json.loads(line)
-                done[rec["disease_name"]] = rec
+def _load_checkpoint() -> dict:
+    """Two record kinds: per-target chemist output (LLM work, resumable) and
+    finalized per-disease pools (only ever written when ALL targets ran)."""
+    done = {"targets": {}, "pools": {}}
+    if CKPT_PATH.exists():
+        for line in CKPT_PATH.read_text().splitlines():
+            if not line.strip():
+                continue
+            rec = json.loads(line)
+            if rec.get("rule_fingerprint") != RULE_FINGERPRINT:
+                raise SystemExit(
+                    "[studyb] REFUSED: checkpoint record predates the current "
+                    "rule fingerprint. Move the stale checkpoint aside.")
+            if rec["kind"] == "target":
+                done["targets"][(rec["disease_name"], rec["target_symbol"])] = rec
+            elif rec["kind"] == "pool":
+                done["pools"][rec["disease_name"]] = rec
     return done
 
 
-def _append_pool(rec: dict) -> None:
-    with open(POOLS_CKPT, "a", encoding="utf-8") as fh:
-        fh.write(json.dumps(rec, sort_keys=True) + "\n")
+def _append(rec: dict) -> None:
+    rec = {**rec, "rule_fingerprint": RULE_FINGERPRINT}
+    with open(CKPT_PATH, "a", encoding="utf-8") as fh:
+        fh.write(json.dumps(rec, sort_keys=True, default=str) + "\n")
 
 
-def _build_pool(disease: str, drugs: list[str]) -> dict:
-    """Run the benchmark harness for one disease; return the merged pool."""
-    rows = select_for_disease(disease)
-    per_target = []
-    merged: dict[str, dict] = {}  # normalized name -> best-composite candidate
-    for k_idx, row in enumerate(rows[:TOP_K], 1):
-        target = {
-            "target_symbol": row["target_symbol"],
-            "uniprot_id": row.get("uniprot_id"),
-            "ensembl_id": row.get("ensembl_id"),
-            "disease_name": row["disease_name"],
-            "orpha_code": row.get("orpha_code"),
-            "ot_association_score": row.get("ot_association_score", 0.0),
-            "tractability_score": row.get("tractability_score"),
-            "unmet_need_score": row.get("unmet_need_score"),
-        }
-        print(f"[studyb]   {disease}: target {k_idx}/{TOP_K} "
-              f"{row.get('target_symbol')}", flush=True)
-        try:
-            bio = run_biologist(target)
-            chem = run_chemist(bio)
-            reviewed = run_reviewer(chem, bio)
-        except Exception as exc:  # noqa: BLE001
-            per_target.append({"target_symbol": row.get("target_symbol"),
-                               "error": str(exc)[:300]})
-            continue
-        for cand in reviewed:
-            name_key = " ".join(str(
-                cand.get("drug_name") or "").split()).casefold()
-            if not name_key:
-                continue
-            prev = merged.get(name_key)
-            if prev is None or float(cand.get("composite_score") or 0) > float(
-                    prev.get("composite_score") or 0):
-                merged[name_key] = cand
-        per_target.append({"target_symbol": row.get("target_symbol"),
-                           "n_reviewed": len(reviewed)})
-    pool = sorted(merged.values(),
-                  key=lambda c: float(c.get("composite_score") or 0),
-                  reverse=True)
+def _row_to_target(row: dict) -> dict:
     return {
-        "disease_name": disease,
-        "holdout_drugs": drugs,
-        "per_target": per_target,
-        "pool_size": len(pool),
-        # Persist the pool so an interrupted profile phase never re-runs the
-        # LLM pipeline. Candidates are plain dicts (JSON-safe).
-        "pool": pool,
+        "target_symbol": row["target_symbol"],
+        "uniprot_id": row.get("uniprot_id"),
+        "ensembl_id": row.get("ensembl_id"),
+        "disease_name": row["disease_name"],
+        "orpha_code": row.get("orpha_code"),
+        "ot_association_score": row.get("ot_association_score", 0.0),
+        "tractability_score": row.get("tractability_score"),
+        "unmet_need_score": row.get("unmet_need_score"),
+        "target_discovery_method": row.get("target_discovery_method"),
     }
+
+
+def _build_pool(disease: str, drugs: list[str], targets_done: dict) -> dict | None:
+    """Run one disease's pool build. Returns the finalized pool record, or
+    None if any target failed (nothing is finalized from a partial build)."""
+    try:
+        rows = select_for_disease(disease)
+    except DiseaseNotInUniverse as exc:
+        print(f"[studyb] {disease}: OUT OF UNIVERSE ({exc})", flush=True)
+        return None
+    run_rows = rows[:TOP_K]
+    all_candidates: list[dict] = []
+    bio_pmids: list[str] = []
+    per_target = []
+    for k_idx, row in enumerate(run_rows, 1):
+        symbol = row["target_symbol"]
+        key = (disease, symbol)
+        rec = targets_done.get(key)
+        if rec is None:
+            print(f"[studyb]   {disease}: target {k_idx}/{len(run_rows)} "
+                  f"{symbol}", flush=True)
+            try:
+                bio = run_biologist(_row_to_target(row))
+                chem = run_chemist(bio)
+            except Exception as exc:  # noqa: BLE001
+                # Partial builds are NOT usable: leave uncheckpointed so a
+                # resume retries this target.
+                print(f"[studyb]   {disease}/{symbol}: ERROR {exc} — "
+                      "target left incomplete for resume", flush=True)
+                return None
+            rec = {
+                "kind": "target",
+                "disease_name": disease,
+                "target_symbol": symbol,
+                "k_idx": k_idx,
+                "candidates": chem.get("candidates", []),
+                "bio_pmids": [h["pmid"] for h in bio.get("literature_hits", [])
+                              if isinstance(h, dict) and h.get("pmid")],
+            }
+            _append(rec)
+            targets_done[key] = rec
+        per_target.append({"target_symbol": symbol,
+                           "n_candidates": len(rec["candidates"])})
+        all_candidates.extend(rec["candidates"])
+        bio_pmids.extend(rec["bio_pmids"])
+
+    # Production semantics: one active-moiety union across targets, one
+    # pooled reviewer pass (mirrors run_v2_engineering_acceptance.py).
+    pooled = merge_chemist_candidates(all_candidates)
+    pooled_output = {
+        "target": _row_to_target(run_rows[0]) if run_rows else {},
+        "targets": [_row_to_target(r) for r in run_rows],
+        "candidates": pooled,
+        "pooled_across_k_targets": True,
+        "k_targets": len(run_rows),
+        "repurposing_only": True,
+    }
+    bio_min = {"literature_hits": [{"pmid": p} for p in bio_pmids]}
+    try:
+        reviewed = run_reviewer(pooled_output, bio_min)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[studyb]   {disease}: pooled reviewer failed: {exc} — "
+              "left for resume (targets are checkpointed)", flush=True)
+        return None
+    pool = sorted(reviewed, key=lambda c: float(c.get("composite_score") or 0),
+                  reverse=True)
+    rec = {"kind": "pool", "disease_name": disease, "holdout_drugs": drugs,
+           "per_target": per_target, "pool_size": len(pool), "pool": pool}
+    _append(rec)
+    return rec
 
 
 def _profile_drug(disease: str, drug: str, pool: list[dict],
@@ -185,21 +250,24 @@ def main() -> None:
     if RESULTS_PATH.exists():
         raise SystemExit("[studyb] REFUSED: results exist. Amend, never "
                          "regenerate.")
+    manifest = _verify_freeze()
     _health_gate()
     diseases = _disease_cases()
-    pools_done = _load_pools_checkpoint()
-    print(f"[studyb] {len(diseases)} diseases, "
-          f"{len(pools_done)} pools checkpointed", flush=True)
+    done = _load_checkpoint()
+    print(f"[studyb] {len(diseases)} diseases, {len(done['pools'])} pools "
+          f"finalized, {len(done['targets'])} targets checkpointed",
+          flush=True)
 
     table: list[dict] = []
+    skipped: list[str] = []
     for disease, drugs in sorted(diseases.items()):
-        pool_rec = pools_done.get(disease)
+        pool_rec = done["pools"].get(disease)
         if pool_rec is None:
-            # Holdout seals disease-side discovery leakage for the pipeline
-            # phase AND switches on audit-lane redaction for the profile phase.
             with holdout.holdout_active(drugs):
-                pool_rec = _build_pool(disease, drugs)
-            _append_pool(pool_rec)
+                pool_rec = _build_pool(disease, drugs, done["targets"])
+            if pool_rec is None:
+                skipped.append(disease)
+                continue
             print(f"[studyb] {disease}: pool={pool_rec['pool_size']}",
                   flush=True)
         pool = pool_rec["pool"]
@@ -215,8 +283,9 @@ def main() -> None:
                                   "row_kind": "context_top_candidate"})
 
     payload = {
-        "contract": "triage-discrimination-studyb-v1",
+        "contract": "triage-discrimination-studyb-v2",
         "descriptive_only": True,
+        "freeze": manifest,
         "non_disease_blind_pool_caveat": (
             "rank/composite/mechanism dimensions derive from a pool built "
             "with disease-linked OpenTargets and trial data; only the "
@@ -224,12 +293,15 @@ def main() -> None:
         "rule_fingerprint": RULE_FINGERPRINT,
         "v2_results_sha256": _sha256_file(V2_RESULTS),
         "n_diseases": len(diseases),
+        "diseases_incomplete": skipped,
         "rows": table,
     }
     payload["results_sha256"] = hashlib.sha256(
-        json.dumps(payload, sort_keys=True).encode()).hexdigest()
-    RESULTS_PATH.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-    print(f"[studyb] wrote {RESULTS_PATH} ({len(table)} rows)", flush=True)
+        json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
+    RESULTS_PATH.write_text(json.dumps(payload, indent=2, sort_keys=True,
+                                       default=str) + "\n")
+    print(f"[studyb] wrote {RESULTS_PATH} ({len(table)} rows, "
+          f"{len(skipped)} diseases incomplete)", flush=True)
 
 
 if __name__ == "__main__":
