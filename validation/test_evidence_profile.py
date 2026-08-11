@@ -106,6 +106,52 @@ class HardDisqualifiersFire(unittest.TestCase):
         self.assertEqual(advisory["disposition"], QUALIFIED)
 
 
+class PrimaryIgnoresPool(unittest.TestCase):
+    """The self-critique found the pool is not disease-blind (reviewer.py
+    derives composite/rank from disease-linked OT/trial data and
+    check_mechanism_direction takes the disease). The PRIMARY metric must
+    therefore never read a pool-derived dimension. These guards pin that."""
+
+    def test_dimension_split_is_complete_and_disjoint(self):
+        from validation.evidence_profile import (
+            DISEASE_DEPENDENT_DIMS, DISEASE_INDEPENDENT_DIMS)
+        self.assertFalse(DISEASE_INDEPENDENT_DIMS & DISEASE_DEPENDENT_DIMS)
+        # The genuinely mechanical, pool-free dimensions must be the primary set.
+        self.assertEqual(DISEASE_INDEPENDENT_DIMS, {
+            "modality_feasibility", "route_feasibility",
+            "human_mechanism_evidence", "lipophilicity"})
+        # The pool-derived dimensions must be quarantined as descriptive-only.
+        self.assertIn("rank", DISEASE_DEPENDENT_DIMS)
+        self.assertIn("mechanism_direction", DISEASE_DEPENDENT_DIMS)
+        self.assertIn("safety", DISEASE_DEPENDENT_DIMS)
+
+    def test_primary_disposition_needs_no_pool(self):
+        # A disease-dependent hard disqualifier (mechanism cap) must NOT fire
+        # the primary disposition, because that dimension is not provably blind.
+        profile = build_profile("X", _audit(cand={
+            "mechanism_cap_applied": True,
+            "safety_cap_applied": True,
+            "score_components": {"evidence_weight_coverage": 1.0},
+            "pubchem_xlogp": 2.0, "nonoral_biologic_flag": False}))
+        self.assertEqual(profile["disposition"], DISQUALIFIED)  # overall
+        self.assertEqual(profile["primary_disposition"], SUPPORTED)  # primary
+        self.assertEqual(profile["primary_hard_fired"], [])
+
+    def test_primary_disposition_fires_on_disease_independent_flag(self):
+        profile = build_profile("X", _audit(findings=[("N3", "flagged")]))
+        self.assertEqual(profile["primary_disposition"], DISQUALIFIED)
+        self.assertIn("human_mechanism_evidence=PRECLINICAL_ONLY",
+                      profile["primary_hard_fired"])
+
+    def test_primary_disposition_available_even_without_case(self):
+        # no_case makes the overall disposition NOT_ASSESSABLE, but the primary
+        # claim never touches the pool, so it must still be scored.
+        profile = build_profile("X", _audit("no_case"))
+        self.assertEqual(profile["disposition"], NOT_ASSESSABLE)
+        self.assertIn(profile["primary_disposition"],
+                      {SUPPORTED, QUALIFIED, DISQUALIFIED})
+
+
 class RuleIsPinned(unittest.TestCase):
     def test_fingerprint_is_stable(self):
         """If this fails, the scored rule changed. That is only legitimate
