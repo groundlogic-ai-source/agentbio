@@ -1,4 +1,10 @@
-# Triage Discrimination Study — Study A Report
+# Triage Discrimination Study — Study A Report (v1 — SUPERSEDED)
+
+> **Superseded by `triage_discrimination_report_v2.md` (result of record).**
+> v1's cohort admitted ~10% original-approval drugs, its control validity
+> counted label-ineligible products, and its scoring surface dropped N4
+> `flagged` (Amendments 1–2). Kept frozen and unedited per convention; its
+> directional findings hold under the corrected v2 design.
 
 Frozen results: `validation/triage_discrimination_results.json`
 (`results_sha256 a21632d1…`). Freeze manifest:
