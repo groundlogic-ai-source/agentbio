@@ -59,6 +59,17 @@ task = "shell.exec"
 args = "cd /home/runner/workspace && python3 -m validation.run_triage_discrimination_studyb 2>&1 | tee /tmp/triage_discrimination_studyb.log"
 
 [[workflows.workflow]]
+name = "await-pubchem-harvest"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && python3 -m validation.await_pubchem_and_harvest --max-hours 12 2>&1 | tee /tmp/await_pubchem.log"
+
+[[workflows.workflow]]
 name = "repodb-validation"
 author = "agent"
 
