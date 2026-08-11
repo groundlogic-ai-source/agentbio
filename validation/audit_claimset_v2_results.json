@@ -1,0 +1,944 @@
+{
+  "label": "audit_claimset_v2",
+  "scored_at": "2026-08-11T01:58:11.935914+00:00",
+  "claim_set_sha256": "5013a57aca080e82fd11b20f2a81820fbf0ec01c44ccc3923ccd35e7fd1c52e2",
+  "freeze_code_commit": "0cce837665babf3e1bb1e73b9e2de5c0b245ee3b",
+  "cache_policy": "Production caches as-is (cache/cache.db, 7-30 day TTLs by source). Degraded states are never cached by design. No cache clearing, pinning, or special treatment for the scored run.",
+  "health_probes": {
+    "chembl": true,
+    "openfda": true,
+    "europepmc": true,
+    "pubtator": true
+  },
+  "rerun_after_harness_defect": null,
+  "metrics": {
+    "defect_recall": 1.0,
+    "defect_recall_cp_lower_95": 0.9512970866899025,
+    "defect_recall_fixed_denominator": 1.0,
+    "defect_counts": {
+      "caught": 60,
+      "eligible": 60,
+      "abstained": 0,
+      "excluded": 0,
+      "registered_total": 60
+    },
+    "novel_recall": 1.0,
+    "novel_recall_cp_lower_95": 0.950492390111773,
+    "novel_counts": {
+      "caught": 59,
+      "eligible": 59,
+      "abstained": 0,
+      "excluded": 0,
+      "registered_total": 59
+    },
+    "control_false_flag_rate": 0.05,
+    "control_false_flag_cp_upper_95": 0.14915196127321298,
+    "control_false_flag_fixed_denominator": 0.05,
+    "control_counts": {
+      "flagged": 2,
+      "clean": 38,
+      "eligible": 40,
+      "abstained": 0,
+      "excluded": 0,
+      "registered_total": 40
+    },
+    "abstention_fraction_by_group": {
+      "existing_fix": 0.0,
+      "novel": 0.0,
+      "control": 0.0
+    },
+    "abstention_breach": false,
+    "verdict": "PASS"
+  },
+  "per_class": {
+    "none": {
+      "caught": 0,
+      "miss": 0,
+      "false_flag": 2,
+      "clean": 38,
+      "abstain": 0,
+      "excluded": 0,
+      "total": 40
+    },
+    "E2_boxed_warning_not_withdrawal": {
+      "caught": 1,
+      "miss": 0,
+      "false_flag": 0,
+      "clean": 0,
+      "abstain": 0,
+      "excluded": 0,
+      "total": 1
+    },
+    "N1_combination_product_splitting": {
+      "caught": 8,
+      "miss": 0,
+      "false_flag": 0,
+      "clean": 0,
+      "abstain": 0,
+      "excluded": 0,
+      "total": 8
+    },
+    "N2_biologic_modality_mis_scope": {
+      "caught": 43,
+      "miss": 0,
+      "false_flag": 0,
+      "clean": 0,
+      "abstain": 0,
+      "excluded": 0,
+      "total": 43
+    },
+    "N4_dose_route_implausibility": {
+      "caught": 8,
+      "miss": 0,
+      "false_flag": 0,
+      "clean": 0,
+      "abstain": 0,
+      "excluded": 0,
+      "total": 8
+    }
+  },
+  "per_group": {
+    "control": {
+      "caught": 0,
+      "miss": 0,
+      "false_flag": 2,
+      "clean": 38,
+      "abstain": 0,
+      "excluded": 0,
+      "total": 40
+    },
+    "existing_fix": {
+      "caught": 1,
+      "miss": 0,
+      "false_flag": 0,
+      "clean": 0,
+      "abstain": 0,
+      "excluded": 0,
+      "total": 1
+    },
+    "novel": {
+      "caught": 59,
+      "miss": 0,
+      "false_flag": 0,
+      "clean": 0,
+      "abstain": 0,
+      "excluded": 0,
+      "total": 59
+    }
+  },
+  "outcomes": {
+    "C-01": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-02": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-03": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-04": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-05": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-06": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-07": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-08": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-09": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-10": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-11": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-12": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-13": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-14": {
+      "outcome": "false_flag",
+      "reason": "flagged findings: N1",
+      "citation": "valid"
+    },
+    "C-15": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-16": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-17": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-18": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-19": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-20": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-21": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-22": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-23": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-24": {
+      "outcome": "false_flag",
+      "reason": "flagged findings: N1",
+      "citation": "valid"
+    },
+    "C-25": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-26": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-27": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-28": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-29": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-30": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-31": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-32": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-33": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-34": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-35": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-36": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-37": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-38": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-39": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "C-40": {
+      "outcome": "clean",
+      "reason": "",
+      "citation": "valid"
+    },
+    "E2-01": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N1-01": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N1-02": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N1-03": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N1-04": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N1-05": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N1-06": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N1-07": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N1-08": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-01": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-02": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-03": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-04": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-05": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-06": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-07": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-08": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-09": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-10": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-11": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-12": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-13": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-14": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-15": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-16": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-17": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-18": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-19": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-20": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-21": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-22": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-23": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-24": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-25": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-26": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-27": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-28": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-29": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-30": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-31": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-32": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-33": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-34": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-35": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-36": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-37": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-38": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-39": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-40": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-41": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-42": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N2-43": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N4-01": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N4-02": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N4-03": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N4-04": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N4-05": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N4-06": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N4-07": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    },
+    "N4-08": {
+      "outcome": "caught",
+      "reason": "",
+      "citation": "valid"
+    }
+  },
+  "disclosure_annotations": {
+    "C-01": {
+      "annotation": "not_applicable"
+    },
+    "C-02": {
+      "annotation": "not_applicable"
+    },
+    "C-03": {
+      "annotation": "not_applicable"
+    },
+    "C-04": {
+      "annotation": "not_applicable"
+    },
+    "C-05": {
+      "annotation": "not_applicable"
+    },
+    "C-06": {
+      "annotation": "not_applicable"
+    },
+    "C-07": {
+      "annotation": "not_applicable"
+    },
+    "C-08": {
+      "annotation": "not_applicable"
+    },
+    "C-09": {
+      "annotation": "not_applicable"
+    },
+    "C-10": {
+      "annotation": "not_applicable"
+    },
+    "C-11": {
+      "annotation": "not_applicable"
+    },
+    "C-12": {
+      "annotation": "not_applicable"
+    },
+    "C-13": {
+      "annotation": "not_applicable"
+    },
+    "C-14": {
+      "annotation": "not_applicable"
+    },
+    "C-15": {
+      "annotation": "not_applicable"
+    },
+    "C-16": {
+      "annotation": "not_applicable"
+    },
+    "C-17": {
+      "annotation": "not_applicable"
+    },
+    "C-18": {
+      "annotation": "not_applicable"
+    },
+    "C-19": {
+      "annotation": "not_applicable"
+    },
+    "C-20": {
+      "annotation": "not_applicable"
+    },
+    "C-21": {
+      "annotation": "not_applicable"
+    },
+    "C-22": {
+      "annotation": "not_applicable"
+    },
+    "C-23": {
+      "annotation": "not_applicable"
+    },
+    "C-24": {
+      "annotation": "not_applicable"
+    },
+    "C-25": {
+      "annotation": "not_applicable"
+    },
+    "C-26": {
+      "annotation": "not_applicable"
+    },
+    "C-27": {
+      "annotation": "not_applicable"
+    },
+    "C-28": {
+      "annotation": "not_applicable"
+    },
+    "C-29": {
+      "annotation": "not_applicable"
+    },
+    "C-30": {
+      "annotation": "not_applicable"
+    },
+    "C-31": {
+      "annotation": "not_applicable"
+    },
+    "C-32": {
+      "annotation": "not_applicable"
+    },
+    "C-33": {
+      "annotation": "not_applicable"
+    },
+    "C-34": {
+      "annotation": "not_applicable"
+    },
+    "C-35": {
+      "annotation": "not_applicable"
+    },
+    "C-36": {
+      "annotation": "not_applicable"
+    },
+    "C-37": {
+      "annotation": "not_applicable"
+    },
+    "C-38": {
+      "annotation": "not_applicable"
+    },
+    "C-39": {
+      "annotation": "not_applicable"
+    },
+    "C-40": {
+      "annotation": "not_applicable"
+    },
+    "E2-01": {
+      "annotation": "consistent",
+      "status_badge": null,
+      "truth_withdrawn": false
+    },
+    "N1-01": {
+      "annotation": "not_applicable"
+    },
+    "N1-02": {
+      "annotation": "not_applicable"
+    },
+    "N1-03": {
+      "annotation": "not_applicable"
+    },
+    "N1-04": {
+      "annotation": "not_applicable"
+    },
+    "N1-05": {
+      "annotation": "not_applicable"
+    },
+    "N1-06": {
+      "annotation": "not_applicable"
+    },
+    "N1-07": {
+      "annotation": "not_applicable"
+    },
+    "N1-08": {
+      "annotation": "not_applicable"
+    },
+    "N2-01": {
+      "annotation": "not_applicable"
+    },
+    "N2-02": {
+      "annotation": "not_applicable"
+    },
+    "N2-03": {
+      "annotation": "not_applicable"
+    },
+    "N2-04": {
+      "annotation": "not_applicable"
+    },
+    "N2-05": {
+      "annotation": "not_applicable"
+    },
+    "N2-06": {
+      "annotation": "not_applicable"
+    },
+    "N2-07": {
+      "annotation": "not_applicable"
+    },
+    "N2-08": {
+      "annotation": "not_applicable"
+    },
+    "N2-09": {
+      "annotation": "not_applicable"
+    },
+    "N2-10": {
+      "annotation": "not_applicable"
+    },
+    "N2-11": {
+      "annotation": "not_applicable"
+    },
+    "N2-12": {
+      "annotation": "not_applicable"
+    },
+    "N2-13": {
+      "annotation": "not_applicable"
+    },
+    "N2-14": {
+      "annotation": "not_applicable"
+    },
+    "N2-15": {
+      "annotation": "not_applicable"
+    },
+    "N2-16": {
+      "annotation": "not_applicable"
+    },
+    "N2-17": {
+      "annotation": "not_applicable"
+    },
+    "N2-18": {
+      "annotation": "not_applicable"
+    },
+    "N2-19": {
+      "annotation": "not_applicable"
+    },
+    "N2-20": {
+      "annotation": "not_applicable"
+    },
+    "N2-21": {
+      "annotation": "not_applicable"
+    },
+    "N2-22": {
+      "annotation": "not_applicable"
+    },
+    "N2-23": {
+      "annotation": "not_applicable"
+    },
+    "N2-24": {
+      "annotation": "not_applicable"
+    },
+    "N2-25": {
+      "annotation": "not_applicable"
+    },
+    "N2-26": {
+      "annotation": "not_applicable"
+    },
+    "N2-27": {
+      "annotation": "not_applicable"
+    },
+    "N2-28": {
+      "annotation": "not_applicable"
+    },
+    "N2-29": {
+      "annotation": "not_applicable"
+    },
+    "N2-30": {
+      "annotation": "not_applicable"
+    },
+    "N2-31": {
+      "annotation": "not_applicable"
+    },
+    "N2-32": {
+      "annotation": "not_applicable"
+    },
+    "N2-33": {
+      "annotation": "not_applicable"
+    },
+    "N2-34": {
+      "annotation": "not_applicable"
+    },
+    "N2-35": {
+      "annotation": "not_applicable"
+    },
+    "N2-36": {
+      "annotation": "not_applicable"
+    },
+    "N2-37": {
+      "annotation": "not_applicable"
+    },
+    "N2-38": {
+      "annotation": "not_applicable"
+    },
+    "N2-39": {
+      "annotation": "not_applicable"
+    },
+    "N2-40": {
+      "annotation": "not_applicable"
+    },
+    "N2-41": {
+      "annotation": "not_applicable"
+    },
+    "N2-42": {
+      "annotation": "not_applicable"
+    },
+    "N2-43": {
+      "annotation": "not_applicable"
+    },
+    "N4-01": {
+      "annotation": "not_applicable"
+    },
+    "N4-02": {
+      "annotation": "not_applicable"
+    },
+    "N4-03": {
+      "annotation": "not_applicable"
+    },
+    "N4-04": {
+      "annotation": "not_applicable"
+    },
+    "N4-05": {
+      "annotation": "not_applicable"
+    },
+    "N4-06": {
+      "annotation": "not_applicable"
+    },
+    "N4-07": {
+      "annotation": "not_applicable"
+    },
+    "N4-08": {
+      "annotation": "not_applicable"
+    }
+  },
+  "limitations": [
+    "E4 (unresolvable-name honesty) may have zero or few claims: v1's construction assumption was falsified (ChEMBL synonyms resolve major brand names), so v2 accepts only brands verified NON-resolving in raw ChEMBL at construction. A near-empty E4 class is reported as untested, not padded.",
+    "The N1 label-parse precision defect observed in v1's control arm (2 of 7 false flags) was deliberately NOT fixed before v2; a residual control false-flag contribution of up to 2/40 is expected and does not by itself fail the <=0.15 bar.",
+    "Composition is construction-determined: existing_fix is the honest pool-bounded yield of the three refreshed safety-v2 pools; novel fills the remainder of the 60-claim defect total per the registered N1 -> N4 -> N2 reallocation order.",
+    "The citation cutoff (2026-08-10) is a mechanical artifact-date rule, not a judgment of evidence currency.",
+    "Pool-context coverage is limited to the two persisted cases referenced by job_id_hint in this claim set (refreshed to safety-v2); novel-lane claims are pool-free by design.",
+    "N3 (species/preclinical-only) yielded ZERO claims under v2's tightened gates (v1 gates PLUS no cutoff-eligible FDA label and no human-trial signal): all five candidates failed raw ground truth at construction. The N3 defect class is untested in v2 \u2014 reported as such, not padded. The novel group's 59 claims are N1=8, N2=43 (reallocation), N4=8.",
+    "Freeze #1 was destroyed by an environment restart before any scoring (Amendment 3); this claim set is the registered rebuild under identical rules. Engineering fixes (EvidenceRecord coercion, LLM provider round-robin + 429 backoff, per-claim checkpoint/resume) were applied BEFORE this freeze and are part of the frozen system under test. Both allowances remain unconsumed."
+  ]
+}
