@@ -250,3 +250,26 @@ structural, not transient API flakiness.
    Clopper-Pearson bounds, abstention caps, one-scored-run discipline).
 3. **Reporting:** the v2 results report must state the pool-context yield
    (fixed-list vs dynamic fill) and this amendment alongside the score.
+
+## Amendment 5 (2026-08-11, AFTER the single scored run completed PASS;
+## post-score hardening, no re-measurement)
+
+An independent code review of the sealed run found that
+`load_or_run_archive()` admitted a COMPLETE raw archive without binding it
+to the frozen code commit (partial archives were already commit-bound).
+The sealed v2 run was NOT affected: its archive was written by the frozen
+code in the single scored run (no prior archive existed), and the scored
+results are hash-bound in the freeze manifest. The fix touches ONLY
+archive-admission refusal paths (`_archive_bound_to_freeze` +
+`_code_drift_between`; `_archive_complete` and `load_or_run_archive`); no
+audit, scoring, or threshold logic changed. Regression tests prove a
+foreign-code complete archive is refused and a code-equivalent later-commit
+archive is admitted (54/54 harness tests pass).
+
+1. The freeze manifest's `code_commit` is advanced from 0cce8376 to
+   852e6109 (the hardening commit) so the drift check continues to permit
+   the documented `--recalc-only` verification path. The scored measurement
+   remains bound to its results hash, unchanged.
+2. Both allowances remain unconsumed; scored_runs_allowed stays 1 and is
+   spent. No re-scoring of v2 occurred or will occur.
+3. This amendment is disclosed in the technical report (§4.4).

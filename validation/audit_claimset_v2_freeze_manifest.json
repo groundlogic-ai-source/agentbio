@@ -2,7 +2,7 @@
   "study": "audit_claimset_v2",
   "frozen_at": "2026-08-11T01:55:00Z",
   "claim_set_file_sha256": "5013a57aca080e82fd11b20f2a81820fbf0ec01c44ccc3923ccd35e7fd1c52e2",
-  "code_commit": "0cce837665babf3e1bb1e73b9e2de5c0b245ee3b",
+  "code_commit": "852e6109b09459c5c37ee6e4c7c92c18cc3ae8dc",
   "composition": {
     "existing_fix": 1,
     "novel": 59,
@@ -55,5 +55,11 @@
     "verdict": "PASS",
     "scored_at": "2026-08-11T01:58:11Z",
     "note": "results artifact hash binds the published outcome; replacing it without a documented manifest amendment refuses any further run."
+  },
+  "post_score_hardening": {
+    "amendment": 5,
+    "commit": "852e6109b09459c5c37ee6e4c7c92c18cc3ae8dc",
+    "prior_code_commit": "0cce837665babf3e1bb1e73b9e2de5c0b245ee3b",
+    "note": "Post-score code-review hardening: complete raw archives are now bound to the frozen code commit (zero .py drift over audited paths). Refusal-path only; the sealed run was unaffected (its archive was written by frozen code in the single scored run). Results hash binding unchanged."
   }
 }
