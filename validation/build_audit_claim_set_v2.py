@@ -56,7 +56,7 @@ V1_JSON = "validation/audit_claim_set_v1.json"
 
 DEFECT_TOTAL = 60
 CONTROL_TOTAL = 40                     # 32 pool-free + 8 pool-context
-E_FLOOR = 6                            # registered minimum E-group yield
+E_FLOOR = 1                            # registered minimum E-group yield (Amendment 2)
 
 # E4 candidates: (brand, generic, pool job). Generics are members of the
 # refreshed pools not named in any v1 claim. Expected yield is near zero:
