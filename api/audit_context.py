@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from data_sources.audit_redaction import redact_audit_lanes
 from data_sources.openfda import get_label_evidence
 from data_sources.pubtator_assertions import search_drug_mechanism_assertions
 
@@ -297,6 +298,14 @@ def build_audit_context(
             "citation_cutoff": "2026-08-10",
             "error": None,
         }
+    # Disease-blind redaction for benchmark runs. Applied at the lane
+    # boundary and never inside the source modules: the label lane caches
+    # its payload for 30 days, so redacting upstream of `cache_set` would
+    # write holdout-shaped records into the shared production cache.
+    # Findings are detected from the redacted payloads, so a benchmark
+    # cannot depend on evidence it claims not to have seen.
+    regulatory, literature, redaction = redact_audit_lanes(
+        regulatory, literature)
     findings = detect_audit_findings(
         regulatory, literature,
         claimed_route=claimed_route,
@@ -313,6 +322,7 @@ def build_audit_context(
             "regulatory_label": regulatory,
             "entity_linked_literature": literature,
         },
+        "holdout_redaction": redaction,
         "findings": findings,
         "limitations": [
             "No finding changes an AgentBio score, rank, cap, or verdict.",
