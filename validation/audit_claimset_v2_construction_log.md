@@ -1,6 +1,6 @@
 # Audit claim-set v2 — construction and exclusion log
 
-- Constructed: 2026-08-11T01:48:40.247673+00:00
+- Constructed: 2026-08-11T02:41:10.563133+00:00
 - Seed: 20260811 · cutoff: 2026-08-10
 - Protocol: validation/audit_claimset_v2_preregistration.md
 - Predecessor: validation/audit_claim_set_v1.json (instances excluded: 114 names)
