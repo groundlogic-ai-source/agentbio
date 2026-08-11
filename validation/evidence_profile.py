@@ -88,6 +88,38 @@ QUALIFIED = "QUALIFIED"
 SUPPORTED = "SUPPORTED"
 NOT_ASSESSABLE = "NOT_ASSESSABLE"
 
+# --- Dimension dependency split --------------------------------------------
+# The self-critique (validation/audit-discrimination-critique.md) found that
+# the persisted pool is NOT disease-blind: agents/reviewer.py computes
+# composite_score/rank from disease-linked OpenTargets and trial data, and
+# check_mechanism_direction(..., disease, ...) takes the disease name. Any
+# dimension read from the pool therefore inherits the disease-side signal the
+# study claims to hold out, which would make a scored claim circular.
+#
+# DISEASE_INDEPENDENT dimensions come only from build_audit_context (label and
+# literature lanes, redacted and proven blind in Step 1) or from drug-side
+# attributes. They need NO pool and NO pipeline run, so the PRIMARY
+# false-disqualification metric reads only these.
+#
+# DISEASE_DEPENDENT dimensions are read from the persisted pool and so are NOT
+# provably blind. They are reported descriptively only and are NEVER scored
+# into the primary claim.
+DISEASE_INDEPENDENT_DIMS = frozenset({
+    "modality_feasibility",     # N2 finding (redacted label lane)
+    "route_feasibility",        # N4 finding (redacted label lane)
+    "human_mechanism_evidence", # N3 finding (redacted literature lane)
+    "lipophilicity",            # drug-side PubChem XLogP attribute
+})
+DISEASE_DEPENDENT_DIMS = frozenset({
+    "pool_presence",            # needs a persisted pool
+    "rank",                     # pool sort over disease-linked composite
+    "rank_fraction",            # derived from rank
+    "total_candidates",         # pool size
+    "mechanism_direction",      # check_mechanism_direction(..., disease, ...)
+    "safety",                   # safety_cap read from pool candidate
+    "evidence_coverage",        # pool score-component coverage
+})
+
 
 def _finding_statuses(audit_context: Any) -> dict[str, set[str]]:
     """Map finding code -> set of statuses emitted for it."""
@@ -180,15 +212,40 @@ def build_profile(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
         else:
             disposition = SUPPORTED
 
+    # Primary disposition: scored ONLY on the disease-independent dimensions,
+    # so it needs no pool and stays on provably disease-blind data. A pair can
+    # carry a primary disposition even when the overall disposition is
+    # NOT_ASSESSABLE (no case / unresolved name), because the primary claim
+    # never touches the pool.
+    primary_hard = [
+        f"{dim}={value}" for dim, value in HARD_DISQUALIFIERS
+        if dim in DISEASE_INDEPENDENT_DIMS and dimensions.get(dim) == value]
+    primary_soft = [
+        f"{dim}={value}" for dim, value in SOFT_CAUTIONS
+        if dim in DISEASE_INDEPENDENT_DIMS and dimensions.get(dim) == value]
+    if primary_hard:
+        primary_disposition = DISQUALIFIED
+    elif primary_soft:
+        primary_disposition = QUALIFIED
+    else:
+        primary_disposition = SUPPORTED
+
     return {
         "contract": PROFILE_CONTRACT,
         "rule_fingerprint": RULE_FINGERPRINT,
         "drug_name": drug_name,
         "audit_status": status,
         "dimensions": dimensions,
+        "dimension_dependency": {
+            "disease_independent": sorted(DISEASE_INDEPENDENT_DIMS),
+            "disease_dependent": sorted(DISEASE_DEPENDENT_DIMS),
+        },
         "hard_disqualifiers_fired": fired_hard,
         "soft_cautions_fired": fired_soft,
         "disposition": disposition,
+        "primary_disposition": primary_disposition,
+        "primary_hard_fired": primary_hard,
+        "primary_soft_fired": primary_soft,
         "flags": sorted(flags),
         "holdout_redaction_applied": bool(
             (context.get("holdout_redaction") or {}).get("applied")),
