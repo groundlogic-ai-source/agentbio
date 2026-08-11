@@ -1,0 +1,8 @@
+{
+  "contract": "triage-discrimination-freeze-v1",
+  "frozen_at_commit": "6c11982ce3c51145e957ae4c4a0076fcca45f6f3",
+  "cases_sha256": "d0807a0c8397b3a38d65f08787a3eb6f9310fa098449dce860bfce6d1ae8ac98",
+  "preregistration_sha256": "a538a12b83a8a000fd04f707b6e9df7113046cf11381e741867ed38888775eec",
+  "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+  "redaction_contract": "audit-holdout-redaction-v1"
+}
