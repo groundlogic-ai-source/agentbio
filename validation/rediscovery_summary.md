@@ -1,6 +1,6 @@
 # Rediscovery-rate summary — repoDB retrospective
 
-_Generated: 2026-08-11 02:37:17 — computed by validation/miss_classifier.py_
+_Generated: 2026-08-11 12:56:22 — computed by validation/miss_classifier.py_
 
 ## repoDB first-10 (biologic-leaning, top-3 targets)
 
@@ -10,7 +10,7 @@ _Generated: 2026-08-11 02:37:17 — computed by validation/miss_classifier.py_
 - Right target, drug absent from activity pool (mechanism-endpoint gap): **0** — recoverable by the candidate-pool fix
 - Right target but pool truncation: **0**
 - Wrong target selected: **0** (true target was in the considered list for 0 → recoverable by target-selection fix)
-- Biologic / non-small-molecule (structurally outside the pool): **2**
+- Biologic / non-small-molecule (structurally outside the pool): **1**
 - No ChEMBL mechanism record for drug: **0**
 
 **Projected ceiling under both fixes: 0/2** (hits + pool-fix recoverable + target-fix recoverable).
@@ -18,7 +18,7 @@ _Generated: 2026-08-11 02:37:17 — computed by validation/miss_classifier.py_
 | Drug | Disease | Class | Detail |
 |---|---|---|---|
 | Dornase alfa | Cystic Fibrosis | biologic_not_addressable | molecule_type=Enzyme; small-molecule IC50/Ki pool cannot contain it. |
-| Desmopressin | Hemophilia A | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. |
+| Anakinra | Chronic Infantile Neurological, Cutaneous, and Articular Syndrome | — |  |
 
 ## repoDB small-molecule set (top-1 target)
 
@@ -57,7 +57,7 @@ _Generated: 2026-08-11 02:37:17 — computed by validation/miss_classifier.py_
 - Right target, drug absent from activity pool (mechanism-endpoint gap): **4** — recoverable by the candidate-pool fix
 - Right target but pool truncation: **0**
 - Wrong target selected: **8** (true target was in the considered list for 5 → recoverable by target-selection fix)
-- Biologic / non-small-molecule (structurally outside the pool): **2**
+- Biologic / non-small-molecule (structurally outside the pool): **1**
 - No ChEMBL mechanism record for drug: **0**
 
 **Projected ceiling under both fixes: 10/15** (hits + pool-fix recoverable + target-fix recoverable).
@@ -65,7 +65,7 @@ _Generated: 2026-08-11 02:37:17 — computed by validation/miss_classifier.py_
 | Drug | Disease | Class | Detail |
 |---|---|---|---|
 | Dornase alfa | Cystic Fibrosis | biologic_not_addressable | molecule_type=Enzyme; small-molecule IC50/Ki pool cannot contain it. |
-| Desmopressin | Hemophilia A | biologic_not_addressable | molecule_type=Protein; small-molecule IC50/Ki pool cannot contain it. |
+| Anakinra | Chronic Infantile Neurological, Cutaneous, and Articular Syndrome | — |  |
 | Dapsone | Leprosy | wrong_target | Drug's mechanism target(s) ['folP1'] absent from the entire considered-target list — discovery problem, not ranking. |
 | Anagrelide | Essential thrombocythemia | right_target_pool_gap | Mechanism endpoint links drug to PDE3A/PDE3B (Phosphodiesterase 3 inhibitor) but no qualifying Homo sapiens IC50/Ki assay exists — activity pool cannot see it. |
 | Sapropterin | Phenylketonuria | right_target_pool_gap | Mechanism endpoint links drug to PAH (Phenylalanine-4-hydroxylase activator) but no qualifying Homo sapiens IC50/Ki assay exists — activity pool cannot see it. |
