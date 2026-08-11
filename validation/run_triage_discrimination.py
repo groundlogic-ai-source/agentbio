@@ -81,6 +81,10 @@ def _health_gate() -> None:
         "openfda": "https://api.fda.gov/drug/label.json?limit=1",
         "pubtator": ("https://www.ncbi.nlm.nih.gov/research/pubtator3-api/"
                      "publications/export/biocjson?pmids=20301572"),
+        # The lipophilicity dimension reads PubChem XLogP; a degraded PubChem
+        # would silently stamp it UNRESOLVED across the cohort.
+        "pubchem": ("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/"
+                    "name/aspirin/property/InChIKey/JSON"),
     }
     failed = []
     for name, url in probes.items():

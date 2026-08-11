@@ -63,9 +63,14 @@ def _sha256_file(path: Path) -> str:
 
 
 def _health_gate() -> None:
+    # PubChem is a hard dependency of pool building (compound enrichment).
+    # Its omission here is why the first attempt wedged for hours against a
+    # 503 ServerBusy instead of refusing to start.
     probes = {
         "chembl": "https://www.ebi.ac.uk/chembl/api/data/status.json",
         "openfda": "https://api.fda.gov/drug/label.json?limit=1",
+        "pubchem": ("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/"
+                    "name/aspirin/property/InChIKey/JSON"),
     }
     failed = []
     for name, url in probes.items():

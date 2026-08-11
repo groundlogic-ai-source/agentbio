@@ -8,12 +8,47 @@ import re
 import requests
 from typing import Any, Optional
 from cache.cache import get, set as cache_set, make_key
+from data_sources import pubchem_snapshot as _snapshot
 
 BASE_URL = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 PUG_VIEW_URL = "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound"
 
 # WHO ATC codes look like e.g. "L01XE03" (1 letter, 2 digits, 2 letters, 2 digits).
 _ATC_RE = re.compile(r"\b[A-Z]\d{2}[A-Z]{2}\d{2}\b")
+
+# Source-internal accession IDs that are NOT chemical names. PubChem's
+# /compound/name/ endpoint can never resolve these, so sending them is a
+# guaranteed miss AND self-inflicted load: one Study B disease fired 2,958
+# such lookups and drove PubChem into 503 ServerBusy. Candidates carrying
+# these IDs must resolve structurally (via SMILES) or not at all.
+_NON_NAME_ID_RE = re.compile(
+    r"^(BDBM\d+|CHEMBL\d+|ZINC\d+|SCHEMBL\d+|CID\s*\d+|\d+)$", re.IGNORECASE)
+
+
+def is_resolvable_name(value: Optional[str]) -> bool:
+    """True when `value` is plausibly a chemical NAME (not an accession ID)."""
+    v = (value or "").strip()
+    return bool(v) and not _NON_NAME_ID_RE.match(v)
+
+
+def _resolve_inchikey_from_smiles(smiles: str) -> Optional[str]:
+    """Structure-first resolution for candidates that have no usable name.
+
+    Uses POST: SMILES routinely contains '#', '/', '\\' and '+', which break
+    path-encoded GETs.
+    """
+    try:
+        resp = requests.post(
+            f"{BASE_URL}/compound/smiles/property/InChIKey/JSON",
+            data={"smiles": smiles}, timeout=20)
+        if resp.status_code == 404:
+            return None
+        resp.raise_for_status()
+        props = resp.json().get("PropertyTable", {}).get("Properties", [])
+        return props[0].get("InChIKey") if props else None
+    except Exception as e:  # noqa: BLE001
+        print(f"[pubchem] WARNING: SMILES resolution failed: {e}")
+        return None
 
 
 def _get_json(url: str) -> Optional[dict]:
@@ -39,7 +74,8 @@ def _resolve_inchikey(drug_name: str) -> Optional[str]:
     return props[0].get("InChIKey")
 
 
-def get_compound_data(drug_name: str) -> dict[str, Any]:
+def get_compound_data(drug_name: str,
+                      smiles: Optional[str] = None) -> dict[str, Any]:
     """
     Resolves drug_name → InChIKey, then fetches CanonicalSMILES, MolecularWeight, XLogP.
     Returns:
@@ -55,7 +91,34 @@ def get_compound_data(drug_name: str) -> dict[str, Any]:
     IMPORTANT: inchikey is the canonical identifier for all downstream matching.
     Never match on drug_name string for anything downstream of this function.
     """
-    cache_key = make_key("get_compound_data", drug_name)
+    # Route selection: a real chemical name uses the name endpoint (and keeps
+    # the long-standing cache key); an accession ID falls back to structural
+    # resolution under its own key, so neither path invalidates the other.
+    use_name = is_resolvable_name(drug_name)
+
+    # Snapshot-first for the bounded drug universe: pinned local chemistry is
+    # outage-proof and byte-reproducible across re-runs. A miss falls through
+    # to the live API (absence of a row is a coverage fact, not an answer);
+    # a corrupt snapshot raises rather than silently degrading.
+    if use_name and _snapshot.available():
+        hit = _snapshot.lookup(drug_name)
+        if hit is not None:
+            return {"inchikey": hit["inchikey"],
+                    "canonical_smiles": hit["canonical_smiles"],
+                    "molecular_weight": hit["molecular_weight"],
+                    "xlogp": hit["xlogp"], "resolved": hit["resolved"],
+                    "error": None, "source": "pubchem_snapshot"}
+
+    if use_name:
+        cache_key = make_key("get_compound_data", drug_name)
+    elif smiles:
+        cache_key = make_key("get_compound_data_smiles", smiles)
+    else:
+        # Nothing resolvable: refuse without touching the network. Not cached
+        # (a later call may supply SMILES for the same candidate).
+        return {"inchikey": None, "canonical_smiles": None,
+                "molecular_weight": None, "xlogp": None, "resolved": False,
+                "error": f"no resolvable identifier for '{drug_name}'"}
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -70,7 +133,8 @@ def get_compound_data(drug_name: str) -> dict[str, Any]:
     }
 
     try:
-        inchikey = _resolve_inchikey(drug_name)
+        inchikey = (_resolve_inchikey(drug_name) if use_name
+                    else _resolve_inchikey_from_smiles(smiles or ""))
         if not inchikey:
             result["error"] = f"Could not resolve InChIKey for '{drug_name}'"
             # Not cached: _resolve_inchikey also returns None on transient
