@@ -44,16 +44,27 @@ candidate pools carrying pre-fix safety labels), a falsified
 claim-construction assumption (brand names resolve in ChEMBL), and a
 detector precision bug (preclinical-only finding over-firing on approved
 drugs). After registered fixes, a fresh frozen claim set (v2) was
-constructed and scored exactly once under the same discipline: the fixed
-layer **passed** all thresholds — defect recall 60/60 = 1.000 (CP lower
-0.951), control false-flag rate 2/40 = 0.050 (CP upper 0.149), and
-novel-class recall 59/59 = 1.000 (classes with no prior defense).
+constructed and scored exactly once under the same discipline. v2 is a
+**narrower instrument than v1**, and its composition must be read with its
+result: 73% of the defect arm (43/59 novel claims) fell into one class via
+the registered shortfall-reallocation rule, all novel claims assert a drug
+attribute against that drug's own regulatory label with the disease field
+inert, and every finding is disclosure-only. On that bounded input-hygiene
+task the fixed layer **passed** all thresholds — defect recall 60/60 = 1.000
+(CP lower 0.951), control false-flag rate 2/40 = 0.050 (CP upper 0.149),
+novel-class recall 59/59 = 1.000. Whether the layer can judge a
+drug–disease *hypothesis* remains untested.
 
 **Conclusions.** Pre-registration plus one-scored-run discipline first
 exposed an audit-layer failure that internal regression suites had masked,
-then verified — under a fresh frozen study — that the registered fixes
-hold. The first study's failure is reported alongside the pass, never
-replaced by it. The system is a research prioritization and evidence-audit
+then verified — under a fresh frozen study — that the registered fixes hold
+*for the input-hygiene checks that study measures*. The first study's
+failure is reported alongside the pass, never replaced by it, and the
+second study's narrow scope is reported alongside its pass. A composition
+audit of v2 (Amendment 6) is included as a worked example of how a
+pre-registered reallocation rule can mechanically bias an instrument toward
+an easier test without any post-hoc selection. The system is a research
+prioritization and evidence-audit
 tool; nothing here is evidence of clinical efficacy, and no output
 constitutes a treatment recommendation.
 
@@ -201,6 +212,20 @@ amendments after two fail-closed construction aborts and a documented
 freeze-loss/rebuild event before any scoring) with identical thresholds,
 one-scored-run discipline, and scoring code.
 
+**v2's measured scope, stated before its result (Amendment 6).** The
+registered shortfall-reallocation order (N1 → N4 → N2) exhausted N1 and N4
+at quota and routed all 36 shortfall claims into N2, which therefore carries
+43 of 59 novel claims (73%) — mechanical, registered in advance, and
+therefore not post-hoc selection, but with the foreseeable effect of loading
+the arm onto the class with the largest universe and the highest v1 recall.
+Substantively, all 59 novel claims assert a *drug attribute* (N2: one
+`modality` field; N4: `route` + `context`; N1: no claim fields, label
+parsing) against that drug's own regulatory label; the `disease_name` field
+is inert, so ground truth never depends on the disease. 59 of 60 defect
+claims are pool-free. Every finding carries `effect: "disclosure_only"` and
+changes no score, rank, cap, or verdict. v2 is accordingly an input-hygiene
+and regression instrument, not a test of hypothesis judgment.
+
 ### 3.4 Engineering regression suite (separate instrument)
 
 An offline trap benchmark (12 planted defect traps covering the twelve
@@ -288,25 +313,43 @@ boundary) — yet the external study failed. Internal regression suites measure
 whether yesterday's fixes still work; they cannot measure whether the audit
 catches what nobody anticipated.
 
-### 4.3 Audit claim-set v2 — pre-registered re-validation, PASS
+### 4.3 Audit claim-set v2 — input-hygiene re-validation, PASS on a narrow instrument
 
 After the v1 failure, the fixes (pool safety refresh, N3 detector
 precision, and pre-freeze robustness work: evidence-record boundary
 coercion, LLM provider failover under rate-limit pressure) were registered,
 and a NEW claim set was constructed, frozen, and scored exactly once under
-the same discipline (v2 pre-registration, Amendments 1–4). The fixed layer
-**passed both thresholded metrics**: defect recall 60/60 = 1.000 (CP lower
-0.951) against ≥0.80/≥0.65; control false-flag rate 2/40 = 0.050 (CP upper
-0.149) against ≤0.15/≤0.30. Novel-class recall was 59/59 = 1.000 (CP lower
-0.950). Zero claims abstained or were excluded; no caught defect carried a
-contradicted safety disclosure. Composition is construction-determined and
-disclosed: E = 1 (E2 only; E4 = 0 is a registered finding — brand names
-resolve in raw ChEMBL), novel = 59 (N1 8, N2 43, N4 8; N3 0 — untested
-under v2's tightened gates), controls = 40. Freeze #1 was destroyed by an
-environment restart before any scoring (no results produced or seen; both
-allowances unconsumed); the scored set is the registered rebuild under
-identical rules (Amendment 3). v1's FAIL is reported alongside this PASS,
-never replaced by it.
+the same discipline (v2 pre-registration, Amendments 1–4).
+
+Composition first, per §3.3 and Amendment 6: E = 1, novel = 59 (N1 8,
+**N2 43**, N4 8, N3 0), controls = 40; all novel claims assert drug
+attributes against the drug's own label with the disease field inert; 59/60
+defect claims are pool-free; findings are disclosure-only.
+
+On that task the fixed layer **passed both thresholded metrics**: defect
+recall 60/60 = 1.000 (CP lower 0.951) against ≥0.80/≥0.65; control
+false-flag rate 2/40 = 0.050 (CP upper 0.149) against ≤0.15/≤0.30.
+Novel-class recall was 59/59 = 1.000 (CP lower 0.950). Zero claims abstained
+or were excluded; no caught defect carried a contradicted safety disclosure.
+Freeze #1 was destroyed by an environment restart before any scoring (no
+results produced or seen; both allowances unconsumed); the scored set is the
+registered rebuild under identical rules (Amendment 3). v1's FAIL is
+reported alongside this PASS, never replaced by it.
+
+**Three classes are untested rather than passed.** N3 yielded zero claims in
+both studies. E4 = 0 is a finding about an external resource (ChEMBL
+synonyms resolve brand names), not a measurement of the layer. And **E2 —
+the class that produced v1's single largest failure (0/19) — is effectively
+untested at n = 1**: six candidates were excluded at construction as lacking
+a cutoff-eligible boxed-warning label, and re-checking those exclusions
+against raw openFDA (2026-08-11) shows at least two are retrieval artifacts
+rather than absent ground truth — metoprolol (348 labels, ≥4 carrying a
+pre-cutoff ischemic-heart-disease boxed warning, missed under a 25-row
+retrieval cap) and levosalbutamol (HTTP 404 under its INN; the USAN name
+levalbuterol returns 19 labels, 3 with pre-cutoff boxed warnings). Four
+exclusions were correct. The frozen claim set is not edited to repair this;
+the scored run stands and the class is reported as untested for
+construction reasons.
 
 ### 4.4 Development history (labeled; not pooled)
 
@@ -341,6 +384,32 @@ defenses generalize — but that its current deployment fails on data freshness
 and on one detector's precision. Both are fixable, and both fixes require new
 pre-registered studies, not post-hoc re-scoring of this one.
 
+**A fourth finding concerns instrument design itself, and it comes from our
+own study.** v2's post-hoc composition audit (Amendment 6) shows that a
+pre-registration can be followed exactly and still yield a weak instrument.
+The shortfall-reallocation rule (N1 → N4 → N2) was registered before
+construction and executed mechanically, with fail-closed aborts rather than
+padding — procedurally clean by every criterion we set. Its effect was to
+place 73% of the defect arm in the class with the largest universe and the
+highest prior recall, while the class carrying the previous study's largest
+failure shrank to n = 1 through label-retrieval artifacts at construction.
+Pre-registration protects against choosing favourable analyses after seeing
+results; it does not protect against a rule whose *mechanical* consequence is
+an easier test. The lesson we draw, and would apply to any successor, is that
+reallocation rules should shift a shortfall toward the hardest remaining
+class or shrink the study and report the smaller n — and that class-level
+composition should be a reported endpoint, not a footnote. We report v2's
+composition audit in full for the same reason we reported v1's failure: the
+instrument's weaknesses are more useful to a reader than its headline.
+
+More broadly, both audit studies test whether the layer notices a false
+assertion *about a drug* — resolvable against that drug's regulatory label.
+Neither tests whether it can judge a drug–*disease* hypothesis, which is the
+question a partner deciding whether to trust a ranked candidate list actually
+asks. That instrument does not exist yet, and building it requires a
+comparable per-pair output that today's disclosure-only findings do not
+provide.
+
 ## 6. Limitations
 
 Retrospective rediscovery with disease-side (not pool-side) holdout;
@@ -348,8 +417,13 @@ funnel-feasibility selection underrepresenting sparse-data diseases; wide CIs
 at n=22 in-scope; a saturated chance baseline; concentration of hits in
 ultra-rare monogenic disease; biologics outside the scoring contract; a
 first audit study that failed (reported unedited) with its fixed-layer
-successor passing — N3 untested in both, E4 measuring a falsified
-assumption; single-universe disease scope; DrugCentral pinned to the 2023
+successor passing on a **materially narrower instrument** — v2's defect arm
+is 73% one class, its novel claims assert drug attributes against the drug's
+own label with the disease field inert, 59/60 defect claims are pool-free,
+and all findings are disclosure-only, so hypothesis judgment is untested;
+N3 untested in both studies, E4 measuring a falsified assumption, and E2
+effectively untested in v2 (≥2 of 6 exclusions were label-retrieval
+artifacts); single-universe disease scope; DrugCentral pinned to the 2023
 release; GtoPdb commercial terms a production dependency; and self-evaluation
 by the system's developer, mitigated but not eliminated by pre-registration,
 frozen artifacts, mechanical scoring, and external ground truth. No clinical,
@@ -365,10 +439,16 @@ and is uninformative, so absolute rates and CIs are the evidence) and — more
 importantly — an audit layer whose first frozen external study **failed**
 (recall 0.533, false-flag 0.175 — a failure internal regression suites had
 masked) and whose registered fixes then **passed** a fresh pre-registered
-frozen study (v2: defect recall 60/60 = 1.000, control false-flag
-2/40 = 0.050, novel-class 59/59 = 1.000). We publish the full evidentiary
-chain for both studies: case lists, claim
-sets, raw outputs, freeze manifests, and recomputation scripts. We hope the
+frozen study on a deliberately bounded task (v2: defect recall 60/60 =
+1.000, control false-flag 2/40 = 0.050, novel-class 59/59 = 1.000). We state
+v2's scope with its score: 73% of its defect arm is a single class, its
+claims assert drug attributes against regulatory labels rather than
+evaluating drug–disease hypotheses, and its findings are disclosure-only.
+The layer's ability to discriminate between good and poor repurposing
+hypotheses is **not** measured by either study and remains open. We publish
+the full evidentiary chain for both studies — case lists, claim sets, raw
+outputs, freeze manifests, recomputation scripts, and the composition audit
+that narrowed v2's interpretation after it passed. We hope the
 instrument designs (screened funnels, novel-class audit claims, one-scored-run
 allowances, hash-bound results) are reusable by any team evaluating
 trustworthiness claims for computational pipelines.

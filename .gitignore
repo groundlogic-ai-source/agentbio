@@ -65,3 +65,5 @@ cache.db-journal
 
 # v2 preflight control-discard budget (runtime state)
 validation/.v2_control_attempts
+cache.db-shm
+cache.db-wal

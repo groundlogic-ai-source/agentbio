@@ -701,8 +701,49 @@ def build_controls(pools: dict) -> None:
             f"{added + added_ctx}/{CONTROL_TOTAL}")
 
 
+FREEZE_MANIFEST = "validation/audit_claimset_v2_freeze_manifest.json"
+
+
+def _refuse_if_frozen_and_scored() -> None:
+    """Fail closed rather than overwrite the frozen artifact of record.
+
+    The builder writes OUT_JSON/OUT_LOG unconditionally. Once v2 was frozen
+    and its single scored run spent, a later re-run of the
+    `build-audit-claimset-v2` workflow silently regenerated the claim set:
+    the 100 claims were byte-identical but `created_at` moved, which changed
+    the file sha and broke the freeze manifest's binding (see Amendment 7).
+    A frozen, scored study must never be rebuildable by accident.
+    """
+    if not os.path.exists(FREEZE_MANIFEST):
+        return
+    try:
+        with open(FREEZE_MANIFEST) as fh:
+            manifest = json.load(fh)
+    except (OSError, ValueError) as exc:
+        raise SystemExit(
+            f"[build-v2] REFUSED: freeze manifest {FREEZE_MANIFEST} exists "
+            f"but is unreadable ({exc}); refusing to overwrite the claim set")
+    scored = manifest.get("scored_results") or {}
+    if not scored.get("results_sha256"):
+        return
+    if os.environ.get("AUDIT_V2_REBUILD_OVERRIDE") == "1":
+        log("[build-v2] WARNING: rebuilding a frozen, scored claim set "
+            "because AUDIT_V2_REBUILD_OVERRIDE=1. This invalidates the "
+            "freeze binding and must be recorded as an amendment.")
+        return
+    raise SystemExit(
+        "[build-v2] REFUSED: audit claim-set v2 is frozen and its single "
+        f"scored run is spent (results sha {scored['results_sha256'][:16]}). "
+        f"Rebuilding would overwrite the artifact of record and break the "
+        f"freeze binding in {FREEZE_MANIFEST}. To construct a successor "
+        "study, write a new builder with its own pre-registration. Set "
+        "AUDIT_V2_REBUILD_OVERRIDE=1 only to deliberately destroy this "
+        "freeze.")
+
+
 def main() -> None:
     global _V1_EXCLUDED
+    _refuse_if_frozen_and_scored()
     b.health_precheck()
     _V1_EXCLUDED = _load_v1_exclusions()
     log(f"v1 instance exclusion set: {len(_V1_EXCLUDED)} names")

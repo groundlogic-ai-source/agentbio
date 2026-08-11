@@ -273,3 +273,140 @@ archive is admitted (54/54 harness tests pass).
 2. Both allowances remain unconsumed; scored_runs_allowed stays 1 and is
    spent. No re-scoring of v2 occurred or will occur.
 3. This amendment is disclosed in the technical report (§4.4).
+
+## Amendment 6 (2026-08-11, AFTER the scored run; interpretation narrowing,
+## no re-measurement)
+
+An internal composition audit of the frozen v2 claim set, run after the PASS
+was recorded, found that the study's measured scope is substantially narrower
+than the phrase "external audit validation" implies. **No measurement
+changes.** The claim set, raw outputs, results hash, per-class counts, and
+PASS verdict stand exactly as scored. What this amendment narrows is what the
+result may be claimed to demonstrate.
+
+Findings, all re-derived mechanically from the frozen artifacts:
+
+1. **One defect class carries the arm.** N2 = 43 of 59 novel claims (73%),
+   43 of 60 defect claims (72%). The registered shortfall-reallocation order
+   (N1 → N4 → N2) exhausted N1 and N4 at their quotas and sent the entire
+   36-claim shortfall to N2 — the class with the largest available universe
+   and the highest v1 recall (13/13). The rule was registered in advance and
+   executed mechanically, so this is **not** post-hoc selection; but its
+   foreseeable effect was to concentrate the defect arm in the easiest
+   available class. A rule that reallocated toward the *hardest* remaining
+   class, or that shrank the study and reported a smaller n, would have
+   produced a more informative instrument. This is recorded as a design
+   defect in the composition rule, to be corrected in any successor study.
+
+2. **The defect claims test drug attributes, not drug→disease hypotheses.**
+   Every N2 claim asserts one field (`modality: "small molecule"`) against a
+   drug whose FDA label identifies a biologic. Every N4 claim asserts
+   `route` + `context`. N1 claims carry no claim fields at all and exercise
+   label parsing. In all 59 novel claims the `disease_name` field is
+   **inert**: ground truth is a property of the drug's label alone and does
+   not depend on the disease. The study therefore measures **input-hygiene
+   detection on asserted drug attributes**, and measures nothing about
+   whether the layer can assess a drug–disease pairing.
+
+3. **Pool context is almost untested.** 59 of 60 defect claims are pool-free;
+   only the single E2 claim (VANDETANIB) carries a `job_id_hint` and
+   exercises a persisted candidate pool. Together with the 8 pool-context
+   controls, 9 of 100 claims touch the pipeline's own candidate pools.
+
+4. **E2's collapse is partly a retrieval artifact, not evidence the class was
+   fixed.** Six E2 candidates were excluded as "no cutoff-eligible FDA label
+   with a boxed warning (ground truth unverifiable)". Re-checked against raw
+   openFDA on 2026-08-11: **METOPROLOL** has 348 labels, of which at least 4
+   carry a pre-cutoff "WARNING: ISCHEMIC HEART DISEASE" boxed warning —
+   missed because `ofda_label_rows()` caps retrieval at 25 rows;
+   **LEVOSALBUTAMOL** returns HTTP 404 under its INN, while the US generic
+   name (levalbuterol) returns 19 labels with 3 pre-cutoff boxed warnings —
+   an INN/USAN name-form miss. The other four exclusions were correct
+   (MILTEFOSINE's only boxed-warning label is dated after the cutoff;
+   CABOZANTINIB and NOREPINEPHRINE have none; ALBUTEROL's two
+   `boxed_warning` fields contain a mis-parsed FEV₁ data table). **At least
+   2 of 6 E2 exclusions were construction-side retrieval failures**; E2
+   should have carried roughly 3 claims rather than 1. The class that
+   produced v1's largest failure (0/19) is therefore effectively untested in
+   v2, and the reason is a measurement limitation — not a demonstration that
+   the defect was resolved.
+
+5. **Findings are disclosure-only.** Every N1–N4 finding carries
+   `effect: "disclosure_only"` and changes no score, rank, cap, or verdict.
+   The study measures whether a disclosure is emitted, not whether any
+   decision changes.
+
+**Required reporting posture (binding on all v2-facing writeups):**
+
+- v2 is described as a **bounded input-hygiene / regression instrument**,
+  never as validation that the audit layer can judge therapeutic hypotheses.
+- Composition (E = 1; N1 8, N2 43, N3 0, N4 8; C = 40) and the N2 share
+  appear **before** the headline metric.
+- The E2 retrieval artifact (item 4) is reported wherever E2's yield is
+  stated.
+- The disclosure-only property is stated wherever the audit layer is
+  described as a safeguard.
+- The retrieval defects in item 4 are **not** fixed in v2 and must not be:
+  the claim set is frozen and the run is scored. They are corrected in the
+  successor instrument, under its own pre-registration.
+
+No metric, claim, citation, or frozen artifact is edited under this
+amendment. Allowances are unchanged: the single scored run is spent, the
+one-fix-one-rerun allowance remains unconsumed.
+
+## Amendment 7 (2026-08-11, AFTER the scored run; freeze-binding breach and
+## repair — no re-measurement)
+
+**Incident.** The `build-audit-claimset-v2` workflow was re-run at
+2026-08-11T02:41:10Z — after the freeze (01:48:40Z) and after the single
+scored run (results written 01:58Z). The builder writes its output
+unconditionally, so it overwrote `validation/audit_claim_set_v2.json` and
+`validation/audit_claimset_v2_construction_log.md` in place. This broke the
+freeze binding: the manifest records
+`claim_set_file_sha256 = 5013a57a…`, while the regenerated file hashed to
+`e2e8c4af…`. Detected on 2026-08-11 during Amendment 6 verification.
+
+**Scope of the breach — substantively nil, procedurally real.** The
+regenerated artifacts were compared field-by-field against the frozen
+versions recovered from the freeze commit (`0cce837`):
+
+- All 100 claims are identical: same `claim_id` set, same content for every
+  shared id (0 differing), same class counts
+  (E2 1, N1 8, N2 43, N4 8, control 40).
+- `citation_cutoff`, `construction_protocol`, `predecessor`, `seed`,
+  `group_totals`, and `pools_used_for_reachability` are unchanged.
+- The only differences are `created_at` (a fresh wall-clock timestamp) and
+  the derived self-recorded `claim_set_sha256` that includes it. The
+  construction log differs by exactly one line, its `Constructed:`
+  timestamp — every acceptance and exclusion event, including the six E2
+  exclusions cited in Amendment 6, is identical.
+
+The construction is therefore deterministic given its inputs, and the
+scored results (`results_sha256 = b39f7426…`) remain the results of the
+claim set they were scored against. No claim, metric, verdict, or result
+hash is affected.
+
+**Repair.** Both artifacts were restored from the freeze commit `0cce837`;
+`validation/audit_claim_set_v2.json` again hashes to `5013a57a…` and the
+manifest binding verifies. Nothing was re-scored, and neither allowance was
+touched (the scored run remains spent, the one-fix-one-rerun allowance
+remains unconsumed).
+
+**Prevention (refusal path only, no scoring change).**
+`validation/build_audit_claim_set_v2.py` now calls
+`_refuse_if_frozen_and_scored()` before doing any work: if the freeze
+manifest records a `scored_results.results_sha256`, the builder exits
+non-zero and writes nothing. An unreadable manifest also refuses, rather
+than falling through to a rebuild. `AUDIT_V2_REBUILD_OVERRIDE=1` is the
+sole escape hatch and logs a warning that using it destroys the freeze.
+Verified: re-running the workflow now exits 1 with the claim-set sha
+unchanged.
+
+**Generalised lesson, recorded because it will recur.** A frozen study whose
+builder remains wired to a live workflow is not actually frozen — the
+freeze lives in a manifest, but the workflow can still fire. Any study
+artifact bound by a hash manifest must have its generator fail closed once
+the study is scored, and the binding must be re-verified whenever the study
+is cited, not only when it is produced. Amendment 6's verification pass is
+what surfaced this; freeze verification is now part of citing v2, not just
+of freezing it.
