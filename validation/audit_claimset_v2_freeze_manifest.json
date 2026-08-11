@@ -1,0 +1,47 @@
+{
+  "study": "audit_claimset_v2",
+  "frozen_at": "2026-08-11T01:55:00Z",
+  "claim_set_file_sha256": "5013a57aca080e82fd11b20f2a81820fbf0ec01c44ccc3923ccd35e7fd1c52e2",
+  "code_commit": "0cce837665babf3e1bb1e73b9e2de5c0b245ee3b",
+  "composition": {
+    "existing_fix": 1,
+    "novel": 59,
+    "control": 40,
+    "novel_breakdown": {"N1": 8, "N2": 43, "N3": 0, "N4": 8},
+    "note": "Composition per Amendments 2 and 4: E-group is the honest pool-bounded yield; N3 yielded zero under the tightened v2 gates (untested class, disclosed); pool-context controls filled dynamically after the registered fixed list exhausted. See validation/audit_claimset_v2_preregistration.md."
+  },
+  "harness_config": {
+    "label": "audit_claimset_v2",
+    "citation_cutoff": "2026-08-10",
+    "pass_min_defect_recall": 0.8,
+    "pass_min_recall_cp_lower": 0.65,
+    "pass_max_control_ffr": 0.15,
+    "pass_max_ffr_cp_upper": 0.3,
+    "max_group_abstention_frac": 0.1
+  },
+  "cache_policy": "Production caches as-is (cache/cache.db, 7-30 day TTLs by source). Degraded states are never cached by design. No cache clearing, pinning, or special treatment for the scored run.",
+  "health_requirements": [
+    "ChEMBL status.json readable",
+    "openFDA drug/label.json query succeeds",
+    "Europe PMC search succeeds",
+    "PubTator3 search succeeds",
+    "Pool jobs referenced by job_id_hint resolvable via api.jobs_db in completed/awaiting_review state with persisted candidates files"
+  ],
+  "scored_runs_allowed": 1,
+  "rerun_allowance": {
+    "consumed": false,
+    "event": null,
+    "marker_file": "validation/audit_claimset_v2_rerun_allowance_consumed.json",
+    "note": "Fresh single-use one-fix-one-rerun allowance for v2 (archive-only: re-scores the frozen raw archive, never re-executes audits). v1's allowance remains consumed forever and is unaffected."
+  },
+  "destroyed_prior_freeze": {
+    "event": "Amendment 3 (2026-08-11): freeze attempt #1 (claim-set sha a9a7f45f..., freeze commit 0b4d776d) was destroyed by a Replit environment restart mid-run before any scoring. No results file was ever written; truth labels were never joined to outputs; both allowances unconsumed. Lost run's only observations were operational (4 harness crashes, sustained 429s), which motivated the pre-freeze engineering fixes below. This claim set is the registered rebuild under identical rules.",
+    "git_recovery": "attempted via git fsck/cat-file; freeze commit 0b4d776d not present in object store"
+  },
+  "pre_freeze_engineering_fixes": [
+    "5f0a55e: EvidenceRecord.__post_init__ boundary coercion (enum/str fields) — malformed adapter output can no longer crash .value access or set membership (observed crash class: 3 claims)",
+    "5f0a55e: data_sources/llm_failover.py — text-only LLM calls round-robin across Anthropic/OpenAI AI-integration providers with cross-provider failover and exponential backoff on 429/5xx; provider-bound web-search calls retry with same-provider backoff",
+    "5f0a55e: harness per-claim atomic checkpointing with commit-bound resume (completed claims kept, crashed/missing re-run; one archive = one code version)",
+    "7a2e196: Amendment 4 — pool-context control dynamic fill (construction-side; registered before rebuild)"
+  ]
+}
