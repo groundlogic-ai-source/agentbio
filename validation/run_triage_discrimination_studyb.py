@@ -251,7 +251,26 @@ def _profile_drug(disease: str, drug: str, pool: list[dict],
             "profile": build_profile(drug, audit)}
 
 
+_LOCK_PATH = ROOT / "validation" / ".studyb_runner.lock"
+
+
+def _acquire_run_lease():
+    """Exclusive same-host lease on the runner itself (not just the
+    supervisor). Workflow restarts can leave the old process alive; without
+    this, two runners load the same checkpoint and double-spend LLM calls.
+    Returns the open fd — the lock is held for the process lifetime."""
+    import fcntl
+    fh = open(_LOCK_PATH, "w")
+    try:
+        fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        raise SystemExit("[studyb] another runner instance holds the lease — "
+                         "exiting (no duplicate LLM spend)")
+    return fh
+
+
 def main() -> None:
+    _lease = _acquire_run_lease()  # noqa: F841 — held until process exit
     if RESULTS_PATH.exists():
         raise SystemExit("[studyb] REFUSED: results exist. Amend, never "
                          "regenerate.")
@@ -273,6 +292,7 @@ def main() -> None:
             if pool_rec is None:
                 skipped.append(disease)
                 continue
+
             print(f"[studyb] {disease}: pool={pool_rec['pool_size']}",
                   flush=True)
         pool = pool_rec["pool"]
@@ -287,6 +307,16 @@ def main() -> None:
                     table.append({**_profile_drug(disease, name, pool, total),
                                   "row_kind": "context_top_candidate"})
 
+    # Fail-closed: a results artifact with missing diseases would be a
+    # permanently incomplete study (the runner refuses to regenerate once
+    # results exist). Transient failures must be retried by the supervisor,
+    # never published as final.
+    if skipped:
+        print(f"[studyb] INCOMPLETE: {len(skipped)} disease(s) not finalized "
+              f"({skipped}) — NOT writing results; resume to continue",
+              flush=True)
+        raise SystemExit(1)
+
     payload = {
         "contract": "triage-discrimination-studyb-v2",
         "descriptive_only": True,
@@ -298,15 +328,18 @@ def main() -> None:
         "rule_fingerprint": RULE_FINGERPRINT,
         "v2_results_sha256": _sha256_file(V2_RESULTS),
         "n_diseases": len(diseases),
-        "diseases_incomplete": skipped,
+        "diseases_incomplete": [],  # always empty: results only exist when complete
         "rows": table,
     }
     payload["results_sha256"] = hashlib.sha256(
         json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
-    RESULTS_PATH.write_text(json.dumps(payload, indent=2, sort_keys=True,
-                                       default=str) + "\n")
+    # Atomic write: readers (endpoints, pull-back) never see a partial file.
+    tmp = RESULTS_PATH.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(payload, indent=2, sort_keys=True,
+                              default=str) + "\n")
+    tmp.replace(RESULTS_PATH)
     print(f"[studyb] wrote {RESULTS_PATH} ({len(table)} rows, "
-          f"{len(skipped)} diseases incomplete)", flush=True)
+          "all diseases complete)", flush=True)
 
 
 if __name__ == "__main__":

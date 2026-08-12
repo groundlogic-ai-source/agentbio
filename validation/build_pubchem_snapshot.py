@@ -80,6 +80,9 @@ def build() -> None:
         pc = get_compound_data(name)
         # Distinguish "PubChem says no such compound" (authoritative, worth
         # persisting) from "the call failed" (transient, must not persist).
+        # pubchem._get_json raises PubChemTransientError on 5xx/429/network
+        # and reserves None for genuine 404s, so only the "could not resolve"
+        # error string is an authoritative negative.
         transient = (not pc.get("resolved")
                      and (pc.get("error") or "").lower().find(
                          "could not resolve") == -1)
@@ -90,6 +93,11 @@ def build() -> None:
         known = False
         if pc.get("inchikey"):
             cls = get_drug_classification(pc["inchikey"])
+            if cls.get("error"):
+                # Classification failed transiently: do not freeze
+                # is_known_drug=False into the snapshot.
+                failed += 1
+                continue
             known = bool(cls.get("is_known_drug"))
             atc = list(cls.get("atc_codes") or [])
         conn.execute(
