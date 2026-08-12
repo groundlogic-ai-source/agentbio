@@ -19,6 +19,8 @@ Output: output/reviewed_candidates.json
 import json
 import os
 import sys
+import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Optional
 
@@ -219,6 +221,64 @@ def _modality_flag(
     return molecule_type != "Small molecule" and not oral
 
 
+#: Seconds between liveness beats while the prefetch lanes are awaited.
+#: Module-level so tests can patch it down.
+_PREFETCH_HEARTBEAT_SECONDS = 120
+
+_PREFETCH_LANES = ("openfda-adverse", "clinicaltrials", "pubchem",
+                   "chembl-safety", "chembl-molecule")
+
+
+class _PrefetchLiveness:
+    """Time-based liveness beat for the reviewer prefetch.
+
+    ``executor.map`` yields results in INPUT order, so a yield-based
+    progress print stays silent when the first pending item is the slow
+    one — the exact failure mode this exists to expose.  Lane workers
+    complete out of order, so wrapping the lane callables keeps the
+    counters moving as long as ANY call finishes; a wedged lane shows up
+    as a frozen counter in the next beat.  Observational only: scoring is
+    untouched.
+    """
+
+    def __init__(self, lanes: tuple, total: int) -> None:
+        self._counts = {lane: 0 for lane in lanes}
+        self._total = total
+        self._lock = threading.Lock()
+        self._stop = threading.Event()
+        self._start = time.monotonic()
+        self._thread = threading.Thread(target=self._beat, daemon=True)
+
+    def wrap(self, lane: str, fn):
+        def counted(item):
+            try:
+                return fn(item)
+            finally:
+                with self._lock:
+                    self._counts[lane] += 1
+        return counted
+
+    def _beat(self) -> None:
+        while not self._stop.wait(_PREFETCH_HEARTBEAT_SECONDS):
+            elapsed = time.monotonic() - self._start
+            with self._lock:
+                summary = ", ".join(
+                    f"{lane}={count}/{self._total}"
+                    for lane, count in self._counts.items()
+                )
+            print(f"[reviewer] prefetch alive {elapsed:.0f}s — {summary}",
+                  flush=True)
+
+    def __enter__(self):
+        self._thread.start()
+        return self
+
+    def __exit__(self, *exc) -> bool:
+        self._stop.set()
+        self._thread.join(timeout=5)
+        return False
+
+
 def _prefetch_candidate_context(
     candidates: list[dict[str, Any]],
     disease: str,
@@ -232,6 +292,9 @@ def _prefetch_candidate_context(
     """
     if not candidates:
         return []
+    total = len(candidates)
+    print(f"[reviewer] prefetch start: {total} candidates for {disease}",
+          flush=True)
     workers = min(MAX_REVIEWER_PREFETCH_WORKERS_PER_SOURCE, len(candidates))
     drugs = [candidate["drug_name"] for candidate in candidates]
     chembl_ids = [_candidate_chembl_ids(candidate) for candidate in candidates]
@@ -251,32 +314,37 @@ def _prefetch_candidate_context(
             drug, ids[0] if ids else None
         )
 
-    with ThreadPoolExecutor(max_workers=workers) as adverse_pool, \
+    with _PrefetchLiveness(_PREFETCH_LANES, total) as live, \
+            ThreadPoolExecutor(max_workers=workers) as adverse_pool, \
             ThreadPoolExecutor(max_workers=workers) as trials_pool, \
             ThreadPoolExecutor(max_workers=workers) as pubchem_pool, \
             ThreadPoolExecutor(max_workers=workers) as safety_pool, \
             ThreadPoolExecutor(max_workers=workers) as molecule_pool:
         # Submit every lane before awaiting any lane, so provider latency
         # overlaps across all five independent sources.
-        adverse_iter = adverse_pool.map(get_adverse_events, drugs)
+        adverse_iter = adverse_pool.map(
+            live.wrap("openfda-adverse", get_adverse_events), drugs)
         trials_iter = trials_pool.map(
-            fetch_trials,
+            live.wrap("clinicaltrials", fetch_trials),
             zip(
                 drugs,
                 chembl_ids,
                 [candidate.get("inchikey") for candidate in candidates],
             ),
         )
-        pubchem_iter = pubchem_pool.map(get_compound_data, drugs)
+        pubchem_iter = pubchem_pool.map(
+            live.wrap("pubchem", get_compound_data), drugs)
         safety_iter = safety_pool.map(
-            fetch_safety, zip(drugs, chembl_ids)
+            live.wrap("chembl-safety", fetch_safety), zip(drugs, chembl_ids)
         )
-        molecule_iter = molecule_pool.map(get_molecule_data, drugs)
+        molecule_iter = molecule_pool.map(
+            live.wrap("chembl-molecule", get_molecule_data), drugs)
         adverse = list(adverse_iter)
         trials = list(trials_iter)
         pubchem = list(pubchem_iter)
         safety = list(safety_iter)
         molecule = list(molecule_iter)
+        print(f"[reviewer] prefetch done: {total} candidates", flush=True)
 
     return [
         {

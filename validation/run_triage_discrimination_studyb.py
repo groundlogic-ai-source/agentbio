@@ -205,6 +205,9 @@ def _build_pool(disease: str, drugs: list[str], targets_done: dict) -> dict | No
         "repurposing_only": True,
     }
     bio_min = {"literature_hits": [{"pmid": p} for p in bio_pmids]}
+    print(f"[studyb]   {disease}: pooled reviewer over {len(pooled)} pooled "
+          f"candidates ({len(all_candidates)} raw across "
+          f"{len(run_rows)} targets)", flush=True)
     try:
         reviewed = run_reviewer(pooled_output, bio_min)
     except Exception as exc:  # noqa: BLE001
