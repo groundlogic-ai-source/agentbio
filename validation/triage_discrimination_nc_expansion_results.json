@@ -1,0 +1,5589 @@
+{
+  "cases": {
+    "nc1": [
+      {
+        "approved_routes": [
+          "intravenous",
+          "subcutaneous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Abatacept",
+        "ind_name": "Juvenile arthritis",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "T-lymphocyte activation antigen CD86 inhibitor",
+        "n_products": 1,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Abatacept",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201823"
+      },
+      {
+        "approved_routes": [
+          "intravenous",
+          "oral"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Aldesleukin",
+        "ind_name": "Leukemia, Myelocytic, Acute",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Interleukin-2 receptor agonist",
+        "n_products": 7,
+        "product_modalities": [
+          "biologic",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Aldesleukin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201438"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Aminophylline",
+        "ind_name": "Asthma",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Phosphodiesterase 4 inhibitor",
+        "n_products": 8,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Aminophylline",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1370561"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc1",
+        "drug_name": "Bemiparin",
+        "ind_name": "Deep Vein Thrombosis",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Coagulation factor X inhibitor",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Bemiparin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL3707365"
+      },
+      {
+        "approved_routes": [
+          "subcutaneous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Certolizumab pegol",
+        "ind_name": "Ankylosing spondylitis",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "TNF-alpha inhibitor",
+        "n_products": 1,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Certolizumab pegol",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201831"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Cetuximab",
+        "ind_name": "Laryngeal Squamous Cell Carcinoma",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Epidermal growth factor receptor erbB1 inhibitor",
+        "n_products": 1,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Cetuximab",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201577"
+      },
+      {
+        "approved_routes": [
+          "extracorporeal",
+          "topical"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Collagenase clostridium histolyticum",
+        "ind_name": "Dupuytren's disease of finger, with contracture",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Collagen hydrolytic enzyme",
+        "n_products": 3,
+        "product_modalities": [
+          "biologic",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Collagenase clostridium histolyticum",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL2108709"
+      },
+      {
+        "approved_routes": [
+          "intravenous",
+          "ophthalmic",
+          "oral",
+          "topical"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Cyclosporine",
+        "ind_name": "Dry Eye Syndromes",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Cyclophilin A modulator",
+        "n_products": 24,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Cyclosporine",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL160"
+      },
+      {
+        "approved_routes": [
+          "intravenous",
+          "subcutaneous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Filgrastim",
+        "ind_name": "Chemotherapy-induced neutropenia",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Granulocyte colony stimulating factor receptor agonist",
+        "n_products": 8,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Filgrastim",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201567"
+      },
+      {
+        "approved_routes": [
+          "subcutaneous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Goserelin",
+        "ind_name": "Endometriosis",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Gonadotropin-releasing hormone receptor agonist",
+        "n_products": 2,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Goserelin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201247"
+      },
+      {
+        "approved_routes": [
+          "intraluminal",
+          "intravenous",
+          "oral",
+          "subcutaneous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Heparin",
+        "ind_name": "Deep Vein Thrombosis",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Antithrombin-III activator",
+        "n_products": 74,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Heparin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL4650299"
+      },
+      {
+        "approved_routes": [
+          "intravenous",
+          "subcutaneous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Infliximab",
+        "ind_name": "Ankylosing spondylitis",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "TNF-alpha inhibitor",
+        "n_products": 5,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Infliximab",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201581"
+      },
+      {
+        "approved_routes": [
+          "intravenous",
+          "oral",
+          "parenteral",
+          "respiratory (inhalation)",
+          "subcutaneous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Insulin Human",
+        "ind_name": "Diabetes Mellitus",
+        "label_status": "ok",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "Insulin receptor agonist",
+        "n_products": 22,
+        "product_modalities": [
+          "biologic",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Insulin Human",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201631"
+      },
+      {
+        "approved_routes": [
+          "oral"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Linaclotide",
+        "ind_name": "Chronic idiopathic constipation",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Heat-stable enterotoxin receptor agonist",
+        "n_products": 1,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Linaclotide",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL3301675"
+      },
+      {
+        "approved_routes": [
+          "subcutaneous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Metreleptin",
+        "ind_name": "Acquired generalized lipodystrophy",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Leptin receptor agonist",
+        "n_products": 1,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Metreleptin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL2107857"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Natalizumab",
+        "ind_name": "Crohn Disease",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Integrin alpha-4/beta-7 inhibitor",
+        "n_products": 2,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Natalizumab",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201607"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc1",
+        "drug_name": "Nesiritide",
+        "ind_name": "Decompensated cardiac failure",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Atrial natriuretic peptide receptor A agonist",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Nesiritide",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201668"
+      },
+      {
+        "approved_routes": [
+          "intravenous",
+          "subcutaneous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Nivolumab",
+        "ind_name": "Malignant melanoma, metastatic",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Programmed cell death protein 1 inhibitor",
+        "n_products": 3,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Nivolumab",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL2108738"
+      },
+      {
+        "approved_routes": [
+          "intramuscular",
+          "intravenous",
+          "oral",
+          "subcutaneous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Octreotide",
+        "ind_name": "Acromegaly",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Somatostatin receptor agonist",
+        "n_products": 17,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Octreotide",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1680"
+      },
+      {
+        "approved_routes": [
+          "intramuscular",
+          "intravenous",
+          "oral"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Oxytocin",
+        "ind_name": "Incomplete spontaneous abortion",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Oxytocin receptor agonist",
+        "n_products": 26,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Oxytocin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL395429"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Pembrolizumab",
+        "ind_name": "Malignant melanoma, metastatic",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Programmed cell death protein 1 inhibitor",
+        "n_products": 1,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Pembrolizumab",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL3137343"
+      },
+      {
+        "approved_routes": [
+          "intravitreal"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Ranibizumab",
+        "ind_name": "Branch retinal vein occlusion with macular edema",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Vascular endothelial growth factor A inhibitor",
+        "n_products": 7,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Ranibizumab",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201825"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Romidepsin",
+        "ind_name": "Lymphoma, T-Cell, Cutaneous",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Histone deacetylase inhibitor",
+        "n_products": 3,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Romidepsin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL343448"
+      },
+      {
+        "approved_routes": [
+          "intravenous",
+          "subcutaneous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Tocilizumab",
+        "ind_name": "Angiolymphoid hyperplasia",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Interleukin-6 receptor alpha subunit inhibitor",
+        "n_products": 7,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Tocilizumab",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1237022"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc1",
+        "drug_name": "Velaglucerase alfa",
+        "ind_name": "Gaucher Disease",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Glucocerebroside hydrolytic enzyme",
+        "n_products": 1,
+        "product_modalities": [
+          "biologic"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "FLAGGED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Velaglucerase alfa",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "DISQUALIFIED",
+          "primary_hard_fired": [
+            "modality_feasibility=FLAGGED"
+          ],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201865"
+      }
+    ],
+    "nc2": [
+      {
+        "approved_routes": [
+          "topical"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Amcinonide",
+        "ind_name": "Chronic small plaque psoriasis",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Glucocorticoid receptor agonist",
+        "n_products": 4,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Amcinonide",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1200732"
+      },
+      {
+        "approved_routes": [
+          "intramuscular",
+          "intravenous",
+          "respiratory (inhalation)"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Amikacin",
+        "ind_name": "Arthropathy associated with infection",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Bacterial 70S ribosome inhibitor",
+        "n_products": 8,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Amikacin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL177"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Anidulafungin",
+        "ind_name": "candidal peritonitis",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "1,3-beta-glucan synthase inhibitor",
+        "n_products": 2,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Anidulafungin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL264241"
+      },
+      {
+        "approved_routes": [
+          "respiratory (inhalation)"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Arformoterol",
+        "ind_name": "Bronchitis, Chronic",
+        "label_status": "ok",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "Beta-2 adrenergic receptor agonist",
+        "n_products": 15,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Arformoterol",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1363"
+      },
+      {
+        "approved_routes": [
+          "intravenous",
+          "oral",
+          "sublingual"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Arsenic trioxide",
+        "ind_name": "Acute myelomonocytic leukemia",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Thioredoxin reductase 1 inhibitor",
+        "n_products": 100,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Arsenic trioxide",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL5483015"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Avibactam",
+        "ind_name": "Intraabdominal Infections",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Bacterial beta-lactamase TEM inhibitor",
+        "n_products": 2,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Avibactam",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1689063"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Azlocillin",
+        "ind_name": "Arthropathy associated with infection",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Penicillin-binding protein inhibitor",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Azlocillin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1537"
+      },
+      {
+        "approved_routes": [
+          "intramuscular",
+          "intravenous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Aztreonam",
+        "ind_name": "Bacterial infection due to Klebsiella pneumoniae",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Bacterial penicillin-binding protein inhibitor",
+        "n_products": 8,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Aztreonam",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL158"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Bendamustine",
+        "ind_name": "Chronic Lymphocytic Leukemia",
+        "label_status": "ok",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "DNA inhibitor",
+        "n_products": 12,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Bendamustine",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL487253"
+      },
+      {
+        "approved_routes": [
+          "dental",
+          "oral",
+          "periodontal",
+          "rectal",
+          "topical"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Benzocaine",
+        "ind_name": "Coughing",
+        "label_status": "ok",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "Unknown",
+        "n_products": 100,
+        "product_modalities": [
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Benzocaine",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL278172"
+      },
+      {
+        "approved_routes": [
+          "oral",
+          "percutaneous",
+          "topical",
+          "transdermal"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Benzyl alcohol",
+        "ind_name": "Pruritus",
+        "label_status": "ok",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "Unknown",
+        "n_products": 28,
+        "product_modalities": [
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Benzyl alcohol",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL720"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Bezafibrate",
+        "ind_name": "Hypercholesterolemia",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Peroxisome proliferator-activated receptor agonist",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Bezafibrate",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL264374"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Bilastine",
+        "ind_name": "Allergic rhinitis (disorder)",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Histamine H1 receptor inverse agonist",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Bilastine",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1742423"
+      },
+      {
+        "approved_routes": [
+          "intra-arterial",
+          "intraperitoneal",
+          "intrathecal",
+          "intravenous",
+          "intraventricular",
+          "irrigation",
+          "ophthalmic",
+          "oral",
+          "sublingual"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Calcium Chloride",
+        "ind_name": "Cardiac Arrest",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": null,
+        "n_products": 81,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Calcium Chloride",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1200668"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Calcium Gluceptate",
+        "ind_name": "Cardiac Arrest",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": null,
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Calcium Gluceptate",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1237066"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Carbenicillin",
+        "ind_name": "Bacterial urinary infection",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Bacterial penicillin-binding protein inhibitor",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Carbenicillin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1214"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Carbimazole",
+        "ind_name": "Graves Disease",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Thyroid peroxidase inhibitor",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Carbimazole",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL508102"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Cefonicid",
+        "ind_name": "Arthropathy associated with infection",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Bacterial penicillin-binding protein inhibitor",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Cefonicid",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1601"
+      },
+      {
+        "approved_routes": [
+          "oral"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Cefprozil",
+        "ind_name": "Acute bacterial sinusitis",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": null,
+        "n_products": 13,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Cefprozil",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL3301800"
+      },
+      {
+        "approved_routes": [
+          "intramuscular",
+          "intravenous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Ceftazidime",
+        "ind_name": "Arthropathy associated with infection",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Bacterial penicillin-binding protein inhibitor",
+        "n_products": 8,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Ceftazidime",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL44354"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Cilastatin",
+        "ind_name": "Abdominal Abscess",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Renal dipeptidase inhibitor",
+        "n_products": 6,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Cilastatin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL766"
+      },
+      {
+        "approved_routes": [
+          "ophthalmic",
+          "topical"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Clobetasol propionate",
+        "ind_name": "Chronic small plaque psoriasis",
+        "label_status": "ok",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "Glucocorticoid receptor agonist",
+        "n_products": 100,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Clobetasol propionate",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1159650"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Daunorubicin",
+        "ind_name": "Acute Erythroblastic Leukemia",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "DNA inhibitor",
+        "n_products": 5,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Daunorubicin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL178"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Dienestrol",
+        "ind_name": "Atrophic Vaginitis",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Estrogen receptor alpha agonist",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Dienestrol",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1018"
+      },
+      {
+        "approved_routes": [
+          "vaginal"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Dinoprostone",
+        "ind_name": "Hydatidiform mole, benign",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Prostaglandin E2 receptor agonist",
+        "n_products": 2,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Dinoprostone",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL548"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Dobutamine",
+        "ind_name": "Decompensated cardiac failure",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Beta-1 adrenergic receptor agonist",
+        "n_products": 12,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Dobutamine",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL926"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Doripenem",
+        "ind_name": "Abdominal Abscess",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Bacterial penicillin-binding protein inhibitor",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Doripenem",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL491571"
+      },
+      {
+        "approved_routes": [
+          "topical"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Edetic Acid",
+        "ind_name": "Accidental poisoning by lead and its compounds and fumes",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": null,
+        "n_products": 2,
+        "product_modalities": [
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Edetic Acid",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL858"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Epoprostenol",
+        "ind_name": "Allergic rhinitis (disorder)",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Prostanoid IP receptor agonist",
+        "n_products": 4,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Epoprostenol",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1139"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Ethyl loflazepate",
+        "ind_name": "Anxiety",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": null,
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Ethyl loflazepate",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1213460"
+      },
+      {
+        "approved_routes": [
+          "auricular (otic)",
+          "intravitreal",
+          "topical"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Fluocinolone Acetonide",
+        "ind_name": "Chloasma",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Glucocorticoid receptor agonist",
+        "n_products": 48,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Fluocinolone Acetonide",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL989"
+      },
+      {
+        "approved_routes": [
+          "topical"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Fluocinonide",
+        "ind_name": "Chronic small plaque psoriasis",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Glucocorticoid receptor agonist",
+        "n_products": 52,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Fluocinonide",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1501"
+      },
+      {
+        "approved_routes": [
+          "respiratory (inhalation)"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Formoterol",
+        "ind_name": "Allergic asthma",
+        "label_status": "ok",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "Beta-2 adrenergic receptor agonist",
+        "n_products": 31,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Formoterol",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1256786"
+      },
+      {
+        "approved_routes": [
+          "intramuscular",
+          "intravenous",
+          "subcutaneous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Hydroxocobalamin",
+        "ind_name": "Anemia, Pernicious",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Cyanide sequestering agent",
+        "n_products": 3,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Hydroxocobalamin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL2103737"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Levobetaxolol",
+        "ind_name": "Glaucoma, Open-Angle",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Beta-1 adrenergic receptor antagonist",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Levobetaxolol",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201274"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Lindane",
+        "ind_name": "Infestation by Phthirus pubis",
+        "label_status": "empty",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "GABA-A receptor negative allosteric modulator",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Lindane",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL15891"
+      },
+      {
+        "approved_routes": [
+          "topical"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Luliconazole",
+        "ind_name": "Tinea corporis (disorder)",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Cytochrome P450 51 inhibitor",
+        "n_products": 2,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Luliconazole",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL2105689"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Medrysone",
+        "ind_name": "Allergic Conjunctivitis",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Glucocorticoid receptor agonist",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Medrysone",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201173"
+      },
+      {
+        "approved_routes": [
+          "cutaneous",
+          "oral",
+          "topical",
+          "transdermal"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Methyl salicylate",
+        "ind_name": "Arthritic pains",
+        "label_status": "ok",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "Unknown",
+        "n_products": 100,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Methyl salicylate",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL108545"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Micafungin",
+        "ind_name": "candidal peritonitis",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "1,3-beta-glucan synthase inhibitor",
+        "n_products": 14,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Micafungin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL457547"
+      },
+      {
+        "approved_routes": [
+          "cutaneous",
+          "topical",
+          "vaginal"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Miconazole",
+        "ind_name": "Candidiasis, Vulvovaginal",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Cytochrome P450 51 inhibitor",
+        "n_products": 100,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Miconazole",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL91"
+      },
+      {
+        "approved_routes": [
+          "topical"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Naftifine",
+        "ind_name": "Tinea corporis (disorder)",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Squalene monooxygenase inhibitor",
+        "n_products": 5,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Naftifine",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL626"
+      },
+      {
+        "approved_routes": [
+          "intramuscular",
+          "intravenous",
+          "subconjunctival",
+          "subcutaneous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Nalbuphine",
+        "ind_name": "Labor Pain",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Opioid receptors; mu/kappa/delta agonist",
+        "n_products": 13,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Nalbuphine",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL895"
+      },
+      {
+        "approved_routes": [
+          "oral",
+          "respiratory (inhalation)"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Nitric Oxide",
+        "ind_name": "Persistent Fetal Circulation Syndrome",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Soluble guanylate cyclase activator",
+        "n_products": 9,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Nitric Oxide",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1200689"
+      },
+      {
+        "approved_routes": [
+          "intravenous",
+          "oral"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Norepinephrine",
+        "ind_name": "Asthma",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Adrenergic receptor agonist",
+        "n_products": 48,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Norepinephrine",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1437"
+      },
+      {
+        "approved_routes": [
+          "intravenous"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Paclitaxel",
+        "ind_name": "Breast Carcinoma",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Tubulin inhibitor",
+        "n_products": 25,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Paclitaxel",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL428647"
+      },
+      {
+        "approved_routes": [
+          "intramuscular",
+          "intravenous",
+          "oral"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Phenobarbital",
+        "ind_name": "Bipolar disorder in remission",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": null,
+        "n_products": 91,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Phenobarbital",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL40"
+      },
+      {
+        "approved_routes": [
+          "nasal",
+          "oral",
+          "sublingual",
+          "topical"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Phenol",
+        "ind_name": "Mouth irritation",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": null,
+        "n_products": 100,
+        "product_modalities": [
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Phenol",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL14060"
+      },
+      {
+        "approved_routes": [
+          "intravenous",
+          "parenteral"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Piperacillin",
+        "ind_name": "Abdominal Abscess",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Bacterial penicillin-binding protein inhibitor",
+        "n_products": 38,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Piperacillin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL702"
+      },
+      {
+        "approved_routes": [
+          "ophthalmic",
+          "oral"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Polyethylene glycol",
+        "ind_name": "Constipation",
+        "label_status": "ok",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "Osmotic laxative",
+        "n_products": 100,
+        "product_modalities": [
+          "drug",
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Polyethylene glycol",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201478"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Procaine benzylpenicillin",
+        "ind_name": "Acute otitis media",
+        "label_status": "empty",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "Unknown",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Procaine benzylpenicillin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1628385"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Retapamulin",
+        "ind_name": "Impetigo",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "70S ribosome inhibitor",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Retapamulin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1658"
+      },
+      {
+        "approved_routes": [
+          "oral"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Salsalate",
+        "ind_name": "Degenerative polyarthritis",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": null,
+        "n_products": 2,
+        "product_modalities": [
+          "unknown"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Salsalate",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL154111"
+      },
+      {
+        "approved_routes": [
+          "topical"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Sinecatechins",
+        "ind_name": "Condylomata Acuminata",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Unknown",
+        "n_products": 1,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Sinecatechins",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201723"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Spectinomycin",
+        "ind_name": "Acute gonococcal cervicitis",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Bacterial 70S ribosome inhibitor",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Spectinomycin",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1167"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Testosterone Propionate",
+        "ind_name": "Cryptorchidism",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Androgen Receptor agonist",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Testosterone Propionate",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1170"
+      },
+      {
+        "approved_routes": [
+          "oral",
+          "respiratory (inhalation)"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Tiotropium",
+        "ind_name": "Asthma",
+        "label_status": "ok",
+        "literature_status": "filtered_empty",
+        "mechanism_symbol": "Muscarinic acetylcholine receptor M3 antagonist",
+        "n_products": 6,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "FLAGGED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "CLEAR",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Tiotropium",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1900528"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Tolazoline",
+        "ind_name": "Cerebrovascular Disorders",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": "Histamine H1 receptor agonist",
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Tolazoline",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL770"
+      },
+      {
+        "approved_routes": [
+          "intracameral",
+          "ophthalmic"
+        ],
+        "cohort": "nc2",
+        "drug_name": "Travoprost",
+        "ind_name": "Glaucoma, Open-Angle",
+        "label_status": "ok",
+        "literature_status": "empty",
+        "mechanism_symbol": "Prostanoid FP receptor agonist",
+        "n_products": 17,
+        "product_modalities": [
+          "drug"
+        ],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "CLEAR",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "CLEAR",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "FLAGGED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Travoprost",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "QUALIFIED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [
+            "route_feasibility=FLAGGED"
+          ],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1200799"
+      },
+      {
+        "approved_routes": [],
+        "cohort": "nc2",
+        "drug_name": "Unoprostone",
+        "ind_name": "Glaucoma, Open-Angle",
+        "label_status": "empty",
+        "literature_status": "empty",
+        "mechanism_symbol": null,
+        "n_products": 0,
+        "product_modalities": [],
+        "profile": {
+          "audit_status": "no_case",
+          "contract": "evidence-profile-v1",
+          "dimension_dependency": {
+            "disease_dependent": [
+              "evidence_coverage",
+              "mechanism_direction",
+              "pool_presence",
+              "rank",
+              "rank_fraction",
+              "safety",
+              "total_candidates"
+            ],
+            "disease_independent": [
+              "combination_product",
+              "human_mechanism_evidence",
+              "lipophilicity",
+              "modality_feasibility",
+              "route_feasibility"
+            ]
+          },
+          "dimensions": {
+            "combination_product": "UNRESOLVED",
+            "evidence_coverage": "COMPLETE",
+            "human_mechanism_evidence": "UNRESOLVED",
+            "lipophilicity": "CLEAR",
+            "mechanism_direction": "UNRESOLVED",
+            "modality_feasibility": "UNRESOLVED",
+            "pool_presence": "NO_CASE",
+            "rank": null,
+            "rank_fraction": null,
+            "route_feasibility": "UNRESOLVED",
+            "safety": "CLEAR",
+            "total_candidates": null
+          },
+          "disposition": "NOT_ASSESSABLE",
+          "drug_name": "Unoprostone",
+          "flags": [
+            "NO_CASE"
+          ],
+          "hard_disqualifiers_fired": [],
+          "holdout_redaction_applied": true,
+          "primary_disposition": "SUPPORTED",
+          "primary_hard_fired": [],
+          "primary_soft_fired": [],
+          "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+          "soft_cautions_fired": []
+        },
+        "resolved_chembl_id": "CHEMBL1201407"
+      }
+    ]
+  },
+  "cases_sha256": "662f3c987d40dfc9f5d1d782376dfa12203be4a342c980fe53f787e9ae77e92a",
+  "contract": "triage-discrimination-nc-expansion-results-v1",
+  "results_sha256": "6e8f06208f1d600cdc6a712f338a315dc0a9496370d784d750795e78b83e9aaa",
+  "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+  "scores": {
+    "nc1": {
+      "detected": 15,
+      "detection_wilson95_lower": 0.7961166964035129,
+      "missed": [],
+      "n": 25,
+      "pass": true,
+      "valid": 15
+    },
+    "nc2": {
+      "detected": 28,
+      "detection_wilson95_lower": 0.8793566935605293,
+      "missed": [],
+      "n": 60,
+      "pass": true,
+      "valid": 28
+    },
+    "pooled_with_v2": {
+      "nc1": {
+        "components": {
+          "expansion": {
+            "detected": 15,
+            "valid": 15
+          },
+          "v2": {
+            "detected": 11,
+            "valid": 11
+          }
+        },
+        "detected": 26,
+        "detection_rate": 1.0,
+        "detection_wilson95_lower": 0.871271076371412,
+        "valid": 26
+      },
+      "nc2": {
+        "components": {
+          "expansion": {
+            "detected": 28,
+            "valid": 28
+          },
+          "v2": {
+            "detected": 9,
+            "valid": 9
+          }
+        },
+        "detected": 37,
+        "detection_rate": 1.0,
+        "detection_wilson95_lower": 0.9059421728185313,
+        "valid": 37
+      },
+      "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf"
+    }
+  }
+}
