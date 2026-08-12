@@ -116,6 +116,60 @@ class ReviewerPrefetchTest(unittest.TestCase):
             ["Stuck", "QuickA", "QuickB"],
         )
 
+    def test_stalled_prefetch_self_terminates(self):
+        """Zero lane progress past the stall budget must trigger the exit
+        hook so the study supervisor restarts the run (cache makes the
+        retry cheap).  os._exit is mocked; the run then completes."""
+        release = threading.Event()
+        candidates = [
+            {"drug_name": "Stuck", "molecule_chembl_id": "CHEMBL1"},
+            {"drug_name": "Quick", "molecule_chembl_id": "CHEMBL2"},
+        ]
+
+        def adverse(drug):
+            if drug == "Stuck":
+                release.wait(10)
+            return {"drug": drug, "adverse_events": []}
+
+        def trials(drug, disease, candidate_chembl_ids=None,
+                   candidate_inchikey=None):
+            return {"drug": drug, "disease": disease, "trials": []}
+
+        def pubchem(drug):
+            return {"drug": drug, "xlogp": None}
+
+        def safety(drug, molecule_id):
+            return {"drug": drug, "molecule_id": molecule_id}
+
+        def molecule(drug):
+            return {"drug": drug}
+
+        exits = []
+
+        def run():
+            with patch.object(reviewer, "_PREFETCH_HEARTBEAT_SECONDS", 0.05), \
+                    patch.object(reviewer, "_PREFETCH_STALL_EXIT_SECONDS",
+                                 0.2), \
+                    patch.object(reviewer.os, "_exit", exits.append), \
+                    patch.object(reviewer, "get_adverse_events", adverse), \
+                    patch.object(reviewer, "check_prior_trials", trials), \
+                    patch.object(reviewer, "get_compound_data", pubchem), \
+                    patch.object(reviewer, "get_molecule_safety_flags",
+                                 safety), \
+                    patch.object(reviewer, "get_molecule_data", molecule), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                reviewer._prefetch_candidate_context(
+                    candidates, "Control disease")
+
+        worker = threading.Thread(target=run)
+        worker.start()
+        time.sleep(1.0)  # beats every 0.05s, stall budget 0.2s, one blocked
+        self.assertTrue(exits, "stall exit never fired")
+        release.set()
+        worker.join(10)
+        self.assertFalse(worker.is_alive())
+        self.assertIn(86, exits)
+
     def test_heldout_trial_lookup_never_touches_network(self):
         holdout.activate(["ControlDrug"])
         with patch.object(

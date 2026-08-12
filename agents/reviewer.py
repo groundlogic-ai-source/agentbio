@@ -115,7 +115,10 @@ MAX_MECHANISM_DIRECTION_CANDIDATES = 3
 # Layer 2 (web-search) only runs on this many top candidates to mirror the
 # Boltz validation scope and keep LLM call costs bounded.
 MAX_SAFETY_LAYER2_CANDIDATES = 3
-MAX_REVIEWER_PREFETCH_WORKERS_PER_SOURCE = 8
+#: Env-overridable so long-running batch contexts (prod study supervisors)
+#: can soften egress pressure without touching the API server's default.
+MAX_REVIEWER_PREFETCH_WORKERS_PER_SOURCE = int(
+    os.environ.get("AGENTBIO_PREFETCH_WORKERS", "8"))
 # -----------------------------------------------------------------------------
 
 
@@ -228,6 +231,15 @@ _PREFETCH_HEARTBEAT_SECONDS = 120
 _PREFETCH_LANES = ("openfda-adverse", "clinicaltrials", "pubchem",
                    "chembl-safety", "chembl-molecule")
 
+#: Seconds with zero lane progress after which the process self-terminates
+#: (0 = never).  Env-overridable; the prod Study B supervisor sets this so
+#: a wedged prefetch kills the run and the supervisor restarts it — resume
+#: is cheap because every completed lane call is cached.  MUST stay 0 for
+#: the API server: the stall handler is os._exit and would kill request
+#: serving.
+_PREFETCH_STALL_EXIT_SECONDS = int(
+    os.environ.get("AGENTBIO_PREFETCH_STALL_EXIT_SECONDS", "0"))
+
 
 class _PrefetchLiveness:
     """Time-based liveness beat for the reviewer prefetch.
@@ -247,6 +259,7 @@ class _PrefetchLiveness:
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._start = time.monotonic()
+        self._last_progress = self._start
         self._thread = threading.Thread(target=self._beat, daemon=True)
 
     def wrap(self, lane: str, fn):
@@ -256,18 +269,26 @@ class _PrefetchLiveness:
             finally:
                 with self._lock:
                     self._counts[lane] += 1
+                    self._last_progress = time.monotonic()
         return counted
 
     def _beat(self) -> None:
         while not self._stop.wait(_PREFETCH_HEARTBEAT_SECONDS):
-            elapsed = time.monotonic() - self._start
+            now = time.monotonic()
+            elapsed = now - self._start
             with self._lock:
                 summary = ", ".join(
                     f"{lane}={count}/{self._total}"
                     for lane, count in self._counts.items()
                 )
+                idle = now - self._last_progress
             print(f"[reviewer] prefetch alive {elapsed:.0f}s — {summary}",
                   flush=True)
+            if 0 < _PREFETCH_STALL_EXIT_SECONDS < idle:
+                print(f"[reviewer] prefetch STALLED: no lane progress for "
+                      f"{idle:.0f}s — self-terminating so the supervisor "
+                      f"restarts from the per-call cache", flush=True)
+                os._exit(86)
 
     def __enter__(self):
         self._thread.start()
