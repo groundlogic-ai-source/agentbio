@@ -941,6 +941,97 @@ def benchmark_greenlight() -> dict:
     return {"status": "greenlit", "note": "supervisor proceeds to the benchmark on its next cycle (<=60s)"}
 
 
+# --------------------------------------------------------------------------- #
+# Study B 24/7 supervisor (Reserved VM; read-only progress + pull-back)
+# --------------------------------------------------------------------------- #
+
+_STUDYB_LOG = os.path.join(_BENCH_DIR, "prod_studyb.log")
+_STUDYB_RESULTS = os.path.join(_BENCH_DIR, "triage_discrimination_studyb_results.json")
+_STUDYB_CKPT = os.path.join(_BENCH_DIR, "triage_discrimination_studyb_checkpoint.jsonl")
+_STUDYB_DONE = os.path.join(_BENCH_DIR, ".prod_studyb_done")
+
+
+def _studyb_supervisor_alive() -> bool:
+    try:
+        out = subprocess.run(
+            ["pgrep", "-f", "prod_studyb_supervisor.sh"],
+            capture_output=True, text=True, timeout=5,
+        )
+        return bool(out.stdout.strip())
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
+@app.get("/internal/studyb-status")
+def studyb_status() -> dict:
+    """Read-only progress of the 24/7 Study B pool rebuild."""
+    status: dict[str, Any] = {
+        "supervisor_log": _STUDYB_LOG,
+        "supervisor_alive": _studyb_supervisor_alive(),
+        "results": _bench_file_meta(_STUDYB_RESULTS),
+    }
+    if os.path.exists(_STUDYB_DONE):
+        try:
+            with open(_STUDYB_DONE) as f:
+                status["terminal_state"] = f.read().strip()
+        except OSError:
+            status["terminal_state"] = "unknown"
+    targets = pools = 0
+    try:
+        with open(_STUDYB_CKPT) as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                kind = json.loads(line).get("kind")
+                if kind == "target":
+                    targets += 1
+                elif kind == "pool":
+                    pools += 1
+    except (OSError, json.JSONDecodeError):
+        pass
+    status["checkpoint"] = {"targets_finalized": targets,
+                            "pools_finalized": pools,
+                            **_bench_file_meta(_STUDYB_CKPT)}
+    tail: list[str] = []
+    try:
+        with open(_STUDYB_LOG) as f:
+            tail = [ln for ln in f.read().splitlines()
+                    if "MorganGenerator" not in ln][-15:]
+    except OSError:
+        pass
+    status["log_tail"] = tail
+    return status
+
+
+@app.get("/internal/studyb-results")
+def studyb_results() -> JSONResponse:
+    """Return the Study B results artifact so it can be pulled back to dev.
+
+    The Reserved VM disk is wiped on restart/redeploy; pull this BEFORE any
+    republish so the frozen result is committed in the repo.
+    """
+    if not os.path.exists(_STUDYB_RESULTS):
+        raise HTTPException(status_code=404, detail="no studyb results yet")
+    data = _bench_read_json(_STUDYB_RESULTS)
+    if data is None:
+        raise HTTPException(status_code=503, detail="results mid-write; retry")
+    return JSONResponse({"artifact": "triage_discrimination_studyb", "data": data})
+
+
+@app.get("/internal/studyb-checkpoint")
+def studyb_checkpoint() -> JSONResponse:
+    """Return the raw Study B checkpoint so dev can resume from prod progress
+    after a republish (prod disk is wiped on redeploy)."""
+    if not os.path.exists(_STUDYB_CKPT):
+        raise HTTPException(status_code=404, detail="no studyb checkpoint yet")
+    records = []
+    with open(_STUDYB_CKPT) as f:
+        for line in f:
+            if line.strip():
+                records.append(json.loads(line))
+    return JSONResponse({"records": records})
+
+
 @app.post("/internal/clear-registry")
 def clear_registry() -> dict:
     """Delete ALL rows from bisociation_history, hypothesis_log, and research_jobs.
