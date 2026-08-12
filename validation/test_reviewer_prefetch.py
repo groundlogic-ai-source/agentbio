@@ -1,5 +1,8 @@
 """Non-network controls for bounded Reviewer enrichment prefetch."""
 
+import contextlib
+import io
+import threading
 import time
 import unittest
 from unittest.mock import patch
@@ -54,6 +57,63 @@ class ReviewerPrefetchTest(unittest.TestCase):
         self.assertEqual(
             [row["safety_layer1"]["molecule_id"] for row in rows],
             ["CHEMBL1", "CHEMBL2", "CHEMBL3"],
+        )
+
+    def test_liveness_beat_fires_while_first_item_blocked(self):
+        """executor.map yields in input order, so a wedged FIRST item must
+        not silence the liveness heartbeat (the production failure mode)."""
+        release = threading.Event()
+        candidates = [
+            {"drug_name": "Stuck", "molecule_chembl_id": "CHEMBL1"},
+            {"drug_name": "QuickA", "molecule_chembl_id": "CHEMBL2"},
+            {"drug_name": "QuickB", "molecule_chembl_id": "CHEMBL3"},
+        ]
+
+        def adverse(drug):
+            if drug == "Stuck":
+                release.wait(10)
+            return {"drug": drug, "adverse_events": []}
+
+        def trials(drug, disease, candidate_chembl_ids=None,
+                   candidate_inchikey=None):
+            return {"drug": drug, "disease": disease, "trials": []}
+
+        def pubchem(drug):
+            return {"drug": drug, "xlogp": None}
+
+        def safety(drug, molecule_id):
+            return {"drug": drug, "molecule_id": molecule_id}
+
+        def molecule(drug):
+            return {"drug": drug}
+
+        buf = io.StringIO()
+        result = {}
+
+        def run():
+            with patch.object(reviewer, "_PREFETCH_HEARTBEAT_SECONDS", 0.05), \
+                    patch.object(reviewer, "get_adverse_events", adverse), \
+                    patch.object(reviewer, "check_prior_trials", trials), \
+                    patch.object(reviewer, "get_compound_data", pubchem), \
+                    patch.object(reviewer, "get_molecule_safety_flags", safety), \
+                    patch.object(reviewer, "get_molecule_data", molecule), \
+                    contextlib.redirect_stdout(buf):
+                result["rows"] = reviewer._prefetch_candidate_context(
+                    candidates, "Control disease"
+                )
+
+        worker = threading.Thread(target=run)
+        worker.start()
+        time.sleep(0.4)  # several beat intervals while "Stuck" is blocked
+        release.set()
+        worker.join(10)
+
+        self.assertFalse(worker.is_alive())
+        self.assertIn("prefetch alive", buf.getvalue())
+        self.assertEqual(len(result["rows"]), 3)
+        self.assertEqual(
+            [row["adverse"]["drug"] for row in result["rows"]],
+            ["Stuck", "QuickA", "QuickB"],
         )
 
     def test_heldout_trial_lookup_never_touches_network(self):
