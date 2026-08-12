@@ -67,7 +67,14 @@ while true; do
     echo "complete" > "$DONE"
     break
   fi
-  python3 -m validation.run_triage_discrimination_studyb >> "$LOG" 2>&1
+  # Prefetch resilience: fewer concurrent lane workers (5 lanes x 8 workers
+  # = 40 in-flight calls reproducibly wedges this VM's egress), and a
+  # 15-min zero-progress stall budget — on stall the runner self-terminates
+  # and this loop restarts it; completed lane calls are cached, so each
+  # retry resumes where the last one froze instead of starting over.
+  AGENTBIO_PREFETCH_WORKERS=3 \
+  AGENTBIO_PREFETCH_STALL_EXIT_SECONDS=900 \
+    python3 -m validation.run_triage_discrimination_studyb >> "$LOG" 2>&1
   rc=$?
   if [ -f "$RESULTS" ]; then
     echo "STUDY B COMPLETE" >> "$LOG"
