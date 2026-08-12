@@ -43,24 +43,42 @@ def _resolve_inchikey_from_smiles(smiles: str) -> Optional[str]:
             data={"smiles": smiles}, timeout=20)
         if resp.status_code == 404:
             return None
+        if resp.status_code >= 500 or resp.status_code == 429:
+            raise PubChemTransientError(f"HTTP {resp.status_code}")
         resp.raise_for_status()
         props = resp.json().get("PropertyTable", {}).get("Properties", [])
         return props[0].get("InChIKey") if props else None
+    except PubChemTransientError:
+        raise
     except Exception as e:  # noqa: BLE001
         print(f"[pubchem] WARNING: SMILES resolution failed: {e}")
-        return None
+        raise PubChemTransientError(str(e)) from e
+
+
+class PubChemTransientError(RuntimeError):
+    """A PubChem call failed transiently (network/5xx/429). Distinct from a
+    404, which is an authoritative "no such compound". Callers that persist
+    results (the snapshot harvester) must treat transient errors as retryable
+    and never stamp them as a negative answer."""
 
 
 def _get_json(url: str) -> Optional[dict]:
+    """GET JSON. Returns None ONLY on 404 (authoritative miss); raises
+    PubChemTransientError on any other failure so callers cannot confuse
+    an outage with a negative answer."""
     try:
         resp = requests.get(url, timeout=20)
         if resp.status_code == 404:
             return None
+        if resp.status_code >= 500 or resp.status_code == 429:
+            raise PubChemTransientError(f"HTTP {resp.status_code} for {url}")
         resp.raise_for_status()
         return resp.json()
+    except PubChemTransientError:
+        raise
     except Exception as e:
         print(f"[pubchem] WARNING: request failed for {url}: {e}")
-        return None
+        raise PubChemTransientError(str(e)) from e
 
 
 def _resolve_inchikey(drug_name: str) -> Optional[str]:

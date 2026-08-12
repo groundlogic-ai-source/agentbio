@@ -949,6 +949,15 @@ _STUDYB_LOG = os.path.join(_BENCH_DIR, "prod_studyb.log")
 _STUDYB_RESULTS = os.path.join(_BENCH_DIR, "triage_discrimination_studyb_results.json")
 _STUDYB_CKPT = os.path.join(_BENCH_DIR, "triage_discrimination_studyb_checkpoint.jsonl")
 _STUDYB_DONE = os.path.join(_BENCH_DIR, ".prod_studyb_done")
+_STUDYB_HEAD = os.path.join(_BENCH_DIR, ".prod_studyb_freeze_head")
+
+
+def _studyb_freeze_head() -> Optional[str]:
+    try:
+        with open(_STUDYB_HEAD) as f:
+            return f.read().strip() or None
+    except OSError:
+        return None
 
 
 def _studyb_supervisor_alive() -> bool:
@@ -968,8 +977,14 @@ def studyb_status() -> dict:
     status: dict[str, Any] = {
         "supervisor_log": _STUDYB_LOG,
         "supervisor_alive": _studyb_supervisor_alive(),
+        "freeze_head": _studyb_freeze_head(),
         "results": _bench_file_meta(_STUDYB_RESULTS),
     }
+    try:
+        from data_sources import pubchem_snapshot as _snap
+        status["pubchem_snapshot_sha256"] = _snap.sha256()
+    except Exception:  # noqa: BLE001 — status endpoint must stay read-only-safe
+        status["pubchem_snapshot_sha256"] = None
     if os.path.exists(_STUDYB_DONE):
         try:
             with open(_STUDYB_DONE) as f:
@@ -1029,7 +1044,11 @@ def studyb_checkpoint() -> JSONResponse:
         for line in f:
             if line.strip():
                 records.append(json.loads(line))
-    return JSONResponse({"records": records})
+    # The freeze-head pin MUST ride with the checkpoint: without it, restoring
+    # after a prod disk wipe would let a newer deployment mint a fresh pin and
+    # resume old work under changed code.
+    return JSONResponse({"records": records,
+                         "freeze_head": _studyb_freeze_head()})
 
 
 @app.post("/internal/clear-registry")
