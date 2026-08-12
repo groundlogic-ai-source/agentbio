@@ -37,17 +37,6 @@ task = "workflow.run"
 args = "audit-claimset-v2-run"
 
 [[workflows.workflow]]
-name = "triage-discrimination-run"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace && python3 -m validation.run_triage_discrimination 2>&1 | tee /tmp/triage_discrimination.log"
-
-[[workflows.workflow]]
 name = "triage-discrimination-studyb"
 author = "agent"
 
@@ -69,66 +58,3 @@ outputType = "console"
 task = "shell.exec"
 args = "cd /home/runner/workspace && python3 -m validation.await_pubchem_and_harvest --max-hours 12 2>&1 | tee /tmp/await_pubchem.log"
 
-[[workflows.workflow]]
-name = "repodb-validation"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace && python3 -m validation.run_repodb_cases 2>&1 | tee /tmp/repodb_val.log"
-
-[[workflows.workflow]]
-name = "repodb-smallmol-validation"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace && python3 -m validation.run_repodb_cases_smallmol 2>&1 | tee /tmp/smallmol_val.log"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow]]
-name = "v2-engineering-acceptance"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace && python3 -m validation.run_v2_engineering_acceptance --fresh --cap 10 2>&1 | tee /tmp/v2_engineering_acceptance.log"
-
-[[workflows.workflow]]
-name = "build-audit-claimset-v2"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace && python3 -m validation.build_audit_claim_set_v2 2>&1 | tee /tmp/build_v2.log"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow]]
-name = "audit-claimset-v2-run"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace && python3 -m validation.run_audit_claimset_v2 --label audit_claimset_v2 2>&1 | tee /tmp/audit_claimset_v2.log"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[agent]
-stack = "PNPM_WORKSPACE"
-expertMode = true
-
-[postMerge]
-path = "scripts/post-merge.sh"
-timeoutMs = 20000
-
-[nix]
-channel = "stable-25_05"
-packages = ["cairo", "catch2", "comic-neue", "coordgenlibs", "eigen", "ffmpeg-full", "freetype", "ghostscript", "glibcLocales", "gobject-introspection", "gtk3", "inchi", "maeparser", "pkg-config", "qhull", "rapidjson", "tcl", "tk"]
