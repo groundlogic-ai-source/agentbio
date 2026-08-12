@@ -36,6 +36,10 @@ args = "build-audit-claimset-v2"
 task = "workflow.run"
 args = "audit-claimset-v2-run"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "nc-expansion-run"
+
 [[workflows.workflow]]
 name = "triage-discrimination-studyb"
 author = "agent"
@@ -57,4 +61,15 @@ outputType = "console"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd /home/runner/workspace && python3 -m validation.await_pubchem_and_harvest --max-hours 12 2>&1 | tee /tmp/await_pubchem.log"
+
+[[workflows.workflow]]
+name = "nc-expansion-run"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && python3 -m validation.run_nc_expansion 2>&1 | tee /tmp/nc_expansion.log"
+
+[workflows.workflow.metadata]
+outputType = "console"
 
