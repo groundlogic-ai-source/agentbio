@@ -1,0 +1,472 @@
+{
+  "built_from_commit": "97f42de746b72e740e36a030cb2a3ced7fee221e",
+  "contract": "triage-discrimination-studyc-cases-v1",
+  "diseases": [
+    {
+      "disease_name": "Acute Coronary Syndrome",
+      "ind_ids": [
+        "C0948089"
+      ],
+      "negatives": [
+        "Atorvastatin"
+      ],
+      "positives": [
+        "Clopidogrel",
+        "Metoprolol",
+        "Ticagrelor",
+        "Tirofiban"
+      ]
+    },
+    {
+      "disease_name": "Aplastic Anemia",
+      "ind_ids": [
+        "C0002874"
+      ],
+      "negatives": [
+        "Daclizumab"
+      ],
+      "positives": [
+        "Drostanolone",
+        "Oxymetholone"
+      ]
+    },
+    {
+      "disease_name": "Atherosclerosis",
+      "ind_ids": [
+        "C0004153"
+      ],
+      "negatives": [
+        "Cangrelor",
+        "Clopidogrel"
+      ],
+      "positives": [
+        "Alirocumab"
+      ]
+    },
+    {
+      "disease_name": "Diabetes Mellitus, Non-Insulin-Dependent",
+      "ind_ids": [
+        "C0011860"
+      ],
+      "negatives": [
+        "Exenatide"
+      ],
+      "positives": [
+        "Insulin Glargine",
+        "Insulin Human",
+        "Insulin Lispro",
+        "Voglibose"
+      ]
+    },
+    {
+      "disease_name": "Diabetic Retinopathy",
+      "ind_ids": [
+        "C0011884"
+      ],
+      "negatives": [
+        "Octreotide"
+      ],
+      "positives": [
+        "Ranibizumab"
+      ]
+    },
+    {
+      "disease_name": "Epilepsy",
+      "ind_ids": [
+        "C0014544"
+      ],
+      "negatives": [
+        "Ezogabine",
+        "Piracetam",
+        "Pregabalin",
+        "Topiramate"
+      ],
+      "positives": [
+        "Amobarbital",
+        "Carbamazepine",
+        "Felbamate",
+        "Fosphenytoin",
+        "Lamotrigine",
+        "Methsuximide",
+        "Methylphenobarbital",
+        "Paramethadione",
+        "Pentobarbital",
+        "Phenacemide",
+        "Phenobarbital",
+        "Phensuximide",
+        "Phenytoin",
+        "Primidone",
+        "Secobarbital",
+        "Thiopental",
+        "Trimethadione",
+        "Valproic Acid"
+      ]
+    },
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "ind_ids": [
+        "C0039483"
+      ],
+      "negatives": [
+        "Infliximab"
+      ],
+      "positives": [
+        "Triamcinolone"
+      ]
+    },
+    {
+      "disease_name": "Hamman-Rich syndrome",
+      "ind_ids": [
+        "C0085786"
+      ],
+      "negatives": [
+        "Warfarin"
+      ],
+      "positives": [
+        "Nintedanib"
+      ]
+    },
+    {
+      "disease_name": "Herpes zoster disease",
+      "ind_ids": [
+        "C0019360"
+      ],
+      "negatives": [
+        "Pregabalin"
+      ],
+      "positives": [
+        "Aciclovir",
+        "Famciclovir",
+        "Penciclovir",
+        "Valaciclovir"
+      ]
+    },
+    {
+      "disease_name": "HIV Infections",
+      "ind_ids": [
+        "C0019693"
+      ],
+      "negatives": [
+        "Isoniazid",
+        "Sulfamethoxazole",
+        "Trimethoprim"
+      ],
+      "positives": [
+        "Lamivudine",
+        "Ritonavir",
+        "Tenofovir"
+      ]
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "ind_ids": [
+        "C0282488"
+      ],
+      "negatives": [
+        "Mycophenolate mofetil",
+        "Mycophenolic acid"
+      ],
+      "positives": [
+        "Pentosan Polysulfate"
+      ]
+    },
+    {
+      "disease_name": "Iron Overload",
+      "ind_ids": [
+        "C0282193"
+      ],
+      "negatives": [
+        "Deferasirox"
+      ],
+      "positives": [
+        "Deferiprone"
+      ]
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "ind_ids": [
+        "C0024141"
+      ],
+      "negatives": [
+        "Mycophenolate mofetil",
+        "Mycophenolic acid"
+      ],
+      "positives": [
+        "Betamethasone",
+        "Chloroquine",
+        "Cortisone acetate",
+        "Hydroxychloroquine",
+        "Prednisone",
+        "Triamcinolone"
+      ]
+    },
+    {
+      "disease_name": "Malignant neoplasm of lung",
+      "ind_ids": [
+        "C0242379"
+      ],
+      "negatives": [
+        "Citalopram",
+        "Dasatinib",
+        "Folic Acid",
+        "Hydroxocobalamin"
+      ],
+      "positives": [
+        "Mechlorethamine",
+        "Methotrexate",
+        "Vindesine"
+      ]
+    },
+    {
+      "disease_name": "Malignant neoplasm of stomach",
+      "ind_ids": [
+        "C0024623"
+      ],
+      "negatives": [
+        "Citalopram"
+      ],
+      "positives": [
+        "Docetaxel"
+      ]
+    },
+    {
+      "disease_name": "Malignant tumor of colon",
+      "ind_ids": [
+        "C0007102"
+      ],
+      "negatives": [
+        "Citalopram"
+      ],
+      "positives": [
+        "Cetuximab",
+        "Trifluridine"
+      ]
+    },
+    {
+      "disease_name": "Multiple Endocrine Neoplasia",
+      "ind_ids": [
+        "C0027662"
+      ],
+      "negatives": [
+        "Erlotinib",
+        "Pertuzumab"
+      ],
+      "positives": [
+        "Cimetidine",
+        "Pantoprazole",
+        "Rabeprazole"
+      ]
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "ind_ids": [
+        "C0026764"
+      ],
+      "negatives": [
+        "Belinostat"
+      ],
+      "positives": [
+        "Bortezomib",
+        "Carmustine",
+        "Cyclophosphamide",
+        "Lenalidomide"
+      ]
+    },
+    {
+      "disease_name": "Myelofibrosis",
+      "ind_ids": [
+        "C0026987"
+      ],
+      "negatives": [
+        "Teriparatide"
+      ],
+      "positives": [
+        "Ruxolitinib"
+      ]
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "ind_ids": [
+        "C0027819"
+      ],
+      "negatives": [
+        "Erlotinib",
+        "Pertuzumab"
+      ],
+      "positives": [
+        "Cyclophosphamide",
+        "Vincristine"
+      ]
+    },
+    {
+      "disease_name": "Non-Small Cell Lung Carcinoma",
+      "ind_ids": [
+        "C0007131"
+      ],
+      "negatives": [
+        "Cisplatin",
+        "Dasatinib",
+        "Pegfilgrastim",
+        "Sunitinib"
+      ],
+      "positives": [
+        "Docetaxel",
+        "Erlotinib",
+        "Gefitinib",
+        "Gemcitabine",
+        "Nintedanib",
+        "Nivolumab",
+        "Paclitaxel",
+        "Pembrolizumab",
+        "Pemetrexed",
+        "Porfimer",
+        "Ramucirumab"
+      ]
+    },
+    {
+      "disease_name": "Obesity",
+      "ind_ids": [
+        "C0028754"
+      ],
+      "negatives": [
+        "Metoprolol"
+      ],
+      "positives": [
+        "Amphetamine",
+        "Bupropion",
+        "Methamphetamine",
+        "Phentermine"
+      ]
+    },
+    {
+      "disease_name": "Pulmonary Hypertension",
+      "ind_ids": [
+        "C0020542"
+      ],
+      "negatives": [
+        "Treprostinil"
+      ],
+      "positives": [
+        "Bosentan",
+        "Epoprostenol",
+        "Nitric Oxide",
+        "Tadalafil"
+      ]
+    },
+    {
+      "disease_name": "Rheumatoid Arthritis",
+      "ind_ids": [
+        "C0003873"
+      ],
+      "negatives": [
+        "Apremilast"
+      ],
+      "positives": [
+        "Abatacept",
+        "Acetylsalicylic acid",
+        "Adalimumab",
+        "Betamethasone",
+        "Celecoxib",
+        "Certolizumab pegol",
+        "Chloroquine",
+        "Cortisone acetate",
+        "Cyclosporine",
+        "Dexibuprofen",
+        "Diclofenac",
+        "Diflunisal",
+        "Etanercept",
+        "Etodolac",
+        "Fenoprofen",
+        "Flurbiprofen",
+        "golimumab",
+        "Hydroxychloroquine",
+        "Ibuprofen",
+        "Indomethacin",
+        "Infliximab",
+        "Ketoprofen",
+        "Leflunomide",
+        "Lithium",
+        "Magnesium salicylate",
+        "Meclofenamic acid",
+        "Meloxicam",
+        "Methotrexate",
+        "Nabumetone",
+        "Naproxen",
+        "Oxaprozin",
+        "Penicillamine",
+        "Piroxicam",
+        "Prednisone",
+        "Rituximab",
+        "Salicylic acid",
+        "Salsalate",
+        "Sulfasalazine",
+        "Sulindac",
+        "Teriflunomide",
+        "Tiaprofenic acid",
+        "Tocilizumab",
+        "Tolmetin",
+        "Triamcinolone"
+      ]
+    },
+    {
+      "disease_name": "Secondary malignant neoplasm of pancreas",
+      "ind_ids": [
+        "C0346976"
+      ],
+      "negatives": [
+        "Gemcitabine"
+      ],
+      "positives": [
+        "Paclitaxel"
+      ]
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "ind_ids": [
+        "C0009324"
+      ],
+      "negatives": [
+        "L-Carnitine"
+      ],
+      "positives": [
+        "Adalimumab",
+        "Cortisone acetate",
+        "golimumab",
+        "Infliximab",
+        "Mesalazine",
+        "Sulfadiazine",
+        "Sulfasalazine",
+        "Vedolizumab"
+      ]
+    },
+    {
+      "disease_name": "Urinary Incontinence",
+      "ind_ids": [
+        "C0042024"
+      ],
+      "negatives": [
+        "Tolterodine"
+      ],
+      "positives": [
+        "Flavoxate",
+        "Methantheline"
+      ]
+    }
+  ],
+  "exclusions": {
+    "dev_suite_drugs_excluded": 23,
+    "overlap_drugs_demoted_to_negative_only": 0
+  },
+  "frame": {
+    "anchor": "disease has >=1 genuine-failure drug AND >=1 repurposed-success drug after exclusions",
+    "overlap_rule": "drug both success and failure for the same disease is scored as negative only",
+    "positive_cap_per_disease": null
+  },
+  "source_csv": "data_prep/output/enriched_dataset.csv",
+  "source_csv_sha256": "ca63f14eebd9ab3a20d3a11b28fcb407ef5eb9a3245edefc7f51bb8902b3e85a",
+  "totals": {
+    "n_diseases": 27,
+    "n_negative_pairs": 43,
+    "n_positive_pairs": 137
+  }
+}
