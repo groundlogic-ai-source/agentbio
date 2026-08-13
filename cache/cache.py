@@ -12,13 +12,19 @@ _BUSY_TIMEOUT_MS = 30_000
 _INIT_LOCK = threading.Lock()
 _INITIALIZED_PATHS: set[str] = set()
 
-# Writes are ASYNC: a bounded queue + one daemon writer thread per process.
+# Writes are HYBRID: set() first tries an inline write under a BOUNDED lock
+# acquire (2s), preserving the read-your-writes contract that callers and
+# tests rely on; on contention it falls back to a bounded queue drained by
+# one daemon writer thread.
 # Root cause of the 2026-08-12 prefetch wedges: a worker held the old
 # process-wide write lock while stuck inside sqlite conn.close() (no timeout
 # covers a threading.Lock wait), freezing every network lane at once. The
 # cache is best-effort — a dropped write only costs a refetch — so workers
-# must NEVER block on SQLite. A stuck writer just fills the queue and writes
-# get dropped while lanes keep flowing.
+# must NEVER block on SQLite without a timeout. A stuck lock-holder now just
+# pushes everyone else onto the queue after 2s; a stuck queue writer fills
+# the queue and writes get dropped while lanes keep flowing.
+_WRITE_LOCK = threading.Lock()
+_INLINE_LOCK_TIMEOUT_SECONDS = 2.0
 _WRITE_QUEUE: "queue.Queue[tuple]" = queue.Queue(maxsize=20_000)
 _WRITER_START_LOCK = threading.Lock()
 _writer_started = False
@@ -142,11 +148,31 @@ def _flush_writes_for_test(timeout: float = 30.0) -> None:
 
 
 def set(key: str, value: Any, ttl_days: float = 7) -> None:
-    """Cache a value (asynchronous write). Overwrites any existing entry.
+    """Cache a value. Overwrites any existing entry for the same key.
 
-    Callers never block on SQLite: the write is enqueued to the single
-    writer thread. A dropped write only costs a refetch on the next get().
+    Inline synchronous write under a BOUNDED lock acquire (read-your-writes
+    holds in the healthy case); if the lock cannot be acquired within 2s —
+    e.g. a holder wedged inside SQLite — the write falls back to the async
+    writer queue so callers never block on SQLite beyond the timeout.
     """
     expires_at = time.time() + ttl_days * 86400
     value_json = json.dumps(value, default=str)
+    if _WRITE_LOCK.acquire(timeout=_INLINE_LOCK_TIMEOUT_SECONDS):
+        try:
+            try:
+                conn = _get_conn()
+                try:
+                    conn.execute(
+                        "INSERT OR REPLACE INTO cache (key, value, expires_at) "
+                        "VALUES (?, ?, ?)",
+                        (key, value_json, expires_at),
+                    )
+                    conn.commit()
+                finally:
+                    conn.close()
+                return
+            except sqlite3.Error:
+                pass  # fall through to the queued write
+        finally:
+            _WRITE_LOCK.release()
     _enqueue_write("put", key, value_json, expires_at)
