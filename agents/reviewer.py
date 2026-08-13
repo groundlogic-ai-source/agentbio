@@ -286,8 +286,13 @@ class _PrefetchLiveness:
                   flush=True)
             if 0 < _PREFETCH_STALL_EXIT_SECONDS < idle:
                 print(f"[reviewer] prefetch STALLED: no lane progress for "
-                      f"{idle:.0f}s — self-terminating so the supervisor "
-                      f"restarts from the per-call cache", flush=True)
+                      f"{idle:.0f}s — dumping thread stacks, then "
+                      f"self-terminating so the supervisor restarts from "
+                      f"the per-call cache", flush=True)
+                # Diagnosis-first: the stacks show WHERE the lane workers
+                # are actually stuck (network read vs lock acquisition).
+                import faulthandler
+                faulthandler.dump_traceback()
                 os._exit(86)
 
     def __enter__(self):
