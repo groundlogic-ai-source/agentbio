@@ -117,8 +117,22 @@ MAX_MECHANISM_DIRECTION_CANDIDATES = 3
 MAX_SAFETY_LAYER2_CANDIDATES = 3
 #: Env-overridable so long-running batch contexts (prod study supervisors)
 #: can soften egress pressure without touching the API server's default.
-MAX_REVIEWER_PREFETCH_WORKERS_PER_SOURCE = int(
-    os.environ.get("AGENTBIO_PREFETCH_WORKERS", "8"))
+def _env_int(name: str, default: int) -> int:
+    """Import-time env parsing must NEVER raise: a bad value would break
+    `import agents.reviewer` and take down API startup with it."""
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    try:
+        return int(raw)
+    except ValueError:
+        print(f"[reviewer] WARNING: {name}={raw!r} is not an integer — "
+              f"using default {default}", flush=True)
+        return default
+
+
+MAX_REVIEWER_PREFETCH_WORKERS_PER_SOURCE = max(
+    1, _env_int("AGENTBIO_PREFETCH_WORKERS", 8))
 # -----------------------------------------------------------------------------
 
 
@@ -237,8 +251,8 @@ _PREFETCH_LANES = ("openfda-adverse", "clinicaltrials", "pubchem",
 #: is cheap because every completed lane call is cached.  MUST stay 0 for
 #: the API server: the stall handler is os._exit and would kill request
 #: serving.
-_PREFETCH_STALL_EXIT_SECONDS = int(
-    os.environ.get("AGENTBIO_PREFETCH_STALL_EXIT_SECONDS", "0"))
+_PREFETCH_STALL_EXIT_SECONDS = max(
+    0, _env_int("AGENTBIO_PREFETCH_STALL_EXIT_SECONDS", 0))
 
 
 class _PrefetchLiveness:

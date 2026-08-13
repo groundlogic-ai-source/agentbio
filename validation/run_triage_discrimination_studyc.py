@@ -77,6 +77,23 @@ def _verify_freeze() -> dict:
         problems.append("case set hash mismatch")
     if manifest.get("rule_fingerprint") != RULE_FINGERPRINT:
         problems.append("rule fingerprint mismatch")
+    # The manifest pins the code commit; running or resuming on different
+    # code with old checkpoint records would publish an irreproducible
+    # "frozen" result. This check runs before the checkpoint is loaded, so
+    # stale target records from another code version can never be consumed.
+    # Fail-open only when git itself is unavailable.
+    frozen_head = manifest.get("frozen_at_commit")
+    if frozen_head:
+        import subprocess
+        try:
+            head = subprocess.run(
+                ["git", "rev-parse", "HEAD"], capture_output=True,
+                text=True, timeout=10, cwd=str(ROOT)).stdout.strip()
+        except Exception:  # noqa: BLE001
+            head = ""
+        if head and head != frozen_head:
+            problems.append(
+                f"HEAD {head[:12]}… != frozen commit {frozen_head[:12]}…")
     if problems:
         raise SystemExit(f"[studyc] FREEZE VIOLATION: {problems}")
     return manifest
@@ -193,13 +210,31 @@ def _build_pool(disease: str, targets_done: dict) -> dict | None:
     return rec
 
 
-def _rank_auc(pos_ranks: list[int], neg_ranks: list[int]) -> float | None:
-    """P(positive ranks ahead of negative), ties at 0.5. Rank 1 = best."""
-    n = len(pos_ranks) * len(neg_ranks)
+def _pool_score(pool: list[dict], drug: str) -> float | None:
+    """The drug's composite score in the pool, or None if absent."""
+    key = " ".join(drug.split()).casefold()
+    for c in pool:
+        if " ".join(str(c.get("drug_name") or "").split()).casefold() == key:
+            try:
+                return float(c.get("composite_score") or 0.0)
+            except (TypeError, ValueError):
+                return None
+    return None
+
+
+def _score_auc(pos_scores: list[float],
+               neg_scores: list[float]) -> float | None:
+    """P(positive scores HIGHER than negative), exact ties at 0.5.
+
+    Computed from composite SCORES, not list positions: sorted ranks are
+    unique positions, so equal scores would otherwise be broken by input
+    order and counted as full wins/losses (architect review 2026-08-13).
+    """
+    n = len(pos_scores) * len(neg_scores)
     if n == 0:
         return None
-    wins = sum(1.0 if p < g else 0.5 if p == g else 0.0
-               for p in pos_ranks for g in neg_ranks)
+    wins = sum(1.0 if p > g else 0.5 if p == g else 0.0
+               for p in pos_scores for g in neg_scores)
     return wins / n
 
 
@@ -230,11 +265,27 @@ def main() -> None:
     if RESULTS_PATH.exists():
         raise SystemExit("[studyc] REFUSED: results exist. Amend, never "
                          "regenerate.")
-    if not STUDYB_RESULTS.exists() and "--force" not in sys.argv:
-        raise SystemExit(
-            "[studyc] REFUSED: Study B results do not exist yet. Study C "
-            "must not run concurrently with Study B (LLM cost). Pass "
-            "--force to override deliberately.")
+    if "--force" not in sys.argv:
+        if not STUDYB_RESULTS.exists():
+            raise SystemExit(
+                "[studyc] REFUSED: Study B results do not exist yet. Study C "
+                "must not run concurrently with Study B (LLM cost). Pass "
+                "--force to override deliberately.")
+        # Existence is not completion: a stale/corrupt/partial Study B file
+        # must not unlock an expensive Study C run.
+        try:
+            sb = json.loads(STUDYB_RESULTS.read_text())
+            studyb_complete = (
+                sb.get("contract") == "triage-discrimination-studyb-v2"
+                and sb.get("diseases_incomplete") == []
+                and bool(sb.get("rows")))
+        except Exception:  # noqa: BLE001
+            studyb_complete = False
+        if not studyb_complete:
+            raise SystemExit(
+                "[studyc] REFUSED: Study B results exist but are not a "
+                "complete v2 artifact (stale or partial file). Pass "
+                "--force to override deliberately.")
     manifest = _verify_freeze()
     _health_gate()
 
@@ -267,11 +318,13 @@ def main() -> None:
         with holdout.holdout_active(positives):
             for drug in positives:
                 rec = {**_profile_drug(disease, drug, pool, total),
+                       "composite_score": _pool_score(pool, drug),
                        "row_kind": "confirmed_positive"}
                 pos_rows.append(rec)
                 table.append(rec)
             for drug in negatives:
                 rec = {**_profile_drug(disease, drug, pool, total),
+                       "composite_score": _pool_score(pool, drug),
                        "row_kind": "genuine_negative"}
                 neg_rows.append(rec)
                 table.append(rec)
@@ -283,6 +336,10 @@ def main() -> None:
                                   "row_kind": "context_top_candidate"})
         pos_ranks = [r["rank"] for r in pos_rows if r["rank"] is not None]
         neg_ranks = [r["rank"] for r in neg_rows if r["rank"] is not None]
+        pos_scores = [r["composite_score"] for r in pos_rows
+                      if r["composite_score"] is not None]
+        neg_scores = [r["composite_score"] for r in neg_rows
+                      if r["composite_score"] is not None]
         per_disease.append({
             "disease_name": disease,
             "pool_size": total,
@@ -290,7 +347,7 @@ def main() -> None:
             "negatives": _presence(neg_rows),
             "pos_ranks": pos_ranks,
             "neg_ranks": neg_ranks,
-            "rank_auc": _rank_auc(pos_ranks, neg_ranks),
+            "score_auc": _score_auc(pos_scores, neg_scores),
         })
 
     if skipped:
@@ -299,11 +356,11 @@ def main() -> None:
               flush=True)
         raise SystemExit(1)
 
-    aucs = [d["rank_auc"] for d in per_disease if d["rank_auc"] is not None]
+    aucs = [d["score_auc"] for d in per_disease if d["score_auc"] is not None]
     pooled_metrics = {
         "n_diseases": len(per_disease),
         "n_diseases_with_contrast": len(aucs),
-        "median_rank_auc": sorted(aucs)[len(aucs) // 2] if aucs else None,
+        "median_score_auc": sorted(aucs)[len(aucs) // 2] if aucs else None,
         "n_auc_above_chance": sum(1 for a in aucs if a > 0.5),
         "n_auc_below_chance": sum(1 for a in aucs if a < 0.5),
         "positive_pool_presence": {
@@ -324,9 +381,10 @@ def main() -> None:
             "with disease-linked OpenTargets and trial data; only the "
             "disease-independent dimensions are provably blind."),
         "metric_note": (
-            "rank_auc = P(confirmed positive ranks ahead of genuine-failure "
-            "negative) among pool-present drugs; pool absence is reported "
-            "per class, never scored as a rank."),
+            "score_auc = P(a confirmed positive's composite_score exceeds a "
+            "genuine-failure negative's), exact ties at 0.5, among "
+            "pool-present drugs; pool absence is reported per class, "
+            "never scored."),
         "pooled": pooled_metrics,
         "per_disease": per_disease,
         "rows": table,

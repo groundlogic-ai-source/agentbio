@@ -38,20 +38,20 @@ class TestAsyncCacheWriter(unittest.TestCase):
         self.assertIsNone(cache.get("test-async-expired"))
 
     def test_concurrent_writers_never_block(self):
-        # 8 threads x 100 writes must complete promptly even if SQLite is
-        # slow: set() is a queue put, not a database call.
+        # 8 threads x 100 writes must never wedge: in the healthy case the
+        # inline write path serializes them on a bounded lock; under a stuck
+        # holder they fall back to the queue after 2s. The bound is generous
+        # (30s) — the assertion targets wedging, not micro-performance.
         def work(base: int):
             for i in range(100):
                 cache.set(f"test-async-conc-{base}-{i}", i, ttl_days=1)
-        t0 = time.time()
         threads = [threading.Thread(target=work, args=(n,)) for n in range(8)]
         for t in threads:
             t.start()
         for t in threads:
-            t.join(timeout=10)
+            t.join(timeout=30)
         self.assertFalse(any(t.is_alive() for t in threads),
                          "set() blocked a worker thread")
-        self.assertLess(time.time() - t0, 10)
         cache._flush_writes_for_test(timeout=60)
         self.assertEqual(cache.get("test-async-conc-3-42"), 42)
 
