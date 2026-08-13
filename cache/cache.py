@@ -1,3 +1,4 @@
+import queue
 import sqlite3
 import hashlib
 import json
@@ -9,8 +10,19 @@ from typing import Any, Optional
 DB_PATH = os.path.join(os.path.dirname(__file__), "cache.db")
 _BUSY_TIMEOUT_MS = 30_000
 _INIT_LOCK = threading.Lock()
-_WRITE_LOCK = threading.Lock()
 _INITIALIZED_PATHS: set[str] = set()
+
+# Writes are ASYNC: a bounded queue + one daemon writer thread per process.
+# Root cause of the 2026-08-12 prefetch wedges: a worker held the old
+# process-wide write lock while stuck inside sqlite conn.close() (no timeout
+# covers a threading.Lock wait), freezing every network lane at once. The
+# cache is best-effort — a dropped write only costs a refetch — so workers
+# must NEVER block on SQLite. A stuck writer just fills the queue and writes
+# get dropped while lanes keep flowing.
+_WRITE_QUEUE: "queue.Queue[tuple]" = queue.Queue(maxsize=20_000)
+_WRITER_START_LOCK = threading.Lock()
+_writer_started = False
+_dropped_writes = 0
 
 
 def _get_conn() -> sqlite3.Connection:
@@ -59,16 +71,7 @@ def get(key: str) -> Optional[Any]:
         value_json, expires_at = row
         if time.time() > expires_at:
             conn.close()
-            with _WRITE_LOCK:
-                delete_conn = _get_conn()
-                try:
-                    delete_conn.execute(
-                        "DELETE FROM cache WHERE key = ? AND expires_at = ?",
-                        (key, expires_at),
-                    )
-                    delete_conn.commit()
-                finally:
-                    delete_conn.close()
+            _enqueue_write("delete", key, expires_at, None)
             return None
         return json.loads(value_json)
     finally:
@@ -78,16 +81,72 @@ def get(key: str) -> Optional[Any]:
             pass
 
 
+def _writer_loop() -> None:
+    """Single daemon writer thread: drains the write queue on ONE persistent
+    connection (opened lazily, used only by this thread). If SQLite ever
+    hangs (commit/close), only THIS thread is lost — workers never block;
+    the queue fills and writes are dropped, which for a best-effort cache
+    only costs a refetch."""
+    conn = None
+    while True:
+        item = _WRITE_QUEUE.get()
+        try:
+            if conn is None:
+                conn = _get_conn()
+            if item[0] == "delete":
+                conn.execute(
+                    "DELETE FROM cache WHERE key = ? AND expires_at = ?",
+                    (item[1], item[2]),
+                )
+            else:
+                conn.execute(
+                    "INSERT OR REPLACE INTO cache (key, value, expires_at) "
+                    "VALUES (?, ?, ?)",
+                    (item[1], item[2], item[3]),
+                )
+            conn.commit()
+        except Exception:  # noqa: BLE001 — best-effort cache, reconnect next write
+            try:
+                if conn is not None:
+                    conn.close()
+            except Exception:  # noqa: BLE001
+                pass
+            conn = None
+        finally:
+            _WRITE_QUEUE.task_done()
+
+
+def _enqueue_write(op: str, key: str, value_or_expiry, expires_at) -> None:
+    global _writer_started, _dropped_writes
+    with _WRITER_START_LOCK:
+        if not _writer_started:
+            threading.Thread(target=_writer_loop, daemon=True,
+                             name="cache-writer").start()
+            _writer_started = True
+    try:
+        _WRITE_QUEUE.put_nowait((op, key, value_or_expiry, expires_at))
+    except queue.Full:
+        _dropped_writes += 1
+        if _dropped_writes % 500 == 1:
+            print(f"[cache] writer queue full — dropped {_dropped_writes} "
+                  "write(s) so far (cache is best-effort)", flush=True)
+
+
+def _flush_writes_for_test(timeout: float = 30.0) -> None:
+    """Test hook: wait until the writer queue has drained."""
+    deadline = time.time() + timeout
+    while _WRITE_QUEUE.unfinished_tasks and time.time() < deadline:
+        time.sleep(0.01)
+    if _WRITE_QUEUE.unfinished_tasks:
+        raise TimeoutError("cache writer queue did not drain")
+
+
 def set(key: str, value: Any, ttl_days: float = 7) -> None:
+    """Cache a value (asynchronous write). Overwrites any existing entry.
+
+    Callers never block on SQLite: the write is enqueued to the single
+    writer thread. A dropped write only costs a refetch on the next get().
+    """
     expires_at = time.time() + ttl_days * 86400
     value_json = json.dumps(value, default=str)
-    with _WRITE_LOCK:
-        conn = _get_conn()
-        try:
-            conn.execute(
-                "INSERT OR REPLACE INTO cache (key, value, expires_at) VALUES (?, ?, ?)",
-                (key, value_json, expires_at),
-            )
-            conn.commit()
-        finally:
-            conn.close()
+    _enqueue_write("put", key, value_json, expires_at)
