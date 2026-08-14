@@ -7,8 +7,10 @@ incidence measure. No API key required (anonymous rate limits apply).
 """
 
 import os
+import random
 import re
 import threading
+import time
 from typing import Any, Optional
 
 import requests
@@ -57,6 +59,66 @@ def _with_key(params: dict[str, Any]) -> dict[str, Any]:
     _note_call()
     key = os.environ.get("OPENFDA_API_KEY")
     return {**params, "api_key": key} if key else params
+
+
+# openFDA enforces a per-minute ceiling as well as a daily quota (roughly
+# 240 requests/minute with a key, 40 without). The reviewer's parallel
+# prefetch fan-out clears either in seconds, so an API key alone does not
+# fix rate limiting — requests must also be spaced process-wide.
+_MIN_REQUEST_INTERVAL = float(
+    os.environ.get("AGENTBIO_OPENFDA_MIN_INTERVAL_SECONDS", "0.28"))
+_RETRY_BASE_SECONDS = float(
+    os.environ.get("AGENTBIO_OPENFDA_RETRY_BASE_SECONDS", "1.0"))
+_RATE_LIMIT_ATTEMPTS = 4
+_THROTTLE_LOCK = threading.Lock()
+_last_request_at = 0.0
+
+
+def _throttle() -> None:
+    """Process-wide minimum spacing between openFDA requests.
+
+    The sleep holds the lock — that is what serializes callers — but it is
+    bounded by _MIN_REQUEST_INTERVAL and never spans a network call.
+    """
+    global _last_request_at
+    with _THROTTLE_LOCK:
+        now = time.monotonic()
+        wait = _last_request_at + _MIN_REQUEST_INTERVAL - now
+        if wait > 0:
+            time.sleep(wait)
+            now = time.monotonic()
+        _last_request_at = now
+
+
+def _retry_delay(resp: Any, attempt: int) -> float:
+    """Honour Retry-After when present, else exponential backoff + jitter."""
+    retry_after = (getattr(resp, "headers", None) or {}).get("Retry-After")
+    if retry_after:
+        try:
+            return max(0.0, min(60.0, float(retry_after)))
+        except (TypeError, ValueError):
+            pass
+    return _RETRY_BASE_SECONDS * (2 ** attempt) + random.uniform(0, 0.5)
+
+
+def _request(url: str, params: dict[str, Any], timeout: float = 30,
+             attempts: int = _RATE_LIMIT_ATTEMPTS) -> Any:
+    """Throttled openFDA GET that retries 429s with backoff.
+
+    Returns the final response even when it is still a 429, so callers keep
+    their existing status handling: 404 stays a legitimate empty result, and
+    a persistent rate limit surfaces as an error rather than as a silent
+    "no data found".
+    """
+    resp = None
+    for attempt in range(max(1, attempts)):
+        _throttle()
+        resp = requests.get(url, params=_with_key(params), timeout=timeout)
+        if resp.status_code != 429:
+            return resp
+        if attempt < attempts - 1:
+            time.sleep(_retry_delay(resp, attempt))
+    return resp
 
 
 _LABEL_EVIDENCE_CACHE_VERSION = "v1"
@@ -116,7 +178,7 @@ def get_label_indications(drug_name: str) -> dict[str, Any]:
     }
 
     try:
-        resp = requests.get(LABEL_URL, params=_with_key(params), timeout=30)
+        resp = _request(LABEL_URL, params)
         if resp.status_code == 404:
             cache_set(cache_key, result, ttl_days=30)
             return result
@@ -165,7 +227,7 @@ def get_label_mechanism(drug_name: str) -> dict[str, Any]:
         "limit": 1,
     }
     try:
-        resp = requests.get(LABEL_URL, params=_with_key(params), timeout=30)
+        resp = _request(LABEL_URL, params)
         if resp.status_code == 404:
             cache_set(cache_key, result, ttl_days=30)
             return result
@@ -373,8 +435,9 @@ def get_label_evidence(
                 return _empty_label_evidence(
                     drug_name, "unavailable", "audit source deadline exceeded")
             timeout = max(0.25, min(timeout, remaining))
-        response = requests.get(LABEL_URL, params=_with_key(params),
-                                timeout=timeout)
+        # attempts=1: this path carries an audit deadline, so it must not
+        # spend its budget sleeping between retries.
+        response = _request(LABEL_URL, params, timeout=timeout, attempts=1)
     except requests.RequestException as exc:
         _note_error()
         return _empty_label_evidence(
@@ -565,7 +628,7 @@ def get_adverse_events(drug_name: str, limit: int = 15) -> dict[str, Any]:
     }
 
     try:
-        resp = requests.get(BASE_URL, params=_with_key(params), timeout=30)
+        resp = _request(BASE_URL, params)
         if resp.status_code == 404:
             # No matching reports — legitimate empty result.
             cache_set(cache_key, result, ttl_days=7)
