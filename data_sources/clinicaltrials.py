@@ -20,6 +20,9 @@ v2 change (vs original):
 """
 
 import os
+import random
+import threading
+import time
 import requests
 from typing import Any, Optional
 from cache.cache import get, set as cache_set, make_key
@@ -38,6 +41,47 @@ _AI_TIMEOUT_SECONDS = 60.0
 _AI_MAX_RETRIES = 0
 
 VALID_CLASSIFICATIONS = {"EFFICACY_FAILURE", "ADMINISTRATIVE", "UNCLEAR"}
+
+# ClinicalTrials.gov rate limiting. The reviewer fans out five provider lanes
+# x N workers at this endpoint; unthrottled that reliably triggers sustained
+# 429s. Each failure drops the trial term from a candidate's composite as a
+# coverage gap, so a 429 storm silently thins the evidence a pool is scored
+# on — a data-quality problem, not merely a slowness problem.
+_RATE_LIMIT_ATTEMPTS = 4
+_RETRY_BASE_SECONDS = 2.0
+_MIN_REQUEST_INTERVAL = float(
+    os.environ.get("AGENTBIO_CTG_MIN_INTERVAL_SECONDS", "0.35"))
+_THROTTLE_LOCK = threading.Lock()
+_last_request_at = 0.0
+
+
+def _throttle() -> None:
+    """Process-wide minimum spacing between ClinicalTrials.gov requests.
+
+    The lock IS held across a sleep, deliberately: that is what serializes
+    callers into a global rate limit. It is safe because the wait is bounded
+    by _MIN_REQUEST_INTERVAL and never spans a network call — unlike the
+    timeout-less lock that once wedged every prefetch lane at once.
+    """
+    global _last_request_at
+    with _THROTTLE_LOCK:
+        now = time.monotonic()
+        wait = _last_request_at + _MIN_REQUEST_INTERVAL - now
+        if wait > 0:
+            time.sleep(wait)
+            now = time.monotonic()
+        _last_request_at = now
+
+
+def _retry_delay(resp: requests.Response, attempt: int) -> float:
+    """Honour Retry-After when present, else exponential backoff + jitter."""
+    retry_after = (resp.headers or {}).get("Retry-After")
+    if retry_after:
+        try:
+            return max(0.0, min(60.0, float(retry_after)))
+        except (TypeError, ValueError):
+            pass
+    return _RETRY_BASE_SECONDS * (2 ** attempt) + random.uniform(0, 0.5)
 
 
 def _anthropic_client() -> Optional[anthropic.Anthropic]:
@@ -106,14 +150,27 @@ def _search_trials(drug_name: str, disease_name: str) -> tuple[list[dict], bool]
         "pageSize": 100,
         "format": "json",
     }
-    try:
-        resp = requests.get(BASE_URL, params=params, timeout=30)
-        resp.raise_for_status()
-        data = resp.json()
-        return data.get("studies", []), False
-    except Exception as e:
-        print(f"[clinicaltrials] WARNING: API call failed ({e})")
-        return [], True
+    for attempt in range(_RATE_LIMIT_ATTEMPTS):
+        _throttle()
+        try:
+            resp = requests.get(BASE_URL, params=params, timeout=30)
+            if resp.status_code == 429:
+                # A 429 is NOT evidence that no trials exist. Back off and
+                # retry; only after exhausting attempts do we report
+                # query_failed so the caller records a coverage gap.
+                if attempt < _RATE_LIMIT_ATTEMPTS - 1:
+                    time.sleep(_retry_delay(resp, attempt))
+                    continue
+                print("[clinicaltrials] WARNING: rate limited (429) after "
+                      f"{_RATE_LIMIT_ATTEMPTS} attempts")
+                return [], True
+            resp.raise_for_status()
+            data = resp.json()
+            return data.get("studies", []), False
+        except Exception as e:
+            print(f"[clinicaltrials] WARNING: API call failed ({e})")
+            return [], True
+    return [], True
 
 
 def check_prior_trials(
