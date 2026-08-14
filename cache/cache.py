@@ -29,20 +29,48 @@ _WRITE_QUEUE: "queue.Queue[tuple]" = queue.Queue(maxsize=20_000)
 _WRITER_START_LOCK = threading.Lock()
 _writer_started = False
 _dropped_writes = 0
+_LOCAL = threading.local()
+
+
+def _drop_thread_conn(db_path: str) -> None:
+    """Discard this thread's connection so the next call reopens it."""
+    conns = getattr(_LOCAL, "conns", None)
+    if not conns:
+        return
+    conn = conns.pop(db_path, None)
+    if conn is not None:
+        try:
+            conn.close()
+        except Exception:  # noqa: BLE001 — best-effort cache
+            pass
 
 
 def _get_conn() -> sqlite3.Connection:
-    """Open a cache connection safe for concurrent source-enrichment workers.
+    """Return this thread's cache connection, opening it on first use.
 
-    Reviewer prefetch uses several thread pools.  Re-running schema DDL on every
-    connection made otherwise-independent cache writes contend on SQLite's
-    database lock.  Initialize each database path once per process, use WAL so
-    readers do not block the single writer, and retain a generous busy timeout
-    for coordination with other AgentBio processes.
+    Connections are per-thread and PERSISTENT. Reviewer prefetch runs several
+    thread pools over hundreds of thousands of rows, and opening a fresh
+    SQLite connection for every get and set made connection setup itself the
+    bottleneck: with ~46 workers, every lane wedged inside sqlite3.connect on
+    a 374MB WAL database while the network sat idle. A connection is cheap to
+    keep and expensive to establish under contention.
+
+    Keyed by absolute path so tests that repoint DB_PATH get a fresh handle
+    rather than a connection to the previous database.
     """
     db_path = os.path.abspath(DB_PATH)
+    conns = getattr(_LOCAL, "conns", None)
+    if conns is None:
+        conns = {}
+        _LOCAL.conns = conns
+    conn = conns.get(db_path)
+    if conn is not None:
+        return conn
     conn = sqlite3.connect(db_path, timeout=_BUSY_TIMEOUT_MS / 1000)
     conn.execute(f"PRAGMA busy_timeout = {_BUSY_TIMEOUT_MS}")
+    # Best-effort cache: a lost recent write only costs a refetch, so trade
+    # durability for not fsyncing on every commit under prefetch load.
+    conn.execute("PRAGMA synchronous = NORMAL")
     if db_path not in _INITIALIZED_PATHS:
         with _INIT_LOCK:
             if db_path not in _INITIALIZED_PATHS:
@@ -58,6 +86,7 @@ def _get_conn() -> sqlite3.Connection:
                 )
                 conn.commit()
                 _INITIALIZED_PATHS.add(db_path)
+    conns[db_path] = conn
     return conn
 
 
@@ -67,24 +96,21 @@ def make_key(func_name: str, *args, **kwargs) -> str:
 
 
 def get(key: str) -> Optional[Any]:
-    conn = _get_conn()
     try:
-        row = conn.execute(
+        row = _get_conn().execute(
             "SELECT value, expires_at FROM cache WHERE key = ?", (key,)
         ).fetchone()
-        if row is None:
-            return None
-        value_json, expires_at = row
-        if time.time() > expires_at:
-            conn.close()
-            _enqueue_write("delete", key, expires_at, None)
-            return None
-        return json.loads(value_json)
-    finally:
-        try:
-            conn.close()
-        except sqlite3.ProgrammingError:
-            pass
+    except sqlite3.Error:
+        # Treat a broken handle as a cache miss and reopen next time.
+        _drop_thread_conn(os.path.abspath(DB_PATH))
+        return None
+    if row is None:
+        return None
+    value_json, expires_at = row
+    if time.time() > expires_at:
+        _enqueue_write("delete", key, expires_at, None)
+        return None
+    return json.loads(value_json)
 
 
 def _writer_loop() -> None:
@@ -93,12 +119,10 @@ def _writer_loop() -> None:
     hangs (commit/close), only THIS thread is lost — workers never block;
     the queue fills and writes are dropped, which for a best-effort cache
     only costs a refetch."""
-    conn = None
     while True:
         item = _WRITE_QUEUE.get()
         try:
-            if conn is None:
-                conn = _get_conn()
+            conn = _get_conn()
             if item[0] == "delete":
                 conn.execute(
                     "DELETE FROM cache WHERE key = ? AND expires_at = ?",
@@ -112,12 +136,7 @@ def _writer_loop() -> None:
                 )
             conn.commit()
         except Exception:  # noqa: BLE001 — best-effort cache, reconnect next write
-            try:
-                if conn is not None:
-                    conn.close()
-            except Exception:  # noqa: BLE001
-                pass
-            conn = None
+            _drop_thread_conn(os.path.abspath(DB_PATH))
         finally:
             _WRITE_QUEUE.task_done()
 
@@ -161,18 +180,16 @@ def set(key: str, value: Any, ttl_days: float = 7) -> None:
         try:
             try:
                 conn = _get_conn()
-                try:
-                    conn.execute(
-                        "INSERT OR REPLACE INTO cache (key, value, expires_at) "
-                        "VALUES (?, ?, ?)",
-                        (key, value_json, expires_at),
-                    )
-                    conn.commit()
-                finally:
-                    conn.close()
+                conn.execute(
+                    "INSERT OR REPLACE INTO cache (key, value, expires_at) "
+                    "VALUES (?, ?, ?)",
+                    (key, value_json, expires_at),
+                )
+                conn.commit()
                 return
             except sqlite3.Error:
-                pass  # fall through to the queued write
+                _drop_thread_conn(os.path.abspath(DB_PATH))
+                # fall through to the queued write
         finally:
             _WRITE_LOCK.release()
     _enqueue_write("put", key, value_json, expires_at)
