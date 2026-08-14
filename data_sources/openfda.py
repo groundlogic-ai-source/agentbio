@@ -6,6 +6,7 @@ real-world safety signal from spontaneous reports; it is NOT a causal or
 incidence measure. No API key required (anonymous rate limits apply).
 """
 
+import os
 import re
 from typing import Any, Optional
 
@@ -14,6 +15,19 @@ from cache.cache import get, set as cache_set, make_key
 
 BASE_URL = "https://api.fda.gov/drug/event.json"
 LABEL_URL = "https://api.fda.gov/drug/label.json"
+
+
+def _with_key(params: dict[str, Any]) -> dict[str, Any]:
+    """Attach the openFDA API key when one is configured.
+
+    Anonymous callers share a per-IP daily quota that a single validation
+    sweep exhausts; openFDA then answers 429 for the rest of the day and
+    escalates to an outright 403 block under sustained retries. A (free)
+    API key raises the ceiling by orders of magnitude. The key is optional:
+    with no OPENFDA_API_KEY set this is a no-op and behaviour is unchanged.
+    """
+    key = os.environ.get("OPENFDA_API_KEY")
+    return {**params, "api_key": key} if key else params
 _LABEL_EVIDENCE_CACHE_VERSION = "v1"
 _AUDIT_CITATION_CUTOFF = "20260810"
 
