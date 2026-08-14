@@ -26,7 +26,7 @@ These are computed by the same formulas used to rank the full rare-disease / NTD
 | Boltz structure confidence (0-1) | 0.920 |
 | Boltz binding-pose confidence (0-1) | 0.952 |
 | Boltz predicted affinity (relative optimization score, 0-1, NOT a Kd) | 0.612 |
-| Boltz predicted structure (CIF) | https://boltz-platform-prod-compute-api-storage.s3.us-east-1.amazonaws.com/org/311afb47-841a-494f-ab03-1ea7fa58b70a/workspace/ws_ai6T67fapbF5DEbF8qVZ/prediction/sab_pred_Rv2mxNyWgi4jL9OyWL90/output/public/sample_0_predicted_structure.cif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=REDACTED&X-Amz-Date=20260627T035513Z&X-Amz-Expires=1800&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED&X-Amz-SignedHeaders=host&x-id=GetObject |
+| Boltz predicted structure (CIF) | https://boltz-platform-prod-compute-api-storage.s3.us-east-1.amazonaws.com/org/311afb47-841a-494f-ab03-1ea7fa58b70a/workspace/ws_ai6T67fapbF5DEbF8qVZ/prediction/sab_pred_Rv2mxNyWgi4jL9OyWL90/output/public/sample_0_predicted_structure.cif (presigned query redacted — expired Boltz temporary credential) |
 | Boltz ADME — lipophilicity (logD) | 1.298 |
 | Boltz ADME — permeability | 0.356 |
 | Boltz ADME — solubility | medium-confidence |

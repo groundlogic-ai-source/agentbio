@@ -10,7 +10,7 @@
       "structure_confidence": 0.8168925642967224,
       "binding_pose_confidence": 0.999312162399292,
       "predicted_affinity": 0.7495027780532837,
-      "pdb_or_cif_url": "https://boltz-platform-prod-compute-api-storage.s3.us-east-1.amazonaws.com/org/311afb47-841a-494f-ab03-1ea7fa58b70a/workspace/ws_ai6T67fapbF5DEbF8qVZ/prediction/sab_pred_3h00UaUaeCir7eHeMqQ8/output/public/sample_0_predicted_structure.cif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=REDACTED&X-Amz-Date=20260730T000221Z&X-Amz-Expires=1800&X-Amz-Security-Token=REDACTED&X-Amz-Signature=REDACTED&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "pdb_or_cif_url": "https://boltz-platform-prod-compute-api-storage.s3.us-east-1.amazonaws.com/org/311afb47-841a-494f-ab03-1ea7fa58b70a/workspace/ws_ai6T67fapbF5DEbF8qVZ/prediction/sab_pred_3h00UaUaeCir7eHeMqQ8/output/public/sample_0_predicted_structure.cif (presigned query redacted \u2014 URL was expired Boltz temporary credential)",
       "estimated_cost_usd": 0.025,
       "raw_metrics": {
         "structure_metrics": {
