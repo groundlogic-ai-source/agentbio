@@ -105,3 +105,38 @@ The 12 benchmark diseases' pools are rebuilt via approved pipeline re-runs
 those diseases are audited against the rebuilt pools (full configuration, all
 dimensions live). Reported descriptively with n disclosed, explicitly labelled
 as computed on non-disease-blind pools. No threshold, no pass/fail.
+
+### Amendment (2026-08-14): trial-evidence coverage gate
+
+**What happened.** ClinicalTrials.gov rate-limited the pool builds
+(thousands of 429s; the client had no backoff). A failed trial query is
+handled by dropping the trial term from that candidate's composite as a
+coverage gap — correct per-candidate behaviour, but it means a pool builds
+to completion while an arbitrary subset of its candidates is scored on
+thinner evidence than the rest. Measured coverage of the five pools built
+before the gate existed:
+
+| Disease | Trial evidence observed |
+|---|---|
+| Acute Promyelocytic Leukemia | 100.0% |
+| Aspergillosis | 95.5% |
+| Brucellosis | **32.1%** |
+| Dermatomyositis | **25.7%** |
+| Gaucher Disease | 100.0% |
+
+**Decision.** The Brucellosis and Dermatomyositis pool records were
+discarded and are rebuilt from scratch. Their per-target biologist/chemist
+records were retained: those are upstream of the reviewer and unaffected by
+trial-source availability. No results file existed at any point, so this
+is a checkpoint invalidation, not an edit to a scored artifact.
+
+**Prevention.** `_trial_coverage()` now gates pool finalization at
+`TRIAL_COVERAGE_MIN` (default 0.95, env-overridable). A pool below the
+threshold is refused and left for resume rather than checkpointed, and
+every finalized pool records its `trial_evidence_coverage`. The
+ClinicalTrials client additionally throttles requests process-wide and
+honours `Retry-After` with exponential backoff.
+
+**Disclosure.** Aspergillosis (95.5%, 217 gapped candidates) passes the
+threshold and is retained; its residual gap is disclosed here and travels
+with the results as a per-pool coverage figure.
