@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -53,6 +54,28 @@ V2_RESULTS = ROOT / "validation" / "benchmark_results_v2.json"
 MANIFEST_PATH = ROOT / "validation" / "triage_discrimination_studyb_freeze_manifest.json"
 CKPT_PATH = ROOT / "validation" / "triage_discrimination_studyb_checkpoint.jsonl"
 RESULTS_PATH = ROOT / "validation" / "triage_discrimination_studyb_results.json"
+
+#: Minimum share of trial-eligible candidates that must carry OBSERVED trial
+#: evidence for a pool to be finalized. Holdout-redacted candidates are
+#: excluded from the denominator: their gap is a deliberate study control,
+#: not a source failure.
+TRIAL_COVERAGE_MIN = float(
+    os.environ.get("AGENTBIO_STUDYB_TRIAL_COVERAGE_MIN", "0.95"))
+
+
+def _trial_coverage(pool: list[dict]) -> tuple[float, str]:
+    """Return (observed share of eligible candidates, human-readable tally)."""
+    tally: dict[str, int] = {}
+    for c in pool:
+        basis = str((c.get("score_components") or {}).get(
+            "trial_evidence_basis"))
+        tally[basis] = tally.get(basis, 0) + 1
+    redacted = tally.get("holdout_redacted", 0)
+    eligible = len(pool) - redacted
+    observed = tally.get("observed", 0)
+    coverage = (observed / eligible) if eligible else 1.0
+    breakdown = ", ".join(f"{k}={v}" for k, v in sorted(tally.items()))
+    return coverage, breakdown
 
 TOP_K = 3
 TOP_N_AUDIT = 10  # pool candidates profiled per disease, as context rows
@@ -216,8 +239,28 @@ def _build_pool(disease: str, drugs: list[str], targets_done: dict) -> dict | No
         return None
     pool = sorted(reviewed, key=lambda c: float(c.get("composite_score") or 0),
                   reverse=True)
+
+    # Trial-evidence coverage gate. When ClinicalTrials.gov rate-limits, each
+    # failed query drops the trial term from that candidate's composite as a
+    # coverage gap. The pool still builds and still looks complete, but its
+    # ranks are no longer comparable — not to other diseases' pools, and not
+    # even within the pool, where some candidates carry trial evidence and
+    # others silently do not. Refuse to finalize; the supervisor retries when
+    # the source recovers. (Observed 2026-08-14: two pools finalized at 32%
+    # and 26% coverage during a 429 storm and had to be discarded.)
+    coverage, breakdown = _trial_coverage(pool)
+    if pool and coverage < TRIAL_COVERAGE_MIN:
+        print(f"[studyb]   {disease}: REFUSED pool — trial-evidence coverage "
+              f"{coverage:.1%} < {TRIAL_COVERAGE_MIN:.0%} ({breakdown}). "
+              "Source is throttled; pool left unfinalized for resume.",
+              flush=True)
+        return None
+    print(f"[studyb]   {disease}: trial-evidence coverage {coverage:.1%} "
+          f"({breakdown})", flush=True)
+
     rec = {"kind": "pool", "disease_name": disease, "holdout_drugs": drugs,
-           "per_target": per_target, "pool_size": len(pool), "pool": pool}
+           "per_target": per_target, "pool_size": len(pool), "pool": pool,
+           "trial_evidence_coverage": round(coverage, 6)}
     _append(rec)
     return rec
 
