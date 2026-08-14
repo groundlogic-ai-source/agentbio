@@ -8,6 +8,7 @@ incidence measure. No API key required (anonymous rate limits apply).
 
 import os
 import re
+import threading
 from typing import Any, Optional
 
 import requests
@@ -15,6 +16,33 @@ from cache.cache import get, set as cache_set, make_key
 
 BASE_URL = "https://api.fda.gov/drug/event.json"
 LABEL_URL = "https://api.fda.gov/drug/label.json"
+
+# Process-wide call accounting. A rate-limited openFDA does not fail a
+# pipeline run: each failed lookup simply yields no safety/label evidence for
+# that candidate, which is indistinguishable downstream from a drug that
+# genuinely has none. Long-running harnesses use these counters to detect a
+# degraded run and refuse to publish results built on it.
+_CALL_LOCK = threading.Lock()
+_CALLS = 0
+_ERRORS = 0
+
+
+def _note_call() -> None:
+    global _CALLS
+    with _CALL_LOCK:
+        _CALLS += 1
+
+
+def _note_error() -> None:
+    global _ERRORS
+    with _CALL_LOCK:
+        _ERRORS += 1
+
+
+def call_stats() -> dict[str, int]:
+    """Cumulative (calls, errors) since process start."""
+    with _CALL_LOCK:
+        return {"calls": _CALLS, "errors": _ERRORS}
 
 
 def _with_key(params: dict[str, Any]) -> dict[str, Any]:
@@ -26,8 +54,11 @@ def _with_key(params: dict[str, Any]) -> dict[str, Any]:
     API key raises the ceiling by orders of magnitude. The key is optional:
     with no OPENFDA_API_KEY set this is a no-op and behaviour is unchanged.
     """
+    _note_call()
     key = os.environ.get("OPENFDA_API_KEY")
     return {**params, "api_key": key} if key else params
+
+
 _LABEL_EVIDENCE_CACHE_VERSION = "v1"
 _AUDIT_CITATION_CUTOFF = "20260810"
 
@@ -85,7 +116,7 @@ def get_label_indications(drug_name: str) -> dict[str, Any]:
     }
 
     try:
-        resp = requests.get(LABEL_URL, params=params, timeout=30)
+        resp = requests.get(LABEL_URL, params=_with_key(params), timeout=30)
         if resp.status_code == 404:
             cache_set(cache_key, result, ttl_days=30)
             return result
@@ -99,6 +130,7 @@ def get_label_indications(drug_name: str) -> dict[str, Any]:
             result["source"] = "openfda_label"
     except Exception as e:
         result["error"] = str(e)
+        _note_error()
         print(f"[openfda] WARNING: label indications query failed for '{drug_name}': {e}")
 
     # Only cache successful lookups (including explicit 404s handled above):
@@ -133,7 +165,7 @@ def get_label_mechanism(drug_name: str) -> dict[str, Any]:
         "limit": 1,
     }
     try:
-        resp = requests.get(LABEL_URL, params=params, timeout=30)
+        resp = requests.get(LABEL_URL, params=_with_key(params), timeout=30)
         if resp.status_code == 404:
             cache_set(cache_key, result, ttl_days=30)
             return result
@@ -164,6 +196,7 @@ def get_label_mechanism(drug_name: str) -> dict[str, Any]:
             })
     except Exception as e:
         result["error"] = str(e)
+        _note_error()
         print(f"[openfda] WARNING: label mechanism query failed for '{drug_name}': {e}")
 
     if result["error"] is None:
@@ -340,8 +373,10 @@ def get_label_evidence(
                 return _empty_label_evidence(
                     drug_name, "unavailable", "audit source deadline exceeded")
             timeout = max(0.25, min(timeout, remaining))
-        response = requests.get(LABEL_URL, params=params, timeout=timeout)
+        response = requests.get(LABEL_URL, params=_with_key(params),
+                                timeout=timeout)
     except requests.RequestException as exc:
+        _note_error()
         return _empty_label_evidence(
             drug_name, "unavailable", f"{type(exc).__name__}: {exc}")
 
@@ -530,7 +565,7 @@ def get_adverse_events(drug_name: str, limit: int = 15) -> dict[str, Any]:
     }
 
     try:
-        resp = requests.get(BASE_URL, params=params, timeout=30)
+        resp = requests.get(BASE_URL, params=_with_key(params), timeout=30)
         if resp.status_code == 404:
             # No matching reports — legitimate empty result.
             cache_set(cache_key, result, ttl_days=7)
@@ -547,6 +582,7 @@ def get_adverse_events(drug_name: str, limit: int = 15) -> dict[str, Any]:
         result["total_event_terms"] = len(rows)
     except Exception as e:
         result["error"] = str(e)
+        _note_error()
         print(f"[openfda] WARNING: adverse event query failed for '{drug_name}': {e}")
 
     # Only cache successful lookups: a transient failure cached as an empty
