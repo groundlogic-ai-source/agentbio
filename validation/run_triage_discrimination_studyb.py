@@ -45,6 +45,7 @@ from agents.biologist import run_biologist  # noqa: E402
 from agents.chemist import run_chemist  # noqa: E402
 from agents.reviewer import run_reviewer  # noqa: E402
 from data_sources.multisource_candidates import merge_chemist_candidates  # noqa: E402
+from data_sources.openfda import call_stats as _openfda_call_stats  # noqa: E402
 from api.audit import _find_molecule_chembl_id  # noqa: E402
 from api.audit_context import build_audit_context  # noqa: E402
 from data_sources import holdout  # noqa: E402
@@ -61,6 +62,13 @@ RESULTS_PATH = ROOT / "validation" / "triage_discrimination_studyb_results.json"
 #: not a source failure.
 TRIAL_COVERAGE_MIN = float(
     os.environ.get("AGENTBIO_STUDYB_TRIAL_COVERAGE_MIN", "0.95"))
+
+#: Maximum share of openFDA lookups that may fail during a pool build. A
+#: throttled openFDA yields no safety/label evidence for the affected
+#: candidates, which downstream is indistinguishable from a drug that
+#: genuinely has none — the same silent degradation the trial gate blocks.
+SOURCE_ERROR_MAX = float(
+    os.environ.get("AGENTBIO_STUDYB_SOURCE_ERROR_MAX", "0.05"))
 
 
 def _trial_coverage(pool: list[dict]) -> tuple[float, str]:
@@ -231,11 +239,23 @@ def _build_pool(disease: str, drugs: list[str], targets_done: dict) -> dict | No
     print(f"[studyb]   {disease}: pooled reviewer over {len(pooled)} pooled "
           f"candidates ({len(all_candidates)} raw across "
           f"{len(run_rows)} targets)", flush=True)
+    fda_before = _openfda_call_stats()
     try:
         reviewed = run_reviewer(pooled_output, bio_min)
     except Exception as exc:  # noqa: BLE001
         print(f"[studyb]   {disease}: pooled reviewer failed: {exc} — "
               "left for resume (targets are checkpointed)", flush=True)
+        return None
+    fda_after = _openfda_call_stats()
+    fda_calls = fda_after["calls"] - fda_before["calls"]
+    fda_errors = fda_after["errors"] - fda_before["errors"]
+    fda_error_rate = (fda_errors / fda_calls) if fda_calls else 0.0
+    if fda_error_rate > SOURCE_ERROR_MAX:
+        print(f"[studyb]   {disease}: REFUSED pool — openFDA error rate "
+              f"{fda_error_rate:.1%} > {SOURCE_ERROR_MAX:.0%} "
+              f"({fda_errors}/{fda_calls} lookups failed). Safety and label "
+              "evidence are degraded; pool left unfinalized for resume.",
+              flush=True)
         return None
     pool = sorted(reviewed, key=lambda c: float(c.get("composite_score") or 0),
                   reverse=True)
