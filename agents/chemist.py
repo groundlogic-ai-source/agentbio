@@ -181,6 +181,47 @@ def _llm_rationale(client: Optional[anthropic.Anthropic], c: dict[str, Any],
         return _fallback_rationale(c, sim_drug, tanimoto, network)
 
 
+# --- LLM rationale budget ----------------------------------------------------
+# _llm_rationale is one API call per candidate and pools run into the
+# thousands, which made rationale prose the dominant LLM cost of the entire
+# pipeline (Study B: 54,105 calls for 21 targets). The rationale is
+# disclosure-only prose — no score, rank, cap, or reviewer verdict consumes
+# it — so deep-pool candidates now get the deterministic template instead.
+# Budget: the top AGENTBIO_MAX_LLM_RATIONALES candidates per target pool by a
+# deterministic quality proxy (approved first, then pChEMBL, then assay
+# confidence). 0 disables LLM rationales entirely; a negative value restores
+# the old unbudgeted behavior.
+def _llm_rationale_budget() -> int:
+    try:
+        return int(os.environ.get("AGENTBIO_MAX_LLM_RATIONALES", "25"))
+    except ValueError:
+        return 25
+
+
+def _llm_rationale_eligible(all_enriched: list[dict[str, Any]],
+                            budget: int) -> set[int]:
+    """Indices into all_enriched that get an LLM rationale this run."""
+    if budget < 0:
+        return set(range(len(all_enriched)))
+    if budget == 0 or not all_enriched:
+        return set()
+
+    def _key(i: int) -> tuple:
+        e = all_enriched[i]
+        try:
+            pchembl = float(e.get("pchembl_value"))
+        except (TypeError, ValueError):
+            pchembl = float("-inf")
+        try:
+            conf = float(e.get("confidence_score"))
+        except (TypeError, ValueError):
+            conf = -1.0
+        return (bool(e.get("is_approved_drug")), pchembl, conf)
+
+    order = sorted(range(len(all_enriched)), key=_key, reverse=True)
+    return set(order[:budget])
+
+
 def _mutation_disclosure_for(drug_name: str, molecule_chembl_id: str) -> dict[str, Any]:
     """
     Build the mutation-specificity DISCLOSURE record for one drug by scanning its
@@ -436,7 +477,13 @@ def run_chemist(biologist_output: dict[str, Any],
     prov_entries: list[dict[str, Any]] = []
     results: list[dict[str, Any]] = []
 
-    for e in all_enriched:
+    rationale_budget = _llm_rationale_budget()
+    rationale_eligible = _llm_rationale_eligible(all_enriched, rationale_budget)
+    print(f"[chemist] LLM rationale budget: {len(rationale_eligible)} of "
+          f"{len(all_enriched)} candidates "
+          f"(AGENTBIO_MAX_LLM_RATIONALES={rationale_budget})")
+
+    for e_idx, e in enumerate(all_enriched):
         e_sym = e.get("target_symbol", symbol)
         e_uid = e.get("uniprot_id", uniprot)
         cand_fp = _fingerprint(e["smiles"])
@@ -480,7 +527,10 @@ def run_chemist(biologist_output: dict[str, Any],
                     best_score = s
                     best_drug = ref.get("drug_name")
 
-        rationale = _llm_rationale(client, e, best_drug, best_score, network)
+        if e_idx in rationale_eligible:
+            rationale = _llm_rationale(client, e, best_drug, best_score, network)
+        else:
+            rationale = _fallback_rationale(e, best_drug, best_score, network)
 
         results.append({
             "drug_name": e["drug_name"],
