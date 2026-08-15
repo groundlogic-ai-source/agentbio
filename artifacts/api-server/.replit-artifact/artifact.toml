@@ -15,7 +15,7 @@ run = "cd /home/runner/workspace && uvicorn api.main:app --host 0.0.0.0 --port 8
 [services.production]
 
 [services.production.run]
-args = ["sh", "-c", "( bash scripts/prod_wait_for_port.sh ${PORT:-8000}; while true; do [ -f validation/.prod_benchmark_done ] && break; bash scripts/prod_benchmark_supervisor.sh >> /tmp/prod_supervisor_boot.log 2>&1; sleep 60; done ) & ( bash scripts/prod_wait_for_port.sh ${PORT:-8000}; while true; do [ -f validation/.prod_studyb_done ] && break; bash scripts/prod_studyb_supervisor.sh >> /tmp/prod_studyb_boot.log 2>&1; sleep 60; done ) & exec uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+args = ["sh", "-c", "( bash scripts/prod_wait_for_port.sh ${PORT:-8000}; while true; do [ -f validation/.prod_benchmark_done ] && break; bash scripts/prod_benchmark_supervisor.sh >> /tmp/prod_supervisor_boot.log 2>&1; sleep 60; done ) & ( bash scripts/prod_wait_for_port.sh ${PORT:-8000}; while true; do [ -f validation/.prod_studyb_done ] && break; bash scripts/prod_studyb_supervisor.sh >> /tmp/prod_studyb_boot.log 2>&1; sleep 60; done ) & ( bash scripts/prod_wait_for_port.sh ${PORT:-8000}; while true; do [ -f validation/.prod_studyc_done ] && break; bash scripts/prod_studyc_supervisor.sh >> /tmp/prod_studyc_boot.log 2>&1; sleep 60; done ) & exec uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
 
 [services.production.health.startup]
 path = "/api/runs"
