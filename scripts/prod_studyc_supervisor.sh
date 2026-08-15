@@ -37,6 +37,17 @@ fi
   fi
 } >> "$LOG" 2>&1
 
+# Resume from a checkpoint snapshot shipped inside the publish: the pulled
+# checkpoint is shipped gzipped (hundreds of MB of JSONL compress ~10-20x)
+# and decompressed here on first boot after a republish. Prod disk wipes on
+# every publish, so a missing .jsonl is exactly the "fresh snapshot"
+# condition; -k keeps the .gz as the pristine fallback.
+CKPT_JSONL=validation/triage_discrimination_studyc_checkpoint.jsonl
+if [ ! -f "$CKPT_JSONL" ] && [ -f "$CKPT_JSONL.gz" ]; then
+  echo "[studyc-supervisor] boot: decompressing shipped checkpoint snapshot" >> "$LOG"
+  gunzip -kf "$CKPT_JSONL.gz"
+fi
+
 while true; do
   # The runner is fail-closed: it refuses to start when results already exist
   # ("amend, never regenerate"), so a completed run exits 1 with that message.
