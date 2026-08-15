@@ -950,6 +950,11 @@ _STUDYB_RESULTS = os.path.join(_BENCH_DIR, "triage_discrimination_studyb_results
 _STUDYB_CKPT = os.path.join(_BENCH_DIR, "triage_discrimination_studyb_checkpoint.jsonl")
 _STUDYB_DONE = os.path.join(_BENCH_DIR, ".prod_studyb_done")
 _STUDYB_HEAD = os.path.join(_BENCH_DIR, ".prod_studyb_freeze_head")
+# sha256 of the PubChem snapshot is expensive (whole-file read); cache it and
+# only re-hash when the file changes. Same for the checkpoint pool/target
+# counts, which otherwise parse a 339MB JSONL on every status poll.
+_SNAP_SHA_CACHE: dict = {}
+_CKPT_COUNT_CACHE: dict = {}
 
 
 def _studyb_freeze_head() -> Optional[str]:
@@ -982,7 +987,15 @@ def studyb_status() -> dict:
     }
     try:
         from data_sources import pubchem_snapshot as _snap
-        status["pubchem_snapshot_sha256"] = _snap.sha256()
+        snap_path = _snap.SNAPSHOT_PATH
+        mtime = os.path.getmtime(snap_path) if snap_path.exists() else None
+        if mtime is None:
+            status["pubchem_snapshot_sha256"] = None
+        else:
+            if _SNAP_SHA_CACHE.get("mtime") != mtime:
+                _SNAP_SHA_CACHE["mtime"] = mtime
+                _SNAP_SHA_CACHE["sha256"] = _snap.sha256()
+            status["pubchem_snapshot_sha256"] = _SNAP_SHA_CACHE.get("sha256")
     except Exception:  # noqa: BLE001 — status endpoint must stay read-only-safe
         status["pubchem_snapshot_sha256"] = None
     if os.path.exists(_STUDYB_DONE):
@@ -993,15 +1006,28 @@ def studyb_status() -> dict:
             status["terminal_state"] = "unknown"
     targets = pools = 0
     try:
-        with open(_STUDYB_CKPT) as f:
-            for line in f:
-                if not line.strip():
-                    continue
-                kind = json.loads(line).get("kind")
-                if kind == "target":
-                    targets += 1
-                elif kind == "pool":
-                    pools += 1
+        # Cache the parse by mtime: pool records embed full ranked pools
+        # (~70MB of JSON per line), so a fresh parse costs real CPU exactly
+        # when the box is busiest. The file only changes when a pool or
+        # target finalizes, so mtime-keyed caching keeps this endpoint cheap
+        # and still correct. (A raw byte-scan is NOT safe: nested candidate
+        # payloads contain the same "kind" markers and overcount.)
+        mtime = os.path.getmtime(_STUDYB_CKPT)
+        if _CKPT_COUNT_CACHE.get("mtime") != mtime:
+            t = p = 0
+            with open(_STUDYB_CKPT) as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    kind = json.loads(line).get("kind")
+                    if kind == "target":
+                        t += 1
+                    elif kind == "pool":
+                        p += 1
+            _CKPT_COUNT_CACHE.clear()
+            _CKPT_COUNT_CACHE.update({"mtime": mtime, "targets": t, "pools": p})
+        targets = _CKPT_COUNT_CACHE["targets"]
+        pools = _CKPT_COUNT_CACHE["pools"]
     except (OSError, json.JSONDecodeError):
         pass
     status["checkpoint"] = {"targets_finalized": targets,
@@ -1009,8 +1035,13 @@ def studyb_status() -> dict:
                             **_bench_file_meta(_STUDYB_CKPT)}
     tail: list[str] = []
     try:
-        with open(_STUDYB_LOG) as f:
-            tail = [ln for ln in f.read().splitlines()
+        # Bounded tail-read: the prod supervisor log grows unbounded across
+        # restarts; never read the whole file on a status call.
+        with open(_STUDYB_LOG, "rb") as f:
+            f.seek(0, 2)
+            size = f.tell()
+            f.seek(max(0, size - 256 * 1024))
+            tail = [ln for ln in f.read().decode("utf-8", "replace").splitlines()
                     if "MorganGenerator" not in ln][-15:]
     except OSError:
         pass
