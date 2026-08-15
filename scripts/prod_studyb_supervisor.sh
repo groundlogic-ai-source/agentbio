@@ -72,9 +72,13 @@ while true; do
   # 15-min zero-progress stall budget — on stall the runner self-terminates
   # and this loop restarts it; completed lane calls are cached, so each
   # retry resumes where the last one froze instead of starting over.
-  AGENTBIO_PREFETCH_WORKERS=3 \
+  # nice -19: on the 1-vCPU reserved VM the prefetch/scoring phases saturate
+  # every hardware thread and starve uvicorn, whose health-check failures make
+  # the LB pull the backend (prod goes dark while the study is fine). Idle
+  # priority keeps the API responsive at zero throughput cost when idle.
+  AGENTBIO_PREFETCH_WORKERS=2 \
   AGENTBIO_PREFETCH_STALL_EXIT_SECONDS=900 \
-    python3 -m validation.run_triage_discrimination_studyb >> "$LOG" 2>&1
+    nice -n 19 python3 -m validation.run_triage_discrimination_studyb >> "$LOG" 2>&1
   rc=$?
   if [ -f "$RESULTS" ]; then
     echo "STUDY B COMPLETE" >> "$LOG"
