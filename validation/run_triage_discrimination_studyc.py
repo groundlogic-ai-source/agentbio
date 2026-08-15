@@ -28,6 +28,10 @@ Discipline (same as Study B):
   and rule fingerprint; stale records refuse the run.
 * **Fail-closed.** Existing results are never regenerated; a disease whose
   targets did not ALL complete is never profiled from a partial pool.
+* **Disclosed exclusion.** A disease with no genetically-associated targets
+  AND no approved-drug MOA targets (deterministically unscorable) is
+  recorded as a hash-bound disease_excluded checkpoint record and disclosed
+  in results under diseases_excluded — never retried, never crash-looped.
 
 This run makes LLM calls (the pipeline agents). Approved 2026-08-12 as the
 powered follow-up to Study B.
@@ -65,6 +69,18 @@ _LOCK_PATH = ROOT / "validation" / ".studyc_runner.lock"
 
 RESULTS_CONTRACT = "triage-discrimination-studyc-v1"
 
+_UNSCORABLE_MARKER = "nothing to score"
+
+
+class DiseaseUnscorable(Exception):
+    """select_for_disease proved there is nothing to score: no genetically-
+    associated targets AND no approved-drug MOA targets. For a resolved
+    disease this is deterministic — retrying can never succeed — so the
+    runner records a permanent, disclosed exclusion instead of crash-looping.
+    The marker requires BOTH lanes empty, so a single-API blip (e.g. an
+    Open Targets degraded-200) cannot trigger a false exclusion while
+    ChEMBL is healthy."""
+
 
 def _sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -100,7 +116,7 @@ def _verify_freeze() -> dict:
 
 
 def _load_checkpoint() -> dict:
-    done = {"targets": {}, "pools": {}}
+    done = {"targets": {}, "pools": {}, "excluded": {}}
     if CKPT_PATH.exists():
         for line in CKPT_PATH.read_text().splitlines():
             if not line.strip():
@@ -116,6 +132,8 @@ def _load_checkpoint() -> dict:
                 done["targets"][(rec["disease_name"], rec["target_symbol"])] = rec
             elif rec["kind"] == "pool":
                 done["pools"][rec["disease_name"]] = rec
+            elif rec["kind"] == "disease_excluded":
+                done["excluded"][rec["disease_name"]] = rec.get("reason", "")
     return done
 
 
@@ -149,6 +167,10 @@ def _build_pool(disease: str, targets_done: dict) -> dict | None:
     except DiseaseNotInUniverse as exc:
         print(f"[studyc] {disease}: OUT OF UNIVERSE ({exc})", flush=True)
         return None
+    except RuntimeError as exc:
+        if _UNSCORABLE_MARKER in str(exc):
+            raise DiseaseUnscorable(str(exc)) from exc
+        raise
     run_rows = rows[:TOP_K]
     all_candidates: list[dict] = []
     bio_pmids: list[str] = []
@@ -299,15 +321,35 @@ def main() -> None:
     table: list[dict] = []
     per_disease: list[dict] = []
     skipped: list[str] = []
+    excluded: list[dict] = []
     for d in diseases:
         disease = d["disease_name"]
         positives, negatives = d["positives"], d["negatives"]
+        if disease in done["excluded"]:
+            excluded.append({"disease_name": disease,
+                             "reason": done["excluded"][disease]})
+            print(f"[studyc] {disease}: EXCLUDED (recorded unscorable) — "
+                  "skipping", flush=True)
+            continue
         pool_rec = done["pools"].get(disease)
         if pool_rec is None:
             with holdout.holdout_active(positives):
-                pool_rec = _build_pool(disease, done["targets"])
+                try:
+                    pool_rec = _build_pool(disease, done["targets"])
+                except DiseaseUnscorable as exc:
+                    _append({"kind": "disease_excluded",
+                             "disease_name": disease,
+                             "reason": str(exc)})
+                    done["excluded"][disease] = str(exc)
+                    pool_rec = None
             if pool_rec is None:
-                skipped.append(disease)
+                if disease in done["excluded"]:
+                    excluded.append({"disease_name": disease,
+                                     "reason": done["excluded"][disease]})
+                    print(f"[studyc] {disease}: EXCLUDED — "
+                          f"{done['excluded'][disease]}", flush=True)
+                else:
+                    skipped.append(disease)
                 continue
             print(f"[studyc] {disease}: pool={pool_rec['pool_size']}",
                   flush=True)
@@ -387,6 +429,7 @@ def main() -> None:
             "never scored."),
         "pooled": pooled_metrics,
         "per_disease": per_disease,
+        "diseases_excluded": excluded,
         "rows": table,
     }
     payload["results_sha256"] = hashlib.sha256(
@@ -395,6 +438,9 @@ def main() -> None:
     tmp.write_text(json.dumps(payload, indent=2, sort_keys=True,
                               default=str) + "\n")
     tmp.replace(RESULTS_PATH)
+    if excluded:
+        print(f"[studyc] {len(excluded)} disease(s) excluded as unscorable "
+              "(disclosed in results under diseases_excluded)", flush=True)
     print(f"[studyc] wrote {RESULTS_PATH} ({len(table)} rows, "
           f"{len(per_disease)} diseases complete)", flush=True)
     print(json.dumps(pooled_metrics, indent=2), flush=True)
