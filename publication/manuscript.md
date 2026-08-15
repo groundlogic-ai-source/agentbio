@@ -424,7 +424,15 @@ and all findings are disclosure-only, so hypothesis judgment is untested;
 N3 untested in both studies, E4 measuring a falsified assumption, and E2
 effectively untested in v2 (≥2 of 6 exclusions were label-retrieval
 artifacts); single-universe disease scope; DrugCentral pinned to the 2023
-release; GtoPdb commercial terms a production dependency; and self-evaluation
+release; GtoPdb commercial terms a production dependency; pool coverage
+rather than scoring as the dominant rediscovery bottleneck — in a descriptive
+12-disease pool-rebuild study, every confirmed repurposing that entered a
+rebuilt pool ranked top-15 (4/4), while 18/22 confirmed pairs never entered a
+pool, decomposing into 8 pathogen-directed or purely symptomatic agents
+(structurally outside a host-target pool), 5 broad cytotoxics on
+non-disease-linked targets, 4 redundant/noisy/sparse entries, and 1 on-target
+miss attributable to bioactivity-assay strictness (tretinoin absent despite
+RARA being a pool target); and self-evaluation
 by the system's developer, mitigated but not eliminated by pre-registration,
 frozen artifacts, mechanical scoring, and external ground truth. No clinical,
 experimental, or prospective validation is claimed.

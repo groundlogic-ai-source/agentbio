@@ -56,6 +56,33 @@
 - Trabectedin (liposarcoma)
 - Eribulin (liposarcoma)
 
+## Miss decomposition (see triage_discrimination_studyb_miss_analysis.md)
+
+Of the 18 pool-absent confirmed pairs:
+
+- **8/18** act on the pathogen or on symptoms, not on disease-linked human
+  genes (4 anti-infectives; 4 anticonvulsants for a syndromic epilepsy) —
+  structurally outside a host-target pool. Disclosure matter, not a defect.
+- **5/18** are broad cytotoxics whose targets are not disease-linked (e.g.
+  TOP2A is not among APL's pool targets IDH1/PNP/RARA; Kaposi's pool targets
+  JAK1/PNP/TOP2A contain no tubulin) — explained at the target level; all are
+  direct standard-of-care approvals, not repurposing opportunities.
+- **4/18** are redundant, noisy, or data-sparse (esomeprazole = isomer of the
+  rank-3 found omeprazole; benzoic acid = dataset noise; roxatidine =
+  Japan-only sparse data; voglibose = off the pool's mechanism set).
+- **1/18** is a genuine in-scope defect: **tretinoin/APL** — RARA is a pool
+  target yet the drug is absent, the ChEMBL IC50/Ki assay-strictness class
+  already tracked as an open task (Sapropterin/Pyridostigmine recovery).
+
+## Scope limitations (for UI/paper disclosure)
+
+Pools are built from human disease-linked genes. The pipeline therefore
+structurally cannot surface: (a) drugs acting on a pathogen rather than the
+host (infectious diseases); (b) purely symptomatic therapies for syndromic
+conditions; (c) agents whose mechanism target is not disease-linked (most
+broad cytotoxics; non-protein mechanisms). Absence of a drug from results
+inside these classes is expected and is not evidence against the drug.
+
 ## Read of the result (descriptive, no inference)
 
 - When a confirmed repurposing is in the rebuilt pool, it ranks well: all 4 found rank in the top 15 (best 3, worst 15). Scoring is not the bottleneck.
