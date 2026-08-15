@@ -157,6 +157,18 @@ export default function TriagePanel({ onNavigate }) {
           safety caps, direction caps, black-box advisories, XLogP cautions, and
           evidence coverage — with every verdict retrievable later by run id.
         </p>
+        <p className="text-xs mt-2 leading-relaxed" style={{ color: "var(--ink-dim)" }}>
+          <strong style={{ color: "var(--ink-muted)" }}>Known scope limits.</strong>{" "}
+          Candidate pools are built from human disease-linked genes, so this tool
+          structurally cannot surface drugs that act on a pathogen rather than the
+          host (infectious diseases), purely symptomatic therapies for syndromic
+          conditions (e.g. anticonvulsants in Lennox-Gastaut), or agents whose
+          targets are not disease-linked (most broad cytotoxics). Absence of a
+          drug in these classes is expected — not evidence against it. Measured in
+          our 12-disease benchmark: confirmed repurposings that entered a pool all
+          ranked top-15 (4/4); 18/22 never entered a pool, almost entirely for the
+          reasons above.
+        </p>
       </div>
 
       <form
