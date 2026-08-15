@@ -1065,21 +1065,133 @@ def studyb_results() -> JSONResponse:
 
 
 @app.get("/internal/studyb-checkpoint")
-def studyb_checkpoint() -> JSONResponse:
-    """Return the raw Study B checkpoint so dev can resume from prod progress
-    after a republish (prod disk is wiped on redeploy)."""
+def studyb_checkpoint() -> FileResponse:
+    """Stream the raw Study B checkpoint so dev can resume from prod progress
+    after a republish (prod disk is wiped on redeploy).
+
+    Streams instead of parsing into a JSON envelope: the checkpoint is
+    hundreds of MB, and building the envelope in memory on the 1-vCPU prod
+    box starved uvicorn (LB health checks failed, backend pulled). The
+    freeze-head pin rides in the X-Freeze-Head header: without it, restoring
+    after a prod disk wipe would let a newer deployment mint a fresh pin and
+    resume old work under changed code.
+    """
     if not os.path.exists(_STUDYB_CKPT):
         raise HTTPException(status_code=404, detail="no studyb checkpoint yet")
-    records = []
-    with open(_STUDYB_CKPT) as f:
-        for line in f:
-            if line.strip():
-                records.append(json.loads(line))
-    # The freeze-head pin MUST ride with the checkpoint: without it, restoring
-    # after a prod disk wipe would let a newer deployment mint a fresh pin and
-    # resume old work under changed code.
-    return JSONResponse({"records": records,
-                         "freeze_head": _studyb_freeze_head()})
+    return FileResponse(
+        _STUDYB_CKPT,
+        media_type="application/x-ndjson",
+        filename="triage_discrimination_studyb_checkpoint.jsonl",
+        headers={"X-Freeze-Head": _studyb_freeze_head() or ""})
+
+
+# --------------------------------------------------------------------------- #
+# Study C (triage discrimination: confirmed positives vs genuine negatives)
+# --------------------------------------------------------------------------- #
+
+_STUDYC_LOG = os.path.join(_BENCH_DIR, "prod_studyc.log")
+_STUDYC_RESULTS = os.path.join(_BENCH_DIR, "triage_discrimination_studyc_results.json")
+_STUDYC_CKPT = os.path.join(_BENCH_DIR, "triage_discrimination_studyc_checkpoint.jsonl")
+_STUDYC_DONE = os.path.join(_BENCH_DIR, ".prod_studyc_done")
+_STUDYC_COUNT_CACHE: dict = {}
+
+
+def _studyc_supervisor_alive() -> bool:
+    try:
+        out = subprocess.run(
+            ["pgrep", "-f", "prod_studyc_supervisor.sh"],
+            capture_output=True, text=True, timeout=5,
+        )
+        return bool(out.stdout.strip())
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
+@app.get("/internal/studyc-status")
+def studyc_status() -> dict:
+    """Read-only progress of the 24/7 Study C discrimination run."""
+    status: dict[str, Any] = {
+        "supervisor_log": _STUDYC_LOG,
+        "supervisor_alive": _studyc_supervisor_alive(),
+        "results": _bench_file_meta(_STUDYC_RESULTS),
+    }
+    if os.path.exists(_STUDYC_DONE):
+        try:
+            with open(_STUDYC_DONE) as f:
+                status["terminal_state"] = f.read().strip()
+        except OSError:
+            status["terminal_state"] = "unknown"
+    targets = pools = 0
+    try:
+        # Same mtime-cached parse discipline as studyb-status: pool records
+        # embed full ranked pools, so an uncached parse per poll would starve
+        # the 1-vCPU prod box exactly when it is busiest.
+        mtime = os.path.getmtime(_STUDYC_CKPT)
+        if _STUDYC_COUNT_CACHE.get("mtime") != mtime:
+            t = p = 0
+            with open(_STUDYC_CKPT) as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    kind = json.loads(line).get("kind")
+                    if kind == "target":
+                        t += 1
+                    elif kind == "pool":
+                        p += 1
+            _STUDYC_COUNT_CACHE.clear()
+            _STUDYC_COUNT_CACHE.update(
+                {"mtime": mtime, "targets": t, "pools": p})
+        targets = _STUDYC_COUNT_CACHE["targets"]
+        pools = _STUDYC_COUNT_CACHE["pools"]
+    except (OSError, json.JSONDecodeError):
+        pass
+    status["checkpoint"] = {"targets_finalized": targets,
+                            "pools_finalized": pools,
+                            **_bench_file_meta(_STUDYC_CKPT)}
+    tail: list[str] = []
+    try:
+        # Bounded tail-read: the prod supervisor log grows unbounded across
+        # restarts; never read the whole file on a status call.
+        with open(_STUDYC_LOG, "rb") as f:
+            f.seek(0, 2)
+            size = f.tell()
+            f.seek(max(0, size - 256 * 1024))
+            tail = [ln for ln in f.read().decode("utf-8", "replace").splitlines()
+                    if "MorganGenerator" not in ln][-15:]
+    except OSError:
+        pass
+    status["log_tail"] = tail
+    return status
+
+
+@app.get("/internal/studyc-results")
+def studyc_results() -> JSONResponse:
+    """Return the Study C results artifact so it can be pulled back to dev.
+
+    The Reserved VM disk is wiped on restart/redeploy; pull this BEFORE any
+    republish so the frozen result is committed in the repo.
+    """
+    if not os.path.exists(_STUDYC_RESULTS):
+        raise HTTPException(status_code=404, detail="no studyc results yet")
+    data = _bench_read_json(_STUDYC_RESULTS)
+    if data is None:
+        raise HTTPException(status_code=503, detail="results mid-write; retry")
+    return JSONResponse({"artifact": "triage_discrimination_studyc",
+                         "data": data})
+
+
+@app.get("/internal/studyc-checkpoint")
+def studyc_checkpoint() -> FileResponse:
+    """Stream the raw Study C checkpoint for pull-back before a republish.
+
+    Streams for the same reason as /internal/studyb-checkpoint.
+    """
+    if not os.path.exists(_STUDYC_CKPT):
+        raise HTTPException(status_code=404, detail="no studyc checkpoint yet")
+    return FileResponse(
+        _STUDYC_CKPT,
+        media_type="application/x-ndjson",
+        filename="triage_discrimination_studyc_checkpoint.jsonl")
 
 
 @app.post("/internal/clear-registry")
