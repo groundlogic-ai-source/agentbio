@@ -1,0 +1,6 @@
+{
+  "contract": "triage-discrimination-studyc-freeze-v1",
+  "frozen_at_commit": "7a89395d894cba09d1f3f1b001300e7f1d608497",
+  "cases_sha256": "4df235c43eb772a8f53d7e6823af41995e4531a2190701106f811cd5f8db93ca",
+  "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf"
+}
