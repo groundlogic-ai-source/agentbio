@@ -1,0 +1,14 @@
+disabled_pending_greenlight
+
+Set 2026-08-17 to halt ungreenlit benchmark preflight re-runs on prod.
+
+Why: a republish wipes the Reserved VM disk, deleting the preflight's
+prod-side completion state; the benchmark supervisor then re-ran the
+(expensive, LLM-bearing) preflight chain from scratch even though the
+benchmark itself remained PAUSED awaiting greenlight, and its blessed
+preflight results (validation/v2_source_ablation_results.json, 2026-08-14)
+are already the state of record in the repo. The re-run burned ~$25 of AI
+integrations in ~2h and CPU-starved the concurrent Study C run.
+
+To actually run the benchmark later: delete this marker, republish, then
+POST /internal/benchmark-greenlight on prod.
