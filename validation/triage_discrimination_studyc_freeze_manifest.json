@@ -7,8 +7,14 @@
     {
       "date": "2026-08-15",
       "scope": "agents/chemist.py: LLM rationale budgeting (AGENTBIO_MAX_LLM_RATIONALES, default top-25 per target pool; non-eligible candidates get the deterministic templated rationale)",
-      "reason": "Per-candidate LLM rationale prose was the dominant run cost (Study B: 54,105 rationale calls across 21 targets) while feeding no score, rank, cap, or reviewer verdict — it is disclosure-only prose passed through to the writer.",
-      "impact": "None on scored outputs: composite scores, ranks, reviewer verdicts, and evidence profiles are deterministic and unchanged. Checkpoint records written before vs after this amendment differ only in the prose rationale field of non-top candidates (LLM prose vs template). RULE_FINGERPRINT (evidence_profile disposition rule) and cases_sha256 are unchanged; frozen_at_commit intentionally left at the freeze commit — the prod commit-pin check fails open by design (no git in the deployment snapshot)."
+      "reason": "Per-candidate LLM rationale prose was the dominant run cost (Study B: 54,105 rationale calls across 21 targets) while feeding no score, rank, cap, or reviewer verdict \u2014 it is disclosure-only prose passed through to the writer.",
+      "impact": "None on scored outputs: composite scores, ranks, reviewer verdicts, and evidence profiles are deterministic and unchanged. Checkpoint records written before vs after this amendment differ only in the prose rationale field of non-top candidates (LLM prose vs template). RULE_FINGERPRINT (evidence_profile disposition rule) and cases_sha256 are unchanged; frozen_at_commit intentionally left at the freeze commit \u2014 the prod commit-pin check fails open by design (no git in the deployment snapshot)."
+    },
+    {
+      "date": "2026-08-17",
+      "scope": "validation/run_triage_discrimination_studyc.py: _load_checkpoint now streams line-by-line (was read_text().splitlines(), ~3x transient RAM) and sheds target records for pool-finalized diseases, which assembly never re-reads",
+      "reason": "The checkpoint grows past 1GB over the run; the old loader's peak RAM footprint is the suspected cause of the 2026-08-17 prod VM restart that wiped an unfinalized pool and ~4.5h of work.",
+      "impact": "None on scored outputs: identical records are validated (rule_fingerprint + cases_sha256 per record, fail-closed) and identical pools reach scoring; only resume-time memory profile changes. Infrastructure, not rules \u2014 RULE_FINGERPRINT unchanged."
     }
   ]
 }

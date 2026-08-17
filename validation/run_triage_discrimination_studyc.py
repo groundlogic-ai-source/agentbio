@@ -116,14 +116,28 @@ def _verify_freeze() -> dict:
 
 
 def _load_checkpoint() -> dict:
+    """Streamed load with pooled-disease target shedding.
+
+    The checkpoint grows past 1GB over the run (pool records embed full
+    ranked pools). The previous implementation did
+    ``read_text().splitlines()`` — transiently tripling the file in RAM
+    (file string + line list + parsed records) on a small reserved VM; the
+    suspected OOM behind the 2026-08-17 prod restart that wiped an
+    unfinalized pool. Stream line-by-line instead, and drop target records
+    for diseases whose pool is finalized: ``_build_pool`` only runs when
+    there is no pool record, so those targets are never consumed again.
+    """
     done = {"targets": {}, "pools": {}, "excluded": {}}
-    if CKPT_PATH.exists():
-        for line in CKPT_PATH.read_text().splitlines():
+    if not CKPT_PATH.exists():
+        return done
+    cases_sha = _sha256_file(CASES_PATH)
+    with open(CKPT_PATH, encoding="utf-8") as fh:
+        for line in fh:
             if not line.strip():
                 continue
             rec = json.loads(line)
             if (rec.get("rule_fingerprint") != RULE_FINGERPRINT
-                    or rec.get("cases_sha256") != _sha256_file(CASES_PATH)):
+                    or rec.get("cases_sha256") != cases_sha):
                 raise SystemExit(
                     "[studyc] REFUSED: checkpoint record predates the "
                     "current case set or rule fingerprint. Move the stale "
@@ -134,6 +148,17 @@ def _load_checkpoint() -> dict:
                 done["pools"][rec["disease_name"]] = rec
             elif rec["kind"] == "disease_excluded":
                 done["excluded"][rec["disease_name"]] = rec.get("reason", "")
+    pooled_diseases = set(done["pools"])
+    if pooled_diseases:
+        before = len(done["targets"])
+        done["targets"] = {
+            key: rec for key, rec in done["targets"].items()
+            if key[0] not in pooled_diseases}
+        dropped = before - len(done["targets"])
+        if dropped:
+            print(f"[studyc] checkpoint: shed {dropped} target record(s) "
+                  f"for pool-finalized diseases (never re-read)",
+                  flush=True)
     return done
 
 
