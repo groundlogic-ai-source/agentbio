@@ -71,6 +71,16 @@ class TestUnscorableExclusion(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 _build_pool("Nowhere Syndrome", {})
 
+    def test_out_of_universe_raises_dedicated(self):
+        """A case outside the rare/NTD universe can never finalize; it must
+        become a disclosed exclusion, not strand in `skipped` forever and
+        block results (observed 2026-08-18: 'Urinary Incontinence')."""
+        with mock.patch.object(
+                studyc, "select_for_disease",
+                side_effect=studyc.DiseaseNotInUniverse("not in universe")):
+            with self.assertRaises(DiseaseUnscorable):
+                _build_pool("Urinary Incontinence", {})
+
     def test_checkpoint_loads_exclusions(self):
         rec = {"kind": "disease_excluded",
                "disease_name": "Nowhere Syndrome",
