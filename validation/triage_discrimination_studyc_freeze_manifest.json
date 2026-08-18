@@ -15,6 +15,12 @@
       "scope": "validation/run_triage_discrimination_studyc.py: _load_checkpoint now streams line-by-line (was read_text().splitlines(), ~3x transient RAM) and sheds target records for pool-finalized diseases, which assembly never re-reads",
       "reason": "The checkpoint grows past 1GB over the run; the old loader's peak RAM footprint is the suspected cause of the 2026-08-17 prod VM restart that wiped an unfinalized pool and ~4.5h of work.",
       "impact": "None on scored outputs: identical records are validated (rule_fingerprint + cases_sha256 per record, fail-closed) and identical pools reach scoring; only resume-time memory profile changes. Infrastructure, not rules \u2014 RULE_FINGERPRINT unchanged."
+    },
+    {
+      "date": "2026-08-18",
+      "scope": "validation/run_triage_discrimination_studyc.py: _build_pool converts DiseaseNotInUniverse into DiseaseUnscorable, so out-of-universe cases are recorded as permanent disclosed exclusions instead of stranding in `skipped`",
+      "reason": "Case 'Urinary Incontinence' is outside the rare-disease/NTD target universe; the old path returned None on every resume, and results are never written while `skipped` is non-empty \u2014 a terminal wedge once it was the last disease standing.",
+      "impact": "Completion semantics only: the disease is disclosed under diseases_excluded (same disclosure path as unscorable cases). No scored row, pool, rule_fingerprint, or metric changes."
     }
   ]
 }

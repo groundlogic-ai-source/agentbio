@@ -190,8 +190,16 @@ def _build_pool(disease: str, targets_done: dict) -> dict | None:
     try:
         rows = select_for_disease(disease)
     except DiseaseNotInUniverse as exc:
-        print(f"[studyc] {disease}: OUT OF UNIVERSE ({exc})", flush=True)
-        return None
+        # Not a transient failure: a case outside the rare-disease/NTD
+        # universe can NEVER finalize. Returning None would strand it in
+        # `skipped` on every resume, and results are never written while
+        # `skipped` is non-empty — a terminal wedge for the whole study
+        # (observed 2026-08-18: 'Urinary Incontinence'). Record it as a
+        # permanent, disclosed exclusion, same path as unscorable cases.
+        print(f"[studyc] {disease}: OUT OF UNIVERSE ({exc}) — recording "
+              f"disclosed exclusion", flush=True)
+        raise DiseaseUnscorable(
+            f"outside the rare-disease/NTD target universe: {exc}") from exc
     except RuntimeError as exc:
         if _UNSCORABLE_MARKER in str(exc):
             raise DiseaseUnscorable(str(exc)) from exc
