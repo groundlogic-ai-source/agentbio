@@ -65,3 +65,4 @@ Stage 1: Given the universe of Orphanet rare diseases + 20 WHO NTDs, ranks the t
 
 - See `README.md` for full run instructions, output field descriptions, and scoring formula details.
 - No follow-up task proposals: do the work directly on main instead of parking it in the project task queue. (stated 2026-08-10; user cancelled tasks #59-61)
+- The product name is AgentBio; "Silver Bullet" survives only in legacy strings (e.g. the out-of-universe error message). Use AgentBio in user-facing prose; don't rename strings piecemeal.
