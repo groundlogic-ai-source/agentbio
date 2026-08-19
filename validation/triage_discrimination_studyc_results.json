@@ -1,0 +1,5428 @@
+{
+  "cases_sha256": "4df235c43eb772a8f53d7e6823af41995e4531a2190701106f811cd5f8db93ca",
+  "contract": "triage-discrimination-studyc-v1",
+  "diseases_excluded": [
+    {
+      "disease_name": "Acute Coronary Syndrome",
+      "reason": "outside the rare-disease/NTD target universe: 'Acute Coronary Syndrome' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Aplastic Anemia",
+      "reason": "outside the rare-disease/NTD target universe: 'Aplastic Anemia' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Atherosclerosis",
+      "reason": "Open Targets returned no genetically-associated targets for 'Atherosclerosis-deafness-diabetes-epilepsy-nephropathy syndrome' (EFO MONDO_0008843) and no approved-drug MOA targets were found in ChEMBL; there is nothing to score."
+    },
+    {
+      "disease_name": "Diabetes Mellitus, Non-Insulin-Dependent",
+      "reason": "outside the rare-disease/NTD target universe: 'Diabetes Mellitus, Non-Insulin-Dependent' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Diabetic Retinopathy",
+      "reason": "outside the rare-disease/NTD target universe: 'Diabetic Retinopathy' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Epilepsy",
+      "reason": "outside the rare-disease/NTD target universe: 'Epilepsy' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Hamman-Rich syndrome",
+      "reason": "outside the rare-disease/NTD target universe: 'Hamman-Rich syndrome' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Herpes zoster disease",
+      "reason": "outside the rare-disease/NTD target universe: 'Herpes zoster disease' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "HIV Infections",
+      "reason": "outside the rare-disease/NTD target universe: 'HIV Infections' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Iron Overload",
+      "reason": "outside the rare-disease/NTD target universe: 'Iron Overload' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Malignant neoplasm of lung",
+      "reason": "outside the rare-disease/NTD target universe: 'Malignant neoplasm of lung' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Malignant neoplasm of stomach",
+      "reason": "outside the rare-disease/NTD target universe: 'Malignant neoplasm of stomach' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Malignant tumor of colon",
+      "reason": "outside the rare-disease/NTD target universe: 'Malignant tumor of colon' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Multiple Endocrine Neoplasia",
+      "reason": "outside the rare-disease/NTD target universe: 'Multiple Endocrine Neoplasia' is an Orphanet 'Group of disorders' umbrella term, not a single scorable disease \u2014 it aggregates several distinct disorders. Silver Bullet scores one (disease, target) pair at a time, so please pick a specific constituent disease within this group (e.g. a named subtype) rather than the umbrella category."
+    },
+    {
+      "disease_name": "Myelofibrosis",
+      "reason": "outside the rare-disease/NTD target universe: 'Myelofibrosis' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Non-Small Cell Lung Carcinoma",
+      "reason": "outside the rare-disease/NTD target universe: 'Non-Small Cell Lung Carcinoma' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Obesity",
+      "reason": "outside the rare-disease/NTD target universe: 'Obesity' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Pulmonary Hypertension",
+      "reason": "outside the rare-disease/NTD target universe: 'Pulmonary Hypertension' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Rheumatoid Arthritis",
+      "reason": "outside the rare-disease/NTD target universe: 'Rheumatoid Arthritis' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Secondary malignant neoplasm of pancreas",
+      "reason": "outside the rare-disease/NTD target universe: 'Secondary malignant neoplasm of pancreas' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    },
+    {
+      "disease_name": "Urinary Incontinence",
+      "reason": "outside the rare-disease/NTD target universe: 'Urinary Incontinence' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). Silver Bullet is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list."
+    }
+  ],
+  "freeze": {
+    "amendments": [
+      {
+        "date": "2026-08-15",
+        "impact": "None on scored outputs: composite scores, ranks, reviewer verdicts, and evidence profiles are deterministic and unchanged. Checkpoint records written before vs after this amendment differ only in the prose rationale field of non-top candidates (LLM prose vs template). RULE_FINGERPRINT (evidence_profile disposition rule) and cases_sha256 are unchanged; frozen_at_commit intentionally left at the freeze commit \u2014 the prod commit-pin check fails open by design (no git in the deployment snapshot).",
+        "reason": "Per-candidate LLM rationale prose was the dominant run cost (Study B: 54,105 rationale calls across 21 targets) while feeding no score, rank, cap, or reviewer verdict \u2014 it is disclosure-only prose passed through to the writer.",
+        "scope": "agents/chemist.py: LLM rationale budgeting (AGENTBIO_MAX_LLM_RATIONALES, default top-25 per target pool; non-eligible candidates get the deterministic templated rationale)"
+      },
+      {
+        "date": "2026-08-17",
+        "impact": "None on scored outputs: identical records are validated (rule_fingerprint + cases_sha256 per record, fail-closed) and identical pools reach scoring; only resume-time memory profile changes. Infrastructure, not rules \u2014 RULE_FINGERPRINT unchanged.",
+        "reason": "The checkpoint grows past 1GB over the run; the old loader's peak RAM footprint is the suspected cause of the 2026-08-17 prod VM restart that wiped an unfinalized pool and ~4.5h of work.",
+        "scope": "validation/run_triage_discrimination_studyc.py: _load_checkpoint now streams line-by-line (was read_text().splitlines(), ~3x transient RAM) and sheds target records for pool-finalized diseases, which assembly never re-reads"
+      },
+      {
+        "date": "2026-08-18",
+        "impact": "Completion semantics only: the disease is disclosed under diseases_excluded (same disclosure path as unscorable cases). No scored row, pool, rule_fingerprint, or metric changes.",
+        "reason": "Case 'Urinary Incontinence' is outside the rare-disease/NTD target universe; the old path returned None on every resume, and results are never written while `skipped` is non-empty \u2014 a terminal wedge once it was the last disease standing.",
+        "scope": "validation/run_triage_discrimination_studyc.py: _build_pool converts DiseaseNotInUniverse into DiseaseUnscorable, so out-of-universe cases are recorded as permanent disclosed exclusions instead of stranding in `skipped`"
+      }
+    ],
+    "cases_sha256": "4df235c43eb772a8f53d7e6823af41995e4531a2190701106f811cd5f8db93ca",
+    "contract": "triage-discrimination-studyc-freeze-v1",
+    "frozen_at_commit": "7a89395d894cba09d1f3f1b001300e7f1d608497",
+    "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf"
+  },
+  "metric_note": "score_auc = P(a confirmed positive's composite_score exceeds a genuine-failure negative's), exact ties at 0.5, among pool-present drugs; pool absence is reported per class, never scored.",
+  "non_disease_blind_pool_caveat": "rank/composite/mechanism dimensions derive from a pool built with disease-linked OpenTargets and trial data; only the disease-independent dimensions are provably blind.",
+  "per_disease": [
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "neg_ranks": [],
+      "negatives": {
+        "absent": 1,
+        "found": 0,
+        "unresolved": 0
+      },
+      "pool_size": 22702,
+      "pos_ranks": [],
+      "positives": {
+        "absent": 1,
+        "found": 0,
+        "unresolved": 0
+      },
+      "score_auc": null
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "neg_ranks": [],
+      "negatives": {
+        "absent": 2,
+        "found": 0,
+        "unresolved": 0
+      },
+      "pool_size": 22042,
+      "pos_ranks": [],
+      "positives": {
+        "absent": 0,
+        "found": 0,
+        "unresolved": 1
+      },
+      "score_auc": null
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "neg_ranks": [],
+      "negatives": {
+        "absent": 2,
+        "found": 0,
+        "unresolved": 0
+      },
+      "pool_size": 4279,
+      "pos_ranks": [
+        64,
+        63,
+        61
+      ],
+      "positives": {
+        "absent": 3,
+        "found": 3,
+        "unresolved": 0
+      },
+      "score_auc": null
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "neg_ranks": [],
+      "negatives": {
+        "absent": 1,
+        "found": 0,
+        "unresolved": 0
+      },
+      "pool_size": 1140,
+      "pos_ranks": [
+        7
+      ],
+      "positives": {
+        "absent": 3,
+        "found": 1,
+        "unresolved": 0
+      },
+      "score_auc": null
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "neg_ranks": [
+        114
+      ],
+      "negatives": {
+        "absent": 1,
+        "found": 1,
+        "unresolved": 0
+      },
+      "pool_size": 6939,
+      "pos_ranks": [],
+      "positives": {
+        "absent": 2,
+        "found": 0,
+        "unresolved": 0
+      },
+      "score_auc": null
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "neg_ranks": [],
+      "negatives": {
+        "absent": 0,
+        "found": 0,
+        "unresolved": 1
+      },
+      "pool_size": 17261,
+      "pos_ranks": [
+        24,
+        25
+      ],
+      "positives": {
+        "absent": 6,
+        "found": 2,
+        "unresolved": 0
+      },
+      "score_auc": null
+    }
+  ],
+  "pooled": {
+    "median_score_auc": null,
+    "n_auc_above_chance": 0,
+    "n_auc_below_chance": 0,
+    "n_diseases": 6,
+    "n_diseases_with_contrast": 0,
+    "negative_pool_presence": {
+      "absent": 7,
+      "found": 1,
+      "unresolved": 1
+    },
+    "positive_pool_presence": {
+      "absent": 15,
+      "found": 6,
+      "unresolved": 1
+    }
+  },
+  "results_sha256": "247bed5353f00e2d6afdd5957f381465fc49c29e97fe1dc1ce0184e7e0240d99",
+  "rows": [
+    {
+      "composite_score": null,
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "Triamcinolone",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 22702
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Triamcinolone",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "Infliximab",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "REVIEW",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 22702
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Infliximab",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "genuine_negative"
+    },
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "RUXOLITINIB",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 1,
+          "rank_fraction": 4.4e-05,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22702
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "RUXOLITINIB",
+        "flags": [
+          "BLACK_BOX_ADVISORY"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY"
+        ]
+      },
+      "rank": 1,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "deucravacitinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 2,
+          "rank_fraction": 8.8e-05,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 22702
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "deucravacitinib",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 2,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "BARICITINIB",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 3,
+          "rank_fraction": 0.000132,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22702
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "BARICITINIB",
+        "flags": [
+          "BLACK_BOX_ADVISORY"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY"
+        ]
+      },
+      "rank": 3,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "tofacitinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 4,
+          "rank_fraction": 0.000176,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22702
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "tofacitinib",
+        "flags": [
+          "BLACK_BOX_ADVISORY"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY"
+        ]
+      },
+      "rank": 4,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "PEFICITINIB",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "PRECLINICAL_ONLY",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 5,
+          "rank_fraction": 0.00022,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 22702
+        },
+        "disposition": "DISQUALIFIED",
+        "drug_name": "PEFICITINIB",
+        "flags": [],
+        "hard_disqualifiers_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "DISQUALIFIED",
+        "primary_hard_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": 5,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "ritlecitinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 6,
+          "rank_fraction": 0.000264,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22702
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "ritlecitinib",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 6,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "golidocitinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 7,
+          "rank_fraction": 0.000308,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 22702
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "golidocitinib",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 7,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "repotrectinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 8,
+          "rank_fraction": 0.000352,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 22702
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "repotrectinib",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 8,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "abrocitinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 9,
+          "rank_fraction": 0.000396,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22702
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "abrocitinib",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 9,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "delgocitinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 10,
+          "rank_fraction": 0.00044,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 22702
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "delgocitinib",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 10,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "Pentosan Polysulfate",
+      "pool_status": "unresolved",
+      "profile": {
+        "audit_status": "unresolved",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "UNRESOLVED_NAME",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 22042
+        },
+        "disposition": "NOT_ASSESSABLE",
+        "drug_name": "Pentosan Polysulfate",
+        "flags": [
+          "UNRESOLVED_NAME"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "Mycophenolate mofetil",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 22042
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Mycophenolate mofetil",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "genuine_negative"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "Mycophenolic acid",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 22042
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Mycophenolic acid",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "genuine_negative"
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "RUXOLITINIB",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 1,
+          "rank_fraction": 4.5e-05,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22042
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "RUXOLITINIB",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 1,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "BARICITINIB",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 2,
+          "rank_fraction": 9.1e-05,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22042
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "BARICITINIB",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 2,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "loxapine",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 3,
+          "rank_fraction": 0.000136,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22042
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "loxapine",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 3,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "olanzapine",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 4,
+          "rank_fraction": 0.000181,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22042
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "olanzapine",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 4,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "tofacitinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 5,
+          "rank_fraction": 0.000227,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22042
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "tofacitinib",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 5,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "DOMPERIDONE",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "PRECLINICAL_ONLY",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 6,
+          "rank_fraction": 0.000272,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 22042
+        },
+        "disposition": "DISQUALIFIED",
+        "drug_name": "DOMPERIDONE",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "DISQUALIFIED",
+        "primary_hard_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 6,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "haloperidol",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 7,
+          "rank_fraction": 0.000318,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22042
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "haloperidol",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 7,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "chlorpromazine",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "FLAGGED",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 8,
+          "rank_fraction": 0.000363,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 22042
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "chlorpromazine",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL",
+          "XLOGP_CAUTION"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "QUALIFIED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [
+          "lipophilicity=FLAGGED"
+        ],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "lipophilicity=FLAGGED",
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 8,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "SULPIRIDE",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "PRECLINICAL_ONLY",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 9,
+          "rank_fraction": 0.000408,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 22042
+        },
+        "disposition": "DISQUALIFIED",
+        "drug_name": "SULPIRIDE",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "DISQUALIFIED",
+        "primary_hard_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 9,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "pramipexole",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 10,
+          "rank_fraction": 0.000454,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 22042
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "pramipexole",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 10,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Betamethasone",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Betamethasone",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Chloroquine",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Chloroquine",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": 0.725,
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Cortisone acetate",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 64,
+          "rank_fraction": 0.014957,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "Cortisone acetate",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 64,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Hydroxychloroquine",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Hydroxychloroquine",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": 0.7298,
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Prednisone",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 63,
+          "rank_fraction": 0.014723,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "Prednisone",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 63,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": 0.7342,
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Triamcinolone",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 61,
+          "rank_fraction": 0.014256,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "Triamcinolone",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 61,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Mycophenolate mofetil",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Mycophenolate mofetil",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "genuine_negative"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Mycophenolic acid",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Mycophenolic acid",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "genuine_negative"
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "fluticasone propionate",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 1,
+          "rank_fraction": 0.000234,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "fluticasone propionate",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 1,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "dexamethasone",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 2,
+          "rank_fraction": 0.000467,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "dexamethasone",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 2,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "prednisolone",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 3,
+          "rank_fraction": 0.000701,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "prednisolone",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 3,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "progesterone",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 4,
+          "rank_fraction": 0.000935,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "progesterone",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 4,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "hydrocortisone",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 5,
+          "rank_fraction": 0.001168,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "hydrocortisone",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 5,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "ciclesonide",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "FLAGGED",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 6,
+          "rank_fraction": 0.001402,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "ciclesonide",
+        "flags": [
+          "EVIDENCE_PARTIAL",
+          "XLOGP_CAUTION"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "QUALIFIED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [
+          "lipophilicity=FLAGGED"
+        ],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "lipophilicity=FLAGGED",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 6,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "budesonide",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 7,
+          "rank_fraction": 0.001636,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "budesonide",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 7,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "difluprednate",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 8,
+          "rank_fraction": 0.00187,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "difluprednate",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 8,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "triamcinolone acetonide",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 9,
+          "rank_fraction": 0.002103,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "triamcinolone acetonide",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 9,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "diflorasone diacetate",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 10,
+          "rank_fraction": 0.002337,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 4279
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "diflorasone diacetate",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 10,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Bortezomib",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Bortezomib",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Carmustine",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Carmustine",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Cyclophosphamide",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Cyclophosphamide",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": 0.8431,
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Lenalidomide",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 7,
+          "rank_fraction": 0.00614,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 1140
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "Lenalidomide",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 7,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Belinostat",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Belinostat",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "genuine_negative"
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "alendronic acid",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 1,
+          "rank_fraction": 0.000877,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "alendronic acid",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 1,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "risedronic acid",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "PRECLINICAL_ONLY",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 2,
+          "rank_fraction": 0.001754,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "DISQUALIFIED",
+        "drug_name": "risedronic acid",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "DISQUALIFIED",
+        "primary_hard_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 2,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "ALENDRONATE SODIUM",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "UNRESOLVED",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 3,
+          "rank_fraction": 0.002632,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "ALENDRONATE SODIUM",
+        "flags": [
+          "EVIDENCE_PARTIAL",
+          "XLOGP_UNRESOLVED"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 3,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "ibandronic acid",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "PRECLINICAL_ONLY",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 4,
+          "rank_fraction": 0.003509,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "DISQUALIFIED",
+        "drug_name": "ibandronic acid",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "DISQUALIFIED",
+        "primary_hard_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 4,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "zoledronic acid",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 5,
+          "rank_fraction": 0.004386,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "zoledronic acid",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 5,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "MINODRONIC ACID",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 6,
+          "rank_fraction": 0.005263,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "MINODRONIC ACID",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 6,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "pomalidomide",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 8,
+          "rank_fraction": 0.007018,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 1140
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "pomalidomide",
+        "flags": [
+          "BLACK_BOX_ADVISORY"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY"
+        ]
+      },
+      "rank": 8,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "thiabendazole",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 9,
+          "rank_fraction": 0.007895,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "thiabendazole",
+        "flags": [],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": 9,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "dasabuvir",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 10,
+          "rank_fraction": 0.008772,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 1140
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "dasabuvir",
+        "flags": [],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": 10,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Cyclophosphamide",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 6939
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Cyclophosphamide",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Vincristine",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 6939
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Vincristine",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": 0.5883,
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Erlotinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 114,
+          "rank_fraction": 0.016429,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 6939
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Erlotinib",
+        "flags": [],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": 114,
+      "row_kind": "genuine_negative"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Pertuzumab",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "REVIEW",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 6939
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Pertuzumab",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "genuine_negative"
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "nortriptyline",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 1,
+          "rank_fraction": 0.000144,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 6939
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "nortriptyline",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 1,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "ALECTINIB",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "FLAGGED",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 2,
+          "rank_fraction": 0.000288,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 6939
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "ALECTINIB",
+        "flags": [
+          "XLOGP_CAUTION"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "QUALIFIED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [
+          "lipophilicity=FLAGGED"
+        ],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "lipophilicity=FLAGGED"
+        ]
+      },
+      "rank": 2,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "CRIZOTINIB",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 3,
+          "rank_fraction": 0.000432,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 6939
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "CRIZOTINIB",
+        "flags": [],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": 3,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "dexmethylphenidate",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 4,
+          "rank_fraction": 0.000576,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 6939
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "dexmethylphenidate",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 4,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "citalopram",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 5,
+          "rank_fraction": 0.000721,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 6939
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "citalopram",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 5,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "mazindol",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 6,
+          "rank_fraction": 0.000865,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 6939
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "mazindol",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 6,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "FORODESINE",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "PRECLINICAL_ONLY",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 7,
+          "rank_fraction": 0.001009,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 6939
+        },
+        "disposition": "DISQUALIFIED",
+        "drug_name": "FORODESINE",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "DISQUALIFIED",
+        "primary_hard_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 7,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "FORODESINE HYDROCHLORIDE",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "UNRESOLVED",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 8,
+          "rank_fraction": 0.001153,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 6939
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "FORODESINE HYDROCHLORIDE",
+        "flags": [
+          "EVIDENCE_PARTIAL",
+          "XLOGP_UNRESOLVED"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 8,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "fluoxetine",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 9,
+          "rank_fraction": 0.001297,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 6939
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "fluoxetine",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 9,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "clomipramine",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "FLAGGED",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 10,
+          "rank_fraction": 0.001441,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 6939
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "clomipramine",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL",
+          "XLOGP_CAUTION"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "QUALIFIED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [
+          "lipophilicity=FLAGGED"
+        ],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "lipophilicity=FLAGGED",
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 10,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Adalimumab",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "REVIEW",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Adalimumab",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Cortisone acetate",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Cortisone acetate",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "golimumab",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "REVIEW",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "golimumab",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Infliximab",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "REVIEW",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Infliximab",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": 0.725,
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Mesalazine",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 24,
+          "rank_fraction": 0.00139,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "Mesalazine",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 24,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Sulfadiazine",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Sulfadiazine",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": 0.725,
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Sulfasalazine",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "HUMAN_PRESENT",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 25,
+          "rank_fraction": 0.001448,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "Sulfasalazine",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 25,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Vedolizumab",
+      "pool_status": "absent",
+      "profile": {
+        "audit_status": "absent",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "REVIEW",
+          "pool_presence": "ABSENT_FROM_POOL",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "Vedolizumab",
+        "flags": [
+          "ABSENT_FROM_POOL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "confirmed_positive"
+    },
+    {
+      "composite_score": null,
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "L-Carnitine",
+      "pool_status": "unresolved",
+      "profile": {
+        "audit_status": "unresolved",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "FLAGGED",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "UNRESOLVED",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "UNRESOLVED_NAME",
+          "rank": null,
+          "rank_fraction": null,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "NOT_ASSESSABLE",
+        "drug_name": "L-Carnitine",
+        "flags": [
+          "UNRESOLVED_NAME"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": null,
+      "row_kind": "genuine_negative"
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "RUXOLITINIB",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 1,
+          "rank_fraction": 5.8e-05,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 17261
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "RUXOLITINIB",
+        "flags": [
+          "BLACK_BOX_ADVISORY"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY"
+        ]
+      },
+      "rank": 1,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "baricitinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 2,
+          "rank_fraction": 0.000116,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 17261
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "baricitinib",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 2,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "tofacitinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 3,
+          "rank_fraction": 0.000174,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 17261
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "tofacitinib",
+        "flags": [
+          "BLACK_BOX_ADVISORY"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY"
+        ]
+      },
+      "rank": 3,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "peficitinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "PRECLINICAL_ONLY",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 4,
+          "rank_fraction": 0.000232,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "DISQUALIFIED",
+        "drug_name": "peficitinib",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "DISQUALIFIED",
+        "primary_hard_fired": [
+          "human_mechanism_evidence=PRECLINICAL_ONLY"
+        ],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 4,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "MOMELOTINIB",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "COMPLETE",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 5,
+          "rank_fraction": 0.00029,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "SUPPORTED",
+        "drug_name": "MOMELOTINIB",
+        "flags": [],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": []
+      },
+      "rank": 5,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "RUXOLITINIB PHOSPHATE",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "UNRESOLVED",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 6,
+          "rank_fraction": 0.000348,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 17261
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "RUXOLITINIB PHOSPHATE",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL",
+          "XLOGP_UNRESOLVED"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 6,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "pacritinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 7,
+          "rank_fraction": 0.000406,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "pacritinib",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 7,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "zileuton",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 8,
+          "rank_fraction": 0.000463,
+          "route_feasibility": "CLEAR",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "zileuton",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 8,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "filgotinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "UNRESOLVED",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "UNRESOLVED",
+          "pool_presence": "IN_POOL",
+          "rank": 9,
+          "rank_fraction": 0.000521,
+          "route_feasibility": "UNRESOLVED",
+          "safety": "CLEAR",
+          "total_candidates": 17261
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "filgotinib",
+        "flags": [
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 9,
+      "row_kind": "context_top_candidate"
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "ritlecitinib",
+      "pool_status": "found",
+      "profile": {
+        "audit_status": "found",
+        "contract": "evidence-profile-v1",
+        "dimension_dependency": {
+          "disease_dependent": [
+            "evidence_coverage",
+            "mechanism_direction",
+            "pool_presence",
+            "rank",
+            "rank_fraction",
+            "safety",
+            "total_candidates"
+          ],
+          "disease_independent": [
+            "combination_product",
+            "human_mechanism_evidence",
+            "lipophilicity",
+            "modality_feasibility",
+            "route_feasibility"
+          ]
+        },
+        "dimensions": {
+          "combination_product": "CLEAR",
+          "evidence_coverage": "PARTIAL",
+          "human_mechanism_evidence": "UNRESOLVED",
+          "lipophilicity": "CLEAR",
+          "mechanism_direction": "COMPATIBLE",
+          "modality_feasibility": "CLEAR",
+          "pool_presence": "IN_POOL",
+          "rank": 10,
+          "rank_fraction": 0.000579,
+          "route_feasibility": "CLEAR",
+          "safety": "ADVISORY",
+          "total_candidates": 17261
+        },
+        "disposition": "QUALIFIED",
+        "drug_name": "ritlecitinib",
+        "flags": [
+          "BLACK_BOX_ADVISORY",
+          "EVIDENCE_PARTIAL"
+        ],
+        "hard_disqualifiers_fired": [],
+        "holdout_redaction_applied": true,
+        "primary_disposition": "SUPPORTED",
+        "primary_hard_fired": [],
+        "primary_soft_fired": [],
+        "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf",
+        "soft_cautions_fired": [
+          "safety=ADVISORY",
+          "evidence_coverage=PARTIAL"
+        ]
+      },
+      "rank": 10,
+      "row_kind": "context_top_candidate"
+    }
+  ],
+  "rule_fingerprint": "c600f834faf889d8f9dd97eaff0d0fbcf4cb96e07828bfacad69168619d260bf"
+}
