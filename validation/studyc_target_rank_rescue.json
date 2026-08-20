@@ -1,0 +1,135 @@
+{
+  "contract": "studyc-target-rank-rescue-v1",
+  "misses": 11,
+  "never_in_universe": 11,
+  "note": "Post-hoc: rank of each missed positive's mechanism target in the disease's full ranked target list. rescued_at_k = misses whose best target rank <= K.",
+  "rescued_at_k": {
+    "3": 0,
+    "5": 0,
+    "10": 0,
+    "25": 0
+  },
+  "rows": [
+    {
+      "best_rank": null,
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "Triamcinolone",
+      "in_universe_at_all": false,
+      "mechanism_targets": [
+        "GLUCOCORTICOID RECEPTOR"
+      ],
+      "n_targets_considered": 5,
+      "target_ranks": {}
+    },
+    {
+      "best_rank": null,
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Betamethasone",
+      "in_universe_at_all": false,
+      "mechanism_targets": [
+        "GLUCOCORTICOID RECEPTOR"
+      ],
+      "n_targets_considered": 5,
+      "target_ranks": {}
+    },
+    {
+      "best_rank": null,
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Chloroquine",
+      "in_universe_at_all": false,
+      "mechanism_targets": [
+        "FERRIPROTOPORPHYRIN IX"
+      ],
+      "n_targets_considered": 5,
+      "target_ranks": {}
+    },
+    {
+      "best_rank": null,
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Hydroxychloroquine",
+      "in_universe_at_all": false,
+      "mechanism_targets": [
+        "FERRIPROTOPORPHYRIN IX"
+      ],
+      "n_targets_considered": 5,
+      "target_ranks": {}
+    },
+    {
+      "best_rank": null,
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Bortezomib",
+      "in_universe_at_all": false,
+      "mechanism_targets": [
+        "26S PROTEASOME"
+      ],
+      "n_targets_considered": 20,
+      "target_ranks": {}
+    },
+    {
+      "best_rank": null,
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Carmustine",
+      "in_universe_at_all": false,
+      "mechanism_targets": [
+        "GLUTATHIONE REDUCTASE, MITOCHONDRIAL"
+      ],
+      "n_targets_considered": 20,
+      "target_ranks": {}
+    },
+    {
+      "best_rank": null,
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Cyclophosphamide",
+      "in_universe_at_all": false,
+      "mechanism_targets": [
+        "DNA"
+      ],
+      "n_targets_considered": 20,
+      "target_ranks": {}
+    },
+    {
+      "best_rank": null,
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Cyclophosphamide",
+      "in_universe_at_all": false,
+      "mechanism_targets": [
+        "DNA"
+      ],
+      "n_targets_considered": 15,
+      "target_ranks": {}
+    },
+    {
+      "best_rank": null,
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Vincristine",
+      "in_universe_at_all": false,
+      "mechanism_targets": [
+        "TUBULIN"
+      ],
+      "n_targets_considered": 15,
+      "target_ranks": {}
+    },
+    {
+      "best_rank": null,
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Cortisone acetate",
+      "in_universe_at_all": false,
+      "mechanism_targets": [
+        "GLUCOCORTICOID RECEPTOR"
+      ],
+      "n_targets_considered": 5,
+      "target_ranks": {}
+    },
+    {
+      "best_rank": null,
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Sulfadiazine",
+      "in_universe_at_all": false,
+      "mechanism_targets": [
+        "DIHYDROPTEROATE SYNTHASE"
+      ],
+      "n_targets_considered": 5,
+      "target_ranks": {}
+    }
+  ]
+}

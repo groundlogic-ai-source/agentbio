@@ -1,0 +1,62 @@
+{
+  "Giant Cell Arteritis": [
+    "JAK1",
+    "JAK2",
+    "JAK3",
+    "TYK2",
+    "IL6R"
+  ],
+  "Lupus Erythematosus, Systemic": [
+    "TLR7",
+    "TLR9",
+    "NR3C1",
+    "TNFSF13B",
+    "IFNAR1"
+  ],
+  "Multiple Myeloma": [
+    "CRBN",
+    "FKBP1A",
+    "CD38",
+    "FDPS",
+    "TOP2A",
+    "GSR",
+    "NR3C1",
+    "CXCR4",
+    "NRAS",
+    "TNFSF11",
+    "XPO1",
+    "JAK1",
+    "SLAMF7",
+    "GPRC5D",
+    "TUBB",
+    "TUBA1A",
+    "STAT3",
+    "DRD3",
+    "DRD2",
+    "TNFRSF17"
+  ],
+  "Neuroblastoma": [
+    "GBA",
+    "DRD3",
+    "DRD1",
+    "ALK",
+    "C5",
+    "PNP",
+    "IMPDH1",
+    "HPRT1",
+    "TUBB",
+    "TUBA1A",
+    "LMO1",
+    "BARD1",
+    "PHOX2B",
+    "DRD2",
+    "ATRX"
+  ],
+  "Ulcerative Colitis": [
+    "JAK2",
+    "JAK3",
+    "TNF",
+    "IL12B",
+    "PPARG"
+  ]
+}
