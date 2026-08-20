@@ -35,7 +35,9 @@ from agents.target_selection import OUTPUT_DIR
 from agents import provenance
 from agents.mutation_disclosure import detect_mutation_specificity
 from agents.biologist import get_pathway_neighbor_targets
-from data_sources.chembl import get_target_candidate_compounds, get_drug_indications
+from data_sources.chembl import (
+    get_target_candidate_compounds, get_drug_indications,
+    get_mechanism_only_approved_drugs)
 from data_sources.pubchem import get_compound_data, get_drug_classification
 from data_sources.openfda import get_label_indications, get_label_mechanism
 from data_sources.multisource_candidates import collect_target_candidates
@@ -120,6 +122,12 @@ def _is_max_phase_approved(max_phase: Any) -> bool:
         return float(max_phase) >= 4
     except (TypeError, ValueError):
         return False
+
+
+def _v2_lanes_disabled() -> bool:
+    """Kill switch restoring machine-v1 pool semantics (mirrors the helper in
+    agents/target_selection.py — keep both reading the same env var)."""
+    return os.environ.get("AGENTBIO_DISABLE_V2_LANES", "").strip() == "1"
 
 
 def _fallback_rationale(c: dict[str, Any], sim_drug: Optional[str], tanimoto: float,
@@ -356,6 +364,30 @@ def run_chemist(biologist_output: dict[str, Any],
               f"{len(compounds)} approved compound(s) (unapproved tool "
               f"compounds dropped at collection time)")
 
+    # Machine-v2 coverage lane (2026-08-20): append APPROVED drugs that hold
+    # a ChEMBL mechanism_of_action row against this target but no qualifying
+    # IC50/Ki activity row. The Study C v1 autopsy showed the activity pool
+    # structurally excludes biologics (mechanism rows, never pChEMBL rows)
+    # and assay-strictness cases. pool_origin="mechanism_only" travels with
+    # each such candidate so reviewer/writer can disclose the weaker,
+    # mechanism-only evidence basis. Fail-soft: lane errors never block the
+    # activity pool.
+    if not _v2_lanes_disabled():
+        try:
+            mech = get_mechanism_only_approved_drugs(uniprot)
+            existing_ids = {c.get("molecule_chembl_id") for c in compounds}
+            new_mech = [m for m in mech
+                        if m["molecule_chembl_id"] not in existing_ids]
+            if new_mech:
+                print(f"[chemist] mechanism-only lane: +{len(new_mech)} "
+                      f"approved drug(s) with mechanism rows but no "
+                      f"qualifying activity "
+                      f"({[m.get('pref_name') for m in new_mech][:6]})")
+                compounds = compounds + new_mech
+        except Exception as e:  # noqa: BLE001
+            print(f"[chemist] WARNING: mechanism-only lane failed for "
+                  f"{symbol} ({uniprot}): {e}")
+
     # Enrich primary target's compounds via the shared helper.
     primary_disc_method = target.get("target_discovery_method", "genetic_association")
     enriched = _enrich_compounds(
@@ -560,8 +592,23 @@ def run_chemist(biologist_output: dict[str, Any],
             # pathways (specificity_tier == "broad_metabolic").  Surfaces in the report
             # so reviewers can judge compartment/mechanism compatibility independently.
             "pathway_specificity_note": e.get("pathway_specificity_note"),
+            # Machine-v2 mechanism-only lane passthrough: these fields carry
+            # the row's true evidence basis. The ledger normalizer branches on
+            # pool_origin (MECHANISM record, never a null-pChEMBL bioactivity
+            # record) and the reviewer/writer disclose the mechanism text.
+            "pool_origin": e.get("pool_origin"),
+            "mechanism_of_action": e.get("mechanism_of_action"),
+            "action_type": e.get("action_type"),
+            "molecule_type": e.get("molecule_type"),
         })
 
+        if e.get("pool_origin") == "mechanism_only":
+            prov_entries.append({
+                "source_type": "chembl_mechanism",
+                "source_id": e["molecule_chembl_id"],
+                "used_by": "chemist",
+                "context": f"{e['drug_name']} mechanism row vs {e_sym}",
+            })
         for aid in e.get("source_activity_ids", []):
             prov_entries.append({
                 "source_type": "chembl_activity",

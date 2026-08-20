@@ -36,21 +36,6 @@ args = "build-audit-claimset-v2"
 task = "workflow.run"
 args = "audit-claimset-v2-run"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "triage-discrimination-studyb"
-
-[[workflows.workflow]]
-name = "triage-discrimination-studyb"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace && ( for i in $(seq 1 30); do AGENTBIO_PREFETCH_STALL_EXIT_SECONDS=600 python3 -m validation.run_triage_discrimination_studyb; rc=$?; echo \"[dev-supervisor] attempt $i rc=$rc\"; if [ $rc -eq 86 ] || [ $rc -eq 1 ]; then sleep 60; else break; fi; done ) 2>&1 | tee /tmp/triage_discrimination_studyb.log"
-
 [[workflows.workflow]]
 name = "await-pubchem-harvest"
 author = "agent"

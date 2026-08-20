@@ -1223,6 +1223,122 @@ def get_drug_mechanism_targets_for_audit(
         return []
 
 
+def get_mechanism_only_approved_drugs(
+    uniprot_id: str,
+    limit: int = 40,
+) -> list[dict[str, Any]]:
+    """Machine-v2 coverage lane (2026-08-20): APPROVED drugs holding a ChEMBL
+    mechanism_of_action row against this target, with NO requirement for a
+    qualifying IC50/Ki activity measurement.
+
+    Why: the Study C v1 miss autopsy showed the activity pool structurally
+    excludes biologics (antibodies carry mechanism rows, never pChEMBL rows)
+    and assay-strictness cases (the Sapropterin class: right target, no
+    IC50/Ki assay). mechanism.json keyed by target_chembl_id is the only
+    ChEMBL endpoint that surfaces them.
+
+    Returns dicts shaped like get_target_candidate_compounds entries
+    (pchembl_value=None, n_activities=0) plus pool_origin="mechanism_only"
+    and the mechanism/action strings, so downstream stages can disclose the
+    weaker, mechanism-only evidence basis. Callers dedup against the
+    activity pool by molecule_chembl_id. Cached 30d; failures NOT cached
+    (cache-poisoning convention).
+    """
+    # v2 key: v1 was written before the empty-payload/partial-aggregate cache
+    # hardening; its entries may freeze ambiguous empties for 30 days.
+    cache_key = make_key("mechanism_only_approved_v2", uniprot_id, limit)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    try:
+        target_ids = _resolve_target_chembl_id(uniprot_id)
+    except Exception as e:
+        print(f"[chembl] WARNING: mechanism-only lane target resolution "
+              f"failed for '{uniprot_id}': {e}")
+        return []  # not cached
+    if not target_ids:
+        # No ChEMBL target for this UniProt: ambiguous between "genuinely
+        # unmapped" and a degraded search response — do NOT cache (empty
+        # payload = failure convention).
+        return []
+
+    by_mid: dict[str, dict[str, Any]] = {}
+    saw_mechanism_rows = False
+    saw_empty_endpoint = False
+    try:
+        for tid in target_ids:
+            data = _get_json(f"{BASE_URL}/mechanism.json",
+                             {"target_chembl_id": tid, "limit": 1000})
+            mechs = data.get("mechanisms", []) or []
+            if mechs:
+                saw_mechanism_rows = True
+            else:
+                # An empty endpoint is ambiguous (ChEMBL's degraded-200
+                # outage mode) — even if other endpoints returned rows, the
+                # aggregate may be missing this endpoint's drugs.
+                saw_empty_endpoint = True
+            for m in mechs:
+                mid = m.get("molecule_chembl_id")
+                if not mid:
+                    continue
+                entry = by_mid.setdefault(mid, {"moas": [], "actions": []})
+                moa = (m.get("mechanism_of_action") or "").strip()
+                if moa and moa not in entry["moas"]:
+                    entry["moas"].append(moa)
+                act = (m.get("action_type") or "").strip()
+                if act and act not in entry["actions"]:
+                    entry["actions"].append(act)
+    except Exception as e:
+        print(f"[chembl] WARNING: mechanism-only lane mechanism query failed "
+              f"for '{uniprot_id}': {e}")
+        return []  # transient failure must not be cached as "no drugs"
+
+    results: list[dict[str, Any]] = []
+    try:
+        for mid in sorted(by_mid)[:limit]:  # stable order: deterministic cap
+            mol = _get_json(f"{BASE_URL}/molecule/{mid}.json")
+            mp = mol.get("max_phase")
+            try:
+                approved = mp is not None and float(mp) >= 4
+            except (TypeError, ValueError):
+                approved = False
+            if not approved:
+                continue
+            structs = mol.get("molecule_structures") or {}
+            results.append({
+                "molecule_chembl_id": mid,
+                "pref_name": mol.get("pref_name"),
+                "max_phase": mp,
+                "molecule_type": mol.get("molecule_type"),
+                "canonical_smiles": structs.get("canonical_smiles"),
+                "pchembl_value": None,
+                "confidence_score": None,
+                "n_activities": 0,
+                "source_activity_ids": [],
+                "source_assay_ids": [],
+                "source_chembl_ids": [mid],
+                "pool_origin": "mechanism_only",
+                "mechanism_of_action": "; ".join(by_mid[mid]["moas"]),
+                "action_type": "; ".join(by_mid[mid]["actions"]),
+            })
+    except Exception as e:
+        print(f"[chembl] WARNING: mechanism-only lane molecule lookup failed "
+              f"for '{uniprot_id}': {e}")
+        return []  # partial aggregates must not be cached
+
+    if (results or saw_mechanism_rows) and not saw_empty_endpoint:
+        # Cache only when every resolved target endpoint returned a
+        # non-ambiguous payload. Any empty endpoint is outage-suspect
+        # (degraded-200 mode) and must not freeze a partial aggregate —
+        # or a baseless "no mechanism drugs" — for 30 days.
+        cache_set(cache_key, results, ttl_days=30)
+    if results:
+        print(f"[chembl] mechanism-only lane: {len(results)} approved "
+              f"mechanism-row drug(s) for {uniprot_id}")
+    return results
+
+
 def get_molecule_data(drug_name: str) -> dict[str, Any]:
     """
     Drug-level ChEMBL lookup: molecule_type, max_phase (global), oral flag.

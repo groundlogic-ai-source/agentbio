@@ -42,6 +42,27 @@ from data_sources.clinicaltrials import check_prior_trials
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "output")
 TOP_N = 30
 TOP_TARGETS_PER_DISEASE = 5
+
+# --- Machine-v2 pathway-neighbor universe lane (2026-08-20) -----------------
+# Study C v1 miss autopsy: 11/22 confirmed positives were unscoreable because
+# the known drug's mechanism target never entered the disease's candidate
+# target UNIVERSE (rescued_at_k = 0 even at K=25 — the wall is upstream of the
+# top-K gate). Path D expands the universe with Reactome pathway neighbors of
+# the leading drug-FREE targets (genetic + literature lanes only; expanding
+# from pharmacological-precedent targets would make the lane drug-derived).
+# Neighbors carry a fixed association score of 0.05 — half the 0.1 genetic
+# gate — so they rank below direct targets of comparable tractability. Rank
+# stays score-governed: a highly tractable neighbor MAY outrank a weakly
+# tractable direct target; that is intended, the lane handicaps, it does not
+# subordinate. Disease-blind: only protein co-participation is used, never
+# drug data, so benchmark holdout is preserved.
+PATHWAY_NEIGHBOR_MAX_SOURCES = 5     # expand from the first N eligible targets
+PATHWAY_NEIGHBOR_PER_SOURCE = 4      # neighbors considered per source target
+PATHWAY_NEIGHBOR_MAX_ADDED = 10      # total neighbor targets per disease
+PATHWAY_NEIGHBOR_ASSOC_SCORE = 0.05  # below the 0.1 genetic-association gate
+# Only drug-free discovery lanes may seed expansion (disease-blind boundary).
+PATHWAY_NEIGHBOR_SOURCE_METHODS = frozenset({
+    "genetic_association", "literature_mechanism_class"})
 # Provisional v2 engineering policy: literature-supported process targets carry
 # moderate disease specificity. This is fixed independently of the five
 # acceptance fixtures and must be calibrated on a broader drug-grouped corpus
@@ -540,6 +561,75 @@ def _match_disease(query: str, candidates: list[dict[str, Any]]) -> Optional[dic
     return None
 
 
+def _v2_lanes_disabled() -> bool:
+    """Kill switch restoring machine-v1 semantics (mirrors the helper in
+    agents/chemist.py — keep both reading the same env var)."""
+    return os.environ.get("AGENTBIO_DISABLE_V2_LANES", "").strip() == "1"
+
+
+def _expand_pathway_neighbors(
+    top_targets: list[dict[str, Any]],
+    log,
+) -> list[dict[str, Any]]:
+    """Path D (machine v2): append Reactome pathway-neighbor targets.
+
+    Expands from the first PATHWAY_NEIGHBOR_MAX_SOURCES targets discovered by
+    drug-FREE lanes (PATHWAY_NEIGHBOR_SOURCE_METHODS: genetic association and
+    literature mechanism class), skipping the broad_metabolic tier
+    (shared-substrate groupings are not mechanism evidence — see
+    data_sources/reactome.py calibration). Neighbors are deduped by UniProt,
+    capped at PATHWAY_NEIGHBOR_MAX_ADDED, and tagged
+    target_discovery_method="pathway_neighbor" with provenance metadata.
+    Fail-soft: any per-source failure logs and continues with that source
+    skipped. Never rescues a disease from "nothing to score": with no direct
+    targets there are no sources to expand from.
+    """
+    if _v2_lanes_disabled() or not top_targets:
+        return top_targets
+    from data_sources.reactome import get_pathway_neighbors
+    seen = {t.get("uniprot_id") for t in top_targets if t.get("uniprot_id")}
+    sources = [t for t in top_targets
+               if t.get("target_discovery_method", "genetic_association")
+               in PATHWAY_NEIGHBOR_SOURCE_METHODS]
+    added: list[dict[str, Any]] = []
+    for src in sources[:PATHWAY_NEIGHBOR_MAX_SOURCES]:
+        uid = src.get("uniprot_id")
+        if not uid:
+            continue
+        try:
+            neighbors = get_pathway_neighbors(
+                uid, max_neighbors=PATHWAY_NEIGHBOR_PER_SOURCE)
+        except Exception as exc:  # noqa: BLE001
+            log(f"  WARN pathway-neighbor lane failed for "
+                f"{src.get('target_symbol')} ({uid}): {exc}")
+            continue
+        for n in neighbors:
+            nuid = n.get("uniprot_id")
+            if not nuid or nuid in seen:
+                continue
+            if n.get("specificity_tier") == "broad_metabolic":
+                continue
+            seen.add(nuid)
+            added.append({
+                "target_symbol": n.get("gene_name"),
+                "uniprot_id": nuid,
+                "association_score": PATHWAY_NEIGHBOR_ASSOC_SCORE,
+                "target_discovery_method": "pathway_neighbor",
+                "pathway_neighbor_of": src.get("target_symbol"),
+                "pathway_neighbor_tier": n.get("specificity_tier"),
+                "pathway_neighbor_pathways": n.get("shared_pathway_names", [])[:3],
+                "pathway_neighbor_count": n.get("pathway_count", 0),
+            })
+            if len(added) >= PATHWAY_NEIGHBOR_MAX_ADDED:
+                break
+        if len(added) >= PATHWAY_NEIGHBOR_MAX_ADDED:
+            break
+    if added:
+        log(f"  Pathway-neighbor targets added (machine v2): "
+            f"{[t['target_symbol'] for t in added]}")
+    return top_targets + added
+
+
 def select_for_disease(query: str) -> list[dict[str, Any]]:
     """
     Manual mode: look up a single disease in the rare/NTD universe and score its
@@ -875,6 +965,11 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
             f"{process_env.get('status')}: {process_env.get('error')}"
         )
     top_targets = top_targets + process_targets
+
+    # Path D — pathway-neighbor universe expansion (machine v2). Appended
+    # after the literature mechanism-class lane so neighbors are scored and
+    # ranked by the same _score_pair formula as every direct target.
+    top_targets = _expand_pathway_neighbors(top_targets, log=_log)
 
     if not top_targets:
         raise RuntimeError(

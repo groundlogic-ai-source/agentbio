@@ -33,11 +33,14 @@ def _run_check(classify_text: str) -> dict:
         safety_check, "cache_set"
     ), patch.object(
         safety_check.anthropic, "Anthropic"
-    ) as constructor:
+    ) as constructor, patch.object(
+        # Step 2 classification moved to the provider round-robin helper in
+        # Amendment 3 (5f0a55e) — mock it where safety_check looks it up.
+        safety_check, "chat_text", return_value=(classify_text, "mock")
+    ):
         client = MagicMock()
         client.messages.create.side_effect = [
             _text_response("Search results about the drug's regulatory history."),
-            _text_response(classify_text),
         ]
         constructor.return_value = client
         return safety_check.web_safety_check("ControlDrug")

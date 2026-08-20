@@ -146,3 +146,45 @@ universe" partly reflects mechanism-knowledge gaps, not only selection.
 would re-measure this ceiling. Build machine v2 (universe expansion first),
 then freeze v2 cases against the new machine, and re-run v1's six diseases
 as the labeled sensitivity cohort for the before/after claim.
+
+## Machine v2 built + acceptance-measured (2026-08-20)
+
+Shipped two coverage lanes, both kill-switched by `AGENTBIO_DISABLE_V2_LANES=1`:
+
+1. **Path D — pathway-neighbor universe expansion** (`select_for_disease`):
+   Reactome neighbors of drug-FREE seed targets only (genetic + literature
+   lanes; pharmacological-precedent rows cannot seed), broad_metabolic tier
+   excluded, ≤10 per disease, fixed association score 0.05 (half the genetic
+   gate — handicapped, score-governed, not strictly subordinated).
+2. **Mechanism-only pool supplement** (`run_chemist` +
+   `chembl.get_mechanism_only_approved_drugs`): approved drugs with a ChEMBL
+   mechanism row but no qualifying IC50/Ki (biologics structurally; the
+   Sapropterin assay-strictness class). Rows carry pool_origin/mechanism/
+   action through the chemist projection and normalize to a ledger MECHANISM
+   record — never a null-pChEMBL bioactivity record. Cache discipline: any
+   empty mechanism endpoint across all resolved target IDs = not cached;
+   key namespaced `mechanism_only_approved_v2`.
+
+**Acceptance result (validation/machine_v2_acceptance.json, exit 0,
+integrity-gated): 0/16 v1 misses rescued.** Universe superset holds on all
+six v1 diseases (v2 adds 0–19 targets/disease, e.g. UC 5→24, MM 20→30).
+The 11 target_not_selected misses stay out: their targets are mechanistically
+ORTHOGONAL to the disease's genetic/literature neighborhood (glucocorticoid
+receptor for GCA/Lupus, proteasome/HDAC for myeloma), not pathway-adjacent.
+The 4 UC biologics stay out one gate later: TNF/ITGA4 enter no top-5
+selection, so the mechanism lane never fires for them.
+
+**What this means:** pathway expansion and biologic lanes are live, safe, and
+improve sparse-universe diseases and evidence honesty — but they do NOT move
+the v1 cohort. The measured ceiling is mechanistic novelty: drugs whose
+working target has no genetic/literature/precedent link to the disease are
+unreachable by ANY target-anchored lane. v2 case-set design should therefore
+expect recall similar to v1 on established-therapy positives and treat the
+discrimination claim as resting on rank quality of found positives, not
+coverage growth. A genuinely different lever (indication-anchored /
+phenotype-first discovery) would be a separate, larger machine change.
+
+Reviewed by architect subagent across 4 rounds (FAIL→FAIL→FAIL→PASS);
+final full suite green. New regressions: validation/test_mechanism_only_lane.py
+(6 tests); safety L2 test rot from Amendment 3 fixed (mock now patches
+chat_text, the round-robin seam).

@@ -1,0 +1,172 @@
+{
+  "based_on_autopsy": "validation/studyc_miss_autopsy.json",
+  "contract": "machine-v2-acceptance-v1",
+  "either_rescued": 0,
+  "misses_evaluated": 16,
+  "missing_v1_baseline": [],
+  "pool_rescued": 0,
+  "rows": [
+    {
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "Triamcinolone",
+      "miss_class": "target_not_selected",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "Pentosan Polysulfate",
+      "miss_class": "no_mechanism_data",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Betamethasone",
+      "miss_class": "target_not_selected",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Chloroquine",
+      "miss_class": "target_not_selected",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Hydroxychloroquine",
+      "miss_class": "target_not_selected",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Bortezomib",
+      "miss_class": "target_not_selected",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Carmustine",
+      "miss_class": "target_not_selected",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Cyclophosphamide",
+      "miss_class": "target_not_selected",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Cyclophosphamide",
+      "miss_class": "target_not_selected",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Vincristine",
+      "miss_class": "target_not_selected",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Adalimumab",
+      "miss_class": "biologic_structural",
+      "pool_detail": "drug target not among top-5 selected rows",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Cortisone acetate",
+      "miss_class": "target_not_selected",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "golimumab",
+      "miss_class": "biologic_structural",
+      "pool_detail": "drug target not among top-5 selected rows",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Infliximab",
+      "miss_class": "biologic_structural",
+      "pool_detail": "drug target not among top-5 selected rows",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Sulfadiazine",
+      "miss_class": "target_not_selected",
+      "pool_detail": "",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    },
+    {
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Vedolizumab",
+      "miss_class": "biologic_structural",
+      "pool_detail": "drug target not among top-5 selected rows",
+      "pool_rescued": false,
+      "universe_method": null,
+      "universe_rank": null,
+      "universe_rescued": false
+    }
+  ],
+  "universe_rescued": 0,
+  "universe_superset_of_v1": true
+}
