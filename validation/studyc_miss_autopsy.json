@@ -1,0 +1,592 @@
+{
+  "based_on_results_sha256": "247bed5353f00e2d6afdd5957f381465fc49c29e97fe1dc1ce0184e7e0240d99",
+  "contract": "studyc-miss-autopsy-v1",
+  "note": "Post-hoc forensic analysis over frozen v1 artifacts; no pipeline stage re-run, no frozen file modified.",
+  "rows": [
+    {
+      "chembl_id": "CHEMBL1451",
+      "detail": "targets ['GLUCOCORTICOID RECEPTOR'] not among selected ['JAK1', 'JAK2', 'JAK3'] (Small molecule)",
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "Triamcinolone",
+      "mechanism_targets": [
+        "GLUCOCORTICOID RECEPTOR"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "JAK1",
+        "JAK2",
+        "JAK3"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1201581",
+      "detail": "molecule_type=Antibody",
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "Infliximab",
+      "mechanism_targets": [
+        "TUMOR NECROSIS FACTOR"
+      ],
+      "miss_class": "biologic_structural",
+      "molecule_type": "Antibody",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "genuine_negative",
+      "selected_targets": [
+        "JAK1",
+        "JAK2",
+        "JAK3"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1201516",
+      "detail": "molecule_type=?",
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "Pentosan Polysulfate",
+      "mechanism_targets": [],
+      "miss_class": "no_mechanism_data",
+      "molecule_type": null,
+      "pool_status": "unresolved",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "JAK1",
+        "STAT3",
+        "DRD3"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1456",
+      "detail": "targets [\"INOSINE-5'-MONOPHOSPHATE DEHYDROGENASE (IMPDH)\"] not among selected ['JAK1', 'STAT3', 'DRD3'] (Small molecule)",
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "Mycophenolate mofetil",
+      "mechanism_targets": [
+        "INOSINE-5'-MONOPHOSPHATE DEHYDROGENASE (IMPDH)"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "genuine_negative",
+      "selected_targets": [
+        "JAK1",
+        "STAT3",
+        "DRD3"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL866",
+      "detail": "targets [\"INOSINE-5'-MONOPHOSPHATE DEHYDROGENASE (IMPDH)\"] not among selected ['JAK1', 'STAT3', 'DRD3'] (Small molecule)",
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "Mycophenolic acid",
+      "mechanism_targets": [
+        "INOSINE-5'-MONOPHOSPHATE DEHYDROGENASE (IMPDH)"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "genuine_negative",
+      "selected_targets": [
+        "JAK1",
+        "STAT3",
+        "DRD3"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL632",
+      "detail": "targets ['GLUCOCORTICOID RECEPTOR'] not among selected ['NR3C1', 'TNFSF13B', 'IFNAR1'] (Small molecule)",
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Betamethasone",
+      "mechanism_targets": [
+        "GLUCOCORTICOID RECEPTOR"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "NR3C1",
+        "TNFSF13B",
+        "IFNAR1"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL76",
+      "detail": "targets ['FERRIPROTOPORPHYRIN IX'] not among selected ['NR3C1', 'TNFSF13B', 'IFNAR1'] (Small molecule)",
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Chloroquine",
+      "mechanism_targets": [
+        "FERRIPROTOPORPHYRIN IX"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "NR3C1",
+        "TNFSF13B",
+        "IFNAR1"
+      ]
+    },
+    {
+      "chembl_id": null,
+      "detail": "",
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Cortisone acetate",
+      "mechanism_targets": [],
+      "miss_class": "found",
+      "molecule_type": null,
+      "pool_status": "found",
+      "rank": 64,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "NR3C1",
+        "TNFSF13B",
+        "IFNAR1"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1535",
+      "detail": "targets ['FERRIPROTOPORPHYRIN IX'] not among selected ['NR3C1', 'TNFSF13B', 'IFNAR1'] (Small molecule)",
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Hydroxychloroquine",
+      "mechanism_targets": [
+        "FERRIPROTOPORPHYRIN IX"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "NR3C1",
+        "TNFSF13B",
+        "IFNAR1"
+      ]
+    },
+    {
+      "chembl_id": null,
+      "detail": "",
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Prednisone",
+      "mechanism_targets": [],
+      "miss_class": "found",
+      "molecule_type": null,
+      "pool_status": "found",
+      "rank": 63,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "NR3C1",
+        "TNFSF13B",
+        "IFNAR1"
+      ]
+    },
+    {
+      "chembl_id": null,
+      "detail": "",
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Triamcinolone",
+      "mechanism_targets": [],
+      "miss_class": "found",
+      "molecule_type": null,
+      "pool_status": "found",
+      "rank": 61,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "NR3C1",
+        "TNFSF13B",
+        "IFNAR1"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1456",
+      "detail": "targets [\"INOSINE-5'-MONOPHOSPHATE DEHYDROGENASE (IMPDH)\"] not among selected ['NR3C1', 'TNFSF13B', 'IFNAR1'] (Small molecule)",
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Mycophenolate mofetil",
+      "mechanism_targets": [
+        "INOSINE-5'-MONOPHOSPHATE DEHYDROGENASE (IMPDH)"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "genuine_negative",
+      "selected_targets": [
+        "NR3C1",
+        "TNFSF13B",
+        "IFNAR1"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL866",
+      "detail": "targets [\"INOSINE-5'-MONOPHOSPHATE DEHYDROGENASE (IMPDH)\"] not among selected ['NR3C1', 'TNFSF13B', 'IFNAR1'] (Small molecule)",
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Mycophenolic acid",
+      "mechanism_targets": [
+        "INOSINE-5'-MONOPHOSPHATE DEHYDROGENASE (IMPDH)"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "genuine_negative",
+      "selected_targets": [
+        "NR3C1",
+        "TNFSF13B",
+        "IFNAR1"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL325041",
+      "detail": "targets ['26S PROTEASOME'] not among selected ['CRBN', 'FKBP1A', 'FDPS'] (Small molecule)",
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Bortezomib",
+      "mechanism_targets": [
+        "26S PROTEASOME"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "CRBN",
+        "FKBP1A",
+        "FDPS"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL513",
+      "detail": "targets ['GLUTATHIONE REDUCTASE, MITOCHONDRIAL'] not among selected ['CRBN', 'FKBP1A', 'FDPS'] (Small molecule)",
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Carmustine",
+      "mechanism_targets": [
+        "GLUTATHIONE REDUCTASE, MITOCHONDRIAL"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "CRBN",
+        "FKBP1A",
+        "FDPS"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1200796",
+      "detail": "targets ['DNA'] not among selected ['CRBN', 'FKBP1A', 'FDPS'] (Small molecule)",
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Cyclophosphamide",
+      "mechanism_targets": [
+        "DNA"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "CRBN",
+        "FKBP1A",
+        "FDPS"
+      ]
+    },
+    {
+      "chembl_id": null,
+      "detail": "",
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Lenalidomide",
+      "mechanism_targets": [],
+      "miss_class": "found",
+      "molecule_type": null,
+      "pool_status": "found",
+      "rank": 7,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "CRBN",
+        "FKBP1A",
+        "FDPS"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL408513",
+      "detail": "targets ['HISTONE DEACETYLASE'] not among selected ['CRBN', 'FKBP1A', 'FDPS'] (Small molecule)",
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Belinostat",
+      "mechanism_targets": [
+        "HISTONE DEACETYLASE"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "genuine_negative",
+      "selected_targets": [
+        "CRBN",
+        "FKBP1A",
+        "FDPS"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1200796",
+      "detail": "targets ['DNA'] not among selected ['ALK', 'SLC6A2', 'PNP'] (Small molecule)",
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Cyclophosphamide",
+      "mechanism_targets": [
+        "DNA"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "ALK",
+        "SLC6A2",
+        "PNP"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL90555",
+      "detail": "targets ['TUBULIN'] not among selected ['ALK', 'SLC6A2', 'PNP'] (Small molecule)",
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Vincristine",
+      "mechanism_targets": [
+        "TUBULIN"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "ALK",
+        "SLC6A2",
+        "PNP"
+      ]
+    },
+    {
+      "chembl_id": null,
+      "detail": "",
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Erlotinib",
+      "mechanism_targets": [],
+      "miss_class": "found",
+      "molecule_type": null,
+      "pool_status": "found",
+      "rank": 114,
+      "row_kind": "genuine_negative",
+      "selected_targets": [
+        "ALK",
+        "SLC6A2",
+        "PNP"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL2007641",
+      "detail": "molecule_type=Antibody",
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Pertuzumab",
+      "mechanism_targets": [
+        "RECEPTOR TYROSINE-PROTEIN KINASE ERBB-2"
+      ],
+      "miss_class": "biologic_structural",
+      "molecule_type": "Antibody",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "genuine_negative",
+      "selected_targets": [
+        "ALK",
+        "SLC6A2",
+        "PNP"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1201580",
+      "detail": "molecule_type=Antibody",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Adalimumab",
+      "mechanism_targets": [
+        "TUMOR NECROSIS FACTOR"
+      ],
+      "miss_class": "biologic_structural",
+      "molecule_type": "Antibody",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "JAK2",
+        "ALOX5",
+        "JAK1"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1650",
+      "detail": "targets ['GLUCOCORTICOID RECEPTOR'] not among selected ['JAK2', 'ALOX5', 'JAK1'] (Small molecule)",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Cortisone acetate",
+      "mechanism_targets": [
+        "GLUCOCORTICOID RECEPTOR"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "JAK2",
+        "ALOX5",
+        "JAK1"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1201833",
+      "detail": "molecule_type=Antibody",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "golimumab",
+      "mechanism_targets": [
+        "TUMOR NECROSIS FACTOR"
+      ],
+      "miss_class": "biologic_structural",
+      "molecule_type": "Antibody",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "JAK2",
+        "ALOX5",
+        "JAK1"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1201581",
+      "detail": "molecule_type=Antibody",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Infliximab",
+      "mechanism_targets": [
+        "TUMOR NECROSIS FACTOR"
+      ],
+      "miss_class": "biologic_structural",
+      "molecule_type": "Antibody",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "JAK2",
+        "ALOX5",
+        "JAK1"
+      ]
+    },
+    {
+      "chembl_id": null,
+      "detail": "",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Mesalazine",
+      "mechanism_targets": [],
+      "miss_class": "found",
+      "molecule_type": null,
+      "pool_status": "found",
+      "rank": 24,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "JAK2",
+        "ALOX5",
+        "JAK1"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL439",
+      "detail": "targets ['DIHYDROPTEROATE SYNTHASE'] not among selected ['JAK2', 'ALOX5', 'JAK1'] (Small molecule)",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Sulfadiazine",
+      "mechanism_targets": [
+        "DIHYDROPTEROATE SYNTHASE"
+      ],
+      "miss_class": "target_not_selected",
+      "molecule_type": "Small molecule",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "JAK2",
+        "ALOX5",
+        "JAK1"
+      ]
+    },
+    {
+      "chembl_id": null,
+      "detail": "",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Sulfasalazine",
+      "mechanism_targets": [],
+      "miss_class": "found",
+      "molecule_type": null,
+      "pool_status": "found",
+      "rank": 25,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "JAK2",
+        "ALOX5",
+        "JAK1"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1743087",
+      "detail": "molecule_type=Antibody",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Vedolizumab",
+      "mechanism_targets": [
+        "INTEGRIN ALPHA-4/BETA-7"
+      ],
+      "miss_class": "biologic_structural",
+      "molecule_type": "Antibody",
+      "pool_status": "absent",
+      "rank": null,
+      "row_kind": "confirmed_positive",
+      "selected_targets": [
+        "JAK2",
+        "ALOX5",
+        "JAK1"
+      ]
+    },
+    {
+      "chembl_id": "CHEMBL1149",
+      "detail": "molecule_type=?",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "L-Carnitine",
+      "mechanism_targets": [],
+      "miss_class": "no_mechanism_data",
+      "molecule_type": null,
+      "pool_status": "unresolved",
+      "rank": null,
+      "row_kind": "genuine_negative",
+      "selected_targets": [
+        "JAK2",
+        "ALOX5",
+        "JAK1"
+      ]
+    }
+  ],
+  "summary": {
+    "confirmed_positive": {
+      "biologic_structural": 4,
+      "found": 6,
+      "no_mechanism_data": 1,
+      "target_not_selected": 11
+    },
+    "genuine_negative": {
+      "biologic_structural": 2,
+      "found": 1,
+      "no_mechanism_data": 1,
+      "target_not_selected": 5
+    }
+  }
+}

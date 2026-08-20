@@ -1,0 +1,158 @@
+{
+  "adalimumab": {
+    "chembl_id": "CHEMBL1201580",
+    "max_phase": 4,
+    "molecule_type": "Antibody",
+    "targets": [
+      "TUMOR NECROSIS FACTOR"
+    ]
+  },
+  "belinostat": {
+    "chembl_id": "CHEMBL408513",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "HISTONE DEACETYLASE"
+    ]
+  },
+  "betamethasone": {
+    "chembl_id": "CHEMBL632",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "GLUCOCORTICOID RECEPTOR"
+    ]
+  },
+  "bortezomib": {
+    "chembl_id": "CHEMBL325041",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "26S PROTEASOME"
+    ]
+  },
+  "carmustine": {
+    "chembl_id": "CHEMBL513",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "GLUTATHIONE REDUCTASE, MITOCHONDRIAL"
+    ]
+  },
+  "chloroquine": {
+    "chembl_id": "CHEMBL76",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "FERRIPROTOPORPHYRIN IX"
+    ]
+  },
+  "cortisone acetate": {
+    "chembl_id": "CHEMBL1650",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "GLUCOCORTICOID RECEPTOR"
+    ]
+  },
+  "cyclophosphamide": {
+    "chembl_id": "CHEMBL1200796",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "DNA"
+    ]
+  },
+  "golimumab": {
+    "chembl_id": "CHEMBL1201833",
+    "max_phase": 4,
+    "molecule_type": "Antibody",
+    "targets": [
+      "TUMOR NECROSIS FACTOR"
+    ]
+  },
+  "hydroxychloroquine": {
+    "chembl_id": "CHEMBL1535",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "FERRIPROTOPORPHYRIN IX"
+    ]
+  },
+  "infliximab": {
+    "chembl_id": "CHEMBL1201581",
+    "max_phase": 4,
+    "molecule_type": "Antibody",
+    "targets": [
+      "TUMOR NECROSIS FACTOR"
+    ]
+  },
+  "l-carnitine": {
+    "chembl_id": "CHEMBL1149",
+    "max_phase": null,
+    "molecule_type": null,
+    "targets": []
+  },
+  "mycophenolate mofetil": {
+    "chembl_id": "CHEMBL1456",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "INOSINE-5'-MONOPHOSPHATE DEHYDROGENASE (IMPDH)"
+    ]
+  },
+  "mycophenolic acid": {
+    "chembl_id": "CHEMBL866",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "INOSINE-5'-MONOPHOSPHATE DEHYDROGENASE (IMPDH)"
+    ]
+  },
+  "pentosan polysulfate": {
+    "chembl_id": "CHEMBL1201516",
+    "max_phase": null,
+    "molecule_type": null,
+    "targets": []
+  },
+  "pertuzumab": {
+    "chembl_id": "CHEMBL2007641",
+    "max_phase": 4,
+    "molecule_type": "Antibody",
+    "targets": [
+      "RECEPTOR TYROSINE-PROTEIN KINASE ERBB-2"
+    ]
+  },
+  "sulfadiazine": {
+    "chembl_id": "CHEMBL439",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "DIHYDROPTEROATE SYNTHASE"
+    ]
+  },
+  "triamcinolone": {
+    "chembl_id": "CHEMBL1451",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "GLUCOCORTICOID RECEPTOR"
+    ]
+  },
+  "vedolizumab": {
+    "chembl_id": "CHEMBL1743087",
+    "max_phase": 4,
+    "molecule_type": "Antibody",
+    "targets": [
+      "INTEGRIN ALPHA-4/BETA-7"
+    ]
+  },
+  "vincristine": {
+    "chembl_id": "CHEMBL90555",
+    "max_phase": 4,
+    "molecule_type": "Small molecule",
+    "targets": [
+      "TUBULIN"
+    ]
+  }
+}

@@ -100,3 +100,49 @@ Design rules, each traceable to a v1 failure:
 Sequencing: v1 results ship first (this publish, $0 remaining). v2 case-set
 construction and freeze can start immediately after — it is cheap and
 offline-first — with the run itself greenlit once sources are healthy.
+
+## Miss autopsy + rescue analysis (2026-08-20)
+
+Post-hoc forensics over the frozen v1 artifacts
+(`validation/studyc_miss_autopsy.json`, `validation/studyc_target_rank_rescue.json`;
+scripts re-runnable, cached, no pipeline stage re-run):
+
+**Absence causes, 22 confirmed positives:**
+
+| class | n | implication |
+|---|---|---|
+| found in pool | 6 | all ranked top ~1.5% |
+| target_not_selected | 11 | drug's ChEMBL mechanism target was not among the disease's top-3 selected targets |
+| biologic_structural | 4 | antibodies never enter an activity-data pool |
+| no_mechanism_data | 1 | resolvable molecule, no ChEMBL mechanism rows |
+| name_resolution_gap | 0 | both "unresolved" drugs resolved with curated alternates (pentosan polysulfate sodium, levocarnitine) |
+
+**Rescue analysis: K-widening buys nothing.** For all 11
+target_not_selected positives, the drug's mechanism target does not appear
+ANYWHERE in the disease's ranked candidate-target list (lists of 5–20
+targets): rescued_at_k = 0 for K = 3, 5, 10, 25. The wall is upstream of the
+top-K gate — it is the target UNIVERSE construction (OpenTargets genetic
+associations + approved-drug MOA targets). Bortezomib's PSMB5 is not among
+myeloma's 20 candidate targets; triamcinolone's NR3C1 is not among GCA's 5.
+
+Notably, the ChEMBL assay-strictness class (the Sapropterin/Pyridostigmine
+pool-recovery task) occurred ZERO times in this case set — that upgrade would
+not have moved v1 coverage. Caveat: ChEMBL mechanism coverage is itself
+incomplete (e.g. hydroxychloroquine's immunomodulation), so "target not in
+universe" partly reflects mechanism-knowledge gaps, not only selection.
+
+**Upgrade ranking by expected coverage gain:**
+
+1. **Target-universe expansion** (rescues the 50% class): pathway/PPI
+   neighbor lanes — the Reactome pathway-neighbor prototype already exists
+   (MTOR confirmed neighbor of TSC1). This is disease-blind (uses no answer
+   drugs), so benchmark integrity is preserved. Tradeoff to decide: loosens
+   the genetics anchor that is part of AgentBio's precision story.
+2. **Biologics lane** (rescues the 18% class): mechanism/indication-based
+   inclusion of antibodies rather than activity-data pooling.
+3. Assay-pool recovery: valuable generally, but would not have changed v1.
+
+**Consequence for v2:** running the discrimination study again on machine v1
+would re-measure this ceiling. Build machine v2 (universe expansion first),
+then freeze v2 cases against the new machine, and re-run v1's six diseases
+as the labeled sensitivity cohort for the before/after claim.
