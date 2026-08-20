@@ -6,6 +6,17 @@
     "TYK2",
     "IL6R"
   ],
+  "Interstitial Cystitis": [
+    "JAK1",
+    "STAT3",
+    "DRD3",
+    "DRD2",
+    "TNF",
+    "SLC6A2",
+    "SLC6A4",
+    "ESR1",
+    "INPP5D"
+  ],
   "Lupus Erythematosus, Systemic": [
     "TLR7",
     "TLR9",

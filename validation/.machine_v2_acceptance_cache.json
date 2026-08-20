@@ -1,0 +1,709 @@
+{
+  "Giant Cell Arteritis": [
+    {
+      "rank": 1,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "JAK1",
+      "uniprot_id": "P23458"
+    },
+    {
+      "rank": 2,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "JAK2",
+      "uniprot_id": "O60674"
+    },
+    {
+      "rank": 3,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "JAK3",
+      "uniprot_id": "P52333"
+    },
+    {
+      "rank": 4,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "TYK2",
+      "uniprot_id": "P29597"
+    },
+    {
+      "rank": 5,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "IL6R",
+      "uniprot_id": "P08887"
+    },
+    {
+      "rank": 6,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "PTPN11",
+      "uniprot_id": "Q06124"
+    },
+    {
+      "rank": 7,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "STAT3",
+      "uniprot_id": "P40763"
+    },
+    {
+      "rank": 8,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "STAT5A",
+      "uniprot_id": "P42229"
+    },
+    {
+      "rank": 9,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "IL6ST",
+      "uniprot_id": "P40189"
+    },
+    {
+      "rank": 10,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "IL6",
+      "uniprot_id": "P05231"
+    },
+    {
+      "rank": 11,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "IL2RG",
+      "uniprot_id": "P31785"
+    }
+  ],
+  "Interstitial Cystitis": [
+    {
+      "rank": 1,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "JAK1",
+      "uniprot_id": "P23458"
+    },
+    {
+      "rank": 2,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "STAT3",
+      "uniprot_id": "P40763"
+    },
+    {
+      "rank": 3,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "DRD3",
+      "uniprot_id": "P35462"
+    },
+    {
+      "rank": 4,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "DRD2",
+      "uniprot_id": "P14416"
+    },
+    {
+      "rank": 5,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "TNF",
+      "uniprot_id": "P01375"
+    },
+    {
+      "rank": 6,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "SLC6A2",
+      "uniprot_id": "P23975"
+    },
+    {
+      "rank": 7,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "SLC6A4",
+      "uniprot_id": "P31645"
+    },
+    {
+      "rank": 8,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "ESR1",
+      "uniprot_id": "P03372"
+    },
+    {
+      "rank": 9,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "INPP5D",
+      "uniprot_id": "Q92835"
+    },
+    {
+      "rank": 10,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "MAOA",
+      "uniprot_id": "P21397"
+    },
+    {
+      "rank": 11,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "ALDH2",
+      "uniprot_id": "P05091"
+    },
+    {
+      "rank": 12,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "BIRC2",
+      "uniprot_id": "Q13490"
+    },
+    {
+      "rank": 13,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "BIRC3",
+      "uniprot_id": "Q13489"
+    },
+    {
+      "rank": 14,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "SLC22A1",
+      "uniprot_id": "O15245"
+    },
+    {
+      "rank": 15,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "TNFRSF1A",
+      "uniprot_id": "P19438"
+    },
+    {
+      "rank": 16,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "SLC17A7",
+      "uniprot_id": "Q9P2U7"
+    },
+    {
+      "rank": 17,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "SLC17A6",
+      "uniprot_id": "Q9P2U8"
+    },
+    {
+      "rank": 18,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "SLC17A8",
+      "uniprot_id": "Q8NDX2"
+    },
+    {
+      "rank": 19,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "CYLD",
+      "uniprot_id": "Q9NQC7"
+    }
+  ],
+  "Lupus Erythematosus, Systemic": [
+    {
+      "rank": 1,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "TLR7",
+      "uniprot_id": "Q9NYK1"
+    },
+    {
+      "rank": 2,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "TLR9",
+      "uniprot_id": "Q9NR96"
+    },
+    {
+      "rank": 3,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "NR3C1",
+      "uniprot_id": "P04150"
+    },
+    {
+      "rank": 4,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "TNFSF13B",
+      "uniprot_id": "Q9Y275"
+    },
+    {
+      "rank": 5,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "IFNAR1",
+      "uniprot_id": "P17181"
+    }
+  ],
+  "Multiple Myeloma": [
+    {
+      "rank": 1,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "CRBN",
+      "uniprot_id": "Q96SW2"
+    },
+    {
+      "rank": 2,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "FKBP1A",
+      "uniprot_id": "P62942"
+    },
+    {
+      "rank": 3,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "CD38",
+      "uniprot_id": "P28907"
+    },
+    {
+      "rank": 4,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "FDPS",
+      "uniprot_id": "P14324"
+    },
+    {
+      "rank": 5,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "TOP2A",
+      "uniprot_id": "P11388"
+    },
+    {
+      "rank": 6,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "GSR",
+      "uniprot_id": "P00390"
+    },
+    {
+      "rank": 7,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "NR3C1",
+      "uniprot_id": "P04150"
+    },
+    {
+      "rank": 8,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "CXCR4",
+      "uniprot_id": "P61073"
+    },
+    {
+      "rank": 9,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "NRAS",
+      "uniprot_id": "P01111"
+    },
+    {
+      "rank": 10,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "TNFSF11",
+      "uniprot_id": "O14788"
+    },
+    {
+      "rank": 11,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "XPO1",
+      "uniprot_id": "O14980"
+    },
+    {
+      "rank": 12,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "JAK1",
+      "uniprot_id": "P23458"
+    },
+    {
+      "rank": 13,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "STAT3",
+      "uniprot_id": "P40763"
+    },
+    {
+      "rank": 14,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "DRD3",
+      "uniprot_id": "P35462"
+    },
+    {
+      "rank": 15,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "DRD2",
+      "uniprot_id": "P14416"
+    },
+    {
+      "rank": 16,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "SLAMF7",
+      "uniprot_id": "Q9NQ25"
+    },
+    {
+      "rank": 17,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "GPRC5D",
+      "uniprot_id": "Q9NZD1"
+    },
+    {
+      "rank": 18,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "TUBB",
+      "uniprot_id": "P07437"
+    },
+    {
+      "rank": 19,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "TUBA1A",
+      "uniprot_id": "Q71U36"
+    },
+    {
+      "rank": 20,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "ACE2",
+      "uniprot_id": "Q9BYF1"
+    },
+    {
+      "rank": 21,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "CCR5",
+      "uniprot_id": "P51681"
+    },
+    {
+      "rank": 22,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "AP2A2",
+      "uniprot_id": "O94973"
+    },
+    {
+      "rank": 23,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "AP2A1",
+      "uniprot_id": "O95782"
+    },
+    {
+      "rank": 24,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "CD70",
+      "uniprot_id": "P32970"
+    },
+    {
+      "rank": 25,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "AP2B1",
+      "uniprot_id": "P63010"
+    },
+    {
+      "rank": 26,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "CD27",
+      "uniprot_id": "P26842"
+    },
+    {
+      "rank": 27,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "EDA",
+      "uniprot_id": "Q92838"
+    },
+    {
+      "rank": 28,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "EDA2R",
+      "uniprot_id": "Q9HAV5"
+    },
+    {
+      "rank": 29,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "SOX17",
+      "uniprot_id": "Q9H6I2"
+    },
+    {
+      "rank": 30,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "TNFRSF17",
+      "uniprot_id": "Q02223"
+    }
+  ],
+  "Neuroblastoma": [
+    {
+      "rank": 1,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "ALK",
+      "uniprot_id": "Q9UM73"
+    },
+    {
+      "rank": 2,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "SLC6A2",
+      "uniprot_id": "P23975"
+    },
+    {
+      "rank": 3,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "PNP",
+      "uniprot_id": "P00491"
+    },
+    {
+      "rank": 4,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "GBA",
+      "uniprot_id": "P04062"
+    },
+    {
+      "rank": 5,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "HPRT1",
+      "uniprot_id": "P00492"
+    },
+    {
+      "rank": 6,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "DRD3",
+      "uniprot_id": "P35462"
+    },
+    {
+      "rank": 7,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "IMPDH1",
+      "uniprot_id": "P20839"
+    },
+    {
+      "rank": 8,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "DRD2",
+      "uniprot_id": "P14416"
+    },
+    {
+      "rank": 9,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "DRD1",
+      "uniprot_id": "P21728"
+    },
+    {
+      "rank": 10,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "TUBB",
+      "uniprot_id": "P07437"
+    },
+    {
+      "rank": 11,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "C5",
+      "uniprot_id": "P01031"
+    },
+    {
+      "rank": 12,
+      "target_discovery_method": "literature_mechanism_class",
+      "target_symbol": "TUBA1A",
+      "uniprot_id": "Q71U36"
+    },
+    {
+      "rank": 13,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "LMO1",
+      "uniprot_id": "P25800"
+    },
+    {
+      "rank": 14,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "BARD1",
+      "uniprot_id": "Q99728"
+    },
+    {
+      "rank": 15,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "PHOX2B",
+      "uniprot_id": "Q99453"
+    },
+    {
+      "rank": 16,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "ATRX",
+      "uniprot_id": "P46100"
+    },
+    {
+      "rank": 17,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "KAT5",
+      "uniprot_id": "Q92993"
+    },
+    {
+      "rank": 18,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "EIF2AK3",
+      "uniprot_id": "Q9NZJ5"
+    },
+    {
+      "rank": 19,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "MRE11",
+      "uniprot_id": "P49959"
+    },
+    {
+      "rank": 20,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "CLTC",
+      "uniprot_id": "Q00610"
+    },
+    {
+      "rank": 21,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "ATM",
+      "uniprot_id": "Q13315"
+    },
+    {
+      "rank": 22,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "BRCA1",
+      "uniprot_id": "P38398"
+    },
+    {
+      "rank": 23,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "DAXX",
+      "uniprot_id": "Q9UER7"
+    },
+    {
+      "rank": 24,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "ACD",
+      "uniprot_id": "Q96AP0"
+    },
+    {
+      "rank": 25,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "BCL11A",
+      "uniprot_id": "Q9H165"
+    },
+    {
+      "rank": 26,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "BIRC6",
+      "uniprot_id": "Q9NR09"
+    }
+  ],
+  "Ulcerative Colitis": [
+    {
+      "rank": 1,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "JAK2",
+      "uniprot_id": "O60674"
+    },
+    {
+      "rank": 2,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "ALOX5",
+      "uniprot_id": "P09917"
+    },
+    {
+      "rank": 3,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "JAK1",
+      "uniprot_id": "P23458"
+    },
+    {
+      "rank": 4,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "TYK2",
+      "uniprot_id": "P29597"
+    },
+    {
+      "rank": 5,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "S1PR1",
+      "uniprot_id": "P21453"
+    },
+    {
+      "rank": 6,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "S1PR4",
+      "uniprot_id": "O95977"
+    },
+    {
+      "rank": 7,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "S1PR5",
+      "uniprot_id": "Q9H228"
+    },
+    {
+      "rank": 8,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "NR3C1",
+      "uniprot_id": "P04150"
+    },
+    {
+      "rank": 9,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "MC2R",
+      "uniprot_id": "Q01718"
+    },
+    {
+      "rank": 10,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "JAK3",
+      "uniprot_id": "P52333"
+    },
+    {
+      "rank": 11,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "TNF",
+      "uniprot_id": "P01375"
+    },
+    {
+      "rank": 12,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "PPARG",
+      "uniprot_id": "P37231"
+    },
+    {
+      "rank": 13,
+      "target_discovery_method": "pharmacological_precedent",
+      "target_symbol": "PPAT",
+      "uniprot_id": "Q06203"
+    },
+    {
+      "rank": 14,
+      "target_discovery_method": "genetic_association",
+      "target_symbol": "IL12B",
+      "uniprot_id": "P29460"
+    },
+    {
+      "rank": 15,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "PTPN11",
+      "uniprot_id": "Q06124"
+    },
+    {
+      "rank": 16,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "STAT3",
+      "uniprot_id": "P40763"
+    },
+    {
+      "rank": 17,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "STAT5A",
+      "uniprot_id": "P42229"
+    },
+    {
+      "rank": 18,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "TNFRSF1A",
+      "uniprot_id": "P19438"
+    },
+    {
+      "rank": 19,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "IL6",
+      "uniprot_id": "P05231"
+    },
+    {
+      "rank": 20,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "IL6ST",
+      "uniprot_id": "P40189"
+    },
+    {
+      "rank": 21,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "IL10",
+      "uniprot_id": "P22301"
+    },
+    {
+      "rank": 22,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "IL12A",
+      "uniprot_id": "P29459"
+    },
+    {
+      "rank": 23,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "IL6R",
+      "uniprot_id": "P08887"
+    },
+    {
+      "rank": 24,
+      "target_discovery_method": "pathway_neighbor",
+      "target_symbol": "IL2RG",
+      "uniprot_id": "P31785"
+    }
+  ],
+  "_config": {
+    "lanes": "v2",
+    "max_added": 10,
+    "sources": "genetic+literature"
+  }
+}

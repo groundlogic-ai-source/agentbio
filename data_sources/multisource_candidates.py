@@ -612,6 +612,13 @@ def normalize_chembl_enriched(
         candidate's ``confidence_score``.
     Plus a REGULATORY_APPROVAL record when ``max_phase >= 4`` and, when an OT
     association score is present, a GENETIC_ASSOCIATION disease-link record.
+
+    Machine-v2 exception: rows from the mechanism-only coverage lane
+    (``pool_origin == "mechanism_only"``) carry a curated ChEMBL
+    mechanism_of_action entry but NO qualifying activity measurement. They
+    get a MECHANISM efficacy record anchored on the mechanism row — never a
+    BIOACTIVITY_ASSAY record with a null pChEMBL, which would mischaracterize
+    the evidence basis to the reviewer and writer.
     """
     records: list[EvidenceRecord] = []
     for c in enriched or []:
@@ -650,17 +657,31 @@ def normalize_chembl_enriched(
             disease_name=disease_name,
         )
 
-        # pChEMBL bioactivity record.
-        records.append(EvidenceRecord(
-            source_type=SourceType.BIOACTIVITY_ASSAY,
-            evidence_role=EvidenceRole.EFFICACY,
-            source_id=f"chembl-pchembl:{assay_anchor}",
-            assay_id=f"chembl-assay:{assay_anchor}",
-            measurement_type="pchembl",
-            measurement_value=pchembl,
-            qualification_status=QualificationStatus.QUALIFIED,
-            **base,
-        ))
+        if c.get("pool_origin") == "mechanism_only":
+            # Machine-v2 mechanism-only lane: curated mechanism row, no
+            # qualifying activity measurement — emit the true evidence type.
+            records.append(EvidenceRecord(
+                source_type=SourceType.MECHANISM,
+                evidence_role=EvidenceRole.EFFICACY,
+                source_id=f"chembl-mechanism:{molecule_id}",
+                action=_clean(c.get("action_type")) or None,
+                direction=_direction_from_action(_clean(c.get("action_type"))),
+                context=_clean(c.get("mechanism_of_action")),
+                qualification_status=QualificationStatus.QUALIFIED,
+                **base,
+            ))
+        else:
+            # pChEMBL bioactivity record.
+            records.append(EvidenceRecord(
+                source_type=SourceType.BIOACTIVITY_ASSAY,
+                evidence_role=EvidenceRole.EFFICACY,
+                source_id=f"chembl-pchembl:{assay_anchor}",
+                assay_id=f"chembl-assay:{assay_anchor}",
+                measurement_type="pchembl",
+                measurement_value=pchembl,
+                qualification_status=QualificationStatus.QUALIFIED,
+                **base,
+            ))
 
         # SEPARATE assay-confidence record (0-9 curator scale) — kept distinct
         # from the pChEMBL potency record so both survive the union.
