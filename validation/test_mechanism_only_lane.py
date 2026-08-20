@@ -141,11 +141,13 @@ class ChemistProjectionTest(unittest.TestCase):
 
 
 class MechanismLaneCacheTest(unittest.TestCase):
-    def _run_lane(self, get_json_side_effect):
+    def _run_lane(self, get_json_side_effect, molecule_meta=None):
         with patch.object(chembl_mod, "get", return_value=None), \
              patch.object(chembl_mod, "cache_set") as mock_set, \
              patch.object(chembl_mod, "_resolve_target_chembl_id",
                           return_value=["CHEMBL2056"]), \
+             patch.object(chembl_mod, "_fetch_molecule_meta",
+                          return_value=molecule_meta or {}), \
              patch.object(chembl_mod, "_get_json",
                           side_effect=get_json_side_effect):
             result = chembl_mod.get_mechanism_only_approved_drugs("P01375")
@@ -169,7 +171,16 @@ class MechanismLaneCacheTest(unittest.TestCase):
             return {"max_phase": 1.0, "pref_name": "TOOLEARLY",
                     "molecule_type": "Small molecule",
                     "molecule_structures": {"canonical_smiles": "CC"}}
-        result, mock_set = self._run_lane(side_effect)
+        result, mock_set = self._run_lane(
+            side_effect,
+            {"CHEMBL999": {
+                "max_phase": 1.0,
+                "pref_name": "TOOLEARLY",
+                "molecule_type": "Small molecule",
+                "canonical_smiles": "CC",
+                "parent_chembl_id": "CHEMBL999",
+            }},
+        )
         self.assertEqual(result, [])
         mock_set.assert_called_once()
         self.assertEqual(mock_set.call_args[0][1], [])
@@ -194,6 +205,97 @@ class MechanismLaneCacheTest(unittest.TestCase):
                           side_effect=side_effect):
             chembl_mod.get_mechanism_only_approved_drugs("P01375")
         mock_set.assert_not_called()
+
+    def test_approval_filter_precedes_result_cap(self):
+        mechanisms = [
+            {
+                "molecule_chembl_id": f"CHEMBL{i:03d}",
+                "mechanism_of_action": "Target modulator",
+                "action_type": "MODULATOR",
+            }
+            for i in range(1, 46)
+        ]
+        metadata = {
+            row["molecule_chembl_id"]: {
+                "max_phase": 1.0,
+                "pref_name": row["molecule_chembl_id"],
+                "molecule_type": "Small molecule",
+                "canonical_smiles": "CC",
+                "parent_chembl_id": row["molecule_chembl_id"],
+            }
+            for row in mechanisms
+        }
+        metadata["CHEMBL045"]["max_phase"] = 4.0
+        metadata["CHEMBL045"]["pref_name"] = "LATE APPROVED DRUG"
+        with patch.object(chembl_mod, "get", return_value=None), \
+             patch.object(chembl_mod, "cache_set"), \
+             patch.object(chembl_mod, "_resolve_target_chembl_id",
+                          return_value=["CHEMBL2056"]), \
+             patch.object(chembl_mod, "_fetch_molecule_meta",
+                          return_value=metadata), \
+             patch.object(chembl_mod, "_get_json",
+                          return_value={"mechanisms": mechanisms}):
+            result = chembl_mod.get_mechanism_only_approved_drugs(
+                "P01375", limit=40)
+        self.assertEqual(
+            [row["molecule_chembl_id"] for row in result], ["CHEMBL045"])
+
+    def test_kill_switch_restores_legacy_raw_id_cap(self):
+        mechanisms = [
+            {
+                "molecule_chembl_id": f"CHEMBL{i:03d}",
+                "mechanism_of_action": "Target modulator",
+                "action_type": "MODULATOR",
+            }
+            for i in range(1, 46)
+        ]
+        legacy_meta = {
+            row["molecule_chembl_id"]: {
+                "max_phase": 1.0,
+                "pref_name": row["molecule_chembl_id"],
+                "molecule_type": "Small molecule",
+                "canonical_smiles": "CC",
+                "parent_chembl_id": row["molecule_chembl_id"],
+            }
+            for row in mechanisms[:40]
+        }
+        with patch.dict(
+                os.environ,
+                {"AGENTBIO_DISABLE_MECHANISM_COMPLETENESS_REPAIR": "1"},
+                clear=False), \
+             patch.object(chembl_mod, "get", return_value=None), \
+             patch.object(chembl_mod, "cache_set"), \
+             patch.object(chembl_mod, "_resolve_target_chembl_id",
+                          return_value=["CHEMBL2056"]), \
+             patch.object(chembl_mod, "_fetch_molecule_meta",
+                          return_value=legacy_meta), \
+             patch.object(chembl_mod, "_get_json",
+                          return_value={"mechanisms": mechanisms}):
+            result = chembl_mod.get_mechanism_only_approved_drugs("P01375")
+        self.assertEqual(result, [])
+
+    def test_source_work_ceiling_fails_closed_before_metadata_fanout(self):
+        mechanisms = [
+            {
+                "molecule_chembl_id": f"CHEMBL{i:04d}",
+                "mechanism_of_action": "Target modulator",
+                "action_type": "MODULATOR",
+            }
+            for i in range(chembl_mod.MECHANISM_ONLY_MAX_SOURCE_ROWS + 1)
+        ]
+        with patch.object(chembl_mod, "get", return_value=None), \
+             patch.object(chembl_mod, "cache_set") as cache_set, \
+             patch.object(chembl_mod, "_resolve_target_chembl_id",
+                          return_value=["CHEMBL2056"]), \
+             patch.object(chembl_mod, "_fetch_molecule_meta") as fetch_meta, \
+             patch.object(chembl_mod, "_get_json", return_value={
+                 "mechanisms": mechanisms,
+                 "page_meta": {"total_count": len(mechanisms)},
+             }):
+            result = chembl_mod.get_mechanism_only_approved_drugs("P01375")
+        self.assertEqual(result, [])
+        fetch_meta.assert_not_called()
+        cache_set.assert_not_called()
 
 
 if __name__ == "__main__":

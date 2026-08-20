@@ -35,6 +35,8 @@ F_MODALITY_CAUTION = "MODALITY_CAUTION"
 F_MODALITY_UNRESOLVED = "MODALITY_UNRESOLVED"
 F_EVIDENCE_PARTIAL = "EVIDENCE_PARTIAL"
 F_ABSENT = "ABSENT_FROM_POOL"
+F_SUPPLIED_ONLY = "AUDITABLE_SUPPLIED_ONLY"
+F_MECHANISM_SOURCE_FAILURE = "MECHANISM_SOURCE_FAILURE"
 F_UNRESOLVED = "UNRESOLVED_NAME"
 F_NO_CASE = "NO_CASE"
 
@@ -58,6 +60,9 @@ def _verdict(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
     row: dict[str, Any] = {
         "drug_name": drug_name,
         "status": status,
+        "audit_scope_status": audit.get("audit_scope_status"),
+        "deterministic_miss_reason": audit.get("deterministic_miss_reason"),
+        "resolved_identity_route": audit.get("resolved_identity_route"),
         "resolved_chembl_id": audit.get("resolved_chembl_id"),
         "rank": None,
         "total_candidates": audit.get("total_candidates"),
@@ -74,6 +79,11 @@ def _verdict(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
         # The exact object produced by run_audit. Triage never reinterprets
         # N1–N4 findings, which guarantees single/batch parity by construction.
         "audit_context": audit.get("audit_context"),
+        "mechanism_evidence_status": audit.get("mechanism_evidence_status"),
+        "stable_mechanism_identities": audit.get(
+            "stable_mechanism_identities") or [],
+        "pool_target_overlap": audit.get("pool_target_overlap") or [],
+        "target_coverage_ladder": audit.get("target_coverage_ladder") or [],
     }
 
     if status == "no_case":
@@ -82,6 +92,10 @@ def _verdict(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
         flags.append(F_UNRESOLVED)
     elif status == "absent":
         flags.append(F_ABSENT)
+        if audit.get("audit_scope_status") == "auditable_only_because_supplied":
+            flags.append(F_SUPPLIED_ONLY)
+        elif audit.get("audit_scope_status") == "source_failure":
+            flags.append(F_MECHANISM_SOURCE_FAILURE)
         row["agentbio_selected_target"] = audit.get("agentbio_selected_target")
         row["drug_mechanism_targets"] = audit.get("drug_mechanism_targets")
     elif status == "found":
@@ -136,15 +150,19 @@ def _verdict(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
 
 def _summary(verdicts: list[dict[str, Any]]) -> dict[str, Any]:
     by_status: dict[str, int] = {}
+    by_audit_scope_status: dict[str, int] = {}
     flag_counts: dict[str, int] = {}
     for v in verdicts:
         s = str(v.get("status"))
         by_status[s] = by_status.get(s, 0) + 1
+        scope = str(v.get("audit_scope_status"))
+        by_audit_scope_status[scope] = by_audit_scope_status.get(scope, 0) + 1
         for f in v.get("flags") or []:
             flag_counts[f] = flag_counts.get(f, 0) + 1
     return {
         "total": len(verdicts),
         "by_status": by_status,
+        "by_audit_scope_status": by_audit_scope_status,
         "flag_counts": flag_counts,
         "flagged_total": sum(1 for v in verdicts if v.get("flags")),
     }

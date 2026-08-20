@@ -69,8 +69,28 @@ def _pool_audit(pool: list[dict], drug: str, chembl_id: str | None,
          mock.patch.object(audit_mod, "_load_candidates", return_value=pool), \
          mock.patch.object(audit_mod, "_find_molecule_chembl_id",
                            return_value=chembl_id), \
-         mock.patch.object(audit_mod, "get_drug_mechanism_targets_for_audit",
-                           return_value=moa or []):
+         mock.patch.object(
+             audit_mod,
+             "get_drug_mechanism_identities_for_audit",
+             return_value={
+                 "status": "ok" if moa else "empty",
+                 "provider": "chembl",
+                 "resolved_molecule_chembl_id": chembl_id,
+                 "identity_route": "provided_chembl_id",
+                 "targets": [{
+                     "target_chembl_id": None,
+                     "target_name": None,
+                     "target_type": None,
+                     "organism": None,
+                     "tax_id": None,
+                     "uniprot_ids": [],
+                     "gene_symbols": [],
+                     "mechanisms": moa or [],
+                     "action_types": [],
+                 }] if moa else [],
+                 "error": None,
+             },
+         ):
         return audit_mod.run_audit("TrapDisease", drug, narrate=False)
 
 
