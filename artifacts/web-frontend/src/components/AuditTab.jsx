@@ -240,15 +240,38 @@ function FoundResult({ data }) {
 function AbsentResult({ data }) {
   const agentTarget = data.agentbio_selected_target;
   const drugTargets = data.drug_mechanism_targets ?? [];
-
-  const overlap = agentTarget
-    ? drugTargets.some(t => t.toUpperCase().includes((agentTarget || "").toUpperCase()))
-    : false;
+  const stableTargets = data.stable_mechanism_identities ?? [];
+  const targetOverlap = data.pool_target_overlap ?? [];
+  const componentOverlap = data.pool_component_target_overlap ?? [];
+  const targetLadder = data.target_coverage_ladder ?? [];
+  const suppliedOnly = data.audit_scope_status === "auditable_only_because_supplied";
+  const sourceFailure = data.audit_scope_status === "source_failure";
+  const missReasonLabel = {
+    BIOLOGIC_STRUCTURAL: "Biologic lacks a qualifying structural-assay pool entry",
+    ASSAY_POOL_GAP: "Target was covered, but the drug was absent from the assay pool",
+    TARGET_NOT_SELECTED: "Drug mechanism target was not represented in the persisted pool",
+    NO_MECHANISM_DATA: "No direct human-protein mechanism identity was available",
+  }[data.deterministic_miss_reason] || data.deterministic_miss_reason;
 
   return (
     <div className="space-y-5">
       <Banner kind="warn">
         {data.narration}
+      </Banner>
+
+      <Banner kind={sourceFailure ? "warn" : "note"}>
+        <strong>
+          {sourceFailure
+            ? "Mechanism source unavailable"
+            : suppliedOnly
+              ? "Auditable only because you supplied this drug"
+              : "Absent from the discovery pool"}
+        </strong>
+        <span className="block mt-1">
+          {sourceFailure
+            ? "AgentBio could not verify stable mechanism identity, so it is not treating missing evidence as biological absence."
+            : "This evidence review does not insert the drug into discovery, assign a rank or score, or count it as a rediscovery hit."}
+        </span>
       </Banner>
 
       <div
@@ -260,7 +283,7 @@ function AbsentResult({ data }) {
         }}
       >
         <div className="px-5 py-4 border-b" style={{ borderColor: "var(--border-light)" }}>
-          <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>Target comparison</p>
+          <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>Stable target-identity audit</p>
           <p className="text-xs mt-0.5" style={{ color: "var(--ink-dim)" }}>
             {data.total_candidates} candidates evaluated by AgentBio for this disease
           </p>
@@ -268,7 +291,7 @@ function AbsentResult({ data }) {
         <div style={{ borderTop: "1px solid var(--border-light)" }}>
           <div className="px-5 py-4 flex gap-4" style={{ borderBottom: "1px solid var(--border-light)" }}>
             <div className="w-44 shrink-0 text-xs pt-0.5" style={{ color: "var(--ink-muted)" }}>
-              AgentBio selected target
+              Legacy top target
             </div>
             <div>
               <span className="font-mono text-sm" style={{ color: "var(--ink-base)" }}>
@@ -287,18 +310,95 @@ function AbsentResult({ data }) {
                 ))
               ) : (
                 <p className="text-sm italic" style={{ color: "var(--ink-dim)" }}>
-                  No mechanism records found in ChEMBL
+                  {sourceFailure
+                    ? "Mechanism evidence unavailable while the ChEMBL source is degraded"
+                    : "No mechanism records found in ChEMBL"}
                 </p>
               )}
             </div>
           </div>
-          {!overlap && drugTargets.length > 0 && agentTarget && (
-            <div className="px-5 py-3" style={{ backgroundColor: "rgba(218, 165, 32, 0.08)" }}>
-              <p className="text-xs" style={{ color: "#9b7e1f" }}>
-                The drug's recorded ChEMBL mechanism targets don't match AgentBio's
-                selected target for this disease — a likely explanation for its absence
-                from the pool.
+          <div className="px-5 py-4 flex gap-4" style={{ borderTop: "1px solid var(--border-light)" }}>
+            <div className="w-44 shrink-0 text-xs pt-0.5" style={{ color: "var(--ink-muted)" }}>
+              Stable identities
+            </div>
+            <div className="space-y-2">
+              {stableTargets.length > 0 ? stableTargets.map((target, i) => (
+                <div key={`${target.target_chembl_id || "target"}-${i}`}>
+                  <p className="text-sm font-medium" style={{ color: "var(--ink-base)" }}>
+                    {target.target_name || target.target_chembl_id || "Unmapped mechanism target"}
+                  </p>
+                  <p className="text-xs font-mono" style={{ color: "var(--ink-dim)" }}>
+                    {[
+                      ...(target.gene_symbols || []),
+                      ...(target.uniprot_ids || []),
+                      target.target_chembl_id,
+                    ].filter(Boolean).join(" · ") || "No stable protein identifier"}
+                    {target.organism ? ` · ${target.organism}` : ""}
+                    {target.target_type ? ` · ${target.target_type}` : ""}
+                  </p>
+                </div>
+              )) : (
+                <p className="text-sm italic" style={{ color: "var(--ink-dim)" }}>
+                  No stable mechanism identity available
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="px-5 py-4 flex gap-4" style={{ borderTop: "1px solid var(--border-light)" }}>
+            <div className="w-44 shrink-0 text-xs pt-0.5" style={{ color: "var(--ink-muted)" }}>
+              Pool overlap
+            </div>
+            <div>
+              {targetOverlap.length > 0 ? (
+                targetOverlap.map((target, i) => (
+                  <p key={i} className="text-sm" style={{ color: "var(--ink-base)" }}>
+                    Direct human-protein match: <span className="font-mono">{target.target_symbol || target.uniprot_id}</span>
+                    {" "}at candidate rank {target.first_candidate_rank}
+                  </p>
+                ))
+              ) : (
+                <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
+                  No direct human single-protein identity overlap
+                </p>
+              )}
+              {componentOverlap.length > 0 && (
+                <p className="text-xs mt-1" style={{ color: "#9b7e1f" }}>
+                  A protein-complex component overlaps the pool, but is not counted as an exact target-entity match.
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="px-5 py-4 flex gap-4" style={{ borderTop: "1px solid var(--border-light)" }}>
+            <div className="w-44 shrink-0 text-xs pt-0.5" style={{ color: "var(--ink-muted)" }}>
+              Deterministic miss reason
+            </div>
+            <div>
+              <p className="text-sm" style={{ color: "var(--ink-base)" }}>
+                {missReasonLabel || (sourceFailure ? "Unavailable while source is degraded" : "Unclassified")}
               </p>
+              <p className="text-xs mt-1" style={{ color: "var(--ink-dim)" }}>
+                Resolution: {data.resolved_identity_route || "unknown"} ·
+                ChEMBL mechanism source: {data.mechanism_evidence_status || "unknown"}
+              </p>
+            </div>
+          </div>
+          {targetLadder.length > 0 && (
+            <div className="px-5 py-4 flex gap-4" style={{ borderTop: "1px solid var(--border-light)" }}>
+              <div className="w-44 shrink-0 text-xs pt-0.5" style={{ color: "var(--ink-muted)" }}>
+                Persisted target ladder
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {targetLadder.map((target, i) => (
+                  <span
+                    key={`${target.target_symbol || target.uniprot_id}-${i}`}
+                    className="audit-chip text-xs px-2 py-1 rounded-full"
+                  >
+                    #{target.first_candidate_rank} {target.target_symbol || target.uniprot_id || "unknown"}
+                    {target.mechanism_identity_overlap ? " · direct match" : ""}
+                    {target.component_identity_overlap ? " · component only" : ""}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
         </div>

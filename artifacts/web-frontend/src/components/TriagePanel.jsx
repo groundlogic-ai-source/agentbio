@@ -18,6 +18,8 @@ const FLAG_META = {
   MODALITY_UNRESOLVED: { label: "Modality unresolved", tone: "neutral" },
   EVIDENCE_PARTIAL:    { label: "Partial evidence",  tone: "info"    },
   ABSENT_FROM_POOL:    { label: "Absent from pool",  tone: "neutral" },
+  AUDITABLE_SUPPLIED_ONLY: { label: "Supplied-only audit", tone: "info" },
+  MECHANISM_SOURCE_FAILURE: { label: "Mechanism source failed", tone: "warning" },
   UNRESOLVED_NAME:     { label: "Name unresolved",   tone: "neutral" },
   NO_CASE:             { label: "No case",           tone: "neutral" },
 };
@@ -51,6 +53,24 @@ const STATUS_LABEL = {
   no_case: "No case",
   no_candidates: "No candidates",
   error: "Error",
+};
+
+const SCOPE_LABEL = {
+  found_by_discovery: "Found by discovery",
+  auditable_only_because_supplied: "Auditable only because supplied",
+  not_assessable: "Not assessable",
+  source_failure: "Source failure",
+};
+
+const MISS_REASON_LABEL = {
+  FOUND: "Found",
+  NAME_RESOLUTION_GAP: "Name resolution gap",
+  BIOLOGIC_STRUCTURAL: "Biologic structural gap",
+  ASSAY_POOL_GAP: "Assay pool gap",
+  TARGET_NOT_SELECTED: "Target not represented",
+  NO_MECHANISM_DATA: "No direct protein identity",
+  NO_CASE: "No case",
+  NO_CANDIDATES: "No candidate snapshot",
 };
 
 function SummaryBar({ summary }) {
@@ -300,7 +320,19 @@ export default function TriagePanel({ onNavigate }) {
                         <div className="text-xs font-normal" style={{ color: "var(--ink-dim)" }}>{v.resolved_chembl_id}</div>
                       )}
                     </td>
-                    <td className="px-3 py-2" style={{ color: "var(--ink)" }}>{STATUS_LABEL[v.status] || v.status}</td>
+                    <td className="px-3 py-2" style={{ color: "var(--ink)" }}>
+                      <div>{STATUS_LABEL[v.status] || v.status}</div>
+                      {v.audit_scope_status && (
+                        <div className="text-xs mt-0.5" style={{ color: "var(--ink-dim)" }}>
+                          {SCOPE_LABEL[v.audit_scope_status] || v.audit_scope_status}
+                        </div>
+                      )}
+                      {v.deterministic_miss_reason && v.deterministic_miss_reason !== "FOUND" && (
+                        <div className="text-xs mt-0.5" style={{ color: "var(--ink-muted)" }}>
+                          {MISS_REASON_LABEL[v.deterministic_miss_reason] || v.deterministic_miss_reason}
+                        </div>
+                      )}
+                    </td>
                     <td className="px-3 py-2" style={{ color: "var(--ink)" }}>
                       {v.rank != null ? `${v.rank} / ${v.total_candidates}` : "—"}
                     </td>

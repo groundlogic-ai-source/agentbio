@@ -24,7 +24,7 @@ from api.domain_findings import domain_findings_for, modality_finding_for
 from agents.reviewer import SAFETY_SCHEMA_VERSION
 from data_sources.chembl import (
     _find_molecule_chembl_id,
-    get_drug_mechanism_targets_for_audit,
+    get_drug_mechanism_identities_for_audit,
     get_molecule_data,
 )
 
@@ -110,6 +110,209 @@ def _find_drug_in_pool(
         if chembl_id and c.get("molecule_chembl_id") == chembl_id:
             return i, c
     return None, None
+
+
+def _resolved_identity_route(
+    candidate: Optional[dict[str, Any]],
+    drug_name: str,
+    chembl_id: Optional[str],
+) -> str:
+    if candidate is None:
+        return "chembl_name_resolution" if chembl_id else "unresolved_name"
+    if _norm(candidate.get("drug_name", "")) == _norm(drug_name):
+        return "pool_name_match"
+    if chembl_id and candidate.get("molecule_chembl_id") == chembl_id:
+        return "pool_molecule_chembl_id_match"
+    return "pool_match"
+
+
+def _pool_target_ladder(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Unique persisted candidate targets in first-candidate appearance order."""
+    seen: set[tuple[str, str, str]] = set()
+    ladder: list[dict[str, Any]] = []
+    for candidate_rank, candidate in enumerate(candidates, 1):
+        symbol = str(candidate.get("target_symbol") or "").strip().upper()
+        uniprot = str(candidate.get("uniprot_id") or "").strip().upper()
+        target_chembl_id = str(
+            candidate.get("target_chembl_id") or "").strip().upper()
+        key = (symbol, uniprot, target_chembl_id)
+        if key == ("", "", "") or key in seen:
+            continue
+        seen.add(key)
+        ladder.append({
+            "target_symbol": symbol or None,
+            "uniprot_id": uniprot or None,
+            "target_chembl_id": target_chembl_id or None,
+            "first_candidate_rank": candidate_rank,
+        })
+    return ladder
+
+
+def _mechanism_target_class(target: dict[str, Any]) -> str:
+    """Classify a ChEMBL target before using it for stable identity overlap."""
+    target_type = str(target.get("target_type") or "").strip().upper()
+    organism = str(target.get("organism") or "").strip().casefold()
+    tax_id = target.get("tax_id")
+    human = tax_id == 9606 or organism == "homo sapiens"
+    if not human:
+        return "nonhuman"
+    if target_type == "SINGLE PROTEIN":
+        return "direct_human_protein"
+    if "PROTEIN" in target_type:
+        return "human_protein_component"
+    return "nonprotein"
+
+
+def _mechanism_identity_keys(target: dict[str, Any]) -> set[tuple[str, str]]:
+    keys = {
+        ("gene_symbol", str(value).strip().upper())
+        for value in target.get("gene_symbols", []) or []
+        if str(value).strip()
+    }
+    keys.update({
+        ("uniprot_id", str(value).strip().upper())
+        for value in target.get("uniprot_ids", []) or []
+        if str(value).strip()
+    })
+    target_chembl_id = str(target.get("target_chembl_id") or "").strip().upper()
+    if target_chembl_id:
+        keys.add(("target_chembl_id", target_chembl_id))
+    return keys
+
+
+def build_audit_scope_diagnostics(
+    status: str,
+    *,
+    candidates: Optional[list[dict[str, Any]]] = None,
+    mechanism_evidence: Optional[dict[str, Any]] = None,
+    molecule_type: Optional[str] = None,
+    identity_route: str = "",
+) -> dict[str, Any]:
+    """Pure supplied-drug audit classification used by product and acceptance.
+
+    It can explain an out-of-pool supplied drug, but it cannot create a
+    candidate, discovery rank, score, or rediscovery claim.
+    """
+    base: dict[str, Any] = {
+        "audit_scope_status": "not_assessable",
+        "deterministic_miss_reason": None,
+        "resolved_identity_route": identity_route or None,
+        "diagnostic_effect": "disclosure_only",
+    }
+    if status == "found":
+        base.update({
+            "audit_scope_status": "found_by_discovery",
+            "deterministic_miss_reason": "FOUND",
+        })
+        return base
+    if status == "unresolved":
+        base["deterministic_miss_reason"] = "NAME_RESOLUTION_GAP"
+        return base
+    if status == "no_case":
+        base["deterministic_miss_reason"] = "NO_CASE"
+        return base
+    if status == "no_candidates":
+        base["deterministic_miss_reason"] = "NO_CANDIDATES"
+        return base
+    if status != "absent":
+        return base
+
+    evidence = mechanism_evidence or {
+        "status": "unavailable", "targets": [], "provider": "chembl"}
+    source_status = str(evidence.get("status") or "unavailable")
+    targets = list(evidence.get("targets") or [])
+    ladder = _pool_target_ladder(candidates or [])
+    direct_mechanism_keys: set[tuple[str, str]] = set()
+    component_mechanism_keys: set[tuple[str, str]] = set()
+    identity_classes: set[str] = set()
+    for target in targets:
+        target_class = _mechanism_target_class(target)
+        identity_classes.add(target_class)
+        keys = _mechanism_identity_keys(target)
+        if target_class == "direct_human_protein":
+            direct_mechanism_keys.update(keys)
+        elif target_class == "human_protein_component":
+            component_mechanism_keys.update(keys)
+
+    overlaps: list[dict[str, Any]] = []
+    component_overlaps: list[dict[str, Any]] = []
+    coverage_ladder: list[dict[str, Any]] = []
+    for row in ladder:
+        row_keys = set()
+        if row.get("target_symbol"):
+            row_keys.add(("gene_symbol", str(row["target_symbol"]).upper()))
+        if row.get("uniprot_id"):
+            row_keys.add(("uniprot_id", str(row["uniprot_id"]).upper()))
+        candidate_target_id = str(
+            row.get("target_chembl_id") or "").strip().upper()
+        if candidate_target_id:
+            row_keys.add(("target_chembl_id", candidate_target_id))
+        matched = sorted(direct_mechanism_keys & row_keys)
+        component_matched = sorted(component_mechanism_keys & row_keys)
+        projected = {
+            **row,
+            "mechanism_identity_overlap": bool(matched),
+            "component_identity_overlap": bool(component_matched),
+        }
+        coverage_ladder.append(projected)
+        if matched:
+            overlaps.append({
+                **row,
+                "matched_identities": [
+                    {"kind": kind, "value": value}
+                    for kind, value in matched
+                ],
+            })
+        if component_matched:
+            component_overlaps.append({
+                **row,
+                "matched_component_identities": [
+                    {"kind": kind, "value": value}
+                    for kind, value in component_matched
+                ],
+            })
+
+    base.update({
+        "mechanism_evidence_status": source_status,
+        "mechanism_evidence_provider": evidence.get("provider") or "chembl",
+        "stable_mechanism_identities": targets,
+        "pool_target_overlap": overlaps,
+        "pool_component_target_overlap": component_overlaps,
+        "target_coverage_ladder": coverage_ladder,
+        "supplied_drug_discovery_rank": None,
+        "supplied_drug_discovery_score": None,
+        "supplied_drug_candidate_inserted": False,
+    })
+    if source_status == "unavailable":
+        base["audit_scope_status"] = "source_failure"
+        return base
+
+    base["audit_scope_status"] = "auditable_only_because_supplied"
+    if direct_mechanism_keys:
+        base["stable_identity_status"] = "direct_human_protein"
+    elif component_mechanism_keys:
+        base["stable_identity_status"] = "component_only"
+    elif "nonhuman" in identity_classes:
+        base["stable_identity_status"] = "nonhuman_or_nonprotein_only"
+    elif "nonprotein" in identity_classes:
+        base["stable_identity_status"] = "nonhuman_or_nonprotein_only"
+    else:
+        base["stable_identity_status"] = "unmapped"
+
+    if source_status == "empty" or not direct_mechanism_keys:
+        base["deterministic_miss_reason"] = "NO_MECHANISM_DATA"
+    elif overlaps:
+        normalized_type = str(molecule_type or "").strip().casefold()
+        biologic = any(token in normalized_type for token in (
+            "antibody", "protein", "enzyme", "oligosaccharide",
+            "oligonucleotide", "cell", "gene",
+        ))
+        base["deterministic_miss_reason"] = (
+            "BIOLOGIC_STRUCTURAL" if biologic else "ASSAY_POOL_GAP"
+        )
+    else:
+        base["deterministic_miss_reason"] = "TARGET_NOT_SELECTED"
+    return base
 
 
 # ── Cap disclosure ─────────────────────────────────────────────────────────────
@@ -231,6 +434,7 @@ def run_audit(
             "status": "no_case",
             "disease_name": disease_name,
             "drug_name": drug_name,
+            **build_audit_scope_diagnostics("no_case"),
             **_modality_payload(drug_name),
         }
         return _attach_audit_context(
@@ -257,6 +461,7 @@ def run_audit(
                 "This job predates per-job candidate persistence. "
                 "Re-run the disease to generate a fresh candidates file."
             ),
+            **build_audit_scope_diagnostics("no_candidates"),
             **_modality_payload(drug_name),
         }
         return _attach_audit_context(
@@ -278,6 +483,8 @@ def run_audit(
     # 4. Look up drug in pool
     rank, cand = _find_drug_in_pool(candidates, drug_name, chembl_id)
     top = candidates[0] if candidates else None
+    identity_route = _resolved_identity_route(cand, drug_name, chembl_id)
+    modality_payload: Optional[dict[str, Any]] = None
 
     if rank is not None and cand is not None:
         cap = _cap_reason(cand)
@@ -293,6 +500,8 @@ def run_audit(
             "top_candidate": top,
             "cap_applied": cap is not None,
             "cap_reason": cap,
+            **build_audit_scope_diagnostics(
+                "found", identity_route=identity_route),
         }
 
     elif chembl_id is None:
@@ -308,17 +517,41 @@ def run_audit(
             "resolved_chembl_id": None,
             "total_candidates": len(candidates),
             "top_candidate": top,
+            **build_audit_scope_diagnostics(
+                "unresolved", identity_route=identity_route),
         }
 
     else:
-        # Drug absent — explain why via target comparison
+        # Drug absent — compare its stable mechanism identity with every target
+        # represented in the persisted pool. This is supplied-drug evidence
+        # review only: it cannot insert the drug or assign a score/rank.
         selected_target = top.get("target_symbol") if top else None
 
-        drug_moa: list[str] = []
         try:
-            drug_moa = get_drug_mechanism_targets_for_audit(drug_name, chembl_id)
-        except Exception:
-            pass
+            mechanism_evidence = get_drug_mechanism_identities_for_audit(
+                drug_name, chembl_id)
+        except Exception as exc:  # fail closed as source state, not absence
+            mechanism_evidence = {
+                "status": "unavailable",
+                "provider": "chembl",
+                "resolved_molecule_chembl_id": chembl_id,
+                "identity_route": identity_route,
+                "targets": [],
+                "error": f"mechanism_lookup_failed:{type(exc).__name__}",
+            }
+        drug_moa = [
+            moa
+            for target in mechanism_evidence.get("targets", []) or []
+            for moa in target.get("mechanisms", []) or []
+        ]
+        modality_payload = _modality_payload(drug_name)
+        diagnostics = build_audit_scope_diagnostics(
+            "absent",
+            candidates=candidates,
+            mechanism_evidence=mechanism_evidence,
+            molecule_type=modality_payload.get("chembl_molecule_type"),
+            identity_route=identity_route,
+        )
 
         result = {
             "status": "absent",
@@ -330,6 +563,13 @@ def run_audit(
             "top_candidate": top,
             "agentbio_selected_target": selected_target,
             "drug_mechanism_targets": drug_moa,
+            "mechanism_evidence": mechanism_evidence,
+            "supplied_drug_safety_disclosure": (
+                "Regulatory and literature findings below are a disclosure-only "
+                "review of the supplied drug. They are not the reviewed-candidate "
+                "safety gate and do not create a score, rank, or discovery hit."
+            ),
+            **diagnostics,
         }
 
     # 5. Narrate with Opus 4.8 — strictly the computed numbers, no new claims.
@@ -363,7 +603,7 @@ def run_audit(
     # 8. Modality finding: applies to the DRUG, not the indication. Live cached
     # lookup so out-of-pool drugs get the same disclosure as reviewed
     # candidates; unresolved lookups are stated, never silently "clear".
-    result.update(_modality_payload(drug_name))
+    result.update(modality_payload or _modality_payload(drug_name))
 
     # 9. Structured regulatory + entity-linked literature context. This uses
     # the already-selected target as the bounded mechanism entity where one is
@@ -373,8 +613,16 @@ def run_audit(
         mechanism_symbol = str(
             (result.get("candidate") or {}).get("target_symbol") or "")
     elif result["status"] == "absent":
-        mechanism_symbol = str(
-            result.get("agentbio_selected_target") or "")
+        stable_targets = result.get("stable_mechanism_identities") or []
+        mechanism_symbol = next(
+            (
+                str(symbol)
+                for target in stable_targets
+                for symbol in (target.get("gene_symbols") or [])
+                if symbol
+            ),
+            "",
+        )
     _attach_audit_context(
         result, drug_name,
         mechanism_symbol=mechanism_symbol,

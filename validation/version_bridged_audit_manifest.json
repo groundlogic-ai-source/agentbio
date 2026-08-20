@@ -1,0 +1,40 @@
+{
+  "contract": "version-bridged-audit-manifest-v1",
+  "registered_date": "2026-08-20",
+  "git_head_at_registration": "2dc02d2b17fecb8cfbf10c216676695927269e7e",
+  "preregistration_sha256": "0cc0dc1470a451e4e611f728d2e0062d02469ab1f25fe6803eefb7a991912a17",
+  "target_universe_cache_sha256": "6e5b46ba088325499f9093e41912613bed00eca6e756eec247abb560258caa86",
+  "historical_artifacts": {
+    "validation/machine_v2_acceptance.json": "57144ff0796609ff0ee1ce26c43c6cbbc26e0a105ca311f82f0b3ec67d9b451b",
+    "validation/studyc_miss_autopsy.json": "4ca602031b8765c7f15f111e91e0f9d2c875ba1c5014d6198e09dd0549afaec5",
+    "validation/studyc_target_rank_rescue.json": "4475d6b40b8a7c26c092c7b7fdc1aaab3dd5dd76892c99a672d443bb6c8b85b5",
+    "validation/triage_discrimination_studyc_results.json": "ac2f7735e7a6b8eae90a97fda91db849efa8dec00efa1e43bcf637fc4281ce05"
+  },
+  "prechange_source_artifacts": {
+    "api/audit.py": "4e7ee987cfadeb1d0a71ae224ed81ba8ee28ef50f6ce2c762a993ac07b83391c",
+    "api/audit_context.py": "929a1a08e347b1d767b75b23c3ac656bf8960a5a316ea554f1ffc2426099f798",
+    "api/triage.py": "5800d5eb6b03677331c938eae239b8c1972707b4bfbca7e4ebbe17aee5463570",
+    "agents/target_selection.py": "42de41d3cd9441a28198715c6308ffa40fd5d00d18935aa07a2b4077b21b5734",
+    "data_sources/chembl.py": "a10733126bae6eb560990c3c1cec9abb9fd9cc04874baa76168859c422e18f4c",
+    "data_sources/holdout.py": "47bcf35f8a619bf5865a92fa53e4f92562b4515056caabc8dba6e6d78776f31e"
+  },
+  "acceptance_case_source": "validation/machine_v2_acceptance.json",
+  "acceptance_case_count": 16,
+  "historical_rediscovery_result": {
+    "contract": "machine-v2-acceptance-v1",
+    "either_rescued": 0,
+    "misses_evaluated": 16
+  },
+  "allowed_claims": [
+    "paired stable-identity measurement correction",
+    "candidate-conditioned audit coverage",
+    "paired mechanism-pool recovery",
+    "engineering acceptance"
+  ],
+  "forbidden_claims": [
+    "replacement of frozen v1 results",
+    "audit-only results counted as rediscovery",
+    "general accuracy",
+    "Study C v2 discrimination"
+  ]
+}

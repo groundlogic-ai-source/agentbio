@@ -1,0 +1,972 @@
+{
+  "base_commit_at_run": "2dc02d2b17fecb8cfbf10c216676695927269e7e",
+  "contract": "version-bridged-audit-acceptance-v1",
+  "controls": [
+    {
+      "detail": "found state remains distinct from supplied-only audit",
+      "name": "found-by-discovery: Prednisone / Lupus Erythematosus, Systemic",
+      "passed": true
+    },
+    {
+      "detail": "found state remains distinct from supplied-only audit",
+      "name": "found-by-discovery: Lenalidomide / Multiple Myeloma",
+      "passed": true
+    },
+    {
+      "detail": "remains absent, unranked, unscored, and outside target coverage",
+      "name": "unrelated supplied-only: Infliximab / Giant Cell Arteritis",
+      "passed": true
+    },
+    {
+      "detail": "remains absent, unranked, unscored, and outside target coverage",
+      "name": "unrelated supplied-only: Mycophenolate mofetil / Interstitial Cystitis",
+      "passed": true
+    },
+    {
+      "detail": "unresolved identity is not treated as biological absence",
+      "name": "unresolved synthetic drug name",
+      "passed": true
+    },
+    {
+      "detail": "transport failure does not become NO_MECHANISM_DATA",
+      "name": "degraded mechanism source",
+      "passed": true
+    }
+  ],
+  "historical_contract": "machine-v2-acceptance-v1",
+  "historical_rediscovery_result": {
+    "contract": "machine-v2-acceptance-v1",
+    "either_rescued": 0,
+    "misses_evaluated": 16
+  },
+  "implementation": {
+    "fingerprint": "6786366c9b605c60df567d5c13e88ed820882c1e0a5b1bd69a96d6be6b6a7cae",
+    "source_sha256": {
+      "api/audit.py": "10a9eeab4f0bd24dbc030fd97013ec2fd4b25fe877a6baedb6eeb893113a415c",
+      "api/triage.py": "04e17bbe5f1e1b4351d56bf93f1b0dafe1032bb1b7754cd0e33bee0b4184a39e",
+      "artifacts/web-frontend/src/components/AuditTab.jsx": "35ffb23c7ef6cec7e80eb50faeb55f6dea178b2be9d0c55317afa410345ea91c",
+      "artifacts/web-frontend/src/components/TriagePanel.jsx": "3700f4c7136f6ba3b78ad8557205015ff95fe20a84a0748bc90a8856688b1e6f",
+      "data_sources/chembl.py": "bcb1f0c8d444a664bc2be6b2a9db0add59ab65617f5417d6e07558f39be53d5b",
+      "validation/run_version_bridged_audit_acceptance.py": "4c208533576f780e90f90e806c9368ad0d052ce9b4918e84fbc04af0d7b4e659"
+    }
+  },
+  "interpretation_guard": "Audit coverage is not discovery recall. Stable-identity universe overlap is not a rediscovery hit. Frozen historical artifacts remain unmodified.",
+  "manifest": "validation/version_bridged_audit_manifest.json",
+  "passed": true,
+  "preregistration": "validation/version_bridged_audit_preregistration.md",
+  "promotion_decision": "Republish with the version-bridged supplied-drug audit and the bounded approval-first mechanism completeness repair enabled; do not describe this as a replacement Study C result or as a change to the historical 0/16 rediscovery result. The repair's kill switch is `AGENTBIO_DISABLE_MECHANISM_COMPLETENESS_REPAIR=1`.",
+  "rows": [
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL1451",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "TARGET_NOT_SELECTED",
+      "disease_name": "Giant Cell Arteritis",
+      "drug_name": "Triamcinolone",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "target_not_selected",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "direct_human_protein",
+      "stable_identity_universe_overlap": false,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "AGONIST"
+          ],
+          "gene_symbols": [
+            "NR3C1"
+          ],
+          "mechanisms": [
+            "Glucocorticoid receptor agonist"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL2034",
+          "target_name": "Glucocorticoid receptor",
+          "target_type": "SINGLE PROTEIN",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "P04150"
+          ]
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": null
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL1201516",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "NO_MECHANISM_DATA",
+      "disease_name": "Interstitial Cystitis",
+      "drug_name": "Pentosan Polysulfate",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "no_mechanism_data",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "nonhuman_or_nonprotein_only",
+      "stable_identity_universe_overlap": false,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [],
+          "gene_symbols": [],
+          "mechanisms": [
+            "Unknown"
+          ],
+          "organism": null,
+          "target_chembl_id": null,
+          "target_name": null,
+          "target_type": null,
+          "tax_id": null,
+          "uniprot_ids": []
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": null
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL632",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "ASSAY_POOL_GAP",
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Betamethasone",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "target_not_selected",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": true,
+      "production_gate_overlap": true,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "direct_human_protein",
+      "stable_identity_universe_overlap": true,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "AGONIST"
+          ],
+          "gene_symbols": [
+            "NR3C1"
+          ],
+          "mechanisms": [
+            "Glucocorticoid receptor agonist"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL2034",
+          "target_name": "Glucocorticoid receptor",
+          "target_type": "SINGLE PROTEIN",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "P04150"
+          ]
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": "NR3C1"
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL76",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "NO_MECHANISM_DATA",
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Chloroquine",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "target_not_selected",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "nonhuman_or_nonprotein_only",
+      "stable_identity_universe_overlap": false,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR",
+            "BINDING AGENT"
+          ],
+          "gene_symbols": [],
+          "mechanisms": [
+            "Ferriprotoporphyrin IX inhibitor",
+            "Ferriprotoporphyrin IX binding agent"
+          ],
+          "organism": "Plasmodium falciparum",
+          "target_chembl_id": "CHEMBL613897",
+          "target_name": "Ferriprotoporphyrin IX",
+          "target_type": "SMALL MOLECULE",
+          "tax_id": 5833,
+          "uniprot_ids": []
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": null
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL1535",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "ASSAY_POOL_GAP",
+      "disease_name": "Lupus Erythematosus, Systemic",
+      "drug_name": "Hydroxychloroquine",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "target_not_selected",
+      "legacy_mechanism_pool_recovery": true,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": true,
+      "production_gate_overlap": true,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "direct_human_protein",
+      "stable_identity_universe_overlap": true,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [],
+          "mechanisms": [
+            "Ferriprotoporphyrin IX inhibitor"
+          ],
+          "organism": "Plasmodium falciparum",
+          "target_chembl_id": "CHEMBL613897",
+          "target_name": "Ferriprotoporphyrin IX",
+          "target_type": "SMALL MOLECULE",
+          "tax_id": 5833,
+          "uniprot_ids": []
+        },
+        {
+          "action_types": [
+            "ANTAGONIST"
+          ],
+          "gene_symbols": [
+            "TLR7"
+          ],
+          "mechanisms": [
+            "Toll-like receptor 7 antagonist"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL5936",
+          "target_name": "Toll-like receptor 7",
+          "target_type": "SINGLE PROTEIN",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "Q9NYK1"
+          ]
+        },
+        {
+          "action_types": [
+            "ANTAGONIST"
+          ],
+          "gene_symbols": [
+            "TLR9"
+          ],
+          "mechanisms": [
+            "Toll-like receptor 9 antagonist"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL5804",
+          "target_name": "Toll-like receptor 9",
+          "target_type": "SINGLE PROTEIN",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "Q9NR96"
+          ]
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": "TLR7"
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL325041",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "NO_MECHANISM_DATA",
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Bortezomib",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "target_not_selected",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "component_only",
+      "stable_identity_universe_overlap": false,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [
+            "ADRM1",
+            "PSMA1",
+            "PSMA2",
+            "PSMA3",
+            "PSMA4",
+            "PSMA5",
+            "PSMA6",
+            "PSMA7",
+            "PSMA8",
+            "PSMB1",
+            "PSMB10",
+            "PSMB11",
+            "PSMB2",
+            "PSMB3",
+            "PSMB4",
+            "PSMB5",
+            "PSMB6",
+            "PSMB7",
+            "PSMB8",
+            "PSMB9",
+            "PSMC1",
+            "PSMC2",
+            "PSMC3",
+            "PSMC4",
+            "PSMC5",
+            "PSMC6",
+            "PSMD1",
+            "PSMD11",
+            "PSMD12",
+            "PSMD13",
+            "PSMD14",
+            "PSMD2",
+            "PSMD3",
+            "PSMD4",
+            "PSMD6",
+            "PSMD7",
+            "PSMD8",
+            "SEM1"
+          ],
+          "mechanisms": [
+            "26S proteasome inhibitor"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL2364701",
+          "target_name": "26S proteasome",
+          "target_type": "PROTEIN COMPLEX",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "A5LHX3",
+            "O00231",
+            "O00232",
+            "O00487",
+            "O14818",
+            "O43242",
+            "P17980",
+            "P20618",
+            "P25786",
+            "P25787",
+            "P25788",
+            "P25789",
+            "P28062",
+            "P28065",
+            "P28066",
+            "P28070",
+            "P28072",
+            "P28074",
+            "P35998",
+            "P40306",
+            "P43686",
+            "P48556",
+            "P49720",
+            "P49721",
+            "P51665",
+            "P55036",
+            "P60896",
+            "P60900",
+            "P62191",
+            "P62195",
+            "P62333",
+            "Q13200",
+            "Q15008",
+            "Q16186",
+            "Q8TAA3",
+            "Q99436",
+            "Q99460",
+            "Q9UNM6"
+          ]
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": null
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL513",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "ASSAY_POOL_GAP",
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Carmustine",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "target_not_selected",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "direct_human_protein",
+      "stable_identity_universe_overlap": true,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [
+            "GSR"
+          ],
+          "mechanisms": [
+            "Glutathione reductase inhibitor"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL2755",
+          "target_name": "Glutathione reductase, mitochondrial",
+          "target_type": "SINGLE PROTEIN",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "P00390"
+          ]
+        },
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [],
+          "mechanisms": [
+            "DNA inhibitor"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL2311221",
+          "target_name": "DNA",
+          "target_type": "NUCLEIC-ACID",
+          "tax_id": 9606,
+          "uniprot_ids": []
+        },
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [],
+          "mechanisms": [
+            "RNA inhibitor"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL2311222",
+          "target_name": "RNA",
+          "target_type": "NUCLEIC-ACID",
+          "tax_id": 9606,
+          "uniprot_ids": []
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": "GSR"
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL1200796",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "NO_MECHANISM_DATA",
+      "disease_name": "Multiple Myeloma",
+      "drug_name": "Cyclophosphamide",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "target_not_selected",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "nonhuman_or_nonprotein_only",
+      "stable_identity_universe_overlap": false,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [],
+          "mechanisms": [
+            "DNA inhibitor"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL2311221",
+          "target_name": "DNA",
+          "target_type": "NUCLEIC-ACID",
+          "tax_id": 9606,
+          "uniprot_ids": []
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": null
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL1200796",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "NO_MECHANISM_DATA",
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Cyclophosphamide",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "target_not_selected",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "nonhuman_or_nonprotein_only",
+      "stable_identity_universe_overlap": false,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [],
+          "mechanisms": [
+            "DNA inhibitor"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL2311221",
+          "target_name": "DNA",
+          "target_type": "NUCLEIC-ACID",
+          "tax_id": 9606,
+          "uniprot_ids": []
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": null
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL90555",
+      "component_target_overlap": [
+        {
+          "first_candidate_rank": 10,
+          "matched_component_identities": [
+            {
+              "kind": "gene_symbol",
+              "value": "TUBB"
+            },
+            {
+              "kind": "uniprot_id",
+              "value": "P07437"
+            }
+          ],
+          "target_chembl_id": null,
+          "target_symbol": "TUBB",
+          "uniprot_id": "P07437"
+        },
+        {
+          "first_candidate_rank": 12,
+          "matched_component_identities": [
+            {
+              "kind": "gene_symbol",
+              "value": "TUBA1A"
+            },
+            {
+              "kind": "uniprot_id",
+              "value": "Q71U36"
+            }
+          ],
+          "target_chembl_id": null,
+          "target_symbol": "TUBA1A",
+          "uniprot_id": "Q71U36"
+        }
+      ],
+      "deterministic_miss_reason": "NO_MECHANISM_DATA",
+      "disease_name": "Neuroblastoma",
+      "drug_name": "Vincristine",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "target_not_selected",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "component_only",
+      "stable_identity_universe_overlap": false,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [
+            "TUBA1A",
+            "TUBA1B",
+            "TUBA1C",
+            "TUBA3C",
+            "TUBA3E",
+            "TUBA4A",
+            "TUBB",
+            "TUBB1",
+            "TUBB2A",
+            "TUBB2B",
+            "TUBB3",
+            "TUBB4A",
+            "TUBB4B",
+            "TUBB6",
+            "TUBB8"
+          ],
+          "mechanisms": [
+            "Tubulin inhibitor"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL2095182",
+          "target_name": "Tubulin",
+          "target_type": "PROTEIN COMPLEX GROUP",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "P04350",
+            "P07437",
+            "P0DPH7",
+            "P68363",
+            "P68366",
+            "P68371",
+            "Q13509",
+            "Q13885",
+            "Q3ZCM7",
+            "Q6PEY2",
+            "Q71U36",
+            "Q9BQE3",
+            "Q9BUF5",
+            "Q9BVA1",
+            "Q9H4B7"
+          ]
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": null
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL1201580",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "BIOLOGIC_STRUCTURAL",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Adalimumab",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "biologic_structural",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "direct_human_protein",
+      "stable_identity_universe_overlap": true,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [
+            "TNF"
+          ],
+          "mechanisms": [
+            "TNF-alpha inhibitor"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL1825",
+          "target_name": "Tumor necrosis factor",
+          "target_type": "SINGLE PROTEIN",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "P01375"
+          ]
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": "TNF"
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL1650",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "ASSAY_POOL_GAP",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Cortisone acetate",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "target_not_selected",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "direct_human_protein",
+      "stable_identity_universe_overlap": true,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "AGONIST"
+          ],
+          "gene_symbols": [
+            "NR3C1"
+          ],
+          "mechanisms": [
+            "Glucocorticoid receptor agonist"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL2034",
+          "target_name": "Glucocorticoid receptor",
+          "target_type": "SINGLE PROTEIN",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "P04150"
+          ]
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": "NR3C1"
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL1201833",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "BIOLOGIC_STRUCTURAL",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "golimumab",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "biologic_structural",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "direct_human_protein",
+      "stable_identity_universe_overlap": true,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [
+            "TNF"
+          ],
+          "mechanisms": [
+            "TNF-alpha inhibitor"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL1825",
+          "target_name": "Tumor necrosis factor",
+          "target_type": "SINGLE PROTEIN",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "P01375"
+          ]
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": "TNF"
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL1201581",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "BIOLOGIC_STRUCTURAL",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Infliximab",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "biologic_structural",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "direct_human_protein",
+      "stable_identity_universe_overlap": true,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [
+            "TNF"
+          ],
+          "mechanisms": [
+            "TNF-alpha inhibitor"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL1825",
+          "target_name": "Tumor necrosis factor",
+          "target_type": "SINGLE PROTEIN",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "P01375"
+          ]
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": "TNF"
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL439",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "NO_MECHANISM_DATA",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Sulfadiazine",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "target_not_selected",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "nonhuman_or_nonprotein_only",
+      "stable_identity_universe_overlap": false,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [
+            "FOLP"
+          ],
+          "mechanisms": [
+            "Bacterial dihydropteroate synthase inhibitor"
+          ],
+          "organism": "Bacteria",
+          "target_chembl_id": "CHEMBL2364668",
+          "target_name": "Dihydropteroate synthase",
+          "target_type": "SINGLE PROTEIN",
+          "tax_id": 2,
+          "uniprot_ids": [
+            "P0AC13"
+          ]
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": null
+    },
+    {
+      "audit_diagnostic_has_rank_or_score": false,
+      "audit_diagnostic_inserted_candidate": false,
+      "audit_scope_status": "auditable_only_because_supplied",
+      "chembl_id": "CHEMBL1743087",
+      "component_target_overlap": [],
+      "deterministic_miss_reason": "NO_MECHANISM_DATA",
+      "disease_name": "Ulcerative Colitis",
+      "drug_name": "Vedolizumab",
+      "historical_exact_string_universe_rescued": false,
+      "historical_miss_class": "biologic_structural",
+      "legacy_mechanism_pool_recovery": false,
+      "mechanism_evidence_status": "ok",
+      "mechanism_pool_recovery": false,
+      "production_gate_overlap": false,
+      "production_gate_rank": null,
+      "rediscovery_recovery": false,
+      "stable_identity_status": "component_only",
+      "stable_identity_universe_overlap": false,
+      "stable_mechanism_identities": [
+        {
+          "action_types": [
+            "INHIBITOR"
+          ],
+          "gene_symbols": [
+            "ITGA4",
+            "ITGB7"
+          ],
+          "mechanisms": [
+            "Integrin alpha-4/beta-7 inhibitor"
+          ],
+          "organism": "Homo sapiens",
+          "target_chembl_id": "CHEMBL2095184",
+          "target_name": "Integrin alpha-4/beta-7",
+          "target_type": "PROTEIN COMPLEX",
+          "tax_id": 9606,
+          "uniprot_ids": [
+            "P13612",
+            "P26010"
+          ]
+        }
+      ],
+      "universe_rank": null,
+      "universe_target_symbol": null
+    }
+  ],
+  "run_metadata": {
+    "bounds": {
+      "acceptance_cases": 16,
+      "approved_mechanism_pool_output_per_target": 100,
+      "mechanism_source_rows_per_target": 200,
+      "production_target_gate": 5
+    },
+    "feature_changes": [
+      "candidate-conditioned stable-identity audit with explicit supplied-only scope",
+      "approval-first bounded mechanism-only pool completeness repair",
+      "single and batch audit presentation of scope, source state, miss reason, and target ladder"
+    ],
+    "llm_calls": 0,
+    "retrieval_date_utc": "2026-08-20",
+    "runtime_seconds": 10.37,
+    "sources": {
+      "mechanism_identity": {
+        "api_base": "https://www.ebi.ac.uk/chembl/api/data",
+        "provider": "ChEMBL",
+        "release": "not_exposed_by_endpoint"
+      },
+      "target_universe": {
+        "artifact": "validation/.machine_v2_acceptance_cache.json",
+        "sha256": "6e5b46ba088325499f9093e41912613bed00eca6e756eec247abb560258caa86"
+      }
+    }
+  },
+  "source_failures": [],
+  "summary": {
+    "audit_coverage": 16,
+    "legacy_mechanism_pool_recovery": 1,
+    "mechanism_pool_recovery": 2,
+    "misses_evaluated": 16,
+    "paired_mechanism_pool_gain": 1,
+    "production_gate_overlap": 2,
+    "rediscovery_recovery": 0,
+    "source_failures": 0,
+    "stable_identity_universe_overlap": 7
+  }
+}

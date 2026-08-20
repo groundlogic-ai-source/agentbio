@@ -5,6 +5,7 @@ then fetches IC50/Ki bioactivity records with confidence_score >= 8.
 """
 
 import math
+import os
 import statistics
 import time
 import requests
@@ -29,6 +30,12 @@ PHARM_PRECEDENT_ASSOC_SCORE: float = 0.90
 # validation/f2_precedent_calibration_justification.md — do not tune per case;
 # changes require a written amendment before any case-level inspection.
 PHARM_PRECEDENT_UMBRELLA_ASSOC_SCORE: float = 0.70
+
+# A bounded repair may inspect at most this many mechanism rows per resolved
+# ChEMBL target. Crossing the ceiling fails closed instead of silently applying
+# a fresh arbitrary raw-ID cap. The output remains capped separately at 100
+# approved molecules for downstream cost control.
+MECHANISM_ONLY_MAX_SOURCE_ROWS = 200
 
 
 def _get_json(url: str, params: dict | None = None) -> dict:
@@ -313,6 +320,7 @@ def _fetch_molecule_meta(molecule_ids: list[str]) -> dict[str, dict[str, Any]]:
             meta[mid] = {
                 "max_phase": m.get("max_phase"),
                 "pref_name": m.get("pref_name"),
+                "molecule_type": m.get("molecule_type"),
                 "canonical_smiles": struct.get("canonical_smiles"),
                 "parent_chembl_id": parent_id,
             }
@@ -1186,11 +1194,184 @@ def get_drug_action_type(
     return result
 
 
+def _mechanism_target_identity(
+    mechanism: dict[str, Any],
+    target: dict[str, Any],
+) -> dict[str, Any]:
+    """Project one ChEMBL mechanism row into stable target identifiers."""
+    accessions: set[str] = set()
+    gene_symbols: set[str] = set()
+    for component in target.get("target_components", []) or []:
+        accession = str(component.get("accession") or "").strip()
+        if accession:
+            accessions.add(accession.upper())
+        for synonym in component.get("target_component_synonyms", []) or []:
+            synonym_type = str(
+                synonym.get("syn_type")
+                or synonym.get("synonym_type")
+                or ""
+            ).upper()
+            value = str(
+                synonym.get("component_synonym")
+                or synonym.get("synonym_value")
+                or ""
+            ).strip()
+            if value and synonym_type == "GENE_SYMBOL":
+                gene_symbols.add(value.upper())
+
+    return {
+        "target_chembl_id": mechanism.get("target_chembl_id"),
+        "target_name": target.get("pref_name"),
+        "target_type": target.get("target_type"),
+        "organism": target.get("organism"),
+        "tax_id": target.get("tax_id"),
+        "uniprot_ids": sorted(accessions),
+        "gene_symbols": sorted(gene_symbols),
+        "mechanism_of_action": (
+            str(mechanism.get("mechanism_of_action") or "").strip() or None
+        ),
+        "action_type": (
+            str(mechanism.get("action_type") or "").strip() or None
+        ),
+    }
+
+
+def get_drug_mechanism_identities_for_audit(
+    drug_name: str,
+    chembl_id: str | None = None,
+) -> dict[str, Any]:
+    """Return a source-state-aware ChEMBL mechanism identity envelope.
+
+    Stable target identity is represented by ChEMBL target ID, UniProt
+    accession, and HGNC gene symbol. Successful non-empty envelopes are cached;
+    transport failures and empty payloads are not, so an outage cannot become a
+    durable claim that a drug has no recorded mechanism.
+    """
+    cache_key = make_key(
+        "drug_mechanism_identities_audit_v1", drug_name, chembl_id or "")
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+
+    identity_route = "provided_chembl_id" if chembl_id else "chembl_name_resolution"
+    try:
+        mid = chembl_id or _find_molecule_chembl_id(drug_name)
+    except Exception as exc:
+        return {
+            "status": "unavailable",
+            "provider": "chembl",
+            "resolved_molecule_chembl_id": None,
+            "identity_route": identity_route,
+            "targets": [],
+            "error": f"name_resolution_failed:{type(exc).__name__}",
+        }
+    if not mid:
+        return {
+            "status": "unavailable",
+            "provider": "chembl",
+            "resolved_molecule_chembl_id": None,
+            "identity_route": "unresolved_name",
+            "targets": [],
+            "error": "molecule_not_resolved",
+        }
+
+    try:
+        data = _get_json(
+            f"{BASE_URL}/mechanism.json",
+            {"molecule_chembl_id": mid, "limit": 100},
+        )
+        mechs = data.get("mechanisms", []) or []
+        mechanism_route = "molecule_chembl_id"
+        if not mechs:
+            data = _get_json(
+                f"{BASE_URL}/mechanism.json",
+                {"parent_molecule_chembl_id": mid, "limit": 100},
+            )
+            mechs = data.get("mechanisms", []) or []
+            mechanism_route = "parent_molecule_chembl_id"
+        if not mechs:
+            return {
+                "status": "empty",
+                "provider": "chembl",
+                "resolved_molecule_chembl_id": mid,
+                "identity_route": identity_route,
+                "mechanism_query_route": mechanism_route,
+                "targets": [],
+                "error": None,
+                "empty_payload_cached": False,
+            }
+
+        target_ids = sorted({
+            str(m.get("target_chembl_id") or "").strip()
+            for m in mechs
+            if m.get("target_chembl_id")
+        })
+        target_details = {
+            tid: _get_json(f"{BASE_URL}/target/{tid}.json")
+            for tid in target_ids
+        }
+
+        by_target: dict[str, dict[str, Any]] = {}
+        for mechanism in mechs:
+            tid = str(mechanism.get("target_chembl_id") or "").strip()
+            identity = _mechanism_target_identity(
+                mechanism, target_details.get(tid, {}))
+            key = tid or (
+                str(identity.get("mechanism_of_action") or "").casefold()
+                + "|"
+                + str(identity.get("action_type") or "").casefold()
+            )
+            existing = by_target.get(key)
+            if existing is None:
+                mechanism_text = identity.pop("mechanism_of_action", None)
+                action_text = identity.pop("action_type", None)
+                identity["mechanisms"] = (
+                    [mechanism_text] if mechanism_text else [])
+                identity["action_types"] = (
+                    [action_text] if action_text else [])
+                by_target[key] = identity
+                continue
+            for field in ("uniprot_ids", "gene_symbols"):
+                existing[field] = sorted(set(existing[field]) | set(identity[field]))
+            moa = identity.get("mechanism_of_action")
+            if moa and moa not in existing["mechanisms"]:
+                existing["mechanisms"].append(moa)
+            action = identity.get("action_type")
+            if action and action not in existing["action_types"]:
+                existing["action_types"].append(action)
+
+        result = {
+            "status": "ok",
+            "provider": "chembl",
+            "resolved_molecule_chembl_id": mid,
+            "identity_route": identity_route,
+            "mechanism_query_route": mechanism_route,
+            "targets": list(by_target.values()),
+            "error": None,
+        }
+    except Exception as exc:
+        print(
+            f"[chembl] WARNING: mechanism identity lookup failed for "
+            f"'{drug_name}': {exc}"
+        )
+        return {
+            "status": "unavailable",
+            "provider": "chembl",
+            "resolved_molecule_chembl_id": mid,
+            "identity_route": identity_route,
+            "targets": [],
+            "error": f"mechanism_lookup_failed:{type(exc).__name__}",
+        }
+
+    cache_set(cache_key, result, ttl_days=30)
+    return result
+
+
 def get_drug_mechanism_targets_for_audit(
     drug_name: str,
     chembl_id: str | None = None,
 ) -> list[str]:
-    """Return the mechanism-of-action strings this drug has in ChEMBL.
+    """Compatibility wrapper returning ChEMBL mechanism descriptions.
 
     Used by the audit endpoint to explain why a drug is absent from an
     AgentBio candidate pool (i.e. to show which proteins it actually targets,
@@ -1199,33 +1380,20 @@ def get_drug_mechanism_targets_for_audit(
     Returns strings like "Phosphodiesterase 5A inhibitor", "CRBN modulator".
     Returns empty list on lookup failure or not-found.
     """
-    mid = chembl_id or _find_molecule_chembl_id(drug_name)
-    if not mid:
-        return []
-    try:
-        data = _get_json(f"{BASE_URL}/mechanism.json",
-                         {"molecule_chembl_id": mid, "limit": 50})
-        mechs = data.get("mechanisms", [])
-        if not mechs:
-            # Fallback: parent molecule
-            data2 = _get_json(f"{BASE_URL}/mechanism.json",
-                               {"parent_molecule_chembl_id": mid, "limit": 50})
-            mechs = data2.get("mechanisms", [])
-        seen: set[str] = set()
-        result: list[str] = []
-        for m in mechs:
-            moa = (m.get("mechanism_of_action") or "").strip()
+    envelope = get_drug_mechanism_identities_for_audit(drug_name, chembl_id)
+    seen: set[str] = set()
+    descriptions: list[str] = []
+    for target in envelope.get("targets", []) or []:
+        for moa in target.get("mechanisms", []) or []:
             if moa and moa not in seen:
                 seen.add(moa)
-                result.append(moa)
-        return result
-    except Exception:
-        return []
+                descriptions.append(moa)
+    return descriptions
 
 
 def get_mechanism_only_approved_drugs(
     uniprot_id: str,
-    limit: int = 40,
+    limit: int = 100,
 ) -> list[dict[str, Any]]:
     """Machine-v2 coverage lane (2026-08-20): APPROVED drugs holding a ChEMBL
     mechanism_of_action row against this target, with NO requirement for a
@@ -1244,9 +1412,17 @@ def get_mechanism_only_approved_drugs(
     activity pool by molecule_chembl_id. Cached 30d; failures NOT cached
     (cache-poisoning convention).
     """
-    # v2 key: v1 was written before the empty-payload/partial-aggregate cache
-    # hardening; its entries may freeze ambiguous empties for 30 days.
-    cache_key = make_key("mechanism_only_approved_v2", uniprot_id, limit)
+    # The completeness repair filters approval status before applying the
+    # bounded result cap. Setting the kill switch restores the pre-change
+    # raw-ID-first 40-row cap for paired acceptance and emergency rollback.
+    completeness_repair = (
+        os.environ.get(
+            "AGENTBIO_DISABLE_MECHANISM_COMPLETENESS_REPAIR", ""
+        ).strip() != "1"
+    )
+    mode = "approval_first" if completeness_repair else "legacy_raw_cap_40"
+    cache_key = make_key(
+        "mechanism_only_approved_v3", uniprot_id, limit, mode)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -1268,9 +1444,28 @@ def get_mechanism_only_approved_drugs(
     saw_empty_endpoint = False
     try:
         for tid in target_ids:
+            source_limit = (
+                MECHANISM_ONLY_MAX_SOURCE_ROWS + 1
+                if completeness_repair else 1000
+            )
             data = _get_json(f"{BASE_URL}/mechanism.json",
-                             {"target_chembl_id": tid, "limit": 1000})
+                             {"target_chembl_id": tid, "limit": source_limit})
             mechs = data.get("mechanisms", []) or []
+            page_meta = data.get("page_meta") or {}
+            total_count = page_meta.get("total_count")
+            if completeness_repair and (
+                len(mechs) > MECHANISM_ONLY_MAX_SOURCE_ROWS
+                or (
+                    isinstance(total_count, int)
+                    and total_count > MECHANISM_ONLY_MAX_SOURCE_ROWS
+                )
+            ):
+                print(
+                    f"[chembl] WARNING: mechanism-only lane source work limit "
+                    f"exceeded for '{uniprot_id}' / {tid}; "
+                    f"max={MECHANISM_ONLY_MAX_SOURCE_ROWS}"
+                )
+                return []  # fail closed; never silently truncate raw IDs
             if mechs:
                 saw_mechanism_rows = True
             else:
@@ -1296,22 +1491,47 @@ def get_mechanism_only_approved_drugs(
 
     results: list[dict[str, Any]] = []
     try:
-        for mid in sorted(by_mid)[:limit]:  # stable order: deterministic cap
-            mol = _get_json(f"{BASE_URL}/molecule/{mid}.json")
-            mp = mol.get("max_phase")
+        all_ids = sorted(by_mid)
+        ids_for_metadata = (
+            all_ids
+            if completeness_repair
+            else all_ids[:min(limit, 40)]
+        )
+        metadata = _fetch_molecule_meta(ids_for_metadata)
+        missing_metadata = set(ids_for_metadata) - set(metadata)
+        if missing_metadata:
+            print(
+                f"[chembl] WARNING: mechanism-only lane molecule metadata "
+                f"incomplete for '{uniprot_id}': "
+                f"{len(missing_metadata)} row(s) missing"
+            )
+            return []
+
+        approved_ids: list[str] = []
+        for mid in ids_for_metadata:
+            mp = metadata[mid].get("max_phase")
             try:
                 approved = mp is not None and float(mp) >= 4
             except (TypeError, ValueError):
                 approved = False
-            if not approved:
-                continue
-            structs = mol.get("molecule_structures") or {}
+            if approved:
+                approved_ids.append(mid)
+        selected_ids = (
+            approved_ids[:limit]
+            if completeness_repair
+            else approved_ids
+        )
+
+        for mid in selected_ids:
+            mol = metadata[mid]
+            mp = mol.get("max_phase")
             results.append({
                 "molecule_chembl_id": mid,
                 "pref_name": mol.get("pref_name"),
                 "max_phase": mp,
                 "molecule_type": mol.get("molecule_type"),
-                "canonical_smiles": structs.get("canonical_smiles"),
+                "canonical_smiles": mol.get("canonical_smiles"),
+                "parent_chembl_id": mol.get("parent_chembl_id"),
                 "pchembl_value": None,
                 "confidence_score": None,
                 "n_activities": 0,
