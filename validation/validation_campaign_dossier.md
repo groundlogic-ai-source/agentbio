@@ -27,7 +27,7 @@ This dossier answers two questions an evaluator should ask separately:
 
 - **Frozen studies.** Each result of record comes from a frozen study at a pinned code
   commit, with results hash-bound to the artifact, and reruns of completed studies are
-  technically refused by the harness itself. One qualification, registered as
+  technically refused by the harness itself. One qualification, nou registered as
   Amendment 3 of the audit v2 protocol: audit v2's first freeze was destroyed by an
   environment restart *before any scoring*, and the scored claim set is the registered
   rebuild under identical rules. Development instruments (the reviewer pilot, the
