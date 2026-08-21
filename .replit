@@ -47,3 +47,6 @@ outputType = "console"
 task = "shell.exec"
 args = "cd /home/runner/workspace && python3 -m validation.await_pubchem_and_harvest --max-hours 12 2>&1 | tee /tmp/await_pubchem.log"
 
+[nix]
+channel = "stable-25_05"
+

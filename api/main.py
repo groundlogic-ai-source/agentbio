@@ -40,6 +40,7 @@ from api import triage_db
 from api import triage as _triage
 from api import dossier as _dossier
 from api import audit as _audit
+from validation.benchmark_v2_completion import inspect_frozen_result
 
 # Node names emitted by graph.stream(...) map 1:1 onto current_stage values.
 _PIPELINE_NODES = {
@@ -670,13 +671,18 @@ def get_research_benchmarks() -> dict[str, Any]:
     trap_artifact = _load_validation_artifact("audit_trap_results.json")
     if trap_artifact is not None:
         summaries.append(_audit_trap_summary(trap_artifact))
+    v2_status = inspect_frozen_result()
     return {
         "benchmarks": summaries,
-        "pilot_status": "not_run",
+        "pilot_status": (
+            "complete_frozen" if v2_status["complete"]
+            else "frozen_artifact_requires_review"
+        ),
         "pilot_note": (
-            "No fresh upgraded pilot has been frozen or run. The displayed figures "
-            "are historical validation artifacts and are separated from future "
-            "post-upgrade results."
+            "Benchmark v2 completed as the single pre-registered run on "
+            "August 9, 2026. Its frozen result is reported separately from the "
+            "historical development artifacts below and must not be rerun or "
+            "pooled with them."
         ),
     }
 
@@ -837,12 +843,16 @@ def _bench_supervisor_alive() -> bool:
 
 @app.get("/internal/benchmark-status")
 def benchmark_status() -> dict:
-    """Read-only progress of the 24/7 v2 benchmark chain (control -> screen -> run)."""
+    """Read-only state of the completed, frozen benchmark-v2 run."""
+    frozen_completion = inspect_frozen_result(_BENCH_RESULTS_JSON)
     status: dict[str, Any] = {
         "supervisor_log": _BENCH_LOG,
         "supervisor_alive": _bench_supervisor_alive(),
         "paused_before_benchmark": os.path.exists(_BENCH_PAUSE),
         "control_discard_attempts": None,
+        "phase": frozen_completion["phase"],
+        "rerun_allowed": False,
+        "frozen_completion": frozen_completion,
     }
     try:
         with open(_BENCH_ATTEMPTS) as f:
@@ -926,19 +936,16 @@ def benchmark_log(lines: int = 200) -> dict:
 
 @app.post("/internal/benchmark-greenlight")
 def benchmark_greenlight() -> dict:
-    """Clear the pre-benchmark pause so the supervisor proceeds to the v2 run.
-
-    Used after the source-ablation control finishes and the final source set
-    for the benchmark has been decided. The supervisor picks this up on its
-    next cycle (<=60s). No-op if not paused.
-    """
-    if not os.path.exists(_BENCH_PAUSE):
-        return {"status": "not_paused"}
-    try:
-        os.remove(_BENCH_PAUSE)
-    except OSError as exc:
-        raise HTTPException(status_code=500, detail=f"could not clear pause: {exc}")
-    return {"status": "greenlit", "note": "supervisor proceeds to the benchmark on its next cycle (<=60s)"}
+    """Refuse a second execution of the one-shot, completed v2 benchmark."""
+    frozen = inspect_frozen_result(_BENCH_RESULTS_JSON)
+    raise HTTPException(
+        status_code=409,
+        detail=(
+            "Benchmark v2 already completed as the single pre-registered run "
+            f"({frozen['completed_on']}). Its frozen result cannot be greenlit "
+            "or rerun."
+        ),
+    )
 
 
 # --------------------------------------------------------------------------- #

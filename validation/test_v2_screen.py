@@ -187,6 +187,10 @@ class RunnerContaminationGuardTest(unittest.TestCase):
             return out
         with mock.patch.object(pf, "_valid_ablation_results",
                                return_value=(True, "complete")), \
+                mock.patch(
+                    "validation.benchmark_v2_completion.inspect_frozen_result",
+                    return_value={"frozen": False},
+                ), \
                 mock.patch.object(pf, "_bless_fingerprint_transition"), \
                 mock.patch.object(pf.os.path, "exists", return_value=True), \
                 mock.patch.object(pf, "_healthy", return_value=True), \
@@ -451,6 +455,10 @@ class AblationControlIntegrityTest(unittest.TestCase):
         # are down, every enabled arm would be rejected afterwards anyway.
         with mock.patch.object(pf, "_ablation_sources_healthy",
                                return_value=False), \
+                mock.patch(
+                    "validation.benchmark_v2_completion.inspect_frozen_result",
+                    return_value={"frozen": False},
+                ), \
                 mock.patch("validation.run_benchmark._chembl_healthy",
                            return_value=True), \
                 mock.patch("validation.screen_v2_cases.ot_healthy",
@@ -507,6 +515,10 @@ class AblationControlIntegrityTest(unittest.TestCase):
             fake_git = mock.MagicMock()
             fake_git.run.return_value = mock.Mock(returncode=1, stdout="")
             with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch(
+                        "validation.benchmark_v2_completion.inspect_frozen_result",
+                        return_value={"frozen": False},
+                    ), \
                     mock.patch.object(pf, "_healthy", return_value=True), \
                     mock.patch.object(pf, "subprocess", fake_git), \
                     mock.patch.object(pf, "_git_available", return_value=True), \
@@ -535,6 +547,10 @@ class AblationControlIntegrityTest(unittest.TestCase):
             validate_control = pf._valid_ablation_results
             with mock.patch.object(pf, "_valid_ablation_results",
                                    side_effect=lambda: validate_control(path)), \
+                    mock.patch(
+                        "validation.benchmark_v2_completion.inspect_frozen_result",
+                        return_value={"frozen": False},
+                    ), \
                     mock.patch.object(pf, "ABLATION_RESULTS", path), \
                     mock.patch.object(pf, "_healthy", return_value=True), \
                     mock.patch.object(pf, "_run_module") as run_module:
@@ -574,6 +590,10 @@ class AblationControlIntegrityTest(unittest.TestCase):
             fake_git = mock.MagicMock()
             fake_git.run.return_value = mock.Mock(returncode=1, stdout="")
             with mock.patch.object(pf, "ABLATION_RESULTS", path), \
+                    mock.patch(
+                        "validation.benchmark_v2_completion.inspect_frozen_result",
+                        return_value={"frozen": False},
+                    ), \
                     mock.patch.object(pf, "_healthy", return_value=True), \
                     mock.patch.object(pf, "subprocess", fake_git), \
                     mock.patch.object(pf, "_git_available", return_value=True), \
@@ -741,6 +761,10 @@ class FreezeAttestationTest(unittest.TestCase):
                 json.dump({"sealed": True}, f)
             missing = os.path.join(td, "missing.json")
             with mock.patch.object(pf, "ABLATION_RESULTS", missing), \
+                    mock.patch(
+                        "validation.benchmark_v2_completion.inspect_frozen_result",
+                        return_value={"frozen": False},
+                    ), \
                     mock.patch.object(pf, "FREEZE_ATTESTATION", p["att"]), \
                     mock.patch.object(pf, "_git_available", return_value=False), \
                     mock.patch.object(pf, "_healthy", return_value=True), \

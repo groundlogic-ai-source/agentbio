@@ -102,6 +102,15 @@ body {
 .benchmark-panel { margin: 0 0 2rem; padding: 1.25rem 1.5rem; border: 1px solid var(--steel-border); border-radius: 8px; background: var(--steel-glow); }
 .benchmark-panel h3 { margin: .25rem 0 .4rem; color: var(--ink); font-size: 1.2rem; }
 .benchmark-note { margin: 0 0 1rem; color: var(--ink-muted); font-size: .75rem; line-height: 1.55; max-width: 65rem; }
+.benchmark-run-status { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin: 0 0 1rem; padding: .85rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); }
+.benchmark-run-status > div:first-child { display: grid; gap: .2rem; }
+.benchmark-run-status strong { color: var(--ink); font-size: .82rem; }
+.benchmark-run-status span { color: var(--ink-muted); font-size: .66rem; }
+.benchmark-run-status-complete { border-color: rgba(61, 122, 61, .3); background: var(--success-glow); }
+.benchmark-run-status-warning { border-color: var(--oxide-border); background: var(--oxide-glow); color: var(--oxide); font-size: .72rem; }
+.benchmark-run-status-loading { color: var(--ink-muted); font-size: .72rem; }
+.benchmark-status-label { color: var(--success) !important; font-family: monospace; text-transform: uppercase; letter-spacing: .1em; font-size: .56rem !important; }
+.benchmark-status-lock { color: var(--success); font-family: monospace; font-size: .58rem; line-height: 1.4; text-align: right; text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; }
 .benchmark-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: .8rem; }
 .benchmark-card { border: 1px solid var(--border); border-radius: 6px; padding: .9rem; background: var(--surface); color: var(--ink-muted); font-size: .7rem; line-height: 1.45; }
 .benchmark-card-title { color: var(--ink); font-weight: 600; margin-bottom: .7rem; }
@@ -120,6 +129,8 @@ body {
   .pool-header h2 { font-size: 1.55rem; }
   .pool-controls { grid-template-columns: 1fr; }.pool-controls label:first-child, .pool-controls label:nth-child(2), .pool-apply { grid-column: auto; }
   .candidate-table th, .candidate-table td { padding: .5rem; }
+  .benchmark-run-status { align-items: flex-start; flex-direction: column; }
+  .benchmark-status-lock { text-align: left; }
 }
 
 /* Scrollbar — webkit only */

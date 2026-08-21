@@ -13,6 +13,7 @@ import {
   generateHypothesisReport,
   saveReport,
   getResearchBenchmarks,
+  getBenchmarkStatus,
   deleteArchivedRegistry,
 } from "../api.js";
 
@@ -28,6 +29,11 @@ function fmtP(v) {
   const n = Number(v);
   if (Number.isNaN(n)) return "—";
   return n.toExponential(2);
+}
+
+function fmtPct(v, digits = 1) {
+  if (v == null || Number.isNaN(Number(v))) return "—";
+  return `${(Number(v) * 100).toFixed(digits)}%`;
 }
 
 // Full auditable write-up for a doubly-passing hypothesis. Renders the audit
@@ -766,19 +772,53 @@ function RegistryResetPanel() {
 
 function BenchmarkPanel() {
   const [state, setState] = useState({ loading: true, error: null, data: null });
+  const [runState, setRunState] = useState({ loading: true, error: null, data: null });
   useEffect(() => {
     getResearchBenchmarks()
       .then((data) => setState({ loading: false, error: null, data }))
       .catch((error) => setState({ loading: false, error: error.message, data: null }));
+    getBenchmarkStatus()
+      .then((data) => setRunState({ loading: false, error: null, data }))
+      .catch((error) => setRunState({ loading: false, error: error.message, data: null }));
   }, []);
   if (state.loading) return <div className="benchmark-panel"><span className="pool-muted">Loading historical validation artifacts…</span></div>;
   if (state.error) return <div className="benchmark-panel pool-error">Could not load benchmark artifacts: {state.error}</div>;
   const data = state.data || {};
+  const frozen = runState.data?.frozen_completion;
   return (
     <section className="benchmark-panel">
       <div className="eyebrow">Validation reporting</div>
       <h3>Historical benchmark artifacts</h3>
       <p className="benchmark-note">{data.pilot_note}</p>
+      {runState.loading && (
+        <div className="benchmark-run-status benchmark-run-status-loading">
+          Verifying the frozen benchmark-v2 result…
+        </div>
+      )}
+      {runState.error && (
+        <div className="benchmark-run-status benchmark-run-status-warning">
+          Frozen benchmark status is temporarily unavailable: {runState.error}
+        </div>
+      )}
+      {frozen && (
+        <div className={`benchmark-run-status ${frozen.complete ? "benchmark-run-status-complete" : "benchmark-run-status-warning"}`}>
+          <div>
+            <span className="benchmark-status-label">
+              {frozen.complete ? "Benchmark v2 · frozen complete" : "Benchmark v2 · integrity review required"}
+            </span>
+            <strong>
+              {frozen.screened_primary ?? "—"}/{frozen.selected_primary ?? "—"} selected cases passed screening ({fmtPct(frozen.funnel_feasibility_rate, 0)} funnel-feasible);{" "}
+              {frozen.primary_rediscovered ?? "—"}/{frozen.primary_in_scope ?? "—"} in-scope screened cases were rediscovered ({fmtPct(frozen.primary_rediscovery_rate)}).
+            </strong>
+            <span>
+              {frozen.primary_executed ?? "—"} screened primary · {frozen.development_executed ?? "—"} development · completed {frozen.completed_on}
+            </span>
+          </div>
+          <div className="benchmark-status-lock">
+            One pre-registered run<br />reruns disabled
+          </div>
+        </div>
+      )}
       <div className="benchmark-grid">
         {(data.benchmarks || []).map((bench) => (
           bench.kind === "audit_traps" ? (

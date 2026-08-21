@@ -18,19 +18,20 @@ from validation import run_benchmark_guarded
 
 
 class RunBenchmarkGuardedTest(unittest.TestCase):
-    def test_delegates_to_watchdog_with_benchmark_module(self):
+    def test_refuses_before_delegating_to_watchdog(self):
         with mock.patch.object(run_benchmark_guarded, "_run_argv",
                                return_value=7) as m:
             rc = run_benchmark_guarded.main()
-        self.assertEqual(rc, 7)
-        argv = m.call_args.args[0]
-        self.assertEqual(argv[-2:], ["-m", "validation.run_benchmark"])
+        self.assertEqual(rc, 2)
+        m.assert_not_called()
 
-    def test_supervisor_invokes_guarded_runner(self):
+    def test_completed_v2_supervisor_is_terminal_guard_only(self):
         script = (pathlib.Path(__file__).resolve().parent.parent
                   / "scripts" / "prod_benchmark_supervisor.sh").read_text()
-        self.assertIn("python3 -m validation.run_benchmark_guarded", script)
-        self.assertNotIn("python3 -m validation.run_benchmark >>", script)
+        self.assertIn("validation.benchmark_v2_completion --verify", script)
+        self.assertNotIn("validation.run_v2_preflight", script)
+        self.assertNotIn("validation.run_benchmark_guarded", script)
+        self.assertNotIn("validation.run_benchmark ", script)
 
 
 if __name__ == "__main__":

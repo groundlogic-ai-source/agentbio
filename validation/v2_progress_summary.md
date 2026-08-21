@@ -1,4 +1,11 @@
-# v2 Benchmark Program — Progress Summary (2026-08-05)
+# v2 Benchmark Program — Historical Progress Snapshot (2026-08-05)
+
+> **Superseded on 2026-08-09.** Benchmark v2 subsequently completed as the
+> single pre-registered run: 32 screened primary rows plus 15 development rows.
+> The frozen result is `validation/benchmark_results_v2.json`. The primary
+> endpoint was 6 rediscoveries among 22 in-scope screened cases (27.3%).
+> This document is retained only as a dated operational snapshot and must not
+> be used as current status or as authorization to rerun the benchmark.
 
 ## Where things stand
 

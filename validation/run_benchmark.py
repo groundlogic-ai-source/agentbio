@@ -1,5 +1,8 @@
-"""The single pre-registered benchmark run — executes
-validation/benchmark_case_list.json under the frozen pipeline.
+"""Historical runner for the completed single pre-registered benchmark v2.
+
+Benchmark v2 completed on 2026-08-09. The canonical entry point now refuses
+before any health probe, source call, or write. The original runner remains
+below solely to preserve the exact code path that produced the frozen result.
 
 Protocol enforcement (validation/benchmark_case_selection_criteria.md §8):
   - REFUSES TO START if the pipeline code (agents/, data_sources/, cache/)
@@ -32,6 +35,7 @@ from validation.run_repodb_cases import (  # noqa: E402
     _run_inline_pipeline, _norm_name, _holdout_fp, _log,
 )
 from validation import miss_classifier  # noqa: E402
+from validation.benchmark_v2_completion import inspect_frozen_result  # noqa: E402
 from data_sources import holdout as holdout_mod  # noqa: E402
 from data_sources.chembl import get_target_candidate_compounds  # noqa: E402
 
@@ -308,6 +312,14 @@ def _build_markdown(cases: list[dict[str, Any]]) -> str:
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main() -> None:
+    frozen = inspect_frozen_result(RESULTS_JSON)
+    _log(
+        "REFUSED: benchmark v2 already completed as the single pre-registered "
+        f"run ({frozen['completed_on']}); phase={frozen['phase']}. The frozen "
+        "result cannot be resumed, replaced, or rerun."
+    )
+    sys.exit(2)
+
     if os.path.exists("validation/BENCHMARK_V1_TERMINATED") and FREEZE_TAG == "benchmark-freeze-v1":
         _log("v1 was terminated by protocol decision (see benchmark_v1_partial_report.md); refusing to run. rc=2.")
         sys.exit(2)

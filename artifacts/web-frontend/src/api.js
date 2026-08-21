@@ -185,6 +185,10 @@ export function getResearchBenchmarks() {
   return request("/api/research/benchmarks");
 }
 
+export function getBenchmarkStatus() {
+  return request("/internal/benchmark-status");
+}
+
 // ── Audit mode: list triage + dossier workspace ─────────────────────────────
 // Triage audits a caller-supplied drug list against one completed case's
 // persisted pool. The run is persisted server-side and retrievable by run id.
