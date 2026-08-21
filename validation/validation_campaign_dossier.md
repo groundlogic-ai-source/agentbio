@@ -27,7 +27,7 @@ This dossier answers two questions an evaluator should ask separately:
 
 - **Frozen studies.** Each result of record comes from a frozen study at a pinned code
   commit, with results hash-bound to the artifact, and reruns of completed studies are
-  technically refused by the harness itself. One qualification, nou registered as
+  technically refused by the harness itself. One qualification, now registered as
   Amendment 3 of the audit v2 protocol: audit v2's first freeze was destroyed by an
   environment restart *before any scoring*, and the scored claim set is the registered
   rebuild under identical rules. Development instruments (the reviewer pilot, the
@@ -78,14 +78,17 @@ This dossier answers two questions an evaluator should ask separately:
   read.
 - **Provenance caveat (disclosed, not repaired):** the run executed under freeze
   `benchmark-freeze-v2` in deployment-attestation mode on the production deployment.
-  Two deployment-side proof files — the screened case list
-  (`benchmark_case_list_v2.json`) and the freeze attestation
-  (`benchmark_freeze_v2_attestation.json`) — were not preserved and are not in the
-  repository, and no local git tag exists. Consequence: the *results artifact* is
-  hash-verifiable, but the screened-list identity and source fingerprint cannot be
-  independently re-verified against the original attestation from this repository.
-  Campaign policy forbids reconstructing those files, so this gap is disclosed rather
-  than filled.
+  The screened case list *is* preserved and pre-hoc checkable: the results artifact
+  references `validation/benchmark_case_list.json`, which is committed in this
+  repository (seed 20260731, committed 2026-08-01 — eight days before the run) and
+  pinned by the `benchmark-cases-v2` tag, byte-identical to the file at HEAD. What
+  remains missing is the deployment-side freeze attestation
+  (`benchmark_freeze_v2_attestation.json`) and the `benchmark-freeze-v2` tag itself.
+  Consequence: the results artifact is hash-verifiable and the screened-list identity
+  is checkable against pre-run git history, but the production source fingerprint
+  cannot be independently re-verified against the original attestation from this
+  repository. Campaign policy forbids reconstructing the attestation, so that
+  residual gap is disclosed rather than filled.
 - **Funnel (primary set):** 50 cases selected by pre-registered criteria from 9,057
   dataset rows (attrition: `validation/benchmark_attrition.md`, which also discloses 7
   coverage failures at selection) → 32 passed the feasibility screen (64%) → 22
@@ -231,6 +234,8 @@ This dossier answers two questions an evaluator should ask separately:
   unresolvable-name honesty (**0/8 caught**); dose/route implausibility was caught 8/9.
   The classes that passed were combination-product splitting (8/8), biologic modality
   mis-scope (13/13), safety withdrawal (2/2), and direction incompatibility (1/1).
+  Novel-lane recall (no threshold pre-registered, as in v2): 29/30 = 0.967 (CP lower
+  0.851) — included here for symmetry with the v2 headline.
 - **What happened next:** the failure was diagnosed to the black-box/withdrawal
   classifier conflation, fixed under amendment, and re-measured as a **new frozen
   study** (v2). v1 was left unedited; both artifacts remain in the record.
@@ -292,10 +297,11 @@ impolite.
 Every headline in this dossier cites its artifact; the frozen artifacts carry their
 hashes, freeze tags/commits, and construction logs. The audit claim sets include raw
 per-claim outputs for spot-checking against external ground truth. One gap is
-disclosed up front: benchmark v2's deployment-side screened-case list and freeze
-attestation were not preserved (see its Provenance caveat), so its results artifact is
-hash-pinned and checkable, but the screened-list identity cannot be re-verified
-against the original attestation from the repository alone.
+disclosed up front: benchmark v2's deployment-side freeze attestation was not
+preserved (see its Provenance caveat), so the production source fingerprint cannot be
+re-verified against the original attestation — but the screened case list itself is
+committed, tagged (`benchmark-cases-v2`), and dated eight days before the run, so the
+screen-lock claim is checkable directly in git history.
 
 ---
 
@@ -330,7 +336,7 @@ against the original attestation from the repository alone.
 
 | Artifact | Study | Frozen |
 |---|---|---|
-| `validation/benchmark_results_v2.json` | Rediscovery benchmark v2 (result of record) | ✅ results hash-pinned; ⚠ screened list + attestation not preserved (disclosed) |
+| `validation/benchmark_results_v2.json` | Rediscovery benchmark v2 (result of record) | ✅ results hash-pinned; ✅ screened list committed pre-run + tagged (`benchmark-cases-v2`); ⚠ deployment attestation not preserved (disclosed) |
 | `validation/benchmark_results_v1_partial.json` + `benchmark_v1_partial_report.md` | Rediscovery benchmark v1 (terminated) | ✅ `benchmark-freeze-v1` |
 | `validation/benchmark_attrition.md` | Case-selection funnel | ✅ |
 | `validation/audit_claimset_v2_results.md` (+ raw, manifest, log) | Audit claim-set v2 (result of record) | ✅ sha `5013a57a…` |
