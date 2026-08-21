@@ -1,7 +1,8 @@
-"""
-Guarded v2 benchmark runner — runs the benchmark under the same 30-minute
-output-silence watchdog that already protects the preflight children
-(control + screen).
+"""Retired guarded runner for the completed, one-shot benchmark v2.
+
+Benchmark v2 completed on 2026-08-09. This wrapper now refuses before starting
+the child process. The historical watchdog implementation is described below
+for provenance, but no second benchmark process may be launched.
 
 Why this exists: the production supervisor invoked ``run_benchmark``
 directly, so unlike the preflight-run control/screen children the benchmark
@@ -21,10 +22,17 @@ Usage:
 import sys
 
 from validation.run_v2_preflight import _run_argv
+from validation.benchmark_v2_completion import inspect_frozen_result
 
 
 def main() -> int:
-    return _run_argv([sys.executable, "-m", "validation.run_benchmark"])
+    frozen = inspect_frozen_result()
+    print(
+        "REFUSED: benchmark v2 is frozen and complete "
+        f"({frozen['completed_on']}; phase={frozen['phase']}).",
+        flush=True,
+    )
+    return 2
 
 
 if __name__ == "__main__":

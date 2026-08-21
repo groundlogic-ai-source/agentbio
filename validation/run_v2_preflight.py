@@ -697,6 +697,16 @@ def _discard_control(reason: str, context: str) -> int:
 
 
 def main() -> int:
+    from validation.benchmark_v2_completion import inspect_frozen_result
+    frozen = inspect_frozen_result()
+    if frozen["frozen"]:
+        _log(
+            "REFUSED: benchmark v2 already completed as the single "
+            f"pre-registered run ({frozen['completed_on']}); "
+            f"phase={frozen['phase']}. Preflight cannot be rerun."
+        )
+        return 2
+
     # 1. Health gate — never compete cases against degraded sources.
     if not _healthy():
         _log("ChEMBL/OT/ablation sources unhealthy — exit 4 (workflow retries)")
