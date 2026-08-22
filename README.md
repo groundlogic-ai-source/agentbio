@@ -440,3 +440,29 @@ AgentBio is in **beta**. Dossiers are machine-generated hypotheses for expert
 review — not medical advice. In-app feedback goes through the beta Google Form
 (linked from the banner). Please file bugs as **GitHub Issues** on
 <https://github.com/groundlogic-ai-source/agentbio>.
+
+## How to cite
+
+If you use AgentBio in your work, please cite the software and, when referring to
+validation results, the validation campaign dossier:
+
+> Britto, E. (2026). *AgentBio: an audited drug-repurposing research pipeline for
+> rare and neglected diseases* (Version benchmark-freeze-v2) [Computer software].
+> MIT License.
+
+```bibtex
+@software{britto2026agentbio,
+  author  = {Britto, Evan},
+  title   = {AgentBio: an audited drug-repurposing research pipeline for rare and neglected diseases},
+  year    = {2026},
+  version = {benchmark-freeze-v2},
+  license = {MIT}
+}
+```
+
+This repository also ships a `CITATION.cff` file, so GitHub and reference managers
+(Zotero, Mendeley) pick the citation up automatically. Validation results of record
+are documented in `validation/validation_campaign_dossier.md`; the provenance of the
+frozen benchmark is independently re-checkable via
+`python3 validation/verify_v2_provenance.py`. AgentBio is a research prototype and
+is not clinically validated.
