@@ -865,6 +865,81 @@ function BenchmarkPanel() {
   );
 }
 
+const CITATION_TEXT =
+  "Britto, E. (2026). AgentBio: an audited drug-repurposing research pipeline for rare and "
+  + "neglected diseases (Version benchmark-freeze-v2) [Computer software]. MIT License.";
+
+const CITATION_BIBTEX = `@software{britto2026agentbio,
+  author  = {Britto, Evan},
+  title   = {AgentBio: an audited drug-repurposing research pipeline for rare and neglected diseases},
+  year    = {2026},
+  version = {benchmark-freeze-v2},
+  license = {MIT}
+}`;
+
+function CitePanel() {
+  const [copied, setCopied] = useState(null); // "text" | "bibtex" | "error" | null
+
+  const copy = async (kind, value) => {
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(value);
+      ok = true;
+    } catch {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = value;
+        document.body.appendChild(ta);
+        ta.select();
+        ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+      } catch {
+        ok = false;
+      }
+    }
+    setCopied(ok ? kind : "error");
+    setTimeout(() => setCopied(null), 2500);
+  };
+
+  return (
+    <section className="benchmark-panel" style={{ marginBottom: "2rem" }}>
+      <div className="eyebrow">Cite this work</div>
+      <h3>How to cite AgentBio</h3>
+      <p className="benchmark-note">
+        If you reference this pipeline or its validation results, cite the software below; the results
+        of record are documented in <code>validation/validation_campaign_dossier.md</code>, and the frozen
+        benchmark's provenance is independently re-checkable via{" "}
+        <code>python3 validation/verify_v2_provenance.py</code>. The repository also ships a{" "}
+        <code>CITATION.cff</code>, so GitHub and reference managers (Zotero, Mendeley) pick this up
+        automatically. Research prototype — not clinically validated.
+      </p>
+      <article className="benchmark-card">
+        <div className="benchmark-card-title">Suggested citation</div>
+        <p style={{ fontStyle: "italic", lineHeight: 1.6 }}>{CITATION_TEXT}</p>
+        <pre style={{
+          fontFamily: "monospace", fontSize: "0.68rem", lineHeight: 1.55,
+          color: "var(--ink-muted)", backgroundColor: "rgba(0,0,0,0.04)",
+          padding: "0.75rem 1rem", borderRadius: "5px", overflowX: "auto",
+          margin: "0.5rem 0 0.75rem", whiteSpace: "pre",
+        }}>{CITATION_BIBTEX}</pre>
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+          <button type="button" className="btn btn-xs btn-ghost-brass" onClick={() => copy("text", CITATION_TEXT)}>
+            {copied === "text" ? "✓ Copied" : "Copy citation"}
+          </button>
+          <button type="button" className="btn btn-xs btn-ghost" onClick={() => copy("bibtex", CITATION_BIBTEX)}>
+            {copied === "bibtex" ? "✓ Copied" : "Copy BibTeX"}
+          </button>
+          {copied === "error" && (
+            <span style={{ color: "var(--oxide)", fontSize: "0.72rem" }}>
+              Copy failed — select the text above manually
+            </span>
+          )}
+        </div>
+      </article>
+    </section>
+  );
+}
+
 export default function ResearchTab({ onRefresh }) {
   const [allHypotheses, setAllHypotheses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -977,6 +1052,7 @@ export default function ResearchTab({ onRefresh }) {
       </div>
 
        <BenchmarkPanel />
+       <CitePanel />
        <DiscoveryBatch onCompleted={fetchHypotheses} />
        <RegistryResetPanel />
       <HypothesisTable hypotheses={visibleHypotheses} loading={loading} onArchive={fetchHypotheses} />
