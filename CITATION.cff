@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: If you use this software in your work, please cite it using the following metadata.
+type: software
+title: "AgentBio: an audited drug-repurposing research pipeline for rare and neglected diseases"
+authors:
+  - family-names: Britto
+    given-names: Evan
+version: benchmark-freeze-v2
+date-released: 2026-08-09
+license: MIT
+keywords:
+  - drug repurposing
+  - rare diseases
+  - computational biology
+  - validation methodology
+abstract: >-
+  AgentBio is a drug-repurposing research pipeline for rare and neglected
+  diseases with an independently validated audit layer. Validation results of
+  record: rediscovery benchmark v2 (6/22 in-scope, all hits top-10, frozen
+  2026-08-09) and audit claim-set v2 (defect recall 60/60, control false-flag
+  2/40, frozen 2026-08-11). Full evidence trail, published failures, and
+  rerunnable provenance verification: validation/validation_campaign_dossier.md
+  and validation/verify_v2_provenance.py. Research prototype; not clinically
+  validated.
