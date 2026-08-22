@@ -78,21 +78,27 @@ This dossier answers two questions an evaluator should ask separately:
   read.
 - **Provenance caveat (disclosed, not repaired):** the run executed under freeze
   `benchmark-freeze-v2` in deployment-attestation mode on the production deployment.
-  The screened case list *is* preserved and pre-hoc checkable: the results artifact
-  references `validation/benchmark_case_list.json`, which is committed in this
-  repository (seed 20260731, committed 2026-08-01 — eight days before the run) and
-  pinned by the `benchmark-cases-v2` tag, byte-identical to the file at HEAD. What
-  remains missing is the deployment-side freeze attestation
-  (`benchmark_freeze_v2_attestation.json`) and the `benchmark-freeze-v2` tag itself.
-  Consequence: the results artifact is hash-verifiable and the screened-list identity
-  is checkable against pre-run git history, but the production source fingerprint
-  cannot be independently re-verified against the original attestation from this
-  repository. Campaign policy forbids reconstructing the attestation, so that
-  residual gap is disclosed rather than filled. **Row-level cross-verification
-  (2026-08-21):** all 32 primary case-rows in the results artifact identity-match
-  (drug + disease) the committed 50-case list — 32/32, no exceptions — and the
-  artifact's funnel (32 screened → 22 in-scope → 6 hits; 13 wrong-target + 3
-  unresolved misses; 10 out-of-scope) reproduces exactly from the per-row data.
+  The results artifact's own metadata names two inputs: `case_list` —
+  `validation/benchmark_case_list.json`, the pre-screen 50-case selection, committed
+  2026-08-01 (seed 20260731, eight days before the run), pinned by the
+  `benchmark-cases-v2` tag and byte-identical at HEAD — and `screened_list` —
+  `validation/benchmark_case_list_v2.json`, the post-screen 32-case file, which was
+  NOT preserved. The screening *criteria* are code-locked pre-hoc:
+  `validation/screen_v2_cases.py` carries the frozen Amendment-1/3 parameters
+  (committed 2026-08-05, four days before the run; a post-run commit only pinned the
+  source set for rerun reproducibility and changed no parameter). The screening
+  *outcomes* depended on live Open Targets/ChEMBL data at run time, so they cannot
+  be independently re-derived offline today; they are evidenced by the frozen
+  artifact's rows, all of which match the committed selection (see below). Still
+  missing: the deployment-side freeze attestation
+  (`benchmark_freeze_v2_attestation.json`) and the `benchmark-freeze-v2` tag — the
+  production source fingerprint cannot be independently re-verified, and campaign
+  policy forbids reconstructing it. **Row-level cross-verification (2026-08-21,
+  rerunnable via `validation/verify_v2_provenance.py`):** all 32 primary case-rows
+  in the results artifact identity-match (drug + disease) the committed 50-case
+  list — 32/32, no exceptions — and the artifact's funnel (32 screened → 22
+  in-scope → 6 hits; 13 wrong-target + 3 unresolved misses; 10 out-of-scope)
+  reproduces exactly from the per-row data.
 - **Funnel (primary set):** 50 cases selected by pre-registered criteria from 9,057
   dataset rows (attrition: `validation/benchmark_attrition.md`, which also discloses 7
   coverage failures at selection) → 32 passed the feasibility screen (64%) → 22
@@ -303,9 +309,11 @@ hashes, freeze tags/commits, and construction logs. The audit claim sets include
 per-claim outputs for spot-checking against external ground truth. One gap is
 disclosed up front: benchmark v2's deployment-side freeze attestation was not
 preserved (see its Provenance caveat), so the production source fingerprint cannot be
-re-verified against the original attestation — but the screened case list itself is
-committed, tagged (`benchmark-cases-v2`), and dated eight days before the run, so the
-screen-lock claim is checkable directly in git history.
+re-verified against the original attestation. What *is* independently checkable: the
+pre-screen case selection (committed, tagged `benchmark-cases-v2`, eight days before
+the run), the screening criteria (committed code, four days before the run), and the
+row-level identity match between the frozen results and that selection —
+`validation/verify_v2_provenance.py` regenerates all of this evidence on demand.
 
 ---
 
@@ -340,7 +348,8 @@ screen-lock claim is checkable directly in git history.
 
 | Artifact | Study | Frozen |
 |---|---|---|
-| `validation/benchmark_results_v2.json` | Rediscovery benchmark v2 (result of record) | ✅ results hash-pinned; ✅ screened list committed pre-run + tagged (`benchmark-cases-v2`); ⚠ deployment attestation not preserved (disclosed) |
+| `validation/benchmark_results_v2.json` | Rediscovery benchmark v2 (result of record) | ✅ results hash-pinned; ✅ pre-run selection + screen criteria committed/tagged pre-run; ⚠ screened-list file + deployment attestation not preserved (disclosed) |
+| `validation/verify_v2_provenance.py` | Benchmark v2 provenance evidence regenerator | read-only, rerunnable |
 | `validation/benchmark_results_v1_partial.json` + `benchmark_v1_partial_report.md` | Rediscovery benchmark v1 (terminated) | ✅ `benchmark-freeze-v1` |
 | `validation/benchmark_attrition.md` | Case-selection funnel | ✅ |
 | `validation/audit_claimset_v2_results.md` (+ raw, manifest, log) | Audit claim-set v2 (result of record) | ✅ sha `5013a57a…` |
