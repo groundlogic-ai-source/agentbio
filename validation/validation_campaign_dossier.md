@@ -88,7 +88,11 @@ This dossier answers two questions an evaluator should ask separately:
   is checkable against pre-run git history, but the production source fingerprint
   cannot be independently re-verified against the original attestation from this
   repository. Campaign policy forbids reconstructing the attestation, so that
-  residual gap is disclosed rather than filled.
+  residual gap is disclosed rather than filled. **Row-level cross-verification
+  (2026-08-21):** all 32 primary case-rows in the results artifact identity-match
+  (drug + disease) the committed 50-case list — 32/32, no exceptions — and the
+  artifact's funnel (32 screened → 22 in-scope → 6 hits; 13 wrong-target + 3
+  unresolved misses; 10 out-of-scope) reproduces exactly from the per-row data.
 - **Funnel (primary set):** 50 cases selected by pre-registered criteria from 9,057
   dataset rows (attrition: `validation/benchmark_attrition.md`, which also discloses 7
   coverage failures at selection) → 32 passed the feasibility screen (64%) → 22
