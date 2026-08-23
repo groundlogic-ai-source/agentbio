@@ -73,9 +73,14 @@ def main() -> int:
 
     tag_date = git("log", "-1", "--format=%cI", "benchmark-cases-v2")
     check("4a. case-list tag commit predates run", tag_date < RUN_DATE, tag_date)
-    param_commit = git("log", "-1", "--format=%cI %h", "0b91101")
-    check("4b. screen parameters committed pre-run (0b91101, Amendment 1/3)",
-          param_commit[:10] < RUN_DATE, param_commit)
+    # Resolve by commit message, not hash: the public mirror's history was
+    # sanitized (internal notes removed), which rewrites commit hashes. The
+    # pre-sanitization hash 0b91101 remains valid in the private archive.
+    param_commit = git("log", "-1", "--format=%cI %h",
+                       "--grep=v2 preflight: Amendment-1 screen")
+    check("4b. screen parameters committed pre-run (Amendment 1/3 commit)",
+          bool(param_commit) and param_commit[:10] < RUN_DATE,
+          param_commit or "commit not found")
     results_commit = git("log", "-1", "--follow", "--format=%cI %h %s", "--",
                          "validation/benchmark_results_v2.json")
     print(f"      results artifact committed: {results_commit}")
