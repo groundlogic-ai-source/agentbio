@@ -26,8 +26,8 @@ export default function BetaBanner() {
         <strong style={{ color: "var(--brass-deep)", letterSpacing: "0.04em" }}>
           BETA
         </strong>
-        {" — "}AgentBio is a research preview. Dossiers are machine-generated
-        hypotheses for expert review, not medical advice.
+        {" — "}AgentBio is a research prototype, not clinically validated.
+        Dossiers are machine-generated hypotheses for expert review, not medical advice.
       </span>
       {isFeedbackEnabled() && (
         <a
