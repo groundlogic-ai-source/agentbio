@@ -68,3 +68,7 @@ validation/.v2_control_attempts
 cache.db-shm
 cache.db-wal
 validation/.studyb_runner.lock
+
+# internal — never publish
+.agents/
+outreach/
