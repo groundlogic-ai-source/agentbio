@@ -46,7 +46,7 @@ Stage 1: Given the universe of Orphanet rare diseases + 20 WHO NTDs, ranks the t
 ## Two-mode target selection (Stage 5)
 
 - **Manual mode** (`disease_name` given): `target_selection.select_for_disease()` resolves the query via 4-step matching (see Architecture), scores its top targets with the SAME `_score_pair` formulas, returns rows sorted best-first. Not found → `DiseaseNotInUniverse` (surfaces as a job error; never silently auto-picks). Does NOT overwrite `output/top_candidates.json`.
-- **Blank mode**: the graph picks the highest-ranked pair not in the `explored_targets` table (`jobs.db`); every selection (both modes) is recorded so repeated blank runs walk down the list.
+- **Blank mode**: the graph picks the highest-ranked pair not in the `explored_targets` table (Postgres jobs store); every selection (both modes) is recorded so repeated blank runs walk down the list.
 - **Critical**: selecting a new target invalidates stale Stage 2/3 artifacts (`biologist_output.json`, `chemist_output.json`, `reviewed_candidates.json`, `structure_validation.json`) via the `output/active_selection.json` marker — otherwise the cached-by-existence reuse makes a new target reuse the previous target's downstream output. Invalidation does not affect resume (which replays from `checkpoints.db`).
 
 ## Gotchas

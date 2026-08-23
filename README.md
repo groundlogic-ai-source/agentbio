@@ -14,38 +14,26 @@ Auditability ethos (both stages): every LLM call is constrained to numbers alrea
 
 ```
 .
-├── data_sources/           # API wrapper modules (one file per source)
-│   ├── orphadata.py        # Orphanet rare disease list + static WHO NTD list
-│   ├── open_targets.py     # Open Targets Platform — target-disease associations
-│   ├── chembl.py           # ChEMBL — bioactivity counts (S1) + candidate compounds (S2)
-│   ├── afdb.py             # AlphaFold DB — per-residue pLDDT confidence
-│   ├── clinicaltrials.py   # ClinicalTrials.gov v2 — prior trial history
-│   ├── pubchem.py          # PubChem PUG REST — structure (S1) + drug classification (S2)
-│   ├── biogrid.py          # [S2] BioGRID — physical/genetic interaction partners
-│   ├── pubmed.py           # [S2] PubMed E-utilities — literature w/ LLM relevance gate
-│   ├── openfda.py          # [S2] openFDA FAERS — drug adverse-event signal
-│   ├── uniprot.py          # [S3] UniProt — canonical protein sequence (FASTA)
-│   └── boltz_api.py        # [S3] Boltz API — protein–ligand structure/affinity + ADME
+├── data_sources/           # API wrapper modules (one file per source): Orphanet,
+│                           #   Open Targets, ChEMBL, AlphaFold DB, ClinicalTrials.gov,
+│                           #   PubChem, BioGRID, PubMed, openFDA, UniProt, Boltz,
+│                           #   GtoPdb, BindingDB, Reactome, PubTator, Europe PMC,
+│                           #   plus a sha256-pinned local DrugCentral 2023 snapshot
 ├── cache/
 │   └── cache.py            # SQLite-backed key-value cache with TTL
 ├── agents/
 │   ├── target_selection.py # [S1] Core scoring agent (no LLM for scoring)
-│   ├── provenance.py       # [S2] Shared provenance log helper
 │   ├── biologist.py        # [S2] Target biology: interactions + literature
 │   ├── chemist.py          # [S2] Candidate compounds + Tanimoto bisociation
 │   ├── reviewer.py         # [S2] Descriptors + safety + composite score
 │   └── writer.py           # [S3] Markdown repurposing report per candidate
 ├── main_graph.py           # [S3] LangGraph orchestration (all stages + human review)
 ├── resume_review.py        # [S3] CLI to resume a paused run after human review
+├── api/                    # [S4] FastAPI service (runs, audit, candidates, benchmarks)
+├── artifacts/web-frontend/ # [S5] React + Vite single-page app (pnpm workspace)
+├── validation/             # Frozen benchmark/audit artifacts of record + harnesses
+├── publication/            # Preprint manuscript drafts + derived metrics
 ├── output/                 # Generated output files (created at runtime)
-│   ├── top_candidates.json / .csv / narration.txt   # Stage 1
-│   ├── biologist_output.json / chemist_output.json  # Stage 2 intermediates
-│   ├── reviewed_candidates.json                      # Stage 2 final output
-│   ├── provenance_log.json                           # Stage 2 audit trail
-│   ├── structure_validation.json                     # Stage 3 Boltz/AFDB results
-│   ├── review_decision.json                          # Stage 3 human-review outcome
-│   └── reports/{disease}_{drug}.md                   # Stage 3 final reports
-├── checkpoints.db          # [S3] LangGraph durable checkpoints (created at runtime)
 └── requirements.txt
 ```
 
@@ -238,23 +226,15 @@ The Biologist resets `output/provenance_log.json` at the start of each fresh run
 }
 ```
 
-### Composite score (exact, fixed formula)
+### Composite score
 
-Defined as named constants at the top of `agents/reviewer.py`:
+The exact weights are named constants at the top of `agents/reviewer.py` — the code is the source of truth. The properties that matter for auditability:
 
-```
-composite = 0.30 × normalized(pchembl_value)
-          + 0.20 × (confidence_score / 9)
-          + 0.20 × normalized(open_targets_association_score)
-          + 0.15 × normalized(tanimoto_score)
-          + 0.15 × (1 if no prior failed trial else 0)
-          − 0.25   (flat, only if Lipinski violations > 1)
-```
-
-- `normalized(x)` is min-max across the candidate set. If all candidates share a value, it maps to `1.0` (when positive) or `0.0`.
-- The `−0.25` Lipinski term is a **soft developability flag**, not a hard ADME prediction — it is noted explicitly per candidate.
+- Components cover binding evidence (ChEMBL pChEMBL and assay confidence), Open Targets association, Tanimoto bisociation, and prior-trial failure, each normalised against **absolute ranges** — never per-run min-max — so a composite means the same thing across runs and pools.
+- **Coverage-aware**: a component that was unobserved or whose lookup failed drops out of *both* sides of the weighted sum instead of being silently treated as zero; `evidence_weight_coverage` is reported per candidate.
+- A flat **Lipinski penalty** (`0.25`) applies when violations > 1 (a soft developability flag, not a hard ADME prediction), and hard **caps** clamp the composite at `0.40` for unapproved-drug, mechanism-mismatch, or safety findings; `pre_cap_score` is always recorded alongside so the uncapped value stays visible.
 - A candidate is flagged `STRONG_MATCH` when `composite_score ≥ 0.70` (`STRONG_MATCH_THRESHOLD`).
-- Provenance de-dup ensures evidence ids are not double-counted in the audit trail; the formula's inputs are independent metrics, so de-dup affects evidence accounting rather than the weighted sum.
+- Provenance de-dup ensures evidence ids (PMIDs, ChEMBL activity ids) are counted only once in the audit trail; the formula's inputs are independent metrics, so de-dup affects evidence accounting rather than the weighted sum.
 
 ---
 
@@ -328,7 +308,7 @@ uvicorn api.main:app --host 0.0.0.0 --port $PORT
 
 ### Job tracking
 
-Job metadata lives in its **own** SQLite file, `jobs.db` — kept separate from the LangGraph `checkpoints.db` (graph state) so the API schema never couples to LangGraph internals. The `jobs` table tracks `status` (`queued` → `running` → `awaiting_review` → `completed` / `error`) and `current_stage`, which is updated **after each graph node actually completes** (`target_selection` → `biologist` → `chemist` → `reviewer` → `structure_validation` → `writer` → `awaiting_review` → `done`) by hooking into LangGraph's `stream()` output — not a single flip from running to done.
+Job metadata lives in a **PostgreSQL** store (Replit's built-in database) — kept separate from the LangGraph `checkpoints.db` (graph state, SQLite) so the API schema never couples to LangGraph internals. The `jobs` table tracks `status` (`queued` → `running` → `awaiting_review` → `completed` / `error`) and `current_stage`, which is updated **after each graph node actually completes** (`target_selection` → `biologist` → `chemist` → `reviewer` → `structure_validation` → `writer` → `awaiting_review` → `done`) by hooking into LangGraph's `stream()` output — not a single flip from running to done.
 
 ### Endpoints
 
@@ -340,74 +320,44 @@ Job metadata lives in its **own** SQLite file, `jobs.db` — kept separate from 
 | `POST /api/runs/{job_id}/resume` | `{"action": "approve"｜"reject", "notes": "optional"}` | resumes via `resume_run()`; job becomes `completed` / `done` |
 | `GET /api/runs/{job_id}/cost` | — | `{"total_cost_usd": ...}` (summed Boltz spend) |
 
+Further route groups — batch runs, dossier audit (`/api/audit*`), the pooled candidate list (`/api/candidates*`), and read-only frozen benchmark results (`/api/research/benchmarks`) — are documented in the interactive `/docs`.
+
 > **`disease_name` drives target selection — two modes:**
 >
 > - **Named (manual mode).** Pass a `disease_name` and Stage 1 looks it up directly in the rare-disease / WHO-NTD universe (case-insensitive name match, falling back to any ICD-10 / OMIM / MeSH cross-reference already pulled). Its top targets are then scored with the **exact same `tractability_score` / `unmet_need_score` formulas** the ranking sweep uses — never faked or skipped. If the disease is **not** in that universe, the run **errors** with a clear message ("scoped to rare and neglected diseases"); it never silently substitutes a different disease. The stored `disease_name` is updated to the canonical matched name.
-> - **Blank (auto-explore mode).** Omit `disease_name` and Stage 1 picks the **highest-ranked (disease, target) pair not yet used by any prior run**. Every selected pair is recorded in an `explored_targets` table in `jobs.db`, so repeated blank runs walk *down* the ranked list instead of re-picking the same #1 candidate. Once the whole ranked list is exhausted, it falls back to the top pair.
+> - **Blank (auto-explore mode).** Omit `disease_name` and Stage 1 picks the **highest-ranked (disease, target) pair not yet used by any prior run**. Every selected pair is recorded in an `explored_targets` table in the Postgres jobs store, so repeated blank runs walk *down* the ranked list instead of re-picking the same #1 candidate. Once the whole ranked list is exhausted, it falls back to the top pair.
 >
 > Both modes carry the real Stage 1 scores into the final report (a **"Stage 1 prioritization scores"** section), and selecting a new target automatically invalidates the stale Stage 2/3 artifacts so the report always describes the pair actually chosen.
 
 ## Stage 5 — AgentBio web frontend
 
-Stage 5 is a **React + Vite + Tailwind** single-page app that turns the Stage 4 API into a usable interface. It is deliberately styled as a **"case dossier"** (a detective's file folder), not a generic admin dashboard: graphite/paper palette, Fraunces / Inter / JetBrains Mono type, file-folder tabs, a vertical pipeline stepper for live runs, an inline report with a sign-off panel, and a circular wax-style **stamp** (`STRONG MATCH` / `REJECTED`) on completed cases. The voice throughout frames every result as a *hypothesis to investigate*, never a cure.
+Stage 5 is a **React + Vite + Tailwind** single-page app in `artifacts/web-frontend/` (a pnpm workspace package) that turns the Stage 4 API into a usable interface. It is styled as a **"case dossier"** rather than a generic admin dashboard: warm paper/ink palette with brass accents, Fraunces / Inter / JetBrains Mono type, file-folder tabs, a vertical pipeline stepper for live runs, an inline report with a sign-off panel, and a wax-style **stamp** (`STRONG MATCH` / `REJECTED`) on completed cases. The voice throughout frames every result as a *hypothesis to investigate*, never a cure.
 
-The whole pipeline is presented as a chain of hypotheses: each run opens a new case, walks the six pipeline stages, pauses for a human sign-off, and is stamped closed.
-
-### Project layout
-
-```
-frontend/
-  src/
-    api.js                 # thin fetch wrapper around /api/*
-    App.jsx                # state + polling orchestration (no router)
-    lib/stages.js          # STAGES list, stepperProgress(), formatters
-    components/
-      Dashboard.jsx        # folder-tab list of all cases
-      CaseView.jsx         # status-routed case view
-      Stepper.jsx          # vertical pipeline stepper (live runs)
-      ReportView.jsx       # markdown report renderer
-      SignOff.jsx          # approve / reject + required note
-      Stamp.jsx            # circular STRONG MATCH / REJECTED stamp
-      ErrorPanel.jsx       # oxide failure panel
-      StatusBadge.jsx, NewCaseDialog.jsx
-  vite.config.js           # build.outDir → ../api/static, /api dev proxy
-```
+The whole pipeline is presented as a chain of hypotheses: each run opens a new case, walks the pipeline stages, pauses for a human sign-off, and is stamped closed. Beyond the case flow (**Case Files** tab), the app includes **Research** (frozen benchmark results), **Candidates**, **Audit**, and **Saved Reports** tabs.
 
 ### Develop (hot reload)
 
 ```bash
-cd frontend
-npm install          # first time only
-npm run dev          # Vite dev server on :5173, proxies /api → :8000
+pnpm --filter @workspace/web-frontend run dev   # Vite dev server on :21854
 ```
 
-Run the backend in another terminal (`uvicorn api.main:app --port 8000`) so the dev proxy has something to talk to.
+On Replit the **web** workflow runs this for you; run the API alongside it (`uvicorn api.main:app --host 0.0.0.0 --port 8000`). The app calls relative `/api/*` paths only — no hardcoded hosts.
 
 ### Build (production)
 
 ```bash
-cd frontend
-npm run build        # emits the SPA into ../api/static/
+PORT=21854 BASE_PATH=/ pnpm --filter @workspace/web-frontend run build
 ```
 
-Vite writes `index.html` + hashed `assets/` straight into **`api/static/`**, which FastAPI serves at `/` via its SPA catch-all (any non-`/api` path falls through to `index.html`). After a build, just (re)start the **AgentBio API** workflow — no separate frontend server in production; the one FastAPI process serves both the API and the UI.
+In deployment the frontend artifact serves `/` and the API artifact serves `/api/*` as two separate processes behind Replit's reverse proxy; the FastAPI service no longer serves static files.
 
 ### How the UI talks to the API
 
-- On load and every **~4 seconds** the app polls `GET /api/runs`; opening a case also polls `GET /api/runs/{job_id}` and `GET /api/runs/{job_id}/cost`.
-- Polling is **terminal-aware**: it keeps refreshing only while a job is non-terminal and **stops automatically** once every visible job is `completed` or `error`.
+- The app polls `GET /api/runs` (plus per-case detail and cost endpoints) only while a visible job is non-terminal, and stops automatically once everything is `completed` or `error`.
 - The stepper reads `current_stage` as the **last completed node** (the backend's contract) — it checks that stage off and highlights the *next* one as "Working…".
-- A finished case shows the report read-only plus the stamp; the chosen `decision` and `review_notes` are persisted server-side, so the stamp and notes survive a page reload.
+- A finished case shows the report read-only plus the stamp; the chosen `decision` and `review_notes` are persisted server-side, so they survive a page reload.
 
-### Full end-to-end flow
-
-1. **Build the frontend** (`npm run build`) and start the **AgentBio API** workflow. Open the webview at `/`.
-2. **Open Case** → either type a rare/NTD `disease_name` to investigate it directly, or leave it blank to auto-explore the next-highest-ranked pair not yet investigated → the case is created and the dashboard shows it as a live tab.
-3. **Watch the stepper** advance through the six real nodes (`target_selection` → `biologist` → `chemist` → `reviewer` → `structure_validation` → `writer`) as polling updates `current_stage`, with live cost shown.
-4. **Awaiting Review** → the compiled report renders inline; type a sign-off note and choose **Approve** or **Reject**.
-5. **Completed** → the case is stamped `STRONG MATCH` (approve) or `REJECTED` (reject); reload to confirm the decision, notes, and report all persist.
-
-> The first cold run is slow (Stage 1–3 populate the cache). Subsequent runs are near-instant and a repeated Boltz prediction is a **cache hit ($0 spend)**.
+> The first cold run is slow (Stages 1–3 populate the cache). A repeated Boltz prediction is a **cache hit ($0 spend)**.
 
 ### Driving the API directly (no UI)
 
@@ -422,17 +372,21 @@ You can still exercise everything from **`/docs`** (interactive Swagger UI):
 ## Validation status (honest)
 
 - A pre-registered, blind retrospective benchmark (50 primary + 15 development
-  drug-repurposing rediscovery cases) is **armed but has not yet run** — it is
-  health-gated on the ChEMBL API and fires automatically when that service
-  recovers from its current outage. Selection criteria:
-  `validation/benchmark_case_selection_criteria.md`; frozen pipeline at tag
-  `benchmark-freeze-v1`; case list at tag `benchmark-cases-v2`; results will be
-  published in full (hits and misses) at `validation/benchmark_results.md`.
+  drug-repurposing rediscovery cases) **has completed and is frozen** — hits,
+  misses, and miss-reason breakdowns are published in full in
+  `validation/validation_campaign_dossier.md`, with raw results in
+  `validation/benchmark_results_v2.json`. The pipeline was frozen at tag
+  `benchmark-freeze-v2`; case-selection criteria are in
+  `validation/benchmark_case_selection_criteria.md`; provenance is independently
+  re-checkable via `python3 validation/verify_v2_provenance.py`.
+- Two follow-on frozen studies (a dossier-audit claim set and a triage
+  discrimination study) are also complete and documented in `validation/`.
+  Wherever validation results are quoted, the audit claim-set **v1 FAIL** must be
+  disclosed alongside the v2 PASS — see the dossier for both, unedited.
 - Earlier small development-suite runs were used for iteration only and are
-  superseded by this benchmark — do not quote them.
+  superseded by the frozen benchmark — do not quote them.
 - Known limitations and past failure postmortems are documented in
-  `validation/` — see `target_selection_diagnosis.md`,
-  `cache_failure_sweep.md`, and `f2_precedent_calibration_justification.md`.
+  `validation/`.
 
 ## Beta status & bug reports
 
