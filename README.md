@@ -388,6 +388,18 @@ You can still exercise everything from **`/docs`** (interactive Swagger UI):
 - Known limitations and past failure postmortems are documented in
   `validation/`.
 
+## Repository provenance (public mirror)
+
+This public repository is a sanitized mirror of the private development repo:
+internal working notes were removed from the history, which rewrites commit
+hashes. Commit dates, messages, authors, tags, and all file contents are
+authentic — blob (file-content) hashes verify identically here and in the
+private archive. The pre-sanitization commit-hash trail referenced in
+`validation/` freeze manifests remains intact in the private archive and is
+available to qualified evaluators on request. A few oversized raw archives are
+omitted from the mirror and are listed, with SHA-256, in
+`validation/private_archive_manifest.md`.
+
 ## Beta status & bug reports
 
 AgentBio is in **beta**. Dossiers are machine-generated hypotheses for expert

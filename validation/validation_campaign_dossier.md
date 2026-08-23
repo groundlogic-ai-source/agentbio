@@ -306,7 +306,9 @@ impolite.
 **"Can we verify any of this independently?"**
 Every headline in this dossier cites its artifact; the frozen artifacts carry their
 hashes, freeze tags/commits, and construction logs. The audit claim sets include raw
-per-claim outputs for spot-checking against external ground truth. One gap is
+per-claim outputs for spot-checking against external ground truth (the full raw
+judge-output dumps are size-omitted from the public mirror — hashed in
+`validation/private_archive_manifest.md` — and available on request). One gap is
 disclosed up front: benchmark v2's deployment-side freeze attestation was not
 preserved (see its Provenance caveat), so the production source fingerprint cannot be
 re-verified against the original attestation. What *is* independently checkable: the
@@ -314,6 +316,11 @@ pre-screen case selection (committed, tagged `benchmark-cases-v2`, eight days be
 the run), the screening criteria (committed code, four days before the run), and the
 row-level identity match between the frozen results and that selection —
 `validation/verify_v2_provenance.py` regenerates all of this evidence on demand.
+One further disclosure about the public GitHub mirror specifically: its history
+was sanitized to remove internal working notes, which rewrites commit hashes —
+the pre-sanitization hashes cited in freeze manifests remain valid in the
+private archive (available to evaluators on request), while commit dates, tags,
+and all file contents in the mirror are authentic and blob-identical.
 
 ---
 
