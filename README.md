@@ -375,10 +375,13 @@ You can still exercise everything from **`/docs`** (interactive Swagger UI):
   drug-repurposing rediscovery cases) **has completed and is frozen** — hits,
   misses, and miss-reason breakdowns are published in full in
   `validation/validation_campaign_dossier.md`, with raw results in
-  `validation/benchmark_results_v2.json`. The pipeline was frozen at tag
-  `benchmark-freeze-v2`; case-selection criteria are in
+  `validation/benchmark_results_v2.json`. The freeze is attested by the results
+  artifact's metadata and SHA-256 hash pin (see
+  `python3 validation/verify_v2_provenance.py`) — no post-hoc
+  `benchmark-freeze-v2` tag was created, to avoid backdating the freeze with a
+  marker that wasn't there when the run executed. Case-selection criteria are in
   `validation/benchmark_case_selection_criteria.md`; provenance is independently
-  re-checkable via `python3 validation/verify_v2_provenance.py`.
+  re-checkable via the verifier above.
 - Two follow-on frozen studies (a dossier-audit claim set and a triage
   discrimination study) are also complete and documented in `validation/`.
   Wherever validation results are quoted, the audit claim-set **v1 FAIL** must be
@@ -413,7 +416,7 @@ If you use AgentBio in your work, please cite the software and, when referring t
 validation results, the validation campaign dossier:
 
 > Britto, E. (2026). *AgentBio: an audited drug-repurposing research pipeline for
-> rare and neglected diseases* (Version benchmark-freeze-v2) [Computer software].
+> rare and neglected diseases* (Version benchmark-v2) [Computer software].
 > MIT License.
 
 ```bibtex
@@ -421,7 +424,7 @@ validation results, the validation campaign dossier:
   author  = {Britto, Evan},
   title   = {AgentBio: an audited drug-repurposing research pipeline for rare and neglected diseases},
   year    = {2026},
-  version = {benchmark-freeze-v2},
+  version = {benchmark-v2},
   license = {MIT}
 }
 ```
