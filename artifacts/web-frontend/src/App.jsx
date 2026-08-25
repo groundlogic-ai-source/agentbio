@@ -7,6 +7,7 @@ import ResearchTab from "./components/ResearchTab.jsx";
 import SavedReportsTab from "./components/SavedReportsTab.jsx";
 import AuditTab from "./components/AuditTab.jsx";
 import CandidatePoolTab from "./components/CandidatePoolTab.jsx";
+import HowItWorksTab from "./components/HowItWorksTab.jsx";
 import TabGuide from "./components/TabGuide.jsx";
 import {
   listRuns,
@@ -33,6 +34,7 @@ const TABS = [
   { id: "candidates", label: "Candidates", group: "case" },
   { id: "research", label: "Research", group: "research" },
   { id: "saved", label: "Saved Reports", group: "research" },
+  { id: "how", label: "How It Works", group: "research" },
 ];
 
 const TAB_IDS = new Set(TABS.map((t) => t.id));
@@ -301,6 +303,8 @@ export default function App() {
       )}
 
       {view === "candidates" && <CandidatePoolTab />}
+
+      {view === "how" && <HowItWorksTab />}
 
       {view === "case" && (
         <CaseView

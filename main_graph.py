@@ -40,6 +40,8 @@ from langgraph.types import interrupt, Command
 
 from agents.target_selection import (
     OUTPUT_DIR,
+    TRACTABILITY_WEIGHTS,
+    TRACTABILITY_WEIGHTS_OVERRIDDEN,
     run as run_target_selection,
     select_for_disease,
     select_source_diverse_targets,
@@ -50,6 +52,7 @@ from data_sources.multisource_candidates import merge_chemist_candidates
 from agents.reviewer import (
     run_reviewer,
     COMPOSITE_WEIGHTS,
+    COMPOSITE_WEIGHTS_OVERRIDDEN,
     LIPINSKI_PENALTY,
     STRONG_MATCH_THRESHOLD,
     SAFETY_SCHEMA_VERSION,
@@ -267,6 +270,55 @@ def _apply_k_cutoff(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return select_source_diverse_targets(rows, TOP_K_TARGETS)
 
 
+def _blank_mode_rows() -> Any:
+    """Load the cached Stage-1 ranking for blank mode, or None to (re)build.
+
+    The ranking's scoring-config fingerprint sidecar
+    (output/top_candidates.config.json, written by every sweep) must match the
+    currently active tractability weights.  A mismatch — or an active
+    AGENTBIO_TRACTABILITY_WEIGHTS override against a pre-fingerprint artifact —
+    fails fast with explicit guidance, because silently reusing such a ranking
+    would make the override ineffective while every dossier still carried the
+    non-comparability banner.  Note: STAGE3_FORCE_RECOMPUTE does NOT rebuild
+    the ranking (the sweep manager reuses an existing file); only rerunning
+    the Stage 1 sweep directly regenerates it.  The fingerprint is therefore
+    validated whenever a cached ranking EXISTS, including under
+    FORCE_RECOMPUTE, because the sweep manager would hand that same file back.
+    """
+    rows = _load_json("top_candidates.json")
+    if rows is None:
+        return None
+    fingerprint = _load_json("top_candidates.config.json")
+    recorded = (fingerprint or {}).get("tractability_weights")
+    current = {k: float(v) for k, v in TRACTABILITY_WEIGHTS.items()}
+    if recorded is None:
+        if TRACTABILITY_WEIGHTS_OVERRIDDEN:
+            raise RuntimeError(
+                "AGENTBIO_TRACTABILITY_WEIGHTS is active, but "
+                "output/top_candidates.json has no scoring-config fingerprint "
+                "— it was ranked under an unknown configuration. Blank-mode "
+                "auto-explore needs a ranking computed under the override: "
+                "rerun the Stage 1 sweep directly "
+                "(python3 -m agents.target_selection) with the same "
+                "AGENTBIO_TRACTABILITY_WEIGHTS value, or remove the override.")
+        # Legacy pre-fingerprint artifact; predates the override knob, so it
+        # was necessarily produced under the default weights.
+        return rows
+    recorded = {k: float(v) for k, v in recorded.items()}
+    if recorded != current:
+        raise RuntimeError(
+            "output/top_candidates.json was ranked under tractability weights "
+            f"{recorded}, but the active configuration is {current}. Rerun "
+            "the Stage 1 sweep directly (python3 -m agents.target_selection) "
+            "under the active configuration, or restore the matching "
+            "AGENTBIO_TRACTABILITY_WEIGHTS value.")
+    if FORCE_RECOMPUTE:
+        # Fingerprint validated above, so whatever the sweep manager returns
+        # is config-compatible even if it is the same file.
+        return None
+    return rows
+
+
 def target_selection_node(state: PipelineState) -> dict[str, Any]:
     requested = (state.get("requested_disease") or "").strip()
 
@@ -278,7 +330,7 @@ def target_selection_node(state: PipelineState) -> dict[str, Any]:
         all_rows = select_for_disease(requested)
         top_rows = _apply_k_cutoff(all_rows)
     else:
-        rows = None if FORCE_RECOMPUTE else _load_json("top_candidates.json")
+        rows = _blank_mode_rows()
         if rows is None:
             print("[graph] target_selection: top_candidates.json missing — "
                   "waiting for background sweep")
@@ -537,8 +589,20 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
     fresh = FORCE_RECOMPUTE or bool(state.get("job_id"))
     existing = None if fresh else _load_json("reviewed_candidates.json")
     if existing is not None:
-        print("[graph] reviewer: reusing existing reviewed_candidates.json")
-        return {"reviewed": existing}
+        if TRACTABILITY_WEIGHTS_OVERRIDDEN or COMPOSITE_WEIGHTS_OVERRIDDEN:
+            # Logging alone is not dossier disclosure: a cached artifact was
+            # produced under an unknown scoring config and would yield dossiers
+            # without the non-comparability banner.  Rescore under the active
+            # override so provenance is always correct.
+            print("[graph] reviewer WARNING: scoring-weight overrides are active "
+                  "but the cached reviewed_candidates.json was produced under an "
+                  "unknown scoring configuration — ignoring the cache and "
+                  "rescoring so every dossier carries correct provenance",
+                  flush=True)
+            existing = None
+        else:
+            print("[graph] reviewer: reusing existing reviewed_candidates.json")
+            return {"reviewed": existing}
     reviewed = run_reviewer(state["chemist_output"], state.get("biologist_output"))
     # Runtime schema validation at the reviewer→writer handoff.
     validate_reviewer_handoff(reviewed)
@@ -555,6 +619,13 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
             ),
             "pchembl_norm_min": PCHEMBL_NORM_MIN,
             "pchembl_norm_max": PCHEMBL_NORM_MAX,
+            "tractability_weights": TRACTABILITY_WEIGHTS,
+            # True when the operator overrode any scoring weight via env
+            # (AGENTBIO_TRACTABILITY_WEIGHTS / AGENTBIO_COMPOSITE_WEIGHTS).
+            # The writer discloses this in every dossier: such scores are not
+            # comparable to the frozen benchmark.
+            "scoring_config_overridden": bool(
+                TRACTABILITY_WEIGHTS_OVERRIDDEN or COMPOSITE_WEIGHTS_OVERRIDDEN),
         },
         "n_candidates": len(reviewed),
         "n_strong_matches": sum(1 for r in reviewed if r["strong_match"]),

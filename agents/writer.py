@@ -111,15 +111,37 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
     weights = formula.get("composite_weights", {})
     comp = candidate.get("score_components", {}) or {}
     # term key -> (display label, score_components key)
-    rows = [
-        ("pchembl", "Normalized pChEMBL affinity", "normalized_pchembl"),
-        ("confidence", "Assay confidence (score / 9)", "confidence_term"),
-        ("ot_association", "Normalized Open Targets association", "normalized_ot_association"),
-        ("tanimoto", "Normalized Tanimoto similarity", "normalized_tanimoto"),
-        ("no_failed_trial", "No prior failed trial (1/0)", "no_failed_trial"),
-    ]
+    # v2 composite schema uses a single efficacy_evidence term; legacy payloads
+    # (pre-v2 formula blocks) carried separate pchembl/confidence weights.
+    # Render whichever schema the run's own formula actually used so the
+    # printed arithmetic always matches how the score was computed.
+    if "efficacy_evidence" in weights:
+        rows = [
+            ("efficacy_evidence",
+             "Efficacy evidence (evidence-ledger calibrated; legacy fallback: "
+             "0.6 × normalized pChEMBL + 0.4 × assay confidence)",
+             "efficacy_evidence"),
+            ("ot_association", "Normalized Open Targets association", "normalized_ot_association"),
+            ("tanimoto", "Normalized Tanimoto similarity", "normalized_tanimoto"),
+            ("no_failed_trial", "No prior failed trial (1/0)", "no_failed_trial"),
+        ]
+    else:
+        rows = [
+            ("pchembl", "Normalized pChEMBL affinity", "normalized_pchembl"),
+            ("confidence", "Assay confidence (score / 9)", "confidence_term"),
+            ("ot_association", "Normalized Open Targets association", "normalized_ot_association"),
+            ("tanimoto", "Normalized Tanimoto similarity", "normalized_tanimoto"),
+            ("no_failed_trial", "No prior failed trial (1/0)", "no_failed_trial"),
+        ]
     lines = ["| Term | Weight | Component value | Contribution |",
              "| --- | ---: | ---: | ---: |"]
+    if formula.get("scoring_config_overridden"):
+        lines.insert(0, "")
+        lines.insert(0, "> **Non-default scoring configuration.** This run used "
+                        "operator-overridden scoring weights "
+                        "(`AGENTBIO_TRACTABILITY_WEIGHTS` / "
+                        "`AGENTBIO_COMPOSITE_WEIGHTS`). Its scores are **not "
+                        "comparable** to the frozen benchmark v2 numbers.")
     subtotal = 0.0
     excluded: list[str] = []
     for wkey, label, ckey in rows:
@@ -138,6 +160,10 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
         contrib = w * float(val) if isinstance(val, (int, float)) else 0.0
         subtotal += contrib
         lines.append(f"| {label} | {w:.2f} | {_fmt(val)} | {contrib:.4f} |")
+
+    bonus = comp.get("qualified_directional_bonus") or 0.0
+    if bonus:
+        lines.append(f"| Qualified directional evidence bonus | — | — | +{bonus:.4f} |")
 
     penalty = 0.0
     if candidate.get("lipinski_penalty_applied"):
@@ -167,7 +193,7 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
         )
 
     total = candidate.get("composite_score")
-    lines.append(f"| **Composite (weighted sum − penalty − cap)** | | | **{_fmt(total, 4)}** |")
+    lines.append(f"| **Composite (renormalized weighted sum + bonus − penalty, capped)** | | | **{_fmt(total, 4)}** |")
     lines.append("")
 
     cap_notes = []
@@ -188,9 +214,24 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
         )
 
     cap_note = (" " + " ".join(cap_notes)) if cap_notes else ""
-    lines.append(f"Weighted sum before penalty = {subtotal:.4f}; "
-                 f"penalty = {penalty:.4f}; "
-                 f"reported composite_score = {_fmt(total, 4)}.{cap_note}")
+    # Show every arithmetic step so the printed table reproduces the reported
+    # score: observed-term subtotal → renormalize over covered weight →
+    # + directional bonus → − Lipinski penalty → caps → composite_score.
+    coverage = comp.get("evidence_weight_coverage")
+    summary = f"Weighted sum of observed terms = {subtotal:.4f}"
+    # The Reviewer ALWAYS divides the numerator by the covered weight — not
+    # only when terms were dropped.  With non-unit-sum weight overrides the
+    # covered weight differs from 1 even with full observation, so the
+    # division must be displayed whenever it is not the identity.
+    if (isinstance(coverage, (int, float)) and 0 < coverage
+            and (excluded or abs(float(coverage) - 1.0) > 1e-9)):
+        summary += (f"; renormalized over covered weight "
+                    f"(÷ {coverage:.4f}) = {subtotal / coverage:.4f}")
+    if bonus:
+        summary += f"; directional bonus = +{bonus:.4f}"
+    summary += (f"; penalty = {penalty:.4f}; "
+                f"reported composite_score = {_fmt(total, 4)}.{cap_note}")
+    lines.append(summary)
 
     if excluded:
         coverage = comp.get("evidence_weight_coverage")

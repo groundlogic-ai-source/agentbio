@@ -17,6 +17,15 @@ async function request(path, options) {
   return res.json();
 }
 
+// The engineering reference is markdown, not JSON — fetch it raw.
+export async function getHowItWorks() {
+  const res = await fetch("/api/how-it-works");
+  if (!res.ok) {
+    throw new Error(`${res.status} ${res.statusText}`);
+  }
+  return res.text();
+}
+
 export function listRuns({ includeArchived = false } = {}) {
   const qs = includeArchived ? "?include_archived=true" : "";
   return request(`/api/runs${qs}`);

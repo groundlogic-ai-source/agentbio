@@ -17,6 +17,7 @@ Output: output/reviewed_candidates.json
 """
 
 import json
+import math
 import os
 import sys
 import threading
@@ -50,7 +51,8 @@ def _mdc_desalted_fp(smiles: Optional[str]):
     except Exception:
         return None
 
-from agents.target_selection import OUTPUT_DIR
+from agents.target_selection import (
+    OUTPUT_DIR, TRACTABILITY_WEIGHTS, TRACTABILITY_WEIGHTS_OVERRIDDEN)
 from agents import provenance
 from data_sources.openfda import get_adverse_events
 from data_sources.clinicaltrials import check_prior_trials
@@ -61,7 +63,7 @@ from data_sources import holdout as _holdout
 from data_sources.pubchem import get_compound_data
 
 # ---- Auditable scoring constants (edit here to adjust the policy) -------------
-COMPOSITE_WEIGHTS: dict[str, float] = {
+_DEFAULT_COMPOSITE_WEIGHTS: dict[str, float] = {
     # v2: one modality-aware pharmacology term.  For legacy candidates with no
     # evidence ledger this is reconstructed as 0.6*pChEMBL + 0.4*assay
     # confidence, preserving the old 0.30 + 0.20 contribution exactly.
@@ -71,6 +73,51 @@ COMPOSITE_WEIGHTS: dict[str, float] = {
     "no_failed_trial": 0.15,  # 1 = looked and found none; 0 = looked and found one;
                               # None = never observed -> term dropped entirely
 }
+
+
+def _load_composite_weight_overrides() -> tuple:
+    """Optional AGENTBIO_COMPOSITE_WEIGHTS JSON override (self-hosting knob).
+
+    Same contract as target_selection._load_weight_overrides: exact key match,
+    numeric values, never raise at import, loud warnings either way. An active
+    override is stamped into the reviewer payload via main_graph
+    (scoring_config_overridden) so every dossier discloses that its scores are
+    not comparable to the frozen benchmark."""
+    raw = os.environ.get("AGENTBIO_COMPOSITE_WEIGHTS")
+    if not raw:
+        return dict(_DEFAULT_COMPOSITE_WEIGHTS), False
+    try:
+        parsed = json.loads(raw)
+        if not isinstance(parsed, dict) or set(parsed) != set(_DEFAULT_COMPOSITE_WEIGHTS):
+            raise ValueError(
+                f"must be a JSON object with exactly the keys "
+                f"{sorted(_DEFAULT_COMPOSITE_WEIGHTS)}")
+        weights = {k: float(v) for k, v in parsed.items()}
+        # NaN/inf would silently poison scores; all-zero would raise
+        # ZeroDivisionError in _coverage_aware_composite (numerator / coverage).
+        if any(not math.isfinite(w) or w < 0 for w in weights.values()):
+            raise ValueError("weights must be finite, non-negative numbers")
+        if sum(weights.values()) <= 0:
+            raise ValueError("at least one weight must be positive")
+        # efficacy_evidence is the ONLY always-observed term.  If its weight is
+        # zero and every optional observation is unavailable, covered weight is
+        # zero and _coverage_aware_composite divides by zero — so a zero here
+        # is an invalid configuration, not a policy choice.
+        if weights["efficacy_evidence"] <= 0:
+            raise ValueError("efficacy_evidence must be positive — it is the "
+                             "only always-observed term; a zero weight would "
+                             "allow a zero-coverage division")
+    except Exception as exc:  # noqa: BLE001
+        print(f"[reviewer] WARNING: AGENTBIO_COMPOSITE_WEIGHTS ignored ({exc}); "
+              "using default composite weights", flush=True)
+        return dict(_DEFAULT_COMPOSITE_WEIGHTS), False
+    print(f"[reviewer] WARNING: AGENTBIO_COMPOSITE_WEIGHTS override active — "
+          f"composite weights = {weights}. Scores are NOT comparable to the "
+          f"frozen benchmark.", flush=True)
+    return weights, True
+
+
+COMPOSITE_WEIGHTS, COMPOSITE_WEIGHTS_OVERRIDDEN = _load_composite_weight_overrides()
 # A small, bounded evidence-resolution term.  It only distinguishes candidates
 # whose normalized evidence otherwise lands on the same floor; it is not a
 # substitute for target or disease evidence.
@@ -1236,6 +1283,11 @@ def main() -> None:
             ),
             "pchembl_norm_min": PCHEMBL_NORM_MIN,
             "pchembl_norm_max": PCHEMBL_NORM_MAX,
+            "tractability_weights": TRACTABILITY_WEIGHTS,
+            # True when the operator overrode any scoring weight via env —
+            # dossiers must disclose that scores are not benchmark-comparable.
+            "scoring_config_overridden": bool(
+                TRACTABILITY_WEIGHTS_OVERRIDDEN or COMPOSITE_WEIGHTS_OVERRIDDEN),
         },
         "n_candidates": len(reviewed),
         "n_strong_matches": sum(1 for r in reviewed if r["strong_match"]),
