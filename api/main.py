@@ -25,7 +25,7 @@ import sweep_manager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel
 
 import api.guardrails as _guardrails
@@ -239,6 +239,19 @@ def internal_health() -> dict:
 # --------------------------------------------------------------------------- #
 # API endpoints
 # --------------------------------------------------------------------------- #
+@app.get("/api/how-it-works")
+def how_it_works() -> PlainTextResponse:
+    """Serve docs/HOW_AGENTBIO_WORKS.md so the UI's How It Works tab always
+    renders the same engineering reference that ships in the repo."""
+    doc = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "docs", "HOW_AGENTBIO_WORKS.md")
+    if not os.path.isfile(doc):
+        raise HTTPException(404, "docs/HOW_AGENTBIO_WORKS.md not found")
+    with open(doc, "r", encoding="utf-8") as fh:
+        return PlainTextResponse(fh.read(), media_type="text/markdown; charset=utf-8")
+
+
 @app.get("/api/limits")
 def get_limits() -> dict:
     """

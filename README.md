@@ -8,6 +8,8 @@ A Python pipeline that systematically identifies drug-repurposing candidates for
 
 Auditability ethos (both stages): every LLM call is constrained to numbers already computed by code — the model never invents facts or scores. All similarity (Tanimoto) and composite scores are real computed numbers, not model guesses.
 
+**Full engineering walkthrough:** [`docs/HOW_AGENTBIO_WORKS.md`](docs/HOW_AGENTBIO_WORKS.md) — every stage, every data source (what it contributes and when it runs), the exact scoring formulas, where the AI is allowed to act, and the self-hosting configuration knobs (`TOP_K_TARGETS`, `AGENTBIO_TRACTABILITY_WEIGHTS`, `AGENTBIO_COMPOSITE_WEIGHTS`, …). The same document is served in-app under the **How It Works** tab.
+
 ---
 
 ## Project Structure

@@ -76,6 +76,18 @@ export const TAB_GUIDES = {
       "These are statistical associations in a retrospective dataset. A confirmed finding is " +
       "context for a reviewer, never a reason to move a candidate up or down.",
   },
+  how: {
+    title: "How It Works",
+    role: "The engineering reference, served from the repo",
+    what:
+      "The complete architecture document: what each of the six stages computes, which data " +
+      "source contributes what (and when it runs), the exact scoring formulas and caps, where " +
+      "the AI is allowed to act, and the self-hosting configuration knobs.",
+    give: "Nothing — this is the same docs/HOW_AGENTBIO_WORKS.md that ships in the open-source repo.",
+    get: "The full pipeline reference, always in sync with the code.",
+    when: "You want to know exactly how a number on any other tab was produced.",
+    notThis: "It is documentation, not a runnable surface — it never changes data.",
+  },
   saved: {
     title: "Saved Reports",
     role: "Pinned write-ups of registry findings",

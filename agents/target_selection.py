@@ -69,11 +69,55 @@ PATHWAY_NEIGHBOR_SOURCE_METHODS = frozenset({
 # before any benchmark freeze.
 PROCESS_EVIDENCE_ASSOC_SCORE = 0.50
 
-TRACTABILITY_WEIGHTS = {
+_DEFAULT_TRACTABILITY_WEIGHTS = {
     "chembl_log_count": 0.40,
     "afdb_plddt": 0.35,
     "trial_penalty": 0.25,
 }
+
+
+def _load_weight_overrides(env_var: str, defaults: dict,
+                           stage_label: str) -> tuple:
+    """
+    Optional operator override of scoring weights (self-hosting knob).
+
+    Parses a JSON object from the env var. The keys must match the default set
+    exactly and every value must be numeric; anything else falls back to the
+    defaults with a loud warning. When an override IS active an equally loud
+    warning is printed: non-default weights make scores incomparable to the
+    frozen benchmark, and the override is stamped into the reviewer payload
+    (scoring_config_overridden) so every dossier discloses it.
+    Import-time parsing must NEVER raise — a bad value must not take down
+    API startup.
+    """
+    raw = os.environ.get(env_var)
+    if not raw:
+        return dict(defaults), False
+    try:
+        parsed = json.loads(raw)
+        if not isinstance(parsed, dict) or set(parsed) != set(defaults):
+            raise ValueError(
+                f"must be a JSON object with exactly the keys {sorted(defaults)}")
+        weights = {k: float(v) for k, v in parsed.items()}
+        # NaN/inf would silently poison scores; all-zero would divide by zero
+        # downstream in coverage-renormalized composites.
+        if any(not math.isfinite(w) or w < 0 for w in weights.values()):
+            raise ValueError("weights must be finite, non-negative numbers")
+        if sum(weights.values()) <= 0:
+            raise ValueError("at least one weight must be positive")
+    except Exception as exc:  # noqa: BLE001
+        print(f"[target_selection] WARNING: {env_var} ignored ({exc}); "
+              f"using default {stage_label} weights", flush=True)
+        return dict(defaults), False
+    print(f"[target_selection] WARNING: {env_var} override active — "
+          f"{stage_label} weights = {weights}. Scores are NOT comparable to "
+          f"the frozen benchmark.", flush=True)
+    return weights, True
+
+
+TRACTABILITY_WEIGHTS, TRACTABILITY_WEIGHTS_OVERRIDDEN = _load_weight_overrides(
+    "AGENTBIO_TRACTABILITY_WEIGHTS", _DEFAULT_TRACTABILITY_WEIGHTS,
+    "tractability")
 
 CHEMBL_COUNT_CAP = 500
 
@@ -1535,6 +1579,16 @@ def run() -> None:
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(top30, f, indent=2, default=str)
     _log(f"Saved JSON → {json_path}")
+
+    # Scoring-config fingerprint sidecar: blank-mode runs validate this before
+    # trusting the cached ranking, so an AGENTBIO_TRACTABILITY_WEIGHTS override
+    # can never silently consume a ranking produced under different weights.
+    fingerprint_path = os.path.join(OUTPUT_DIR, "top_candidates.config.json")
+    with open(fingerprint_path, "w", encoding="utf-8") as f:
+        json.dump({"ranking_schema": 1,
+                   "tractability_weights": TRACTABILITY_WEIGHTS},
+                  f, indent=2, default=str)
+    _log(f"Saved scoring-config fingerprint → {fingerprint_path}")
 
     if top30:
         fieldnames = list(top30[0].keys())
