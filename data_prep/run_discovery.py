@@ -224,15 +224,20 @@ No prose outside the JSON.
 """.strip() % DSL_DOC
 
 
-HISTORY_PROMPT_MAX_ITEMS = 80
-HISTORY_PROMPT_MAX_CHARS = 12000
+# Two-tier history budget: full status+note lines for the most recent domains,
+# plus a compact NAMES-ONLY roster of every older domain. A domain must never
+# leave the prompt entirely — once evicted it becomes re-proposable, which
+# wastes generation calls, test compute, and FDR slots on known ground.
+HISTORY_PROMPT_MAX_ITEMS = 40          # full-detail entries (most recent first)
+HISTORY_PROMPT_MAX_CHARS = 9000        # full-detail budget
+HISTORY_PROMPT_NAMES_MAX_CHARS = 4000  # older names-only roster budget
 
 
 def _history_blurb() -> str:
     hist = R.load_history()
     if hist.empty:
         return "(bisociation_history is EMPTY — this is the first run; no domains explored yet.)"
-    lines = []
+    entries = []  # (domain_key, domain_name, full_line), chronological
     for _, r in hist.iterrows():
         note = str(r.get("outcome_note") or "").strip()
         dom = str(r.get("domain_description") or "").strip()
@@ -245,32 +250,56 @@ def _history_blurb() -> str:
             status = "salvageable (good rationale, needs different feature_spec)"
         else:
             status = "did not survive"
-        lines.append((dom.casefold(), f"- {dom} [{status}] {note}"))
-    # de-dup identical lines, keep order
-    seen, out = set(), []
-    for domain_key, ln in reversed(lines):
-        if domain_key not in seen:
-            seen.add(domain_key)
-            out.append(ln)
-        if len(out) >= HISTORY_PROMPT_MAX_ITEMS:
+        entries.append((dom.casefold(), dom, f"- {dom} [{status}] {note}"))
+    # de-dup by domain, keeping the NEWEST row per domain; iterate newest-first
+    seen, recent_first = set(), []
+    for entry in reversed(entries):
+        if entry[0] not in seen:
+            seen.add(entry[0])
+            recent_first.append(entry)
+
+    # Tier 1: full status+note lines for the most recent domains, bounded.
+    # A single oversized line is SKIPPED (its domain still lands in tier 2 via
+    # full_keys), it must not starve every later entry of full detail.
+    full: list[str] = []
+    full_keys: set[str] = set()
+    used = 0
+    for domain_key, _dom, ln in recent_first:
+        if len(full) >= HISTORY_PROMPT_MAX_ITEMS:
             break
-    out.reverse()
-    text = "\n".join(out)
-    omitted = max(0, len(lines) - len(out))
-    if len(text) > HISTORY_PROMPT_MAX_CHARS:
-        kept: list[str] = []
-        used = 0
-        for ln in reversed(out):
-            if used + len(ln) + 1 > HISTORY_PROMPT_MAX_CHARS:
-                omitted += 1
-                continue
-            kept.append(ln)
-            used += len(ln) + 1
-        text = "\n".join(reversed(kept))
-    if omitted:
+        if used + len(ln) + 1 > HISTORY_PROMPT_MAX_CHARS:
+            continue
+        full.append(ln)
+        full_keys.add(domain_key)
+        used += len(ln) + 1
+    full.reverse()  # back to chronological for readability
+
+    # Tier 2: every remaining (older) domain as a compact names-only roster,
+    # newest-of-the-old first. Bounded too, but far more compact per domain.
+    older_names: list[str] = []
+    names_used = 0
+    names_omitted = 0
+    for domain_key, dom, _ln in recent_first:
+        if domain_key in full_keys:
+            continue
+        extra = len(dom) + (2 if older_names else 0)
+        if names_used + extra > HISTORY_PROMPT_NAMES_MAX_CHARS:
+            names_omitted += 1
+            continue
+        older_names.append(dom)
+        names_used += extra
+
+    text = "\n".join(full)
+    if older_names:
         text += (
-            f"\n\n[History bounded: {omitted} older or duplicate entries omitted. "
-            "Do not infer novelty from omission; avoid near-duplicates.]"
+            "\n\nOlder domains also already explored (names only — do NOT "
+            "re-propose these or near-duplicates): " + "; ".join(older_names) + "."
+        )
+    if names_omitted:
+        text += (
+            f"\n\n[History bounded: {names_omitted} oldest domain(s) omitted even "
+            "from the names roster. Do not infer novelty from omission; avoid "
+            "near-duplicates of well-worn drug-attribute angles.]"
         )
     return text
 
@@ -334,6 +363,63 @@ def _overlap(a: list[dict], b: list[dict]) -> list[str]:
                 hits.append(nb)
                 break
     return hits
+
+
+def _norm_domain(name: Any) -> str:
+    """Normalized domain key: casefolded, whitespace-collapsed."""
+    return " ".join(str(name or "").strip().casefold().split())
+
+
+def _known_domain_keys() -> tuple[set[str], set[str]]:
+    """Return (all history domain keys, salvageable domain keys), normalized.
+
+    SALVAGEABLE domains are explicitly re-proposable by design (good rationale,
+    needs a different feature_spec), so they are reported separately and stay
+    eligible.
+    """
+    hist = R.load_history()
+    if hist.empty:
+        return set(), set()
+    all_keys: set[str] = set()
+    salv: set[str] = set()
+    for _, r in hist.iterrows():
+        key = _norm_domain(r.get("domain_description"))
+        if not key:
+            continue
+        all_keys.add(key)
+        if str(r.get("outcome_note") or "").strip().startswith("SALVAGEABLE"):
+            salv.add(key)
+    return all_keys, salv
+
+
+def _reject_known_domains(proposals: list[dict], label: str,
+                          known: set[str], salvageable: set[str]) -> list[dict]:
+    """Code-level backstop to the prompt exclusion list.
+
+    The prompt's history blurb is bounded, so it cannot GUARANTEE exclusion of
+    an unbounded history — this deterministic filter is the actual guarantee
+    for exact re-proposals. It fires only on exact normalized domain-name
+    matches: genuinely different angles carry a distinct name per
+    GEN_INSTRUCTIONS and are untouched, and SALVAGEABLE domains remain
+    re-proposable by design. Dropped domains already have history rows (that
+    is how they became "known"), so no extra history bookkeeping is needed.
+    """
+    if not known:
+        return proposals
+    kept, dropped = [], []
+    for p in proposals:
+        key = _norm_domain(p.get("domain"))
+        if key and key in known and key not in salvageable:
+            dropped.append(str(p.get("domain", "")).strip())
+        else:
+            kept.append(p)
+    if dropped:
+        print(
+            f"[gen] {label}: code-level rejection of {len(dropped)} exact "
+            f"re-proposal(s) of known domain(s): {dropped}",
+            flush=True,
+        )
+    return kept
 
 
 def generate() -> tuple[list[dict], list[dict]]:
@@ -414,6 +500,13 @@ def generate() -> tuple[list[dict], list[dict]]:
                 "Keeping first Sol pass.",
                 flush=True,
             )
+
+    # Code-level exclusion backstop: the prompt's history blurb is bounded, so
+    # this deterministic filter is the actual guarantee against exact
+    # re-proposals of known domains (SALVAGEABLE domains stay re-proposable).
+    known_keys, salv_keys = _known_domain_keys()
+    a = _reject_known_domains(a, "A", known_keys, salv_keys)
+    b = _reject_known_domains(b, "B", known_keys, salv_keys)
     return a, b
 
 
