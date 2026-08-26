@@ -255,10 +255,14 @@ cost guardrail):
 ### Stage 3b — Writer (`agents/writer.py`)
 
 Compiles one Markdown dossier per selected candidate into `output/reports/`,
-with exactly five sections: hypothesis summary, evidence table, full citations
+with five sections — hypothesis summary, evidence table, full citations
 (deduplicated PMIDs / ChEMBL activity IDs / NCT numbers), the **complete
 composite breakdown** (every term, weight, contribution, penalty, cap,
-coverage note), and limitations. The writer invents nothing: it restates
+coverage note), and limitations — plus a static sixth section, **"How to read
+this dossier"**: a versioned reader's guide that explains the format and
+vocabulary only. It is deliberately claim-free (no candidate-specific
+content), so it cannot introduce an unverifiable statement into an otherwise
+claim-audited document. The writer invents nothing: it restates
 numbers already computed, and it re-derives the breakdown from the candidate's
 own `score_components` so the arithmetic is auditable against
 `reviewed_candidates.json`.
@@ -269,6 +273,12 @@ The graph interrupts. A person approves, rejects, or annotates. The decision
 is persisted with the job. Every dossier is labeled a machine-generated
 hypothesis for expert review — the system does not call itself clinically
 validated anywhere.
+
+Note the ordering: this checkpoint sits **after** structure validation. Boltz
+spend has already happened by the time a human is asked — the checkpoint gates
+*completion* of the run (whether the dossier is accepted into the record), not
+the expensive computation. The `human_review` node itself makes zero API
+calls before the interrupt, so resuming can never re-spend money.
 
 ---
 

@@ -16,6 +16,7 @@ Run:
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -1552,7 +1553,21 @@ _discovery_active_job: dict = {"job_id": None}
 _continuous_stop_flags: dict[str, dict] = {}
 
 
-def _run_discovery_batch_job(job_id: str) -> None:
+def _sanitize_run_label(label: Optional[str]) -> Optional[str]:
+    """Slugify an optional run-family label (a-z, 0-9, dash; max 24 chars).
+
+    The label prefixes every run_id of the batch so a deliberate NEW research
+    family is identifiable in the registry WITHOUT deleting history — the
+    cumulative FDR family intentionally spans all runs, old and new (wiping
+    history to lighten the multiple-testing burden would be optional stopping).
+    """
+    if not label:
+        return None
+    slug = re.sub(r"[^a-z0-9]+", "-", label.lower()).strip("-")[:24].strip("-")
+    return slug or None
+
+
+def _run_discovery_batch_job(job_id: str, run_label: Optional[str] = None) -> None:
     """
     Background thread: run ONE full autonomous discovery batch via
     run_discovery.run_batch() and record the summary on the research job.
@@ -1563,7 +1578,8 @@ def _run_discovery_batch_job(job_id: str) -> None:
         research_db.update_job(job_id, status="running")
         _ensure_research_modules()
         import run_discovery as _RD
-        summary = _RD.run_batch(run_id=f"run-{job_id[:8]}")
+        prefix = f"{run_label}-" if run_label else ""
+        summary = _RD.run_batch(run_id=f"{prefix}run-{job_id[:8]}")
         research_db.update_job(job_id, status="completed",
                                result_json=_json.dumps({"mode": "autonomous_discovery",
                                                          "summary": summary}))
@@ -1575,7 +1591,7 @@ def _run_discovery_batch_job(job_id: str) -> None:
                 _discovery_active_job["job_id"] = None
 
 
-def _run_continuous_discovery_job(job_id: str) -> None:
+def _run_continuous_discovery_job(job_id: str, run_label: Optional[str] = None) -> None:
     """
     Background thread: chain autonomous discovery batches continuously until
     a double-pass is found, a safety cap is hit, or the user requests a stop.
@@ -1599,6 +1615,7 @@ def _run_continuous_discovery_job(job_id: str) -> None:
         summary = _RD.run_continuous_batch(
             stop_flag=stop_flag,
             progress_callback=_progress,
+            run_id_prefix=f"{run_label}-" if run_label else "",
         )
         research_db.update_job(
             job_id,
@@ -1734,8 +1751,16 @@ def submit_research_hypothesis(req: ResearchHypothesisRequest) -> dict:
     return {"job_id": job_id}
 
 
+class DiscoveryRunRequest(BaseModel):
+    # Optional family label; prefixes run_ids so a deliberately NEW research
+    # family is identifiable without deleting registry history (which would
+    # reset the cumulative FDR family — optional stopping).
+    run_label: Optional[str] = None
+
+
 @app.post("/api/research/discovery-batch")
-def run_discovery_batch(request: Request) -> dict:
+def run_discovery_batch(request: Request,
+                        body: Optional[DiscoveryRunRequest] = None) -> dict:
     """
     Start a full AUTONOMOUS discovery batch: two independent generators
     (Claude Opus 4.8 + GPT-5.6 Sol) each propose their own bisociative domains,
@@ -1743,6 +1768,10 @@ def run_discovery_batch(request: Request) -> dict:
     tested on the discovery split, FDR-corrected over the whole cumulative log,
     then confirmed on the holdout half and confound-checked. NO user hypothesis
     is provided — the models pick their own domains.
+
+    Optional JSON body: {"run_label": "<slug>"} tags every run_id of this batch
+    with a family prefix (e.g. "fresh26-run-a1b2c3d4"). The label is a naming
+    aid only — it does NOT alter the cumulative FDR family.
 
     Runs in a background daemon thread; poll GET /api/research/jobs/{job_id}.
     Guardrails (this batch is expensive — many LLM calls):
@@ -1753,19 +1782,25 @@ def run_discovery_batch(request: Request) -> dict:
     # batches (the 409 single-run guard only bounds concurrent overlap).
     _guardrails.check_ip_rate_limit(request)
 
+    run_label = _sanitize_run_label(body.run_label if body else None)
+
     with _discovery_lock:
         if _discovery_active_job["job_id"] is not None:
             raise HTTPException(
                 status_code=409,
                 detail="a discovery batch is already running",
             )
-        job_id = research_db.create_job("(autonomous discovery batch — no user hypothesis)")
+        desc = "(autonomous discovery batch — no user hypothesis)"
+        if run_label:
+            desc = f"(autonomous discovery batch — family '{run_label}', no user hypothesis)"
+        job_id = research_db.create_job(desc)
         _discovery_active_job["job_id"] = job_id
 
     # If the thread fails to start, release the single-run slot so the endpoint
     # doesn't get wedged in a permanently-"busy" state.
     try:
-        t = threading.Thread(target=_run_discovery_batch_job, args=(job_id,), daemon=True)
+        t = threading.Thread(target=_run_discovery_batch_job,
+                             args=(job_id, run_label), daemon=True)
         t.start()
     except Exception as exc:  # noqa: BLE001
         with _discovery_lock:
@@ -1778,12 +1813,16 @@ def run_discovery_batch(request: Request) -> dict:
 
 
 @app.post("/api/research/discovery-continuous")
-def run_continuous_discovery(request: Request) -> dict:
+def run_continuous_discovery(request: Request,
+                             body: Optional[DiscoveryRunRequest] = None) -> dict:
     """
     Start continuous autonomous discovery batches, chaining until EITHER:
       - at least one hypothesis achieves a double-pass (discovery AND confirmation), OR
       - a safety cap is reached (default: 20 domains or 50 hypotheses), OR
       - the caller stops the run via POST .../stop.
+
+    Optional JSON body: {"run_label": "<slug>"} tags every batch's run_id with
+    a family prefix (naming aid only — the cumulative FDR family is unchanged).
 
     Uses the same _discovery_lock as single-batch runs so at most one
     autonomous job (single or continuous) can run at a time.
@@ -1791,20 +1830,23 @@ def run_continuous_discovery(request: Request) -> dict:
     """
     _guardrails.check_ip_rate_limit(request)
 
+    run_label = _sanitize_run_label(body.run_label if body else None)
+
     with _discovery_lock:
         if _discovery_active_job["job_id"] is not None:
             raise HTTPException(
                 status_code=409,
                 detail="a discovery batch is already running",
             )
-        job_id = research_db.create_job(
-            "(continuous discovery — runs until double-pass or cap)"
-        )
+        desc = "(continuous discovery — runs until double-pass or cap)"
+        if run_label:
+            desc = f"(continuous discovery — family '{run_label}', runs until double-pass or cap)"
+        job_id = research_db.create_job(desc)
         _discovery_active_job["job_id"] = job_id
 
     try:
         t = threading.Thread(
-            target=_run_continuous_discovery_job, args=(job_id,), daemon=True
+            target=_run_continuous_discovery_job, args=(job_id, run_label), daemon=True
         )
         t.start()
     except Exception as exc:  # noqa: BLE001

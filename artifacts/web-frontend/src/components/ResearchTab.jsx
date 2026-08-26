@@ -530,6 +530,7 @@ function DiscoveryBatch({ onCompleted }) {
   const [jobState, setJobState] = useState(null);
   const [error, setError] = useState(null);
   const [mode, setMode] = useState("single"); // "single" | "continuous"
+  const [runLabel, setRunLabel] = useState("");
   const [activeJobId, setActiveJobId] = useState(null);
   const pollRef = useRef(null);
 
@@ -547,7 +548,7 @@ function DiscoveryBatch({ onCompleted }) {
     stopPoll();
     try {
       const starter = mode === "continuous" ? runContinuousDiscovery : runDiscoveryBatch;
-      const { job_id } = await starter();
+      const { job_id } = await starter(runLabel.trim() || null);
       setActiveJobId(job_id);
       setJobState({ job_id, status: "pending" });
       pollRef.current = setInterval(async () => {
@@ -571,7 +572,7 @@ function DiscoveryBatch({ onCompleted }) {
       setError(err.message);
       setBusy(false);
     }
-  }, [mode, onCompleted, stopPoll]);
+  }, [mode, runLabel, onCompleted, stopPoll]);
 
   const handleStop = useCallback(async () => {
     if (!activeJobId) return;
@@ -656,6 +657,29 @@ function DiscoveryBatch({ onCompleted }) {
             {label}
           </button>
         ))}
+      </div>
+
+      {/* Optional family label — prefixes run_ids so a new research family is
+          identifiable WITHOUT wiping history (the cumulative FDR family is
+          intentionally unchanged; resetting it would be optional stopping). */}
+      <div style={{ margin: "0.75rem 0 1rem", display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
+        <label htmlFor="run-label-input" style={{ fontSize: "0.7rem", color: "var(--ink-muted)" }}>
+          Family label <span style={{ color: "var(--ink-dim)" }}>(optional — tags run IDs, e.g. "fresh26")</span>
+        </label>
+        <input
+          id="run-label-input"
+          type="text"
+          value={runLabel}
+          disabled={busy}
+          onChange={(e) => setRunLabel(e.target.value)}
+          placeholder="leave blank for an untagged run"
+          maxLength={24}
+          style={{
+            fontFamily: "monospace", fontSize: "0.72rem", padding: "0.3rem 0.55rem",
+            borderRadius: "4px", border: "1px solid rgba(184,151,90,0.35)",
+            backgroundColor: "transparent", color: "var(--ink)", width: "16rem",
+          }}
+        />
       </div>
 
       {error && (
@@ -940,6 +964,64 @@ function CitePanel() {
   );
 }
 
+function ReadFindingsGuide() {
+  const [open, setOpen] = useState(false);
+  return (
+    <section className="benchmark-panel" style={{ marginBottom: "2rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "1rem", flexWrap: "wrap" }}>
+        <div>
+          <div className="eyebrow">Reader's guide</div>
+          <h3>How to read a finding on this page</h3>
+        </div>
+        <button type="button" className="btn btn-xs btn-ghost" onClick={() => setOpen((v) => !v)}>
+          {open ? "Collapse" : "Expand"}
+        </button>
+      </div>
+      {!open && (
+        <p className="benchmark-note">
+          What the badges, p-values, and q-values mean, how a hypothesis earns a "double pass", and what a
+          finding here does — and does not — imply for the case pipeline.
+        </p>
+      )}
+      {open && (
+        <div className="benchmark-note" style={{ lineHeight: 1.65 }}>
+          <p>
+            <strong>How a finding is made.</strong> Two independent models (Claude Opus and GPT-5.6 Sol) each
+            propose candidate hypotheses about drug attributes; a lead reviewer consolidates them; then{" "}
+            <em>code, not the models</em>, tests each one on the discovery half of the repoDB repurposing
+            dataset. Every p-value ever produced joins one cumulative family, and Benjamini–Hochberg FDR
+            correction is recomputed over that entire family at read time. Hypotheses that pass discovery are
+            re-tested on the held-out confirmation half (its own cumulative family) and checked for label
+            confounding in code. A hypothesis that passes both is a <strong>double pass</strong>.
+          </p>
+          <p style={{ marginTop: "0.6rem" }}>
+            <strong>Reading a row.</strong> The hypothesis text is the exact pre-registered claim.{" "}
+            <code>p</code> is the raw test statistic; <code>q</code> is the FDR-adjusted value against the
+            cumulative family — q-values can move as new tests are added, because the correction reflects the
+            whole history, not a frozen snapshot. Methodology (test type, threshold, correction) is locked
+            before any result is computed; re-testing under different methodology appends a new row, never an
+            overwrite.
+          </p>
+          <p style={{ marginTop: "0.6rem" }}>
+            <strong>What a finding is — and is not.</strong> A confirmed finding here is a base-rate
+            regularity about the retrospective dataset (e.g. "drugs with attribute X were repurposed more
+            often"), disclosed as context on triage and dossier surfaces. It{" "}
+            <strong>never changes a candidate's score, cap, or verdict</strong> — it is disclosure-only
+            context, not a scoring input, and it is not evidence that any specific drug will work.
+          </p>
+          <p style={{ marginTop: "0.6rem" }}>
+            <strong>Archiving and run families.</strong> Archiving hides a row from this list only — it never
+            removes the test from the cumulative FDR family (deleting history to lighten the
+            multiple-testing burden would be optional stopping). A "family label" on a new discovery run
+            prefixes its run IDs so the batch is identifiable — a naming aid that likewise leaves the FDR
+            family intact.
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function ResearchTab({ onRefresh }) {
   const [allHypotheses, setAllHypotheses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1051,6 +1133,7 @@ export default function ResearchTab({ onRefresh }) {
         </div>
       </div>
 
+       <ReadFindingsGuide />
        <BenchmarkPanel />
        <CitePanel />
        <DiscoveryBatch onCompleted={fetchHypotheses} />

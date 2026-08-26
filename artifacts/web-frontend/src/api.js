@@ -108,15 +108,23 @@ export function getResearchJob(jobId) {
 
 // Start a full autonomous discovery batch (two generators + lead review, no
 // user-provided hypothesis). Returns { job_id }; poll with getResearchJob.
-export function runDiscoveryBatch() {
-  return request("/api/research/discovery-batch", { method: "POST" });
+export function runDiscoveryBatch(runLabel = null) {
+  return request("/api/research/discovery-batch", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(runLabel ? { run_label: runLabel } : {}),
+  });
 }
 
 // Start continuous autonomous discovery: chains batches until a double-pass is
 // found, the safety cap is reached (20 domains / 50 hypotheses), or the run is
 // stopped. Returns { job_id }; poll with getResearchJob for live progress.
-export function runContinuousDiscovery() {
-  return request("/api/research/discovery-continuous", { method: "POST" });
+export function runContinuousDiscovery(runLabel = null) {
+  return request("/api/research/discovery-continuous", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(runLabel ? { run_label: runLabel } : {}),
+  });
 }
 
 // Signal a running continuous discovery job to stop after its current batch.

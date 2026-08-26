@@ -5,12 +5,14 @@ Compiles a human-readable Markdown repurposing report for each STRONG_MATCH
 candidate produced by the Stage 2 Reviewer, enriched with the Stage 3 Boltz
 structure / binding / ADME results.
 
-Each report has EXACTLY these five sections:
+Each report has EXACTLY these five sections, plus a static appendix:
   1. Hypothesis summary (one paragraph)
   2. Evidence table (affinity, structure confidence, ADME, network context)
   3. Full source citations (deduplicated PMIDs, ChEMBL activity IDs, NCT numbers)
   4. Composite score breakdown (every term of the Stage 2 formula, with weights)
   5. Limitations (the full standard list)
+  6. How to read this dossier (static reader's guide — format explanation only,
+     no candidate-specific claims; see _readers_guide_appendix)
 
 Reports are written to output/reports/{disease}_{drug}.md.
 
@@ -191,6 +193,13 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
         lines.append(
             f"| Safety cap ({layer_str}, hard gate, max 0.400) | — | — | applied |"
         )
+
+    _any_cap = (candidate.get("unapproved_cap_applied")
+                or candidate.get("mechanism_cap_applied")
+                or candidate.get("safety_cap_applied"))
+    pre_cap = candidate.get("pre_cap_score")
+    if _any_cap and isinstance(pre_cap, (int, float)):
+        lines.append(f"| **Pre-cap score (before hard caps)** | | | **{_fmt(pre_cap, 4)}** |")
 
     total = candidate.get("composite_score")
     lines.append(f"| **Composite (renormalized weighted sum + bonus − penalty, capped)** | | | **{_fmt(total, 4)}** |")
@@ -465,6 +474,86 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
     if druggability:
         return bullets + "\n\n" + druggability
     return bullets
+
+
+_READERS_GUIDE_VERSION = "1.0"
+
+
+def _readers_guide_appendix() -> str:
+    """Static "How to read this dossier" appendix (reader's guide).
+
+    Deliberately STATIC text: it explains the dossier's format and vocabulary
+    only. It must never state or imply anything about the specific candidate —
+    keeping it claim-free means it cannot introduce an unverifiable statement
+    into an otherwise claim-audited document.
+    """
+    return f"""Every section above reports numbers computed by deterministic code from
+the sources cited in Section 3. This appendix explains what the terms mean; it
+makes no claims about the candidate itself.
+
+**What this document is.** A machine-generated repurposing *hypothesis*,
+produced by a staged pipeline (target selection → literature/bioactivity
+evidence → candidate scoring → structure prediction → this report) and then
+held for a mandatory human review before the run is marked complete. The human
+checkpoint gates completion of the record — the structure prediction (the
+expensive step) has already run by the time a person is asked. This document
+is a prioritised starting point for expert review, not a clinical conclusion.
+
+**Composite score.** A weighted sum of the evidence terms listed in Section
+4's table (efficacy evidence, the Open Targets target–disease association,
+Tanimoto structural similarity to approved drugs for the same target, and
+absence of prior failed trials), each scored 0–1, plus any qualified
+directional-evidence bonus and minus any penalties — giving a single 0–1
+number. **STRONG_MATCH** requires a composite at or above the
+threshold shown in Section 4 *and* no hard cap in effect.
+
+**Hard caps.** Certain findings cap the score at 0.400 no matter how strong the
+rest of the evidence is: a *safety cap* (withdrawn status or black-box-class
+signal), a *mechanism-direction cap* (the drug acts on the target in the
+opposite direction to what the disease biology requires), and an
+*unapproved-compound cap* (the hit is not an approved drug, so it is not a
+repurposing candidate at all). Where a cap applies, Section 4 shows both the
+uncapped score (`pre_cap_score`) and the cap that fired. A capped candidate can
+still be scientifically interesting — the cap says "not an approvable
+repurposing pick as-is", not "no biology here".
+
+**Coverage renormalization.** When a data source could not be checked for this
+candidate (source unreachable, identifier unresolvable, or the term is a
+stamped constant for the whole pool), that term is **dropped from both the
+numerator and the denominator** — it is never silently scored as zero. Section
+4 shows the renormalization explicitly ("covered weight" < 1.0000 means some
+terms were dropped). A renormalized score is comparable in scale but rests on
+less evidence; treat heavy renormalization as "unscored", not "clean".
+
+**Evidence table (Section 2).** Each row reports one measured or predicted
+quantity and the source that produced it.
+
+- **pChEMBL** — −log10 of molar potency from ChEMBL assays; higher = more
+  potent. Reported as a median over *Homo sapiens* IC50/Ki assays at ChEMBL
+  confidence ≥ 8.
+- **Tanimoto similarity** — structural fingerprint similarity (0–1) to
+  approved drugs known to act on the same target. It is computed **within the
+  retrieved candidate pool only**: a low value means "unlike the other drugs
+  retrieved for this target", not "globally novel chemistry".
+- **Structure confidence / affinity** — Boltz *predictions* for the
+  protein–ligand complex. Confidence (pLDDT-like) reflects how well the model
+  thinks it placed the atoms; predicted affinity suggests the molecule may
+  occupy the target. Neither is a measurement, and neither establishes
+  agonism, antagonism, or therapeutic benefit.
+- **ADME** — lipophilicity, permeability, solubility and related values are
+  model *predictions*, not experimental measurements.
+
+**Citations (Section 3).** PMIDs are PubMed articles, ChEMBL activity IDs are
+individual assay records, and NCT numbers are ClinicalTrials.gov trials. Every
+load-bearing number above traces to at least one of these.
+
+**Limitations (Section 5).** The standard caveats that apply to every dossier —
+read them before acting on any number in this report.
+
+_Reader's guide v{_READERS_GUIDE_VERSION}. A longer engineering-level
+description of the pipeline (sources, formulas, and the exact role of each AI
+call) is in `docs/HOW_AGENTBIO_WORKS.md` in the project repository._
+"""
 
 
 def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
@@ -776,6 +865,10 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     # 5. Limitations
     parts.append("\n## 5. Limitations\n")
     parts.append(_limitations(candidate, struct, biologist_output) + "\n")
+
+    # 6. Static reader's guide (format explanation only — no candidate claims)
+    parts.append("\n## 6. How to read this dossier\n")
+    parts.append(_readers_guide_appendix() + "\n")
 
     return "".join(parts)
 

@@ -1328,6 +1328,7 @@ def run_continuous_batch(
     progress_callback=None,
     hard_max_batches: int = HARD_MAX_BATCHES,
     hard_max_seconds: float = HARD_MAX_SECONDS,
+    run_id_prefix: str = "",
 ) -> dict:
     """
     Chain autonomous discovery batches until a DOUBLE PASS is achieved — at least
@@ -1387,7 +1388,7 @@ def run_continuous_batch(
             break
 
         batch_num += 1
-        run_id = "run-" + uuid.uuid4().hex[:8]
+        run_id = f"{run_id_prefix}run-" + uuid.uuid4().hex[:8]
         run_ids.append(run_id)
         print(
             f"\n=== CONTINUOUS batch {batch_num} ({run_id}) — "
