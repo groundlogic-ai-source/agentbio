@@ -1591,7 +1591,8 @@ def _run_discovery_batch_job(job_id: str, run_label: Optional[str] = None) -> No
                 _discovery_active_job["job_id"] = None
 
 
-def _run_continuous_discovery_job(job_id: str, run_label: Optional[str] = None) -> None:
+def _run_continuous_discovery_job(job_id: str, run_label: Optional[str] = None,
+                                  max_batches: Optional[int] = None) -> None:
     """
     Background thread: chain autonomous discovery batches continuously until
     a double-pass is found, a safety cap is hit, or the user requests a stop.
@@ -1616,6 +1617,7 @@ def _run_continuous_discovery_job(job_id: str, run_label: Optional[str] = None) 
             stop_flag=stop_flag,
             progress_callback=_progress,
             run_id_prefix=f"{run_label}-" if run_label else "",
+            hard_max_batches=_RD.clamp_max_batches(max_batches),
         )
         research_db.update_job(
             job_id,
@@ -1756,6 +1758,10 @@ class DiscoveryRunRequest(BaseModel):
     # family is identifiable without deleting registry history (which would
     # reset the cumulative FDR family — optional stopping).
     run_label: Optional[str] = None
+    # Optional continuous-mode batch cap (spend bound). None -> server default
+    # (DEFAULT_MAX_BATCHES); clamped to [1, HARD_MAX_BATCHES]. Continuous mode
+    # only — ignored by the single-batch endpoint.
+    max_batches: Optional[int] = None
 
 
 @app.post("/api/research/discovery-batch")
@@ -1818,8 +1824,13 @@ def run_continuous_discovery(request: Request,
     """
     Start continuous autonomous discovery batches, chaining until EITHER:
       - at least one hypothesis achieves a double-pass (discovery AND confirmation), OR
-      - a safety cap is reached (default: 20 domains or 50 hypotheses), OR
+      - the batch cap is reached (body "max_batches", default 10, ceiling 40), OR
+      - the 6-hour time bound is hit or batches keep failing, OR
       - the caller stops the run via POST .../stop.
+
+    The 20-domain / 50-hypothesis budgets are SOFT: exceeding them is reported
+    but does not end the run. A cap stop is reported as "search did not finish",
+    never as a negative result.
 
     Optional JSON body: {"run_label": "<slug>"} tags every batch's run_id with
     a family prefix (naming aid only — the cumulative FDR family is unchanged).
@@ -1846,7 +1857,9 @@ def run_continuous_discovery(request: Request,
 
     try:
         t = threading.Thread(
-            target=_run_continuous_discovery_job, args=(job_id, run_label), daemon=True
+            target=_run_continuous_discovery_job,
+            args=(job_id, run_label, body.max_batches if body else None),
+            daemon=True,
         )
         t.start()
     except Exception as exc:  # noqa: BLE001

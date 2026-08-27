@@ -531,6 +531,7 @@ function DiscoveryBatch({ onCompleted }) {
   const [error, setError] = useState(null);
   const [mode, setMode] = useState("single"); // "single" | "continuous"
   const [runLabel, setRunLabel] = useState("");
+  const [maxBatches, setMaxBatches] = useState("10"); // continuous-mode spend cap
   const [activeJobId, setActiveJobId] = useState(null);
   const pollRef = useRef(null);
 
@@ -548,7 +549,11 @@ function DiscoveryBatch({ onCompleted }) {
     stopPoll();
     try {
       const starter = mode === "continuous" ? runContinuousDiscovery : runDiscoveryBatch;
-      const { job_id } = await starter(runLabel.trim() || null);
+      const parsedCap = Number.parseInt(maxBatches, 10);
+      const { job_id } = mode === "continuous"
+        ? await starter(runLabel.trim() || null,
+                        Number.isFinite(parsedCap) ? parsedCap : null)
+        : await starter(runLabel.trim() || null);
       setActiveJobId(job_id);
       setJobState({ job_id, status: "pending" });
       pollRef.current = setInterval(async () => {
@@ -572,7 +577,7 @@ function DiscoveryBatch({ onCompleted }) {
       setError(err.message);
       setBusy(false);
     }
-  }, [mode, runLabel, onCompleted, stopPoll]);
+  }, [mode, runLabel, maxBatches, onCompleted, stopPoll]);
 
   const handleStop = useCallback(async () => {
     if (!activeJobId) return;
@@ -680,6 +685,27 @@ function DiscoveryBatch({ onCompleted }) {
             backgroundColor: "transparent", color: "var(--ink)", width: "16rem",
           }}
         />
+        {mode === "continuous" && (
+          <>
+            <label htmlFor="max-batches-input" style={{ fontSize: "0.7rem", color: "var(--ink-muted)" }}>
+              Max batches <span style={{ color: "var(--ink-dim)" }}>(spend cap — each batch is many model calls; run stops at a double-pass, this cap, or 6 hours)</span>
+            </label>
+            <input
+              id="max-batches-input"
+              type="number"
+              min={1}
+              max={40}
+              value={maxBatches}
+              disabled={busy}
+              onChange={(e) => setMaxBatches(e.target.value)}
+              style={{
+                fontFamily: "monospace", fontSize: "0.72rem", padding: "0.3rem 0.55rem",
+                borderRadius: "4px", border: "1px solid rgba(184,151,90,0.35)",
+                backgroundColor: "transparent", color: "var(--ink)", width: "4.5rem",
+              }}
+            />
+          </>
+        )}
       </div>
 
       {error && (

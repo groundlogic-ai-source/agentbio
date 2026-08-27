@@ -117,13 +117,19 @@ export function runDiscoveryBatch(runLabel = null) {
 }
 
 // Start continuous autonomous discovery: chains batches until a double-pass is
-// found, the safety cap is reached (20 domains / 50 hypotheses), or the run is
-// stopped. Returns { job_id }; poll with getResearchJob for live progress.
-export function runContinuousDiscovery(runLabel = null) {
+// found, the batch cap is reached (default 10, hard ceiling 40), the 6-hour
+// time bound is hit, or the run is stopped. Returns { job_id }; poll with
+// getResearchJob for live progress.
+export function runContinuousDiscovery(runLabel = null, maxBatches = null) {
+  const body = {};
+  if (runLabel) body.run_label = runLabel;
+  // != null (not truthiness): an entered 0 must reach the server clamp (-> 1),
+  // not be silently swapped for the default. Blank/unparseable stays null.
+  if (maxBatches != null) body.max_batches = maxBatches;
   return request("/api/research/discovery-continuous", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(runLabel ? { run_label: runLabel } : {}),
+    body: JSON.stringify(body),
   });
 }
 

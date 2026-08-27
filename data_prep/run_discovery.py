@@ -1413,6 +1413,28 @@ HARD_MAX_BATCHES = 40
 HARD_MAX_SECONDS = 6 * 60 * 60
 MAX_CONSECUTIVE_FAILURES = 3
 
+# User-facing default batch cap for continuous mode. LLM spend scales with
+# batch count, so continuous runs default to a modest cap rather than the
+# absolute 40-batch ceiling; callers may raise it up to HARD_MAX_BATCHES.
+DEFAULT_MAX_BATCHES = 10
+
+
+def clamp_max_batches(value) -> int:
+    """Resolve a requested continuous-mode batch cap.
+
+    None/unparseable -> DEFAULT_MAX_BATCHES; otherwise clamped into
+    [1, HARD_MAX_BATCHES]. This is a spend bound, not a search parameter:
+    it only changes when a run gives up, never what counts as a finding.
+    """
+    if value is None or isinstance(value, bool):
+        return DEFAULT_MAX_BATCHES
+    try:
+        n = int(value)
+    except (TypeError, ValueError, OverflowError):
+        # OverflowError: int(float("inf")) / int(float("nan")) raise here.
+        return DEFAULT_MAX_BATCHES
+    return max(1, min(n, HARD_MAX_BATCHES))
+
 
 def run_continuous_batch(
     stop_flag: dict,

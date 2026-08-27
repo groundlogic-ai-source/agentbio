@@ -431,9 +431,11 @@ decides:
    narrates them and may not introduce any statistic not already present.
 
 **Continuous mode** chains batches until a double pass (discovery AND
-confirmation), a user stop, or the absolute safety bounds (40 batches /
-6 hours). The UI reports a cap stop as "search did not finish", never as a
-negative result.
+confirmation), a user stop, or a spend bound: a user-set batch cap (default
+10, adjustable in the Research tab up to the absolute 40-batch ceiling) or
+6 hours, whichever comes first. The cap is a cost bound only — it never
+changes what counts as a finding — and the UI reports a cap stop as "search
+did not finish", never as a negative result.
 
 ---
 
