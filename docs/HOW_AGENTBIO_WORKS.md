@@ -385,7 +385,59 @@ Required secrets for a full run: Anthropic (via Replit AI Integrations or
 
 ---
 
-## 8. Validation posture (why the numbers can be cited)
+## 8. The research module (bisociation engine)
+
+The case pipeline above answers "which drug for this disease?". The research
+module (`data_prep/`, Research tab) asks the dual question: **what properties
+of a drug predict repurposing success in general?** It is an autonomous
+hypothesis engine with the same division of labor — LLMs propose, code
+decides:
+
+1. **Generation** (`run_discovery.py::generate`). Two independent models —
+   Claude Opus ("A") and GPT-5.6 "Sol" ("B") — each propose 4–5 narrow
+   analogical phenomena NOT already explored, each with 3–4 candidate
+   predictor features reduced to a closed feature DSL (or explicitly marked
+   NEEDS_ENRICHMENT). The exclusion list is two-tier and bounded (recent
+   domains in full detail, all older domains as a names-only roster), and a
+   deterministic exact-name filter rejects any re-proposal of a known domain
+   in code — the prompt list is advisory, the filter is the guarantee.
+   SALVAGEABLE domains (good rationale, wrong feature spec) stay re-proposable
+   by design.
+2. **Lead review** (`lead_review`, chunked Opus): consolidates both models'
+   output, tags each hypothesis READY or DISCARDED with a reason. Code guards
+   ensure no proposed domain vanishes silently.
+3. **Testing** (`stats_tests.py`, `features.py`): every READY hypothesis is
+   computed and tested by plain Python against the **discovery half** of a
+   repoDB-derived dataset (drug-level group-aware split, leave-one-out
+   chronology; `data_prep/` docs). Predictor kinds are allow-listed per op —
+   a misrouted kind fails loudly rather than silently testing nonsense.
+4. **FDR** (`hypothesis_registry.py`): every p-value joins ONE cumulative
+   Benjamini–Hochberg family, recomputed at read time — q-values can move as
+   the family grows. Discovery survivors are re-tested on the held-out
+   **confirmation half**, which has its own cumulative family (chaining
+   batches until something passes would be optional stopping). Registry rows
+   are append-only: re-testing under different methodology creates a new row,
+   never an overwrite; "archived" hides rows in the UI only and never removes
+   them from the FDR family. Optional run labels prefix run IDs to name a
+   research family — naming only, never an FDR scope.
+5. **Confound check** (`confound_check.py`): label-confounding guards run in
+   code (e.g. features derived from prior-repurposing counts are hard-blocked
+   — they are definitionally tied to the outcome label).
+6. **Findings are disclosure-only.** A confirmed finding is a base-rate
+   regularity about the retrospective dataset, shown as context on triage and
+   dossier surfaces. It NEVER changes a candidate score, cap, or verdict.
+7. **Hypothesis reports** (`hypothesis_report.py`): numbers are assembled
+   deterministically from the registry (with read-time FDR); Opus only
+   narrates them and may not introduce any statistic not already present.
+
+**Continuous mode** chains batches until a double pass (discovery AND
+confirmation), a user stop, or the absolute safety bounds (40 batches /
+6 hours). The UI reports a cap stop as "search did not finish", never as a
+negative result.
+
+---
+
+## 9. Validation posture (why the numbers can be cited)
 
 The pipeline's claims rest on frozen, provenance-checked artifacts in
 `validation/`, not on the live system:
