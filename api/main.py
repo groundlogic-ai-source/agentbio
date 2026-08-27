@@ -669,22 +669,73 @@ def _audit_trap_summary(artifact: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# Allow-listed frozen validation reports, served read-only for in-app reading
+# from the Research tab's benchmark cards. Entries must point at committed,
+# frozen artifacts only — this endpoint never writes, regenerates, or serves
+# mutable content. Adding a report means adding a line here, nothing else.
+_BENCHMARK_REPORTS = {
+    "benchmark-v2": ("Benchmark v2 — pre-registered protocol",
+                     "benchmark_v2_preregistration.md"),
+    "engineering-acceptance": ("Engineering acceptance — full report",
+                               "engineering_acceptance_results.md"),
+    "small-molecule": ("Small-molecule retrospective — full report",
+                       "repodb_results_smallmol.md"),
+    "top-k": ("Top-K retrospective — full report",
+              "repodb_results_topk.md"),
+    "audit-trap": ("Audit trap benchmark — full report",
+                   "audit_trap_results.md"),
+}
+
+
+@app.get("/api/research/benchmark-report/{report_id}")
+def get_benchmark_report(report_id: str) -> dict[str, str]:
+    """Serve one frozen validation report as markdown for in-app viewing.
+
+    Read-only and allow-listed: only committed artifacts in validation/ are
+    servable; unknown ids and missing files both 404.
+    """
+    entry = _BENCHMARK_REPORTS.get(report_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="unknown benchmark report id")
+    title, filename = entry
+    path = os.path.join(_VALIDATION_DIR, filename)
+    if not os.path.isfile(path):
+        raise HTTPException(status_code=404,
+                            detail=f"report file {filename} not present")
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            markdown = fh.read()
+    except OSError as exc:
+        raise HTTPException(status_code=503,
+                            detail=f"report file unreadable: {exc}") from exc
+    return {"id": report_id, "title": title, "markdown": markdown}
+
+
 @app.get("/api/research/benchmarks")
 def get_research_benchmarks() -> dict[str, Any]:
     """Expose existing validation artifacts with their provenance and limits."""
+    # report_id must be a key of _BENCHMARK_REPORTS — the frontend renders the
+    # "Read full report" button from it, so it must stay stable even if the
+    # display label copy changes.
     artifacts = [
-        ("Engineering acceptance", "engineering_acceptance_results.json"),
-        ("Small-molecule retrospective", "repodb_results_smallmol.json"),
-        ("Top-K retrospective", "repodb_results_topk.json"),
+        ("Engineering acceptance", "engineering_acceptance_results.json",
+         "engineering-acceptance"),
+        ("Small-molecule retrospective", "repodb_results_smallmol.json",
+         "small-molecule"),
+        ("Top-K retrospective", "repodb_results_topk.json", "top-k"),
     ]
-    summaries = [
-        _benchmark_summary(artifact, label)
-        for label, filename in artifacts
-        if (artifact := _load_validation_artifact(filename)) is not None
-    ]
+    summaries = []
+    for label, filename, report_id in artifacts:
+        artifact = _load_validation_artifact(filename)
+        if artifact is not None:
+            summary = _benchmark_summary(artifact, label)
+            summary["report_id"] = report_id
+            summaries.append(summary)
     trap_artifact = _load_validation_artifact("audit_trap_results.json")
     if trap_artifact is not None:
-        summaries.append(_audit_trap_summary(trap_artifact))
+        trap_summary = _audit_trap_summary(trap_artifact)
+        trap_summary["report_id"] = "audit-trap"
+        summaries.append(trap_summary)
     v2_status = inspect_frozen_result()
     return {
         "benchmarks": summaries,

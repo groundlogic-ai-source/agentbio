@@ -133,6 +133,12 @@ export function runContinuousDiscovery(runLabel = null, maxBatches = null) {
   });
 }
 
+// Fetch one frozen validation report (markdown) for in-app reading from the
+// benchmark cards. Ids are allow-listed server-side; unknown ids 404.
+export function getBenchmarkReport(reportId) {
+  return request(`/api/research/benchmark-report/${encodeURIComponent(reportId)}`);
+}
+
 // Signal a running continuous discovery job to stop after its current batch.
 // Returns immediately; the job finishes the in-flight batch before stopping.
 export function stopContinuousDiscovery(jobId) {

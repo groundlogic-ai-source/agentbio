@@ -14,6 +14,7 @@ import {
   saveReport,
   getResearchBenchmarks,
   getBenchmarkStatus,
+  getBenchmarkReport,
   deleteArchivedRegistry,
 } from "../api.js";
 
@@ -823,6 +824,63 @@ function RegistryResetPanel() {
 function BenchmarkPanel() {
   const [state, setState] = useState({ loading: true, error: null, data: null });
   const [runState, setRunState] = useState({ loading: true, error: null, data: null });
+  // Frozen-report viewer: null when closed, otherwise { status, id, title, markdown, error }.
+  // reportReq guards the async fetch: closing the viewer or opening a second
+  // report invalidates any in-flight request, so a late response can never
+  // reopen the modal or overwrite a newer report with an older one.
+  const [report, setReport] = useState(null);
+  const reportReq = useRef(0);
+  const openerRef = useRef(null);   // button that opened the dialog (focus restore)
+  const closeBtnRef = useRef(null); // initial focus target inside the dialog
+  const openReport = async (id, opener) => {
+    openerRef.current = opener || null;
+    const req = ++reportReq.current;
+    setReport({ status: "loading", id });
+    try {
+      const data = await getBenchmarkReport(id);
+      if (req === reportReq.current) setReport({ status: "ok", ...data });
+    } catch (err) {
+      if (req === reportReq.current) setReport({ status: "error", id, error: err.message });
+    }
+  };
+  const closeReport = useCallback(() => {
+    reportReq.current += 1; // invalidate any in-flight fetch
+    setReport(null);
+  }, []);
+  const reportOpen = report !== null;
+  useEffect(() => {
+    if (!reportOpen) return undefined;
+    closeBtnRef.current?.focus();
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        closeReport();
+      } else if (e.key === "Tab") {
+        // Minimal focus trap: keep Tab/Shift+Tab inside the dialog.
+        const dialog = closeBtnRef.current?.closest("[role='dialog']");
+        if (!dialog) return;
+        const focusable = dialog.querySelectorAll(
+          "button, a[href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      if (openerRef.current && document.contains(openerRef.current)) {
+        openerRef.current.focus();
+      }
+    };
+  }, [reportOpen, closeReport]);
   useEffect(() => {
     getResearchBenchmarks()
       .then((data) => setState({ loading: false, error: null, data }))
@@ -867,6 +925,14 @@ function BenchmarkPanel() {
           <div className="benchmark-status-lock">
             One pre-registered run<br />reruns disabled
           </div>
+          <button
+            type="button"
+            className="btn btn-xs btn-ghost-brass"
+            onClick={(e) => openReport("benchmark-v2", e.currentTarget)}
+            title="Read the frozen pre-registration that v2 was committed to before any case ran"
+          >
+            Read full protocol
+          </button>
         </div>
       )}
       <div className="benchmark-grid">
@@ -887,6 +953,17 @@ function BenchmarkPanel() {
               <details><summary>Control outcomes (must not be flagged)</summary>
                 <ul>{(bench.controls || []).map((c) => <li key={c.id}>{c.id} {c.class}: {c.clean ? "clean" : "FALSE-FLAGGED"}</li>)}</ul>
               </details>
+              {bench.report_id && (
+                <button
+                  type="button"
+                  className="btn btn-xs btn-ghost-brass"
+                  style={{ marginTop: "0.5rem" }}
+                  onClick={(e) => openReport(bench.report_id, e.currentTarget)}
+                  title="Read the frozen full report for this artifact"
+                >
+                  Read full report
+                </button>
+              )}
             </article>
           ) : (
           <article className="benchmark-card" key={bench.label}>
@@ -907,10 +984,58 @@ function BenchmarkPanel() {
                 <tbody>{(bench.fixtures || []).map((row, i) => <tr key={i}><td>{row.disease || "—"}</td><td>{row.drug || "—"}</td><td>{row.rank ?? "—"}</td><td>{row.outcome}</td></tr>)}</tbody>
               </table></div>
             </details>
+            {bench.report_id && (
+              <button
+                type="button"
+                className="btn btn-xs btn-ghost-brass"
+                style={{ marginTop: "0.5rem" }}
+                onClick={(e) => openReport(bench.report_id, e.currentTarget)}
+                title="Read the frozen full report for this artifact"
+              >
+                Read full report
+              </button>
+            )}
           </article>
           )
         ))}
       </div>
+      {report && (
+        <div
+          style={{
+            position: "fixed", inset: 0, zIndex: 50, display: "flex",
+            alignItems: "center", justifyContent: "center", padding: "2rem",
+            backgroundColor: "rgba(20,20,24,0.45)",
+          }}
+          onClick={closeReport}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={report.title || "Benchmark report"}
+            style={{
+              backgroundColor: "var(--paper, #faf8f3)", width: "100%", maxWidth: "52rem",
+              maxHeight: "82vh", overflowY: "auto", borderRadius: "8px",
+              border: "1px solid rgba(184,151,90,0.35)", padding: "1.25rem 1.5rem",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "1rem", marginBottom: "0.75rem" }}>
+              <strong style={{ fontSize: "0.9rem" }}>{report.title || "Benchmark report"}</strong>
+              <button type="button" className="btn btn-xs btn-ghost" ref={closeBtnRef} onClick={closeReport}>Close</button>
+            </div>
+            {report.status === "loading" && <p className="pool-muted">Loading frozen report…</p>}
+            {report.status === "error" && <p className="pool-error">Could not load report: {report.error}</p>}
+            {report.status === "ok" && (
+              <div style={{ fontSize: "0.78rem", lineHeight: 1.65 }}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{report.markdown}</ReactMarkdown>
+              </div>
+            )}
+            <p className="benchmark-note" style={{ marginTop: "1rem" }}>
+              Frozen artifact — served verbatim from the committed validation file; it never changes.
+            </p>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
