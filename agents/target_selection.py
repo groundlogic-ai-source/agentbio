@@ -14,6 +14,7 @@ import math
 import os
 import sys
 import time
+import unicodedata as _unicodedata
 from typing import Any, Optional
 
 import anthropic
@@ -480,8 +481,19 @@ def _efo_name_overlap(queried: str, efo_id: str) -> Optional[float]:
     ot_name = get_ot_canonical_disease_name(efo_id)
     if not ot_name:
         return None
-    q_tok = set(_re.split(r"\W+", queried.lower())) - _EFO_NAME_STOP
-    n_tok = set(_re.split(r"\W+", ot_name.lower())) - _EFO_NAME_STOP
+    def _tokens(value: str) -> set[str]:
+        # Open Targets and Orphanet can spell the same name with different
+        # diacritics (for example, "Cantú" vs "Cantu"). Fold accents before
+        # comparing so a correct ontology mapping is not hard-stopped.
+        folded = _unicodedata.normalize("NFKD", value)
+        folded = "".join(
+            char for char in folded
+            if not _unicodedata.combining(char)
+        ).casefold()
+        return set(_re.split(r"\W+", folded)) - _EFO_NAME_STOP
+
+    q_tok = _tokens(queried)
+    n_tok = _tokens(ot_name)
     if not q_tok:
         return None
     return len(q_tok & n_tok) / len(q_tok)
