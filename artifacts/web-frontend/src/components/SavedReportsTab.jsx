@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { listSavedReports, getSavedReport, deleteSavedReport } from "../api.js";
+import TherapeuticApplicabilityCaveat from "./TherapeuticApplicabilityCaveat.jsx";
 
 function fmtP(v) {
   if (v == null || v === "") return "—";
@@ -126,6 +127,7 @@ function ReportDetail({ report, onBack, onDeleted }) {
         <h2 style={{ fontSize: "1.15rem", fontWeight: 700, color: "var(--ink)", margin: "0 0 1.5rem", lineHeight: 1.35 }}>
           {report.hypothesis_text || report.hypothesis_id}
         </h2>
+        <TherapeuticApplicabilityCaveat />
 
         {sectionLabel("Audit numbers — from the registry at save time")}
         <AuditTables facts={report.facts} />

@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import TherapeuticApplicabilityCaveat from "./TherapeuticApplicabilityCaveat.jsx";
 import {
   getResearchHypotheses,
   archiveHypothesis,
@@ -99,6 +100,7 @@ function ReportPanel({ hypothesisId, onSaved }) {
 
   return (
     <div style={{ padding: "1.25rem 1.5rem", backgroundColor: "var(--paper-warm)" }}>
+      <TherapeuticApplicabilityCaveat />
       {/* ── Audit numbers, rendered directly from the registry facts ── */}
       <div style={{
         fontFamily: "monospace", fontSize: "0.55rem", textTransform: "uppercase",
@@ -898,6 +900,7 @@ function BenchmarkPanel() {
       <div className="eyebrow">Validation reporting</div>
       <h3>Historical benchmark artifacts</h3>
       <p className="benchmark-note">{data.pilot_note}</p>
+      <TherapeuticApplicabilityCaveat />
       {runState.loading && (
         <div className="benchmark-run-status benchmark-run-status-loading">
           Verifying the frozen benchmark-v2 result…

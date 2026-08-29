@@ -252,6 +252,15 @@ cost guardrail):
   plus ADME predictions (lipophilicity, permeability, solubility). Cost is
   summed into the job row.
 
+These structure and ADME outputs do **not** establish therapeutic
+applicability. AgentBio does not score whether a candidate reaches the
+relevant tissue, cell, or subcellular compartment at an effective, tolerable
+human exposure. It also does not infer compatibility from a missing result.
+Route, dose, human pharmacokinetics, disease stage or subtype, and the
+therapeutic window remain explicit expert-review questions. This is a general
+limitation rather than a blood-brain-barrier-specific rule, and it introduces
+no new score, cap, or gate.
+
 ### Stage 3b — Writer (`agents/writer.py`)
 
 Compiles one Markdown dossier per selected candidate into `output/reports/`,
@@ -265,7 +274,9 @@ content), so it cannot introduce an unverifiable statement into an otherwise
 claim-audited document. The writer invents nothing: it restates
 numbers already computed, and it re-derives the breakdown from the candidate's
 own `score_components` so the arithmetic is auditable against
-`reviewed_candidates.json`.
+`reviewed_candidates.json`. Every generated dossier also carries a prominent
+therapeutic-applicability disclosure near the top and repeats the boundary in
+the reader's guide: **unknown must not be interpreted as compatible**.
 
 ### Stage 3c — Human review (`main_graph.py`, `human_review_node`)
 

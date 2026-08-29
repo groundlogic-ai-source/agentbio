@@ -89,6 +89,18 @@ body {
 .pool-error { background: var(--oxide-glow); color: var(--oxide); border: 1px solid var(--oxide-border); }
 .pool-muted { color: var(--ink-muted); font-size: .76rem; margin: 1rem 0; }
 .pool-disclosure { border-left: 2px solid var(--brass); color: var(--ink-muted); font-size: .72rem; line-height: 1.55; padding: .4rem .65rem; margin-top: 1rem; background: var(--brass-glow); }
+.therapeutic-applicability-caveat {
+  margin: 1rem 0;
+  padding: .75rem .9rem;
+  border: 1px solid var(--brass-border);
+  border-left: 3px solid var(--brass);
+  border-radius: 0 5px 5px 0;
+  background: var(--brass-glow);
+  color: var(--ink-muted);
+  font-size: .76rem;
+  line-height: 1.55;
+}
+.therapeutic-applicability-caveat strong { color: var(--brass-deep); }
 .candidate-evidence-panel { margin-top: 1.5rem; border: 1px solid var(--steel-border); border-radius: 8px; padding: 1.25rem; background: var(--paper-warm); }
 .evidence-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .75rem; margin-top: 1rem; }
 .evidence-card { padding: .85rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); font-size: .7rem; }

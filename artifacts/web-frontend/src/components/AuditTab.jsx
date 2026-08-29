@@ -6,6 +6,7 @@ import DomainFindings from "./DomainFindings";
 import AuditContextFindings from "./AuditContextFindings";
 import ModalityModeToggle from "./ModalityModeToggle";
 import InlineCaseRunner from "./InlineCaseRunner";
+import TherapeuticApplicabilityCaveat from "./TherapeuticApplicabilityCaveat";
 import { useModalityMode } from "../modalityMode";
 
 // Modality finding card, hidden when the user disengages the mode. Wrapper
@@ -201,6 +202,7 @@ function FoundResult({ data }) {
       <Banner kind="info">
         {data.narration}
       </Banner>
+      <TherapeuticApplicabilityCaveat />
 
       <CandidateCard
         cand={data.candidate}
@@ -258,6 +260,7 @@ function AbsentResult({ data }) {
       <Banner kind="warn">
         {data.narration}
       </Banner>
+      <TherapeuticApplicabilityCaveat />
 
       <Banner kind={sourceFailure ? "warn" : "note"}>
         <strong>

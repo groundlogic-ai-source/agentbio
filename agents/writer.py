@@ -499,6 +499,14 @@ checkpoint gates completion of the record — the structure prediction (the
 expensive step) has already run by the time a person is asked. This document
 is a prioritised starting point for expert review, not a clinical conclusion.
 
+**Therapeutic applicability is not scored.** The ranking does not assess
+whether a drug reaches the relevant tissue, cell, or compartment at an
+effective, tolerable human exposure. Route, dose, pharmacokinetics (PK),
+disease stage/subtype, and therapeutic window require expert review.
+Unknown must not be interpreted as compatible. This
+limitation is disclosure-only: it introduces no tissue-specific score, cap, or
+gate.
+
 **Composite score.** A weighted sum of the evidence terms listed in Section
 4's table (efficacy evidence, the Open Targets target–disease association,
 Tanimoto structural similarity to approved drugs for the same target, and
@@ -605,6 +613,17 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"{_fmt(threshold, 2)}) and it cannot reach STRONG_MATCH regardless of "
             "its other scores.\n\n"
         )
+
+    # General therapeutic-applicability disclosure. Informational only: this
+    # intentionally adds no tissue-specific score, penalty, cap, or gate.
+    parts.append(
+        "> ⚠ **Therapeutic applicability not assessed.** Ranking does not assess "
+        "whether this drug reaches the relevant tissue, cell, or compartment at "
+        "an effective, tolerable human exposure. Route, dose, pharmacokinetics "
+        "(PK), disease stage/subtype, and therapeutic window require expert "
+        "review. **Unknown must not be interpreted as "
+        "compatible.**\n\n"
+    )
 
     parts.append(header_note)
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getCandidateEvidence, getCandidatePool, listRuns } from "../api.js";
 import ModalityModeToggle from "./ModalityModeToggle.jsx";
+import TherapeuticApplicabilityCaveat from "./TherapeuticApplicabilityCaveat.jsx";
 import { useModalityMode } from "../modalityMode.js";
 
 const labelStyle = {
@@ -139,6 +140,7 @@ export default function CandidatePoolTab() {
         </div>
         <ModalityModeToggle />
       </header>
+      <TherapeuticApplicabilityCaveat />
 
       {runs.length === 0 ? (
         <div className="pool-empty">No completed case with a persisted candidate pool is available yet. Complete a case first.</div>

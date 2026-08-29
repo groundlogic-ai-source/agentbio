@@ -4,6 +4,7 @@ import DomainFindings from "./DomainFindings";
 import AuditContextFindings from "./AuditContextFindings";
 import ModalityModeToggle from "./ModalityModeToggle";
 import InlineCaseRunner from "./InlineCaseRunner";
+import TherapeuticApplicabilityCaveat from "./TherapeuticApplicabilityCaveat";
 import { useModalityMode } from "../modalityMode";
 
 // ── Flag presentation ─────────────────────────────────────────────────────────
@@ -277,6 +278,7 @@ export default function TriagePanel({ onNavigate }) {
 
       {result && result.status === "ok" && (
         <div className="space-y-4 printable-report">
+          <TherapeuticApplicabilityCaveat />
           {/* Print header — visible only in the PDF/print output */}
           <div className="print-only">
             <div style={{

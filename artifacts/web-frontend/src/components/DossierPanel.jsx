@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAuditDossiers, getDossierClaims } from "../api";
+import TherapeuticApplicabilityCaveat from "./TherapeuticApplicabilityCaveat";
 
 // ── Audit status presentation ─────────────────────────────────────────────────
 const STATUS_META = {
@@ -114,6 +115,7 @@ function ClaimLedger({ hypothesisId, onClose }) {
           <button onClick={onClose} className="audit-chip text-xs px-3 py-1.5 rounded-full">Close</button>
         </div>
       </div>
+      <TherapeuticApplicabilityCaveat />
 
       {(d.status_reasons || []).map((r, i) => (
         <p key={i} className="text-sm" style={{ color: "var(--ink-muted)" }}>{r}</p>

@@ -67,6 +67,20 @@ class TestReadersGuideAppendix(unittest.TestCase):
         text = _readers_guide_appendix().lower()
         self.assertIn("already run", text)
 
+    def test_every_report_discloses_therapeutic_applicability(self):
+        md = build_report_markdown(_minimal_candidate(), {}, {}, None)
+        self.assertIn("Therapeutic applicability not assessed", md)
+        self.assertIn("relevant tissue, cell, or compartment", md)
+        self.assertIn("effective, tolerable human exposure", md)
+        self.assertIn("Route, dose, pharmacokinetics (PK)", md)
+        self.assertIn("Unknown must not be interpreted as compatible", md)
+
+    def test_reader_guide_says_applicability_is_not_scored(self):
+        text = _readers_guide_appendix()
+        self.assertIn("Therapeutic applicability is not scored", text)
+        self.assertIn("no tissue-specific score, cap, or", text)
+        self.assertIn("gate", text)
+
     def test_appendix_appears_after_limitations(self):
         md = build_report_markdown(_minimal_candidate(), {}, {}, None)
         self.assertLess(md.index("## 5. Limitations"),

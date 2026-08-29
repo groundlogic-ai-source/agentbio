@@ -283,7 +283,7 @@ For each selected candidate (STRONG_MATCH first; see the env switches below):
 
 ### The `writer` node
 
-Writes one Markdown report per selected candidate to `output/reports/{disease}_{drug}.md`, each with exactly five sections: **(1)** hypothesis summary, **(2)** evidence table, **(3)** full source citations (deduplicated PMIDs, ChEMBL activity IDs, NCT numbers), **(4)** composite-score breakdown (every weighted term, reconciled against `reviewed_candidates.json`), and **(5)** limitations. The writer invents no facts — it only restates numbers already produced upstream.
+Writes one Markdown report per selected candidate to `output/reports/{disease}_{drug}.md`, with six sections: **(1)** hypothesis summary, **(2)** evidence table, **(3)** full source citations (deduplicated PMIDs, ChEMBL activity IDs, NCT numbers), **(4)** composite-score breakdown (every weighted term, reconciled against `reviewed_candidates.json`), **(5)** limitations, and **(6)** a static reader's guide. Every dossier states that therapeutic applicability is not scored: tissue or cellular exposure, route, dose, human pharmacokinetics, disease stage/subtype, and therapeutic window require expert review, and unknown must not be treated as compatible. The writer invents no facts — it only restates numbers already produced upstream.
 
 ### Environment switches
 

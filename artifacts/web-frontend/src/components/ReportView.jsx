@@ -1,5 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import TherapeuticApplicabilityCaveat from "./TherapeuticApplicabilityCaveat.jsx";
+import { hasTherapeuticApplicabilityDisclosure } from "../therapeuticApplicability.js";
 
 export default function ReportView({ report }) {
   if (!report) {
@@ -9,6 +11,9 @@ export default function ReportView({ report }) {
       </p>
     );
   }
+  const showLegacyApplicabilityCaveat =
+    !hasTherapeuticApplicabilityDisclosure(report);
+
   return (
     <div className="dossier">
       <p
@@ -26,6 +31,7 @@ export default function ReportView({ report }) {
         Beta research preview — this dossier is a machine-generated hypothesis
         for expert review, not medical advice or a treatment recommendation.
       </p>
+      {showLegacyApplicabilityCaveat && <TherapeuticApplicabilityCaveat />}
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{report}</ReactMarkdown>
     </div>
   );
