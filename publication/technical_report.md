@@ -42,17 +42,20 @@ rules.
 
 ## 2. Provenance and freeze controls
 
-- **Benchmark v2** ran under freeze tag `benchmark-freeze-v2`. Because the
-  production deployment ships without a git repository, the freeze is sealed
-  by a deployment attestation (`freeze_mode: deployment-attestation` in the
-  results) pinning the pipeline source fingerprint, the completed
-  source-ablation control hash, and the screened case-list hash (pre-registration
-  Amendment 5). **Provenance caveat (disclosed):** the attestation file
+- **Benchmark v2** ran in deployment-attestation mode
+  (`freeze_mode: deployment-attestation` in the results); no
+  `benchmark-freeze-v2` git tag was preserved. The results metadata records the
+  pipeline source fingerprint, completed source-ablation control hash, and
+  screened case-list hash (pre-registration Amendment 5), but the deployment
+  attestation itself is unavailable. **Provenance caveat (disclosed):** the attestation file
   (`validation/benchmark_freeze_v2_attestation.json`) and the screened case
   list (`validation/benchmark_case_list_v2.json`) were written inside the
   deployment filesystem and are **not committed to this repository**; the
   executed primary set recorded in the committed results artifact *is* the
-  screened list. Future freezes should copy both files back into the repo.
+  screened list. The results hash and row-level funnel are independently
+  checkable, but the production source fingerprint and live-source screening
+  outcomes cannot be independently reconstructed. Future freezes should copy
+  both files back into the repo.
 - **Audit claim-set v1** is sealed by `validation/audit_claimset_freeze_manifest.json`:
   claim-set sha256 `32efd7d9…`, code-commit ancestry + `.py` drift checks, harness
   config equality, and a results-hash binding that refuses any silent replacement

@@ -1,7 +1,11 @@
 # Publication package — AgentBio report & preprint
 
-Everything here is generated from, or cites, **frozen committed artifacts**.
-Nothing is a screenshot of a spreadsheet; every number is reproducible.
+Everything here is generated from, or cites, committed study artifacts.
+Audit metrics and the benchmark's results-level funnel are independently
+recomputable. Benchmark v2's deployment attestation and post-screen case-list
+file were not preserved, so its production source fingerprint and live-source
+screening outcomes cannot be independently reconstructed; see the provenance
+caveat in `technical_report.md`.
 
 ## Contents
 

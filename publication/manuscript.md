@@ -141,18 +141,20 @@ disclosure, including model identifiers, is in the Supplement.
 Both studies were pre-registered in the repository before the relevant code
 or runs existed (benchmark v2: 2026-08-01 with six amendments through
 2026-08-08, each committed before the event it governed; audit study:
-2026-08-10 with three amendments). Frozen artifacts include the case lists,
-claim set (sha256-pinned), raw per-claim audit outputs, scoring code
-(code-commit ancestry and file-drift checks), and results (hash-bound so
-silent replacement is refused). The benchmark's deployment attestation and
-screened case list are held in the immutable published deployment, which
-ships without git (a disclosed provenance gap); the executed primary set
-recorded in the committed results artifact is the screened list. Each study
-allowed exactly one scored run;
+2026-08-10 with three amendments). Committed artifacts include the benchmark's
+pre-screen case list and hash-pinned per-row results, plus the audit claim set
+(sha256-pinned), raw per-claim outputs, scoring code (code-commit ancestry and
+file-drift checks), and hash-bound results. The benchmark's deployment
+attestation and post-screen case-list file were not preserved; the executed
+primary set recorded in the committed results artifact is the only surviving
+record of that screened list. Its results-level funnel is recomputable, but the
+production source fingerprint and live-source screening outcomes cannot be
+independently reconstructed. Each study allowed exactly one scored run;
 the audit study's single pre-registered harness-defect rerun allowance was
 exercised once (a plumbing crash *before any metric was computed*), recorded
-as Amendment 3, and permanently consumed. All metrics are independently
-recomputable from the committed raw archives; we verified exact reproduction.
+as Amendment 3, and permanently consumed. Audit metrics reproduce exactly from
+the committed raw archive; benchmark counts reproduce from the committed
+per-row results subject to the provenance limitation above.
 
 ### 3.2 Benchmark v2: retrospective rediscovery
 

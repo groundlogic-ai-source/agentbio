@@ -382,8 +382,9 @@ You can still exercise everything from **`/docs`** (interactive Swagger UI):
   `python3 validation/verify_v2_provenance.py`) — no post-hoc
   `benchmark-freeze-v2` tag was created, to avoid backdating the freeze with a
   marker that wasn't there when the run executed. Case-selection criteria are in
-  `validation/benchmark_case_selection_criteria.md`; provenance is independently
-  re-checkable via the verifier above.
+  `validation/benchmark_case_selection_criteria.md`; the verifier independently
+  checks the results hash and row-level funnel, but cannot reconstruct the
+  missing production source fingerprint or live-source screening outcomes.
 - Two follow-on frozen studies (a dossier-audit claim set and a triage
   discrimination study) are also complete and documented in `validation/`.
   Wherever validation results are quoted, the audit claim-set **v1 FAIL** must be
