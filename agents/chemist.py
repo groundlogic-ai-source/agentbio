@@ -40,7 +40,8 @@ from data_sources.chembl import (
     get_mechanism_only_approved_drugs)
 from data_sources.pubchem import get_compound_data, get_drug_classification
 from data_sources.openfda import get_label_indications, get_label_mechanism
-from data_sources.multisource_candidates import collect_target_candidates
+from data_sources.multisource_candidates import (
+    collect_target_candidates, filter_repurposing_eligible)
 from data_sources import holdout as _holdout
 from data_sources.evidence_ledger import (
     EvidenceRecord, EvidenceRole, QualificationStatus, SourceType,
@@ -656,6 +657,31 @@ def run_chemist(biologist_output: dict[str, Any],
         multisource["source_status"]["openfda_label"] = {
             "status": "empty", "error": None, "release": None,
         }
+
+    # Fail-closed approved-only gate, re-applied AFTER the label re-merge (the
+    # re-merge rebuilds approval fields from the raw records, so the gate has to
+    # run last).  In repurposing-only mode a candidate with no positive approval
+    # evidence never reaches the Reviewer: an unapproved research compound is
+    # not a repurposing candidate, and leaving it in the pool is how one became
+    # a dossier headline.
+    results, gate_excluded = filter_repurposing_eligible(
+        results, enforce=repurposing_only, log=print)
+    approval_gate = dict(multisource.get("approval_gate") or {})
+    approval_gate["enforced"] = bool(repurposing_only)
+    approval_gate["n_excluded_unapproved"] = (
+        int(approval_gate.get("n_excluded_unapproved") or 0) + len(gate_excluded)
+    )
+    approval_gate.setdefault("excluded", [])
+    approval_gate["excluded"] = list(approval_gate["excluded"]) + [
+        {
+            "drug_name": c.get("drug_name"),
+            "inchikey": c.get("inchikey"),
+            "max_phase": c.get("max_phase"),
+            "providers": (c.get("_evidence_ledger") or {}).get("providers", []),
+        }
+        for c in gate_excluded
+    ]
+
     for candidate in results:
         candidate.setdefault("atc_codes", [])
         candidate.setdefault("most_similar_approved_drug", None)
@@ -675,6 +701,8 @@ def run_chemist(biologist_output: dict[str, Any],
 
     # Rank: approved drugs always before unapproved (repurposing requires a prior
     # human safety profile), then by affinity, then structural novelty signal.
+    # In repurposing_only mode the pool is already approved-only (gate above);
+    # this ordering still matters for the mixed CLI pool.
     results.sort(key=lambda r: (
         1 if r["is_approved_drug"] else 0,
         r["pchembl_value"] or 0.0,
@@ -694,6 +722,7 @@ def run_chemist(biologist_output: dict[str, Any],
         "repurposing_only": repurposing_only,
         "approved_reference_set_size": len(approved_fps),
         "source_status": multisource["source_status"],
+        "approval_gate": approval_gate,
         "reference_set_note": (
             "Tanimoto computed against approved drugs found in this target's "
             "candidate pool (bounded scope)."

@@ -10,7 +10,14 @@ export const STAGES = [
   { key: "awaiting_review", label: "Awaiting Review" },
 ];
 
-export const TERMINAL_STATUSES = new Set(["completed", "error"]);
+// "no_eligible_candidate": the pipeline ran correctly but had nothing
+// recommendable, so it terminated before writing a dossier or opening the
+// human-review checkpoint. Terminal, but NOT an error and NOT a sign-off.
+export const TERMINAL_STATUSES = new Set([
+  "completed",
+  "error",
+  "no_eligible_candidate",
+]);
 
 export function isTerminal(status) {
   return TERMINAL_STATUSES.has(status);

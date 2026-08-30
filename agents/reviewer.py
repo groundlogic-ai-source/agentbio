@@ -814,6 +814,15 @@ def run_reviewer(chemist_output: dict[str, Any],
             # HOW each primary target was surfaced. Without this the field drops here
             # and shows as None in every downstream artifact.
             "target_discovery_method": c.get("target_discovery_method"),
+            # Causal-anchor tier (see _target_tier).  Disclosure + rank-only
+            # demotion; never a score change.
+            "target_tier": _target_tier(c.get("target_discovery_method")),
+            "exploratory_rank_demoted": False,
+            "causal_anchor": None,
+            # How approval was positively established for this candidate
+            # ("unknown" means it was NOT established — see the approval gate).
+            "approval_basis": c.get("approval_basis"),
+            "approval_evidence_providers": c.get("approval_evidence_providers", []),
             "mechanism_class": c.get("mechanism_class"),
             "therapeutic_role": c.get("therapeutic_role", "disease_modifying"),
             "process_support": c.get("process_support", []),
@@ -851,7 +860,7 @@ def run_reviewer(chemist_output: dict[str, Any],
         })
 
     provenance.log_many(prov_entries)
-    _sort_reviewed(reviewed)
+    _rank_reviewed(reviewed)
 
     # ── DILI-target whole-pool pre-cap pass ───────────────────────────────────
     # For every target in the ICH S7A/S7B pharmaceutical safety-profiling panel,
@@ -908,7 +917,7 @@ def run_reviewer(chemist_output: dict[str, Any],
         _pre_cap_resort = True
 
     if _pre_cap_resort:
-        _sort_reviewed(reviewed)
+        _rank_reviewed(reviewed)
         n_precap = sum(1 for c in reviewed if (c.get("mechanism_direction") or {}).get("auto_precap"))
         print(f"[reviewer] DILI-target pre-cap: {n_precap} candidate(s) auto-capped "
               f"(source=any_mechanism on safety-screen target)")
@@ -1026,7 +1035,7 @@ def run_reviewer(chemist_output: dict[str, Any],
         )
 
     if _mdc_needs_resort:
-        _sort_reviewed(reviewed)
+        _rank_reviewed(reviewed)
 
     # ── Post-cap direction-check pass ─────────────────────────────────────────
     # Problem: if the initial top-K candidates ALL get capped (e.g. three
@@ -1105,7 +1114,7 @@ def run_reviewer(chemist_output: dict[str, Any],
         )
 
     if _mdc_second_resort:
-        _sort_reviewed(reviewed)
+        _rank_reviewed(reviewed)
     # ── End mechanism-direction pass ──────────────────────────────────────────
 
     # ── Safety-disclosure pass (Layer 1 + Layer 2) ────────────────────────────
@@ -1157,7 +1166,7 @@ def run_reviewer(chemist_output: dict[str, Any],
     # ── End safety-disclosure pass ────────────────────────────────────────────
 
     if needs_resort:
-        _sort_reviewed(reviewed)
+        _rank_reviewed(reviewed)
 
     return reviewed
 
@@ -1237,6 +1246,113 @@ def _reconcile_safety(r: dict[str, Any], layer1: dict[str, Any],
             if r.get("unapproved_cap_applied") else None
         )
     return safety_triggered
+
+
+# ── Causal-anchor tier (pre-registered; rank-only, mirrors the F2 target-level
+# mechanistic-convergence cap in agents/target_selection.py) ──────────────────
+#
+# A target reached by pathway expansion — or one whose discovery method never
+# got attributed — is an EXPLORATORY lead, not a disease-causal anchor.  The
+# pathway expander is documented as "handicaps, does not subordinate", so an
+# exploratory target could outrank a directly disease-linked one and become the
+# dossier headline with no visible signal that the causal gene was never the
+# subject.  This restores the hierarchy at the CANDIDATE level (the F2 cap acts
+# on targets only) as a rank demotion with disclosure — scores are untouched
+# and STRONG_MATCH gating is unaffected.
+
+#: Discovery methods that carry a direct disease-target link.
+_CAUSAL_DISCOVERY_METHODS = frozenset({"genetic_association"})
+
+#: Discovery methods carrying clinical precedent for the disease itself.
+_PRECEDENT_DISCOVERY_METHODS = frozenset({
+    "pharmacological_precedent",
+    "pharmacological_precedent_via_parent_umbrella",
+})
+
+#: Discovery methods that only reach the target indirectly.
+_EXPLORATORY_DISCOVERY_METHODS = frozenset({"pathway_neighbor"})
+
+
+def _target_tier(method: Optional[str]) -> str:
+    """Classify a candidate's target by how directly it is tied to the disease.
+
+    Unknown / blank discovery methods are classified ``unattributed`` and are
+    treated as exploratory: an unexplained provenance is the weakest claim in
+    the pool, never the strongest.
+    """
+    m = (method or "").strip()
+    if not m:
+        return "unattributed"
+    if m in _CAUSAL_DISCOVERY_METHODS:
+        return "causal_anchor"
+    if m in _PRECEDENT_DISCOVERY_METHODS:
+        return "clinical_precedent"
+    if m in _EXPLORATORY_DISCOVERY_METHODS:
+        return "exploratory_expansion"
+    return "unattributed"
+
+
+_EXPLORATORY_TIERS = frozenset({"exploratory_expansion", "unattributed"})
+
+
+def _apply_causal_tier_demotion(reviewed: list[dict[str, Any]]) -> None:
+    """Rank-only demotion of exploratory candidates below the best anchored one.
+
+    ``reviewed`` must already be sorted best-first; it is reordered in place.
+    When the pool contains NO anchored candidate (every lead is exploratory),
+    nothing is demoted — the ordering is left alone and each row keeps its
+    exploratory tier for disclosure.
+    """
+    for r in reviewed:
+        r["target_tier"] = _target_tier(r.get("target_discovery_method"))
+        r.setdefault("exploratory_rank_demoted", False)
+        r.setdefault("causal_anchor", None)
+
+    anchor_idx = next(
+        (i for i, r in enumerate(reviewed)
+         if r["target_tier"] not in _EXPLORATORY_TIERS),
+        None,
+    )
+    if anchor_idx is None or anchor_idx == 0:
+        return
+
+    anchor = reviewed[anchor_idx]
+    anchor_note = {
+        "drug_name": anchor.get("drug_name"),
+        "target_symbol": anchor.get("target_symbol"),
+        "target_discovery_method": anchor.get("target_discovery_method"),
+        "target_tier": anchor["target_tier"],
+        "composite_score": anchor.get("composite_score"),
+    }
+
+    demoted = [r for r in reviewed[:anchor_idx]]
+    first_time = any(not r.get("exploratory_rank_demoted") for r in demoted)
+    for r in demoted:
+        r["exploratory_rank_demoted"] = True
+        r["causal_anchor"] = anchor_note
+
+    rest = reviewed[anchor_idx:]
+    reordered = [anchor] + demoted + rest[1:]
+    reviewed[:] = reordered
+    if first_time:
+        print(
+            f"[reviewer] causal-anchor tier: demoted {len(demoted)} exploratory "
+            f"candidate(s) below {anchor.get('drug_name')} "
+            f"({anchor.get('target_symbol')}, "
+            f"{anchor.get('target_discovery_method')}); scores unchanged, rank only"
+        )
+
+
+def _rank_reviewed(reviewed: list[dict[str, Any]]) -> None:
+    """Score-sort, then apply the rank-only causal-anchor demotion.
+
+    Ranking ALWAYS goes through this pair.  Demoting only once at the end would
+    let a candidate reach rank 1 after the bounded mechanism-direction and
+    Layer-2 safety shortlists were already drawn from the old top of the list,
+    so the eventual headline could skip both checks.
+    """
+    _sort_reviewed(reviewed)
+    _apply_causal_tier_demotion(reviewed)
 
 
 def _sort_reviewed(reviewed: list[dict[str, Any]]) -> None:

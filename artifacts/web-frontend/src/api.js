@@ -72,7 +72,11 @@ export function getBatch(batchId) {
   return request(`/api/runs/batch/${encodeURIComponent(batchId)}`);
 }
 
-export const TERMINAL_STATUSES = new Set(["completed", "error"]);
+export const TERMINAL_STATUSES = new Set([
+  "completed",
+  "error",
+  "no_eligible_candidate",
+]);
 
 // ── Research hypothesis registry (Feature 3) ──────────────────────────────────
 

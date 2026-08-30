@@ -113,6 +113,30 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
 
       {status === "error" && <ErrorPanel message={job.error_message} />}
 
+      {status === "no_eligible_candidate" && (
+        <Paper className="mb-6">
+          <div className="p-6">
+            <div className="text-lg font-semibold" style={{ color: "var(--ink)" }}>
+              No eligible repurposing candidate
+            </div>
+            <p
+              className="mt-2 text-sm leading-relaxed"
+              style={{ color: "var(--ink-muted)" }}
+            >
+              {job.error_message ||
+                "The pipeline completed but found no compound with an established human safety profile for this target."}
+            </p>
+            <p
+              className="mt-3 text-sm leading-relaxed"
+              style={{ color: "var(--ink-muted)" }}
+            >
+              This is a real result, not a failure: no dossier was written and no
+              sign-off is required. Re-run against a different target to continue.
+            </p>
+          </div>
+        </Paper>
+      )}
+
       {(status === "queued" || status === "running") && (
         <Paper>
           <div className="p-6">

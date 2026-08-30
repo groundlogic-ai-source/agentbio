@@ -64,6 +64,39 @@ def _citations(candidate: dict[str, Any],
             elif st == "chembl_activity":
                 chembl_acts.add(str(sid))
 
+    # Multi-source ledger identifiers.  The three citation classes above are
+    # all ChEMBL/PubMed/NCT-shaped, so a candidate that entered through GtoPdb,
+    # DrugCentral, BindingDB or a regulatory label rendered "none" on every
+    # citation row while the dossier claimed full traceability.  Every provider
+    # record carries its own source id — surface them.
+    ledger_ids: dict[str, set[str]] = {}
+    for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
+        if not isinstance(record, dict):
+            continue
+        provider = str(record.get("provider") or "").strip().lower()
+        pid = str(record.get("publication_id") or "").strip()
+        if pid:
+            # publication_id is not always a PMID — BindingDB stores a DOI when
+            # no PMID exists. Mislabelling one as the other is a false citation.
+            if pid.isdigit():
+                pmids.add(pid)
+            elif provider:
+                ledger_ids.setdefault(provider, set()).add(f"doi/ref:{pid}")
+        if provider in ("", "chembl"):
+            # ChEMBL ids are already rendered as their own citation class.
+            continue
+        found_id = False
+        for key in ("source_id", "label_id", "trial_id"):
+            value = str(record.get(key) or "").strip()
+            if value:
+                ledger_ids.setdefault(provider, set()).add(value)
+                found_id = True
+        if not found_id:
+            # The lane contributed evidence but carried no citable identifier —
+            # say so rather than dropping the lane from the citation list.
+            ledger_ids.setdefault(provider, set()).add(
+                "⚠ record with no citable identifier")
+
     # Target-level literature confirmed by the biologist (PMID provenance).
     for h in (biologist_output or {}).get("literature_hits", []):
         if h.get("pmid") is not None:
@@ -86,6 +119,11 @@ def _citations(candidate: dict[str, Any],
         "pmids": sorted(pmids),
         "chembl_activity_ids": sorted(chembl_acts),
         "nct_numbers": sorted(ncts),
+        # provider -> sorted source identifiers (GtoPdb interactions/ligands,
+        # DrugCentral struct ids, BindingDB assay anchors, openFDA label ids).
+        "source_records": {
+            provider: sorted(ids) for provider, ids in sorted(ledger_ids.items())
+        },
     }
 
 
@@ -306,6 +344,50 @@ def _modality_cell(candidate: dict[str, Any]) -> str:
     return base
 
 
+def _discovery_method_cell(candidate: dict[str, Any]) -> str:
+    """How the target was surfaced — never guessed, never blank."""
+    method = str(candidate.get("target_discovery_method") or "").strip()
+    if not method:
+        return ("⚠ unattributed — the provenance of this target was not "
+                "recorded; treat the target-disease link as unverified")
+    return method
+
+
+def _target_tier_cell(candidate: dict[str, Any]) -> str:
+    """Causal-anchor tier plus the rank-demotion disclosure, when it applies."""
+    tier = str(candidate.get("target_tier") or "").strip() or "unknown"
+    labels = {
+        "causal_anchor": "causal anchor (direct disease-target association)",
+        "clinical_precedent": "clinical precedent (approved for this disease concept)",
+        "exploratory_expansion": "⚠ exploratory (reached by pathway expansion, "
+                                 "not a direct disease-target link)",
+        "unattributed": "⚠ unattributed (target provenance not recorded)",
+    }
+    cell = labels.get(tier, tier)
+    if candidate.get("exploratory_rank_demoted"):
+        anchor = candidate.get("causal_anchor") or {}
+        cell += (
+            f" — rank-demoted below the anchored candidate "
+            f"{anchor.get('drug_name')} ({anchor.get('target_symbol')}, "
+            f"{anchor.get('target_discovery_method')}); scores unchanged"
+        )
+    return cell
+
+
+def _approval_basis_cell(candidate: dict[str, Any]) -> str:
+    """What positively established this compound's regulatory approval."""
+    basis = str(candidate.get("approval_basis") or "").strip()
+    providers = candidate.get("approval_evidence_providers") or []
+    if not basis:
+        return "not recorded"
+    if basis == "unknown":
+        return ("⚠ NOT established — no qualified regulatory-approval record "
+                "and no max_phase ≥ 4 was found for this compound")
+    if providers:
+        return f"{basis} ({', '.join(providers)})"
+    return basis
+
+
 def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
     cx = (struct or {}).get("complex") or {}
     adme = (struct or {}).get("adme") or {}
@@ -359,8 +441,12 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
           "(neither credited nor penalised)"
           if candidate.get("trials_query_failed")
           else _fmt(candidate.get("prior_trial_count")))),
-        ("Target discovery method",
-         candidate.get("target_discovery_method", "genetic_association")),
+        # NEVER default this to a discovery method: a blank or missing value
+        # means the provenance was lost, and silently printing
+        # "genetic_association" would assert a disease link nobody established.
+        ("Target discovery method", _discovery_method_cell(candidate)),
+        ("Target tier", _target_tier_cell(candidate)),
+        ("Approval basis", _approval_basis_cell(candidate)),
     ]
     lines = ["| Evidence | Value |", "| --- | --- |"]
     for k, v in rows:
@@ -632,10 +718,22 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     if repurposing_only:
         parts.append(
             "> **Repurposing-only pool:** the candidate compounds for this target "
-            "were restricted to FDA-approved / known drugs (ChEMBL max_phase ≥ 4) "
-            "at collection time. Unapproved research-grade tool compounds were "
-            "excluded from the pool, not merely down-ranked.\n\n"
+            "were restricted to approved / established drugs at collection time "
+            "and re-checked against the merged pool afterwards. Approval must be "
+            "positively evidenced (a qualified regulatory-approval record, or "
+            "max_phase ≥ 4); a compound whose approval status cannot be resolved "
+            "is excluded, not merely down-ranked.\n\n"
         )
+        # Fail-loud contradiction check: the pool claim above must be true for
+        # the candidate actually being recommended.
+        if str(candidate.get("approval_basis") or "") == "unknown" or \
+                candidate.get("is_approved_drug") is not True:
+            parts.append(
+                "> ⚠ **Disclosure conflict:** this dossier declares a "
+                "repurposing-only pool, but the candidate above has no "
+                "positively established regulatory approval. Treat the "
+                "repurposing framing as unsupported for this candidate.\n\n"
+            )
 
     # K-target evaluation summary — visible count of how many of the K targets
     # were successfully evaluated so a partial failure is not invisible.
@@ -876,6 +974,19 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
         f"- **NCT numbers ({len(cites['nct_numbers'])}):** "
         + (", ".join(cites["nct_numbers"]) if cites["nct_numbers"] else "none") + "\n"
     )
+    source_records = cites.get("source_records") or {}
+    if source_records:
+        for provider, ids in source_records.items():
+            shown = ", ".join(ids[:25])
+            more = f" (+{len(ids) - 25} more)" if len(ids) > 25 else ""
+            parts.append(
+                f"- **{provider} record ids ({len(ids)}):** {shown}{more}\n"
+            )
+    else:
+        parts.append(
+            "- **Other source record ids:** none (this candidate's evidence "
+            "came only from the ChEMBL/PubMed/trial lanes above)\n"
+        )
 
     # 4. Composite breakdown
     parts.append("\n## 4. Composite score breakdown\n")

@@ -3,6 +3,8 @@ const STYLES = {
   running:         { label: "In progress",     color: "var(--ink-muted)" },
   awaiting_review: { label: "Awaiting review", color: "var(--brass)"  },
   error:           { label: "Error",           color: "var(--oxide)"  },
+  // Ran correctly, found nothing recommendable — not an error, not a sign-off.
+  no_eligible_candidate: { label: "No eligible candidate", color: "var(--ink-muted)" },
 };
 
 export default function StatusBadge({ status, decision }) {

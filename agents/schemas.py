@@ -131,6 +131,10 @@ _CHEMIST_REQUIRED_FIELDS: list[tuple[str, str]] = [
     ("source_health",           "warn"),
     ("smiles",                  "warn"),    # None is OK but absence is suspicious
     ("is_approved_drug",        "warn"),
+    # Stamped by the approval gate on every candidate it inspects. Absence means
+    # a pool bypassed the gate entirely, which is exactly how an unapproved
+    # research compound once reached a repurposing dossier.
+    ("approval_basis",          "error"),
 ]
 
 _REVIEWER_REQUIRED_FIELDS: list[tuple[str, str]] = [
@@ -156,6 +160,35 @@ _REVIEWER_REQUIRED_FIELDS: list[tuple[str, str]] = [
 ]
 
 
+# Fields whose VALUE must be non-blank, not merely present.
+#
+# Background: the presence-only check above passes an empty string, so a
+# candidate that reaches the dossier with target_discovery_method="" renders a
+# blank "how this target was found" row while every validator reports OK.  A
+# ledger-native candidate (one that never came from a legacy ChEMBL row) hits
+# exactly this path, because the ledger owns the field and the passthrough
+# overlay will not backfill an authoritative field.
+_CHEMIST_VALUE_FIELDS: list[tuple[str, str]] = [
+    ("drug_name",               "error"),
+    ("target_symbol",           "error"),
+    ("target_discovery_method", "error"),
+    ("uniprot_id",              "warn"),   # legitimately unresolved sometimes
+    ("_evidence_ledger",        "error"),  # empty dict = no lineage at all
+    ("approval_basis",          "warn"),   # "unknown" is a value, "" is a bug
+]
+
+_REVIEWER_VALUE_FIELDS: list[tuple[str, str]] = [
+    ("drug_name",               "error"),
+    ("target_symbol",           "error"),
+    ("disease_name",            "error"),
+    ("target_discovery_method", "error"),
+    # uniprot_id and _evidence_ledger are deliberately NOT value-checked here:
+    # rows persisted before those fields existed legitimately carry None/{} and
+    # must stay replayable.  Both are value-checked one hop upstream at the
+    # chemist boundary, which is where a dropout actually originates.
+]
+
+
 # ---------------------------------------------------------------------------
 # Runtime validation
 # ---------------------------------------------------------------------------
@@ -164,6 +197,7 @@ def validate_handoff(
     candidates: list[dict[str, Any]],
     stage: str,
     field_specs: list[tuple[str, str]],
+    value_specs: Optional[list[tuple[str, str]]] = None,
 ) -> list[str]:
     """
     Validate a list of candidate dicts against a field spec.
@@ -175,7 +209,12 @@ def validate_handoff(
     Args:
         candidates: the list of candidate dicts to check
         stage: human-readable label for the stage (e.g. "chemist→reviewer")
-        field_specs: list of (field_name, severity) tuples
+        field_specs: list of (field_name, severity) tuples — PRESENCE only
+        value_specs: list of (field_name, severity) tuples whose VALUE must be
+            non-blank.  Presence-only checking passes an empty string, so a
+            field that is carried through blank (an empty
+            ``target_discovery_method`` renders as an empty dossier row) is
+            invisible to the presence check.
     """
     problems: list[str] = []
     for i, cand in enumerate(candidates):
@@ -191,14 +230,47 @@ def validate_handoff(
                 print(msg)
                 if severity == "error" and STRICT_VALIDATION:
                     raise RuntimeError(msg)
+        for field, severity in (value_specs or []):
+            if field not in cand:
+                continue  # already reported by the presence pass
+            if not _is_blank(cand.get(field)):
+                continue
+            msg = (
+                f"[schemas] {severity.upper()} at {stage} handoff: "
+                f"'{drug}' carries field '{field}' with a BLANK value "
+                f"({cand.get(field)!r}). The field survived the handoff but "
+                f"its value was never populated, so downstream reports will "
+                f"render it empty."
+            )
+            problems.append(msg)
+            print(msg)
+            if severity == "error" and STRICT_VALIDATION:
+                raise RuntimeError(msg)
     return problems
+
+
+def _is_blank(value: Any) -> bool:
+    """True when a value is present but carries no information.
+
+    ``None`` counts as blank ONLY for fields listed in a value spec — those are
+    fields where a null is a real dropout, not a legitimate "unmeasured".
+    """
+    if value is None:
+        return True
+    if isinstance(value, str):
+        return not value.strip()
+    if isinstance(value, (list, tuple, set, dict)):
+        return len(value) == 0
+    return False
 
 
 def validate_chemist_handoff(candidates: list[dict[str, Any]]) -> list[str]:
     """Validate candidates produced by the Chemist before the Reviewer sees them."""
-    return validate_handoff(candidates, "chemist→reviewer", _CHEMIST_REQUIRED_FIELDS)
+    return validate_handoff(candidates, "chemist→reviewer",
+                            _CHEMIST_REQUIRED_FIELDS, _CHEMIST_VALUE_FIELDS)
 
 
 def validate_reviewer_handoff(candidates: list[dict[str, Any]]) -> list[str]:
     """Validate candidates produced by the Reviewer before Writer/Validator sees them."""
-    return validate_handoff(candidates, "reviewer→writer", _REVIEWER_REQUIRED_FIELDS)
+    return validate_handoff(candidates, "reviewer→writer",
+                            _REVIEWER_REQUIRED_FIELDS, _REVIEWER_VALUE_FIELDS)

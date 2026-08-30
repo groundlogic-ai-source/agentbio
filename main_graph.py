@@ -114,6 +114,10 @@ class PipelineState(TypedDict, total=False):
     k_bio_failed: int                  # count of biologist stubs (K>1 only)
     chemist_output: dict[str, Any]
     reviewed: dict[str, Any]
+    # Pre-dossier eligibility verdict (see eligibility_gate_node).  When
+    # eligible is False the run terminates WITHOUT writing a dossier or opening
+    # a human-review checkpoint.
+    eligibility: dict[str, Any]
     selected: list[dict[str, Any]]
     structure_results: dict[str, Any]
     reports: list[dict[str, Any]]
@@ -565,6 +569,10 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
         "repurposing_only": repurposing_only,
         "pooled_across_multiple_targets": has_any_pooled,
         "approved_reference_set_size": total_approved_fps,
+        # Aggregate the per-target approval-gate audit so the eligibility gate
+        # and the dossier can report what the union boundary excluded across
+        # ALL K targets, not just the last one.
+        "approval_gate": _pool_approval_gates(chemist_results),
         "source_status": {
             f"target_{i + 1}_{targets[i].get('target_symbol', i)}": (
                 (chemist_results[i] or {}).get("source_status", {})
@@ -642,6 +650,80 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
     print(f"[graph] reviewer: {payload['n_strong_matches']} STRONG_MATCH of "
           f"{payload['n_candidates']}")
     return {"reviewed": payload}
+
+
+def _pool_approval_gates(
+        chemist_results: list[Optional[dict[str, Any]]]) -> dict[str, Any]:
+    """Merge the per-target approval-gate audits into one pooled envelope."""
+    pooled: dict[str, Any] = {"enforced": False, "n_excluded_unapproved": 0,
+                              "excluded": []}
+    for result in chemist_results:
+        gate = (result or {}).get("approval_gate") or {}
+        if not gate:
+            continue
+        pooled["enforced"] = pooled["enforced"] or bool(gate.get("enforced"))
+        pooled["n_excluded_unapproved"] += int(
+            gate.get("n_excluded_unapproved") or 0)
+        pooled["excluded"].extend(gate.get("excluded") or [])
+    return pooled
+
+
+def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
+    """Terminate BEFORE the dossier when no eligible candidate exists.
+
+    Without this gate the pipeline still wrote a report (or an empty one) and
+    still opened the Approve/Reject checkpoint, which asks a human to sign off
+    on a recommendation the pipeline never actually had.  In repurposing-only
+    mode eligibility means approval was POSITIVELY established; unknown
+    approval is not eligible.
+    """
+    reviewed = state.get("reviewed") or {}
+    candidates = reviewed.get("candidates", [])
+    repurposing_only = bool(
+        reviewed.get("repurposing_only") or state.get("repurposing_only"))
+
+    def _eligible(c: dict[str, Any]) -> bool:
+        if not repurposing_only:
+            return True
+        return c.get("is_approved_drug") is True
+
+    eligible = [c for c in candidates if _eligible(c)]
+
+    if not candidates:
+        reason = ("No candidate compound was found for the selected target(s) "
+                  "in any enabled source.")
+    elif not eligible:
+        reason = (
+            f"No eligible repurposing candidate found: all "
+            f"{len(candidates)} pooled compound(s) lack positively established "
+            f"regulatory approval. Repurposing requires an existing human "
+            f"safety profile, so an unapproved research compound is not a "
+            f"candidate."
+        )
+    else:
+        reason = ""
+
+    verdict = {
+        "eligible": bool(eligible),
+        "reason": reason,
+        "n_candidates": len(candidates),
+        "n_eligible": len(eligible),
+        "repurposing_only": repurposing_only,
+        "approval_gate": (state.get("chemist_output") or {}).get("approval_gate"),
+    }
+    _write_json("eligibility.json", verdict)
+    if verdict["eligible"]:
+        print(f"[graph] eligibility_gate: {len(eligible)} eligible candidate(s) "
+              f"of {len(candidates)}")
+    else:
+        print(f"[graph] eligibility_gate: TERMINATING — {reason}")
+    return {"eligibility": verdict}
+
+
+def _route_after_eligibility(state: PipelineState) -> str:
+    return ("structure_validation"
+            if (state.get("eligibility") or {}).get("eligible")
+            else END)
 
 
 def _select_candidates(reviewed: dict[str, Any]) -> list[dict[str, Any]]:
@@ -813,6 +895,7 @@ def build_graph():
     g.add_node("biologist", biologist_node)
     g.add_node("chemist", chemist_node)
     g.add_node("reviewer", reviewer_node)
+    g.add_node("eligibility_gate", eligibility_gate_node)
     g.add_node("structure_validation", structure_validation_node)
     g.add_node("writer", writer_node)
     g.add_node("human_review", human_review_node)
@@ -821,7 +904,15 @@ def build_graph():
     g.add_edge("target_selection", "biologist")
     g.add_edge("biologist", "chemist")
     g.add_edge("chemist", "reviewer")
-    g.add_edge("reviewer", "structure_validation")
+    g.add_edge("reviewer", "eligibility_gate")
+    # No eligible candidate -> terminate here.  Writing a dossier and opening an
+    # Approve/Reject checkpoint for a pool with nothing recommendable asks a
+    # human to sign off on a recommendation that does not exist.
+    g.add_conditional_edges(
+        "eligibility_gate",
+        _route_after_eligibility,
+        {"structure_validation": "structure_validation", END: END},
+    )
     g.add_edge("structure_validation", "writer")
     g.add_edge("writer", "human_review")
     g.add_edge("human_review", END)

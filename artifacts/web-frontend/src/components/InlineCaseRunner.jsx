@@ -148,6 +148,16 @@ export default function InlineCaseRunner({ disease, onReady, verb = "Run this ca
           setPhase("failed");
           return false;
         }
+        // Terminal, but there is nothing to audit: the pipeline ran and found
+        // no eligible candidate. Must stop polling — it will never advance.
+        if (current.status === "no_eligible_candidate") {
+          setError(
+            current.error_message ||
+            "The pipeline found no eligible repurposing candidate for this target."
+          );
+          setPhase("failed");
+          return false;
+        }
         return true;
       } finally {
         inFlightRef.current = false;

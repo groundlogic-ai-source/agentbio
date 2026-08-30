@@ -61,6 +61,8 @@ from data_sources.evidence_ledger import (
 
 __all__ = [
     "collect_target_candidates",
+    "approval_basis",
+    "filter_repurposing_eligible",
     "normalize_chembl_enriched",
     "records_from_gtopdb_envelope",
     "records_from_drugcentral_envelope",
@@ -141,6 +143,96 @@ def _source_status(envelope: dict[str, Any]) -> dict[str, Any]:
         "error": envelope.get("error"),
         "release": envelope.get("release"),
     }
+
+
+# ---------------------------------------------------------------------------
+# Approval eligibility (fail-closed)
+# ---------------------------------------------------------------------------
+#
+# ``repurposing_only`` used to be enforced per-source only: each adapter was
+# asked for approved rows, but the UNION was never re-checked.  Any row that
+# slipped past one adapter's filter (or that entered without a resolvable
+# approval status) survived the merge and could become the headline candidate,
+# because ranking merely sorts approved-first and the unapproved cap is a score
+# cap, not a gate.  The filter below closes that hole at the union boundary.
+#
+# Rule: approval must be POSITIVELY evidenced.  Unknown approval is NOT
+# approved.
+
+#: Basis strings recorded on every candidate as ``approval_basis``.
+APPROVAL_BASIS_LEDGER = "regulatory_approval_record"
+APPROVAL_BASIS_MAX_PHASE = "max_phase>=4"
+APPROVAL_BASIS_UNKNOWN = "unknown"
+
+
+def approval_basis(candidate: dict[str, Any]) -> tuple[bool, str, list[str]]:
+    """Positive-evidence approval test for one merged candidate.
+
+    Returns ``(is_approved, basis, providers)``.  ``basis`` is
+    ``APPROVAL_BASIS_UNKNOWN`` whenever no qualified regulatory-approval record
+    and no ``max_phase >= 4`` is present — an explicitly UNRESOLVED status that
+    the caller must treat as *not* approved rather than as "probably fine".
+    """
+    ledger = candidate.get("_evidence_ledger") or {}
+    providers: list[str] = []
+    for record in ledger.get("records") or []:
+        if not isinstance(record, dict):
+            continue
+        if record.get("source_type") != SourceType.REGULATORY_APPROVAL.value:
+            continue
+        if record.get("qualification_status") != QualificationStatus.QUALIFIED.value:
+            continue
+        phase = _to_float(record.get("measurement_value"))
+        if phase is None or phase < 4:
+            continue
+        provider = _clean(record.get("provider"))
+        if provider and provider not in providers:
+            providers.append(provider)
+    if providers:
+        return True, APPROVAL_BASIS_LEDGER, sorted(providers)
+
+    max_phase = _to_float(candidate.get("max_phase"))
+    if max_phase is not None and max_phase >= 4:
+        return True, APPROVAL_BASIS_MAX_PHASE, []
+
+    return False, APPROVAL_BASIS_UNKNOWN, []
+
+
+def filter_repurposing_eligible(
+    candidates: list[dict[str, Any]],
+    *,
+    enforce: bool = True,
+    log=None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Stamp ``approval_basis`` on every candidate and split by eligibility.
+
+    Every candidate is stamped regardless of ``enforce`` so the dossier can
+    always disclose HOW approval was established.  When ``enforce`` is False
+    (mixed-pool CLI mode) nothing is dropped and the excluded list is empty.
+    """
+    eligible: list[dict[str, Any]] = []
+    excluded: list[dict[str, Any]] = []
+    for candidate in candidates:
+        approved, basis, providers = approval_basis(candidate)
+        candidate["approval_basis"] = basis
+        candidate["approval_evidence_providers"] = providers
+        # Keep the downstream cap predicate consistent with the gate: the
+        # ledger derives is_approved_drug from max_phase alone, so a candidate
+        # approved via a provider approval record must not read as unapproved.
+        if approved:
+            candidate["is_approved_drug"] = True
+        if approved or not enforce:
+            eligible.append(candidate)
+        else:
+            excluded.append(candidate)
+    if enforce and excluded and log:
+        log(
+            f"[multisource] repurposing_only: excluded {len(excluded)} "
+            f"candidate(s) with no positive approval evidence "
+            f"(unknown approval is NOT approved): "
+            f"{[c.get('drug_name') or c.get('inchikey') for c in excluded[:5]]}"
+        )
+    return eligible, excluded
 
 
 _LEDGER_AUTHORITATIVE_FIELDS = {
@@ -287,7 +379,12 @@ def merge_chemist_candidates(
         # Compatibility for callers predating the ledger. The production
         # Chemist always emits records after v2 integration.
         return rows
-    return _overlay_passthrough_fields(merge_candidates(records), rows)
+    merged = _overlay_passthrough_fields(merge_candidates(records), rows)
+    # Re-merging rebuilds is_approved_drug from max_phase alone, which would
+    # silently drop approval established by a provider approval record. Re-stamp
+    # (never filter here — the enforcing gate belongs to the Chemist).
+    merged, _ = filter_repurposing_eligible(merged, enforce=False)
+    return merged
 
 
 # ---------------------------------------------------------------------------
@@ -962,6 +1059,13 @@ def collect_target_candidates(
         candidates = _overlay_passthrough_fields(
             candidates, list(chembl_enriched or []))
 
+    # Fail-closed approved-only gate on the UNION.  Per-source filters are not
+    # sufficient: a row that enters without resolvable approval status would
+    # otherwise survive the merge and be eligible to become the headline
+    # candidate.  Unknown approval is treated as NOT approved.
+    candidates, excluded_unapproved = filter_repurposing_eligible(
+        candidates, enforce=repurposing_only, log=print)
+
     if not chembl_on:
         source_status["chembl"] = dict(_disabled)
     elif chembl_enriched is not None:
@@ -971,4 +1075,20 @@ def collect_target_candidates(
             "release": None,
         }
 
-    return {"candidates": candidates, "source_status": source_status}
+    return {
+        "candidates": candidates,
+        "source_status": source_status,
+        "approval_gate": {
+            "enforced": bool(repurposing_only),
+            "n_excluded_unapproved": len(excluded_unapproved),
+            "excluded": [
+                {
+                    "drug_name": c.get("drug_name"),
+                    "inchikey": c.get("inchikey"),
+                    "max_phase": c.get("max_phase"),
+                    "providers": (c.get("_evidence_ledger") or {}).get("providers", []),
+                }
+                for c in excluded_unapproved
+            ],
+        },
+    }

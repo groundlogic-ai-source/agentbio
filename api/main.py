@@ -166,6 +166,11 @@ def _run_graph(job_id: str, thread_id: str) -> None:
         if requested:
             initial_state["requested_disease"] = requested
 
+        # Set when the pre-dossier eligibility gate terminates the run: the
+        # pipeline ran correctly but had nothing recommendable, which is a
+        # distinct outcome from both "completed" and "error".
+        ineligible: dict[str, Any] = {}
+
         for chunk in graph.stream(initial_state, config=config, stream_mode="updates"):
             if "__interrupt__" in chunk:
                 # human_review reached: pipeline paused for the reviewer.
@@ -175,6 +180,11 @@ def _run_graph(job_id: str, thread_id: str) -> None:
                 return
 
             for node, value in chunk.items():
+                if node == "eligibility_gate":
+                    verdict = (value or {}).get("eligibility") or {}
+                    if not verdict.get("eligible"):
+                        ineligible = verdict
+                    continue
                 if node not in _PIPELINE_NODES:
                     continue
                 fields: dict[str, Any] = {"status": "running",
@@ -206,6 +216,19 @@ def _run_graph(job_id: str, thread_id: str) -> None:
                     _audit.save_job_candidates(job_id)
 
                 jobs_db.update_job_status(job_id, **fields)
+
+        if ineligible:
+            # Correct pipeline execution with nothing recommendable. Reported as
+            # its own terminal state so it is never mistaken for a signed-off
+            # dossier, and never sent to a human as an Approve/Reject decision.
+            jobs_db.update_job_status(
+                job_id,
+                status="no_eligible_candidate",
+                current_stage="done",
+                error_message=ineligible.get("reason") or
+                "No eligible repurposing candidate found.",
+            )
+            return
 
         # The first pass always interrupts at human_review; reaching here means
         # the graph finished without pausing (already-resumed thread, etc.).
