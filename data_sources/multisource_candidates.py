@@ -369,12 +369,21 @@ def _overlay_passthrough_fields(
 
 def merge_chemist_candidates(
     candidates: Iterable[dict[str, Any]],
+    *,
+    extra_records: Optional[Iterable[EvidenceRecord]] = None,
 ) -> list[dict[str, Any]]:
-    """Union already-normalized Chemist candidates across target pools."""
+    """Union already-normalized Chemist candidates across target pools.
+
+    ``candidates`` are already-serialized ledger-backed Chemist outputs, so
+    their embedded records must be unpacked before re-merging.  ``extra_records``
+    is for a new evidence lane (for example an FDA label) that should be added
+    without discarding the existing candidate ledger or passthrough fields.
+    """
     rows = [row for row in candidates if isinstance(row, dict)]
     records: list[dict[str, Any]] = []
     for row in rows:
         records.extend((row.get("_evidence_ledger") or {}).get("records") or [])
+    records.extend(record for record in (extra_records or []) if record is not None)
     if not records:
         # Compatibility for callers predating the ledger. The production
         # Chemist always emits records after v2 integration.

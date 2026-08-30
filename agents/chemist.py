@@ -41,7 +41,8 @@ from data_sources.chembl import (
 from data_sources.pubchem import get_compound_data, get_drug_classification
 from data_sources.openfda import get_label_indications, get_label_mechanism
 from data_sources.multisource_candidates import (
-    collect_target_candidates, filter_repurposing_eligible)
+    approval_basis, collect_target_candidates, filter_repurposing_eligible,
+    merge_chemist_candidates)
 from data_sources import holdout as _holdout
 from data_sources.evidence_ledger import (
     EvidenceRecord, EvidenceRole, QualificationStatus, SourceType,
@@ -277,6 +278,57 @@ def _label_mechanism_record(candidate: dict[str, Any]) -> Optional[EvidenceRecor
         context=text,
         qualification_status=QualificationStatus.QUALIFIED,
     )
+
+
+def _assert_evidence_augmentation_monotonic(
+    before: list[dict[str, Any]],
+    after: list[dict[str, Any]],
+    *,
+    lane: str,
+) -> None:
+    """Refuse to turn evidence augmentation into silent candidate deletion.
+
+    A supplemental evidence lane may merge duplicate representations of the
+    same active moiety, but it must not remove an established identity or erase
+    positive approval evidence.  Raising here produces an explicit pipeline
+    failure instead of the scientifically misleading ``no_eligible_candidate``
+    terminal state caused by the former OpenFDA label re-merge bug.
+    """
+    def _identity(candidate: dict[str, Any]) -> str:
+        ledger = candidate.get("_evidence_ledger") or {}
+        return str(
+            ledger.get("identity")
+            or candidate.get("inchikey")
+            or candidate.get("molecule_chembl_id")
+            or candidate.get("drug_name")
+            or ""
+        ).strip()
+
+    before_by_id = {
+        identity: candidate
+        for candidate in before
+        if (identity := _identity(candidate))
+    }
+    after_by_id = {
+        identity: candidate
+        for candidate in after
+        if (identity := _identity(candidate))
+    }
+    missing = sorted(set(before_by_id) - set(after_by_id))
+    approval_lost = sorted(
+        identity
+        for identity, candidate in before_by_id.items()
+        if approval_basis(candidate)[0]
+        and identity in after_by_id
+        and not approval_basis(after_by_id[identity])[0]
+    )
+    if missing or approval_lost:
+        raise RuntimeError(
+            f"{lane} evidence augmentation violated the monotonic merge "
+            f"invariant: missing identities={missing[:5]}, "
+            f"approval lost={approval_lost[:5]}. Refusing to report a "
+            f"potentially false no-eligible-candidate result."
+        )
 
 
 def _enrich_compounds(
@@ -648,8 +700,17 @@ def run_chemist(biologist_output: dict[str, Any],
         if record is not None
     ]
     if label_records:
-        from data_sources.evidence_ledger import merge_candidates
-        results = merge_candidates([*results, *label_records])
+        # ``results`` are already serialized ledger-backed candidates.  Do not
+        # pass those dicts to the low-level merge_candidates() function: that
+        # function normalizes a dict as one record and would discard the
+        # candidate's embedded approval records/max_phase.  The Chemist-level
+        # helper unpacks the existing ledgers, adds the label records, and
+        # overlays non-ledger enrichment such as rationale and ATC codes.
+        before_label_merge = results
+        results = merge_chemist_candidates(
+            before_label_merge, extra_records=label_records)
+        _assert_evidence_augmentation_monotonic(
+            before_label_merge, results, lane="OpenFDA label")
         multisource["source_status"]["openfda_label"] = {
             "status": "ok", "error": None, "release": None,
         }

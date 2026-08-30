@@ -231,6 +231,71 @@ class UnionTests(unittest.TestCase):
         # Structural union keyed on the shared 14-char block.
         self.assertTrue(cand["_evidence_ledger"]["identity"].endswith(_BLOCK))
 
+    def test_remerge_with_extra_evidence_preserves_approval_and_passthrough(self):
+        """Adding a label must not erase the existing approval ledger."""
+        from data_sources.evidence_ledger import (
+            EvidenceRole, EvidenceRecord, QualificationStatus, SourceType,
+        )
+
+        candidate = _chembl_enriched()
+        candidate.update({
+            "drug_name": "Aspirin",
+            "rationale": "existing rationale",
+            "atc_codes": ["B01AC06"],
+            "_evidence_ledger": {
+                "records": [{
+                    "provider": "chembl",
+                    "source_type": "regulatory_approval",
+                    "evidence_role": "approval",
+                    "source_id": "chembl-approval:CHEMBL25",
+                    "molecule_id": "CHEMBL25",
+                    "molecule_name": "ASPIRIN",
+                    "inchikey": _FREE_BASE,
+                    "smiles": candidate["smiles"],
+                    "target_symbol": "PTGS1",
+                    "target_accession": "P23219",
+                    "target_species": "Homo sapiens",
+                    "disease_name": "inflammation",
+                    "measurement_type": "phase",
+                    "measurement_value": 4.0,
+                    "qualification_status": "qualified",
+                    "contradiction_status": "none",
+                }],
+            },
+        })
+        label = EvidenceRecord(
+            provider="openfda",
+            source_type=SourceType.DRUG_LABEL,
+            evidence_role=EvidenceRole.EFFICACY,
+            source_id="openfda-label-mechanism:aspirin-label",
+            label_id="aspirin-label",
+            molecule_id="CHEMBL25",
+            molecule_name="Aspirin",
+            inchikey=_FREE_BASE,
+            smiles=candidate["smiles"],
+            target_symbol="PTGS1",
+            target_accession="P23219",
+            target_species="Homo sapiens",
+            disease_name="inflammation",
+            measurement_type="label_mechanism_class",
+            context="cyclooxygenase inhibitor",
+            qualification_status=QualificationStatus.QUALIFIED,
+        )
+
+        merged = msc.merge_chemist_candidates(
+            [candidate], extra_records=[label])
+        self.assertEqual(len(merged), 1)
+        result = merged[0]
+        self.assertEqual(result["drug_name"].casefold(), "aspirin")
+        self.assertFalse(result["drug_name"].startswith("moiety:"))
+        self.assertEqual(result["max_phase"], 4.0)
+        self.assertTrue(result["is_approved_drug"])
+        self.assertEqual(result["rationale"], "existing rationale")
+        self.assertEqual(result["atc_codes"], ["B01AC06"])
+        self.assertEqual(
+            {record["provider"] for record in result["_evidence_ledger"]["records"]},
+            {"chembl", "openfda"},
+        )
     def test_target_first_never_queries_by_name(self):
         _, g, d = self._collect(
             _gtopdb_env(candidates=[_gtopdb_candidate()]),
@@ -560,6 +625,127 @@ class ChemistPassthroughTests(unittest.TestCase):
             chem_mod.run_chemist(bio)
 
         self.assertIsNone(captured["enabled_sources"])
+
+    def test_run_chemist_label_lane_preserves_existing_approval(self):
+        """The production label branch must unpack, not flatten, the ledger."""
+        from agents import chemist as chem_mod
+
+        bio = {"target": {
+            "uniprot_id": "P23219", "target_symbol": "PTGS1",
+            "disease_name": "inflammation", "ot_association_score": 0.42,
+            "target_discovery_method": "pharmacological_precedent",
+        }}
+        approved = merge_candidates(
+            msc.normalize_chembl_enriched([_chembl_enriched()]))[0]
+        approved["rationale"] = "existing rationale"
+        approved["atc_codes"] = ["B01AC06"]
+        label = EvidenceRecord(
+            provider="openfda",
+            source_type=SourceType.DRUG_LABEL,
+            evidence_role=EvidenceRole.EFFICACY,
+            source_id="openfda-label-mechanism:aspirin-label",
+            label_id="aspirin-label",
+            molecule_id="CHEMBL25",
+            molecule_name="ASPIRIN",
+            inchikey=_FREE_BASE,
+            smiles=approved["smiles"],
+            target_symbol="PTGS1",
+            target_accession="P23219",
+            target_species="Homo sapiens",
+            disease_name="inflammation",
+            measurement_type="label_mechanism_class",
+            context="cyclooxygenase inhibitor",
+            qualification_status=QualificationStatus.QUALIFIED,
+        )
+
+        with mock.patch.object(
+                chem_mod, "get_target_candidate_compounds",
+                return_value={"compounds": [],
+                              "pooled_across_multiple_targets": False}), \
+             mock.patch.object(chem_mod, "get_mechanism_only_approved_drugs",
+                               return_value=[]), \
+             mock.patch.object(chem_mod, "_anthropic_client",
+                               return_value=None), \
+             mock.patch.object(chem_mod, "get_pathway_neighbor_targets",
+                               return_value=[]), \
+             mock.patch.object(
+                 chem_mod, "collect_target_candidates",
+                 return_value={
+                     "candidates": [approved],
+                     "source_status": {},
+                     "approval_gate": {
+                         "enforced": True,
+                         "n_excluded_unapproved": 0,
+                         "excluded": [],
+                     },
+                 }), \
+             mock.patch.object(chem_mod, "_label_mechanism_record",
+                               return_value=label):
+            result = chem_mod.run_chemist(bio, repurposing_only=True)
+
+        self.assertEqual(len(result["candidates"]), 1)
+        candidate = result["candidates"][0]
+        self.assertEqual(candidate["max_phase"], 4.0)
+        self.assertTrue(candidate["is_approved_drug"])
+        self.assertNotEqual(candidate["approval_basis"], "unknown")
+        self.assertFalse(candidate["drug_name"].startswith("moiety:"))
+        self.assertEqual(candidate["rationale"], "existing rationale")
+        self.assertEqual(
+            {record["provider"]
+             for record in candidate["_evidence_ledger"]["records"]},
+            {"chembl", "openfda"},
+        )
+
+    def test_run_chemist_refuses_silent_label_merge_candidate_loss(self):
+        """A broken future evidence merge must fail, not report an empty pool."""
+        from agents import chemist as chem_mod
+
+        bio = {"target": {
+            "uniprot_id": "P23219", "target_symbol": "PTGS1",
+            "disease_name": "inflammation", "ot_association_score": 0.42,
+            "target_discovery_method": "pharmacological_precedent",
+        }}
+        approved = merge_candidates(
+            msc.normalize_chembl_enriched([_chembl_enriched()]))[0]
+        label = EvidenceRecord(
+            provider="openfda",
+            source_type=SourceType.DRUG_LABEL,
+            evidence_role=EvidenceRole.EFFICACY,
+            source_id="openfda-label-mechanism:aspirin-label",
+            molecule_id="CHEMBL25",
+            molecule_name="ASPIRIN",
+            inchikey=_FREE_BASE,
+            qualification_status=QualificationStatus.QUALIFIED,
+        )
+
+        with mock.patch.object(
+                chem_mod, "get_target_candidate_compounds",
+                return_value={"compounds": [],
+                              "pooled_across_multiple_targets": False}), \
+             mock.patch.object(chem_mod, "get_mechanism_only_approved_drugs",
+                               return_value=[]), \
+             mock.patch.object(chem_mod, "_anthropic_client",
+                               return_value=None), \
+             mock.patch.object(chem_mod, "get_pathway_neighbor_targets",
+                               return_value=[]), \
+             mock.patch.object(
+                 chem_mod, "collect_target_candidates",
+                 return_value={
+                     "candidates": [approved],
+                     "source_status": {},
+                     "approval_gate": {
+                         "enforced": True,
+                         "n_excluded_unapproved": 0,
+                         "excluded": [],
+                     },
+                 }), \
+             mock.patch.object(chem_mod, "_label_mechanism_record",
+                               return_value=label), \
+             mock.patch.object(chem_mod, "merge_chemist_candidates",
+                               return_value=[]):
+            with self.assertRaisesRegex(
+                    RuntimeError, "potentially false no-eligible-candidate"):
+                chem_mod.run_chemist(bio, repurposing_only=True)
 
 
 class GtopdbStructure204Tests(unittest.TestCase):
