@@ -1049,25 +1049,9 @@ def run_reviewer(chemist_output: dict[str, Any],
     # STRONG_MATCH candidates that were NOT in the original shortlist and run
     # direction checks on them.  Total LLM calls are bounded at 2×MAX (= 6).
     _mdc_checked_names: set[str] = {c["drug_name"] for c in _mdc_candidates}
-    _mdc_second_pass: list[dict] = []
-    _mdc_second_fps: list = []
-    for _cand in reviewed:
-        if len(_mdc_second_pass) >= MAX_MECHANISM_DIRECTION_CANDIDATES:
-            break
-        if not _cand.get("strong_match"):
-            break  # below threshold — no point checking further
-        if _cand["drug_name"] in _mdc_checked_names:
-            continue  # already checked in first pass
-        _cand_fp = _mdc_desalted_fp(_cand.get("smiles"))
-        _is_dup = False
-        if _cand_fp is not None:
-            for _seen_fp in _mdc_seen_fps + _mdc_second_fps:
-                if _seen_fp is not None and DataStructs.TanimotoSimilarity(_cand_fp, _seen_fp) >= 0.99:
-                    _is_dup = True
-                    break
-        if not _is_dup:
-            _mdc_second_pass.append(_cand)
-            _mdc_second_fps.append(_cand_fp)
+    _mdc_second_pass = _postcap_direction_shortlist(
+        reviewed, _mdc_checked_names, _mdc_seen_fps,
+    )
 
     _mdc_second_resort = False
     for _top in _mdc_second_pass:
@@ -1295,6 +1279,44 @@ def _target_tier(method: Optional[str]) -> str:
 _EXPLORATORY_TIERS = frozenset({"exploratory_expansion", "unattributed"})
 
 
+def _postcap_direction_shortlist(
+    reviewed: list[dict[str, Any]],
+    checked_names: set[str],
+    seen_fps: list[Any],
+) -> list[dict[str, Any]]:
+    """Collect newly promoted strong candidates after cap-driven re-ranking.
+
+    Tier ordering can place a weak causal anchor before strong exploratory
+    candidates. Therefore a non-strong row must be skipped, not treated as an
+    end-of-list sentinel.
+    """
+    selected: list[dict[str, Any]] = []
+    selected_fps: list[Any] = []
+    for candidate in reviewed:
+        if len(selected) >= MAX_MECHANISM_DIRECTION_CANDIDATES:
+            break
+        if not candidate.get("strong_match"):
+            continue
+        if candidate["drug_name"] in checked_names:
+            continue
+        candidate_fp = _mdc_desalted_fp(candidate.get("smiles"))
+        is_duplicate = False
+        if candidate_fp is not None:
+            for seen_fp in seen_fps + selected_fps:
+                if (
+                    seen_fp is not None
+                    and DataStructs.TanimotoSimilarity(
+                        candidate_fp, seen_fp,
+                    ) >= 0.99
+                ):
+                    is_duplicate = True
+                    break
+        if not is_duplicate:
+            selected.append(candidate)
+            selected_fps.append(candidate_fp)
+    return selected
+
+
 def _apply_causal_tier_demotion(reviewed: list[dict[str, Any]]) -> None:
     """Rank-only demotion of exploratory candidates below the best anchored one.
 
@@ -1305,8 +1327,12 @@ def _apply_causal_tier_demotion(reviewed: list[dict[str, Any]]) -> None:
     """
     for r in reviewed:
         r["target_tier"] = _target_tier(r.get("target_discovery_method"))
-        r.setdefault("exploratory_rank_demoted", False)
-        r.setdefault("causal_anchor", None)
+        # Recompute disclosure metadata from the CURRENT score order. A later
+        # cap can make a formerly rank-demoted row naturally fall below the
+        # anchor; stale labels would then claim a demotion that no longer
+        # affected its position.
+        r["exploratory_rank_demoted"] = False
+        r["causal_anchor"] = None
 
     anchor_idx = next(
         (i for i, r in enumerate(reviewed)
@@ -1326,7 +1352,6 @@ def _apply_causal_tier_demotion(reviewed: list[dict[str, Any]]) -> None:
     }
 
     demoted = [r for r in reviewed[:anchor_idx]]
-    first_time = any(not r.get("exploratory_rank_demoted") for r in demoted)
     for r in demoted:
         r["exploratory_rank_demoted"] = True
         r["causal_anchor"] = anchor_note
@@ -1334,13 +1359,12 @@ def _apply_causal_tier_demotion(reviewed: list[dict[str, Any]]) -> None:
     rest = reviewed[anchor_idx:]
     reordered = [anchor] + demoted + rest[1:]
     reviewed[:] = reordered
-    if first_time:
-        print(
-            f"[reviewer] causal-anchor tier: demoted {len(demoted)} exploratory "
-            f"candidate(s) below {anchor.get('drug_name')} "
-            f"({anchor.get('target_symbol')}, "
-            f"{anchor.get('target_discovery_method')}); scores unchanged, rank only"
-        )
+    print(
+        f"[reviewer] causal-anchor tier: demoted {len(demoted)} exploratory "
+        f"candidate(s) below {anchor.get('drug_name')} "
+        f"({anchor.get('target_symbol')}, "
+        f"{anchor.get('target_discovery_method')}); scores unchanged, rank only"
+    )
 
 
 def _rank_reviewed(reviewed: list[dict[str, Any]]) -> None:

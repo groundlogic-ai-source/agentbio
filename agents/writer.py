@@ -85,7 +85,7 @@ def _citations(candidate: dict[str, Any],
         if provider in ("", "chembl"):
             # ChEMBL ids are already rendered as their own citation class.
             continue
-        found_id = False
+        found_id = bool(pid)
         for key in ("source_id", "label_id", "trial_id"):
             value = str(record.get(key) or "").strip()
             if value:
@@ -984,8 +984,8 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             )
     else:
         parts.append(
-            "- **Other source record ids:** none (this candidate's evidence "
-            "came only from the ChEMBL/PubMed/trial lanes above)\n"
+            "- **Other source record ids:** none recorded in the candidate "
+            "evidence ledger\n"
         )
 
     # 4. Composite breakdown

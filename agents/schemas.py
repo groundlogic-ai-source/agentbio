@@ -40,6 +40,8 @@ class ChemistCandidate(TypedDict, total=False):
     tanimoto_score: Optional[float]
     most_similar_approved_drug: Optional[str]
     is_approved_drug: Optional[bool]
+    approval_basis: Required[str]
+    approval_evidence_providers: list[str]
     rationale: Optional[str]
     source_activity_ids: list
     source_chembl_ids: list
@@ -83,6 +85,11 @@ class ReviewerCandidate(TypedDict, total=False):
     evidence_weight_coverage: Optional[float]
     strong_match: Required[bool]
     is_approved_drug: Optional[bool]
+    approval_basis: Optional[str]
+    approval_evidence_providers: list[str]
+    target_tier: Optional[str]
+    exploratory_rank_demoted: Optional[bool]
+    causal_anchor: Optional[dict]
     unapproved_cap_applied: Required[bool]
     mechanism_cap_applied: Required[bool]
     mechanism_direction: Optional[dict]
@@ -157,6 +164,13 @@ _REVIEWER_REQUIRED_FIELDS: list[tuple[str, str]] = [
     ("black_box_advisory",      "warn"),
     ("evidence_weight_coverage", "warn"),
     ("safety_reconciliation",   "warn"),
+    # Historical rows predate these fields, so replay remains warn-only.
+    # Every new reviewer row carries them; warnings expose future dropouts.
+    ("approval_basis",          "warn"),
+    ("approval_evidence_providers", "warn"),
+    ("target_tier",             "warn"),
+    ("exploratory_rank_demoted", "warn"),
+    ("causal_anchor",           "warn"),
 ]
 
 
@@ -182,6 +196,8 @@ _REVIEWER_VALUE_FIELDS: list[tuple[str, str]] = [
     ("target_symbol",           "error"),
     ("disease_name",            "error"),
     ("target_discovery_method", "error"),
+    ("approval_basis",          "warn"),
+    ("target_tier",             "warn"),
     # uniprot_id and _evidence_ledger are deliberately NOT value-checked here:
     # rows persisted before those fields existed legitimately carry None/{} and
     # must stay replayable.  Both are value-checked one hop upstream at the

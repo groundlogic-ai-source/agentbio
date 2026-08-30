@@ -142,6 +142,11 @@ class OldRowBackwardCompatTest(unittest.TestCase):
         row["black_box_advisory"] = True
         row["evidence_weight_coverage"] = 0.85
         row["safety_reconciliation"] = None
+        row["approval_basis"] = "chembl_max_phase"
+        row["approval_evidence_providers"] = ["chembl"]
+        row["target_tier"] = "unattributed"
+        row["exploratory_rank_demoted"] = False
+        row["causal_anchor"] = None
         self.assertEqual(validate_reviewer_handoff([row]), [])
 
 

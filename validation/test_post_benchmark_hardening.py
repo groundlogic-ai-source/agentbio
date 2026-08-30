@@ -13,7 +13,10 @@ import unittest
 from unittest import mock
 
 from agents import schemas
-from agents.reviewer import _apply_causal_tier_demotion, _target_tier
+from agents.reviewer import (
+    _apply_causal_tier_demotion, _postcap_direction_shortlist,
+    _rank_reviewed, _target_tier,
+)
 from agents.writer import (
     _approval_basis_cell, _citations, _discovery_method_cell, _target_tier_cell,
 )
@@ -150,6 +153,18 @@ class TestValueLevelValidation(unittest.TestCase):
         self.assertIn(("target_discovery_method", "error"),
                       schemas._CHEMIST_VALUE_FIELDS)
 
+    def test_approval_lineage_is_required_at_chemist_boundary(self):
+        self.assertIn(("approval_basis", "error"),
+                      schemas._CHEMIST_REQUIRED_FIELDS)
+
+    def test_new_reviewer_lineage_fields_are_monitored(self):
+        required = dict(schemas._REVIEWER_REQUIRED_FIELDS)
+        for field in (
+            "approval_basis", "approval_evidence_providers", "target_tier",
+            "exploratory_rank_demoted", "causal_anchor",
+        ):
+            self.assertIn(field, required)
+
 
 class TestCausalTierDemotion(unittest.TestCase):
     """An exploratory target may not silently outrank an anchored one."""
@@ -174,6 +189,18 @@ class TestCausalTierDemotion(unittest.TestCase):
                          ["anchored", "exploratory"])
         self.assertTrue(reviewed[1]["exploratory_rank_demoted"])
         self.assertEqual(reviewed[1]["causal_anchor"]["target_symbol"], "ABCC9")
+
+    def test_normal_rank_entrypoint_applies_causal_hierarchy(self):
+        reviewed = [
+            {"drug_name": "exploratory", "composite_score": 0.40,
+             "pre_cap_score": 0.40, "target_discovery_method": "pathway_neighbor",
+             "target_symbol": "ABCC8"},
+            {"drug_name": "anchored", "composite_score": 0.38,
+             "pre_cap_score": 0.38, "target_discovery_method": "genetic_association",
+             "target_symbol": "ABCC9"},
+        ]
+        _rank_reviewed(reviewed)
+        self.assertEqual(reviewed[0]["drug_name"], "anchored")
 
     def test_scores_are_never_changed(self):
         reviewed = [
@@ -209,6 +236,36 @@ class TestCausalTierDemotion(unittest.TestCase):
         self.assertEqual([r["drug_name"] for r in reviewed],
                          ["anchored", "exploratory"])
         self.assertFalse(reviewed[1]["exploratory_rank_demoted"])
+
+    def test_demotion_metadata_is_recomputed_after_score_change(self):
+        reviewed = [
+            {"drug_name": "exploratory", "composite_score": 0.7,
+             "pre_cap_score": 0.7,
+             "target_discovery_method": "pathway_neighbor"},
+            {"drug_name": "anchor", "composite_score": 0.6,
+             "pre_cap_score": 0.6,
+             "target_discovery_method": "genetic_association"},
+        ]
+        _rank_reviewed(reviewed)
+        self.assertTrue(reviewed[1]["exploratory_rank_demoted"])
+
+        reviewed[1]["composite_score"] = 0.2
+        _rank_reviewed(reviewed)
+        exploratory = next(r for r in reviewed if r["drug_name"] == "exploratory")
+        self.assertFalse(exploratory["exploratory_rank_demoted"])
+        self.assertIsNone(exploratory["causal_anchor"])
+
+    def test_postcap_shortlist_skips_weak_tier_prioritized_anchor(self):
+        reviewed = [
+            {"drug_name": "weak-anchor", "strong_match": False, "smiles": None},
+            {"drug_name": "new-strong-exploratory", "strong_match": True,
+             "smiles": None},
+        ]
+        selected = _postcap_direction_shortlist(reviewed, set(), [])
+        self.assertEqual(
+            [candidate["drug_name"] for candidate in selected],
+            ["new-strong-exploratory"],
+        )
 
 
 class TestEligibilityGate(unittest.TestCase):
@@ -297,6 +354,37 @@ class TestDossierDisclosure(unittest.TestCase):
         # ChEMBL keeps its own citation class; it is not duplicated here.
         self.assertNotIn("chembl", cites["source_records"])
         self.assertIn("12345678", cites["pmids"])
+
+    def test_non_numeric_publication_reference_is_not_called_a_pmid(self):
+        candidate = {
+            "drug_name": "d",
+            "_evidence_ledger": {"records": [{
+                "provider": "bindingdb",
+                "publication_id": "10.1016/j.example.2024.01.001",
+            }]},
+        }
+        with mock.patch("agents.writer.check_prior_trials",
+                        return_value={"trials": []}):
+            cites = _citations(candidate, None)
+        self.assertEqual(cites["pmids"], [])
+        self.assertIn(
+            "doi/ref:10.1016/j.example.2024.01.001",
+            cites["source_records"]["bindingdb"],
+        )
+
+    def test_provider_without_identifier_is_disclosed_not_dropped(self):
+        candidate = {
+            "drug_name": "d",
+            "_evidence_ledger": {"records": [{"provider": "drugcentral"}]},
+        }
+        with mock.patch("agents.writer.check_prior_trials",
+                        return_value={"trials": []}):
+            cites = _citations(candidate, None)
+        self.assertIn("drugcentral", cites["source_records"])
+        self.assertIn(
+            "⚠ record with no citable identifier",
+            cites["source_records"]["drugcentral"],
+        )
 
 
 if __name__ == "__main__":

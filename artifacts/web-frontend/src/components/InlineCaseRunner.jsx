@@ -44,7 +44,7 @@ function stageLabel(job) {
  */
 export default function InlineCaseRunner({ disease, onReady, verb = "Run this case now" }) {
   const [job, setJob] = useState(null);
-  const [phase, setPhase] = useState("idle"); // idle | starting | running | ready | failed
+  const [phase, setPhase] = useState("idle"); // idle | starting | running | ready | no_candidate | failed
   const [cost, setCost] = useState(null);
   const [error, setError] = useState(null);
 
@@ -155,7 +155,7 @@ export default function InlineCaseRunner({ disease, onReady, verb = "Run this ca
             current.error_message ||
             "The pipeline found no eligible repurposing candidate for this target."
           );
-          setPhase("failed");
+          setPhase("no_candidate");
           return false;
         }
         return true;
@@ -178,6 +178,20 @@ export default function InlineCaseRunner({ disease, onReady, verb = "Run this ca
   }, [disease, stopPolling]);
 
   if (!disease?.trim()) return null;
+
+  if (phase === "no_candidate") {
+    return (
+      <div className="inline-runner">
+        <p className="inline-runner-error">
+          {error || "No eligible repurposing candidate was found."}
+        </p>
+        <p className="inline-runner-note">
+          The case completed normally, but there is no candidate to audit. No
+          dossier or sign-off checkpoint was created.
+        </p>
+      </div>
+    );
+  }
 
   if (phase === "idle" || phase === "failed") {
     const retry = phase === "failed";
