@@ -202,6 +202,25 @@ def get_label_indications(drug_name: str) -> dict[str, Any]:
     return result
 
 
+def _stable_label_id(row: dict[str, Any]) -> Optional[str]:
+    """Select a traceable SPL/application identifier, never a zero placeholder."""
+    candidates = (
+        _values(row.get("set_id"))
+        + _nested_values(row, "spl_set_id")
+        + _values(row.get("id"))
+    )
+    for value in candidates:
+        if value.casefold() not in {"0", "none", "null", "n/a", "unknown"}:
+            return value
+    application_numbers = (
+        _nested_values(row, "application_number")
+        + _values(row.get("application_number"))
+    )
+    if application_numbers:
+        return f"application:{application_numbers[0]}"
+    return None
+
+
 def get_label_mechanism(drug_name: str) -> dict[str, Any]:
     """Return FDA-label pharmacology text as a quoted mechanism assertion.
 
@@ -209,7 +228,7 @@ def get_label_mechanism(drug_name: str) -> dict[str, Any]:
     evidence that the drug treats the requested disease.  Consumers must keep
     that distinction explicit in their ledger role and score disclosure.
     """
-    cache_key = make_key("get_label_mechanism_v1", drug_name)
+    cache_key = make_key("get_label_mechanism_v2", drug_name)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -247,13 +266,7 @@ def get_label_mechanism(drug_name: str) -> dict[str, Any]:
                 text = " ".join(str(item) for item in text)
             result.update({
                 "mechanism_text": str(text or "").strip(),
-                "label_id": (
-                    (row.get("set_id") or row.get("id") or
-                     (row.get("openfda") or {}).get("spl_set_id") or [None])[0]
-                    if isinstance((row.get("openfda") or {}).get("spl_set_id"), list)
-                    else row.get("set_id") or row.get("id") or
-                    (row.get("openfda") or {}).get("spl_set_id")
-                ),
+                "label_id": _stable_label_id(row),
                 "source": "openfda_label",
             })
     except Exception as e:

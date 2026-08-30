@@ -47,6 +47,19 @@ def _fmt(v: Any, nd: int = 3) -> str:
     return str(v)
 
 
+def _valid_citation_id(value: Any) -> Optional[str]:
+    """Return a meaningful provider identifier, rejecting placeholder junk."""
+    text = str(value or "").strip()
+    folded = text.casefold()
+    if (not text
+            or folded in {"0", "none", "null", "n/a", "na", "unknown"}
+            or folded.endswith(":0")
+            or "identifier-unavailable" in folded
+            or folded.startswith("unresolved-label-for:")):
+        return None
+    return text
+
+
 def _citations(candidate: dict[str, Any],
                biologist_output: Optional[dict[str, Any]]) -> dict[str, list[str]]:
     """Gather every PMID, ChEMBL activity id, and NCT number used, deduplicated."""
@@ -74,7 +87,7 @@ def _citations(candidate: dict[str, Any],
         if not isinstance(record, dict):
             continue
         provider = str(record.get("provider") or "").strip().lower()
-        pid = str(record.get("publication_id") or "").strip()
+        pid = _valid_citation_id(record.get("publication_id")) or ""
         if pid:
             # publication_id is not always a PMID — BindingDB stores a DOI when
             # no PMID exists. Mislabelling one as the other is a false citation.
@@ -87,9 +100,9 @@ def _citations(candidate: dict[str, Any],
             continue
         found_id = bool(pid)
         for key in ("source_id", "label_id", "trial_id"):
-            value = str(record.get(key) or "").strip()
+            value = _valid_citation_id(record.get(key))
             if value:
-                ledger_ids.setdefault(provider, set()).add(value)
+                ledger_ids.setdefault(provider, set()).add(str(value))
                 found_id = True
         if not found_id:
             # The lane contributed evidence but carried no citable identifier —
@@ -158,8 +171,9 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
     if "efficacy_evidence" in weights:
         rows = [
             ("efficacy_evidence",
-             "Efficacy evidence (evidence-ledger calibrated; legacy fallback: "
-             "0.6 × normalized pChEMBL + 0.4 × assay confidence)",
+             "Efficacy evidence — calibrated confidence (not measured efficacy; "
+             "evidence-ledger calibrated; legacy fallback: 0.6 × normalized "
+             "pChEMBL + 0.4 × assay confidence)",
              "efficacy_evidence"),
             ("ot_association", "Normalized Open Targets association", "normalized_ot_association"),
             ("tanimoto", "Normalized Tanimoto similarity", "normalized_tanimoto"),
@@ -388,6 +402,87 @@ def _approval_basis_cell(candidate: dict[str, Any]) -> str:
     return basis
 
 
+def _confidence_band(value: Any) -> str:
+    """Qualitative 0-1 confidence band used only for report prose."""
+    if not isinstance(value, (int, float)):
+        return "unavailable"
+    bounded = max(0.0, min(1.0, float(value)))
+    if bounded < 0.33:
+        return "low"
+    if bounded < 0.67:
+        return "moderate"
+    return "high"
+
+
+def _direct_chembl_activity_note(candidate: dict[str, Any]) -> str:
+    """Explain whether the dossier has a qualifying direct ChEMBL assay."""
+    activity_ids = {
+        str(value).strip()
+        for value in candidate.get("source_activity_ids", [])
+        if _valid_citation_id(value)
+    }
+    for group in ("counted_once", "collapsed_as_duplicate"):
+        for record in (candidate.get("provenance") or {}).get(group, []):
+            if record.get("source_type") == "chembl_activity":
+                value = _valid_citation_id(record.get("source_id"))
+                if value:
+                    activity_ids.add(value)
+    for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
+        if not isinstance(record, dict):
+            continue
+        if (record.get("provider") == "chembl"
+                and record.get("source_type") == "bioactivity_assay"
+                and record.get("qualification_status") in (None, "", "qualified")):
+            value = (
+                _valid_citation_id(record.get("assay_id"))
+                or _valid_citation_id(record.get("source_id"))
+            )
+            if value:
+                activity_ids.add(value)
+    if (candidate.get("pchembl_value") is not None
+            and candidate.get("confidence_score") is not None
+            and activity_ids):
+        return (
+            f"Direct assay-backed: {len(activity_ids)} qualifying ChEMBL "
+            "Homo sapiens IC50/Ki activity record(s)"
+        )
+    return (
+        "No qualifying direct ChEMBL Homo sapiens IC50/Ki activity record "
+        "at assay confidence ≥ 8 was found; potency and assay confidence "
+        "are therefore unavailable."
+    )
+
+
+def _efficacy_provenance_cell(candidate: dict[str, Any]) -> str:
+    """Describe modalities behind the calibrated evidence value."""
+    modalities: set[str] = set()
+    for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
+        if not isinstance(record, dict):
+            continue
+        if record.get("qualification_status") not in (None, "", "qualified"):
+            continue
+        if record.get("evidence_role") not in ("efficacy", "target_link", "disease_link"):
+            continue
+        source_type = str(record.get("source_type") or "").strip()
+        if source_type:
+            modalities.add(source_type.replace("_", " "))
+    source = (candidate.get("score_components") or {}).get("efficacy_evidence_source")
+    assay_backed = "bioactivity assay" in modalities
+    if source == "legacy_pchembl_assay_confidence":
+        return "assay-backed legacy pChEMBL + assay-confidence calculation"
+    if modalities:
+        basis = ", ".join(sorted(modalities))
+        prefix = "assay-backed" if assay_backed else "not direct-assay-backed"
+        return (
+            f"{prefix}; calibrated from qualified {basis} evidence. "
+            "This is evidence confidence, not a measured probability of efficacy."
+        )
+    return (
+        "provenance unavailable; this calibrated evidence value is not a "
+        "measured probability of efficacy"
+    )
+
+
 def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
     cx = (struct or {}).get("complex") or {}
     adme = (struct or {}).get("adme") or {}
@@ -401,6 +496,9 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
     rows = [
         ("ChEMBL median pChEMBL affinity", _fmt(candidate.get("pchembl_value"), 2)),
         ("Assay confidence score (0-9)", _fmt(candidate.get("confidence_score"))),
+        ("Direct ChEMBL activity basis", _direct_chembl_activity_note(candidate)),
+        ("Calibrated evidence-confidence provenance",
+         _efficacy_provenance_cell(candidate)),
         ("Open Targets association score", _fmt(candidate.get("ot_association_score"))),
         ("Tanimoto to nearest approved drug",
          f"{_fmt(candidate.get('tanimoto_score'), 3)} "
@@ -530,9 +628,12 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
     )
 
     bullet_list = [
-        f"- **Binding is not efficacy.** A high binding-pose confidence "
-        f"({_fmt(cx.get('binding_pose_confidence'))}) or predicted affinity "
-        f"({_fmt(cx.get('predicted_affinity'))}) only suggests the molecule may "
+        f"- **Binding is not efficacy.** The binding-pose confidence is "
+        f"**{_confidence_band(cx.get('binding_pose_confidence'))}** "
+        f"({_fmt(cx.get('binding_pose_confidence'))}); the relative predicted "
+        f"affinity is **{_confidence_band(cx.get('predicted_affinity'))}** "
+        f"({_fmt(cx.get('predicted_affinity'))}). These predictions only suggest "
+        f"the molecule may "
         f"occupy the target; it does NOT establish agonism vs. antagonism, "
         f"functional modulation, or therapeutic benefit.",
         "- **ADME values are model predictions, not measurements.** The Boltz "
@@ -562,7 +663,7 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
     return bullets
 
 
-_READERS_GUIDE_VERSION = "1.0"
+_READERS_GUIDE_VERSION = "1.1"
 
 
 def _readers_guide_appendix() -> str:
@@ -594,7 +695,7 @@ limitation is disclosure-only: it introduces no tissue-specific score, cap, or
 gate.
 
 **Composite score.** A weighted sum of the evidence terms listed in Section
-4's table (efficacy evidence, the Open Targets target–disease association,
+4's table (calibrated evidence confidence, the Open Targets target–disease association,
 Tanimoto structural similarity to approved drugs for the same target, and
 absence of prior failed trials), each scored 0–1, plus any qualified
 directional-evidence bonus and minus any penalties — giving a single 0–1
@@ -622,6 +723,11 @@ less evidence; treat heavy renormalization as "unscored", not "clean".
 **Evidence table (Section 2).** Each row reports one measured or predicted
 quantity and the source that produced it.
 
+- **Calibrated evidence confidence** — a modality-aware score assembled from
+  qualified assay, mechanism, label, genetic, publication, pathway, or trial
+  evidence available for the candidate. It is not a measured probability of
+  efficacy. The table states whether direct qualifying ChEMBL activity supports
+  it.
 - **pChEMBL** — −log10 of molar potency from ChEMBL assays; higher = more
   potent. Reported as a median over *Homo sapiens* IC50/Ki assays at ChEMBL
   confidence ≥ 8.
@@ -637,9 +743,13 @@ quantity and the source that produced it.
 - **ADME** — lipophilicity, permeability, solubility and related values are
   model *predictions*, not experimental measurements.
 
-**Citations (Section 3).** PMIDs are PubMed articles, ChEMBL activity IDs are
-individual assay records, and NCT numbers are ClinicalTrials.gov trials. Every
-load-bearing number above traces to at least one of these.
+**Citations (Section 3).** Provenance may include PMIDs (PubMed), ChEMBL
+activity/approval/mechanism records, NCT numbers (ClinicalTrials.gov), Open
+Targets, openFDA label or safety records, PubChem, AlphaFold DB, Boltz, GtoPdb,
+DrugCentral, BindingDB, Reactome, and BioGRID. Section 3 lists stable record
+identifiers carried in the candidate ledger; model outputs and database-derived
+values are identified by their source family even when no PMID, activity ID, or
+NCT number applies.
 
 **Limitations (Section 5).** The standard caveats that apply to every dossier —
 read them before acting on any number in this report.
@@ -894,9 +1004,8 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     parts.append("## 1. Hypothesis summary\n")
     parts.append(
         f"{drug} is proposed as a repurposing candidate against **{disease}** via "
-        f"the target **{target}**. It shows a ChEMBL median pChEMBL affinity of "
-        f"{_fmt(candidate.get('pchembl_value'), 2)} at assay confidence "
-        f"{_fmt(candidate.get('confidence_score'))}/9, an Open Targets "
+        f"the target **{target}**. "
+        f"{_direct_chembl_activity_note(candidate)} It has an Open Targets "
         f"target-disease association of {_fmt(candidate.get('ot_association_score'))}, "
         f"and a Tanimoto similarity of {_fmt(candidate.get('tanimoto_score'), 3)} to "
         f"{candidate.get('most_similar_approved_drug') or 'no approved analog in the set'}. "

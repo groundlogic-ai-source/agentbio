@@ -9,6 +9,8 @@ import unittest
 
 from agents.writer import (
     _READERS_GUIDE_VERSION,
+    _citations,
+    _confidence_band,
     _readers_guide_appendix,
     build_report_markdown,
 )
@@ -60,6 +62,50 @@ class TestReadersGuideAppendix(unittest.TestCase):
         for term in ("STRONG_MATCH", "pre_cap_score", "Tanimoto", "pChEMBL",
                      "renormaliz", "hard cap", "human review", "ADME"):
             self.assertIn(term.lower(), text.lower(), f"missing term: {term}")
+
+    def test_confidence_bands_cover_low_middle_and_high(self):
+        self.assertEqual(_confidence_band(0.161), "low")
+        self.assertEqual(_confidence_band(0.50), "moderate")
+        self.assertEqual(_confidence_band(0.85), "high")
+
+    def test_low_structure_values_are_never_called_high(self):
+        md = build_report_markdown(
+            _minimal_candidate(),
+            {"complex": {"binding_pose_confidence": 0.161,
+                         "predicted_affinity": 0.190}},
+            {}, None,
+        )
+        self.assertIn("binding-pose confidence is **low** (0.161)", md)
+        self.assertIn("predicted affinity is **low** (0.190)", md)
+        self.assertNotIn("high binding-pose confidence", md.lower())
+
+    def test_no_direct_activity_explanation_and_modality_provenance(self):
+        candidate = _minimal_candidate()
+        candidate["_evidence_ledger"] = {"records": [{
+            "provider": "openfda",
+            "source_type": "drug_label",
+            "evidence_role": "efficacy",
+            "qualification_status": "qualified",
+            "label_id": "abc-label",
+        }]}
+        candidate["score_components"]["efficacy_evidence_source"] = "multisource_ledger"
+        md = build_report_markdown(candidate, {}, {}, None)
+        self.assertIn("No qualifying direct ChEMBL", md)
+        self.assertIn("potency and assay confidence are therefore unavailable", md)
+        self.assertIn("not direct-assay-backed", md)
+        self.assertIn("not a measured probability of efficacy", md)
+
+    def test_zero_like_provider_ids_are_not_cited(self):
+        candidate = _minimal_candidate()
+        candidate["_evidence_ledger"] = {"records": [{
+            "provider": "openfda",
+            "source_id": "openfda-label-mechanism:0",
+            "label_id": 0,
+        }]}
+        with unittest.mock.patch("agents.writer.check_prior_trials",
+                                 return_value={"trials": []}):
+            cites = _citations(candidate, None)
+        self.assertNotIn("0", cites["source_records"]["openfda"])
 
     def test_appendix_states_checkpoint_ordering(self):
         # Regression guard for the ChatGPT-review misreading: the human

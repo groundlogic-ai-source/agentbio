@@ -259,12 +259,14 @@ def _label_mechanism_record(candidate: dict[str, Any]) -> Optional[EvidenceRecor
     text = str(label.get("mechanism_text") or "").strip()
     if not text or label.get("error"):
         return None
+    label_id = str(label.get("label_id") or "").strip()
+    stable_id = label_id if label_id else "identifier-unavailable"
     return EvidenceRecord(
         provider="openfda",
         source_type=SourceType.DRUG_LABEL,
         evidence_role=EvidenceRole.EFFICACY,
-        source_id=f"openfda-label-mechanism:{label.get('label_id') or drug_name}",
-        label_id=str(label.get("label_id") or ""),
+        source_id=f"openfda-label-mechanism:{stable_id}",
+        label_id=label_id,
         molecule_id=str(candidate.get("molecule_chembl_id") or ""),
         molecule_name=drug_name,
         inchikey=str(candidate.get("inchikey") or ""),

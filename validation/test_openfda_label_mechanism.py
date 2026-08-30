@@ -39,6 +39,25 @@ class LabelMechanismTest(unittest.TestCase):
         self.assertEqual(result["mechanism_text"], "")
         self.assertIsNone(result["error"])
 
+    @patch.object(openfda, "get", return_value=None)
+    @patch.object(openfda, "cache_set")
+    @patch.object(openfda.requests, "get")
+    def test_rejects_zero_id_and_falls_back_to_application_number(
+        self, request, cache_set, cache_get
+    ):
+        response = Mock(status_code=200)
+        response.json.return_value = {
+            "results": [{
+                "id": 0,
+                "openfda": {"spl_set_id": ["0"],
+                            "application_number": ["NDA012345"]},
+                "mechanism_of_action": ["Blocks a channel."],
+            }]
+        }
+        request.return_value = response
+        result = openfda.get_label_mechanism("SyntheticDrug")
+        self.assertEqual(result["label_id"], "application:NDA012345")
+
 
 if __name__ == "__main__":
     unittest.main()
