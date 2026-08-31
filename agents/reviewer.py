@@ -61,6 +61,7 @@ from data_sources.safety_check import web_safety_check
 from data_sources.mechanism_direction import check_mechanism_direction
 from data_sources import holdout as _holdout
 from data_sources.pubchem import get_compound_data
+from data_sources.evidence_ledger import qualified_target_chembl_activity_ids
 
 # ---- Auditable scoring constants (edit here to adjust the policy) -------------
 _DEFAULT_COMPOSITE_WEIGHTS: dict[str, float] = {
@@ -254,6 +255,15 @@ def _candidate_chembl_ids(candidate: dict[str, Any]) -> list[str]:
         if molecule_id.upper().startswith("CHEMBL"):
             ids.add(molecule_id)
     return sorted(ids)
+
+
+def _target_matched_chembl_activity_ids(candidate: dict[str, Any]) -> list[str]:
+    """Raw, target-matched ChEMBL activity observations only."""
+    return qualified_target_chembl_activity_ids(
+        ((candidate.get("_evidence_ledger") or {}).get("records") or []),
+        target_symbol=candidate.get("target_symbol") or "",
+        target_accession=candidate.get("uniprot_id") or "",
+    )
 
 
 def _candidate_is_heldout(candidate: dict[str, Any]) -> bool:
@@ -557,17 +567,73 @@ def _coverage_aware_composite(
     return numerator / coverage, coverage
 
 
+def _known_drug_action(value: Any) -> bool:
+    """Whether an action is recorded rather than guessed from assay format."""
+    text = str(value or "").strip().lower()
+    return bool(text and text not in {"unknown", "none", "n/a"}
+                and "inferred" not in text)
+
+
 def _has_qualified_directional_evidence(candidate: dict[str, Any]) -> bool:
-    """True when a qualified ledger record states a concrete drug action."""
+    """Compatibility inspection seam retained for legacy callers/tests.
+
+    This answers only whether a qualified ledger row records a concrete action.
+    It does NOT earn the directional bonus; `_auditable_compatible_direction`
+    is the stricter scoring gate.
+    """
     directional = {"agonist", "antagonist", "inhibitor", "activator", "modulator"}
     for record in (candidate.get("_evidence_ledger") or {}).get("records", []):
-        if str(record.get("qualification_status", "")).lower() != "qualified":
+        if str(record.get("qualification_status") or "").lower() != "qualified":
             continue
-        action = str(record.get("action", "")).strip().lower()
-        direction = str(record.get("direction", "")).strip().lower()
+        action = str(record.get("action") or "").strip().lower()
+        direction = str(record.get("direction") or "").strip().lower()
         if action in directional or direction in directional:
             return True
     return False
+
+
+def _auditable_compatible_direction(direction: Any) -> bool:
+    """Strict gate for the small directional bonus.
+
+    A compatibility label by itself is not evidence.  The bonus is available
+    only after a persisted, reviewable direction result records the actual drug
+    action, disease-mechanism retrieval, a nonempty reason, and citations.
+    """
+    if not isinstance(direction, dict):
+        return False
+    return (
+        direction.get("verdict") == "DIRECTIONALLY_COMPATIBLE"
+        and _known_drug_action(direction.get("action_type_used"))
+        and bool(str(direction.get("disease_mechanism_summary") or "").strip())
+        and bool(str(direction.get("reason") or "").strip())
+        and bool(str(direction.get("search_citations") or "").strip())
+    )
+
+
+def _apply_directional_bonus(candidate: dict[str, Any]) -> bool:
+    """Apply the bonus once, only for an auditable compatible result."""
+    components = candidate.setdefault("score_components", {})
+    qualified = _auditable_compatible_direction(
+        candidate.get("mechanism_direction"))
+    old_bonus = float(components.get("qualified_directional_bonus") or 0.0)
+    new_bonus = QUALIFIED_DIRECTIONAL_BONUS if qualified else 0.0
+    components["qualified_directional"] = qualified
+    components["qualified_directional_bonus"] = new_bonus
+    if old_bonus == new_bonus:
+        return False
+    # The initial score contains no directional bonus.  Update the pre-cap
+    # score as well, then respect any cap already applied to the final score.
+    delta = new_bonus - old_bonus
+    candidate["pre_cap_score"] = round(
+        float(candidate.get("pre_cap_score") or candidate.get("composite_score") or 0)
+        + delta, 4)
+    candidate["composite_score"] = round(min(
+        float(candidate.get("composite_score") or 0) + delta,
+        MECHANISM_DIRECTION_CAP if candidate.get("mechanism_cap_applied") else 1.0,
+    ), 4)
+    candidate["strong_match"] = (
+        candidate["composite_score"] >= STRONG_MATCH_THRESHOLD)
+    return True
 
 
 def run_reviewer(
@@ -670,9 +736,10 @@ def run_reviewer(
             n_tanimoto,
             no_failed_trial,
         )
-        qualified_directional = _has_qualified_directional_evidence(c)
-        directional_bonus = QUALIFIED_DIRECTIONAL_BONUS if qualified_directional else 0.0
-        composite = min(1.0, composite + directional_bonus)
+        # A ledger action alone does not earn a directional bonus.  Compatibility
+        # must be established later by the auditable direction check.
+        qualified_directional = False
+        directional_bonus = 0.0
 
         lipinski_violations = desc.get("lipinski_violations")
         penalty_applied = lipinski_violations is not None and lipinski_violations > 1
@@ -702,7 +769,8 @@ def run_reviewer(
 
         # Provenance: collapse repeated source ids (chembl activity ids + pmids).
         candidate_pairs = (
-            [("chembl_activity", sid) for sid in c.get("source_activity_ids", [])]
+            [("chembl_activity", sid)
+             for sid in _target_matched_chembl_activity_ids(c)]
             + [("chembl", sid) for sid in c.get("source_chembl_ids", [])]
             + [("pmid", pid) for pid in target_pmids]
         )
@@ -891,7 +959,10 @@ def run_reviewer(
                 "collapsed_as_duplicate": collapsed_ids,
             },
             "source_chembl_ids": c.get("source_chembl_ids", []),
-            "source_activity_ids": c.get("source_activity_ids", []),
+            # Preserve only real target-matched ChEMBL activity identities.
+            # Generic provider metadata must never cross the reviewer handoff
+            # under the activity-id label.
+            "source_activity_ids": _target_matched_chembl_activity_ids(c),
             "source_types": c.get("source_types", []),
             "source_health": c.get("source_health", {}),
             "target_memberships": c.get("target_memberships", []),
@@ -1062,6 +1133,11 @@ def run_reviewer(
             candidate_inchikey=_top.get("inchikey"),
         )
         _top["mechanism_direction"] = _direction
+        # A direction label is bonus-eligible only when its complete,
+        # citation-bearing rationale is persisted.  This is deliberately after
+        # the check, never inferred from a ledger action row.
+        if _apply_directional_bonus(_top):
+            _mdc_needs_resort = True
         if _direction.get("incompatible"):
             _top["composite_score"]       = min(_top["composite_score"], MECHANISM_DIRECTION_CAP)
             _top["mechanism_cap_applied"] = True
@@ -1105,6 +1181,26 @@ def run_reviewer(
         )
         _action_t   = _at_info.get("action_type")
         _moa        = _at_info.get("mechanism_of_action")
+        _ledger_action_record = next(
+            (
+                rec for rec in ((_top.get("_evidence_ledger") or {}).get("records", []))
+                if rec.get("qualification_status") == "qualified"
+                and rec.get("evidence_role") in ("efficacy", "target_link")
+                and rec.get("action")
+                and (
+                    not _target_sym
+                    or str(rec.get("target_symbol") or "").upper() == _target_sym.upper()
+                )
+            ),
+            None,
+        )
+        if _ledger_action_record:
+            _action_t = _ledger_action_record.get("action")
+            _moa = _ledger_action_record.get("context") or _moa
+            _at_info = {
+                **_at_info,
+                "source": f"evidence_ledger:{_ledger_action_record.get('provider')}",
+            }
         if _at_info.get("source") == "any_mechanism" and _action_t:
             _action_t = (
                 f"INHIBITOR (inferred from IC50/Ki bioactivity assay data; "
@@ -1125,6 +1221,8 @@ def run_reviewer(
             candidate_inchikey=_top.get("inchikey"),
         )
         _top["mechanism_direction"] = _direction
+        if _apply_directional_bonus(_top):
+            _mdc_second_resort = True
         if _direction.get("incompatible"):
             _top["composite_score"]       = min(_top["composite_score"], MECHANISM_DIRECTION_CAP)
             _top["mechanism_cap_applied"] = True
@@ -1246,6 +1344,9 @@ def _build_dossier_evidence_contract(
             "approved_drugs", [])
         if target_matches else []
     )
+    # One comparator identity has one explanatory row.  A drug that appears in
+    # both the approved-target list and review pool is not independent support.
+    seen_comparator_names: set[str] = set()
     pool_comparators = [
         {
             "drug_name": row.get("drug_name"),
@@ -1255,9 +1356,37 @@ def _build_dossier_evidence_contract(
             "relationship": "selected_candidate",
         }
         for row in reviewed_pool
-        if row.get("drug_name") != candidate.get("drug_name")
+        if (str(row.get("drug_name") or "").casefold()
+            != str(candidate.get("drug_name") or "").casefold())
         and row.get("target_symbol") == candidate.get("target_symbol")
+        and not (str(row.get("drug_name") or "").casefold()
+                 in seen_comparator_names
+                 or seen_comparator_names.add(
+                     str(row.get("drug_name") or "").casefold()))
     ][:10]
+    timothy_scope = None
+    if ("timothy syndrome" in str(candidate.get("disease_name") or "").casefold()
+            and candidate_target == "CACNA1C"):
+        timothy_scope = {
+            "proposed_variant_scope": "TS1 CACNA1C p.G406R",
+            "proposed_exon_scope": "8A",
+            "clinical_scope": "cardiac electrophysiology only",
+            "genotype_confirmation_status": "UNCONFIRMED_BY_PIPELINE",
+            "status": "PROPOSED_SCOPE_AWAITING_HUMAN_CONFIRMATION",
+            "scope_basis": (
+                "flagship review framing; canonical disease input alone does "
+                "not establish that a specific case is TS1 or carries p.G406R"
+            ),
+            "required_tests": [
+                "mutation-specific CACNA1C channel electrophysiology",
+                "TS1 p.G406R exon 8A patient-derived or engineered iPSC-cardiomyocyte testing",
+            ],
+            "safety_exposure_plan": [
+                "cardiac rhythm and QT/QTc monitoring",
+                "blood-pressure and heart-rate monitoring",
+                "exposure/PK assessment at a tolerable dose",
+            ],
+        }
     return {
         "contract_version": "flagship-dossier-evidence-v1",
         "unknown_state": unknown,
@@ -1296,6 +1425,7 @@ def _build_dossier_evidence_contract(
             "selected_candidates": pool_comparators,
             "scope": "biologist approved-drug lookup plus current reviewed pool",
         },
+        "timothy_syndrome_cardiac_scope": timothy_scope,
         "trial_audit": candidate.get("trial_audit", {
             "query_status": unknown, "trials": [],
             "negative_repurposing_result": unknown,

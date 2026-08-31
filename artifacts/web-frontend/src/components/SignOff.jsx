@@ -2,7 +2,8 @@ import { useState } from "react";
 
 // The human review checkpoint. Either decision requires a short typed note
 // before it confirms — this is a deliberate sign-off, not a generic form.
-export default function SignOff({ onResume, busy }) {
+export default function SignOff({ onResume, busy, diseaseName = "" }) {
+  const timothyScope = /^timothy syndrome$/i.test(diseaseName.trim());
   const [note, setNote] = useState("");
   const [pending, setPending] = useState(null); // "approve" | "reject" | null
   const canSubmit = note.trim().length > 0 && !busy;
@@ -48,6 +49,18 @@ export default function SignOff({ onResume, busy }) {
         >
           This is a falsifiable hypothesis, not a finding.
         </p>
+        {timothyScope && (
+          <p
+            className="mt-3 rounded border p-3 text-sm leading-relaxed"
+            style={{ borderColor: "var(--brass-border)", color: "var(--ink-muted)" }}
+          >
+            For this flagship, explicitly confirm or reject the proposed TS1
+            CACNA1C p.G406R/exon 8A cardiac-electrophysiology scope. State that
+            approval advances mutation-matched channel/iPSC validation and
+            cardiac safety/exposure review only—not neurologic benefit,
+            whole-syndrome modification, clinical efficacy, or prescribing.
+          </p>
+        )}
         <p
           className="mt-1.5 text-sm leading-relaxed"
           style={{ color: "var(--ink-muted)" }}
@@ -82,7 +95,7 @@ export default function SignOff({ onResume, busy }) {
             if (e.target.value.trim()) setPending(null);
           }}
           rows={3}
-          placeholder="e.g. Affinity and structure confidence justify wet-lab follow-up despite the sub-threshold composite score."
+          placeholder="State the exact disease subtype, phenotype, evidence limits, and next validation decision."
           className="w-full resize-y rounded border p-3 text-sm outline-none"
           style={{
             borderColor: note.trim()

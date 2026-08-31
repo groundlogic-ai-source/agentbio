@@ -3,6 +3,21 @@ import remarkGfm from "remark-gfm";
 import TherapeuticApplicabilityCaveat from "./TherapeuticApplicabilityCaveat.jsx";
 import { hasTherapeuticApplicabilityDisclosure } from "../therapeuticApplicability.js";
 
+function SafeLink({ href, children }) {
+  const value = String(href || "");
+  const isInternal = value.startsWith("/api/structures/");
+  const isWeb = /^https?:\/\//i.test(value);
+  if (!isInternal && !isWeb) return <span>{children}</span>;
+  return (
+    <a
+      href={value}
+      {...(isWeb ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+    >
+      {children}
+    </a>
+  );
+}
+
 export default function ReportView({ report }) {
   if (!report) {
     return (
@@ -32,7 +47,9 @@ export default function ReportView({ report }) {
         for expert review, not medical advice or a treatment recommendation.
       </p>
       {showLegacyApplicabilityCaveat && <TherapeuticApplicabilityCaveat />}
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{report}</ReactMarkdown>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ a: SafeLink }}>
+        {report}
+      </ReactMarkdown>
     </div>
   );
 }

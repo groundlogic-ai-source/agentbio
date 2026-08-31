@@ -32,6 +32,7 @@ from agents.target_selection import OUTPUT_DIR
 # symbol. Flagship rendering never calls it; trial evidence is persisted by the
 # Reviewer and rendered from candidate["trial_audit"].
 from data_sources.clinicaltrials import check_prior_trials  # noqa: F401
+from data_sources.evidence_ledger import qualified_target_chembl_activity_ids
 
 REPORTS_DIR = os.path.join(OUTPUT_DIR, "reports")
 
@@ -80,6 +81,22 @@ def _citations(candidate: dict[str, Any],
                 pmids.add(str(sid))
             elif st == "chembl_activity":
                 chembl_acts.add(str(sid))
+
+    # The provenance compatibility list can contain legacy values.  The ledger
+    # is authoritative for a ChEMBL activity citation: only a ChEMBL
+    # bioactivity record may contribute one, never a provider metadata id.
+    ledger_activity_ids = set(qualified_target_chembl_activity_ids(
+        ((candidate.get("_evidence_ledger") or {}).get("records") or []),
+        target_symbol=candidate.get("target_symbol") or "",
+        target_accession=candidate.get("uniprot_id") or "",
+    ))
+    if ledger_activity_ids:
+        chembl_acts = ledger_activity_ids
+    elif (candidate.get("_evidence_ledger") or {}).get("records"):
+        # A populated ledger with no qualifying ChEMBL activity must render
+        # none, rather than reclassifying DrugCentral/label metadata from an
+        # old provenance list as ChEMBL activity.
+        chembl_acts = set()
 
     # Multi-source ledger identifiers.  The three citation classes above are
     # all ChEMBL/PubMed/NCT-shaped, so a candidate that entered through GtoPdb,
@@ -416,26 +433,16 @@ def _direct_chembl_activity_note(candidate: dict[str, Any]) -> str:
     """Explain whether the dossier has a qualifying direct ChEMBL assay."""
     target = str(candidate.get("target_symbol") or "").upper()
     accession = str(candidate.get("uniprot_id") or "").upper()
-    qualifying_rows = []
-    for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
-        if not isinstance(record, dict):
-            continue
-        row_target = str(record.get("target_symbol") or "").upper()
-        row_accession = str(record.get("target_accession") or "").upper()
-        target_matches = (
-            bool(target and row_target == target)
-            or bool(accession and row_accession == accession)
-        )
-        if (str(record.get("provider") or "").lower() == "chembl"
-                and record.get("source_type") == "bioactivity_assay"
-                and str(record.get("qualification_status") or "").lower() == "qualified"
-                and str(record.get("target_species") or "").lower() == "homo sapiens"
-                and target_matches):
-            qualifying_rows.append(record)
-    if qualifying_rows:
+    identities = qualified_target_chembl_activity_ids(
+        ((candidate.get("_evidence_ledger") or {}).get("records") or []),
+        target_symbol=target,
+        target_accession=accession,
+    )
+    if identities:
         return (
-            f"Direct assay-backed: {len(qualifying_rows)} qualified ChEMBL "
-            "human bioactivity ledger row(s) for this target"
+            f"Direct assay-backed: {len(identities)} independent qualified "
+            "ChEMBL human target-matched activity observation(s), counted by "
+            "stable activity/source identity"
         )
     return (
         "No qualified ChEMBL human bioactivity ledger row matched this target; "
@@ -717,7 +724,11 @@ def _assay_audit_table(candidate: dict[str, Any]) -> str:
         "| --- | --- | --- | --- | ---: | --- | --- | --- |",
     ]
     for row in sorted(set(rows)):
-        lines.append("| " + " | ".join(row) + " |")
+        # Persisted free-text context/identifiers may contain a pipe; escape it
+        # so one malformed provider value cannot corrupt the Markdown table.
+        lines.append("| " + " | ".join(
+            str(value).replace("|", r"\|").replace("\n", " ")
+            for value in row) + " |")
     return "\n".join(lines)
 
 
@@ -733,18 +744,54 @@ def _comparator_table(candidate: dict[str, Any],
     selected = comparators.get("selected_candidates", [])
     lines = ["| Comparator | Source / relationship | Approval or score |",
              "| --- | --- | --- |"]
+    seen: set[str] = set()
     for row in target_drugs or []:
+        name = _audit_value(row.get("name"))
+        key = name.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
         lines.append(
-            f"| {_audit_value(row.get('name'))} | biologist ChEMBL target-approved drug | "
+            f"| {name} | biologist ChEMBL target-approved drug | "
             f"max phase {_audit_value(row.get('max_phase'))} |")
     for row in selected or []:
+        name = _audit_value(row.get("drug_name"))
+        key = name.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
         lines.append(
-            f"| {_audit_value(row.get('drug_name'))} | current reviewed-pool candidate | "
+            f"| {name} | current reviewed-pool candidate | "
             f"composite {_audit_value(row.get('composite_score'))}; approval "
             f"{_audit_value(row.get('approval_basis'))} |")
     if len(lines) == 2:
         lines.append("| NONE RECORDED | No biologist approved-drug or reviewed-pool comparator was supplied | UNKNOWN |")
     return "\n".join(lines)
+
+
+def _comparator_rationale(candidate: dict[str, Any]) -> str:
+    """State the ranking comparison using persisted fields, not class lore."""
+    contract = candidate.get("dossier_evidence_contract") or {}
+    comparators = contract.get("comparators") or {}
+    selected = comparators.get("selected_candidates") or []
+    if not selected:
+        return ("Comparator rationale: no alternative selected-candidate score "
+                "was persisted for this target; no comparative superiority is claimed.")
+    values = [
+        row.get("composite_score") for row in selected
+        if isinstance(row.get("composite_score"), (int, float))
+    ]
+    basis = (
+        "the persisted composite score and the target-matched ChEMBL activity "
+        "audit; it does not establish clinical efficacy or safety superiority"
+    )
+    if str(candidate.get("drug_name") or "").casefold() == "nisoldipine":
+        return ("Nisoldipine-vs-alternatives rationale: this ordering is based only on "
+                f"{basis}. Compared alternatives have persisted score(s) "
+                + (", ".join(_fmt(v, 4) for v in values) if values else "UNKNOWN")
+                + ".")
+    return ("Comparator rationale: relative ordering is based only on "
+            f"{basis}.")
 
 
 def _apply_matched_biologist_context(
@@ -810,6 +857,34 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
             or "UNKNOWN"
         ) + ".",
     ]
+    direction = candidate.get("mechanism_direction") or {}
+    if direction:
+        lines.extend([
+            "\n### Directional-mechanism audit",
+            f"- Verdict: `{_audit_value(direction.get('verdict'))}`; action used: "
+            f"`{_audit_value(direction.get('action_type_used'))}`.",
+            f"- Disease-mechanism summary: {_audit_value(direction.get('disease_mechanism_summary'))}.",
+            f"- Reason: {_audit_value(direction.get('reason'))}.",
+            f"- Citations: {_audit_value(direction.get('search_citations'))}.",
+        ])
+    scope = contract.get("timothy_syndrome_cardiac_scope")
+    if isinstance(scope, dict):
+        lines.extend([
+            "\n### Proposed Timothy syndrome mutation-specific cardiac scope",
+            f"- Proposed scope: `{_audit_value(scope.get('proposed_variant_scope'))}`, exon "
+            f"`{_audit_value(scope.get('proposed_exon_scope'))}`; "
+            f"{_audit_value(scope.get('clinical_scope'))}.",
+            f"- Genotype confirmation: `{_audit_value(scope.get('genotype_confirmation_status'))}`. "
+            "The canonical disease input does not establish TS1 or p.G406R for a specific case.",
+            f"- Scope status: `{_audit_value(scope.get('status'))}`; basis: "
+            f"{_audit_value(scope.get('scope_basis'))}.",
+            "- The scope and tests below are **proposed for explicit human review** "
+            "and remain **future, unperformed** activities, not results.",
+            "- Required channel/iPSC tests: " + "; ".join(
+                str(item) for item in scope.get("required_tests", [])) + ".",
+            "- Cardiac safety/exposure plan: " + "; ".join(
+                str(item) for item in scope.get("safety_exposure_plan", [])) + ".",
+        ])
     return "\n".join(lines)
 
 
@@ -1264,6 +1339,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     parts.append(_assay_audit_table(candidate) + "\n")
     parts.append("\n### Comparator table\n")
     parts.append(_comparator_table(candidate, biologist_output) + "\n")
+    parts.append(_comparator_rationale(candidate) + "\n")
 
     # 3. Citations
     parts.append("\n## 3. Full source citations\n")

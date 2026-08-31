@@ -39,6 +39,10 @@ export function getRun(jobId) {
   return request(`/api/runs/${jobId}`);
 }
 
+export function caseReportPdfUrl(jobId) {
+  return `/api/runs/${encodeURIComponent(jobId)}/report.pdf`;
+}
+
 export function getCost(jobId) {
   return request(`/api/runs/${jobId}/cost`);
 }

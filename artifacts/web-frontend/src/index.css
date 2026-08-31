@@ -728,6 +728,16 @@ textarea:focus-visible,
     page-break-inside: auto;
   }
 
+  .dossier thead,
+  .printable-report thead {
+    display: table-header-group;
+  }
+
+  .dossier tfoot,
+  .printable-report tfoot {
+    display: table-footer-group;
+  }
+
   .dossier tr {
     page-break-inside: avoid;
     page-break-after: auto;
@@ -748,7 +758,9 @@ textarea:focus-visible,
   .dossier th,
   .dossier td {
     white-space: normal !important;
-    overflow-wrap: anywhere !important;
+    /* Preserve identifiers, accession numbers, and score tokens intact. */
+    overflow-wrap: normal !important;
+    word-break: normal !important;
     font-variant-numeric: tabular-nums;
   }
 
@@ -834,7 +846,8 @@ textarea:focus-visible,
     /* Long audit text (cap reasons, flags, disclosures) must wrap in PDF —
        nowrap here once clipped content out of the printed audit pack. */
     white-space: normal !important;
-    overflow-wrap: anywhere !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
     text-align: left !important;
     font-variant-numeric: tabular-nums !important;
   }

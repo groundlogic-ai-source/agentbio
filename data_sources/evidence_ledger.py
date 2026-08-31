@@ -139,6 +139,7 @@ class EvidenceRecordDict(TypedDict, total=False):
     provider: str                # which adapter produced this (chembl, ot, ...)
     source_type: str             # SourceType value
     source_id: str               # provider-native record id
+    source_activity_ids: list[str]  # raw provider activity observations
     source_version: str          # provider data/release version
     lineage_id: str              # OPTIONAL explicit lineage override
     evidence_role: str           # EvidenceRole value
@@ -230,6 +231,7 @@ class EvidenceRecord:
     provider: str = ""
     source_type: SourceType = SourceType.OTHER
     source_id: str = ""
+    source_activity_ids: tuple[str, ...] = ()
     source_version: str = ""
     evidence_role: EvidenceRole = EvidenceRole.OTHER
 
@@ -303,6 +305,12 @@ class EvidenceRecord:
                 _set(self, field_name,
                      "" if isinstance(value, (dict, list, set))
                      else str(value))
+        raw_activity_ids = self.source_activity_ids or ()
+        if not isinstance(raw_activity_ids, (list, tuple, set)):
+            raw_activity_ids = ()
+        _set(self, "source_activity_ids", tuple(
+            sorted({_s(value) for value in raw_activity_ids if _s(value)})
+        ))
 
     def lineage_key(self) -> str:
         """Deterministic key identifying the UNDERLYING evidence artifact.
@@ -385,6 +393,7 @@ def normalize_evidence(raw: Any) -> EvidenceRecord:
         provider=_s(d.get("provider")),
         source_type=_coerce_enum(SourceType, d.get("source_type"), SourceType.OTHER),
         source_id=_s(d.get("source_id")),
+        source_activity_ids=tuple(d.get("source_activity_ids") or ()),
         source_version=_s(d.get("source_version")),
         evidence_role=_coerce_enum(EvidenceRole, d.get("evidence_role"), EvidenceRole.OTHER),
         molecule_id=_s(d.get("molecule_id")),
@@ -413,6 +422,48 @@ def normalize_evidence(raw: Any) -> EvidenceRecord:
             ContradictionStatus, d.get("contradiction_status"), ContradictionStatus.NONE),
         lineage_id=_s(d.get("lineage_id")),
     )
+
+
+def qualified_target_chembl_activity_ids(
+    records: Iterable[Any],
+    *,
+    target_symbol: str = "",
+    target_accession: str = "",
+) -> list[str]:
+    """Return unique raw ChEMBL activity observations for one human target.
+
+    Assay-confidence companion rows are metadata about the same observations,
+    not independent bioactivity evidence. New records carry their raw activity
+    IDs explicitly; legacy records may use a numeric activity-shaped source ID.
+    """
+    symbol = _s(target_symbol).upper()
+    accession = _s(target_accession).upper()
+    found: set[str] = set()
+    for raw in records or []:
+        record = raw if isinstance(raw, dict) else (
+            raw.__dict__ if isinstance(raw, EvidenceRecord) else {})
+        if _s(record.get("provider")).lower() != "chembl":
+            continue
+        if _s(record.get("source_type")).lower() != SourceType.BIOACTIVITY_ASSAY.value:
+            continue
+        if _s(record.get("qualification_status")).lower() != QualificationStatus.QUALIFIED.value:
+            continue
+        if _s(record.get("target_species")).lower() != "homo sapiens":
+            continue
+        row_symbol = _s(record.get("target_symbol")).upper()
+        row_accession = _s(record.get("target_accession")).upper()
+        if not ((symbol and row_symbol == symbol)
+                or (accession and row_accession == accession)):
+            continue
+        for activity_id in record.get("source_activity_ids") or ():
+            if _s(activity_id):
+                found.add(_s(activity_id))
+        if not record.get("source_activity_ids"):
+            source_id = _s(record.get("source_id"))
+            if re.fullmatch(r"(?:chembl[-_:])?(?:activity[-_:])?\d+", source_id,
+                            flags=re.IGNORECASE):
+                found.add(source_id)
+    return sorted(found)
 
 
 # ---------------------------------------------------------------------------
@@ -675,8 +726,20 @@ class MergedCandidate:
             "is_approved_drug": (self.max_phase is not None and self.max_phase >= 4),
             "source_chembl_ids": sorted(
                 {r.molecule_id for r in self.records if r.molecule_id}),
-            "source_activity_ids": sorted(
-                {r.assay_id for r in self.records if r.assay_id}),
+            # This field is specifically a ChEMBL *activity observation* audit
+            # list.  It must not be populated from generic assay metadata (or
+            # from another provider's assay ids): doing so makes a DrugCentral
+            # interaction look like a ChEMBL activity in downstream dossiers.
+            # ``source_id`` is the stable provider activity identity; the
+            # ChEMBL assay id is only a fallback for older adapters which did
+            # not retain an activity id.
+            "source_activity_ids": sorted({
+                (r.source_id or r.assay_id)
+                for r in self.records
+                if (r.provider.strip().lower() == "chembl"
+                    and r.source_type == SourceType.BIOACTIVITY_ASSAY
+                    and (r.source_id or r.assay_id))
+            }),
             "target_symbol": (sorted(self.target_symbols)[0]
                               if self.target_symbols else ""),
             "uniprot_id": self.uniprot_id,

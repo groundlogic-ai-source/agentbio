@@ -99,13 +99,12 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
           ← All case files
         </button>
         {canPrint && (
-          <button
-            type="button"
-            onClick={() => window.print()}
+          <a
+            href={`/api/runs/${encodeURIComponent(job.job_id)}/report.pdf`}
             className="btn btn-ghost btn-sm ml-auto"
           >
             Download PDF
-          </button>
+          </a>
         )}
       </div>
 
@@ -172,7 +171,11 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
               <ReportView report={job.report} />
             </div>
           </Paper>
-          <SignOff onResume={onResume} busy={resuming} />
+          <SignOff
+            onResume={onResume}
+            busy={resuming}
+            diseaseName={job.disease_name || ""}
+          />
         </div>
       )}
 

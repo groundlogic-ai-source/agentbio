@@ -93,6 +93,8 @@ class ReviewerCandidate(TypedDict, total=False):
     unapproved_cap_applied: Required[bool]
     mechanism_cap_applied: Required[bool]
     mechanism_direction: Optional[dict]
+    # 0.05 only after a persisted, citation-bearing compatible direction audit.
+    qualified_directional_bonus: Optional[float]
     safety_cap_applied: Required[bool]
     black_box_advisory: Optional[bool]   # BBW present but drug NOT withdrawn
     # Structured-vs-independent withdrawal disagreement; never silently
@@ -122,6 +124,9 @@ class ReviewerCandidate(TypedDict, total=False):
     process_source_status: Optional[str]
     # Versioned, explicit-unknown evidence handoff used by flagship dossiers.
     dossier_evidence_contract: dict
+    # Present for CACNA1C Timothy syndrome dossiers; structured TS1 cardiac
+    # validation scope is explicitly future/unperformed.
+    timothy_syndrome_cardiac_scope: Optional[dict]
     trial_audit: dict
 
 

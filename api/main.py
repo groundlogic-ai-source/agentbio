@@ -20,13 +20,14 @@ import re
 import subprocess
 import sys
 import threading
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 import sweep_manager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response
 from pydantic import BaseModel
 
 import api.guardrails as _guardrails
@@ -41,6 +42,7 @@ from api import triage_db
 from api import triage as _triage
 from api import dossier as _dossier
 from api import audit as _audit
+from api.report_pdf import render_case_pdf
 from validation.benchmark_v2_completion import inspect_frozen_result
 
 # Node names emitted by graph.stream(...) map 1:1 onto current_stage values.
@@ -245,6 +247,14 @@ def _read_report(path: Optional[str]) -> Optional[str]:
     return None
 
 
+def _report_download_name(job: dict[str, Any]) -> str:
+    """A header-safe, stable attachment name; never reflect arbitrary DB text."""
+    disease = re.sub(r"[^A-Za-z0-9]+", "-", str(job.get("disease_name") or "case"))
+    disease = disease.strip("-").lower()[:60] or "case"
+    job_id = re.sub(r"[^A-Za-z0-9_-]", "", str(job.get("job_id") or ""))[:32]
+    return f"agentbio-{disease}-{job_id or 'report'}.pdf"
+
+
 # --------------------------------------------------------------------------- #
 # Health / root paths (Replit deployment liveness probes hit these)
 # --------------------------------------------------------------------------- #
@@ -411,6 +421,39 @@ def get_run(job_id: str) -> dict[str, Any]:
     if job["status"] in ("awaiting_review", "completed"):
         job["report"] = _read_report(job.get("report_path"))
     return job
+
+
+@app.get("/api/runs/{job_id}/report.pdf")
+def download_case_report_pdf(job_id: str) -> Response:
+    """Download the persisted case-report snapshot as a server-rendered PDF."""
+    job = jobs_db.get_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="job not found")
+    report = _read_report(job.get("report_path"))
+    if not report:
+        raise HTTPException(status_code=404, detail="persisted report snapshot not found")
+    try:
+        report_path = job.get("report_path")
+        frozen_job = dict(job)
+        frozen_job["report_sha256"] = hashlib.sha256(
+            report.encode("utf-8")).hexdigest()
+        if report_path and os.path.exists(report_path):
+            frozen_job["report_snapshot_at"] = datetime.fromtimestamp(
+                os.path.getmtime(report_path), tz=timezone.utc
+            ).isoformat()
+        else:
+            frozen_job["report_snapshot_at"] = job.get("created_at")
+        payload = render_case_pdf(report, frozen_job)
+    except Exception as exc:  # rendering failures should be explicit to users
+        raise HTTPException(status_code=500, detail=f"could not render report PDF: {exc}") from exc
+    return Response(
+        content=payload,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{_report_download_name(job)}"',
+            "Cache-Control": "private, no-store",
+        },
+    )
 
 
 @app.post("/api/runs/{job_id}/resume")

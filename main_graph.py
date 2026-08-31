@@ -26,6 +26,7 @@ Resume a paused run:  python resume_review.py <thread_id> <approve|reject|edit> 
 
 import json
 import os
+import re
 import sqlite3
 import sys
 import time
@@ -858,11 +859,47 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
                   f"dossier druggability context may describe the wrong target")
         return match or primary_bio
 
-    reports = writer.run_writer(
-        reviewed, selected, structure_results, primary_bio,
-        state.get("target"), bio_for_candidate=_bio_for,
-        k_target_summary=reviewed.get("k_target_summary"))
-    print(f"[graph] writer: wrote {len(reports)} report(s) to output/reports/")
+    job_id = state.get("job_id")
+    if job_id:
+        # API reports are snapshots, not the old disease_drug cache.  Apart from
+        # preventing same-pair runs from overwriting one another, exclusive
+        # creation means graph replay cannot silently alter an already-reviewed
+        # dossier.  The CLI intentionally retains writer.run_writer's legacy
+        # location and behavior below.
+        if not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", job_id):
+            raise ValueError("job_id contains unsafe path characters")
+        job_reports_dir = os.path.join(writer.REPORTS_DIR, "jobs", job_id)
+        os.makedirs(job_reports_dir, exist_ok=True)
+        reports = []
+        formula = reviewed.get("formula", {}) or {}
+        repurposing_only = bool(reviewed.get("repurposing_only", False))
+        for index, candidate in enumerate(selected, start=1):
+            drug = candidate.get("drug_name", "unknown")
+            disease = candidate.get("disease_name", "unknown")
+            filename = f"{index:02d}_{writer._slug(disease)}_{writer._slug(drug)}.md"
+            path = os.path.join(job_reports_dir, filename)
+            if not os.path.exists(path):
+                markdown = writer.build_report_markdown(
+                    candidate, (structure_results or {}).get(drug, {}), formula,
+                    _bio_for(candidate), state.get("target"),
+                    repurposing_only=repurposing_only,
+                    k_target_summary=reviewed.get("k_target_summary"),
+                )
+                # x is the immutable-storage guard. Existing files are never
+                # rewritten, including if a checkpointed node is replayed.
+                with open(path, "x", encoding="utf-8") as report_file:
+                    report_file.write(markdown)
+            reports.append({
+                "drug": drug, "disease": disease, "path": path,
+                "strong_match": bool(candidate.get("strong_match")),
+            })
+        print(f"[graph] writer: wrote {len(reports)} immutable report(s) for job {job_id}")
+    else:
+        reports = writer.run_writer(
+            reviewed, selected, structure_results, primary_bio,
+            state.get("target"), bio_for_candidate=_bio_for,
+            k_target_summary=reviewed.get("k_target_summary"))
+        print(f"[graph] writer: wrote {len(reports)} report(s) to output/reports/")
     return {"reports": reports}
 
 

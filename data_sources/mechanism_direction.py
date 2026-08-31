@@ -62,6 +62,33 @@ _NO_INFO_TEXT = (
 _AI_TIMEOUT_SECONDS = 60.0
 _AI_MAX_RETRIES = 0
 
+
+def _has_auditable_compatible_basis(result: dict[str, Any]) -> bool:
+    """Compatibility needs a complete persisted audit trail, not just a token."""
+    action = str(result.get("action_type_used") or "").strip().lower()
+    return (
+        bool(action and action not in {"unknown", "none", "n/a"}
+             and "inferred" not in action)
+        and bool(str(result.get("disease_mechanism_summary") or "").strip())
+        and bool(str(result.get("reason") or "").strip())
+        and bool(str(result.get("search_citations") or "").strip())
+    )
+
+
+def _enforce_auditable_compatible(result: dict[str, Any]) -> dict[str, Any]:
+    """Downgrade an incomplete COMPATIBLE result to explicit insufficient info."""
+    if (result.get("verdict") == VERDICT_COMPATIBLE
+            and not _has_auditable_compatible_basis(result)):
+        result["verdict"] = VERDICT_INSUFFICIENT
+        result["compatible"] = False
+        result["incompatible"] = False
+        result["reason"] = (
+            "A DIRECTIONALLY_COMPATIBLE label was not retained because its "
+            "auditable record lacks a known drug action, disease-mechanism "
+            "summary, nonempty reason, or citations. " + _NO_INFO_TEXT
+        )
+    return result
+
 # Known pharmaceutical safety-screening targets.
 # Companies routinely measure IC50/Ki of drug candidates against these proteins
 # to detect DRUG-INDUCED LIVER INJURY (DILI) or cardiac liability BEFORE
@@ -158,7 +185,7 @@ def check_mechanism_direction(
     )
     cached = get(cache_key)
     if cached is not None:
-        return cached
+        return _enforce_auditable_compatible(cached)
 
     result: dict[str, Any] = {
         "verdict": VERDICT_INSUFFICIENT,
@@ -352,6 +379,7 @@ def check_mechanism_direction(
         result["search_citations"] = cite
         result["compatible"]       = (verdict == VERDICT_COMPATIBLE)
         result["incompatible"]     = (verdict == VERDICT_INCOMPATIBLE)
+        _enforce_auditable_compatible(result)
 
         cache_set(cache_key, result, ttl_days=30)
 
