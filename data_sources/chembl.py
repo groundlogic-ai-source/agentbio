@@ -677,7 +677,7 @@ def _fetch_molecule_safety(molecule_chembl_id: str) -> dict[str, Any]:
     Cached for 30 days; regulatory status changes rarely.
     Returns safe defaults (False/None) on any API error.
     """
-    cache_key = make_key("_fetch_molecule_safety_v1", molecule_chembl_id)
+    cache_key = make_key("_fetch_molecule_safety_v2", molecule_chembl_id)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -686,6 +686,7 @@ def _fetch_molecule_safety(molecule_chembl_id: str) -> dict[str, Any]:
         "withdrawn_flag": False,
         "black_box_warning": False,
         "availability_type": None,
+        "query_status": "ERROR",
     }
     try:
         data = _get_json(f"{BASE_URL}/molecule/{molecule_chembl_id}")
@@ -693,6 +694,7 @@ def _fetch_molecule_safety(molecule_chembl_id: str) -> dict[str, Any]:
             "withdrawn_flag":    bool(data.get("withdrawn_flag")),
             "black_box_warning": bool(data.get("black_box_warning")),
             "availability_type": data.get("availability_type"),
+            "query_status": "OBSERVED",
         }
     except Exception as e:
         print(f"[chembl] WARNING: molecule safety fetch failed for "
@@ -743,7 +745,7 @@ def get_molecule_safety_flags(
           "disclosure_text"    : str
         }
     """
-    cache_key = make_key("get_molecule_safety_flags_v2", drug_name,
+    cache_key = make_key("get_molecule_safety_flags_v3", drug_name,
                          molecule_chembl_id or "")
     cached = get(cache_key)
     if cached is not None:
@@ -781,6 +783,15 @@ def get_molecule_safety_flags(
         result["source_url"] = source_url
 
         flags = _fetch_molecule_safety(mid)
+        if flags.get("query_status") != "OBSERVED":
+            result["api_error"] = True
+            result["disclosure_text"] = (
+                f"Layer 1 structured safety lookup failed for {drug_name} "
+                f"({mid}); withdrawal and boxed-warning status are UNKNOWN. "
+                "The independent safety lane is required for redundancy."
+            )
+            cache_set(cache_key, result, ttl_days=1)
+            return result
         result["availability_type"] = flags.get("availability_type")
 
         if flags.get("withdrawn_flag"):

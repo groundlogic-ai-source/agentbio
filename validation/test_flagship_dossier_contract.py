@@ -104,6 +104,25 @@ class FlagshipDossierContractTests(unittest.TestCase):
         self.assertEqual(contract["comparators"]["target_approved_drugs"], [])
         self.assertEqual(contract["comparators"]["selected_candidates"], [])
 
+    def test_contract_persists_casefolded_target_context(self):
+        candidate = _candidate()
+        candidate["target_symbol"] = "aud1"
+        matched = {
+            "target": {"target_symbol": "AUD1"},
+            "literature_hits": [{"pmid": "12345"}],
+            "druggability_context": {
+                "approved_drugs": [{"name": "RightDrug"}],
+            },
+        }
+        contract = _build_dossier_evidence_contract(
+            candidate, matched, [candidate])
+        self.assertEqual(
+            contract["disease_mechanism_context"]["literature_pmids"],
+            ["12345"])
+        self.assertEqual(
+            contract["comparators"]["target_approved_drugs"][0]["name"],
+            "RightDrug")
+
     def test_writer_refreshes_contract_from_matched_target_context(self):
         candidate = _candidate()
         candidate["dossier_evidence_contract"] = _build_dossier_evidence_contract(
@@ -121,7 +140,55 @@ class FlagshipDossierContractTests(unittest.TestCase):
         self.assertIn("RightDrug", report)
         self.assertEqual(
             candidate["dossier_evidence_contract"]["disease_mechanism_context"][
-                "literature_pmids"], ["12345"])
+                "literature_pmids"], [])
+
+    def test_failed_structure_prediction_is_not_rendered_as_available(self):
+        candidate = _candidate()
+        candidate["dossier_evidence_contract"] = _build_dossier_evidence_contract(
+            candidate, None, [candidate])
+        report = build_report_markdown(candidate, {
+            "complex": {"available": False, "error": "timed out"},
+        }, {"composite_weights": {}, "formula_version": "v"}, None)
+        self.assertIn("Structure evidence:** `NOT_YET_AVAILABLE`", report)
+        self.assertNotIn("Structure evidence:** `AVAILABLE", report)
+
+    def test_off_target_assay_does_not_create_direct_summary_claim(self):
+        candidate = _candidate()
+        candidate["_evidence_ledger"]["records"][0]["target_symbol"] = "OTHER"
+        candidate["_evidence_ledger"]["records"][0]["target_accession"] = "P99999"
+        report = build_report_markdown(candidate, {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, None)
+        self.assertIn("does not claim direct target-assay support", report)
+
+    def test_trial_table_renders_title_and_stop_reason(self):
+        candidate = _candidate()
+        candidate["trial_audit"]["trials"][0].update({
+            "title": "Stopped efficacy study",
+            "why_stopped": "Did not meet efficacy endpoint",
+        })
+        report = build_report_markdown(candidate, {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, None)
+        self.assertIn("Stopped efficacy study", report)
+        self.assertIn("Did not meet efficacy endpoint", report)
+
+    def test_safety_states_distinguish_unresolved_error_and_skipped(self):
+        candidate = _candidate()
+        candidate["safety_layer1"] = {
+            "chembl_id": None,
+            "api_error": False,
+            "disclosure_text": "Identity unresolved.",
+        }
+        candidate["safety_layer2"] = {
+            "verdict": "SKIPPED",
+            "disclosure_text": "Not run.",
+        }
+        report = build_report_markdown(candidate, {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, None)
+        self.assertIn("UNRESOLVED / UNKNOWN", report)
+        self.assertIn("SKIPPED / UNKNOWN", report)
 
     def test_safety_matrix_uses_disclosure_text(self):
         candidate = _candidate()
@@ -152,7 +219,7 @@ class FlagshipDossierContractTests(unittest.TestCase):
                                           "tanimoto": .15,
                                           "no_failed_trial": .15},
                 }, None)
-        for expected in ("Evidence-stage verdict", "Auditable assay rows",
+        for expected in ("Evidence-stage verdict", "Assay evidence audit",
                          "CHEMBLASSAY1", "Comparator table",
                          "Novelty and prior-trial audit",
                          "Safety and applicability matrix",

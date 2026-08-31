@@ -611,7 +611,11 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
         else:
             print("[graph] reviewer: reusing existing reviewed_candidates.json")
             return {"reviewed": existing}
-    reviewed = run_reviewer(state["chemist_output"], state.get("biologist_output"))
+    reviewed = run_reviewer(
+        state["chemist_output"],
+        state.get("biologist_output"),
+        state.get("biologist_outputs"),
+    )
     # Runtime schema validation at the reviewer→writer handoff.
     validate_reviewer_handoff(reviewed)
     payload = {

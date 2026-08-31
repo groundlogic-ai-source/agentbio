@@ -90,8 +90,8 @@ class TestReadersGuideAppendix(unittest.TestCase):
         }]}
         candidate["score_components"]["efficacy_evidence_source"] = "multisource_ledger"
         md = build_report_markdown(candidate, {}, {}, None)
-        self.assertIn("No qualifying direct ChEMBL", md)
-        self.assertIn("potency and assay confidence are therefore unavailable", md)
+        self.assertIn("No qualified ChEMBL human bioactivity ledger row", md)
+        self.assertIn("does not claim direct target-assay support", md)
         self.assertIn("not direct-assay-backed", md)
         self.assertIn("not a measured probability of efficacy", md)
 

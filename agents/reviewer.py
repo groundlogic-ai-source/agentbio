@@ -570,15 +570,32 @@ def _has_qualified_directional_evidence(candidate: dict[str, Any]) -> bool:
     return False
 
 
-def run_reviewer(chemist_output: dict[str, Any],
-                 biologist_output: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
+def run_reviewer(
+    chemist_output: dict[str, Any],
+    biologist_output: Optional[dict[str, Any]] = None,
+    biologist_outputs: Optional[list[dict[str, Any]]] = None,
+) -> list[dict[str, Any]]:
     candidates = chemist_output.get("candidates", [])
     disease = chemist_output.get("target", {}).get("disease_name", "")
 
-    # Target-level PMIDs (shared evidence) for provenance accounting.
-    target_pmids = []
-    if biologist_output:
-        target_pmids = [h["pmid"] for h in biologist_output.get("literature_hits", [])]
+    bios = biologist_outputs or ([biologist_output] if biologist_output else [])
+
+    def _matched_bio(candidate: dict[str, Any]) -> Optional[dict[str, Any]]:
+        symbol = str(candidate.get("target_symbol") or "").upper()
+        accession = str(candidate.get("uniprot_id") or "").upper()
+        accession_match = next((
+            bio for bio in bios
+            if accession and str(
+                ((bio.get("target") or {}).get("uniprot_id") or "")
+            ).upper() == accession
+        ), None)
+        symbol_match = next((
+            bio for bio in bios
+            if symbol and str(
+                ((bio.get("target") or {}).get("target_symbol") or "")
+            ).upper() == symbol
+        ), None)
+        return accession_match or symbol_match
 
     # Normalization:
     #   pChEMBL  → fixed range [3.0, 10.0] (pharmacological reference, run-independent)
@@ -593,6 +610,11 @@ def run_reviewer(chemist_output: dict[str, Any],
     prefetched = _prefetch_candidate_context(candidates, disease)
 
     for c, context in zip(candidates, prefetched):
+        matched_bio = _matched_bio(c)
+        target_pmids = [
+            h["pmid"] for h in (matched_bio or {}).get("literature_hits", [])
+            if h.get("pmid") is not None
+        ]
         desc = _descriptors(c.get("smiles"))
         adverse = context["adverse"]
         trials = context["trials"]
@@ -1175,7 +1197,7 @@ def run_reviewer(chemist_output: dict[str, Any],
     # pre-gate verdict as its final scientific readiness.
     for r in reviewed:
         r["dossier_evidence_contract"] = _build_dossier_evidence_contract(
-            r, biologist_output, reviewed)
+            r, _matched_bio(r), reviewed)
     return reviewed
 
 
@@ -1210,9 +1232,14 @@ def _build_dossier_evidence_contract(
         ("mechanism_direction", candidate.get("mechanism_cap_applied")),
         ("safety", candidate.get("safety_cap_applied")),
     ) if hit]
-    bio_target = ((biologist_output or {}).get("target") or {}).get("target_symbol")
+    bio_identity = (biologist_output or {}).get("target") or {}
+    bio_target = str(bio_identity.get("target_symbol") or "").upper()
+    candidate_target = str(candidate.get("target_symbol") or "").upper()
+    bio_accession = str(bio_identity.get("uniprot_id") or "").upper()
+    candidate_accession = str(candidate.get("uniprot_id") or "").upper()
     target_matches = bool(
-        bio_target and bio_target == candidate.get("target_symbol")
+        (candidate_accession and bio_accession == candidate_accession)
+        or (candidate_target and bio_target == candidate_target)
     )
     approved = (
         (biologist_output or {}).get("druggability_context", {}).get(

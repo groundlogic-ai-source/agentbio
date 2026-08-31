@@ -22,6 +22,7 @@ score_components and the formula weights carried in the reviewed payload, so the
 arithmetic is auditable against reviewed_candidates.json.
 """
 
+import copy
 import os
 import re
 from typing import Any, Optional
@@ -413,40 +414,32 @@ def _confidence_band(value: Any) -> str:
 
 def _direct_chembl_activity_note(candidate: dict[str, Any]) -> str:
     """Explain whether the dossier has a qualifying direct ChEMBL assay."""
-    activity_ids = {
-        str(value).strip()
-        for value in candidate.get("source_activity_ids", [])
-        if _valid_citation_id(value)
-    }
-    for group in ("counted_once", "collapsed_as_duplicate"):
-        for record in (candidate.get("provenance") or {}).get(group, []):
-            if record.get("source_type") == "chembl_activity":
-                value = _valid_citation_id(record.get("source_id"))
-                if value:
-                    activity_ids.add(value)
+    target = str(candidate.get("target_symbol") or "").upper()
+    accession = str(candidate.get("uniprot_id") or "").upper()
+    qualifying_rows = []
     for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
         if not isinstance(record, dict):
             continue
-        if (record.get("provider") == "chembl"
+        row_target = str(record.get("target_symbol") or "").upper()
+        row_accession = str(record.get("target_accession") or "").upper()
+        target_matches = (
+            bool(target and row_target == target)
+            or bool(accession and row_accession == accession)
+        )
+        if (str(record.get("provider") or "").lower() == "chembl"
                 and record.get("source_type") == "bioactivity_assay"
-                and record.get("qualification_status") in (None, "", "qualified")):
-            value = (
-                _valid_citation_id(record.get("assay_id"))
-                or _valid_citation_id(record.get("source_id"))
-            )
-            if value:
-                activity_ids.add(value)
-    if (candidate.get("pchembl_value") is not None
-            and candidate.get("confidence_score") is not None
-            and activity_ids):
+                and str(record.get("qualification_status") or "").lower() == "qualified"
+                and str(record.get("target_species") or "").lower() == "homo sapiens"
+                and target_matches):
+            qualifying_rows.append(record)
+    if qualifying_rows:
         return (
-            f"Direct assay-backed: {len(activity_ids)} qualifying ChEMBL "
-            "Homo sapiens IC50/Ki activity record(s)"
+            f"Direct assay-backed: {len(qualifying_rows)} qualified ChEMBL "
+            "human bioactivity ledger row(s) for this target"
         )
     return (
-        "No qualifying direct ChEMBL Homo sapiens IC50/Ki activity record "
-        "at assay confidence ≥ 8 was found; potency and assay confidence "
-        "are therefore unavailable."
+        "No qualified ChEMBL human bioactivity ledger row matched this target; "
+        "the dossier does not claim direct target-assay support."
     )
 
 
@@ -670,8 +663,28 @@ def _audit_value(value: Any) -> str:
     return _fmt(value)
 
 
+def _safety_lane_state(
+    lane: dict[str, Any],
+    *,
+    structured: bool = False,
+) -> str:
+    """Separate lookup completion from the presence of a safety flag."""
+    if not lane:
+        return "NOT ASSESSED"
+    if lane.get("api_error") or str(lane.get("status") or "").upper() == "ERROR":
+        return "ERROR / UNKNOWN"
+    verdict = str(lane.get("verdict") or "").upper()
+    if verdict == "SKIPPED":
+        return "SKIPPED / UNKNOWN"
+    if structured and not lane.get("chembl_id"):
+        return "UNRESOLVED / UNKNOWN"
+    if lane.get("confirmed") or verdict == "YES":
+        return "FLAG OBSERVED"
+    return "OBSERVED; NO FLAG FOUND"
+
+
 def _assay_audit_table(candidate: dict[str, Any]) -> str:
-    """Lossless, auditable assay rows from the existing evidence ledger only."""
+    """Render ledger assay summaries without presenting aggregates as raw rows."""
     rows = []
     for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
         if not isinstance(record, dict):
@@ -691,7 +704,15 @@ def _assay_audit_table(candidate: dict[str, Any]) -> str:
     if not rows:
         return ("No ledger bioactivity-assay rows were available. This is an "
                 "explicit absence of reportable rows, not evidence of no binding.")
+    activity_ids = [
+        str(value) for value in candidate.get("source_activity_ids", [])
+        if _valid_citation_id(value)
+    ]
     lines = [
+        "Rows below are the persisted ledger representation. A row may summarize "
+        "multiple source activities; it is not a raw assay export.",
+        "- Underlying source activity IDs: "
+        + (", ".join(activity_ids) if activity_ids else "UNKNOWN"),
         "| Provider | Record / assay ID | Target | Measurement | Value | Unit | Species | Qualification |",
         "| --- | --- | --- | --- | ---: | --- | --- | --- |",
     ]
@@ -763,7 +784,8 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
     context = contract.get("disease_mechanism_context") or {}
     cx = (struct or {}).get("complex") or {}
     gates = readiness.get("blocking_gates") or []
-    structure_state = ("AVAILABLE (prediction only)" if cx else
+    structure_state = ("AVAILABLE (prediction only)"
+                       if cx.get("available") is True else
                        readiness.get("structure_prediction", "UNKNOWN"))
     lines = [
         "### Evidence-stage verdict and scientific readiness\n",
@@ -801,12 +823,14 @@ def _trial_safety_applicability_audit(candidate: dict[str, Any]) -> str:
              f"- Exact drug+disease trials returned: "
              f"{_audit_value(audit.get('trial_count'))}."]
     if trials:
-        lines += ["| NCT | Status | Results posted | Stop classification |",
-                  "| --- | --- | --- | --- |"]
+        lines += ["| NCT | Title | Status | Results posted | Stop reason | Stop classification |",
+                  "| --- | --- | --- | --- | --- | --- |"]
         for trial in trials:
             lines.append(
-                f"| {_audit_value(trial.get('nct_id'))} | {_audit_value(trial.get('status'))} | "
+                f"| {_audit_value(trial.get('nct_id'))} | {_audit_value(trial.get('title'))} | "
+                f"{_audit_value(trial.get('status'))} | "
                 f"{_audit_value(trial.get('has_results'))} | "
+                f"{_audit_value(trial.get('why_stopped'))} | "
                 f"{_audit_value(trial.get('why_stopped_classification'))} |")
     else:
         lines.append("- No individual trial rows were returned (this does not establish novelty).")
@@ -816,11 +840,11 @@ def _trial_safety_applicability_audit(candidate: dict[str, Any]) -> str:
         "| Domain | Existing evidence | State |",
         "| --- | --- | --- |",
         f"| Regulatory safety | {_audit_value(candidate.get('status_badge'))} | "
-        f"{'FLAGGED' if candidate.get('safety_cap_applied') else 'NOT FLAGGED / UNKNOWN'} |",
+        f"{'FLAGGED' if candidate.get('safety_cap_applied') else 'ELIGIBILITY OBSERVED; NO WITHDRAWAL CAP'} |",
         f"| Structured safety lane | {_audit_value(l1.get('disclosure_text'))} | "
-        f"{'OBSERVED' if l1 else 'UNKNOWN'} |",
+        f"{_safety_lane_state(l1, structured=True)} |",
         f"| Independent safety lane | {_audit_value(l2.get('disclosure_text'))} | "
-        f"{'OBSERVED' if l2 else 'NOT ASSESSED'} |",
+        f"{_safety_lane_state(l2)} |",
         f"| Route / modality | {_modality_cell(candidate)} | "
         f"{'OBSERVED' if candidate.get('chembl_molecule_type') is not None else 'UNKNOWN'} |",
         "| Relevant tissue/cell/compartment exposure | Not assessed by this pipeline | UNKNOWN |",
@@ -930,6 +954,9 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
                           target_meta: Optional[dict[str, Any]] = None,
                           repurposing_only: bool = False,
                           k_target_summary: Optional[dict[str, Any]] = None) -> str:
+    # Render from a detached projection: report generation must not rewrite
+    # the persisted reviewer handoff supplied by the caller.
+    candidate = copy.deepcopy(candidate)
     drug = candidate.get("drug_name", "Unknown drug")
     target = candidate.get("target_symbol", "?")
     disease = candidate.get("disease_name", "?")
@@ -1233,7 +1260,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     parts.append("\n## 2. Evidence table\n")
     parts.append(_evidence_table(candidate, struct) + "\n")
     parts.append("\n" + _readiness_and_context(candidate, struct) + "\n")
-    parts.append("\n### Auditable assay rows\n")
+    parts.append("\n### Assay evidence audit\n")
     parts.append(_assay_audit_table(candidate) + "\n")
     parts.append("\n### Comparator table\n")
     parts.append(_comparator_table(candidate, biologist_output) + "\n")
