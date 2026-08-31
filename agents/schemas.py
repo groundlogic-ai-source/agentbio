@@ -120,6 +120,9 @@ class ReviewerCandidate(TypedDict, total=False):
     therapeutic_role: str
     process_support: list[dict]
     process_source_status: Optional[str]
+    # Versioned, explicit-unknown evidence handoff used by flagship dossiers.
+    dossier_evidence_contract: dict
+    trial_audit: dict
 
 
 # ---------------------------------------------------------------------------

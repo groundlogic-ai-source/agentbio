@@ -27,7 +27,10 @@ import re
 from typing import Any, Optional
 
 from agents.target_selection import OUTPUT_DIR
-from data_sources.clinicaltrials import check_prior_trials
+# Retained as a compatibility seam for older tests/extensions that patch this
+# symbol. Flagship rendering never calls it; trial evidence is persisted by the
+# Reviewer and rendered from candidate["trial_audit"].
+from data_sources.clinicaltrials import check_prior_trials  # noqa: F401
 
 REPORTS_DIR = os.path.join(OUTPUT_DIR, "reports")
 
@@ -115,18 +118,12 @@ def _citations(candidate: dict[str, Any],
         if h.get("pmid") is not None:
             pmids.add(str(h["pmid"]))
 
-    # NCT numbers used for the prior-trial check (cache-first; no new spend).
+    # NCT numbers already retrieved by the Reviewer. The Writer is a pure
+    # renderer: it must not silently refresh evidence after scoring.
     ncts: set[str] = set()
-    drug = candidate.get("drug_name")
-    disease = candidate.get("disease_name")
-    if drug and disease:
-        try:
-            pt = check_prior_trials(drug, disease)
-            for t in pt.get("trials", []):
-                if t.get("nct_id"):
-                    ncts.add(t["nct_id"])
-        except Exception:
-            pass
+    for trial in (candidate.get("trial_audit") or {}).get("trials", []):
+        if trial.get("nct_id"):
+            ncts.add(str(trial["nct_id"]))
 
     return {
         "pmids": sorted(pmids),
@@ -663,7 +660,174 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
     return bullets
 
 
-_READERS_GUIDE_VERSION = "1.1"
+_READERS_GUIDE_VERSION = "1.2"
+
+
+def _audit_value(value: Any) -> str:
+    """Render missing evidence as an explicit unknown state."""
+    if value is None or value == "":
+        return "UNKNOWN"
+    return _fmt(value)
+
+
+def _assay_audit_table(candidate: dict[str, Any]) -> str:
+    """Lossless, auditable assay rows from the existing evidence ledger only."""
+    rows = []
+    for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
+        if not isinstance(record, dict):
+            continue
+        if str(record.get("source_type") or "") != "bioactivity_assay":
+            continue
+        rows.append((
+            _audit_value(record.get("provider")),
+            _audit_value(record.get("assay_id") or record.get("source_id")),
+            _audit_value(record.get("target_symbol") or record.get("target_accession")),
+            _audit_value(record.get("measurement_type")),
+            _audit_value(record.get("measurement_value")),
+            _audit_value(record.get("measurement_unit")),
+            _audit_value(record.get("target_species")),
+            _audit_value(record.get("qualification_status")),
+        ))
+    if not rows:
+        return ("No ledger bioactivity-assay rows were available. This is an "
+                "explicit absence of reportable rows, not evidence of no binding.")
+    lines = [
+        "| Provider | Record / assay ID | Target | Measurement | Value | Unit | Species | Qualification |",
+        "| --- | --- | --- | --- | ---: | --- | --- | --- |",
+    ]
+    for row in sorted(set(rows)):
+        lines.append("| " + " | ".join(row) + " |")
+    return "\n".join(lines)
+
+
+def _comparator_table(candidate: dict[str, Any],
+                      biologist_output: Optional[dict[str, Any]]) -> str:
+    """Render only comparators supplied by the biologist or reviewed payload."""
+    contract = candidate.get("dossier_evidence_contract") or {}
+    comparators = contract.get("comparators") or {}
+    target_drugs = comparators.get("target_approved_drugs")
+    if target_drugs is None:
+        target_drugs = ((biologist_output or {}).get("druggability_context") or {}).get(
+            "approved_drugs", [])
+    selected = comparators.get("selected_candidates", [])
+    lines = ["| Comparator | Source / relationship | Approval or score |",
+             "| --- | --- | --- |"]
+    for row in target_drugs or []:
+        lines.append(
+            f"| {_audit_value(row.get('name'))} | biologist ChEMBL target-approved drug | "
+            f"max phase {_audit_value(row.get('max_phase'))} |")
+    for row in selected or []:
+        lines.append(
+            f"| {_audit_value(row.get('drug_name'))} | current reviewed-pool candidate | "
+            f"composite {_audit_value(row.get('composite_score'))}; approval "
+            f"{_audit_value(row.get('approval_basis'))} |")
+    if len(lines) == 2:
+        lines.append("| NONE RECORDED | No biologist approved-drug or reviewed-pool comparator was supplied | UNKNOWN |")
+    return "\n".join(lines)
+
+
+def _apply_matched_biologist_context(
+    candidate: dict[str, Any],
+    biologist_output: Optional[dict[str, Any]],
+) -> None:
+    """Refresh target-specific contract facts from the Writer's matched context.
+
+    Multi-target review pools are scored together, while Writer receives the
+    correctly matched biologist payload for each candidate. Replace only the
+    target-specific fields; persisted trial/readiness facts remain untouched.
+    """
+    if not biologist_output:
+        return
+    bio_target = (biologist_output.get("target") or {}).get("target_symbol")
+    if not bio_target or str(bio_target).upper() != str(
+            candidate.get("target_symbol") or "").upper():
+        return
+    contract = candidate.get("dossier_evidence_contract")
+    if not isinstance(contract, dict):
+        return
+    context = contract.setdefault("disease_mechanism_context", {})
+    context["literature_pmids"] = [
+        str(hit["pmid"]) for hit in biologist_output.get("literature_hits", [])
+        if hit.get("pmid") is not None
+    ]
+    comparators = contract.setdefault("comparators", {})
+    comparators["target_approved_drugs"] = (
+        (biologist_output.get("druggability_context") or {}).get(
+            "approved_drugs", [])
+    )
+
+
+def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
+    contract = candidate.get("dossier_evidence_contract") or {}
+    readiness = contract.get("scientific_readiness") or {}
+    context = contract.get("disease_mechanism_context") or {}
+    cx = (struct or {}).get("complex") or {}
+    gates = readiness.get("blocking_gates") or []
+    structure_state = ("AVAILABLE (prediction only)" if cx else
+                       readiness.get("structure_prediction", "UNKNOWN"))
+    lines = [
+        "### Evidence-stage verdict and scientific readiness\n",
+        f"- **Evidence-stage verdict:** `{_audit_value(contract.get('evidence_stage_verdict'))}`.",
+        f"- **Readiness:** `{_audit_value(readiness.get('status'))}`. This is not a clinical efficacy verdict.",
+        f"- **Qualified human target-assay evidence:** "
+        f"`{_audit_value(readiness.get('qualified_human_target_assay_evidence', readiness.get('direct_human_assay_evidence')))}`. "
+        "This establishes target pharmacology only, not rescue of the disease-causing variant.",
+        f"- **Mutation-specific evidence:** `{_audit_value(readiness.get('mutation_specific_evidence'))}`.",
+        f"- **Disease-model evidence:** `{_audit_value(readiness.get('disease_model_evidence'))}`.",
+        f"- **Clinical efficacy evidence:** `{_audit_value(readiness.get('clinical_efficacy_evidence'))}`.",
+        f"- **Structure evidence:** `{_audit_value(structure_state)}`.",
+        f"- **Blocking gates:** {', '.join(gates) if gates else 'NONE RECORDED'}.",
+        "\n### Disease and mechanism context\n",
+        f"- Disease: {_audit_value(context.get('disease_name', candidate.get('disease_name')))}; "
+        f"target: {_audit_value(context.get('target_symbol', candidate.get('target_symbol')))}.",
+        f"- Target discovery: {_audit_value(context.get('target_discovery_method', candidate.get('target_discovery_method')))}; "
+        f"therapeutic role: {_audit_value(context.get('therapeutic_role', candidate.get('therapeutic_role')))}; "
+        f"mechanism class: {_audit_value(context.get('mechanism_class', candidate.get('mechanism_class')))}.",
+        "- Process support: " + (
+            ", ".join(str(x) for x in context.get("process_support", []))
+            or "UNKNOWN"
+        ) + ".",
+    ]
+    return "\n".join(lines)
+
+
+def _trial_safety_applicability_audit(candidate: dict[str, Any]) -> str:
+    """Report known, negative, and unknown states without triggering lookups."""
+    audit = candidate.get("trial_audit") or {}
+    trials = audit.get("trials") or []
+    lines = ["### Novelty and prior-trial audit\n",
+             f"- Trial query state: `{_audit_value(audit.get('query_status'))}`.",
+             f"- Negative repurposing result: `{_audit_value(audit.get('negative_repurposing_result'))}`.",
+             f"- Exact drug+disease trials returned: "
+             f"{_audit_value(audit.get('trial_count'))}."]
+    if trials:
+        lines += ["| NCT | Status | Results posted | Stop classification |",
+                  "| --- | --- | --- | --- |"]
+        for trial in trials:
+            lines.append(
+                f"| {_audit_value(trial.get('nct_id'))} | {_audit_value(trial.get('status'))} | "
+                f"{_audit_value(trial.get('has_results'))} | "
+                f"{_audit_value(trial.get('why_stopped_classification'))} |")
+    else:
+        lines.append("- No individual trial rows were returned (this does not establish novelty).")
+    l1, l2 = candidate.get("safety_layer1") or {}, candidate.get("safety_layer2") or {}
+    lines += [
+        "\n### Safety and applicability matrix\n",
+        "| Domain | Existing evidence | State |",
+        "| --- | --- | --- |",
+        f"| Regulatory safety | {_audit_value(candidate.get('status_badge'))} | "
+        f"{'FLAGGED' if candidate.get('safety_cap_applied') else 'NOT FLAGGED / UNKNOWN'} |",
+        f"| Structured safety lane | {_audit_value(l1.get('disclosure_text'))} | "
+        f"{'OBSERVED' if l1 else 'UNKNOWN'} |",
+        f"| Independent safety lane | {_audit_value(l2.get('disclosure_text'))} | "
+        f"{'OBSERVED' if l2 else 'NOT ASSESSED'} |",
+        f"| Route / modality | {_modality_cell(candidate)} | "
+        f"{'OBSERVED' if candidate.get('chembl_molecule_type') is not None else 'UNKNOWN'} |",
+        "| Relevant tissue/cell/compartment exposure | Not assessed by this pipeline | UNKNOWN |",
+        "| Effective tolerable human exposure, dose and PK | Not assessed by this pipeline | UNKNOWN |",
+        "| Disease stage/subtype and therapeutic window | Not assessed by this pipeline | UNKNOWN |",
+    ]
+    return "\n".join(lines)
 
 
 def _readers_guide_appendix() -> str:
@@ -771,6 +935,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     disease = candidate.get("disease_name", "?")
     strong = candidate.get("strong_match")
     threshold = formula.get("strong_match_threshold")
+    _apply_matched_biologist_context(candidate, biologist_output)
 
     network = (biologist_output or {}).get("interacting_genes", [])[:8]
     biogrid_status = (biologist_output or {}).get("biogrid_query_status", "")
@@ -1067,6 +1232,11 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     # 2. Evidence table
     parts.append("\n## 2. Evidence table\n")
     parts.append(_evidence_table(candidate, struct) + "\n")
+    parts.append("\n" + _readiness_and_context(candidate, struct) + "\n")
+    parts.append("\n### Auditable assay rows\n")
+    parts.append(_assay_audit_table(candidate) + "\n")
+    parts.append("\n### Comparator table\n")
+    parts.append(_comparator_table(candidate, biologist_output) + "\n")
 
     # 3. Citations
     parts.append("\n## 3. Full source citations\n")
@@ -1096,9 +1266,17 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             "- **Other source record ids:** none recorded in the candidate "
             "evidence ledger\n"
         )
+    parts.append("\n" + _trial_safety_applicability_audit(candidate) + "\n")
 
     # 4. Composite breakdown
     parts.append("\n## 4. Composite score breakdown\n")
+    parts.append(
+        f"**Reproducibility contract:** dossier evidence "
+        f"`{_audit_value((candidate.get('dossier_evidence_contract') or {}).get('contract_version'))}`; "
+        f"scoring formula `{_audit_value(formula.get('formula_version'))}`; "
+        f"safety schema `{_audit_value(formula.get('safety_schema_version'))}`. "
+        "Arithmetic below is recomputed from this candidate's persisted score components.\n\n"
+    )
     parts.append(_composite_breakdown(candidate, formula) + "\n")
 
     # 5. Limitations

@@ -767,6 +767,24 @@ def run_reviewer(chemist_output: dict[str, Any],
             "adverse_events": adverse.get("adverse_events", [])[:10],
             "prior_trial_count": trials.get("trial_count", 0),
             "has_negative_repurposing_result": trials.get("has_negative_repurposing_result", False),
+            # Keep the individual, already-retrieved trial rows.  The former
+            # count-only handoff made a "no prior failure" score impossible to
+            # audit in a dossier without making a second network request.
+            "trial_audit": {
+                "query_status": (
+                    "UNKNOWN" if trials.get("query_failed")
+                    else ("REDACTED" if trials.get("holdout_redacted") else "OBSERVED")
+                ),
+                "trials": trials.get("trials", []),
+                "trial_count": (
+                    None if trials.get("query_failed") or trials.get("holdout_redacted")
+                    else trials.get("trial_count", 0)
+                ),
+                "negative_repurposing_result": (
+                    None if trials.get("query_failed") or trials.get("holdout_redacted")
+                    else trials.get("has_negative_repurposing_result", False)
+                ),
+            },
             "score_components": {
                 "normalized_pchembl": round(n_pchembl, 4),
                 "confidence_term": round(conf / 9, 4),
@@ -1152,7 +1170,110 @@ def run_reviewer(chemist_output: dict[str, Any],
     if needs_resort:
         _rank_reviewed(reviewed)
 
+    # This is a pure, post-gate view of existing records.  It deliberately runs
+    # after both safety and mechanism passes so the dossier cannot describe a
+    # pre-gate verdict as its final scientific readiness.
+    for r in reviewed:
+        r["dossier_evidence_contract"] = _build_dossier_evidence_contract(
+            r, biologist_output, reviewed)
     return reviewed
+
+
+def _build_dossier_evidence_contract(
+    candidate: dict[str, Any],
+    biologist_output: Optional[dict[str, Any]],
+    reviewed_pool: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Create a versioned, no-new-facts dossier handoff.
+
+    ``UNKNOWN`` is intentional wire data, not a cosmetic fallback: consumers
+    can distinguish an unmeasured property from a negative observation.
+    """
+    unknown = "UNKNOWN"
+    direct_assay = any(
+        str(record.get("source_type") or "") == "bioactivity_assay"
+        and str(record.get("qualification_status") or "").lower() == "qualified"
+        and str(record.get("target_species") or "").lower() == "homo sapiens"
+        and (
+            str(record.get("target_symbol") or "").upper()
+            == str(candidate.get("target_symbol") or "").upper()
+            or (
+                candidate.get("uniprot_id")
+                and str(record.get("target_accession") or "").upper()
+                == str(candidate.get("uniprot_id") or "").upper()
+            )
+        )
+        for record in (candidate.get("_evidence_ledger") or {}).get("records", [])
+    )
+    caps = [name for name, hit in (
+        ("unapproved", candidate.get("unapproved_cap_applied")),
+        ("mechanism_direction", candidate.get("mechanism_cap_applied")),
+        ("safety", candidate.get("safety_cap_applied")),
+    ) if hit]
+    bio_target = ((biologist_output or {}).get("target") or {}).get("target_symbol")
+    target_matches = bool(
+        bio_target and bio_target == candidate.get("target_symbol")
+    )
+    approved = (
+        (biologist_output or {}).get("druggability_context", {}).get(
+            "approved_drugs", [])
+        if target_matches else []
+    )
+    pool_comparators = [
+        {
+            "drug_name": row.get("drug_name"),
+            "molecule_chembl_id": row.get("molecule_chembl_id"),
+            "composite_score": row.get("composite_score"),
+            "approval_basis": row.get("approval_basis", unknown),
+            "relationship": "selected_candidate",
+        }
+        for row in reviewed_pool
+        if row.get("drug_name") != candidate.get("drug_name")
+        and row.get("target_symbol") == candidate.get("target_symbol")
+    ][:10]
+    return {
+        "contract_version": "flagship-dossier-evidence-v1",
+        "unknown_state": unknown,
+        "evidence_stage_verdict": (
+            "PRIORITIZED_HYPOTHESIS" if candidate.get("strong_match")
+            else "NOT_PRIORITIZED"
+        ),
+        "scientific_readiness": {
+            "status": "HYPOTHESIS_REQUIRES_EXPERIMENTAL_VALIDATION",
+            "qualified_human_target_assay_evidence": (
+                "OBSERVED" if direct_assay else unknown
+            ),
+            "mutation_specific_evidence": unknown,
+            "disease_model_evidence": unknown,
+            "clinical_efficacy_evidence": unknown,
+            "structure_prediction": (
+                "NOT_YET_AVAILABLE"  # structure stage augments the rendered view
+            ),
+            "blocking_gates": caps,
+        },
+        "disease_mechanism_context": {
+            "disease_name": candidate.get("disease_name", unknown),
+            "target_symbol": candidate.get("target_symbol", unknown),
+            "target_discovery_method": candidate.get(
+                "target_discovery_method", unknown),
+            "therapeutic_role": candidate.get("therapeutic_role", unknown),
+            "mechanism_class": candidate.get("mechanism_class", unknown),
+            "process_support": candidate.get("process_support", []),
+            "literature_pmids": [
+                str(h.get("pmid")) for h in (biologist_output or {}).get(
+                    "literature_hits", []) if h.get("pmid") is not None
+            ] if target_matches else [],
+        },
+        "comparators": {
+            "target_approved_drugs": approved,
+            "selected_candidates": pool_comparators,
+            "scope": "biologist approved-drug lookup plus current reviewed pool",
+        },
+        "trial_audit": candidate.get("trial_audit", {
+            "query_status": unknown, "trials": [],
+            "negative_repurposing_result": unknown,
+        }),
+    }
 
 
 def _reconcile_safety(r: dict[str, Any], layer1: dict[str, Any],
@@ -1412,6 +1533,8 @@ def main() -> None:
 
     payload = {
         "formula": {
+            "formula_version": "reviewer-composite-v2",
+            "safety_schema_version": SAFETY_SCHEMA_VERSION,
             "composite_weights": COMPOSITE_WEIGHTS,
             "lipinski_penalty": LIPINSKI_PENALTY,
             "strong_match_threshold": STRONG_MATCH_THRESHOLD,

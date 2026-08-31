@@ -738,6 +738,20 @@ textarea:focus-visible,
     page-break-after: avoid;
   }
 
+  /* The flagship evidence tables contain long provenance and applicability
+     cells. Keep their header attached to the first row and permit wrapping
+     rather than truncating identifiers in print/PDF. */
+  .dossier h3 {
+    break-after: avoid-page;
+  }
+
+  .dossier th,
+  .dossier td {
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    font-variant-numeric: tabular-nums;
+  }
+
   .dossier li {
     page-break-inside: avoid;
   }

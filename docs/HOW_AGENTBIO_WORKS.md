@@ -278,6 +278,17 @@ own `score_components` so the arithmetic is auditable against
 therapeutic-applicability disclosure near the top and repeats the boundary in
 the reader's guide: **unknown must not be interpreted as compatible**.
 
+Flagship dossiers also carry the versioned
+`flagship-dossier-evidence-v1` handoff. It is a deterministic view over
+already collected evidence — it makes **no additional provider or LLM calls**.
+It records an evidence-stage verdict and scientific-readiness state, disease /
+mechanism context, ledger-native assay rows, target-approved and reviewed-pool
+comparators, individual ClinicalTrials.gov rows, and a safety/applicability
+matrix. Missing data is rendered as explicit `UNKNOWN`, `NOT ASSESSED`, or
+`NOT YET AVAILABLE`; it is never silently converted to a favorable state.
+The score section stamps the formula and safety-schema versions and replays the
+persisted component arithmetic, including coverage renormalization and caps.
+
 ### Stage 3c — Human review (`main_graph.py`, `human_review_node`)
 
 The graph interrupts. A person approves, rejects, or annotates. The decision

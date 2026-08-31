@@ -616,6 +616,8 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
     validate_reviewer_handoff(reviewed)
     payload = {
         "formula": {
+            "formula_version": "reviewer-composite-v2",
+            "safety_schema_version": SAFETY_SCHEMA_VERSION,
             "composite_weights": COMPOSITE_WEIGHTS,
             "lipinski_penalty": LIPINSKI_PENALTY,
             "strong_match_threshold": STRONG_MATCH_THRESHOLD,
