@@ -745,23 +745,47 @@ def _comparator_table(candidate: dict[str, Any],
     lines = ["| Comparator | Source / relationship | Approval or score |",
              "| --- | --- | --- |"]
     seen: set[str] = set()
+
+    def active_moiety(row: dict[str, Any], name: str) -> tuple[str, str]:
+        parent_id = str(
+            row.get("parent_chembl_id")
+            or row.get("active_moiety_id")
+            or ""
+        ).strip()
+        if parent_id:
+            return f"chembl:{parent_id.casefold()}", name
+        # Legacy persisted contexts predate parent IDs. This conservative
+        # presentation-only fallback collapses common counterion suffixes while
+        # retaining the underlying source rows in the evidence ledger.
+        base = re.sub(
+            r"\s+(?:HYDROCHLORIDE|BENZOATE|BESYLATE|MALEATE|MALATE|"
+            r"MESYLATE|CITRATE|FUMARATE|TARTRATE|SUCCINATE|PHOSPHATE|"
+            r"SULFATE|NITRATE|HYDRATE)$",
+            "",
+            name,
+            flags=re.IGNORECASE,
+        ).strip()
+        return f"name:{base.casefold()}", base or name
+
     for row in target_drugs or []:
         name = _audit_value(row.get("name"))
-        key = name.casefold()
-        if key in seen:
+        key, display_name = active_moiety(row, name)
+        display_key = f"name:{display_name.casefold()}"
+        if key in seen or display_key in seen:
             continue
-        seen.add(key)
+        seen.update((key, display_key))
         lines.append(
-            f"| {name} | biologist ChEMBL target-approved drug | "
+            f"| {display_name} | biologist ChEMBL target-approved active moiety | "
             f"max phase {_audit_value(row.get('max_phase'))} |")
     for row in selected or []:
         name = _audit_value(row.get("drug_name"))
-        key = name.casefold()
-        if key in seen:
+        key, display_name = active_moiety(row, name)
+        display_key = f"name:{display_name.casefold()}"
+        if key in seen or display_key in seen:
             continue
-        seen.add(key)
+        seen.update((key, display_key))
         lines.append(
-            f"| {name} | current reviewed-pool candidate | "
+            f"| {display_name} | current reviewed-pool candidate | "
             f"composite {_audit_value(row.get('composite_score'))}; approval "
             f"{_audit_value(row.get('approval_basis'))} |")
     if len(lines) == 2:

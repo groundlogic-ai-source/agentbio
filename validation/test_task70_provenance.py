@@ -1,6 +1,7 @@
 """Focused deterministic regressions for task 70 dossier provenance rules."""
 
 import unittest
+from unittest import mock
 
 from agents.reviewer import (
     _auditable_compatible_direction,
@@ -9,6 +10,7 @@ from agents.reviewer import (
 )
 from agents.writer import _citations, _direct_chembl_activity_note
 from data_sources.evidence_ledger import merge_candidates
+from data_sources import chembl
 
 
 class Task70ProvenanceTests(unittest.TestCase):
@@ -81,6 +83,97 @@ class Task70ProvenanceTests(unittest.TestCase):
              "molecule_name": "x"},
         ])
         self.assertEqual(rows[0]["source_activity_ids"], ["ACT1"])
+
+    def test_raw_activity_ids_survive_ledger_serialization(self):
+        rows = merge_candidates([
+            {"provider": "chembl", "source_type": "bioactivity_assay",
+             "source_id": "chembl-pchembl:CHEMBL1726:15373265",
+             "source_activity_ids": ["15373265"],
+             "measurement_type": "pchembl",
+             "molecule_id": "CHEMBL1726", "molecule_name": "nisoldipine",
+             "target_symbol": "CACNA1C", "target_species": "Homo sapiens",
+             "qualification_status": "qualified"},
+            {"provider": "chembl", "source_type": "bioactivity_assay",
+             "source_id": "chembl-confidence:CHEMBL1726:15373265",
+             "source_activity_ids": ["15373265"],
+             "measurement_type": "assay_confidence",
+             "molecule_id": "CHEMBL1726", "molecule_name": "nisoldipine",
+             "target_symbol": "CACNA1C", "target_species": "Homo sapiens",
+             "qualification_status": "qualified"},
+        ])
+        candidate = rows[0]
+        self.assertEqual(candidate["source_activity_ids"], ["15373265"])
+        self.assertEqual(
+            candidate["_evidence_ledger"]["records"][0]["source_activity_ids"],
+            ["15373265"],
+        )
+        self.assertEqual(
+            _target_matched_chembl_activity_ids(candidate), ["15373265"])
+        self.assertIn("1 independent qualified",
+                      _direct_chembl_activity_note(candidate))
+
+    def test_comparator_table_collapses_salt_forms(self):
+        from agents.writer import _comparator_table
+
+        candidate = {"dossier_evidence_contract": {"comparators": {
+            "target_approved_drugs": [
+                {"name": "AMLODIPINE BENZOATE", "max_phase": 4},
+                {"name": "AMLODIPINE BESYLATE", "max_phase": 4},
+                {"name": "AMLODIPINE MALEATE", "max_phase": 4},
+                {"name": "NIFEDIPINE", "max_phase": 4},
+            ],
+            "selected_candidates": [],
+        }}}
+        table = _comparator_table(candidate, None)
+        self.assertEqual(table.count("| AMLODIPINE |"), 1)
+        self.assertNotIn("BESYLATE", table)
+        self.assertIn("| NIFEDIPINE |", table)
+
+    def test_approved_target_drugs_collapse_to_parent_active_moiety(self):
+        child_meta = {
+            "CHEMBL_CHILD_A": {
+                "max_phase": "4.0", "pref_name": "AMLODIPINE BENZOATE",
+                "parent_chembl_id": "CHEMBL_PARENT",
+            },
+            "CHEMBL_CHILD_B": {
+                "max_phase": "4.0", "pref_name": "AMLODIPINE BESYLATE",
+                "parent_chembl_id": "CHEMBL_PARENT",
+            },
+        }
+        parent_meta = {
+            "CHEMBL_PARENT": {
+                "max_phase": "4.0", "pref_name": "AMLODIPINE",
+                "parent_chembl_id": "CHEMBL_PARENT",
+            },
+        }
+        with (
+            mock.patch.object(chembl, "get", return_value=None),
+            mock.patch.object(chembl, "cache_set"),
+            mock.patch.object(
+                chembl, "_resolve_target_chembl_id",
+                return_value=["CHEMBL_TARGET"],
+            ),
+            mock.patch.object(
+                chembl, "_get_json",
+                return_value={"mechanisms": [
+                    {"molecule_chembl_id": "CHEMBL_CHILD_A"},
+                    {"molecule_chembl_id": "CHEMBL_CHILD_B"},
+                ]},
+            ),
+            mock.patch.object(
+                chembl, "_fetch_molecule_meta",
+                side_effect=lambda ids: (
+                    parent_meta if ids == ["CHEMBL_PARENT"] else child_meta
+                ),
+            ),
+        ):
+            result = chembl.get_approved_drugs_for_target("Q13936")
+        self.assertEqual(result["approved_drug_count"], 1)
+        self.assertEqual(result["approved_drugs"][0]["name"], "AMLODIPINE")
+        self.assertEqual(
+            result["approved_drugs"][0]["source_molecule_chembl_ids"],
+            ["CHEMBL_CHILD_A", "CHEMBL_CHILD_B"],
+        )
 
     def test_timothy_scope_is_structured_and_explicitly_future(self):
         candidate = {

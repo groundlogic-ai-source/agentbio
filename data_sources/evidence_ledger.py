@@ -681,6 +681,7 @@ class MergedCandidate:
                 "provider": r.provider,
                 "source_type": r.source_type.value,
                 "source_id": r.source_id,
+                "source_activity_ids": list(r.source_activity_ids),
                 "source_version": r.source_version,
                 "lineage_id": r.lineage_key(),
                 "evidence_role": r.evidence_role.value,
@@ -734,11 +735,28 @@ class MergedCandidate:
             # ChEMBL assay id is only a fallback for older adapters which did
             # not retain an activity id.
             "source_activity_ids": sorted({
-                (r.source_id or r.assay_id)
+                activity_id
                 for r in self.records
                 if (r.provider.strip().lower() == "chembl"
                     and r.source_type == SourceType.BIOACTIVITY_ASSAY
-                    and (r.source_id or r.assay_id))
+                    and r.measurement_type != "assay_confidence")
+                for activity_id in (
+                    r.source_activity_ids
+                    or (
+                        (r.source_id,)
+                        if (r.source_id
+                            and not r.source_id.lower().startswith(
+                                ("chembl-pchembl:", "chembl-confidence:",
+                                 "chembl-assay:")))
+                        else (
+                            (r.assay_id,)
+                            if (r.assay_id
+                                and not r.assay_id.lower().startswith(
+                                    ("chembl-confidence:", "chembl-assay:")))
+                            else ()
+                        )
+                    )
+                )
             }),
             "target_symbol": (sorted(self.target_symbols)[0]
                               if self.target_symbols else ""),

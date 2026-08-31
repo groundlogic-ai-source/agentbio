@@ -343,7 +343,7 @@ def get_approved_drugs_for_target(uniprot_id: str) -> dict[str, Any]:
         "target_chembl_ids":    [str],
       }
     """
-    cache_key = make_key("get_approved_drugs_for_target", uniprot_id)
+    cache_key = make_key("get_approved_drugs_for_target_v2", uniprot_id)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -377,7 +377,7 @@ def get_approved_drugs_for_target(uniprot_id: str) -> dict[str, Any]:
             return result
 
         meta = _fetch_molecule_meta(list(mol_ids))
-        approved = []
+        approved_children = []
         for mid, info in meta.items():
             mp = info.get("max_phase")
             try:
@@ -385,12 +385,39 @@ def get_approved_drugs_for_target(uniprot_id: str) -> dict[str, Any]:
             except (TypeError, ValueError):
                 mp_float = 0.0
             if mp_float >= 4:
-                approved.append({
+                approved_children.append({
                     "molecule_chembl_id": mid,
+                    "parent_chembl_id": info.get("parent_chembl_id") or mid,
                     "name": info.get("pref_name") or mid,
                     "max_phase": mp_float,
                 })
 
+        parent_ids = sorted({
+            row["parent_chembl_id"] for row in approved_children
+            if row["parent_chembl_id"] not in meta
+        })
+        parent_meta = _fetch_molecule_meta(parent_ids)
+        by_parent: dict[str, dict[str, Any]] = {}
+        for row in approved_children:
+            parent_id = row["parent_chembl_id"]
+            canonical = by_parent.setdefault(parent_id, {
+                "molecule_chembl_id": parent_id,
+                "parent_chembl_id": parent_id,
+                "name": (
+                    (parent_meta.get(parent_id) or {}).get("pref_name")
+                    or row["name"]
+                ),
+                "max_phase": row["max_phase"],
+                "source_molecule_chembl_ids": [],
+            })
+            canonical["max_phase"] = max(
+                float(canonical["max_phase"]), float(row["max_phase"]))
+            canonical["source_molecule_chembl_ids"].append(
+                row["molecule_chembl_id"])
+        approved = list(by_parent.values())
+        for row in approved:
+            row["source_molecule_chembl_ids"] = sorted(set(
+                row["source_molecule_chembl_ids"]))
         approved.sort(key=lambda x: (x.get("name") or ""))
         result["approved_drugs"] = approved
         result["approved_drug_count"] = len(approved)
