@@ -169,7 +169,7 @@ class TestWriterBreakdownDisclosure(unittest.TestCase):
     def test_v2_schema_renders_efficacy_row_with_real_contribution(self):
         out = _composite_breakdown(self._candidate(),
                                    {"composite_weights": self._WEIGHTS})
-        self.assertIn("Efficacy evidence", out)
+        self.assertIn("Candidate-support evidence confidence", out)
         # 0.50 * 0.8 = 0.4 must appear as a printed contribution, and the
         # weighted subtotal 0.4 + 0.1 + 0.045 + 0.15 = 0.695 must be shown.
         self.assertIn("0.4000", out)

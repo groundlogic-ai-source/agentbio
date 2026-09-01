@@ -236,6 +236,8 @@ class EvidenceRecord:
     evidence_role: EvidenceRole = EvidenceRole.OTHER
 
     molecule_id: str = ""
+    parent_molecule_id: str = ""
+    source_molecule_ids: tuple[str, ...] = ()
     molecule_name: str = ""
     inchikey: str = ""
     smiles: str = ""
@@ -291,6 +293,7 @@ class EvidenceRecord:
             ContradictionStatus.NONE))
         for field_name in (
                 "provider", "source_id", "source_version", "molecule_id",
+                "parent_molecule_id",
                 "molecule_name", "inchikey", "smiles", "target_symbol",
                 "target_accession", "target_species", "action",
                 "measurement_type", "measurement_unit", "assay_id",
@@ -310,6 +313,12 @@ class EvidenceRecord:
             raw_activity_ids = ()
         _set(self, "source_activity_ids", tuple(
             sorted({_s(value) for value in raw_activity_ids if _s(value)})
+        ))
+        raw_molecule_ids = self.source_molecule_ids or ()
+        if not isinstance(raw_molecule_ids, (list, tuple, set)):
+            raw_molecule_ids = ()
+        _set(self, "source_molecule_ids", tuple(
+            sorted({_s(value) for value in raw_molecule_ids if _s(value)})
         ))
 
     def lineage_key(self) -> str:
@@ -589,8 +598,27 @@ def _dimension_quality(records: Iterable[EvidenceRecord], modalities: set):
 
 
 def efficacy_confidence(records: Iterable[EvidenceRecord]):
-    """Efficacy-only calibrated confidence (0..1) or NOT_APPLICABLE."""
-    return _dimension_quality(records, _EFFICACY_MODALITIES)
+    """Candidate-support confidence (0..1) or NOT_APPLICABLE.
+
+    Disease-target context (Open Targets genetics, pathway membership, and
+    disease-level publications) is scored separately and must not inflate the
+    candidate's pharmacology term.  Keep direct candidate efficacy records plus
+    curated drug-target mechanism links; exclude generic disease-link context.
+    """
+    eligible = [
+        record for record in records
+        if (
+            record.evidence_role == EvidenceRole.EFFICACY
+            or (
+                record.evidence_role == EvidenceRole.TARGET_LINK
+                and record.source_type in {
+                    SourceType.BIOACTIVITY_ASSAY,
+                    SourceType.MECHANISM,
+                }
+            )
+        )
+    ]
+    return _dimension_quality(eligible, _EFFICACY_MODALITIES)
 
 
 def safety_confidence(records: Iterable[EvidenceRecord]):
@@ -659,6 +687,8 @@ class MergedCandidate:
     inchikey: str = ""
     smiles: str = ""
     molecule_chembl_id: Optional[str] = None
+    parent_chembl_id: Optional[str] = None
+    source_molecule_chembl_ids: set = field(default_factory=set)
     uniprot_id: Optional[str] = None
     disease_name: str = ""
     ot_association_score: Optional[float] = None
@@ -686,6 +716,8 @@ class MergedCandidate:
                 "lineage_id": r.lineage_key(),
                 "evidence_role": r.evidence_role.value,
                 "molecule_id": r.molecule_id,
+                "parent_molecule_id": r.parent_molecule_id,
+                "source_molecule_ids": list(r.source_molecule_ids),
                 "molecule_name": r.molecule_name,
                 "inchikey": r.inchikey,
                 "smiles": r.smiles,
@@ -714,6 +746,9 @@ class MergedCandidate:
             # --- fields the Chemist output already carries ---
             "drug_name": self.drug_name,
             "molecule_chembl_id": self.molecule_chembl_id,
+            "parent_chembl_id": self.parent_chembl_id,
+            "source_molecule_chembl_ids": sorted(
+                self.source_molecule_chembl_ids),
             "smiles": self.smiles,
             "inchikey": self.inchikey,
             "pchembl_value": self.best_affinity,
@@ -895,6 +930,12 @@ def _absorb(mc: MergedCandidate, rec: EvidenceRecord) -> None:
                             or (not str(mc.molecule_chembl_id).upper().startswith("CHEMBL")
                                 and rec.molecule_id.upper().startswith("CHEMBL"))):
         mc.molecule_chembl_id = rec.molecule_id
+    if rec.provider.strip().lower() == "chembl":
+        if rec.molecule_id:
+            mc.source_molecule_chembl_ids.add(rec.molecule_id)
+        mc.source_molecule_chembl_ids.update(rec.source_molecule_ids)
+        if not mc.parent_chembl_id and rec.parent_molecule_id:
+            mc.parent_chembl_id = rec.parent_molecule_id
     if not mc.uniprot_id and rec.target_accession:
         mc.uniprot_id = rec.target_accession
     if not mc.disease_name and rec.disease_name:

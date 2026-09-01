@@ -1344,6 +1344,30 @@ def _build_dossier_evidence_contract(
             "approved_drugs", [])
         if target_matches else []
     )
+    candidate_name = str(candidate.get("drug_name") or "").strip().casefold()
+    candidate_ids = {
+        str(value).strip().casefold()
+        for value in (
+            candidate.get("molecule_chembl_id"),
+            candidate.get("parent_chembl_id"),
+            *((candidate.get("source_chembl_ids") or [])),
+            *((candidate.get("source_molecule_chembl_ids") or [])),
+        )
+        if value
+    }
+    approved = [
+        row for row in approved
+        if str(row.get("name") or "").strip().casefold() != candidate_name
+        and not ({
+            str(value).strip().casefold()
+            for value in (
+                row.get("molecule_chembl_id"),
+                row.get("parent_chembl_id"),
+                *((row.get("source_molecule_chembl_ids") or [])),
+            )
+            if value
+        } & candidate_ids)
+    ]
     # One comparator identity has one explanatory row.  A drug that appears in
     # both the approved-target list and review pool is not independent support.
     seen_comparator_names: set[str] = set()
@@ -1351,6 +1375,10 @@ def _build_dossier_evidence_contract(
         {
             "drug_name": row.get("drug_name"),
             "molecule_chembl_id": row.get("molecule_chembl_id"),
+            "parent_chembl_id": row.get("parent_chembl_id"),
+            "active_moiety_id": row.get("active_moiety_id"),
+            "source_molecule_chembl_ids": row.get(
+                "source_molecule_chembl_ids", []),
             "composite_score": row.get("composite_score"),
             "approval_basis": row.get("approval_basis", unknown),
             "relationship": "selected_candidate",

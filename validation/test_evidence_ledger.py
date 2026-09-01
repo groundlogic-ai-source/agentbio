@@ -193,10 +193,12 @@ class LineageDedupTests(unittest.TestCase):
     def test_qualified_wins_over_unqualified_duplicate(self):
         unq = rec(provider="p1", inchikey=_FREE_BASE, assay_id="A1",
                   target_accession="P1", source_type="bioactivity_assay",
+                  evidence_role="efficacy",
                   measurement_type="pchembl", measurement_value=7.0,
                   qualification_status="unqualified")
         q = rec(provider="p2", inchikey=_FREE_BASE, assay_id="A1",
                 target_accession="P1", source_type="bioactivity_assay",
+                evidence_role="efficacy",
                 measurement_type="pchembl", measurement_value=7.0,
                 qualification_status="qualified")
         merged = merge_candidates([unq, q])[0]
@@ -238,7 +240,7 @@ class QualityTests(unittest.TestCase):
     def test_efficacy_and_safety_separate(self):
         recs = [
             rec(source_type="bioactivity_assay", measurement_type="pchembl",
-                measurement_value=8.0),
+                measurement_value=8.0, evidence_role="efficacy"),
             rec(source_type="adverse_event", evidence_role="safety"),
         ]
         eff = efficacy_confidence(recs)
@@ -256,6 +258,33 @@ class QualityTests(unittest.TestCase):
             qualification_status="qualified",
         )
         self.assertEqual(efficacy_confidence([label]), 0.8)
+
+    def test_disease_context_does_not_inflate_candidate_support(self):
+        assay = rec(
+            source_type="bioactivity_assay", evidence_role="efficacy",
+            measurement_type="pchembl", measurement_value=8.0,
+            qualification_status="qualified",
+        )
+        disease_context = [
+            rec(source_type="genetic_association",
+                evidence_role="disease_link",
+                qualification_status="qualified"),
+            rec(source_type="pathway", evidence_role="disease_link",
+                qualification_status="qualified"),
+            rec(source_type="publication", evidence_role="disease_link",
+                qualification_status="qualified"),
+        ]
+        self.assertEqual(
+            efficacy_confidence([assay, *disease_context]),
+            efficacy_confidence([assay]),
+        )
+
+    def test_curated_target_mechanism_remains_candidate_support(self):
+        mechanism = rec(
+            source_type="mechanism", evidence_role="target_link",
+            qualification_status="qualified",
+        )
+        self.assertEqual(efficacy_confidence([mechanism]), 0.85)
 
     def test_unqualified_penalty_not_dropped_to_zero(self):
         r = rec(source_type="mechanism", qualification_status="unqualified")

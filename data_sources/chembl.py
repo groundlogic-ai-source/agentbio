@@ -466,10 +466,11 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
     Mirrors get_target_bioactivity_count's strict filtering — this is the
     compound-level counterpart of that count.
     """
-    # v2: approved drugs (max_phase >= 4) are always included regardless of pchembl rank.
+    # v3: preserve parent/child molecule identity so salt forms cannot survive
+    # as duplicate candidates or self-comparators downstream.
     # repurposing_only is part of the cache key so the approved-only and mixed
     # pools never collide in the cache.
-    cache_key = make_key("get_target_candidate_compounds_v2", uniprot_id,
+    cache_key = make_key("get_target_candidate_compounds_v3", uniprot_id,
                          max_compounds, repurposing_only)
     cached = get(cache_key)
     if cached is not None:
@@ -528,6 +529,8 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
             assay_ids = sorted(d["assay_ids"])
             compounds.append({
                 "molecule_chembl_id": mid,
+                "parent_chembl_id": m.get("parent_chembl_id") or mid,
+                "source_molecule_chembl_ids": [mid],
                 "pref_name": m.get("pref_name"),
                 "max_phase": m.get("max_phase"),
                 "canonical_smiles": smiles,

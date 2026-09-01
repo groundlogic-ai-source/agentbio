@@ -11,6 +11,11 @@ from agents.reviewer import (
 from agents.writer import _citations, _direct_chembl_activity_note
 from data_sources.evidence_ledger import merge_candidates
 from data_sources import chembl
+from data_sources.multisource_candidates import (
+    _ot_disease_link,
+    normalize_chembl_enriched,
+)
+from data_sources.evidence_ledger import merge_candidates
 
 
 class Task70ProvenanceTests(unittest.TestCase):
@@ -174,6 +179,46 @@ class Task70ProvenanceTests(unittest.TestCase):
             result["approved_drugs"][0]["source_molecule_chembl_ids"],
             ["CHEMBL_CHILD_A", "CHEMBL_CHILD_B"],
         )
+
+    def test_open_targets_fact_has_provider_independent_lineage(self):
+        base = {
+            "molecule_id": "CHEMBL1726", "molecule_name": "nisoldipine",
+            "target_symbol": "CACNA1C", "target_accession": "Q13936",
+        }
+        chembl_record = _ot_disease_link(
+            provider="chembl", base=base, uniprot_id="Q13936",
+            disease_name="Timothy syndrome", ot_score=0.827)
+        bindingdb_record = _ot_disease_link(
+            provider="bindingdb", base=base, uniprot_id="Q13936",
+            disease_name="Timothy syndrome", ot_score=0.827)
+        self.assertEqual(
+            chembl_record.lineage_key(), bindingdb_record.lineage_key())
+
+    def test_parent_identity_survives_chembl_ledger_round_trip(self):
+        records = normalize_chembl_enriched([{
+            "drug_name": "LEAD HYDROCHLORIDE",
+            "molecule_chembl_id": "CHEMBL_CHILD",
+            "parent_chembl_id": "CHEMBL_PARENT",
+            "source_molecule_chembl_ids": [
+                "CHEMBL_CHILD", "CHEMBL_PARENT"],
+            "inchikey": "ABCDEFGHIJKLMN-UHFFFAOYSA-N",
+            "pchembl_value": 7.2,
+            "confidence_score": 9,
+            "max_phase": 4,
+            "target_symbol": "CACNA1C",
+            "uniprot_id": "Q13936",
+            "disease_name": "Timothy syndrome",
+        }])
+        candidate = merge_candidates(records)[0]
+        self.assertEqual(candidate["parent_chembl_id"], "CHEMBL_PARENT")
+        self.assertEqual(
+            candidate["source_molecule_chembl_ids"],
+            ["CHEMBL_CHILD", "CHEMBL_PARENT"],
+        )
+        self.assertTrue(all(
+            row["parent_molecule_id"] == "CHEMBL_PARENT"
+            for row in candidate["_evidence_ledger"]["records"]
+        ))
 
     def test_timothy_scope_is_structured_and_explicitly_future(self):
         candidate = {

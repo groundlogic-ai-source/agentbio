@@ -86,7 +86,7 @@ class TestPoolAndCountCacheGates(unittest.TestCase):
     UID = "U_FAKE_SWEEP_B"
 
     def setUp(self):
-        self.pool_key = make_key("get_target_candidate_compounds_v2",
+        self.pool_key = make_key("get_target_candidate_compounds_v3",
                                  self.UID, 25, True)
         self.count_key = make_key("get_target_bioactivity_count", self.UID)
         _purge(self.pool_key, self.count_key)
@@ -113,6 +113,35 @@ class TestPoolAndCountCacheGates(unittest.TestCase):
                                                         repurposing_only=True)
         self.assertEqual(res["compounds"], [])
         self.assertTrue(_has(self.pool_key))
+
+    def test_pool_preserves_parent_identity_from_molecule_metadata(self):
+        activity = {
+            "activity_id": 15373265,
+            "molecule_chembl_id": "CHEMBL_CHILD",
+            "canonical_smiles": "CC",
+            "pchembl_value": "8.0",
+            "_confidence": 9,
+            "assay_chembl_id": "CHEMBL_ASSAY",
+        }
+        metadata = {
+            "CHEMBL_CHILD": {
+                "pref_name": "LEAD HYDROCHLORIDE",
+                "max_phase": 4,
+                "canonical_smiles": "CC",
+                "parent_chembl_id": "CHEMBL_PARENT",
+            }
+        }
+        with mock.patch.object(chembl, "_resolve_target_chembl_id",
+                               return_value=["CHEMBL_T1"]), \
+             mock.patch.object(chembl, "_fetch_activities_full",
+                               return_value=([activity], True)), \
+             mock.patch.object(chembl, "_fetch_molecule_meta",
+                               return_value=metadata):
+            row = chembl.get_target_candidate_compounds(
+                self.UID, repurposing_only=True)["compounds"][0]
+        self.assertEqual(row["parent_chembl_id"], "CHEMBL_PARENT")
+        self.assertEqual(
+            row["source_molecule_chembl_ids"], ["CHEMBL_CHILD"])
 
     def test_count_zero_not_cached_when_no_raw_payload(self):
         with mock.patch.object(chembl, "_resolve_target_chembl_id",

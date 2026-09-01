@@ -622,6 +622,9 @@ def run_chemist(biologist_output: dict[str, Any],
         results.append({
             "drug_name": e["drug_name"],
             "molecule_chembl_id": e["molecule_chembl_id"],
+            "parent_chembl_id": e.get("parent_chembl_id"),
+            "source_molecule_chembl_ids": e.get(
+                "source_molecule_chembl_ids", []),
             "smiles": e["smiles"],
             "inchikey": e["inchikey"],
             "pchembl_value": e.get("pchembl_value"),

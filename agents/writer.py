@@ -52,6 +52,16 @@ def _fmt(v: Any, nd: int = 3) -> str:
     return str(v)
 
 
+def _display_token(value: Any) -> str:
+    """Render internal enum/status tokens as professional reader-facing text."""
+    text = _audit_value(value)
+    if text == "UNKNOWN":
+        return "Unknown"
+    if "_" in text or (text.isupper() and any(ch.isalpha() for ch in text)):
+        return text.replace("_", " ").lower().capitalize()
+    return text
+
+
 def _valid_citation_id(value: Any) -> Optional[str]:
     """Return a meaningful provider identifier, rejecting placeholder junk."""
     text = str(value or "").strip()
@@ -186,8 +196,8 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
     if "efficacy_evidence" in weights:
         rows = [
             ("efficacy_evidence",
-             "Efficacy evidence — calibrated confidence (not measured efficacy; "
-             "evidence-ledger calibrated; legacy fallback: 0.6 × normalized "
+             "Candidate-support evidence confidence (not measured efficacy; "
+             "candidate pharmacology records only; legacy fallback: 0.6 × normalized "
              "pChEMBL + 0.4 × assay confidence)",
              "efficacy_evidence"),
             ("ot_association", "Normalized Open Targets association", "normalized_ot_association"),
@@ -458,9 +468,14 @@ def _efficacy_provenance_cell(candidate: dict[str, Any]) -> str:
             continue
         if record.get("qualification_status") not in (None, "", "qualified"):
             continue
-        if record.get("evidence_role") not in ("efficacy", "target_link", "disease_link"):
-            continue
+        role = str(record.get("evidence_role") or "").strip()
         source_type = str(record.get("source_type") or "").strip()
+        if not (
+            role == "efficacy"
+            or (role == "target_link"
+                and source_type in ("bioactivity_assay", "mechanism"))
+        ):
+            continue
         if source_type:
             modalities.add(source_type.replace("_", " "))
     source = (candidate.get("score_components") or {}).get("efficacy_evidence_source")
@@ -860,22 +875,25 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
                        readiness.get("structure_prediction", "UNKNOWN"))
     lines = [
         "### Evidence-stage verdict and scientific readiness\n",
-        f"- **Evidence-stage verdict:** `{_audit_value(contract.get('evidence_stage_verdict'))}`.",
-        f"- **Readiness:** `{_audit_value(readiness.get('status'))}`. This is not a clinical efficacy verdict.",
+        f"- **Evidence-stage verdict:** {_display_token(contract.get('evidence_stage_verdict'))}.",
+        f"- **Readiness:** {_display_token(readiness.get('status'))}. This is not a clinical efficacy verdict.",
         f"- **Qualified human target-assay evidence:** "
-        f"`{_audit_value(readiness.get('qualified_human_target_assay_evidence', readiness.get('direct_human_assay_evidence')))}`. "
+        f"{_display_token(readiness.get('qualified_human_target_assay_evidence', readiness.get('direct_human_assay_evidence')))}. "
         "This establishes target pharmacology only, not rescue of the disease-causing variant.",
-        f"- **Mutation-specific evidence:** `{_audit_value(readiness.get('mutation_specific_evidence'))}`.",
-        f"- **Disease-model evidence:** `{_audit_value(readiness.get('disease_model_evidence'))}`.",
-        f"- **Clinical efficacy evidence:** `{_audit_value(readiness.get('clinical_efficacy_evidence'))}`.",
-        f"- **Structure evidence:** `{_audit_value(structure_state)}`.",
-        f"- **Blocking gates:** {', '.join(gates) if gates else 'NONE RECORDED'}.",
+        f"- **Mutation-specific evidence:** {_display_token(readiness.get('mutation_specific_evidence'))}.",
+        f"- **Disease-model evidence:** {_display_token(readiness.get('disease_model_evidence'))}.",
+        f"- **Clinical efficacy evidence:** {_display_token(readiness.get('clinical_efficacy_evidence'))}.",
+        f"- **Structure evidence:** {_display_token(structure_state)}.",
+        "- **Automated score-capping flags:** "
+        + (", ".join(_display_token(gate) for gate in gates)
+           if gates else "None recorded")
+        + ". This does not mean experimental or clinical validation is complete.",
         "\n### Disease and mechanism context\n",
         f"- Disease: {_audit_value(context.get('disease_name', candidate.get('disease_name')))}; "
         f"target: {_audit_value(context.get('target_symbol', candidate.get('target_symbol')))}.",
-        f"- Target discovery: {_audit_value(context.get('target_discovery_method', candidate.get('target_discovery_method')))}; "
-        f"therapeutic role: {_audit_value(context.get('therapeutic_role', candidate.get('therapeutic_role')))}; "
-        f"mechanism class: {_audit_value(context.get('mechanism_class', candidate.get('mechanism_class')))}.",
+        f"- Target discovery: {_display_token(context.get('target_discovery_method', candidate.get('target_discovery_method')))}; "
+        f"therapeutic role: {_display_token(context.get('therapeutic_role', candidate.get('therapeutic_role')))}; "
+        f"mechanism class: {_display_token(context.get('mechanism_class', candidate.get('mechanism_class')))}.",
         "- Process support: " + (
             ", ".join(str(x) for x in context.get("process_support", []))
             or "UNKNOWN"
@@ -884,12 +902,14 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
     direction = candidate.get("mechanism_direction") or {}
     if direction:
         lines.extend([
-            "\n### Directional-mechanism audit",
-            f"- Verdict: `{_audit_value(direction.get('verdict'))}`; action used: "
-            f"`{_audit_value(direction.get('action_type_used'))}`.",
-            f"- Disease-mechanism summary: {_audit_value(direction.get('disease_mechanism_summary'))}.",
+            "\n### Target-level directional compatibility audit",
+            f"- Verdict: {_display_token(direction.get('verdict'))}; action used: "
+            f"{_display_token(direction.get('action_type_used'))}.",
             f"- Reason: {_audit_value(direction.get('reason'))}.",
             f"- Citations: {_audit_value(direction.get('search_citations'))}.",
+            "- Scope: this is a bounded target-level direction screen, not "
+            "mutation-specific rescue, disease-model validation, clinical efficacy, "
+            "or a prescribing conclusion.",
         ])
     scope = contract.get("timothy_syndrome_cardiac_scope")
     if isinstance(scope, dict):
@@ -898,9 +918,9 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
             f"- Proposed scope: `{_audit_value(scope.get('proposed_variant_scope'))}`, exon "
             f"`{_audit_value(scope.get('proposed_exon_scope'))}`; "
             f"{_audit_value(scope.get('clinical_scope'))}.",
-            f"- Genotype confirmation: `{_audit_value(scope.get('genotype_confirmation_status'))}`. "
+            f"- Genotype confirmation: {_display_token(scope.get('genotype_confirmation_status'))}. "
             "The canonical disease input does not establish TS1 or p.G406R for a specific case.",
-            f"- Scope status: `{_audit_value(scope.get('status'))}`; basis: "
+            f"- Scope status: {_display_token(scope.get('status'))}; basis: "
             f"{_audit_value(scope.get('scope_basis'))}.",
             "- The scope and tests below are **proposed for explicit human review** "
             "and remain **future, unperformed** activities, not results.",
@@ -1010,11 +1030,12 @@ less evidence; treat heavy renormalization as "unscored", not "clean".
 **Evidence table (Section 2).** Each row reports one measured or predicted
 quantity and the source that produced it.
 
-- **Calibrated evidence confidence** — a modality-aware score assembled from
-  qualified assay, mechanism, label, genetic, publication, pathway, or trial
-  evidence available for the candidate. It is not a measured probability of
-  efficacy. The table states whether direct qualifying ChEMBL activity supports
-  it.
+- **Candidate-support evidence confidence** — a modality-aware score assembled
+  from qualified candidate–target assays, curated drug–target mechanisms, and
+  candidate-specific label, publication, or trial evidence. Disease–target
+  genetics and pathway context are scored or disclosed separately and do not
+  inflate this term. It is not a measured probability of efficacy. The table
+  states whether direct qualifying ChEMBL activity supports it.
 - **pChEMBL** — −log10 of molar potency from ChEMBL assays; higher = more
   potent. Reported as a median over *Homo sapiens* IC50/Ki assays at ChEMBL
   confidence ≥ 8.
@@ -1296,7 +1317,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     parts.append(
         f"{drug} is proposed as a repurposing candidate against **{disease}** via "
         f"the target **{target}**. "
-        f"{_direct_chembl_activity_note(candidate)} It has an Open Targets "
+        f"{_direct_chembl_activity_note(candidate).rstrip('.')}. It has an Open Targets "
         f"target-disease association of {_fmt(candidate.get('ot_association_score'))}, "
         f"and a Tanimoto similarity of {_fmt(candidate.get('tanimoto_score'), 3)} to "
         f"{candidate.get('most_similar_approved_drug') or 'no approved analog in the set'}. "

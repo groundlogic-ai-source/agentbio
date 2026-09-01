@@ -149,7 +149,7 @@ class FlagshipDossierContractTests(unittest.TestCase):
         report = build_report_markdown(candidate, {
             "complex": {"available": False, "error": "timed out"},
         }, {"composite_weights": {}, "formula_version": "v"}, None)
-        self.assertIn("Structure evidence:** `NOT_YET_AVAILABLE`", report)
+        self.assertIn("Structure evidence:** Not yet available", report)
         self.assertNotIn("Structure evidence:** `AVAILABLE", report)
 
     def test_off_target_assay_does_not_create_direct_summary_claim(self):
@@ -225,6 +225,78 @@ class FlagshipDossierContractTests(unittest.TestCase):
                          "Safety and applicability matrix",
                          "NOT ASSESSED", "Reproducibility contract"):
             self.assertIn(expected, report)
+
+    def test_contract_excludes_lead_from_approved_comparators(self):
+        candidate = _candidate()
+        candidate["drug_name"] = "Nisoldipine"
+        candidate["molecule_chembl_id"] = "CHEMBL1726"
+        context = {"target": {"target_symbol": candidate["target_symbol"]},
+                   "druggability_context": {"approved_drugs": [
+                       {"name": "NISOLDIPINE",
+                        "molecule_chembl_id": "CHEMBL1726"},
+                       {"name": "NIFEDIPINE",
+                        "molecule_chembl_id": "CHEMBL193"},
+                   ]}}
+        contract = _build_dossier_evidence_contract(
+            candidate, context, [candidate])
+        self.assertEqual(
+            [row["name"] for row in
+             contract["comparators"]["target_approved_drugs"]],
+            ["NIFEDIPINE"],
+        )
+
+    def test_contract_excludes_salt_child_lead_from_parent_comparator(self):
+        candidate = _candidate()
+        candidate.update({
+            "drug_name": "LEAD HYDROCHLORIDE",
+            "molecule_chembl_id": "CHEMBL_CHILD",
+            "parent_chembl_id": "CHEMBL_PARENT",
+            "source_molecule_chembl_ids": [
+                "CHEMBL_CHILD", "CHEMBL_PARENT"],
+        })
+        context = {"target": {"target_symbol": candidate["target_symbol"]},
+                   "druggability_context": {"approved_drugs": [
+                       {"name": "LEAD",
+                        "molecule_chembl_id": "CHEMBL_PARENT",
+                        "parent_chembl_id": "CHEMBL_PARENT",
+                        "source_molecule_chembl_ids": [
+                            "CHEMBL_CHILD", "CHEMBL_PARENT"]},
+                       {"name": "NIFEDIPINE",
+                        "molecule_chembl_id": "CHEMBL193",
+                        "parent_chembl_id": "CHEMBL193"},
+                   ]}}
+        contract = _build_dossier_evidence_contract(
+            candidate, context, [candidate])
+        self.assertEqual(
+            [row["name"] for row in
+             contract["comparators"]["target_approved_drugs"]],
+            ["NIFEDIPINE"],
+        )
+
+    def test_report_hides_raw_direction_search_and_humanizes_statuses(self):
+        candidate = _candidate()
+        candidate["mechanism_direction"] = {
+            "verdict": "DIRECTIONALLY_COMPATIBLE",
+            "action_type_used": "GATING_INHIBITOR",
+            "disease_mechanism_summary": (
+                "If you want, I can next turn this into a verdict."),
+            "reason": "Target-level inhibition opposes gain of function",
+            "search_citations": "https://example.org/source",
+        }
+        candidate["dossier_evidence_contract"] = (
+            _build_dossier_evidence_contract(candidate, None, [candidate]))
+        report = build_report_markdown(
+            candidate, {}, {
+                "formula_version": "reviewer-composite-v2",
+                "safety_schema_version": "safety-v2",
+                "composite_weights": {"efficacy_evidence": .5},
+            }, None)
+        self.assertNotIn("If you want", report)
+        self.assertNotIn("Disease-mechanism summary:", report)
+        self.assertIn("Prioritized hypothesis", report)
+        self.assertIn("Hypothesis requires experimental validation", report)
+        self.assertIn("Target-level directional compatibility audit", report)
+        self.assertIn("Automated score-capping flags", report)
 
 
 if __name__ == "__main__":

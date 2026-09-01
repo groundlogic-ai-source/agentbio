@@ -754,6 +754,13 @@ def normalize_chembl_enriched(
         base = dict(
             provider="chembl",
             molecule_id=molecule_id,
+            parent_molecule_id=_clean(c.get("parent_chembl_id")),
+            source_molecule_ids=tuple(
+                _clean(value)
+                for value in (c.get("source_molecule_chembl_ids") or
+                              c.get("source_chembl_ids") or [])
+                if _clean(value)
+            ),
             molecule_name=name,
             inchikey=inchikey,
             smiles=smiles,
@@ -868,6 +875,12 @@ def _ot_disease_link(*, provider: str, base: dict[str, Any], uniprot_id: str,
         source_type=SourceType.GENETIC_ASSOCIATION,
         evidence_role=EvidenceRole.DISEASE_LINK,
         source_id=f"{provider}-ot:{uniprot_id}:{disease_name}",
+        # The Open Targets disease assertion is one underlying fact even when
+        # copied onto candidates entering through several provider lanes.
+        lineage_id=(
+            f"opentargets-disease:{str(uniprot_id).strip().casefold()}:"
+            f"{' '.join(str(disease_name).strip().casefold().split())}"
+        ),
         measurement_type="ot_association",
         measurement_value=ot_score,
         qualification_status=QualificationStatus.QUALIFIED,
