@@ -56,18 +56,20 @@ export default function SignOff({ onResume, busy, diseaseName = "" }) {
           >
             For this flagship, explicitly confirm or reject the proposed TS1
             CACNA1C p.G406R/exon 8A cardiac-electrophysiology scope. State that
-            approval advances mutation-matched channel/iPSC validation and
-            cardiac safety/exposure review only—not neurologic benefit,
-            whole-syndrome modification, clinical efficacy, or prescribing.
+            approval records acceptance of this defined scope for organizational
+            consideration—not neurologic benefit, whole-syndrome modification,
+            clinical efficacy, prescribing, or human-use suitability.
           </p>
         )}
         <p
           className="mt-1.5 text-sm leading-relaxed"
           style={{ color: "var(--ink-muted)" }}
         >
-          Record your scientific reasoning below, then sign off. Approving
-          advances this candidate for wet-lab validation; rejecting closes the
-          case permanently.
+          Record your scientific reasoning and your organization&apos;s chosen
+          next step. Approval records the authorized reviewer&apos;s decision; it
+          does not authorize experiments, human use, prescribing, or clinical
+          action. Rejection records this case&apos;s decision and does not
+          establish that the candidate is ineffective.
         </p>
 
         <label

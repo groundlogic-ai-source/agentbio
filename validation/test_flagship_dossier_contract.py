@@ -46,6 +46,83 @@ def _candidate():
 
 
 class FlagshipDossierContractTests(unittest.TestCase):
+    def test_precedent_stamped_ot_value_is_not_rendered_as_measured_evidence(self):
+        candidate = _candidate()
+        candidate["ot_association_score"] = 0.827
+        candidate["target_discovery_method"] = "pharmacological_precedent"
+        candidate["target_tier"] = "clinical_precedent"
+        candidate["score_components"].update({
+            "normalized_ot_association": None,
+            "ot_association_basis": "precedent_stamped_constant",
+        })
+        report = build_report_markdown(candidate, {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, None)
+        self.assertIn("target-selection ordering value stamped", report)
+        self.assertIn("not a measured Open Targets association", report)
+        self.assertNotIn(
+            "clinical precedent (approved for this disease concept)", report)
+
+    def test_target_precedent_does_not_claim_disease_approval(self):
+        candidate = _candidate()
+        candidate["target_tier"] = "clinical_precedent"
+        report = build_report_markdown(candidate, {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, None)
+        self.assertIn("target-level pharmacological precedent", report)
+        self.assertIn(
+            "does not establish approval or clinical efficacy for this disease",
+            report,
+        )
+
+    def test_empty_chembl_mechanism_result_is_source_scoped(self):
+        candidate = _candidate()
+        report = build_report_markdown(candidate, {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, {"druggability_context": {
+            "has_approved_drug_for_target": False,
+            "approved_drug_count": 0,
+        }})
+        self.assertIn("no qualifying approved-drug record was returned", report)
+        self.assertIn("does **not** mean that no approved drug modulates", report)
+        self.assertNotIn(
+            "No approved drug currently exists with a known mechanism", report)
+
+    def test_free_form_chemist_rationale_cannot_restate_report_facts(self):
+        candidate = _candidate()
+        candidate["rationale"] = (
+            "CONTRADICTORY FREE-FORM CLAIM with a different BioGRID list.")
+        report = build_report_markdown(candidate, {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, None)
+        self.assertNotIn("CONTRADICTORY FREE-FORM CLAIM", report)
+        self.assertNotIn("_Chemist rationale:_", report)
+
+    def test_report_does_not_mandate_wet_lab_or_clinical_validation(self):
+        report = build_report_markdown(_candidate(), {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, None)
+        self.assertIn(
+            "responsible organization determines whether orthogonal experiments",
+            report,
+        )
+        self.assertNotIn("requires wet-lab", report)
+        self.assertNotIn("ultimately, clinical validation", report)
+
+    def test_direction_reason_has_exactly_one_terminal_period(self):
+        candidate = _candidate()
+        candidate["mechanism_direction"] = {
+            "verdict": "DIRECTIONALLY_COMPATIBLE",
+            "action_type_used": "INHIBITOR",
+            "reason": "Reason already punctuated.",
+            "search_citations": "https://example.org/source",
+        }
+        report = build_report_markdown(candidate, {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, None)
+        self.assertIn("Reason: Reason already punctuated.", report)
+        self.assertNotIn("Reason: Reason already punctuated..", report)
+
     def test_contract_is_versioned_and_explicit_about_missingness(self):
         candidate = _candidate()
         contract = _build_dossier_evidence_contract(

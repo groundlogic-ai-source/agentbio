@@ -389,7 +389,24 @@ def _discovery_method_cell(candidate: dict[str, Any]) -> str:
     if not method:
         return ("⚠ unattributed — the provenance of this target was not "
                 "recorded; treat the target-disease link as unverified")
-    return method
+    return _display_token(method)
+
+
+def _ot_association_cell(candidate: dict[str, Any]) -> str:
+    """Render OT context using the Reviewer's measurement semantics."""
+    components = candidate.get("score_components") or {}
+    measured = components.get("normalized_ot_association")
+    basis = str(components.get("ot_association_basis") or "").strip()
+    raw = candidate.get("ot_association_score")
+    if measured is not None:
+        return f"{_fmt(measured)} (measured Open Targets target–disease association)"
+    if basis == "precedent_stamped_constant":
+        return (
+            f"{_fmt(raw)} (target-selection ordering value stamped by the "
+            "pharmacological-precedent lane; not a measured Open Targets "
+            "association and excluded from candidate scoring)"
+        )
+    return "not observed; excluded from candidate scoring"
 
 
 def _target_tier_cell(candidate: dict[str, Any]) -> str:
@@ -397,7 +414,10 @@ def _target_tier_cell(candidate: dict[str, Any]) -> str:
     tier = str(candidate.get("target_tier") or "").strip() or "unknown"
     labels = {
         "causal_anchor": "causal anchor (direct disease-target association)",
-        "clinical_precedent": "clinical precedent (approved for this disease concept)",
+        "clinical_precedent": (
+            "target-level pharmacological precedent (does not establish approval "
+            "or clinical efficacy for this disease)"
+        ),
         "exploratory_expansion": "⚠ exploratory (reached by pathway expansion, "
                                  "not a direct disease-target link)",
         "unattributed": "⚠ unattributed (target provenance not recorded)",
@@ -423,8 +443,8 @@ def _approval_basis_cell(candidate: dict[str, Any]) -> str:
         return ("⚠ NOT established — no qualified regulatory-approval record "
                 "and no max_phase ≥ 4 was found for this compound")
     if providers:
-        return f"{basis} ({', '.join(providers)})"
-    return basis
+        return f"{_display_token(basis)} ({', '.join(_display_token(p) for p in providers)})"
+    return _display_token(basis)
 
 
 def _confidence_band(value: Any) -> str:
@@ -509,14 +529,18 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
         ("ChEMBL median pChEMBL affinity", _fmt(candidate.get("pchembl_value"), 2)),
         ("Assay confidence score (0-9)", _fmt(candidate.get("confidence_score"))),
         ("Direct ChEMBL activity basis", _direct_chembl_activity_note(candidate)),
-        ("Calibrated evidence-confidence provenance",
+        ("Candidate-support evidence-confidence provenance",
          _efficacy_provenance_cell(candidate)),
-        ("Open Targets association score", _fmt(candidate.get("ot_association_score"))),
+        ("Open Targets target-selection / association context",
+         _ot_association_cell(candidate)),
         ("Tanimoto to nearest approved drug",
          f"{_fmt(candidate.get('tanimoto_score'), 3)} "
          f"({candidate.get('most_similar_approved_drug') or 'none in set'})"),
         ("Approved / known drug", (
-            "⚠ EXPERIMENTAL COMPOUND — NOT YET APPROVED"
+            "⚠ NOT APPROVED FOR THE PROPOSED USE — experimental/unresolved "
+            "status. Do not self-administer or use for self-treatment; any "
+            "research or clinical activity requires qualified professionals "
+            "and applicable institutional/regulatory oversight"
             if candidate.get("is_approved_drug") is False
             else _fmt(candidate.get("is_approved_drug"))
         )),
@@ -594,8 +618,11 @@ def _druggability_subsection(biologist_output: Optional[dict[str, Any]]) -> str:
         )
     else:
         lines.append(
-            "- **No approved drug currently exists with a known mechanism against this "
-            "target** (ChEMBL mechanism endpoint, Homo sapiens only)."
+            "- **Bounded ChEMBL mechanism query:** no qualifying approved-drug "
+            "record was returned by the ChEMBL human mechanism endpoint in this "
+            "run. This source-specific absence does **not** mean that no approved "
+            "drug modulates the target; assay, DrugCentral, GtoPdb, or other "
+            "evidence is reported separately."
         )
 
     flag = dc.get("druggability_flag", "")
@@ -650,7 +677,7 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
         f"functional modulation, or therapeutic benefit.",
         "- **ADME values are model predictions, not measurements.** The Boltz "
         "lipophilicity/permeability/solubility numbers are computed estimates and "
-        "must be confirmed experimentally before any decision.",
+        "should not be treated as measured PK or exposure.",
         f"- **Structure confidence is bounded.** This hypothesis relies on a Boltz "
         f"structure_confidence of {_fmt(sconf)} (complex pLDDT "
         f"{_fmt(plddt_complex)}) and an AFDB apo mean pLDDT of {_fmt(apo_plddt, 1)}; "
@@ -662,8 +689,12 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
         "- **Absence of evidence is not evidence of absence.** A zero prior-trial "
         "count or no adverse-event signal may reflect that the pair has simply never "
         "been studied, not that it is safe or untried.",
-        "- **This is a repurposing *hypothesis*, not a finding.** It is a prioritised "
-        "starting point that requires wet-lab and, ultimately, clinical validation.",
+        "- **This is a repurposing *hypothesis*, not a finding or treatment "
+        "recommendation.** The responsible organization determines whether "
+        "orthogonal experiments or other validation are appropriate. This report "
+        "does not require, authorize, or substitute for wet-lab, translational, "
+        "regulatory, or clinical review. Do not use it to self-treat, change "
+        "medication, prescribe, or obtain/use an unapproved or off-label product.",
     ]
     if efo_warn:
         # Prepend so the mismatch is the first thing a reviewer reads.
@@ -905,7 +936,7 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
             "\n### Target-level directional compatibility audit",
             f"- Verdict: {_display_token(direction.get('verdict'))}; action used: "
             f"{_display_token(direction.get('action_type_used'))}.",
-            f"- Reason: {_audit_value(direction.get('reason'))}.",
+            f"- Reason: {_audit_value(direction.get('reason')).rstrip('.')}.",
             f"- Citations: {_audit_value(direction.get('search_citations'))}.",
             "- Scope: this is a bounded target-level direction screen, not "
             "mutation-specific rescue, disease-model validation, clinical efficacy, "
@@ -1317,16 +1348,17 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     parts.append(
         f"{drug} is proposed as a repurposing candidate against **{disease}** via "
         f"the target **{target}**. "
-        f"{_direct_chembl_activity_note(candidate).rstrip('.')}. It has an Open Targets "
-        f"target-disease association of {_fmt(candidate.get('ot_association_score'))}, "
+        f"{_direct_chembl_activity_note(candidate).rstrip('.')}. Open Targets context: "
+        f"{_ot_association_cell(candidate)}. It has "
         f"and a Tanimoto similarity of {_fmt(candidate.get('tanimoto_score'), 3)} to "
         f"{candidate.get('most_similar_approved_drug') or 'no approved analog in the set'}. "
         f"Target network context (BioGRID, physical/genetic — not mechanism): {net_str}. "
         f"The resulting composite score is "
         f"{_fmt(candidate.get('composite_score'), 4)}.\n"
     )
-    if candidate.get("rationale"):
-        parts.append(f"\n_Chemist rationale:_ {candidate['rationale']}\n")
+    # Free-form Chemist prose historically restated structured facts from a
+    # different target/context and contradicted the canonical evidence tables.
+    # The dossier renders only persisted, typed evidence below.
 
     # Stage 1 prioritization scores — the SAME two-dimensional scores the ranking
     # sweep computes, shown here whether the target was auto-ranked or hand-picked.

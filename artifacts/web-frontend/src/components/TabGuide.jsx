@@ -167,7 +167,8 @@ function TabMap() {
       <p className="tab-map-intro">
         AgentBio is a drug-repurposing research system. It generates hypotheses, lets you audit
         them or your own, and separately studies what makes repurposing succeed at all. Nothing
-        here is a clinical recommendation; every candidate needs wet-lab validation.
+        here is a clinical recommendation. Qualified organizations decide whether experiments,
+        translational work, regulatory review, or clinical study are appropriate.
       </p>
       <div className="tab-map-groups">
         {TAB_MAP.map((g) => (

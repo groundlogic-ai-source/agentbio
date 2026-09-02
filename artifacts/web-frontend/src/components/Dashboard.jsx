@@ -167,7 +167,8 @@ export default function Dashboard({
           >
             A case file for every drug-repurposing hypothesis — evidence,
             citations, and limitations, compiled for human review. Each candidate
-            requires wet-lab validation; nothing here is a cure.
+            is for qualified review; the responsible organization decides what
+            follow-up is appropriate. Nothing here is a cure or treatment recommendation.
           </p>
         </div>
 
