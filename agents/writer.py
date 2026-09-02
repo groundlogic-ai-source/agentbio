@@ -398,14 +398,14 @@ def _ot_association_cell(candidate: dict[str, Any]) -> str:
     measured = components.get("normalized_ot_association")
     basis = str(components.get("ot_association_basis") or "").strip()
     raw = candidate.get("ot_association_score")
-    if measured is not None:
-        return f"{_fmt(measured)} (measured Open Targets target–disease association)"
     if basis == "precedent_stamped_constant":
         return (
             f"{_fmt(raw)} (target-selection ordering value stamped by the "
             "pharmacological-precedent lane; not a measured Open Targets "
             "association and excluded from candidate scoring)"
         )
+    if measured is not None:
+        return f"{_fmt(measured)} (measured Open Targets target–disease association)"
     return "not observed; excluded from candidate scoring"
 
 
@@ -1349,7 +1349,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
         f"{drug} is proposed as a repurposing candidate against **{disease}** via "
         f"the target **{target}**. "
         f"{_direct_chembl_activity_note(candidate).rstrip('.')}. Open Targets context: "
-        f"{_ot_association_cell(candidate)}. It has "
+        f"{_ot_association_cell(candidate)}. "
         f"and a Tanimoto similarity of {_fmt(candidate.get('tanimoto_score'), 3)} to "
         f"{candidate.get('most_similar_approved_drug') or 'no approved analog in the set'}. "
         f"Target network context (BioGRID, physical/genetic — not mechanism): {net_str}. "
@@ -1400,12 +1400,12 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
                 f"\n> **Unmet-need reconciliation:** Open Targets links no approved "
                 f"therapy to this disease's own EFO record, yet {_tgt_approved} "
                 f"approved drug(s) with known mechanism against the selected target "
-                f"exist (see Target druggability context). For syndromic diseases "
-                f"this usually means an approved therapy treats a manifestation "
-                f"recorded under a different EFO node (e.g. medullary thyroid "
-                f"carcinoma for MEN2A). The unmet_need_score above reflects "
-                f"disease-level OT linkage only and may overstate unmet need — "
-                f"judge accordingly.\n"
+                f"exist (see Target druggability context). These are different "
+                f"questions: target-level pharmacological precedent does not "
+                f"establish an approved therapy for this disease, while absence of "
+                f"a therapy link on the disease EFO record does not establish that "
+                f"no manifestation-directed treatment exists. The unmet_need_score "
+                f"reflects the bounded disease-level Open Targets linkage only.\n"
             )
 
     # 2. Evidence table
