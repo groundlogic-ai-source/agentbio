@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch
 
 from agents.reviewer import _build_dossier_evidence_contract
-from agents.writer import build_report_markdown
+from agents.writer import build_report_markdown, validate_dossier_inputs
 
 
 def _candidate():
@@ -46,6 +46,63 @@ def _candidate():
 
 
 class FlagshipDossierContractTests(unittest.TestCase):
+    def _preflight_ready_candidate(self):
+        candidate = _candidate()
+        candidate["uniprot_id"] = "P00001"
+        candidate["approval_basis"] = "regulatory_approval_record"
+        candidate["dossier_evidence_contract"] = _build_dossier_evidence_contract(
+            candidate,
+            {"target": {
+                "target_symbol": "AUD1", "uniprot_id": "P00001",
+            }},
+            [candidate],
+        )
+        return candidate
+
+    def test_dossier_preflight_accepts_reconciled_inputs(self):
+        candidate = self._preflight_ready_candidate()
+        validate_dossier_inputs(
+            candidate,
+            {"target": {"target_symbol": "AUD1", "uniprot_id": "P00001"}},
+            {"target_symbol": "AUD1", "uniprot_id": "P00001"},
+            repurposing_only=True,
+        )
+
+    def test_dossier_preflight_rejects_wrong_target_context(self):
+        candidate = self._preflight_ready_candidate()
+        with self.assertRaisesRegex(ValueError, "Biologist target"):
+            validate_dossier_inputs(
+                candidate,
+                {"target": {"target_symbol": "OTHER", "uniprot_id": "P99999"}},
+                {"target_symbol": "AUD1", "uniprot_id": "P00001"},
+                repurposing_only=True,
+            )
+
+    def test_dossier_preflight_rejects_scored_precedent_stamp(self):
+        candidate = self._preflight_ready_candidate()
+        candidate["target_discovery_method"] = "pharmacological_precedent"
+        candidate["score_components"].update({
+            "normalized_ot_association": 0.9,
+            "ot_association_basis": "precedent_stamped_constant",
+        })
+        with self.assertRaisesRegex(ValueError, "scored/measured Open Targets"):
+            validate_dossier_inputs(
+                candidate, None, None, repurposing_only=True)
+
+    def test_dossier_preflight_rejects_approval_without_provenance(self):
+        candidate = self._preflight_ready_candidate()
+        candidate["approval_basis"] = "unknown"
+        with self.assertRaisesRegex(ValueError, "approval provenance"):
+            validate_dossier_inputs(
+                candidate, None, None, repurposing_only=True)
+
+    def test_summary_uses_complete_tanimoto_sentence(self):
+        report = build_report_markdown(_candidate(), {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, None)
+        self.assertIn("Tanimoto similarity is", report)
+        self.assertNotIn(". and a Tanimoto", report)
+
     def test_precedent_stamped_ot_value_is_not_rendered_as_measured_evidence(self):
         candidate = _candidate()
         candidate["ot_association_score"] = 0.827

@@ -119,6 +119,7 @@ class PipelineState(TypedDict, total=False):
     # eligible is False the run terminates WITHOUT writing a dossier or opening
     # a human-review checkpoint.
     eligibility: dict[str, Any]
+    dossier_preflight: dict[str, Any]
     selected: list[dict[str, Any]]
     structure_results: dict[str, Any]
     reports: list[dict[str, Any]]
@@ -733,6 +734,46 @@ def _route_after_eligibility(state: PipelineState) -> str:
             else END)
 
 
+def dossier_preflight_node(state: PipelineState) -> dict[str, Any]:
+    """Reconcile report inputs before any metered structure prediction."""
+    reviewed = state.get("reviewed") or {}
+    candidates = reviewed.get("candidates") or []
+    repurposing_only = bool(
+        reviewed.get("repurposing_only") or state.get("repurposing_only"))
+    targets = state.get("targets") or [state.get("target") or {}]
+    bios = state.get("biologist_outputs") or [
+        state.get("biologist_output") or {}
+    ]
+
+    def matched(rows: list[dict[str, Any]], candidate: dict[str, Any],
+                nested_target: bool = False) -> Optional[dict[str, Any]]:
+        symbol = str(candidate.get("target_symbol") or "").upper()
+        accession = str(candidate.get("uniprot_id") or "").upper()
+        for row in rows:
+            identity = (row.get("target") or {}) if nested_target else row
+            if accession and str(identity.get("uniprot_id") or "").upper() == accession:
+                return row
+            if symbol and str(identity.get("target_symbol") or "").upper() == symbol:
+                return row
+        return None
+
+    checked = 0
+    for candidate in candidates:
+        if repurposing_only and candidate.get("is_approved_drug") is not True:
+            continue
+        writer.validate_dossier_inputs(
+            candidate,
+            matched(bios, candidate, nested_target=True),
+            matched(targets, candidate),
+            repurposing_only=repurposing_only,
+        )
+        checked += 1
+    verdict = {"valid": True, "n_candidates_checked": checked}
+    _write_json("dossier_preflight.json", verdict)
+    print(f"[graph] dossier_preflight: {checked} candidate(s) reconciled")
+    return {"dossier_preflight": verdict}
+
+
 def _select_candidates(reviewed: dict[str, Any]) -> list[dict[str, Any]]:
     cands = reviewed.get("candidates", [])
     strong = [c for c in cands if c.get("strong_match")]
@@ -840,6 +881,7 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
         if uid:
             bio_map_uid[uid] = bio
     primary_bio = state.get("biologist_output")
+    targets_list = state.get("targets") or [state.get("target") or {}]
 
     def _bio_for(cand: dict) -> Optional[dict]:
         sym = cand.get("target_symbol")
@@ -855,9 +897,26 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
         match = by_uid or by_sym
         if match is None:
             print(f"[graph] writer WARNING: no biologist output matches candidate "
-                  f"target {sym}/{uid} — falling back to PRIMARY target context; "
-                  f"dossier druggability context may describe the wrong target")
-        return match or primary_bio
+                  f"target {sym}/{uid} — target-specific Biologist context will "
+                  f"be rendered as unavailable, never borrowed from another target")
+        return match
+
+    def _target_for(cand: dict) -> Optional[dict]:
+        symbol = str(cand.get("target_symbol") or "").upper()
+        accession = str(cand.get("uniprot_id") or "").upper()
+        by_symbol = next((
+            row for row in targets_list
+            if symbol and str(row.get("target_symbol") or "").upper() == symbol
+        ), None)
+        by_accession = next((
+            row for row in targets_list
+            if accession and str(row.get("uniprot_id") or "").upper() == accession
+        ), None)
+        if by_symbol is not None and by_accession is not None \
+                and by_symbol is not by_accession:
+            print(f"[graph] writer WARNING: Stage 1 target conflict for "
+                  f"candidate {symbol}/{accession} — using UniProt match")
+        return by_accession or by_symbol
 
     job_id = state.get("job_id")
     if job_id:
@@ -881,7 +940,7 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
             if not os.path.exists(path):
                 markdown = writer.build_report_markdown(
                     candidate, (structure_results or {}).get(drug, {}), formula,
-                    _bio_for(candidate), state.get("target"),
+                    _bio_for(candidate), _target_for(candidate),
                     repurposing_only=repurposing_only,
                     k_target_summary=reviewed.get("k_target_summary"),
                 )
@@ -898,6 +957,7 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
         reports = writer.run_writer(
             reviewed, selected, structure_results, primary_bio,
             state.get("target"), bio_for_candidate=_bio_for,
+            target_for_candidate=_target_for,
             k_target_summary=reviewed.get("k_target_summary"))
         print(f"[graph] writer: wrote {len(reports)} report(s) to output/reports/")
     return {"reports": reports}
@@ -939,6 +999,7 @@ def build_graph():
     g.add_node("chemist", chemist_node)
     g.add_node("reviewer", reviewer_node)
     g.add_node("eligibility_gate", eligibility_gate_node)
+    g.add_node("dossier_preflight", dossier_preflight_node)
     g.add_node("structure_validation", structure_validation_node)
     g.add_node("writer", writer_node)
     g.add_node("human_review", human_review_node)
@@ -954,8 +1015,11 @@ def build_graph():
     g.add_conditional_edges(
         "eligibility_gate",
         _route_after_eligibility,
-        {"structure_validation": "structure_validation", END: END},
+        # Keep the route's established semantic label while inserting the
+        # deterministic preflight before the actual structure node.
+        {"structure_validation": "dossier_preflight", END: END},
     )
+    g.add_edge("dossier_preflight", "structure_validation")
     g.add_edge("structure_validation", "writer")
     g.add_edge("writer", "human_review")
     g.add_edge("human_review", END)

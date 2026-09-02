@@ -35,6 +35,7 @@ from data_sources.clinicaltrials import check_prior_trials  # noqa: F401
 from data_sources.evidence_ledger import qualified_target_chembl_activity_ids
 
 REPORTS_DIR = os.path.join(OUTPUT_DIR, "reports")
+DOSSIER_CONTRACT_VERSION = "flagship-dossier-evidence-v1"
 
 
 def _slug(text: str) -> str:
@@ -50,6 +51,102 @@ def _fmt(v: Any, nd: int = 3) -> str:
     if isinstance(v, (int, float)):
         return f"{v:.{nd}f}" if isinstance(v, float) else str(v)
     return str(v)
+
+
+def validate_dossier_inputs(
+    candidate: dict[str, Any],
+    biologist_output: Optional[dict[str, Any]],
+    target_meta: Optional[dict[str, Any]],
+    *,
+    repurposing_only: bool,
+) -> None:
+    """Fail closed when persisted report inputs disagree.
+
+    This is intentionally pure and belongs before structure prediction in the
+    graph. A report must never spend on Boltz—or reach human review—when its
+    authoritative evidence layers cannot be reconciled deterministically.
+    """
+    errors: list[str] = []
+    drug = str(candidate.get("drug_name") or "unknown candidate")
+    candidate_target = str(candidate.get("target_symbol") or "").upper()
+    candidate_accession = str(candidate.get("uniprot_id") or "").upper()
+
+    contract = candidate.get("dossier_evidence_contract")
+    if not isinstance(contract, dict):
+        errors.append("missing dossier_evidence_contract")
+        contract = {}
+    elif contract.get("contract_version") != DOSSIER_CONTRACT_VERSION:
+        errors.append(
+            "unsupported dossier contract "
+            f"{contract.get('contract_version')!r}"
+        )
+
+    context = contract.get("disease_mechanism_context") or {}
+    contract_target = str(context.get("target_symbol") or "").upper()
+    contract_disease = str(context.get("disease_name") or "").casefold()
+    candidate_disease = str(candidate.get("disease_name") or "").casefold()
+    if contract_target and contract_target != candidate_target:
+        errors.append(
+            f"contract target {contract_target} != candidate target {candidate_target}"
+        )
+    if contract_disease and contract_disease != candidate_disease:
+        errors.append("contract disease != candidate disease")
+
+    bio_target = ((biologist_output or {}).get("target") or {})
+    bio_symbol = str(bio_target.get("target_symbol") or "").upper()
+    bio_accession = str(bio_target.get("uniprot_id") or "").upper()
+    if biologist_output is not None and not (
+        (candidate_accession and bio_accession == candidate_accession)
+        or (candidate_target and bio_symbol == candidate_target)
+    ):
+        errors.append(
+            f"Biologist target {bio_symbol or '?'}/{bio_accession or '?'} "
+            f"does not match candidate {candidate_target or '?'}/"
+            f"{candidate_accession or '?'}"
+        )
+
+    meta_symbol = str((target_meta or {}).get("target_symbol") or "").upper()
+    meta_accession = str((target_meta or {}).get("uniprot_id") or "").upper()
+    if target_meta is not None and not (
+        (candidate_accession and meta_accession == candidate_accession)
+        or (candidate_target and meta_symbol == candidate_target)
+    ):
+        errors.append(
+            f"Stage 1 target {meta_symbol or '?'}/{meta_accession or '?'} "
+            f"does not match candidate {candidate_target or '?'}/"
+            f"{candidate_accession or '?'}"
+        )
+
+    approval_basis = str(candidate.get("approval_basis") or "")
+    if repurposing_only and (
+        candidate.get("is_approved_drug") is not True
+        or approval_basis in {"", "unknown"}
+    ):
+        errors.append(
+            "repurposing-only candidate lacks positive approval provenance"
+        )
+    if (
+        candidate.get("is_approved_drug") is False
+        and not candidate.get("unapproved_cap_applied")
+    ):
+        errors.append("unapproved candidate lacks the required score cap")
+
+    method = str(candidate.get("target_discovery_method") or "").lower()
+    score_components = candidate.get("score_components") or {}
+    ot_basis = score_components.get("ot_association_basis")
+    normalized_ot = score_components.get("normalized_ot_association")
+    if "pharmacological_precedent" in method and (
+        ot_basis != "precedent_stamped_constant" or normalized_ot is not None
+    ):
+        errors.append(
+            "pharmacological-precedent target carries a scored/measured "
+            "Open Targets value"
+        )
+
+    if errors:
+        raise ValueError(
+            f"dossier preflight failed for {drug}: " + "; ".join(errors)
+        )
 
 
 def _display_token(value: Any) -> str:
@@ -1350,7 +1447,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
         f"the target **{target}**. "
         f"{_direct_chembl_activity_note(candidate).rstrip('.')}. Open Targets context: "
         f"{_ot_association_cell(candidate)}. "
-        f"and a Tanimoto similarity of {_fmt(candidate.get('tanimoto_score'), 3)} to "
+        f"Tanimoto similarity is {_fmt(candidate.get('tanimoto_score'), 3)} to "
         f"{candidate.get('most_similar_approved_drug') or 'no approved analog in the set'}. "
         f"Target network context (BioGRID, physical/genetic — not mechanism): {net_str}. "
         f"The resulting composite score is "
@@ -1475,6 +1572,7 @@ def run_writer(reviewed: dict[str, Any], selected: list[dict[str, Any]],
                biologist_output: Optional[dict[str, Any]] = None,
                target: Optional[dict[str, Any]] = None,
                bio_for_candidate: Optional[Any] = None,
+               target_for_candidate: Optional[Any] = None,
                k_target_summary: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
     """
     Write one Markdown report per selected candidate. Returns a list of
@@ -1504,7 +1602,12 @@ def run_writer(reviewed: dict[str, Any], selected: list[dict[str, Any]],
             resolved = bio_for_candidate(cand)
             if resolved is not None:
                 cand_bio = resolved
-        md = build_report_markdown(cand, struct, formula, cand_bio, target,
+        cand_target = target
+        if target_for_candidate is not None:
+            resolved_target = target_for_candidate(cand)
+            if resolved_target is not None:
+                cand_target = resolved_target
+        md = build_report_markdown(cand, struct, formula, cand_bio, cand_target,
                                    repurposing_only=repurposing_only,
                                    k_target_summary=k_target_summary)
         fname = f"{_slug(disease)}_{_slug(drug)}.md"
