@@ -165,6 +165,8 @@ class FlagshipDossierContractTests(unittest.TestCase):
         )
         self.assertNotIn("requires wet-lab", report)
         self.assertNotIn("ultimately, clinical validation", report)
+        self.assertNotIn("Hypothesis requires experimental validation", report)
+        self.assertNotIn("Required channel/iPSC tests", report)
 
     def test_direction_reason_has_exactly_one_terminal_period(self):
         candidate = _candidate()
@@ -193,6 +195,9 @@ class FlagshipDossierContractTests(unittest.TestCase):
         self.assertEqual(
             contract["scientific_readiness"]["clinical_efficacy_evidence"],
             "UNKNOWN")
+        self.assertEqual(
+            contract["scientific_readiness"]["status"],
+            "HYPOTHESIS_FOR_QUALIFIED_REVIEW")
 
     def test_failed_trial_query_does_not_become_a_negative_result(self):
         candidate = _candidate()
@@ -275,6 +280,26 @@ class FlagshipDossierContractTests(unittest.TestCase):
         self.assertEqual(
             candidate["dossier_evidence_contract"]["disease_mechanism_context"][
                 "literature_pmids"], [])
+
+    def test_writer_refresh_cannot_reintroduce_lead_as_comparator(self):
+        candidate = _candidate()
+        candidate["drug_name"] = "Nisoldipine"
+        candidate["molecule_chembl_id"] = "CHEMBL123"
+        candidate["dossier_evidence_contract"] = _build_dossier_evidence_contract(
+            candidate, None, [candidate])
+        matched = {
+            "target": {"target_symbol": "AUD1"},
+            "druggability_context": {"approved_drugs": [
+                {"name": "Nisoldipine", "molecule_chembl_id": "CHEMBL123"},
+                {"name": "Nifedipine", "molecule_chembl_id": "CHEMBL456"},
+            ]},
+        }
+        report = build_report_markdown(candidate, {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, matched)
+        comparator_section = report.split("### Comparator table", 1)[1]
+        self.assertNotIn("| Nisoldipine |", comparator_section)
+        self.assertIn("| Nifedipine |", comparator_section)
 
     def test_failed_structure_prediction_is_not_rendered_as_available(self):
         candidate = _candidate()
@@ -428,7 +453,7 @@ class FlagshipDossierContractTests(unittest.TestCase):
         self.assertNotIn("If you want", report)
         self.assertNotIn("Disease-mechanism summary:", report)
         self.assertIn("Prioritized hypothesis", report)
-        self.assertIn("Hypothesis requires experimental validation", report)
+        self.assertIn("Hypothesis for qualified review", report)
         self.assertIn("Target-level directional compatibility audit", report)
         self.assertIn("Automated score-capping flags", report)
 

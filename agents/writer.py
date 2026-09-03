@@ -875,6 +875,41 @@ def _assay_audit_table(candidate: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _filter_approved_target_comparators(
+    candidate: dict[str, Any],
+    rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Remove the lead candidate from target-approved comparison rows."""
+    candidate_name = str(candidate.get("drug_name") or "").strip().casefold()
+    candidate_ids = {
+        str(value).strip().casefold()
+        for value in (
+            candidate.get("molecule_chembl_id"),
+            candidate.get("parent_chembl_id"),
+            *((candidate.get("source_chembl_ids") or [])),
+            *((candidate.get("source_molecule_chembl_ids") or [])),
+        )
+        if value
+    }
+    filtered: list[dict[str, Any]] = []
+    for row in rows:
+        if str(row.get("name") or "").strip().casefold() == candidate_name:
+            continue
+        row_ids = {
+            str(value).strip().casefold()
+            for value in (
+                row.get("molecule_chembl_id"),
+                row.get("parent_chembl_id"),
+                *((row.get("source_molecule_chembl_ids") or [])),
+            )
+            if value
+        }
+        if candidate_ids.intersection(row_ids):
+            continue
+        filtered.append(row)
+    return filtered
+
+
 def _comparator_table(candidate: dict[str, Any],
                       biologist_output: Optional[dict[str, Any]]) -> str:
     """Render only comparators supplied by the biologist or reviewed payload."""
@@ -884,6 +919,8 @@ def _comparator_table(candidate: dict[str, Any],
     if target_drugs is None:
         target_drugs = ((biologist_output or {}).get("druggability_context") or {}).get(
             "approved_drugs", [])
+    target_drugs = _filter_approved_target_comparators(
+        candidate, target_drugs or [])
     selected = comparators.get("selected_candidates", [])
     lines = ["| Comparator | Source / relationship | Approval or score |",
              "| --- | --- | --- |"]
@@ -986,9 +1023,10 @@ def _apply_matched_biologist_context(
         if hit.get("pmid") is not None
     ]
     comparators = contract.setdefault("comparators", {})
-    comparators["target_approved_drugs"] = (
+    comparators["target_approved_drugs"] = _filter_approved_target_comparators(
+        candidate,
         (biologist_output.get("druggability_context") or {}).get(
-            "approved_drugs", [])
+            "approved_drugs", []),
     )
 
 
@@ -1052,7 +1090,7 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
             f"{_audit_value(scope.get('scope_basis'))}.",
             "- The scope and tests below are **proposed for explicit human review** "
             "and remain **future, unperformed** activities, not results.",
-            "- Required channel/iPSC tests: " + "; ".join(
+            "- Potential mutation-specific evidence options: " + "; ".join(
                 str(item) for item in scope.get("required_tests", [])) + ".",
             "- Cardiac safety/exposure plan: " + "; ".join(
                 str(item) for item in scope.get("safety_exposure_plan", [])) + ".",

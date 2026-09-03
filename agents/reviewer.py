@@ -1423,7 +1423,7 @@ def _build_dossier_evidence_contract(
             else "NOT_PRIORITIZED"
         ),
         "scientific_readiness": {
-            "status": "HYPOTHESIS_REQUIRES_EXPERIMENTAL_VALIDATION",
+            "status": "HYPOTHESIS_FOR_QUALIFIED_REVIEW",
             "qualified_human_target_assay_evidence": (
                 "OBSERVED" if direct_assay else unknown
             ),
