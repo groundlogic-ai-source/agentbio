@@ -143,6 +143,37 @@ def validate_dossier_inputs(
             "Open Targets value"
         )
 
+    readiness = contract.get("scientific_readiness") or {}
+    if readiness.get("status") == "HYPOTHESIS_REQUIRES_EXPERIMENTAL_VALIDATION":
+        errors.append("dossier contract mandates experimental validation")
+
+    candidate_name = str(candidate.get("drug_name") or "").strip().casefold()
+    candidate_ids = {
+        str(value).strip().casefold()
+        for value in (
+            candidate.get("molecule_chembl_id"),
+            candidate.get("parent_chembl_id"),
+            *((candidate.get("source_chembl_ids") or [])),
+            *((candidate.get("source_molecule_chembl_ids") or [])),
+        )
+        if value
+    }
+    for row in (contract.get("comparators") or {}).get(
+            "target_approved_drugs", []):
+        row_name = str(row.get("name") or "").strip().casefold()
+        row_ids = {
+            str(value).strip().casefold()
+            for value in (
+                row.get("molecule_chembl_id"),
+                row.get("parent_chembl_id"),
+                *((row.get("source_molecule_chembl_ids") or [])),
+            )
+            if value
+        }
+        if row_name == candidate_name or candidate_ids.intersection(row_ids):
+            errors.append("lead candidate appears in its own comparator set")
+            break
+
     if errors:
         raise ValueError(
             f"dossier preflight failed for {drug}: " + "; ".join(errors)
@@ -242,6 +273,10 @@ def _citations(candidate: dict[str, Any],
     for h in (biologist_output or {}).get("literature_hits", []):
         if h.get("pmid") is not None:
             pmids.add(str(h["pmid"]))
+    for row in (candidate.get("literature_limitation") or {}).get(
+            "evidence", []):
+        if row.get("pmid") is not None:
+            pmids.add(str(row["pmid"]))
 
     # NCT numbers already retrieved by the Reviewer. The Writer is a pure
     # renderer: it must not silently refresh evidence after scoring.
@@ -1098,6 +1133,54 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
     return "\n".join(lines)
 
 
+def _literature_limitation_audit(candidate: dict[str, Any]) -> str:
+    """Render only the persisted, mechanically checked limitation record."""
+    finding = (
+        (candidate.get("dossier_evidence_contract") or {}).get(
+            "literature_limitation")
+        or candidate.get("literature_limitation")
+        or {}
+    )
+    lines = [
+        "### Treatment-landscape and literature-limitation gate\n",
+        f"- **Verdict:** {_display_token(finding.get('verdict'))}.",
+        f"- **Source state:** {_display_token(finding.get('source_status'))}.",
+        f"- **Prioritization effect:** "
+        f"{'BLOCKED — evidence score preserved; paid validation not authorized' if finding.get('blocked') else 'No automatic literature block recorded'}.",
+        f"- **Reason:** {_audit_value(finding.get('reason'))}.",
+        f"- **Bounded coverage:** {_audit_value(finding.get('records_screened'))} "
+        "PubMed record(s) screened across the persisted query families. A search "
+        "with no qualifying limitation is not evidence of novelty, efficacy, or safety.",
+    ]
+    evidence = finding.get("evidence") or []
+    if evidence:
+        lines.extend([
+            "",
+            "| PMID / source | Source type | Year | Classification | Exact quotation |",
+            "| --- | --- | ---: | --- | --- |",
+        ])
+        for row in evidence:
+            pmid = _audit_value(row.get("pmid"))
+            source = row.get("source_url")
+            source_cell = f"[{pmid}]({source})" if source else pmid
+            quote = str(row.get("quote") or "").replace("|", "\\|")
+            lines.append(
+                f"| {source_cell} | "
+                f"{_audit_value(', '.join(row.get('publication_types') or []))} | "
+                f"{_audit_value(row.get('publication_year'))} | "
+                f"{_display_token(row.get('label'))} | “{quote}” |"
+            )
+    else:
+        lines.append(
+            "- No mechanically verified quotation was persisted for this state."
+        )
+    lines.append(
+        "- **Policy boundary:** this is a post-benchmark production gate. It "
+        "does not alter or recompute frozen benchmark results."
+    )
+    return "\n".join(lines)
+
+
 def _trial_safety_applicability_audit(candidate: dict[str, Any]) -> str:
     """Report known, negative, and unknown states without triggering lookups."""
     audit = candidate.get("trial_audit") or {}
@@ -1249,6 +1332,16 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     strong = candidate.get("strong_match")
     threshold = formula.get("strong_match_threshold")
     _apply_matched_biologist_context(candidate, biologist_output)
+    # The matched-context projection is the final report input. Validate again
+    # after that projection so no Writer enrichment can bypass the pre-Boltz
+    # dossier contract gate.
+    if isinstance(candidate.get("dossier_evidence_contract"), dict):
+        validate_dossier_inputs(
+            candidate,
+            biologist_output,
+            target_meta,
+            repurposing_only=repurposing_only,
+        )
 
     network = (biologist_output or {}).get("interacting_genes", [])[:8]
     biogrid_status = (biologist_output or {}).get("biogrid_query_status", "")
@@ -1270,6 +1363,14 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"(composite {_fmt(candidate.get('composite_score'), 4)} < "
             f"{_fmt(threshold, 2)}). It is included as the highest-ranked hypothesis "
             f"for review; treat it accordingly.\n\n"
+        )
+    if candidate.get("literature_limitation_blocked"):
+        header_note = (
+            "> **NOT PRIORITIZABLE — KNOWN LITERATURE LIMITATION.** The "
+            "candidate's evidence score is retained for auditability, but an "
+            "applicable class/drug limitation met the deterministic blocking "
+            "threshold. Paid structure validation and external prioritization "
+            "are not authorized for this use.\n\n"
         )
 
     parts = []
@@ -1547,6 +1648,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     parts.append("\n## 2. Evidence table\n")
     parts.append(_evidence_table(candidate, struct) + "\n")
     parts.append("\n" + _readiness_and_context(candidate, struct) + "\n")
+    parts.append("\n" + _literature_limitation_audit(candidate) + "\n")
     parts.append("\n### Assay evidence audit\n")
     parts.append(_assay_audit_table(candidate) + "\n")
     parts.append("\n### Comparator table\n")

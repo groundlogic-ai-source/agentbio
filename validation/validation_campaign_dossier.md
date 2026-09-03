@@ -55,6 +55,7 @@ This dossier answers two questions an evaluator should ask separately:
 | 2026-08-11 | repoDB miss-classifier summary | 1/15; projected ceiling 10/15 under then-planned fixes |
 | 2026-08-19 | Study C v1 (triage discrimination) | 6 scored + 21 disclosed exclusions; AUC vacuous |
 | 2026-08-20 | Machine v2 acceptance | 0/16 v1 misses rescued — coverage ceiling is mechanistic |
+| 2026-09-03 | Literature-limitation gate | Post-benchmark production hardening; no frozen study recomputed |
 
 ## Results of record
 
@@ -207,6 +208,31 @@ This dossier answers two questions an evaluator should ask separately:
 ---
 
 ## Track 2 — Audit integrity
+
+### Literature-limitation gate — post-benchmark production hardening (2026-09-03)
+
+- **Artifacts:** `validation/timothy_literature_limitation_postmortem.md`,
+  `validation/flagship_selection_rubric.md`, and deterministic acceptance tests
+  in `validation/test_literature_limitation.py`.
+- **Motivating failure:** the Timothy syndrome / nisoldipine case showed that a
+  plausible target-level direction result can miss an explicit disease- and
+  class-level limitation. Target pharmacology did not establish correction of
+  the TS1 channel-gating/inactivation defect.
+- **Production policy:** a bounded PubMed retrieval runs before paid structure
+  validation. A model can only classify a supplied abstract and copy an exact
+  passage. Python verifies the quote, PMID, exact disease/use/class
+  applicability, and source-authority/multi-record threshold. Conflicts and
+  failures remain non-negative unknown states.
+- **Decision semantics:** a confirmed limitation preserves the original
+  evidence score, removes any coarse directional bonus, and separately blocks
+  external prioritization and paid structure validation.
+- **Study boundary:** this is not a successor benchmark or a revised audit
+  result. Frozen holdout runs bypass the gate, and no frozen result is
+  regenerated, rescored, or edited.
+- **Supports:** regression protection for a newly identified production failure
+  class and a prespecified gate for future flagship selection.
+- **Does not support:** a measured recall/false-positive rate in an independent
+  frozen study, clinical effectiveness, or novelty.
 
 ### Audit claim-set v2 — the result of record (2026-08-11, frozen, PASS)
 

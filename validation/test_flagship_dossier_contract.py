@@ -96,6 +96,27 @@ class FlagshipDossierContractTests(unittest.TestCase):
             validate_dossier_inputs(
                 candidate, None, None, repurposing_only=True)
 
+    def test_dossier_preflight_rejects_lead_in_comparator_set(self):
+        candidate = self._preflight_ready_candidate()
+        candidate["dossier_evidence_contract"]["comparators"] = {
+            "target_approved_drugs": [{
+                "name": "AuditDrug",
+                "molecule_chembl_id": "CHEMBL1",
+            }],
+        }
+        with self.assertRaisesRegex(ValueError, "own comparator set"):
+            validate_dossier_inputs(
+                candidate, None, None, repurposing_only=True)
+
+    def test_dossier_preflight_rejects_mandatory_experiment_status(self):
+        candidate = self._preflight_ready_candidate()
+        candidate["dossier_evidence_contract"]["scientific_readiness"][
+            "status"
+        ] = "HYPOTHESIS_REQUIRES_EXPERIMENTAL_VALIDATION"
+        with self.assertRaisesRegex(ValueError, "mandates experimental"):
+            validate_dossier_inputs(
+                candidate, None, None, repurposing_only=True)
+
     def test_summary_uses_complete_tanimoto_sentence(self):
         report = build_report_markdown(_candidate(), {}, {
             "composite_weights": {}, "formula_version": "v",

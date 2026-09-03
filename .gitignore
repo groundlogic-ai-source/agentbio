@@ -72,3 +72,6 @@ validation/.studyb_runner.lock
 # internal — never publish
 .agents/
 outreach/
+
+# Local PDF rendering scratch output
+--out-dir/

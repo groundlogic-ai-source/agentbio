@@ -147,6 +147,9 @@ class OldRowBackwardCompatTest(unittest.TestCase):
         row["target_tier"] = "unattributed"
         row["exploratory_rank_demoted"] = False
         row["causal_anchor"] = None
+        row["literature_limitation_blocked"] = False
+        row["literature_limitation_gate_cleared"] = True
+        row["externally_prioritizable"] = False
         self.assertEqual(validate_reviewer_handoff([row]), [])
 
 

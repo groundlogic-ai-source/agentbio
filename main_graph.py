@@ -599,7 +599,19 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
     fresh = FORCE_RECOMPUTE or bool(state.get("job_id"))
     existing = None if fresh else _load_json("reviewed_candidates.json")
     if existing is not None:
-        if TRACTABILITY_WEIGHTS_OVERRIDDEN or COMPOSITE_WEIGHTS_OVERRIDDEN:
+        cached_candidates = existing.get("candidates") or []
+        if cached_candidates and any(
+            "literature_limitation_gate_cleared" not in row
+            for row in cached_candidates
+        ):
+            print(
+                "[graph] reviewer: cached artifact predates the required "
+                "literature-limitation gate — ignoring it and rescoring",
+                flush=True,
+            )
+            existing = None
+        if existing is not None and (
+                TRACTABILITY_WEIGHTS_OVERRIDDEN or COMPOSITE_WEIGHTS_OVERRIDDEN):
             # Logging alone is not dossier disclosure: a cached artifact was
             # produced under an unknown scoring config and would yield dossiers
             # without the non-comparability banner.  Rescore under the active
@@ -610,7 +622,7 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
                   "rescoring so every dossier carries correct provenance",
                   flush=True)
             existing = None
-        else:
+        elif existing is not None:
             print("[graph] reviewer: reusing existing reviewed_candidates.json")
             return {"reviewed": existing}
     reviewed = run_reviewer(
@@ -691,6 +703,12 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
         reviewed.get("repurposing_only") or state.get("repurposing_only"))
 
     def _eligible(c: dict[str, Any]) -> bool:
+        literature_ok = (
+            not c.get("literature_limitation_blocked")
+            and c.get("literature_limitation_gate_cleared") is True
+        )
+        if not literature_ok:
+            return False
         if not repurposing_only:
             return True
         return c.get("is_approved_drug") is True
@@ -700,6 +718,22 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
     if not candidates:
         reason = ("No candidate compound was found for the selected target(s) "
                   "in any enabled source.")
+    elif not eligible and any(
+            c.get("literature_limitation_blocked") for c in candidates):
+        reason = (
+            "No candidate is authorized for paid validation: applicable "
+            "literature blocks external prioritization of the assessed lead(s). "
+            "The evidence score is preserved for auditability."
+        )
+    elif not eligible and any(
+            (not repurposing_only or c.get("is_approved_drug") is True)
+            and c.get("literature_limitation_gate_cleared") is not True
+            for c in candidates):
+        reason = (
+            "No candidate is authorized for paid validation: the bounded "
+            "literature-limitation check did not clear an eligible lead. A "
+            "failed or unperformed search is unknown, not a favorable result."
+        )
     elif not eligible:
         reason = (
             f"No eligible repurposing candidate found: all "
@@ -776,13 +810,18 @@ def dossier_preflight_node(state: PipelineState) -> dict[str, Any]:
 
 def _select_candidates(reviewed: dict[str, Any]) -> list[dict[str, Any]]:
     cands = reviewed.get("candidates", [])
-    strong = [c for c in cands if c.get("strong_match")]
+    eligible = [
+        c for c in cands
+        if not c.get("literature_limitation_blocked")
+        and c.get("literature_limitation_gate_cleared") is True
+    ]
+    strong = [c for c in eligible if c.get("strong_match")]
     if strong:
         return strong[:MAX_STRUCTURE_CANDIDATES]
     if STRONG_ONLY:
         return []
     # Demonstration fallback: highest-ranked candidate, flagged as below threshold.
-    return cands[:1]
+    return eligible[:1]
 
 
 def structure_validation_node(state: PipelineState) -> dict[str, Any]:

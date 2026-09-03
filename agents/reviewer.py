@@ -59,6 +59,10 @@ from data_sources.clinicaltrials import check_prior_trials
 from data_sources.chembl import get_molecule_safety_flags, get_drug_action_type, get_molecule_data
 from data_sources.safety_check import web_safety_check
 from data_sources.mechanism_direction import check_mechanism_direction
+from data_sources.literature_limitation import (
+    VERDICT_NOT_ASSESSED as LITERATURE_NOT_ASSESSED,
+    check_literature_limitation,
+)
 from data_sources import holdout as _holdout
 from data_sources.pubchem import get_compound_data
 from data_sources.evidence_ledger import qualified_target_chembl_activity_ids
@@ -163,6 +167,9 @@ MAX_MECHANISM_DIRECTION_CANDIDATES = 3
 # Layer 2 (web-search) only runs on this many top candidates to mirror the
 # Boltz validation scope and keep LLM call costs bounded.
 MAX_SAFETY_LAYER2_CANDIDATES = 3
+# This post-benchmark production gate runs only on candidates that could reach
+# paid structure prediction. Unchecked candidates are never structure-eligible.
+MAX_LITERATURE_LIMITATION_CANDIDATES = 3
 #: Env-overridable so long-running batch contexts (prod study supervisors)
 #: can soften egress pressure without touching the API server's default.
 def _env_int(name: str, default: int) -> int:
@@ -636,6 +643,32 @@ def _apply_directional_bonus(candidate: dict[str, Any]) -> bool:
     return True
 
 
+def _remove_directional_bonus_for_limitation(candidate: dict[str, Any]) -> None:
+    """Withdraw a coarse direction bonus without rewriting the underlying score."""
+    components = candidate.setdefault("score_components", {})
+    old_bonus = float(components.get("qualified_directional_bonus") or 0.0)
+    if not old_bonus:
+        components["qualified_directional"] = False
+        components["qualified_directional_bonus"] = 0.0
+        return
+    components["qualified_directional"] = False
+    components["qualified_directional_bonus"] = 0.0
+    pre_cap = max(
+        0.0,
+        float(candidate.get("pre_cap_score") or 0.0) - old_bonus,
+    )
+    candidate["pre_cap_score"] = round(pre_cap, 4)
+    cap = min(
+        MECHANISM_DIRECTION_CAP
+        if candidate.get("mechanism_cap_applied") else 1.0,
+        SAFETY_CAP if candidate.get("safety_cap_applied") else 1.0,
+        SAFETY_CAP if candidate.get("unapproved_cap_applied") else 1.0,
+    )
+    candidate["composite_score"] = round(min(pre_cap, cap), 4)
+    candidate["strong_match"] = (
+        candidate["composite_score"] >= STRONG_MATCH_THRESHOLD)
+
+
 def run_reviewer(
     chemist_output: dict[str, Any],
     biologist_output: Optional[dict[str, Any]] = None,
@@ -954,6 +987,12 @@ def run_reviewer(
             # post-sort mechanism-direction pass below (top-1 only).
             "mechanism_direction": None,
             "mechanism_cap_applied": False,
+            # Populated by the post-benchmark literature limitation pass. A
+            # candidate must be assessed and cleared before paid validation.
+            "literature_limitation": None,
+            "literature_limitation_blocked": False,
+            "literature_limitation_gate_cleared": False,
+            "externally_prioritizable": False,
             "provenance": {
                 "counted_once": new_ids,
                 "collapsed_as_duplicate": collapsed_ids,
@@ -1290,6 +1329,87 @@ def run_reviewer(
     if needs_resort:
         _rank_reviewed(reviewed)
 
+    # ── Literature limitation gate (post-benchmark production policy) ─────────
+    # This is deliberately separate from mechanism direction: Timothy syndrome
+    # showed that plausible target-level direction can coexist with an explicit
+    # disease/class-level therapeutic limitation. The bounded shortlist is the
+    # only set authorized to proceed to paid structure validation.
+    if _holdout.is_active():
+        # Frozen/holdout studies predate this gate. Do not query the held-out
+        # candidate or change their ranking semantics post hoc.
+        for r in reviewed:
+            r["literature_limitation"] = {
+                "schema_version": "literature-limitation-v2",
+                "verdict": LITERATURE_NOT_ASSESSED,
+                "source_status": "NOT_ASSESSED_BENCHMARK_HOLDOUT",
+                "blocked": False,
+                "gate_cleared": True,
+                "reason": (
+                    "Post-benchmark production gate was not applied to this "
+                    "holdout study; frozen benchmark semantics are unchanged."
+                ),
+                "evidence": [],
+                "post_benchmark_production_gate": True,
+            }
+            r["literature_limitation_gate_cleared"] = True
+            r["externally_prioritizable"] = bool(r.get("strong_match"))
+    else:
+        shortlist = reviewed[:MAX_LITERATURE_LIMITATION_CANDIDATES]
+        for r in shortlist:
+            direction = r.get("mechanism_direction") or {}
+            action_type = direction.get("action_type_used")
+            mechanism = direction.get("mechanism_of_action_used")
+            if not action_type and not mechanism:
+                action_info = get_drug_action_type(
+                    r["drug_name"], r.get("target_symbol") or "") or {}
+                action_type = action_info.get("action_type")
+                mechanism = action_info.get("mechanism_of_action")
+            intended_use = (
+                "cardiac electrophysiology in TS1 CACNA1C p.G406R/exon 8A"
+                if "timothy syndrome" in disease.casefold()
+                and str(r.get("target_symbol") or "").upper() == "CACNA1C"
+                else f"treatment of {disease}"
+            )
+            limitation = check_literature_limitation(
+                r["drug_name"],
+                disease,
+                r.get("target_symbol") or "",
+                action_type,
+                mechanism,
+                intended_use,
+            )
+            blocked = bool(limitation.get("blocked"))
+            cleared = bool(limitation.get("gate_cleared"))
+            r["literature_limitation"] = limitation
+            r["literature_limitation_blocked"] = blocked
+            r["literature_limitation_gate_cleared"] = cleared
+            if blocked:
+                _remove_directional_bonus_for_limitation(r)
+            r["externally_prioritizable"] = bool(
+                r.get("strong_match") and cleared and not blocked)
+            print(
+                f"[reviewer] literature-limitation: {r['drug_name']} / {disease} "
+                f"→ {limitation.get('verdict')} "
+                f"(block={'YES' if blocked else 'no'}, "
+                f"paid-gate={'clear' if cleared and not blocked else 'closed'})"
+            )
+        for r in reviewed[MAX_LITERATURE_LIMITATION_CANDIDATES:]:
+            r["literature_limitation"] = {
+                "schema_version": "literature-limitation-v2",
+                "verdict": LITERATURE_NOT_ASSESSED,
+                "source_status": "NOT_ASSESSED_OUTSIDE_BOUNDED_SHORTLIST",
+                "blocked": False,
+                "gate_cleared": False,
+                "reason": (
+                    "Not assessed because this candidate was outside the bounded "
+                    "pre-structure shortlist; it is not authorized for paid validation."
+                ),
+                "evidence": [],
+                "post_benchmark_production_gate": True,
+            }
+            r["literature_limitation_gate_cleared"] = False
+            r["externally_prioritizable"] = False
+
     # This is a pure, post-gate view of existing records.  It deliberately runs
     # after both safety and mechanism passes so the dossier cannot describe a
     # pre-gate verdict as its final scientific readiness.
@@ -1329,6 +1449,8 @@ def _build_dossier_evidence_contract(
         ("unapproved", candidate.get("unapproved_cap_applied")),
         ("mechanism_direction", candidate.get("mechanism_cap_applied")),
         ("safety", candidate.get("safety_cap_applied")),
+        ("known_literature_limitation",
+         candidate.get("literature_limitation_blocked")),
     ) if hit]
     bio_identity = (biologist_output or {}).get("target") or {}
     bio_target = str(bio_identity.get("target_symbol") or "").upper()
@@ -1419,11 +1541,17 @@ def _build_dossier_evidence_contract(
         "contract_version": "flagship-dossier-evidence-v1",
         "unknown_state": unknown,
         "evidence_stage_verdict": (
-            "PRIORITIZED_HYPOTHESIS" if candidate.get("strong_match")
+            "PRIORITIZED_HYPOTHESIS"
+            if candidate.get("externally_prioritizable",
+                             candidate.get("strong_match"))
             else "NOT_PRIORITIZED"
         ),
         "scientific_readiness": {
-            "status": "HYPOTHESIS_FOR_QUALIFIED_REVIEW",
+            "status": (
+                "NOT_PRIORITIZABLE_KNOWN_LITERATURE_LIMITATION"
+                if candidate.get("literature_limitation_blocked")
+                else "HYPOTHESIS_FOR_QUALIFIED_REVIEW"
+            ),
             "qualified_human_target_assay_evidence": (
                 "OBSERVED" if direct_assay else unknown
             ),
@@ -1434,6 +1562,14 @@ def _build_dossier_evidence_contract(
                 "NOT_YET_AVAILABLE"  # structure stage augments the rendered view
             ),
             "blocking_gates": caps,
+        },
+        "literature_limitation": candidate.get("literature_limitation") or {
+            "schema_version": "literature-limitation-v2",
+            "verdict": LITERATURE_NOT_ASSESSED,
+            "source_status": "NOT_ASSESSED",
+            "blocked": False,
+            "gate_cleared": False,
+            "evidence": [],
         },
         "disease_mechanism_context": {
             "disease_name": candidate.get("disease_name", unknown),

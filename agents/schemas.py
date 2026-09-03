@@ -95,6 +95,10 @@ class ReviewerCandidate(TypedDict, total=False):
     mechanism_direction: Optional[dict]
     # 0.05 only after a persisted, citation-bearing compatible direction audit.
     qualified_directional_bonus: Optional[float]
+    literature_limitation: Optional[dict]
+    literature_limitation_blocked: Required[bool]
+    literature_limitation_gate_cleared: Required[bool]
+    externally_prioritizable: Required[bool]
     safety_cap_applied: Required[bool]
     black_box_advisory: Optional[bool]   # BBW present but drug NOT withdrawn
     # Structured-vs-independent withdrawal disagreement; never silently
@@ -160,6 +164,11 @@ _REVIEWER_REQUIRED_FIELDS: list[tuple[str, str]] = [
     ("strong_match",            "error"),
     ("unapproved_cap_applied",  "error"),
     ("mechanism_cap_applied",   "error"),
+    # Warn-level for persisted pre-gate rows; every new Reviewer row carries
+    # these and the graph fails closed before paid validation when uncleared.
+    ("literature_limitation_blocked", "warn"),
+    ("literature_limitation_gate_cleared", "warn"),
+    ("externally_prioritizable", "warn"),
     ("safety_cap_applied",      "error"),
     ("trials_query_failed",     "error"),
     ("uniprot_id",              "error"),   # None is OK; key must be present

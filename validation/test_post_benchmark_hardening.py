@@ -294,14 +294,31 @@ class TestEligibilityGate(unittest.TestCase):
         self.assertIn("No candidate compound", verdict["reason"])
 
     def test_approved_candidate_is_eligible(self):
-        verdict = self._verdict([{"drug_name": "d", "is_approved_drug": True}])
+        verdict = self._verdict([{
+            "drug_name": "d",
+            "is_approved_drug": True,
+            "literature_limitation_blocked": False,
+            "literature_limitation_gate_cleared": True,
+        }])
         self.assertTrue(verdict["eligible"])
         self.assertEqual(verdict["reason"], "")
 
     def test_mixed_pool_mode_does_not_gate(self):
-        verdict = self._verdict([{"drug_name": "tool", "is_approved_drug": False}],
-                                repurposing_only=False)
+        verdict = self._verdict([{
+            "drug_name": "tool",
+            "is_approved_drug": False,
+            "literature_limitation_blocked": False,
+            "literature_limitation_gate_cleared": True,
+        }], repurposing_only=False)
         self.assertTrue(verdict["eligible"])
+
+    def test_pre_gate_legacy_candidate_is_ineligible_for_paid_validation(self):
+        verdict = self._verdict([{
+            "drug_name": "legacy",
+            "is_approved_drug": True,
+        }])
+        self.assertFalse(verdict["eligible"])
+        self.assertIn("did not clear", verdict["reason"])
 
     def test_router_sends_ineligible_runs_to_end(self):
         from langgraph.graph import END

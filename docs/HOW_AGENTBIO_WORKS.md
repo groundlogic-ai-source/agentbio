@@ -9,7 +9,7 @@ The one-paragraph mental model:
 > AgentBio is a **deterministic evidence pipeline with AI-assisted
 > interpretation**, not an AI that invents repurposing ideas. Public biomedical
 > databases supply the evidence; plain Python computes every score, rank, cap,
-> and gate; language models are confined to four narrow jobs (literature
+> and gate; language models are confined to narrow jobs (literature
 > relevance screening, cited summarization, fact-restatement prose, and a
 > constrained mechanism-direction verdict); a human sign-off node is a real,
 > pausing stage in the graph — not a UI decoration.
@@ -233,6 +233,32 @@ Two honesty rules are load-bearing here:
     1) plus an independent web-search check on the top 3 (layer 2).
     Disagreements between layers are preserved as a visible audit object.
 
+**Post-benchmark literature-limitation gate.** Before a candidate can proceed
+to paid structure validation, the top three candidates receive a separate
+retrieval-first PubMed screen (`data_sources/literature_limitation.py`). This
+asks whether applicable guidelines, systematic reviews, clinical reports, or
+mechanism-specific studies explicitly limit the proposed drug/class for the
+exact disease and intended use. It is deliberately separate from target-level
+direction: a target action can look directionally plausible while the class is
+known not to correct the relevant gating, trafficking, compartment, or clinical
+problem.
+
+The model sees one bounded batch of at most eight retrieved abstracts per
+candidate and may only return labels and exact quotations keyed to supplied
+PMIDs. Python verifies that each quotation is verbatim, the PMID was retrieved,
+and the cited title/abstract independently contains the exact disease,
+specific drug or sufficiently specific class/mechanism, and meaningful
+intended-use terms; target presence or one generic use term is not enough, and
+model-supplied match booleans are never sufficient. A block
+requires either one PubMed-typed guideline/systematic-review/consensus source or at least two
+independent explicit PubMed records. One low-authority record is caution only;
+supporting and limiting records produce a visible conflict; source failure is
+unknown and closes the paid gate without asserting ineffectiveness. A confirmed
+limitation preserves the evidence score, withdraws any coarse directional
+bonus, and separately marks the candidate not externally prioritizable. Frozen
+holdout studies bypass this post-benchmark gate so their semantics are never
+changed retroactively.
+
 `STRONG_MATCH` = composite ≥ 0.70 **and** no cap. The pipeline keeps both
 `pre_cap_score` and the capped `composite_score`, so "weak candidate" is
 distinguishable from "strong candidate blocked by a gate".
@@ -313,7 +339,7 @@ calls before the interrupt, so resuming can never re-spend money.
 | ChEMBL | `chembl.py` | Bioactivity counts (tractability), mechanism-of-action precedent targets, the candidate compound pool, approved drugs per target, safety flags, action types, molecule type/orality | Stages 1–2, always (small-molecule lanes) |
 | AlphaFold DB | `afdb.py` | Mean pLDDT (tractability term); apo structure pre-check | Stage 1 + Stage 3, whenever a UniProt ID exists |
 | ClinicalTrials.gov | `clinicaltrials.py` | Prior/negative repurposing trials (Stage 1 penalty, Reviewer term, Writer citations) | Stages 1, 2c, 3b — always |
-| PubMed (E-utilities) | `pubmed.py` | Abstracts for target–disease literature and druggability history | Biologist, always |
+| PubMed (E-utilities) | `pubmed.py` + `literature_limitation.py` | Abstracts for target–disease literature, druggability history, and the pre-structure exact-use limitation gate | Biologist always; Reviewer bounded top-3 gate |
 | Europe PMC | `europepmc_mechanisms.py` | Path C literature mechanism-class targets | Stage 1, always |
 | BioGRID | `biogrid.py` | Physical/genetic interactors (network context) | Biologist, always (needs `BIOGRID_API_KEY`; degrades gracefully) |
 | Reactome | `reactome.py` | Pathway-neighbor proteins (Path D) and chemist expansion neighbors | Conditional: universe expansion + when a target's approved-drug pool is thin |
@@ -345,11 +371,12 @@ not a confirmed negative — empty pools get purged by content, not trusted.
 | 2 | Biologist druggability summary | Haiku, temp 0 | 2–3 sentences of historical-difficulty context | Only if ≥ 2 abstracts passed gate 1; may only use supplied abstracts + one ChEMBL fact; **cannot affect any score** |
 | 3 | Chemist rationale | Sonnet, temp 0 | Restate a candidate's measured numbers in exactly two sentences | Budget-capped (default 25/pool); fact-list prompt banning praise/speculation; disclosure-only — nothing parses it |
 | 4 | Mechanism-direction check | LLM via `mechanism_direction.py` | COMPATIBLE / DIRECTIONALLY_INCOMPATIBLE / INSUFFICIENT_INFO | Top-3 candidates only; only INCOMPATIBLE acts (cap at 0.40); verdict + reason disclosed in the report |
-| 5 | Research module hypothesis proposer ("Sol") | LLM, `data_prep/` | Proposes analogical hypotheses about repurposing success in general | Every hypothesis becomes a testable predicate run against held-out repoDB outcomes under cumulative Benjamini–Hochberg FDR; findings are disclosure-only base rates, never score inputs |
-| 6 | Stage-1 CLI narration | Sonnet | Plain-English summary of the already-written top-30 table | Post-hoc; references only numbers already on disk; not used by the API path |
+| 5 | Literature-limitation extraction | LLM via `literature_limitation.py` | Classify a bounded batch of retrieved PubMed abstracts and copy exact limiting/supportive passages | One call per top-3 candidate, at most 8 abstracts each; Python verifies quote + PMID + exact applicability and applies the multi-source/source-authority threshold; failures never become negative findings |
+| 6 | Research module hypothesis proposer ("Sol") | LLM, `data_prep/` | Proposes analogical hypotheses about repurposing success in general | Every hypothesis becomes a testable predicate run against held-out repoDB outcomes under cumulative Benjamini–Hochberg FDR; findings are disclosure-only base rates, never score inputs |
+| 7 | Stage-1 CLI narration | Sonnet | Plain-English summary of the already-written top-30 table | Post-hoc; references only numbers already on disk; not used by the API path |
 
 What the AI **never** does: calculate any score, rank, or similarity; decide
-caps or STRONG_MATCH; resolve disease identity; invent or select citations;
+caps, literature blocks, or STRONG_MATCH; resolve disease identity; invent or select citations;
 override a gate; or mark anything clinically validated. All AI clients honor
 spend guardrails (`AGENTBIO_MAX_LLM_RATIONALES`, prefetch worker caps), and
 provider-level hard spend limits are documented as the required backstop in
