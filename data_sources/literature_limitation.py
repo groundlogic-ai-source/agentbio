@@ -19,8 +19,9 @@ from typing import Any, Callable, Optional
 import requests
 
 from cache.cache import get, make_key, set as cache_set
-from data_sources.llm_failover import chat_text
+from data_sources.llm_failover import MODEL_TIER_CRITICAL, chat_text
 from data_sources.pubmed import BASE_URL, _api_key_params, _esearch
+from data_sources.provider_request_policy import request as provider_request
 
 
 VERDICT_CONFIRMED = "CONFIRMED_APPLICABLE_LIMITATION"
@@ -104,15 +105,14 @@ def _fetch_records(pmids: list[str]) -> list[dict[str, Any]]:
     """Fetch citable PubMed records. Raises on source failure; never returns it as empty."""
     if not pmids:
         return []
-    response = requests.get(
-        f"{BASE_URL}efetch.fcgi",
+    response = provider_request(
+        "ncbi", requests.get, f"{BASE_URL}efetch.fcgi",
         params={
             "db": "pubmed", "id": ",".join(pmids), "retmode": "xml",
             "rettype": "abstract", **_api_key_params(),
         },
         timeout=60,
     )
-    response.raise_for_status()
     root = ET.fromstring(response.content)
     records: list[dict[str, Any]] = []
     for article in root.findall(".//PubmedArticle"):
@@ -242,7 +242,9 @@ PMID: {record.get('pmid')}
 Title: {record.get('title')}
 Abstract:
 {str(record.get('abstract') or '')[:6000]}"""
-    raw, provider = chat_text(prompt, max_tokens=500)
+    raw, provider = chat_text(
+        prompt, max_tokens=500, model_tier=MODEL_TIER_CRITICAL,
+        operation_label="literature-limitation-record-classification")
     parsed = _extract_json(raw) or {}
     return {**parsed, "classifier_provider": provider, "classifier_raw": raw}
 
@@ -283,7 +285,9 @@ quote or empty","disease_match":true|false,"use_match":true|false,
 Use only supplied text. Never omit a PMID and never use outside knowledge.
 
 {supplied}"""
-    raw, provider = chat_text(prompt, max_tokens=2400)
+    raw, provider = chat_text(
+        prompt, max_tokens=2400, model_tier=MODEL_TIER_CRITICAL,
+        operation_label="literature-limitation-batch-classification")
     parsed = _extract_json(raw)
     if parsed is None or not isinstance(parsed.get("findings"), list):
         raise ValueError("Classifier returned invalid JSON or no findings array")

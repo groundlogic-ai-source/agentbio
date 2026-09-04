@@ -31,6 +31,7 @@ from data_sources.pubmed import search_literature, fetch_raw_abstracts
 from data_sources.chembl import get_approved_drugs_for_target
 from data_sources.reactome import get_pathway_neighbors
 from cache.cache import get, set as cache_set, make_key
+from data_sources.llm_failover import call_with_backoff
 
 SCREENING_MODEL = "claude-sonnet-4-6"
 HAIKU_MODEL = "claude-haiku-4-5-20251001"
@@ -41,7 +42,7 @@ def _anthropic_client() -> Optional[anthropic.Anthropic]:
     api_key = os.environ.get("AI_INTEGRATIONS_ANTHROPIC_API_KEY")
     if not base_url or not api_key:
         return None
-    return anthropic.Anthropic(base_url=base_url, api_key=api_key)
+    return anthropic.Anthropic(base_url=base_url, api_key=api_key, max_retries=0)
 
 
 def get_druggability_literature(
@@ -130,14 +131,16 @@ def get_druggability_literature(
             f"Abstract:\n{abstract[:4000]}"
         )
         try:
-            msg = client.messages.create(
+            msg = call_with_backoff(
+                lambda: client.messages.create(
+                    model=SCREENING_MODEL, max_tokens=120,
+                    # temperature=0: YES/NO classifier that gates which abstracts enter
+                    # supporting_pmids. Pinned for reproducibility; non-zero temperature
+                    # could produce different outcomes on borderline abstracts across runs.
+                    temperature=0,
+                    messages=[{"role": "user", "content": prompt}]),
+                label="biologist-druggability-screen", provider="anthropic",
                 model=SCREENING_MODEL,
-                max_tokens=120,
-                # temperature=0: YES/NO classifier that gates which abstracts enter
-                # supporting_pmids. Pinned for reproducibility; non-zero temperature
-                # could produce different outcomes on borderline abstracts across runs.
-                temperature=0,
-                messages=[{"role": "user", "content": prompt}],
             )
             block = msg.content[0]
             text = (block.text if block.type == "text" else str(block)).strip()
@@ -181,11 +184,12 @@ def get_druggability_literature(
     )
 
     try:
-        msg = client.messages.create(
+        msg = call_with_backoff(
+            lambda: client.messages.create(
+                model=HAIKU_MODEL, max_tokens=512, temperature=0,
+                messages=[{"role": "user", "content": summary_prompt}]),
+            label="biologist-druggability-summary", provider="anthropic",
             model=HAIKU_MODEL,
-            max_tokens=512,
-            temperature=0,
-            messages=[{"role": "user", "content": summary_prompt}],
         )
         block = msg.content[0]
         result["difficulty_summary"] = (

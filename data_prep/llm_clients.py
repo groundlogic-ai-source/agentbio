@@ -18,6 +18,7 @@ import os
 
 from anthropic import Anthropic
 from openai import OpenAI
+from data_sources.llm_failover import call_with_backoff
 
 OPUS_MODEL = "claude-opus-4-8"
 SOL_MODEL = "gpt-5.6-sol"
@@ -32,6 +33,7 @@ def _ac() -> Anthropic:
         _anthropic = Anthropic(
             api_key=os.environ["AI_INTEGRATIONS_ANTHROPIC_API_KEY"],
             base_url=os.environ["AI_INTEGRATIONS_ANTHROPIC_BASE_URL"],
+            max_retries=0,
         )
     return _anthropic
 
@@ -42,16 +44,18 @@ def _oc() -> OpenAI:
         _openai = OpenAI(
             api_key=os.environ["AI_INTEGRATIONS_OPENAI_API_KEY"],
             base_url=os.environ["AI_INTEGRATIONS_OPENAI_BASE_URL"],
+            max_retries=0,
         )
     return _openai
 
 
 def opus(prompt: str, max_tokens: int = 8000) -> str:
     """Call Claude Opus 4.8 (temperature omitted — deprecated on this model)."""
-    resp = _ac().messages.create(
-        model=OPUS_MODEL,
-        max_tokens=max_tokens,
-        messages=[{"role": "user", "content": prompt}],
+    resp = call_with_backoff(
+        lambda: _ac().messages.create(
+            model=OPUS_MODEL, max_tokens=max_tokens,
+            messages=[{"role": "user", "content": prompt}]),
+        label="discovery-opus", provider="anthropic", model=OPUS_MODEL,
     )
     if getattr(resp, "stop_reason", None) == "max_tokens":
         # Truncated output is catastrophic for JSON-array callers: extract_json's
@@ -72,10 +76,11 @@ def sol(prompt: str, max_output_tokens: int = 16000) -> str:
     Sol is a reasoning model, so max_output_tokens covers reasoning tokens too and
     the visible JSON can be cut off well before the nominal budget looks spent.
     """
-    resp = _oc().responses.create(
-        model=SOL_MODEL,
-        input=prompt,
-        max_output_tokens=max_output_tokens,
+    resp = call_with_backoff(
+        lambda: _oc().responses.create(
+            model=SOL_MODEL, input=prompt,
+            max_output_tokens=max_output_tokens),
+        label="discovery-sol", provider="openai", model=SOL_MODEL,
     )
     # Mirror the Opus truncation guard: a silently truncated array used to be
     # "recovered" as one nested object, which is indistinguishable from a real
@@ -99,11 +104,13 @@ def opus_with_search(prompt: str, max_tokens: int = 2000) -> str:
     triggers UNCLEAR tagging downstream — the pipeline continues unaffected.
     """
     try:
-        resp = _ac().messages.create(
+        resp = call_with_backoff(
+            lambda: _ac().messages.create(
+                model=OPUS_MODEL, max_tokens=max_tokens,
+                tools=[{"type": "web_search_20250305", "name": "web_search"}],
+                messages=[{"role": "user", "content": prompt}]),
+            label="discovery-opus-web-search", provider="anthropic",
             model=OPUS_MODEL,
-            max_tokens=max_tokens,
-            tools=[{"type": "web_search_20250305", "name": "web_search"}],
-            messages=[{"role": "user", "content": prompt}],
         )
         # The response may contain server_tool_use, web_search_tool_result, and
         # text blocks. Extract only the final text block(s).

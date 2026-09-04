@@ -44,6 +44,9 @@ VALID_STATUSES = (
     "running",
     "awaiting_review",
     "completed",
+    "no_eligible_candidate",
+    "source_unavailable",
+    "degraded_unscorable",
     "error",
 )
 VALID_STAGES = (
@@ -242,6 +245,50 @@ def update_job_status(job_id: str, **fields: Any) -> Optional[dict[str, Any]]:
     with _conn(lock=True) as conn, conn.cursor() as cur:
         cur.execute(f"UPDATE jobs SET {assignments} WHERE job_id = %s", values)
     return get_job(job_id)
+
+
+def save_candidate_snapshot(job_id: str, payload: dict[str, Any]) -> None:
+    """Upsert a durable reviewer-payload snapshot for one job.
+
+    The table is schema-managed alongside ``jobs`` (no application startup DDL):
+    job_candidate_snapshots(job_id text primary key, payload_json jsonb not null,
+    created_at text not null, updated_at text not null).
+    """
+    now = _now()
+    with _conn(lock=True) as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO job_candidate_snapshots
+                (job_id, payload_json, created_at, updated_at)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (job_id) DO UPDATE SET
+                payload_json = EXCLUDED.payload_json,
+                updated_at = EXCLUDED.updated_at
+            """,
+            (job_id, psycopg2.extras.Json(payload), now, now),
+        )
+
+
+def get_candidate_snapshot(job_id: str) -> Optional[dict[str, Any]]:
+    """Return a job's durable reviewer snapshot, if the schema/table is present."""
+    with _conn() as conn, conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        cur.execute(
+            "SELECT payload_json FROM job_candidate_snapshots WHERE job_id = %s",
+            (job_id,),
+        )
+        row = cur.fetchone()
+    if not row:
+        return None
+    payload = row["payload_json"]
+    # psycopg2 normally decodes jsonb to dict; accepting a string keeps this
+    # seam compatible with mocked cursors and non-default JSON adapters.
+    if isinstance(payload, str):
+        try:
+            payload = json.loads(payload)
+        except json.JSONDecodeError:
+            return None
+    return payload if isinstance(payload, dict) else None
 
 
 def get_job(job_id: str) -> Optional[dict[str, Any]]:

@@ -936,6 +936,9 @@ def run_reviewer(
                 "qualified_directional": qualified_directional,
                 "qualified_directional_bonus": directional_bonus,
             },
+            # This is a ReviewerCandidate handoff field, not only a score
+            # component.  Keep both representations for existing consumers.
+            "evidence_weight_coverage": round(evidence_weight_coverage, 4),
             "composite_score": composite,
             "pre_cap_score": pre_cap_score,
             "unapproved_cap_applied": unapproved_cap_applied,

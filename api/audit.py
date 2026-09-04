@@ -22,6 +22,7 @@ import api.jobs_db as jobs_db
 from api.audit_context import build_audit_context
 from api.domain_findings import domain_findings_for, modality_finding_for
 from agents.reviewer import SAFETY_SCHEMA_VERSION
+from data_sources.llm_failover import call_with_backoff
 from data_sources.chembl import (
     _find_molecule_chembl_id,
     get_drug_mechanism_identities_for_audit,
@@ -41,30 +42,59 @@ def candidates_path(job_id: str) -> str:
     return os.path.join(_CANDIDATES_DIR, f"{job_id}.json")
 
 
-def save_job_candidates(job_id: str) -> bool:
-    """Copy current reviewed_candidates.json → output/candidates/{job_id}.json.
-    Called from _run_graph() when the writer node fires. Returns True on success."""
-    os.makedirs(_CANDIDATES_DIR, exist_ok=True)
-    if not os.path.exists(_SHARED_PATH):
+def save_job_candidates(job_id: str, payload: dict[str, Any]) -> bool:
+    """Persist this job's reviewer payload, independent of shared artifacts.
+
+    The graph's shared ``reviewed_candidates.json`` is a CLI cache and is not a
+    synchronization boundary for concurrent API jobs.  Call this immediately
+    after reviewer output is produced, before eligibility can end the run.
+    Returns True only when the database write succeeded; the file is a
+    best-effort compatibility copy and never counts as durable acknowledgement.
+    """
+    if not job_id or not isinstance(payload, dict):
         return False
+    durably_persisted = False
     try:
-        with open(_SHARED_PATH, encoding="utf-8") as fh:
-            payload = json.load(fh)
-        with open(candidates_path(job_id), "w", encoding="utf-8") as fh:
-            json.dump(payload, fh)
-        return True
+        jobs_db.save_candidate_snapshot(job_id, payload)
+        durably_persisted = True
     except Exception:
-        return False
+        # File persistence remains a backwards-compatible fallback for local
+        # installs before the schema-managed snapshot table is published.
+        pass
+    try:
+        os.makedirs(_CANDIDATES_DIR, exist_ok=True)
+        path = candidates_path(job_id)
+        temp_path = f"{path}.tmp"
+        with open(temp_path, "w", encoding="utf-8") as fh:
+            json.dump(payload, fh)
+        os.replace(temp_path, path)
+    except Exception:
+        pass
+    # An ephemeral compatibility file is not sufficient for an API job.  The
+    # caller uses this return value as the durable checkpoint acknowledgement.
+    return durably_persisted
 
 
 def _load_candidates(job_id: str, canonical_disease: str) -> Optional[list[dict]]:
     """Load candidates for a job.
 
     Preference order:
-    1. Per-job file at output/candidates/{job_id}.json  (always correct)
-    2. Shared fallback output/reviewed_candidates.json  (only if disease matches)
-    Returns None if neither is available.
+    1. Durable job_candidate_snapshots database row
+    2. Per-job file at output/candidates/{job_id}.json (legacy compatibility)
+    3. Shared fallback output/reviewed_candidates.json (only if disease matches)
+    Returns None if none is available.
     """
+    try:
+        payload = jobs_db.get_candidate_snapshot(job_id)
+    except Exception:
+        payload = None
+    if payload is not None:
+        cands = payload.get("candidates", [])
+        if payload.get("safety_schema_version") != SAFETY_SCHEMA_VERSION:
+            for c in cands:
+                c["pool_safety_stale"] = True
+        return cands
+
     path = candidates_path(job_id)
     if os.path.exists(path):
         with open(path, encoding="utf-8") as fh:
@@ -828,18 +858,20 @@ def _narrate(result: dict) -> str:
         client = Anthropic(
             base_url=_os.environ["AI_INTEGRATIONS_ANTHROPIC_BASE_URL"],
             api_key=_os.environ["AI_INTEGRATIONS_ANTHROPIC_API_KEY"],
+            max_retries=0,
         )
         facts = _facts_for_narration(result)
-        msg = client.messages.create(
-            model="claude-opus-4-5",
-            max_tokens=400,
-            messages=[{"role": "user", "content": (
-                "You are narrating a drug-repurposing audit result for a scientist. "
-                "Narrate ONLY the numbered facts below — do not add new claims, do not "
-                "speculate about biology, and do not evaluate the drug's candidacy. "
-                "Write 2–4 concise sentences.\n\n"
-                f"Facts:\n{facts}"
-            )}],
+        msg = call_with_backoff(
+            lambda: client.messages.create(
+                model="claude-opus-4-5", max_tokens=400,
+                messages=[{"role": "user", "content": (
+                    "You are narrating a drug-repurposing audit result for a scientist. "
+                    "Narrate ONLY the numbered facts below — do not add new claims, do not "
+                    "speculate about biology, and do not evaluate the drug's candidacy. "
+                    "Write 2–4 concise sentences.\n\n"
+                    f"Facts:\n{facts}"
+                )}]),
+            label="audit-narration", provider="anthropic", model="claude-opus-4-5",
         )
         return msg.content[0].text.strip()
     except Exception as exc:

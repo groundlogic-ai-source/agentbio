@@ -12,6 +12,7 @@ import requests
 from typing import Any
 from cache.cache import get, set as cache_set, make_key
 from data_sources import holdout
+from data_sources.provider_request_policy import request as provider_request
 
 BASE_URL = "https://www.ebi.ac.uk/chembl/api/data"
 UNIPROT_REST = "https://rest.uniprot.org/uniprotkb"
@@ -39,8 +40,9 @@ MECHANISM_ONLY_MAX_SOURCE_ROWS = 200
 
 
 def _get_json(url: str, params: dict | None = None) -> dict:
-    resp = requests.get(url, params=params, headers={"Accept": "application/json"}, timeout=30)
-    resp.raise_for_status()
+    resp = provider_request(
+        "chembl", requests.get, url, params=params,
+        headers={"Accept": "application/json"}, timeout=30)
     return resp.json()
 
 
@@ -357,7 +359,6 @@ def get_approved_drugs_for_target(uniprot_id: str) -> dict[str, Any]:
     try:
         target_ids = _resolve_target_chembl_id(uniprot_id)
         if not target_ids:
-            cache_set(cache_key, result, ttl_days=7)
             return result
 
         result["target_chembl_ids"] = target_ids
@@ -373,7 +374,6 @@ def get_approved_drugs_for_target(uniprot_id: str) -> dict[str, Any]:
                     mol_ids.add(mid)
 
         if not mol_ids:
-            cache_set(cache_key, result, ttl_days=7)
             return result
 
         meta = _fetch_molecule_meta(list(mol_ids))
@@ -428,7 +428,10 @@ def get_approved_drugs_for_target(uniprot_id: str) -> dict[str, Any]:
         # for 7 days as "no approved mechanism drugs exist".
         return result
 
-    cache_set(cache_key, result, ttl_days=7)
+    # An empty mechanisms result can also be an incomplete/degraded response.
+    # Preserve only positive source facts; refetch ambiguous empties next run.
+    if result["approved_drug_count"] > 0:
+        cache_set(cache_key, result, ttl_days=7)
     return result
 
 
@@ -636,7 +639,9 @@ def get_drug_indications(molecule_chembl_id: str, limit: int = 200) -> list[str]
         print(f"[chembl] WARNING: drug_indication query failed for '{molecule_chembl_id}': {e}")
         return []  # do not cache transient failures as "no indications"
 
-    cache_set(cache_key, terms, ttl_days=30)
+    # Empty indication payloads are indistinguishable from degraded API output.
+    if terms:
+        cache_set(cache_key, terms, ttl_days=30)
     return terms
 
 

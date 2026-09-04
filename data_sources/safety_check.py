@@ -129,6 +129,8 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
                 messages=[{"role": "user", "content": search_query}],
             ),
             label="safety-web-search",
+            provider="anthropic",
+            model="claude-sonnet-4-6",
         )
 
         # Extract all text from the response (model answer incorporating search results)

@@ -37,14 +37,43 @@ import os
 import random
 import threading
 import time
+import json
 from typing import Any, Callable, Optional
 
-_ANTHROPIC_TEXT_MODEL = "claude-sonnet-4-6"
-_OPENAI_TEXT_MODEL = "gpt-5.4"
+# Model tiers are deliberately explicit.  Existing callers use STANDARD unless
+# they opt in to CHEAP; do not silently downgrade a call that influences a gate,
+# score, or report.
+MODEL_TIER_CRITICAL = "critical"
+MODEL_TIER_STANDARD = "standard"
+MODEL_TIER_CHEAP = "cheap"
+_MODEL_TIERS = frozenset({
+    MODEL_TIER_CRITICAL, MODEL_TIER_STANDARD, MODEL_TIER_CHEAP,
+})
+
+ANTHROPIC_CRITICAL_TEXT_MODEL = "claude-sonnet-4-6"
+OPENAI_CRITICAL_TEXT_MODEL = "gpt-5.4"
+# Standard is currently identical to critical for capability preservation.
+ANTHROPIC_STANDARD_TEXT_MODEL = ANTHROPIC_CRITICAL_TEXT_MODEL
+OPENAI_STANDARD_TEXT_MODEL = OPENAI_CRITICAL_TEXT_MODEL
+# These are opt-in routing targets for low-risk classification/narration only.
+# Environment overrides make the tier deploy-configurable without changing code.
+ANTHROPIC_CHEAP_TEXT_MODEL = os.environ.get(
+    "AGENTBIO_ANTHROPIC_CHEAP_TEXT_MODEL", "claude-haiku-4-5")
+OPENAI_CHEAP_TEXT_MODEL = os.environ.get(
+    "AGENTBIO_OPENAI_CHEAP_TEXT_MODEL", "gpt-5-mini")
+
+# Backward-compatible internal names retained for callers/tests that imported
+# them before tiers were introduced.
+_ANTHROPIC_TEXT_MODEL = ANTHROPIC_STANDARD_TEXT_MODEL
+_OPENAI_TEXT_MODEL = OPENAI_STANDARD_TEXT_MODEL
 
 _MAX_ATTEMPTS = 6
 _BASE_DELAY_SECONDS = 2.0
 _TIMEOUT_SECONDS = 90.0
+_DEFAULT_MAX_CONCURRENT_PER_PROVIDER = max(
+    1, int(os.environ.get("AGENTBIO_LLM_MAX_CONCURRENT_PER_PROVIDER", "2")))
+_DEFAULT_MIN_INTERVAL_SECONDS = max(
+    0.0, float(os.environ.get("AGENTBIO_LLM_MIN_INTERVAL_SECONDS", "0.25")))
 
 _rr_lock = threading.Lock()
 _rr_counter = [0]
@@ -52,6 +81,123 @@ _rr_counter = [0]
 # Cache clients: they are thread-safe for our usage and expensive to rebuild.
 _clients: dict[str, Any] = {}
 _clients_lock = threading.Lock()
+
+
+class _ProviderAdmissionScheduler:
+    """Process-wide per-provider concurrency and start-rate admission control.
+
+    ``Condition.wait`` always releases ``_condition`` while waiting, so a
+    throttled caller never blocks releases or admissions for another provider.
+    """
+
+    def __init__(self, *, max_concurrent: int = _DEFAULT_MAX_CONCURRENT_PER_PROVIDER,
+                 min_interval_seconds: float = _DEFAULT_MIN_INTERVAL_SECONDS) -> None:
+        self._max_concurrent = max(1, max_concurrent)
+        self._min_interval_seconds = max(0.0, min_interval_seconds)
+        self._condition = threading.Condition()
+        self._active: dict[str, int] = {}
+        self._next_start: dict[str, float] = {}
+
+    def _try_acquire_locked(self, provider: str, now: float) -> Optional[float]:
+        """Reserve a slot, or return seconds until the next possible admission."""
+        active = self._active.get(provider, 0)
+        next_start = self._next_start.get(provider, 0.0)
+        if active < self._max_concurrent and now >= next_start:
+            self._active[provider] = active + 1
+            self._next_start[provider] = now + self._min_interval_seconds
+            return None
+        # A full concurrency limit has no clock-only deadline; a release will
+        # notify waiters. A rate limit has a precise deadline.
+        return max(0.0, next_start - now) if now < next_start else 0.0
+
+    def acquire(self, provider: str) -> None:
+        """Block until this provider has both a slot and a start-rate permit."""
+        with self._condition:
+            while True:
+                wait_seconds = self._try_acquire_locked(provider, time.monotonic())
+                if wait_seconds is None:
+                    return
+                # Condition.wait releases the global scheduler lock.
+                self._condition.wait(timeout=wait_seconds or None)
+
+    def release(self, provider: str) -> None:
+        with self._condition:
+            active = self._active.get(provider, 0)
+            if active <= 0:
+                raise RuntimeError(f"LLM scheduler release without admission: {provider}")
+            self._active[provider] = active - 1
+            self._condition.notify_all()
+
+
+_provider_scheduler = _ProviderAdmissionScheduler()
+
+
+def text_model_for(provider: str, tier: str = MODEL_TIER_STANDARD) -> str:
+    """Return the configured text model for an explicit provider/tier pair.
+
+    ``CHEAP`` is a routing hook, not a policy change: callers must request it
+    explicitly and should use it only for low-risk classification or narration.
+    """
+    if tier not in _MODEL_TIERS:
+        raise ValueError(f"unknown LLM model tier: {tier!r}")
+    models = {
+        "anthropic": {
+            MODEL_TIER_CRITICAL: ANTHROPIC_CRITICAL_TEXT_MODEL,
+            MODEL_TIER_STANDARD: ANTHROPIC_STANDARD_TEXT_MODEL,
+            MODEL_TIER_CHEAP: ANTHROPIC_CHEAP_TEXT_MODEL,
+        },
+        "openai": {
+            MODEL_TIER_CRITICAL: OPENAI_CRITICAL_TEXT_MODEL,
+            MODEL_TIER_STANDARD: OPENAI_STANDARD_TEXT_MODEL,
+            MODEL_TIER_CHEAP: OPENAI_CHEAP_TEXT_MODEL,
+        },
+    }
+    try:
+        return models[provider][tier]
+    except KeyError as exc:
+        raise ValueError(f"unknown LLM provider: {provider!r}") from exc
+
+
+def _token_usage(response: Any) -> Optional[dict[str, int]]:
+    """Normalize the subset of SDK usage metadata that is actually present."""
+    usage = getattr(response, "usage", None)
+    if usage is None:
+        return None
+    def read(*names: str) -> Optional[int]:
+        for name in names:
+            value = usage.get(name) if isinstance(usage, dict) else getattr(usage, name, None)
+            if isinstance(value, int) and not isinstance(value, bool):
+                return value
+        return None
+
+    normalized = {
+        "input_tokens": read("input_tokens", "prompt_tokens"),
+        "output_tokens": read("output_tokens", "completion_tokens"),
+        "total_tokens": read("total_tokens"),
+    }
+    return {key: value for key, value in normalized.items() if value is not None} or None
+
+
+def _emit_telemetry(*, provider: Optional[str], model: Optional[str],
+                    operation: Optional[str], attempt: int,
+                    latency_seconds: float, success: bool,
+                    response: Any = None, error: Optional[Exception] = None) -> None:
+    """Emit a safe JSON event; prompts, responses, keys, and error text stay out."""
+    event: dict[str, Any] = {
+        "event": "llm_call",
+        "provider": provider,
+        "model": model,
+        "operation": operation,
+        "attempt": attempt,
+        "latency_ms": round(latency_seconds * 1000, 2),
+        "success": success,
+        # Exception class is actionable without risking prompt/provider payloads.
+        "error": None if success else type(error).__name__,
+    }
+    usage = _token_usage(response) if success else None
+    if usage:
+        event["token_usage"] = usage
+    print(f"[llm_telemetry] {json.dumps(event, sort_keys=True)}", flush=True)
 
 
 def _available_providers() -> list[str]:
@@ -113,9 +259,10 @@ def _backoff_sleep(attempt: int) -> None:
     time.sleep(min(delay, 60.0))
 
 
-def _anthropic_text(prompt: str, system: Optional[str], max_tokens: int) -> str:
+def _anthropic_text(prompt: str, system: Optional[str], max_tokens: int,
+                    model: str) -> tuple[str, Any]:
     kwargs: dict[str, Any] = {
-        "model": _ANTHROPIC_TEXT_MODEL,
+        "model": model,
         "max_tokens": max_tokens,
         "temperature": 0,
         "messages": [{"role": "user", "content": prompt}],
@@ -125,24 +272,27 @@ def _anthropic_text(prompt: str, system: Optional[str], max_tokens: int) -> str:
     msg = _get_client("anthropic").messages.create(**kwargs)
     parts = [b.text for b in msg.content
              if getattr(b, "type", None) == "text" and getattr(b, "text", None)]
-    return "\n".join(parts).strip()
+    return "\n".join(parts).strip(), msg
 
 
-def _openai_text(prompt: str, system: Optional[str], max_tokens: int) -> str:
+def _openai_text(prompt: str, system: Optional[str], max_tokens: int,
+                 model: str) -> tuple[str, Any]:
     messages = ([{"role": "system", "content": system}] if system else []) + [
         {"role": "user", "content": prompt}]
     resp = _get_client("openai").chat.completions.create(
-        model=_OPENAI_TEXT_MODEL,
+        model=model,
         max_completion_tokens=max_tokens,
         messages=messages,
     )
     if not resp.choices:
-        return ""
-    return (resp.choices[0].message.content or "").strip()
+        return "", resp
+    return (resp.choices[0].message.content or "").strip(), resp
 
 
 def chat_text(prompt: str, *, system: Optional[str] = None,
-              max_tokens: int = 512) -> tuple[str, str]:
+              max_tokens: int = 512,
+              model_tier: str = MODEL_TIER_STANDARD,
+              operation_label: Optional[str] = None) -> tuple[str, str]:
     """Text-only LLM call with round-robin provider rotation + failover.
 
     Returns ``(text, provider_used)``.  Raises the last exception if every
@@ -150,6 +300,10 @@ def chat_text(prompt: str, *, system: Optional[str] = None,
     so sustained load is split across both AI-integration providers; a
     transient error (429/5xx/timeout) backs off and tries the next provider.
     """
+    # Validate before checking credentials, so an invalid routing request is
+    # never hidden by a local configuration error.
+    if model_tier not in _MODEL_TIERS:
+        raise ValueError(f"unknown LLM model tier: {model_tier!r}")
     providers = _available_providers()
     if not providers:
         raise RuntimeError(
@@ -163,17 +317,35 @@ def chat_text(prompt: str, *, system: Optional[str] = None,
     last_exc: Optional[Exception] = None
     for attempt in range(_MAX_ATTEMPTS):
         provider = order[attempt % len(order)]
+        model = text_model_for(provider, model_tier)
+        started = time.monotonic()
         try:
-            if provider == "anthropic":
-                return _anthropic_text(prompt, system, max_tokens), provider
-            return _openai_text(prompt, system, max_tokens), provider
+            _provider_scheduler.acquire(provider)
+            try:
+                if provider == "anthropic":
+                    text, response = _anthropic_text(prompt, system, max_tokens, model)
+                else:
+                    text, response = _openai_text(prompt, system, max_tokens, model)
+            finally:
+                _provider_scheduler.release(provider)
+            _emit_telemetry(
+                provider=provider, model=model,
+                operation=operation_label or "chat_text", attempt=attempt + 1,
+                latency_seconds=time.monotonic() - started, success=True,
+                response=response)
+            return text, provider
         except Exception as exc:  # noqa: BLE001 — orchestrated retry
             last_exc = exc
+            _emit_telemetry(
+                provider=provider, model=model,
+                operation=operation_label or "chat_text", attempt=attempt + 1,
+                latency_seconds=time.monotonic() - started, success=False,
+                error=exc)
             if not _is_transient(exc):
                 raise
             print(f"[llm_failover] {provider} transient error "
                   f"(attempt {attempt + 1}/{_MAX_ATTEMPTS}): "
-                  f"{type(exc).__name__}: {str(exc)[:160]}", flush=True)
+                   f"{type(exc).__name__}", flush=True)
             _backoff_sleep(attempt)
     raise RuntimeError(
         f"chat_text exhausted {_MAX_ATTEMPTS} attempts across providers "
@@ -181,7 +353,8 @@ def chat_text(prompt: str, *, system: Optional[str] = None,
 
 
 def call_with_backoff(fn: Callable[[], Any], *, max_attempts: int = 5,
-                      label: str = "llm") -> Any:
+                      label: str = "llm", provider: Optional[str] = None,
+                      model: Optional[str] = None) -> Any:
     """Retry ``fn`` on transient errors with exponential backoff + jitter.
 
     For provider-bound calls (e.g. web-search tool calls that only one
@@ -189,12 +362,28 @@ def call_with_backoff(fn: Callable[[], Any], *, max_attempts: int = 5,
     propagate immediately.
     """
     for attempt in range(max_attempts):
+        started = time.monotonic()
         try:
-            return fn()
+            if provider:
+                _provider_scheduler.acquire(provider)
+            try:
+                response = fn()
+            finally:
+                if provider:
+                    _provider_scheduler.release(provider)
+            _emit_telemetry(
+                provider=provider, model=model, operation=label,
+                attempt=attempt + 1, latency_seconds=time.monotonic() - started,
+                success=True, response=response)
+            return response
         except Exception as exc:  # noqa: BLE001 — orchestrated retry
+            _emit_telemetry(
+                provider=provider, model=model, operation=label,
+                attempt=attempt + 1, latency_seconds=time.monotonic() - started,
+                success=False, error=exc)
             if attempt == max_attempts - 1 or not _is_transient(exc):
                 raise
             print(f"[llm_failover] {label} transient error "
                   f"(attempt {attempt + 1}/{max_attempts}): "
-                  f"{type(exc).__name__}: {str(exc)[:160]}", flush=True)
+                   f"{type(exc).__name__}", flush=True)
             _backoff_sleep(attempt)

@@ -44,6 +44,7 @@ from data_sources.multisource_candidates import (
     approval_basis, collect_target_candidates, filter_repurposing_eligible,
     merge_chemist_candidates)
 from data_sources import holdout as _holdout
+from data_sources.llm_failover import call_with_backoff
 from data_sources.evidence_ledger import (
     EvidenceRecord, EvidenceRole, QualificationStatus, SourceType,
 )
@@ -73,7 +74,7 @@ def _anthropic_client() -> Optional[anthropic.Anthropic]:
     api_key = os.environ.get("AI_INTEGRATIONS_ANTHROPIC_API_KEY")
     if not base_url or not api_key:
         return None
-    return anthropic.Anthropic(base_url=base_url, api_key=api_key)
+    return anthropic.Anthropic(base_url=base_url, api_key=api_key, max_retries=0)
 
 
 def _fingerprint(smiles: Optional[str]):
@@ -178,11 +179,11 @@ def _llm_rationale(client: Optional[anthropic.Anthropic], c: dict[str, Any],
         + "\n".join(f"- {f}" for f in facts)
     )
     try:
-        msg = client.messages.create(
-            model=MODEL,
-            max_tokens=256,
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}],
+        msg = call_with_backoff(
+            lambda: client.messages.create(
+                model=MODEL, max_tokens=256, temperature=0,
+                messages=[{"role": "user", "content": prompt}]),
+            label="chemist-rationale", provider="anthropic", model=MODEL,
         )
         block = msg.content[0]
         return (block.text if block.type == "text" else str(block)).strip()
@@ -444,7 +445,10 @@ def run_chemist(biologist_output: dict[str, Any],
                   f"{symbol} ({uniprot}): {e}")
 
     # Enrich primary target's compounds via the shared helper.
-    primary_disc_method = target.get("target_discovery_method", "genetic_association")
+    primary_disc_method = (
+        str(target.get("target_discovery_method") or "").strip()
+        or "genetic_association"
+    )
     enriched = _enrich_compounds(
         compounds, symbol, uniprot, disease_name, ot_score, primary_disc_method)
 
@@ -640,8 +644,10 @@ def run_chemist(biologist_output: dict[str, Any],
             "source_chembl_ids": e.get("source_chembl_ids", []),
             "source_activity_ids": e.get("source_activity_ids", []),
             "target_symbol": e_sym,
-            "target_discovery_method": e.get("target_discovery_method",
-                                             primary_disc_method),
+            "target_discovery_method": (
+                str(e.get("target_discovery_method") or "").strip()
+                or primary_disc_method
+            ),
             "uniprot_id": e_uid,
             "disease_name": disease_name,
             "ot_association_score": e.get("ot_association_score",

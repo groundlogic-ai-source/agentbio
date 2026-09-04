@@ -5,6 +5,13 @@ const STYLES = {
   error:           { label: "Error",           color: "var(--oxide)"  },
   // Ran correctly, found nothing recommendable — not an error, not a sign-off.
   no_eligible_candidate: { label: "No eligible candidate", color: "var(--ink-muted)" },
+  // Required evidence services failed. This attempt is retryable, but did not
+  // produce a result and must not be confused with no_eligible_candidate.
+  source_unavailable: { label: "Evidence services unavailable", color: "var(--oxide)" },
+  degraded_unscorable: {
+    label: "Literature checks unavailable",
+    color: "var(--oxide)",
+  },
 };
 
 export default function StatusBadge({ status, decision }) {

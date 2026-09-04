@@ -43,6 +43,7 @@ from api import triage as _triage
 from api import dossier as _dossier
 from api import audit as _audit
 from api.report_pdf import render_case_pdf
+from data_sources.source_health import probe_required_sources
 from validation.benchmark_v2_completion import inspect_frozen_result
 
 # Node names emitted by graph.stream(...) map 1:1 onto current_stage values.
@@ -153,6 +154,24 @@ def _run_graph(job_id: str, thread_id: str) -> None:
     """
     try:
         jobs_db.update_job_status(job_id, status="running")
+        source_health = probe_required_sources()
+        if not source_health["healthy"]:
+            unavailable = [
+                f"{name} ({status.get('error') or 'unavailable'})"
+                for name, status in source_health["sources"].items()
+                if not status.get("available")
+            ]
+            jobs_db.update_job_status(
+                job_id,
+                status="source_unavailable",
+                current_stage="done",
+                error_message=(
+                    "Required source admission check failed: "
+                    f"{'; '.join(unavailable)}. This is retryable; retry the "
+                    "research run when the external source has recovered."
+                ),
+            )
+            return
         graph = build_graph()
         config = {"configurable": {"thread_id": thread_id}}
 
@@ -213,9 +232,6 @@ def _run_graph(job_id: str, thread_id: str) -> None:
                     reports = value.get("reports") or []
                     if reports and reports[0].get("path"):
                         fields["report_path"] = reports[0]["path"]
-                    # Persist reviewed candidates per-job so the audit endpoint
-                    # can serve any historical case, not just the most recent run.
-                    _audit.save_job_candidates(job_id)
 
                 jobs_db.update_job_status(job_id, **fields)
 
@@ -225,9 +241,9 @@ def _run_graph(job_id: str, thread_id: str) -> None:
             # dossier, and never sent to a human as an Approve/Reject decision.
             jobs_db.update_job_status(
                 job_id,
-                status="no_eligible_candidate",
+                status=ineligible.get("terminal_status") or "no_eligible_candidate",
                 current_stage="done",
-                error_message=ineligible.get("reason") or
+                error_message=ineligible.get("terminal_reason") or ineligible.get("reason") or
                 "No eligible repurposing candidate found.",
             )
             return
@@ -418,6 +434,14 @@ def get_run(job_id: str) -> dict[str, Any]:
     job = jobs_db.get_job(job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="job not found")
+    # The deployed jobs schema has no separate JSON terminal-metadata columns.
+    # Preserve the durable, schema-backed status/error fields while exposing a
+    # stable terminal contract to API consumers.
+    if job["status"] in (
+            "no_eligible_candidate", "source_unavailable", "degraded_unscorable"):
+        job["terminal_reason"] = job.get("error_message")
+        job["retryable"] = job["status"] in (
+            "source_unavailable", "degraded_unscorable")
     if job["status"] in ("awaiting_review", "completed"):
         job["report"] = _read_report(job.get("report_path"))
     return job

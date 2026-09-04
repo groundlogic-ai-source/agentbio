@@ -39,6 +39,7 @@ from data_sources import holdout as _holdout
 from data_sources.europepmc_mechanisms import discover_disease_process_targets
 from data_sources.afdb import get_structure_confidence
 from data_sources.clinicaltrials import check_prior_trials
+from data_sources.llm_failover import call_with_backoff
 
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "output")
 TOP_N = 30
@@ -1369,7 +1370,8 @@ def _narrate_top5(top5: list[dict[str, Any]]) -> str:
     if not base_url or not api_key:
         return "[LLM narration skipped — AI_INTEGRATIONS_ANTHROPIC_BASE_URL or API_KEY not set]"
 
-    client = anthropic.Anthropic(base_url=base_url, api_key=api_key)
+    client = anthropic.Anthropic(
+        base_url=base_url, api_key=api_key, max_retries=0)
 
     summary_rows = []
     for i, row in enumerate(top5, 1):
@@ -1397,13 +1399,15 @@ def _narrate_top5(top5: list[dict[str, Any]]) -> str:
     )
 
     try:
-        message = client.messages.create(
+        message = call_with_backoff(
+            lambda: client.messages.create(
+                model="claude-sonnet-4-6", max_tokens=512,
+                # temperature=0: narrative-only, does not affect scores or rankings,
+                # but pinned for overall run reproducibility.
+                temperature=0,
+                messages=[{"role": "user", "content": prompt}]),
+            label="target-selection-narration", provider="anthropic",
             model="claude-sonnet-4-6",
-            max_tokens=512,
-            # temperature=0: narrative-only, does not affect scores or rankings,
-            # but pinned for overall run reproducibility.
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}],
         )
         block = message.content[0]
         return block.text if block.type == "text" else str(block)

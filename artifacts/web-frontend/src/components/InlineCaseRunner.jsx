@@ -158,6 +158,25 @@ export default function InlineCaseRunner({ disease, onReady, verb = "Run this ca
           setPhase("no_candidate");
           return false;
         }
+        // Evidence-source failures are terminal for this attempt. They are
+        // retryable once the services recover, but are not a no-candidate
+        // scientific result.
+        if (current.status === "source_unavailable") {
+          setError(
+            current.error_message ||
+            "Evidence services were unavailable, so no scientific conclusion was produced."
+          );
+          setPhase("source_unavailable");
+          return false;
+        }
+        if (current.status === "degraded_unscorable") {
+          setError(
+            current.error_message ||
+            "All bounded literature checks failed, so no scientific conclusion was produced."
+          );
+          setPhase("degraded_unscorable");
+          return false;
+        }
         return true;
       } finally {
         inFlightRef.current = false;
@@ -188,6 +207,34 @@ export default function InlineCaseRunner({ disease, onReady, verb = "Run this ca
         <p className="inline-runner-note">
           The case completed normally, but there is no candidate to audit. No
           dossier or sign-off checkpoint was created.
+        </p>
+      </div>
+    );
+  }
+
+  if (phase === "source_unavailable") {
+    return (
+      <div className="inline-runner">
+        <p className="inline-runner-error">
+          {error || "Evidence services were unavailable."}
+        </p>
+        <p className="inline-runner-note">
+          No scientific conclusion, dossier, or sign-off checkpoint was produced.
+          Retry this case after the evidence services recover.
+        </p>
+      </div>
+    );
+  }
+
+  if (phase === "degraded_unscorable") {
+    return (
+      <div className="inline-runner">
+        <p className="inline-runner-error">
+          {error || "All bounded literature checks failed."}
+        </p>
+        <p className="inline-runner-note">
+          No scientific conclusion, dossier, or sign-off checkpoint was produced.
+          Retry this case after the evidence services recover.
         </p>
       </div>
     );

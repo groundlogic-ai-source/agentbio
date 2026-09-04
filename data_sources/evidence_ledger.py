@@ -796,7 +796,12 @@ class MergedCandidate:
             "target_symbol": (sorted(self.target_symbols)[0]
                               if self.target_symbols else ""),
             "uniprot_id": self.uniprot_id,
-            "target_discovery_method": self.target_discovery_method,
+            # A ledger-native candidate can have pharmacology evidence without
+            # a TARGET_LINK record. Preserve that uncertainty explicitly rather
+            # than handing an empty string to the chemist/reviewer boundary.
+            "target_discovery_method": (
+                self.target_discovery_method or "unattributed"
+            ),
             "disease_name": self.disease_name,
             "ot_association_score": self.ot_association_score,
             "source_types": sorted(st.value for st in self.source_types),

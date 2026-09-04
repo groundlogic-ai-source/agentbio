@@ -136,6 +136,56 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
         </Paper>
       )}
 
+      {status === "source_unavailable" && (
+        <Paper className="mb-6">
+          <div className="p-6">
+            <div className="text-lg font-semibold" style={{ color: "var(--ink)" }}>
+              Evidence services unavailable
+            </div>
+            <p
+              className="mt-2 text-sm leading-relaxed"
+              style={{ color: "var(--ink-muted)" }}
+            >
+              {job.error_message ||
+                "One or more evidence services failed while this case was running."}
+            </p>
+            <p
+              className="mt-3 text-sm leading-relaxed"
+              style={{ color: "var(--ink-muted)" }}
+            >
+              No scientific conclusion was produced. The pipeline stopped before
+              it could evaluate the evidence, so no dossier or sign-off was
+              created. Retry this case after the evidence services recover.
+            </p>
+          </div>
+        </Paper>
+      )}
+
+      {status === "degraded_unscorable" && (
+        <Paper className="mb-6">
+          <div className="p-6">
+            <div className="text-lg font-semibold" style={{ color: "var(--ink)" }}>
+              Literature evidence checks unavailable
+            </div>
+            <p
+              className="mt-2 text-sm leading-relaxed"
+              style={{ color: "var(--ink-muted)" }}
+            >
+              {job.error_message ||
+                "All bounded literature checks failed while this case was running."}
+            </p>
+            <p
+              className="mt-3 text-sm leading-relaxed"
+              style={{ color: "var(--ink-muted)" }}
+            >
+              No scientific conclusion was produced. The pipeline could not score
+              the evidence, so no dossier or sign-off was created. Retry this case
+              after the evidence services recover.
+            </p>
+          </div>
+        </Paper>
+      )}
+
       {(status === "queued" || status === "running") && (
         <Paper>
           <div className="p-6">

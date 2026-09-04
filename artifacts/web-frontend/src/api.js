@@ -80,6 +80,8 @@ export const TERMINAL_STATUSES = new Set([
   "completed",
   "error",
   "no_eligible_candidate",
+  "source_unavailable",
+  "degraded_unscorable",
 ]);
 
 // ── Research hypothesis registry (Feature 3) ──────────────────────────────────

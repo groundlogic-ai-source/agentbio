@@ -13,10 +13,20 @@ export const STAGES = [
 // "no_eligible_candidate": the pipeline ran correctly but had nothing
 // recommendable, so it terminated before writing a dossier or opening the
 // human-review checkpoint. Terminal, but NOT an error and NOT a sign-off.
+//
+// "source_unavailable": one or more required evidence services failed. It is
+// terminal for this attempt (and therefore must not be polled), but retryable
+// once those services recover. Unlike no_eligible_candidate, it produced no
+// scientific conclusion.
+//
+// "degraded_unscorable": the pipeline's bounded literature checks all failed.
+// This is likewise terminal and retryable, rather than a no-candidate result.
 export const TERMINAL_STATUSES = new Set([
   "completed",
   "error",
   "no_eligible_candidate",
+  "source_unavailable",
+  "degraded_unscorable",
 ]);
 
 export function isTerminal(status) {
@@ -44,6 +54,12 @@ export function stepperProgress(status, currentStage) {
   }
   if (status === "queued") {
     return { completedThrough: -1, activeIndex: 0 }; // nothing run yet
+  }
+  if (status === "source_unavailable" || status === "degraded_unscorable") {
+    // The attempt is over. Preserve completed work, but never show a stage as
+    // still executing after a terminal source outage.
+    const idx = STAGES.findIndex((s) => s.key === currentStage);
+    return { completedThrough: idx < 0 ? -1 : idx, activeIndex: -1 };
   }
 
   // status === "running" (or any other live state): current_stage is the last

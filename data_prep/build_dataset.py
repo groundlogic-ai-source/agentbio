@@ -34,6 +34,7 @@ import pyreadr
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from data_sources.clinicaltrials import HAIKU_MODEL, _anthropic_client  # noqa: E402
+from data_sources.llm_failover import call_with_backoff  # noqa: E402
 import extract_drugcentral  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -83,11 +84,12 @@ def _classify_batch(texts: list[str], client) -> list[str]:
         "in the same order as the items. No other text."
     )
     try:
-        resp = client.messages.create(
+        resp = call_with_backoff(
+            lambda: client.messages.create(
+                model=HAIKU_MODEL, max_tokens=8 * len(texts) + 50,
+                temperature=0, messages=[{"role": "user", "content": prompt}]),
+            label="dataset-why-stopped-classification", provider="anthropic",
             model=HAIKU_MODEL,
-            max_tokens=8 * len(texts) + 50,
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}],
         )
         raw = resp.content[0].text.strip()
         start, end = raw.find("["), raw.rfind("]")

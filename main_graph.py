@@ -59,6 +59,7 @@ from agents.reviewer import (
     SAFETY_SCHEMA_VERSION,
     PCHEMBL_NORM_MIN,
     PCHEMBL_NORM_MAX,
+    MAX_LITERATURE_LIMITATION_CANDIDATES,
 )
 from agents.schemas import validate_chemist_handoff, validate_reviewer_handoff
 from agents import provenance
@@ -158,6 +159,7 @@ _ACTIVE_SELECTION = "active_selection.json"
 
 def _target_from_row(r: dict[str, Any]) -> dict[str, Any]:
     """Build the graph `target` dict, carrying the real Stage 1 scores forward."""
+    discovery_method = str(r.get("target_discovery_method") or "").strip()
     return {
         "target_symbol": r["target_symbol"],
         "uniprot_id": r.get("uniprot_id"),
@@ -171,7 +173,7 @@ def _target_from_row(r: dict[str, Any]) -> dict[str, Any]:
         # defaults to "genetic_association" for pharm-precedent / pathway-
         # neighbor primary targets.  Falls back only when the source row
         # genuinely has no method recorded (should not happen in practice).
-        "target_discovery_method": r.get("target_discovery_method", "genetic_association"),
+        "target_discovery_method": discovery_method or "genetic_association",
         "mechanism_class": r.get("mechanism_class"),
         "therapeutic_role": r.get("therapeutic_role", "disease_modifying"),
         "process_support": r.get("process_support", []),
@@ -666,6 +668,18 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
     k_summary = state["chemist_output"].get("k_target_summary")
     if k_summary:
         payload["k_target_summary"] = k_summary
+    # API jobs must snapshot the in-memory reviewer result now, rather than
+    # copying the shared CLI artifact later at writer time.  Eligibility can
+    # deliberately terminate this run, and concurrent jobs can replace that
+    # artifact before writer executes.
+    job_id = state.get("job_id")
+    if job_id:
+        from api import audit as job_audit
+        if not job_audit.save_job_candidates(job_id, payload):
+            raise RuntimeError(
+                f"Reviewer candidates for job {job_id} were not durably "
+                "persisted; stopping before eligibility."
+            )
     _write_json("reviewed_candidates.json", payload)
     print(f"[graph] reviewer: {payload['n_strong_matches']} STRONG_MATCH of "
           f"{payload['n_candidates']}")
@@ -686,6 +700,32 @@ def _pool_approval_gates(
             gate.get("n_excluded_unapproved") or 0)
         pooled["excluded"].extend(gate.get("excluded") or [])
     return pooled
+
+
+def _source_failure_details(source_status: Any) -> list[dict[str, Any]]:
+    """Extract failed provider envelopes without treating a genuine empty as one."""
+    failures: list[dict[str, Any]] = []
+    failed_states = {
+        "failed", "failure", "error", "unavailable", "timeout", "degraded",
+        "classifier_integrity_failed",
+    }
+
+    def visit(value: Any, path: str = "") -> None:
+        if not isinstance(value, dict):
+            return
+        status = str(value.get("status") or "").strip().casefold()
+        if status in failed_states:
+            failures.append({
+                "source": path or "unknown",
+                "status": value.get("status"),
+                "error": value.get("error"),
+            })
+        for key, child in value.items():
+            if isinstance(child, dict):
+                visit(child, f"{path}.{key}" if path else key)
+
+    visit(source_status)
+    return failures
 
 
 def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
@@ -714,8 +754,48 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
         return c.get("is_approved_drug") is True
 
     eligible = [c for c in candidates if _eligible(c)]
+    source_failures = _source_failure_details(
+        (state.get("chemist_output") or {}).get("source_status")
+    )
+    shortlist = candidates[:MAX_LITERATURE_LIMITATION_CANDIDATES]
+    classifier_failures = [
+        {
+            "drug_name": c.get("drug_name"),
+            "verdict": (c.get("literature_limitation") or {}).get("verdict"),
+            "source_status": (c.get("literature_limitation") or {}).get("source_status"),
+            "reason": (c.get("literature_limitation") or {}).get("reason"),
+        }
+        for c in shortlist
+        if (c.get("literature_limitation") or {}).get("verdict") == "SEARCH_FAILED"
+    ]
+    terminal_status = "no_eligible_candidate"
 
-    if not candidates:
+    if not candidates and source_failures:
+        terminal_status = "source_unavailable"
+        reason = (
+            "No candidate can be assessed because one or more enabled candidate "
+            "sources were unavailable; retry after source recovery."
+        )
+    elif not eligible and shortlist and len(classifier_failures) == len(shortlist):
+        terminal_status = "degraded_unscorable"
+        reason = (
+            "No candidate can be authorized because every bounded shortlist "
+            "literature-limitation classifier search failed; retry after classifier "
+            "or source recovery."
+        )
+    elif not eligible and source_failures:
+        # A partial candidate-source outage cannot support a genuine "no
+        # eligible" conclusion: the missing source may have supplied an
+        # approved, literature-clear candidate even though other sources
+        # returned rows.
+        terminal_status = "source_unavailable"
+        reason = (
+            "No candidate can be authorized as eligible while one or more "
+            "enabled candidate sources were unavailable; retry after source "
+            "recovery because the missing source could change eligibility."
+        )
+    elif not candidates:
+        terminal_status = "no_eligible_candidate"
         reason = ("No candidate compound was found for the selected target(s) "
                   "in any enabled source.")
     elif not eligible and any(
@@ -735,6 +815,7 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
             "failed or unperformed search is unknown, not a favorable result."
         )
     elif not eligible:
+        terminal_status = "no_eligible_candidate"
         reason = (
             f"No eligible repurposing candidate found: all "
             f"{len(candidates)} pooled compound(s) lack positively established "
@@ -743,6 +824,7 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
             f"candidate."
         )
     else:
+        terminal_status = "completed"
         reason = ""
 
     verdict = {
@@ -752,6 +834,11 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
         "n_eligible": len(eligible),
         "repurposing_only": repurposing_only,
         "approval_gate": (state.get("chemist_output") or {}).get("approval_gate"),
+        "terminal_status": terminal_status,
+        "terminal_reason": reason,
+        "retryable": terminal_status in {"source_unavailable", "degraded_unscorable"},
+        "source_failures": source_failures,
+        "classifier_failures": classifier_failures,
     }
     _write_json("eligibility.json", verdict)
     if verdict["eligible"]:

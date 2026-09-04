@@ -21,6 +21,7 @@ import anthropic
 
 from cache.cache import get, set as cache_set, make_key
 from data_sources.llm_failover import chat_text
+from data_sources.provider_request_policy import request as provider_request
 
 BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 MODEL = "claude-sonnet-4-6"
@@ -48,8 +49,8 @@ def _esearch(term: str, retmax: int) -> list[str]:
         "sort": "relevance",
         **_api_key_params(),
     }
-    resp = requests.get(f"{BASE_URL}esearch.fcgi", params=params, timeout=30)
-    resp.raise_for_status()
+    resp = provider_request(
+        "ncbi", requests.get, f"{BASE_URL}esearch.fcgi", params=params, timeout=30)
     return resp.json().get("esearchresult", {}).get("idlist", [])
 
 
@@ -64,8 +65,8 @@ def _efetch(pmids: list[str]) -> dict[str, str]:
         "rettype": "abstract",
         **_api_key_params(),
     }
-    resp = requests.get(f"{BASE_URL}efetch.fcgi", params=params, timeout=60)
-    resp.raise_for_status()
+    resp = provider_request(
+        "ncbi", requests.get, f"{BASE_URL}efetch.fcgi", params=params, timeout=60)
 
     abstracts: dict[str, str] = {}
     root = ET.fromstring(resp.content)
@@ -93,17 +94,16 @@ def _llm_relationship(abstract: str, subject: str, obj: str,
         f"a connection? Answer only with YES or NO, followed by a one-sentence "
         f"reason.\n\nAbstract:\n{abstract[:4000]}"
     )
-    try:
-        # Round-robin across AI-integration providers with 429 failover.
-        # llm_failover keeps deterministic (temperature=0) decoding where the
-        # provider supports it, preserving this YES/NO gate's reproducibility.
-        text, _provider = chat_text(prompt, max_tokens=120)
-        kept = text.upper().lstrip().startswith("YES")
-        reason = text.split("\n", 1)[0].strip()
-        return kept, reason
-    except Exception as e:
-        # On LLM failure we cannot assert a relationship — drop the abstract.
-        return False, f"[relevance check failed: {e}]"
+    # Round-robin across AI-integration providers with 429 failover.
+    # llm_failover keeps deterministic (temperature=0) decoding where the
+    # provider supports it, preserving this YES/NO gate's reproducibility.
+    # Deliberately propagate exhaustion/errors: treating an unclassified
+    # abstract as NO would create a false healthy zero-hit result.
+    text, _provider = chat_text(
+        prompt, max_tokens=120, operation_label="pubmed_relationship_gate")
+    kept = text.upper().lstrip().startswith("YES")
+    reason = text.split("\n", 1)[0].strip()
+    return kept, reason
 
 
 def fetch_raw_abstracts(term: str, retmax: int = 8) -> dict[str, str]:
@@ -118,13 +118,17 @@ def fetch_raw_abstracts(term: str, retmax: int = 8) -> dict[str, str]:
         return cached
 
     abstracts: dict[str, str] = {}
+    source_succeeded = False
     try:
         pmids = _esearch(term, retmax)
         abstracts = _efetch(pmids)
+        source_succeeded = True
     except Exception as e:
         print(f"[pubmed] WARNING: raw abstract fetch failed for '{term}': {e}")
 
-    cache_set(cache_key, abstracts, ttl_days=7)
+    # Never turn a transient source outage into a cached "no abstracts" result.
+    if source_succeeded:
+        cache_set(cache_key, abstracts, ttl_days=7)
     return abstracts
 
 
@@ -144,6 +148,7 @@ def search_literature(drug_name: Optional[str], target_name: str,
         n_kept: int,
         literature_hits: [{pmid, summary, relationship_asserted: True, abstract}],
         error: str | None,
+        source_status: "HEALTHY" | "DEGRADED",
       }
     """
     cache_key = make_key("search_literature", drug_name, target_name, disease_name, retmax)
@@ -166,15 +171,17 @@ def search_literature(drug_name: Optional[str], target_name: str,
         "n_kept": 0,
         "literature_hits": [],
         "error": None,
+        "source_status": "HEALTHY",
     }
 
     client = _anthropic_client()
     if client is None:
         result["error"] = "AI integration not configured; cannot verify relationships"
+        result["source_status"] = "DEGRADED"
         print("[pubmed] WARNING: no Anthropic client; literature relationship gate skipped")
-        cache_set(cache_key, result, ttl_days=1)
         return result
 
+    search_completed = False
     try:
         pmids = _esearch(term, retmax)
         abstracts = _efetch(pmids)
@@ -194,9 +201,14 @@ def search_literature(drug_name: Optional[str], target_name: str,
 
         result["literature_hits"] = hits
         result["n_kept"] = len(hits)
+        search_completed = True
     except Exception as e:
         result["error"] = str(e)
+        result["source_status"] = "DEGRADED"
         print(f"[pubmed] WARNING: literature search failed for '{term}': {e}")
 
-    cache_set(cache_key, result, ttl_days=7)
+    # A failed source or LLM relevance gate is unknown, not a durable empty
+    # literature result.
+    if search_completed:
+        cache_set(cache_key, result, ttl_days=7)
     return result

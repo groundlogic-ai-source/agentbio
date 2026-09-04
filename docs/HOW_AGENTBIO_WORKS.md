@@ -382,6 +382,28 @@ spend guardrails (`AGENTBIO_MAX_LLM_RATIONALES`, prefetch worker caps), and
 provider-level hard spend limits are documented as the required backstop in
 `api/guardrails.py`.
 
+### LLM routing tiers and telemetry
+
+`data_sources/llm_failover.py` keeps the existing capable defaults unchanged:
+standard/critical text calls use Sonnet 4.6 and GPT-5.4. Discovery continues to
+own its separate Opus 4.8/GPT-5.6 Sol choices. The module also defines an
+**opt-in** `cheap` tier (`AGENTBIO_ANTHROPIC_CHEAP_TEXT_MODEL` and
+`AGENTBIO_OPENAI_CHEAP_TEXT_MODEL`) for future low-risk classification or
+narration; no current critical or default call is routed there.
+
+Each shared failover attempt emits a structured `llm_call` telemetry event with
+provider, model, operation label, attempt, latency, success/error class, and
+SDK token usage when supplied. It never emits prompt text, response text,
+credentials, or error payload text. Token counts are not USD: an actual cost
+calculation requires the provider's applicable input/output (and any tool)
+rates plus returned usage for that call.
+
+Before every shared call, a process-wide scheduler admits each provider at no
+more than 2 concurrent calls and one new call every 0.25 seconds by default.
+Self-hosters can tune `AGENTBIO_LLM_MAX_CONCURRENT_PER_PROVIDER` and
+`AGENTBIO_LLM_MIN_INTERVAL_SECONDS`; each provider receives its own independent
+limit rather than sharing one global request slot.
+
 ---
 
 ## 6. Persistence: four stores, four jobs
@@ -419,6 +441,9 @@ the frozen benchmark.
 | `STAGE3_FORCE_RECOMPUTE` | 0 | If 1, ignore cached stage artifacts (CLI path) |
 | `PATHWAY_NEIGHBOR_MIN_APPROVED` | 3 | Approved-pool size below which pathway-neighbor expansion triggers (0 = never) |
 | `AGENTBIO_MAX_LLM_RATIONALES` | 25 | LLM rationale budget per pool (0 = all templated, −1 = unbounded) |
+| `AGENTBIO_LLM_MAX_CONCURRENT_PER_PROVIDER` | 2 | Shared LLM scheduler concurrent-call limit per provider |
+| `AGENTBIO_LLM_MIN_INTERVAL_SECONDS` | 0.25 | Shared LLM scheduler minimum interval between starts per provider |
+| `AGENTBIO_ANTHROPIC_CHEAP_TEXT_MODEL` / `AGENTBIO_OPENAI_CHEAP_TEXT_MODEL` | Haiku 4.5 / GPT-5 mini | Opt-in low-risk routing tier only; current default/critical calls are unchanged |
 | `AGENTBIO_PREFETCH_WORKERS` | 8 | Reviewer prefetch concurrency per source |
 | `AGENTBIO_DISABLE_V2_LANES` | — | If 1, restore machine-v1 pool semantics (ChEMBL-only) |
 | `AGENTBIO_TRACTABILITY_WEIGHTS` | `{"chembl_log_count":0.40,"afdb_plddt":0.35,"trial_penalty":0.25}` | JSON object overriding Stage-1 tractability weights |

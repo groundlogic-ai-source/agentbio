@@ -46,7 +46,9 @@ from openai import OpenAI
 
 from cache.cache import get, set as cache_set, make_key
 from data_sources import holdout
-from data_sources.llm_failover import call_with_backoff, chat_text
+from data_sources.llm_failover import (
+    MODEL_TIER_CRITICAL, call_with_backoff, chat_text,
+)
 
 VERDICT_INCOMPATIBLE = "DIRECTIONALLY_INCOMPATIBLE"
 VERDICT_COMPATIBLE   = "DIRECTIONALLY_COMPATIBLE"
@@ -288,6 +290,8 @@ def check_mechanism_direction(
                 input=search_query,
             ),
             label="mechanism-direction-search",
+            provider="openai",
+            model="gpt-5.4",
         )
         search_text = (search_response.output_text or "").strip()
         result["disease_mechanism_summary"] = search_text
@@ -348,8 +352,11 @@ def check_mechanism_direction(
             f"CITATIONS: <comma-separated URLs or citation identifiers, or 'none'>"
         )
         # Text-only classification: round-robin providers + 429 failover.
-        classify_text, _provider = chat_text(classification_prompt,
-                                             max_tokens=512)
+        classify_text, _provider = chat_text(
+            classification_prompt, max_tokens=512,
+            model_tier=MODEL_TIER_CRITICAL,
+            operation_label="mechanism-direction-final-classification",
+        )
         classify_text = classify_text.strip()
         result["step2_raw"] = classify_text
 
