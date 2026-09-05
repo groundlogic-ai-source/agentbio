@@ -15,12 +15,12 @@ Design rules (each exercised by validation/test_multisource_candidates.py):
      query any source by drug name — a name lookup would let a held-out
      benchmark drug leak in through the back door.
 
-  2. NORMALIZE, DON'T RE-SCORE.  Each adapter row and each of its per-row
+   2. NORMALIZE, DON'T RE-SCORE.  Each adapter row and each of its per-row
      evidence blobs becomes one or more EvidenceRecord objects.  Quality
      calibration, dedup-by-lineage and the active-moiety union are ALL delegated
      to the ledger; this module never invents a "more providers = better" bonus.
-     Because the ledger deduplicates by lineage (not by provider), a drug found
-     by GtoPdb AND DrugCentral AND ChEMBL is unioned by InChIKey block into ONE
+      Because the ledger deduplicates by lineage (not by provider), a drug found
+      by GtoPdb AND DrugCentral AND ChEMBL is unioned by full InChIKey and target
      candidate whose distinct-evidence count reflects distinct artifacts only.
 
   3. REGULATORY APPROVAL IS EXPLICIT EVIDENCE.  When an adapter row is an
@@ -55,6 +55,7 @@ from data_sources.evidence_ledger import (
     QualificationStatus,
     SourceType,
     merge_candidates,
+    canonical_inchikey,
     inchikey_block,
     normalize_name,
 )
@@ -242,6 +243,8 @@ _LEDGER_AUTHORITATIVE_FIELDS = {
     "target_symbol", "uniprot_id", "target_discovery_method", "disease_name",
     "ot_association_score", "source_types", "source_health",
     "target_memberships", "_evidence_ledger",
+    "canonical_compound_identity", "compound_identity_mode",
+    "parent_active_moiety_equivalence", "compound_aliases",
 }
 
 _PROCESS_METADATA_FIELDS = {
@@ -254,16 +257,22 @@ _PROCESS_METADATA_FIELDS = {
 
 
 def _same_candidate(a: dict[str, Any], b: dict[str, Any]) -> bool:
-    ab = inchikey_block(_clean(a.get("inchikey")))
-    bb = inchikey_block(_clean(b.get("inchikey")))
-    if ab and bb:
-        return ab == bb
+    at = (_clean(a.get("uniprot_id")).upper()
+          or _clean(a.get("target_symbol")).upper())
+    bt = (_clean(b.get("uniprot_id")).upper()
+          or _clean(b.get("target_symbol")).upper())
+    if at and bt and at != bt:
+        return False
+    ak = canonical_inchikey(_clean(a.get("inchikey")))
+    bk = canonical_inchikey(_clean(b.get("inchikey")))
+    if ak and bk:
+        return ak == bk
     aid = _clean(a.get("molecule_chembl_id"))
     bid = _clean(b.get("molecule_chembl_id"))
     if aid and bid and aid.upper().startswith("CHEMBL") and bid.upper().startswith("CHEMBL"):
         return aid.upper() == bid.upper()
     # Name is a last resort only when neither side has a structural identity.
-    if not ab and not bb:
+    if not ak and not bk:
         an = normalize_name(_clean(a.get("drug_name")))
         bn = normalize_name(_clean(b.get("drug_name")))
         return bool(an and bn and an == bn)
@@ -510,6 +519,7 @@ def records_from_drugcentral_envelope(
     envelope: dict[str, Any],
     *,
     uniprot_id: str = "",
+    gene: str = "",
     disease_name: str = "",
     ot_score: Optional[float] = None,
     target_discovery_method: str = "",
@@ -523,6 +533,7 @@ def records_from_drugcentral_envelope(
     """
     if not isinstance(envelope, dict):
         return []
+    pursued_gene = _clean(gene)
     records: list[EvidenceRecord] = []
     for cand in envelope.get("candidates") or []:
         if not isinstance(cand, dict):
@@ -531,9 +542,29 @@ def records_from_drugcentral_envelope(
         molecule_id = _clean(cand.get("struct_id"))
         inchikey = _clean(cand.get("inchikey"))
         smiles = _clean(cand.get("smiles"))
-        gene = _clean(cand.get("gene"))
-        accession = _clean(cand.get("accession")) or _clean(
-            cand.get("swissprot")) or uniprot_id
+        row_gene = _clean(cand.get("gene"))
+        accession = _clean(cand.get("accession"))
+        swissprot = _clean(cand.get("swissprot"))
+        # DrugCentral's swissprot field is commonly a mnemonic
+        # (e.g. SUR2_HUMAN), not a UniProt accession. Use it as an accession
+        # only when it exactly equals the accession being pursued.
+        if (not accession and uniprot_id
+                and swissprot.casefold() == uniprot_id.casefold()):
+            accession = swissprot
+        accession_matches = bool(
+            uniprot_id and accession
+            and accession.casefold() == uniprot_id.casefold())
+        symbol_matches = bool(
+            pursued_gene and row_gene
+            and row_gene.casefold() == pursued_gene.casefold())
+        target_qualified = accession_matches or symbol_matches
+        # A target-first response may contain records for another target (for
+        # example a channel-complex partner). Keep those facts, but label them
+        # as cross-target and never attach the pursued target's score.
+        evidence_scope = (
+            "target_qualified" if target_qualified else "cross_target")
+        if target_qualified and not accession:
+            accession = uniprot_id
         action = _clean(cand.get("action_type")) or _clean(cand.get("moa"))
 
         base = dict(
@@ -542,9 +573,10 @@ def records_from_drugcentral_envelope(
             molecule_name=name,
             inchikey=inchikey,
             smiles=smiles,
-            target_symbol=gene or _clean(cand.get("target_name")),
+            target_symbol=row_gene or _clean(cand.get("target_name")),
             target_accession=accession,
             target_species="Homo sapiens",
+            target_evidence_scope=evidence_scope,
             disease_name=disease_name,
         )
 
@@ -821,7 +853,7 @@ def normalize_chembl_enriched(
                 phase=max_phase,
             ))
 
-        if ot_score is not None:
+        if ot_score is not None and discovery != "pathway_neighbor":
             records.append(_ot_disease_link(
                 provider="chembl", base=base, uniprot_id=uniprot_id,
                 disease_name=disease_name, ot_score=ot_score))
@@ -833,6 +865,10 @@ def normalize_chembl_enriched(
                 evidence_role=EvidenceRole.TARGET_LINK,
                 source_id=f"chembl-discovery:{molecule_id}",
                 qualification_status=QualificationStatus.QUALIFIED,
+                context=(
+                    "own_target_association=unavailable;pathway co-membership only"
+                    if discovery == "pathway_neighbor" else ""
+                ),
                 **base,
             ))
     return records
@@ -897,6 +933,13 @@ def _genetic_link_records(existing: list[EvidenceRecord], uniprot_id: str,
     seen: set[tuple[str, str, str]] = set()
     out: list[EvidenceRecord] = []
     for r in existing:
+        row_target = (_clean(r.target_accession).casefold()
+                      or _clean(r.target_symbol).casefold())
+        pursued_target = (_clean(uniprot_id).casefold())
+        if (r.target_evidence_scope != "target_qualified"
+                or (pursued_target and row_target
+                    and row_target != pursued_target)):
+            continue
         ident = (r.inchikey, r.molecule_id, r.molecule_name)
         if ident in seen:
             continue
@@ -937,6 +980,8 @@ def _process_link_records(
     seen_moieties: set[tuple[str, str, str]] = set()
     out: list[EvidenceRecord] = []
     for rec in existing:
+        if rec.target_evidence_scope != "target_qualified":
+            continue
         ident = (rec.inchikey, rec.molecule_id, rec.molecule_name)
         if ident in seen_moieties:
             continue
@@ -1043,7 +1088,8 @@ def collect_target_candidates(
         drugcentral_env = drugcentral_v2.get_target_interactions(
             uniprot_id, gene=gene or None)
         records.extend(records_from_drugcentral_envelope(
-            drugcentral_env, uniprot_id=uniprot_id, disease_name=disease_name,
+            drugcentral_env, uniprot_id=uniprot_id, gene=gene,
+            disease_name=disease_name,
             ot_score=ot_score,
             target_discovery_method=target_discovery_method))
         source_status["drugcentral"] = _source_status(drugcentral_env)
@@ -1083,6 +1129,17 @@ def collect_target_candidates(
         candidates = _overlay_passthrough_fields(
             candidates, list(chembl_enriched or []))
 
+    # Cross-target observations remain auditable but are never placed in the
+    # rankable target-qualified pool.
+    cross_target_candidates = [
+        candidate for candidate in candidates
+        if candidate.get("target_qualification_status") == "cross_target_only"
+    ]
+    candidates = [
+        candidate for candidate in candidates
+        if candidate.get("target_qualification_status") != "cross_target_only"
+    ]
+
     # Fail-closed approved-only gate on the UNION.  Per-source filters are not
     # sufficient: a row that enters without resolvable approval status would
     # otherwise survive the merge and be eligible to become the headline
@@ -1101,6 +1158,7 @@ def collect_target_candidates(
 
     return {
         "candidates": candidates,
+        "cross_target_candidates": cross_target_candidates,
         "source_status": source_status,
         "approval_gate": {
             "enforced": bool(repurposing_only),

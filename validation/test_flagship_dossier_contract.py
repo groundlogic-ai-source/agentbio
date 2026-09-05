@@ -4,7 +4,11 @@ import unittest
 from unittest.mock import patch
 
 from agents.reviewer import _build_dossier_evidence_contract
-from agents.writer import build_report_markdown, validate_dossier_inputs
+from agents.writer import (
+    _filter_approved_target_comparators,
+    build_report_markdown,
+    validate_dossier_inputs,
+)
 
 
 def _candidate():
@@ -46,6 +50,42 @@ def _candidate():
 
 
 class FlagshipDossierContractTests(unittest.TestCase):
+    def test_newly_stamped_production_candidate_uses_v2_contract(self):
+        candidate = _candidate()
+        candidate.update({
+            "target_applicability": "DIRECT_CAUSAL",
+            "candidate_source_coverage": {
+                "complete": True,
+                "enabled_sources": [
+                    "bindingdb", "chembl", "drugcentral", "gtopdb"],
+                "failures": [],
+            },
+            "paid_validation_eligible": True,
+            "headline_eligible": True,
+        })
+        contract = _build_dossier_evidence_contract(
+            candidate, None, [candidate])
+        self.assertEqual(
+            contract["contract_version"],
+            "flagship-dossier-evidence-v2",
+        )
+
+    def test_glyburide_glibenclamide_lead_alias_is_not_a_comparator(self):
+        candidate = _candidate()
+        candidate.update({
+            "drug_name": "glyburide",
+            "compound_aliases": ["glibenclamide"],
+        })
+        rows = [
+            {"name": "glibenclamide", "max_phase": 4},
+            {"name": "repaglinide", "max_phase": 4},
+        ]
+        filtered = _filter_approved_target_comparators(candidate, rows)
+        self.assertEqual(
+            [row["name"] for row in filtered],
+            ["repaglinide"],
+        )
+
     def _preflight_ready_candidate(self):
         candidate = _candidate()
         candidate["uniprot_id"] = "P00001"

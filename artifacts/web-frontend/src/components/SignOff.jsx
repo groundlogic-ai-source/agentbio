@@ -2,11 +2,17 @@ import { useState } from "react";
 
 // The human review checkpoint. Either decision requires a short typed note
 // before it confirms — this is a deliberate sign-off, not a generic form.
-export default function SignOff({ onResume, busy, diseaseName = "" }) {
+export default function SignOff({
+  onResume,
+  busy,
+  diseaseName = "",
+  disabled = false,
+  disabledReasons = [],
+}) {
   const timothyScope = /^timothy syndrome$/i.test(diseaseName.trim());
   const [note, setNote] = useState("");
   const [pending, setPending] = useState(null); // "approve" | "reject" | null
-  const canSubmit = note.trim().length > 0 && !busy;
+  const canSubmit = note.trim().length > 0 && !busy && !disabled;
 
   function submit(action) {
     if (!canSubmit) {
@@ -43,6 +49,27 @@ export default function SignOff({ onResume, busy, diseaseName = "" }) {
       </div>
 
       <div className="px-6 py-5">
+        {disabled && (
+          <div
+            className="mb-5 rounded border p-4"
+            style={{
+              borderColor: "var(--oxide)",
+              backgroundColor: "var(--oxide-glow)",
+              color: "var(--oxide)",
+            }}
+          >
+            <p className="font-semibold">
+              Superseded policy snapshot — historical only — cannot be approved.
+            </p>
+            {disabledReasons.length > 0 && (
+              <ul className="mt-2 list-disc pl-5 text-sm">
+                {disabledReasons.map((reason) => (
+                  <li key={reason}>{reason}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
         <p
           className="text-base font-semibold leading-snug"
           style={{ color: "var(--ink)" }}
@@ -130,7 +157,7 @@ export default function SignOff({ onResume, busy, diseaseName = "" }) {
           <button
             type="button"
             onClick={() => submit("approve")}
-            disabled={busy}
+            disabled={busy || disabled}
             className="rounded px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
             style={{
               backgroundColor: "var(--brass)",
@@ -159,7 +186,7 @@ export default function SignOff({ onResume, busy, diseaseName = "" }) {
           <button
             type="button"
             onClick={() => submit("reject")}
-            disabled={busy}
+            disabled={busy || disabled}
             className="rounded px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
             style={{
               backgroundColor: "transparent",

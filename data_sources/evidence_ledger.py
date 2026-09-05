@@ -1,5 +1,5 @@
 """
-Common evidence ledger + active-moiety candidate union (PURE module).
+Common evidence ledger + compound-target candidate union (PURE module).
 
 This module is deliberately self-contained and side-effect free: no network,
 no filesystem, no third-party imports.  It gives the pipeline ONE normalized
@@ -15,9 +15,9 @@ Design invariants (each is exercised by validation/test_evidence_ledger.py):
      If ChEMBL and Open Targets both cite PMID 12345 for the same assay, that
      is ONE piece of evidence, counted once.  Provider count is never a boost.
 
-  2. Candidate identity prioritises the STRUCTURAL active moiety /
-     connectivity: the first InChIKey block (the 14-char skeleton) collapses
-     salt/ester/hydrate forms of one active moiety.  When no structure is
+   2. Candidate identity is the full stereochemical InChIKey plus target
+      accession/symbol. The connectivity block is retained only as explicit
+      parent/active-moiety equivalence metadata. When no structure is
      available we fall back to a stable provider molecule ID, and only then to
      a normalized name.  We NEVER collapse two records that merely share a name
      but have distinct structures, and we NEVER collapse structurally-unrelated
@@ -152,6 +152,7 @@ class EvidenceRecordDict(TypedDict, total=False):
     target_symbol: str
     target_accession: str        # e.g. UniProt accession
     target_species: str
+    target_evidence_scope: str  # target_qualified | off_target | cross_target
     # Action / direction
     action: str
     direction: str               # Direction value
@@ -183,6 +184,13 @@ _WS_RE = re.compile(r"\s+")
 # 14-char connectivity block of a standard InChIKey (AAAAAAAAAAAAAA-...-N).
 _INCHIKEY_RE = re.compile(r"^([A-Z]{14})-([A-Z]{8,10})-([A-Z0-9])$")
 
+# International/non-US names that denote the same active ingredient.  This is
+# deliberately small and explicit: name identity is only a last-resort path.
+_NAME_ALIASES = {
+    "glibenclamide": "glyburide",
+    "glyburide": "glyburide",
+}
+
 
 def normalize_name(name: Optional[str]) -> str:
     """Case/space-fold a drug or molecule name for stable comparison.
@@ -194,7 +202,8 @@ def normalize_name(name: Optional[str]) -> str:
     """
     if not name:
         return ""
-    return _WS_RE.sub(" ", str(name).strip().lower())
+    normalized = _WS_RE.sub(" ", str(name).strip().lower())
+    return _NAME_ALIASES.get(normalized, normalized)
 
 
 def inchikey_block(inchikey: Optional[str]) -> Optional[str]:
@@ -215,6 +224,14 @@ def inchikey_block(inchikey: Optional[str]) -> Optional[str]:
     if re.fullmatch(r"[A-Z]{14}", key):
         return key
     return None
+
+
+def canonical_inchikey(inchikey: Optional[str]) -> Optional[str]:
+    """Return a validated full InChIKey, preserving stereo/protonation layers."""
+    if not inchikey:
+        return None
+    key = str(inchikey).strip().upper()
+    return key if _INCHIKEY_RE.fullmatch(key) else None
 
 
 def _s(value: Any) -> str:
@@ -245,6 +262,10 @@ class EvidenceRecord:
     target_symbol: str = ""
     target_accession: str = ""
     target_species: str = ""
+    # Whether this record concerns the target of the candidate pair.  Adapters
+    # may retain cross-target observations, but those observations are never
+    # allowed to qualify the pursued target's evidence score.
+    target_evidence_scope: str = "target_qualified"
 
     action: str = ""
     direction: Direction = Direction.UNKNOWN
@@ -295,7 +316,7 @@ class EvidenceRecord:
                 "provider", "source_id", "source_version", "molecule_id",
                 "parent_molecule_id",
                 "molecule_name", "inchikey", "smiles", "target_symbol",
-                "target_accession", "target_species", "action",
+                "target_accession", "target_species", "target_evidence_scope", "action",
                 "measurement_type", "measurement_unit", "assay_id",
                 "context", "publication_id", "label_id", "trial_id",
                 "disease_id", "disease_name", "phenotype", "lineage_id"):
@@ -406,12 +427,16 @@ def normalize_evidence(raw: Any) -> EvidenceRecord:
         source_version=_s(d.get("source_version")),
         evidence_role=_coerce_enum(EvidenceRole, d.get("evidence_role"), EvidenceRole.OTHER),
         molecule_id=_s(d.get("molecule_id")),
+        parent_molecule_id=_s(d.get("parent_molecule_id")),
+        source_molecule_ids=tuple(d.get("source_molecule_ids") or ()),
         molecule_name=_s(d.get("molecule_name")),
         inchikey=_s(d.get("inchikey")).upper(),
         smiles=_s(d.get("smiles")),
         target_symbol=_s(d.get("target_symbol")),
         target_accession=_s(d.get("target_accession")),
         target_species=_s(d.get("target_species")),
+        target_evidence_scope=(
+            _s(d.get("target_evidence_scope")) or "target_qualified"),
         action=_s(d.get("action")),
         direction=_coerce_enum(Direction, d.get("direction"), Direction.UNKNOWN),
         measurement_type=_s(d.get("measurement_type")),
@@ -456,6 +481,8 @@ def qualified_target_chembl_activity_ids(
         if _s(record.get("source_type")).lower() != SourceType.BIOACTIVITY_ASSAY.value:
             continue
         if _s(record.get("qualification_status")).lower() != QualificationStatus.QUALIFIED.value:
+            continue
+        if _s(record.get("target_evidence_scope")).lower() != "target_qualified":
             continue
         if _s(record.get("target_species")).lower() != "homo sapiens":
             continue
@@ -608,8 +635,12 @@ def efficacy_confidence(records: Iterable[EvidenceRecord]):
     eligible = [
         record for record in records
         if (
+            record.target_evidence_scope == "target_qualified"
+            and
             record.evidence_role == EvidenceRole.EFFICACY
             or (
+                record.target_evidence_scope == "target_qualified"
+                and
                 record.evidence_role == EvidenceRole.TARGET_LINK
                 and record.source_type in {
                     SourceType.BIOACTIVITY_ASSAY,
@@ -634,11 +665,10 @@ def safety_confidence(records: Iterable[EvidenceRecord]):
 # ---------------------------------------------------------------------------
 
 def candidate_identity(record: EvidenceRecord) -> str:
-    """Deterministic identity key for the active moiety a record concerns.
+    """Deterministic identity key for one compound-target pair.
 
     Priority:
-      1. InChIKey connectivity block (active-moiety / structural identity) —
-         collapses salt/ester/hydrate forms of one moiety.
+      1. Full InChIKey (canonical stereochemical compound identity).
       2. A stable provider molecule ID (namespaced by provider so two
          providers' opaque ids never accidentally collide).
       3. Normalized name (LAST resort; only when neither structure nor a
@@ -646,17 +676,23 @@ def candidate_identity(record: EvidenceRecord) -> str:
          different structures never merge on name, and a record WITH structure
          is never merged into a name-only bucket.
     """
-    block = inchikey_block(record.inchikey)
-    if block:
-        return f"moiety:{block}"
-    if record.molecule_id:
+    full_key = canonical_inchikey(record.inchikey)
+    if full_key:
+        compound = f"inchikey:{full_key}"
+    elif record.molecule_id:
         prov = record.provider or "?"
-        return f"molid:{prov.lower()}:{record.molecule_id.strip().lower()}"
-    name = normalize_name(record.molecule_name)
-    if name:
-        return f"name:{name}"
-    # No identity at all — key on source id so we never merge unrelated blanks.
-    return f"anon:{record.provider.lower()}:{record.source_id.lower()}"
+        compound = f"molid:{prov.lower()}:{record.molecule_id.strip().lower()}"
+    else:
+        name = normalize_name(record.molecule_name)
+        if name:
+            compound = f"name:{name}"
+        else:
+            compound = f"anon:{record.provider.lower()}:{record.source_id.lower()}"
+
+    target = (_s(record.target_accession).upper()
+              or _s(record.target_symbol).upper()
+              or "UNATTRIBUTED")
+    return f"{compound}|target:{target}"
 
 
 # ---------------------------------------------------------------------------
@@ -665,7 +701,7 @@ def candidate_identity(record: EvidenceRecord) -> str:
 
 @dataclass
 class MergedCandidate:
-    """Identity-keyed union of every record concerning one active moiety."""
+    """Identity-keyed union for exactly one compound-target pair."""
     identity: str
     records: list[EvidenceRecord] = field(default_factory=list)
     # Preserved memberships / provenance
@@ -693,9 +729,17 @@ class MergedCandidate:
     disease_name: str = ""
     ot_association_score: Optional[float] = None
     target_discovery_method: str = ""
+    parent_active_moiety_blocks: set = field(default_factory=set)
+    compound_aliases: set = field(default_factory=set)
 
     def _num_lineages(self) -> int:
         return len({r.lineage_key() for r in self.records})
+
+    def _num_target_qualified_lineages(self) -> int:
+        return len({
+            r.lineage_key() for r in self.records
+            if r.target_evidence_scope == "target_qualified"
+        })
 
     def to_chemist_candidate(self) -> dict[str, Any]:
         """Return a dict byte-compatible with agents/chemist.py output.
@@ -724,6 +768,7 @@ class MergedCandidate:
                 "target_symbol": r.target_symbol,
                 "target_accession": r.target_accession,
                 "target_species": r.target_species,
+                "target_evidence_scope": r.target_evidence_scope,
                 "action": r.action,
                 "direction": r.direction.value,
                 "measurement_type": r.measurement_type,
@@ -751,6 +796,19 @@ class MergedCandidate:
                 self.source_molecule_chembl_ids),
             "smiles": self.smiles,
             "inchikey": self.inchikey,
+            "canonical_compound_identity": (
+                canonical_inchikey(self.inchikey) or self.identity.split("|target:", 1)[0]
+            ),
+            "compound_identity_mode": (
+                "full_stereochemical_inchikey"
+                if canonical_inchikey(self.inchikey) else "fallback"
+            ),
+            "parent_active_moiety_equivalence": {
+                "basis": "inchikey_connectivity_block",
+                "blocks": sorted(self.parent_active_moiety_blocks),
+                "used_for_deduplication": False,
+            },
+            "compound_aliases": sorted(self.compound_aliases),
             "pchembl_value": self.best_affinity,
             # Preserve the legacy ChEMBL assay-confidence scale (0-9).  The
             # cross-modality evidence confidence is a separate 0-1 field.
@@ -813,6 +871,13 @@ class MergedCandidate:
                 {"uniprot_id": accession}
                 for accession in sorted(self.target_accessions)
             ],
+            "target_qualification_status": (
+                "qualified" if self._num_target_qualified_lineages()
+                else "cross_target_only"
+            ),
+            "target_qualified_evidence_count": (
+                self._num_target_qualified_lineages()
+            ),
             # --- ledger extras (superset; safe to ignore downstream) ---
             "_evidence_ledger": {
                 "identity": self.identity,
@@ -835,10 +900,10 @@ class MergedCandidate:
 
 
 def merge_candidates(candidates: Iterable[Any]) -> list[dict[str, Any]]:
-    """Identity-keyed union of raw evidence records into Chemist candidates.
+    """Compound-target-keyed union of raw evidence records into candidates.
 
     ``candidates`` is an iterable of EvidenceRecord objects OR adapter dicts.
-    Records are grouped by :func:`candidate_identity`; within each group
+    Records are grouped by full stereochemical identity AND target; within each group
     duplicate evidence is collapsed by lineage key (NOT by provider), so that
     the same assay/publication/label/trial reported by several providers counts
     once.  The result is a deterministically-ordered list of Chemist-compatible
@@ -881,6 +946,9 @@ def _absorb(mc: MergedCandidate, rec: EvidenceRecord) -> None:
         mc.target_symbols.add(rec.target_symbol)
     if rec.target_accession:
         mc.target_accessions.add(rec.target_accession)
+    block = inchikey_block(rec.inchikey)
+    if block:
+        mc.parent_active_moiety_blocks.add(block)
     mc.source_types.add(rec.source_type)
     if rec.provider:
         mc.providers.add(rec.provider)
@@ -910,12 +978,14 @@ def _absorb(mc: MergedCandidate, rec: EvidenceRecord) -> None:
                         else max(mc.max_phase, rec.measurement_value))
 
     # Best quantitative affinity (highest pChEMBL).
-    if (rec.measurement_type.lower() in ("pchembl", "pchembl_value")
+    if (rec.target_evidence_scope == "target_qualified"
+            and rec.measurement_type.lower() in ("pchembl", "pchembl_value")
             and rec.measurement_value is not None):
         mc.best_affinity = (rec.measurement_value if mc.best_affinity is None
                             else max(mc.best_affinity, rec.measurement_value))
 
-    if (rec.measurement_type.lower() == "assay_confidence"
+    if (rec.target_evidence_scope == "target_qualified"
+            and rec.measurement_type.lower() == "assay_confidence"
             and rec.measurement_value is not None):
         score = int(round(rec.measurement_value))
         mc.assay_confidence_score = (
@@ -930,6 +1000,11 @@ def _absorb(mc: MergedCandidate, rec: EvidenceRecord) -> None:
         mc.smiles = rec.smiles
     if not mc.drug_name and rec.molecule_name:
         mc.drug_name = rec.molecule_name
+    normalized_name = normalize_name(rec.molecule_name)
+    if normalized_name == "glyburide":
+        mc.compound_aliases.update({"glyburide", "glibenclamide"})
+    elif rec.molecule_name:
+        mc.compound_aliases.add(rec.molecule_name)
     # Prefer a ChEMBL-looking id for molecule_chembl_id.
     if rec.molecule_id and (mc.molecule_chembl_id is None
                             or (not str(mc.molecule_chembl_id).upper().startswith("CHEMBL")
@@ -945,7 +1020,9 @@ def _absorb(mc: MergedCandidate, rec: EvidenceRecord) -> None:
         mc.uniprot_id = rec.target_accession
     if not mc.disease_name and rec.disease_name:
         mc.disease_name = rec.disease_name
-    if not mc.target_discovery_method and rec.evidence_role == EvidenceRole.TARGET_LINK:
+    if (not mc.target_discovery_method
+            and rec.target_evidence_scope == "target_qualified"
+            and rec.evidence_role == EvidenceRole.TARGET_LINK):
         # Map source type to a discovery-method label the Writer understands.
         mc.target_discovery_method = {
             SourceType.GENETIC_ASSOCIATION: "genetic_association",
@@ -953,7 +1030,8 @@ def _absorb(mc: MergedCandidate, rec: EvidenceRecord) -> None:
             SourceType.PATHWAY: "pathway_neighbor",
         }.get(rec.source_type, mc.target_discovery_method)
     # ot_association_score from a genetic disease link measurement.
-    if (rec.source_type == SourceType.GENETIC_ASSOCIATION
+    if (rec.target_evidence_scope == "target_qualified"
+            and rec.source_type == SourceType.GENETIC_ASSOCIATION
             and rec.measurement_type.lower() in ("ot_association", "association_score")
             and rec.measurement_value is not None):
         mc.ot_association_score = (
@@ -970,7 +1048,7 @@ __all__ = [
     "QualificationStatus", "ContradictionStatus",
     "NOT_APPLICABLE", "EvidenceRecordDict", "EvidenceRecord",
     "MergedCandidate",
-    "normalize_name", "inchikey_block", "normalize_evidence",
+    "normalize_name", "inchikey_block", "canonical_inchikey", "normalize_evidence",
     "evidence_quality", "efficacy_confidence", "safety_confidence",
     "candidate_identity", "merge_candidates",
 ]

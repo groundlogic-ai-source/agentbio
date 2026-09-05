@@ -41,6 +41,7 @@ from data_sources.chembl import (
 from data_sources.pubchem import get_compound_data, get_drug_classification
 from data_sources.openfda import get_label_indications, get_label_mechanism
 from data_sources.multisource_candidates import (
+    normalize_enabled_sources,
     approval_basis, collect_target_candidates, filter_repurposing_eligible,
     merge_chemist_candidates)
 from data_sources import holdout as _holdout
@@ -400,21 +401,63 @@ def run_chemist(biologist_output: dict[str, Any],
                 repurposing_only: bool = False,
                 enabled_sources: Optional[Iterable[str]] = None,
                 ) -> dict[str, Any]:
-    target = biologist_output["target"]
+    target = biologist_output.get("target") or {}
     uniprot = target.get("uniprot_id")
     symbol = target.get("target_symbol")
     disease_name = target.get("disease_name", "")
     ot_score = target.get("ot_association_score", 0.0)
     network = biologist_output.get("interacting_genes", [])
+    enabled = normalize_enabled_sources(enabled_sources)
 
-    if not uniprot:
-        print("[chemist] WARNING: target has no UniProt id; cannot query ChEMBL")
-        return {"target": target, "candidates": [],
-                "pooled_across_multiple_targets": False,
-                "repurposing_only": repurposing_only}
+    early_error = biologist_output.get("error")
+    if early_error or not uniprot:
+        reason = (
+            f"Biologist target evaluation failed: {early_error}"
+            if early_error
+            else "Target has no UniProt accession; candidate sources were not evaluated."
+        )
+        print(f"[chemist] WARNING: {reason}")
+        return {
+            "target": target,
+            "candidates": [],
+            "pooled_across_multiple_targets": False,
+            "repurposing_only": repurposing_only,
+            "enabled_sources": sorted(enabled),
+            "error": reason,
+            "source_status": {
+                source: {
+                    "status": "unavailable",
+                    "error": reason,
+                    "release": None,
+                    "evaluated": False,
+                }
+                for source in sorted(enabled)
+            },
+            "cross_target_candidates": [],
+            "excluded_candidates": [],
+            "approval_gate": {
+                "enforced": bool(repurposing_only),
+                "excluded": [],
+                "n_excluded_unapproved": 0,
+            },
+        }
 
     cc = get_target_candidate_compounds(uniprot, repurposing_only=repurposing_only)
     compounds = cc["compounds"]
+    chembl_source_status = {
+        "status": (
+            cc.get("source_status")
+            or ("ok" if compounds else "unavailable")
+        ),
+        "error": (
+            cc.get("source_error")
+            or (
+                None if compounds
+                else "ChEMBL returned no verifiable complete candidate payload"
+            )
+        ),
+        "release": None,
+    }
     if repurposing_only:
         print(f"[chemist] repurposing_only mode: pool restricted to "
               f"{len(compounds)} approved compound(s) (unapproved tool "
@@ -648,6 +691,8 @@ def run_chemist(biologist_output: dict[str, Any],
                 str(e.get("target_discovery_method") or "").strip()
                 or primary_disc_method
             ),
+            "target_applicability": e.get("target_applicability")
+            or target.get("target_applicability"),
             "uniprot_id": e_uid,
             "disease_name": disease_name,
             "ot_association_score": e.get("ot_association_score",
@@ -701,6 +746,15 @@ def run_chemist(biologist_output: dict[str, Any],
         process_support=target.get("process_support", []),
         enabled_sources=enabled_sources,
     )
+    # The collector receives ChEMBL rows rather than the provider envelope, so
+    # restore the target-query health assessment instead of allowing a surviving
+    # non-ChEMBL candidate to mask an ambiguous ChEMBL failure.
+    configured = (
+        None if enabled_sources is None
+        else {str(value).strip().lower() for value in enabled_sources}
+    )
+    if configured is None or "chembl" in configured:
+        multisource["source_status"]["chembl"] = chembl_source_status
     results = multisource["candidates"]
     # Regulatory labels are a separate evidence lane for non-binding modalities
     # (antimetabolites, cofactors, pathway inhibitors).  Add them only after
@@ -750,6 +804,7 @@ def run_chemist(biologist_output: dict[str, Any],
             "inchikey": c.get("inchikey"),
             "max_phase": c.get("max_phase"),
             "providers": (c.get("_evidence_ledger") or {}).get("providers", []),
+            "exclusion_reasons": ["approval_not_established"],
         }
         for c in gate_excluded
     ]
@@ -792,8 +847,23 @@ def run_chemist(biologist_output: dict[str, Any],
         "candidates": results,
         "pooled_across_multiple_targets": cc["pooled_across_multiple_targets"],
         "repurposing_only": repurposing_only,
+        "enabled_sources": sorted(enabled),
         "approved_reference_set_size": len(approved_fps),
         "source_status": multisource["source_status"],
+        "cross_target_candidates": multisource.get("cross_target_candidates", []),
+        "excluded_candidates": (
+            approval_gate.get("excluded", [])
+            + [
+                {
+                    "drug_name": c.get("drug_name"),
+                    "inchikey": c.get("inchikey"),
+                    "target_symbol": c.get("target_symbol"),
+                    "uniprot_id": c.get("uniprot_id"),
+                    "exclusion_reasons": ["cross_target_only"],
+                }
+                for c in multisource.get("cross_target_candidates", [])
+            ]
+        ),
         "approval_gate": approval_gate,
         "reference_set_note": (
             "Tanimoto computed against approved drugs found in this target's "

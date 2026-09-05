@@ -22,6 +22,20 @@ from cache.cache import get, make_key, set as cache_set
 from data_sources.llm_failover import MODEL_TIER_CRITICAL, chat_text
 from data_sources.pubmed import BASE_URL, _api_key_params, _esearch
 from data_sources.provider_request_policy import request as provider_request
+from data_sources.literature_semantics import (
+    APPLICABLE_SUPPORT,
+    DRUG_ALIAS,
+    DRUG_CLASS,
+    EVIDENCE_LEVELS,
+    EXACT_DRUG,
+    EXPLICIT_LIMITATION,
+    NO_INTERVENTION_MATCH,
+    NOT_APPLICABLE_TO_EXACT_DRUG_USE,
+    UNKNOWN_INTEGRITY_FAILED,
+    canonical_exact_use_label,
+    intervention_identity,
+    legacy_projection,
+)
 
 
 VERDICT_CONFIRMED = "CONFIRMED_APPLICABLE_LIMITATION"
@@ -40,7 +54,8 @@ _HIGH_AUTHORITY_TYPES = {
     "consensus development conference, nih",
 }
 _ALLOWED_LABELS = {
-    "EXPLICIT_LIMITATION", "CAUTION", "SUPPORT", "IRRELEVANT",
+    EXPLICIT_LIMITATION, APPLICABLE_SUPPORT,
+    NOT_APPLICABLE_TO_EXACT_DRUG_USE, UNKNOWN_INTEGRITY_FAILED, "CAUTION",
 }
 _NEGATIVE_WORDS = re.compile(
     r"\b(ineffective|not effective|failed|no benefit|did not improve|"
@@ -224,18 +239,22 @@ Target: {target_symbol}
 Exact disease: {disease_name}
 Intended use: {intended_use}
 
-Allowed labels:
+Allowed exact_use_label values:
 - EXPLICIT_LIMITATION: the abstract explicitly says this drug/class is ineffective,
   failed, not recommended, lacks benefit, worsens disease, or has a mechanistic
   limitation for this exact disease/use.
-- CAUTION: relevant concern or uncertainty, but no explicit ineffectiveness statement.
-- SUPPORT: reports benefit or recommends the drug/class for this exact disease/use.
-- IRRELEVANT: wrong disease/subtype/use/class, or only says evidence is insufficient.
+- APPLICABLE_SUPPORT: reports benefit for this exact drug (or an alias) and exact use.
+- NOT_APPLICABLE_TO_EXACT_DRUG_USE: related class/mechanistic evidence, wrong
+  drug, disease/subtype/use, or merely insufficient evidence.
+- UNKNOWN/INTEGRITY_FAILED: the supplied abstract cannot support a reliable extraction.
 
 Return one JSON object and nothing else:
-{{"label":"...","quote":"exact contiguous quote from abstract or empty",
-  "disease_match":true|false,"use_match":true|false,
-  "drug_or_class_match":true|false,"reason":"one sentence"}}
+{{"exact_use_label":"...","quote":"exact contiguous quote from abstract or empty",
+  "disease_match":true|false,"subtype_match":true|false,"use_match":true|false,
+  "drug_or_class_match":true|false,
+  "intervention_identity":"EXACT_DRUG|DRUG_ALIAS|DRUG_CLASS|NO_INTERVENTION_MATCH",
+  "evidence_level":"mechanistic|disease_model|case_report_clinical",
+  "reason":"one sentence"}}
 The quote must be copied exactly from the abstract. Do not use outside knowledge.
 
 PMID: {record.get('pmid')}
@@ -246,6 +265,8 @@ Abstract:
         prompt, max_tokens=500, model_tier=MODEL_TIER_CRITICAL,
         operation_label="literature-limitation-record-classification")
     parsed = _extract_json(raw) or {}
+    if "label" not in parsed and "exact_use_label" in parsed:
+        parsed["label"] = parsed["exact_use_label"]
     return {**parsed, "classifier_provider": provider, "classifier_raw": raw}
 
 
@@ -271,17 +292,22 @@ Target: {target_symbol}
 Exact disease: {disease_name}
 Intended use: {intended_use}
 
-For every supplied PMID return one finding. Allowed labels:
+For every supplied PMID return one finding. Allowed exact_use_label values:
 EXPLICIT_LIMITATION = explicit ineffective/failed/not recommended/no benefit/
 mechanistic limitation for the exact disease and use.
-CAUTION = relevant concern without explicit ineffectiveness.
-SUPPORT = benefit or recommendation for the exact disease/use.
-IRRELEVANT = wrong subtype/use/class or only insufficient evidence.
+APPLICABLE_SUPPORT = benefit for the exact drug (or an alias) and exact use.
+NOT_APPLICABLE_TO_EXACT_DRUG_USE = related class/mechanistic evidence, wrong
+drug, subtype/use, or only insufficient evidence.
+UNKNOWN/INTEGRITY_FAILED = no reliable extraction can be made.
 
 Return one JSON object only:
-{{"findings":[{{"pmid":"retrieved PMID","label":"...","quote":"exact contiguous
-quote or empty","disease_match":true|false,"use_match":true|false,
-"drug_or_class_match":true|false,"reason":"one sentence"}}]}}
+{{"findings":[{{"pmid":"retrieved PMID","exact_use_label":"...",
+"quote":"exact contiguous quote or empty","disease_match":true|false,
+"subtype_match":true|false,"use_match":true|false,
+"drug_or_class_match":true|false,
+"intervention_identity":"EXACT_DRUG|DRUG_ALIAS|DRUG_CLASS|NO_INTERVENTION_MATCH",
+"evidence_level":"mechanistic|disease_model|case_report_clinical",
+"reason":"one sentence"}}]}}
 Use only supplied text. Never omit a PMID and never use outside knowledge.
 
 {supplied}"""
@@ -302,8 +328,11 @@ Use only supplied text. Never omit a PMID and never use outside knowledge.
         raise ValueError("Classifier returned malformed or duplicate findings")
     if set(returned) != set(expected):
         raise ValueError("Classifier omitted or invented a retrieved PMID")
+    for row in findings:
+        if "label" not in row and "exact_use_label" in row:
+            row["label"] = row["exact_use_label"]
     if any(
-        str(row.get("label") or "").upper() not in _ALLOWED_LABELS
+        canonical_exact_use_label(row.get("label")) not in _ALLOWED_LABELS
         for row in findings
     ):
         raise ValueError("Classifier returned an unsupported finding label")
@@ -324,6 +353,34 @@ def _quote_is_verbatim(quote: Any, abstract: Any) -> bool:
     return len(quote_norm) >= 20 and quote_norm in abstract_norm
 
 
+def _mechanical_evidence_level(
+    record: dict[str, Any], classification: dict[str, Any],
+) -> str:
+    supplied = (
+        str(classification.get("evidence_level") or "")
+        .strip().casefold().replace(" ", "_").replace("/", "_")
+    )
+    if supplied in EVIDENCE_LEVELS:
+        return supplied
+    source = " ".join([
+        str(record.get("title") or ""),
+        str(record.get("abstract") or ""),
+        " ".join(str(value) for value in record.get("publication_types", [])),
+    ])
+    if re.search(
+        r"\b(case report|patient|participant|clinical|trial)\b",
+        source, re.IGNORECASE,
+    ):
+        return "case_report_clinical"
+    if re.search(
+        r"\b(mouse|mice|murine|zebrafish|animal model|disease model|"
+        r"cell(?:ular)? model|iPSC)\b",
+        source, re.IGNORECASE,
+    ):
+        return "disease_model"
+    return "mechanistic"
+
+
 def aggregate_findings(
     records: list[dict[str, Any]],
     classifications: list[dict[str, Any]],
@@ -334,15 +391,39 @@ def aggregate_findings(
     drug_class: str = "",
     target_symbol: str = "",
     intended_use: str = "",
+    drug_aliases: Optional[list[str]] = None,
 ) -> dict[str, Any]:
     """Mechanically validate extractions and determine the gate verdict."""
+    aliases = [str(value) for value in (drug_aliases or []) if str(value).strip()]
+    alignment_failed = len(records) != len(classifications)
+    if not alignment_failed and classifications and all(
+        classification.get("pmid") is not None
+        for classification in classifications
+    ):
+        expected = [str(record.get("pmid")) for record in records]
+        returned = [str(row.get("pmid")) for row in classifications]
+        alignment_failed = (
+            len(returned) != len(set(returned)) or set(returned) != set(expected)
+        )
+        if not alignment_failed:
+            by_pmid = {str(row.get("pmid")): row for row in classifications}
+            classifications = [by_pmid[pmid] for pmid in expected]
+
     evidence: list[dict[str, Any]] = []
     rejected: list[dict[str, Any]] = []
-    classifier_integrity_failures = 0
+    related_evidence: list[dict[str, Any]] = []
+    classifier_integrity_failures = int(alignment_failed)
     for record, classification in zip(records, classifications):
-        label = str(classification.get("label") or "").upper()
+        raw_label = (
+            classification.get("exact_use_label")
+            if classification.get("exact_use_label") is not None
+            else classification.get("label")
+        )
+        label = canonical_exact_use_label(raw_label)
         classifier_match = all(classification.get(key) is True for key in (
             "disease_match", "use_match", "drug_or_class_match"))
+        if classification.get("subtype_match") is False:
+            classifier_match = False
         source_text = (
             f"{record.get('title') or ''} {record.get('abstract') or ''}")
         deterministic_disease = _phrase_or_term_match(
@@ -360,6 +441,13 @@ def aggregate_findings(
             for value in (drug_name, drug_class)
             if _terms(value)
         )
+        source_identity = intervention_identity(
+            source_text, drug_name, aliases, drug_class)
+        exact_drug_identity = source_identity in {EXACT_DRUG, DRUG_ALIAS}
+        deterministic_intervention = (
+            deterministic_intervention
+            or source_identity != NO_INTERVENTION_MATCH
+        )
         use_specific_terms = _use_terms(
             intended_use, disease_name, target_symbol)
         use_overlap = use_specific_terms & _terms(source_text)
@@ -371,7 +459,7 @@ def aggregate_findings(
                 and len(use_overlap) / len(use_specific_terms) >= 0.75
             )
         )
-        exact_match = bool(
+        limitation_match = bool(
             classifier_match
             and deterministic_disease
             and deterministic_intervention
@@ -388,35 +476,76 @@ def aggregate_findings(
         supportive_language = bool(_SUPPORT_WORDS.search(str(quote or "")))
         source_has_negative_language = bool(
             _NEGATIVE_WORDS.search(str(record.get("abstract") or "")))
+        requested_label = label
+        exact_support_match = bool(limitation_match and exact_drug_identity)
+        if label == APPLICABLE_SUPPORT and not exact_support_match:
+            # Class, disease-model, and adjacent-use support is useful context,
+            # but is not evidence for the exact candidate drug/use.
+            label = NOT_APPLICABLE_TO_EXACT_DRUG_USE
+        exact_match = (
+            limitation_match if label in {EXPLICIT_LIMITATION, "CAUTION"}
+            else exact_support_match
+        )
         valid = (
             valid_label
             and valid_citation
-            and (label == "IRRELEVANT" or (exact_match and valid_quote))
-            and (label != "EXPLICIT_LIMITATION" or explicit_language)
             and (
-                label != "SUPPORT"
+                (
+                    label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
+                    and requested_label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
+                )
+                or (exact_match and valid_quote)
+                or (
+                    label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
+                    and requested_label == APPLICABLE_SUPPORT
+                    and valid_quote
+                )
+            )
+            and (label != EXPLICIT_LIMITATION or explicit_language)
+            and (
+                label != APPLICABLE_SUPPORT
                 or (supportive_language and not explicit_language)
             )
             # A retrieved record containing explicit negative language cannot
             # silently disappear behind an IRRELEVANT label. Without a valid
             # exact-applicability extraction, classification is unresolved.
             and not (
-                label == "IRRELEVANT" and source_has_negative_language
+                label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
+                and source_has_negative_language
             )
+            and label != UNKNOWN_INTEGRITY_FAILED
         )
+        evidence_level = _mechanical_evidence_level(record, classification)
         row = {
             "pmid": record.get("pmid"),
             "title": record.get("title"),
             "publication_year": record.get("publication_year"),
             "publication_types": record.get("publication_types", []),
             "source_url": record.get("source_url"),
-            "label": label if valid_label else "INVALID",
+            # label is retained as a compatibility projection. New consumers
+            # must use exact_use_label, whose vocabulary is unambiguous.
+            "label": legacy_projection(label) if valid else "INVALID",
+            "exact_use_label": label if valid else UNKNOWN_INTEGRITY_FAILED,
             "quote": quote if valid_quote else "",
             "reason": classification.get("reason"),
             "exact_applicability": exact_match,
+            "intervention_identity": source_identity,
+            "evidence_level": evidence_level,
+            "applicability": {
+                "disease": deterministic_disease,
+                "subtype": (
+                    deterministic_disease
+                    and classification.get("subtype_match") is not False
+                ),
+                "use": deterministic_use,
+            },
             "classifier_applicability": classifier_match,
             "deterministic_applicability": {
                 "disease": deterministic_disease,
+                "subtype": (
+                    deterministic_disease
+                    and classification.get("subtype_match") is not False
+                ),
                 "drug_or_class": deterministic_intervention,
                 "intended_use": deterministic_use,
                 "intended_use_terms": sorted(use_specific_terms),
@@ -428,16 +557,54 @@ def aggregate_findings(
         (evidence if valid else rejected).append(row)
         if not valid:
             classifier_integrity_failures += 1
+        if (
+            valid_citation and valid_quote
+            and not explicit_language
+            and (
+                supportive_language
+                or (
+                    requested_label == APPLICABLE_SUPPORT
+                )
+            )
+            and deterministic_disease
+            and (
+                source_identity == DRUG_CLASS
+                or (exact_drug_identity and not deterministic_use)
+            )
+        ):
+            related_evidence.append({
+                **row,
+                "exact_use_label": NOT_APPLICABLE_TO_EXACT_DRUG_USE,
+                "label": "IRRELEVANT",
+                "exact_applicability": False,
+                "mechanically_verified": True,
+                "disclosure_only": True,
+                "efficacy_score_boost": 0,
+            })
 
-    explicit = [row for row in evidence if row["label"] == "EXPLICIT_LIMITATION"]
-    support = [row for row in evidence if row["label"] == "SUPPORT"]
+    explicit = [
+        row for row in evidence
+        if row["exact_use_label"] == EXPLICIT_LIMITATION
+    ]
+    support = [
+        row for row in evidence
+        if row["exact_use_label"] == APPLICABLE_SUPPORT
+    ]
     cautions = [row for row in evidence if row["label"] == "CAUTION"]
     authoritative = [
         row for row in explicit
         if _HIGH_AUTHORITY_TYPES.intersection(
             {str(value).casefold() for value in row["publication_types"]})
     ]
-    if explicit and support:
+    if alignment_failed:
+        verdict = VERDICT_FAILED
+        blocked = False
+        reason = (
+            "Classifier rows could not be mechanically aligned one-to-one with "
+            "the retrieved PMIDs. The result is unknown and paid validation is "
+            "not authorized."
+        )
+    elif explicit and support:
         verdict = VERDICT_CONFLICTING
         blocked = False
         reason = (
@@ -474,7 +641,7 @@ def aggregate_findings(
             "this is not evidence of novelty, efficacy, or safety."
         )
     return {
-        "schema_version": "literature-limitation-v2",
+        "schema_version": "literature-limitation-v3",
         "verdict": verdict,
         "source_status": (
             "CLASSIFIER_INTEGRITY_FAILED"
@@ -490,6 +657,12 @@ def aggregate_findings(
         "explicit_limitation_count": len(explicit),
         "support_count": len(support),
         "classifier_integrity_failures": classifier_integrity_failures,
+        "related_support": {
+            "disclosure_only": True,
+            "efficacy_score_boost": 0,
+            "evidence": related_evidence,
+            "count": len(related_evidence),
+        },
         "post_benchmark_production_gate": True,
     }
 
@@ -502,21 +675,23 @@ def check_literature_limitation(
     mechanism_of_action: Optional[str],
     intended_use: Optional[str] = None,
     *,
+    drug_aliases: Optional[list[str]] = None,
     retriever: Callable[..., tuple[list[str], list[dict[str, Any]]]] = retrieve_literature,
     classifier: Callable[..., dict[str, Any]] = classify_record,
 ) -> dict[str, Any]:
     """Retrieve, classify, mechanically verify, and aggregate limitation evidence."""
     intended = intended_use or f"treatment of {disease_name}"
     cache_key = make_key(
-        "literature_limitation_v2_batch8_policy1",
+        "literature_limitation_v3_batch8_policy2",
         drug_name, disease_name, target_symbol,
         action_type or "", mechanism_of_action or "", intended,
+        sorted(drug_aliases or []),
     )
     if retriever is retrieve_literature and classifier is classify_record:
         cached = get(cache_key)
         if (
             isinstance(cached, dict)
-            and cached.get("schema_version") == "literature-limitation-v2"
+            and cached.get("schema_version") == "literature-limitation-v3"
             and cached.get("source_status") == "HEALTHY"
             and isinstance(cached.get("gate_cleared"), bool)
             and isinstance(cached.get("blocked"), bool)
@@ -569,6 +744,7 @@ def check_literature_limitation(
             drug_class=drug_class,
             target_symbol=target_symbol,
             intended_use=intended,
+            drug_aliases=drug_aliases,
         )
         result["source_record_fingerprint"] = hashlib.sha256(
             json.dumps(
@@ -591,7 +767,7 @@ def check_literature_limitation(
         # Source/classifier failures are not cached: a transient outage must not
         # become a durable "no limitation found" result.
         return {
-            "schema_version": "literature-limitation-v2",
+            "schema_version": "literature-limitation-v3",
             "verdict": VERDICT_FAILED,
             "source_status": "FAILED",
             "blocked": False,
@@ -604,5 +780,11 @@ def check_literature_limitation(
             "records_screened": 0,
             "evidence": [],
             "rejected_extractions": [],
+            "related_support": {
+                "disclosure_only": True,
+                "efficacy_score_boost": 0,
+                "evidence": [],
+                "count": 0,
+            },
             "post_benchmark_production_gate": True,
         }

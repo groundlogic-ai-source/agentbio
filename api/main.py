@@ -14,6 +14,7 @@ Run:
 """
 
 import hashlib
+import hmac
 import json
 import os
 import re
@@ -31,6 +32,14 @@ from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Res
 from pydantic import BaseModel
 
 import api.guardrails as _guardrails
+from api.policy_contracts import (
+    DECISION_CONTRACT_VERSION,
+    LITERATURE_SCHEMA_VERSION,
+    REPORT_CONTRACT_VERSION,
+    REVIEWER_FORMULA_VERSION,
+    SAFETY_SCHEMA_VERSION,
+    canonical_json_bytes,
+)
 
 from main_graph import build_graph
 from resume_review import resume_run
@@ -55,6 +64,231 @@ _PIPELINE_NODES = {
     "structure_validation",
     "writer",
 }
+
+_JOB_REPORT_ROOT = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "output", "job_reports",
+)
+_STALE_POLICY = (
+    "Superseded policy snapshot — historical only — cannot be approved."
+)
+
+
+def _job_report_path(job_id: str) -> str:
+    safe_id = re.sub(r"[^A-Za-z0-9_-]", "", job_id)
+    if not safe_id or safe_id != job_id:
+        raise ValueError("invalid job id for report provenance")
+    return os.path.join(_JOB_REPORT_ROOT, safe_id, "report.md")
+
+
+def _snapshot_binding_line(snapshot_sha256: str) -> str:
+    return f"Candidate snapshot SHA-256: `{snapshot_sha256}`"
+
+
+def _persist_actionable_report(
+        job_id: str, generated_path: str) -> dict[str, Any]:
+    """Freeze the writer output only after its durable reviewer snapshot exists."""
+    snapshot = jobs_db.get_candidate_snapshot(job_id)
+    if not isinstance(snapshot, dict):
+        raise RuntimeError(
+            "Durable job candidate snapshot missing; report cannot become "
+            "actionable.")
+    snapshot_formula = snapshot.get("formula") or {}
+    snapshot_candidates = snapshot.get("candidates") or []
+    if (
+        snapshot_formula.get("formula_version") != REVIEWER_FORMULA_VERSION
+        or snapshot.get("safety_schema_version") != SAFETY_SCHEMA_VERSION
+        or snapshot.get("literature_schema_version")
+        != LITERATURE_SCHEMA_VERSION
+        or snapshot.get("report_contract_version") != REPORT_CONTRACT_VERSION
+        or not snapshot.get("reviewer_input_fingerprint")
+        or snapshot.get("source_coverage_complete") is not True
+        or bool(snapshot.get("source_failure_details"))
+        or not snapshot_candidates
+        or any(
+            (candidate.get("dossier_evidence_contract") or {}).get(
+                "contract_version") != REPORT_CONTRACT_VERSION
+            or (candidate.get("candidate_source_coverage") or {}).get(
+                "complete") is not True
+            for candidate in snapshot_candidates
+        )
+    ):
+        raise RuntimeError(
+            "Reviewer snapshot is incomplete or uses superseded policy "
+            "contracts; report cannot become actionable.")
+    snapshot_hash = hashlib.sha256(canonical_json_bytes(snapshot)).hexdigest()
+    with open(generated_path, "rb") as fh:
+        generated_bytes = fh.read()
+    # Reports are Markdown/UTF-8; validate and bind the exact durable snapshot
+    # before hashing or creating the immutable copy.
+    generated_report = generated_bytes.decode("utf-8")
+    binding_prefix = (
+        "<!-- AgentBio immutable decision provenance -->\n"
+        f"{_snapshot_binding_line(snapshot_hash)}\n\n"
+    )
+    report_bytes = (
+        generated_bytes
+        if generated_report.startswith(binding_prefix)
+        else f"{binding_prefix}{generated_report}".encode("utf-8")
+    )
+    report_path = _job_report_path(job_id)
+    os.makedirs(os.path.dirname(report_path), exist_ok=True)
+    if os.path.exists(report_path):
+        with open(report_path, "rb") as fh:
+            if fh.read() != report_bytes:
+                raise RuntimeError(
+                    "Immutable job-scoped report already exists with different "
+                    "content.")
+    temp_path = f"{report_path}.{threading.get_ident()}.tmp"
+    with open(temp_path, "wb") as fh:
+        fh.write(report_bytes)
+        fh.flush()
+        os.fsync(fh.fileno())
+    try:
+        os.link(temp_path, report_path)
+    except FileExistsError:
+        with open(report_path, "rb") as fh:
+            if fh.read() != report_bytes:
+                raise RuntimeError(
+                    "Immutable job-scoped report race produced different "
+                    "content.")
+    finally:
+        os.unlink(temp_path)
+    metadata = {
+        "report_path": report_path,
+        "decision_contract_version": DECISION_CONTRACT_VERSION,
+        "report_contract_version": REPORT_CONTRACT_VERSION,
+        "report_sha256": hashlib.sha256(report_bytes).hexdigest(),
+        "candidate_snapshot_sha256": snapshot_hash,
+        "reviewer_input_fingerprint":
+            snapshot.get("reviewer_input_fingerprint"),
+    }
+    try:
+        jobs_db.finalize_job_report(job_id, **metadata)
+    except Exception:
+        # If the snapshot changed in the narrow pre-finalization window, do not
+        # leave an unbound file blocking a safe retry. Remove only our exact
+        # bytes; never remove a report another finalizer may have established.
+        try:
+            with open(report_path, "rb") as fh:
+                owns_unbound_file = fh.read() == report_bytes
+            current_job = jobs_db.get_job(job_id)
+            if owns_unbound_file and not (current_job or {}).get("report_sha256"):
+                os.unlink(report_path)
+        except OSError:
+            pass
+        raise
+    return metadata
+
+
+def _actionability(job: dict[str, Any]) -> dict[str, Any]:
+    """Validate every durable boundary needed for an actionable decision."""
+    reasons: list[str] = []
+    snapshot: Optional[dict[str, Any]]
+    try:
+        snapshot = jobs_db.get_candidate_snapshot(str(job.get("job_id") or ""))
+    except Exception:
+        snapshot = None
+    if not isinstance(snapshot, dict):
+        reasons.append("durable job candidate snapshot is missing")
+    expected_metadata = {
+        "decision_contract_version": DECISION_CONTRACT_VERSION,
+        "report_contract_version": REPORT_CONTRACT_VERSION,
+    }
+    for field, expected in expected_metadata.items():
+        if job.get(field) != expected:
+            reasons.append(f"{field} is missing or superseded")
+
+    if snapshot is not None:
+        formula = snapshot.get("formula") or {}
+        if formula.get("formula_version") != REVIEWER_FORMULA_VERSION:
+            reasons.append("reviewer formula contract is missing or superseded")
+        if snapshot.get("safety_schema_version") != SAFETY_SCHEMA_VERSION:
+            reasons.append("safety contract is missing or superseded")
+        if snapshot.get("literature_schema_version") != LITERATURE_SCHEMA_VERSION:
+            reasons.append("literature contract is missing or superseded")
+        if snapshot.get("report_contract_version") != REPORT_CONTRACT_VERSION:
+            reasons.append("report contract is missing or superseded")
+        if snapshot.get("source_coverage_complete") is not True:
+            reasons.append("required source coverage is incomplete")
+        if snapshot.get("source_failure_details"):
+            reasons.append("target/source failure envelopes are present")
+        fingerprint = snapshot.get("reviewer_input_fingerprint")
+        if (
+            not fingerprint
+            or fingerprint != job.get("reviewer_input_fingerprint")
+        ):
+            reasons.append("reviewer input fingerprint is missing or mismatched")
+        candidate_contracts = [
+            (candidate.get("dossier_evidence_contract") or {}).get(
+                "contract_version")
+            for candidate in snapshot.get("candidates", [])
+        ]
+        if (
+            not candidate_contracts
+            or any(version != REPORT_CONTRACT_VERSION
+                   for version in candidate_contracts)
+        ):
+            reasons.append("candidate dossier contract is missing or superseded")
+        candidate_coverage = [
+            candidate.get("candidate_source_coverage") or {}
+            for candidate in snapshot.get("candidates", [])
+        ]
+        if (
+            not candidate_coverage
+            or any(coverage.get("complete") is not True
+                   for coverage in candidate_coverage)
+        ):
+            reasons.append("candidate-level required source coverage is incomplete")
+        actual_snapshot_hash = hashlib.sha256(
+            canonical_json_bytes(snapshot)).hexdigest()
+        if not job.get("candidate_snapshot_sha256") or not hmac.compare_digest(
+                actual_snapshot_hash, str(job.get("candidate_snapshot_sha256"))):
+            reasons.append("candidate snapshot hash is missing or mismatched")
+
+    report_path = job.get("report_path")
+    try:
+        expected_path = os.path.abspath(_job_report_path(str(job["job_id"])))
+        actual_path = os.path.abspath(str(report_path)) if report_path else ""
+        resolved_path = os.path.realpath(actual_path) if actual_path else ""
+        resolved_root = os.path.realpath(_JOB_REPORT_ROOT)
+        path_is_scoped = (
+            actual_path == expected_path
+            and not os.path.islink(actual_path)
+            and os.path.commonpath([resolved_path, resolved_root])
+            == resolved_root
+        )
+    except (KeyError, ValueError):
+        expected_path, actual_path, path_is_scoped = "", "", False
+    if not path_is_scoped:
+        reasons.append("report is not an immutable job-scoped report")
+    report_bytes: Optional[bytes] = None
+    if path_is_scoped and os.path.isfile(actual_path):
+        with open(actual_path, "rb") as fh:
+            report_bytes = fh.read()
+    else:
+        reasons.append("job-scoped report snapshot is missing")
+    if report_bytes is not None:
+        actual_hash = hashlib.sha256(report_bytes).hexdigest()
+        if not job.get("report_sha256") or not hmac.compare_digest(
+                actual_hash, str(job.get("report_sha256"))):
+            reasons.append("report hash is missing or mismatched")
+        expected_binding = _snapshot_binding_line(
+            str(job.get("candidate_snapshot_sha256") or ""))
+        try:
+            report_text = report_bytes.decode("utf-8")
+        except UnicodeDecodeError:
+            report_text = ""
+        if not report_text.startswith(
+                "<!-- AgentBio immutable decision provenance -->\n"
+                f"{expected_binding}\n"):
+            reasons.append(
+                "report does not contain the exact candidate snapshot binding")
+    return {
+        "actionable": not reasons,
+        "stale_policy": None if not reasons else _STALE_POLICY,
+        "stale_reasons": reasons,
+    }
 
 app = FastAPI(title="AgentBio API", version="1.0.0")
 
@@ -231,7 +465,8 @@ def _run_graph(job_id: str, thread_id: str) -> None:
                 if node == "writer":
                     reports = value.get("reports") or []
                     if reports and reports[0].get("path"):
-                        fields["report_path"] = reports[0]["path"]
+                        fields.update(_persist_actionable_report(
+                            job_id, reports[0]["path"]))
 
                 jobs_db.update_job_status(job_id, **fields)
 
@@ -444,6 +679,32 @@ def get_run(job_id: str) -> dict[str, Any]:
             "source_unavailable", "degraded_unscorable")
     if job["status"] in ("awaiting_review", "completed"):
         job["report"] = _read_report(job.get("report_path"))
+    job.update(_actionability(job))
+    structure_accounted = (
+        job.get("current_stage") in {
+            "structure_validation", "writer", "awaiting_review", "done"}
+        or job.get("status") in {"awaiting_review", "completed"}
+    )
+    job["run_accounting"] = {
+        "structure_validation": {
+            "status": "OBSERVED" if structure_accounted else "UNKNOWN",
+            "cost_usd": (
+                job.get("total_cost_usd") if structure_accounted else None
+            ),
+        },
+        "llm": {
+            "status": "UNKNOWN",
+            "cost_usd": None,
+            "reason": (
+                "Provider telemetry is not yet durably attributable per run; "
+                "no process-global or estimated USD value is reported."
+            ),
+        },
+    }
+    if not structure_accounted:
+        # The database's historical 0.0 default is not evidence that no cost
+        # occurred. Expose unknown until the metered structure node reports.
+        job["total_cost_usd"] = None
     return job
 
 
@@ -459,8 +720,15 @@ def download_case_report_pdf(job_id: str) -> Response:
     try:
         report_path = job.get("report_path")
         frozen_job = dict(job)
-        frozen_job["report_sha256"] = hashlib.sha256(
-            report.encode("utf-8")).hexdigest()
+        policy = _actionability(job)
+        frozen_job.update(policy)
+        if not policy["actionable"]:
+            report = (
+                "# SUPERSEDED POLICY SNAPSHOT — HISTORICAL ONLY\n\n"
+                "**This report cannot be approved.** "
+                f"{'; '.join(policy['stale_reasons'])}\n\n---\n\n"
+                + report
+            )
         if report_path and os.path.exists(report_path):
             frozen_job["report_snapshot_at"] = datetime.fromtimestamp(
                 os.path.getmtime(report_path), tz=timezone.utc
@@ -498,12 +766,49 @@ def resume(job_id: str, req: ResumeRequest) -> dict[str, Any]:
         raise HTTPException(
             status_code=409,
             detail=f"job is '{job['status']}', not awaiting_review")
+    policy = _actionability(job)
+    if not policy["actionable"]:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "message": _STALE_POLICY,
+                "stale_reasons": policy["stale_reasons"],
+            },
+        )
+    claimed = jobs_db.claim_job_for_review(job_id)
+    if claimed is None:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "Review decision already claimed by another request; this "
+                "request did not invoke resume_run."
+            ),
+        )
+    # Persist attempted-decision context for crash recovery without treating the
+    # attempt as a completed durable decision.
+    jobs_db.update_job_status(
+        job_id,
+        status="reviewing",
+        error_message=(
+            f"Attempted decision '{action}' was atomically claimed; checkpoint "
+            "side effects remain uncertain until completion."
+        ),
+        review_notes=req.notes or "",
+    )
 
     try:
-        review = resume_run(job["thread_id"], action, req.notes or "")
+        review = resume_run(claimed["thread_id"], action, req.notes or "")
     except Exception as exc:  # noqa: BLE001
         jobs_db.update_job_status(
-            job_id, status="error", error_message=str(exc))
+            job_id,
+            status="error",
+            error_message=(
+                f"Review decision attempt '{action}' failed after atomic claim; "
+                "checkpoint side effects may have occurred and the job was not "
+                f"restored to awaiting_review: {exc}"
+            ),
+            review_notes=req.notes or "",
+        )
         raise HTTPException(status_code=500, detail=str(exc))
 
     updated = jobs_db.update_job_status(
@@ -517,7 +822,23 @@ def get_cost(job_id: str) -> dict[str, Any]:
     job = jobs_db.get_job(job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="job not found")
-    return {"job_id": job_id, "total_cost_usd": job["total_cost_usd"]}
+    structure_accounted = (
+        job.get("current_stage") in {
+            "structure_validation", "writer", "awaiting_review", "done"}
+        or job.get("status") in {"awaiting_review", "completed"}
+    )
+    return {
+        "job_id": job_id,
+        "total_cost_usd": (
+            job.get("total_cost_usd") if structure_accounted else None
+        ),
+        "accounting": {
+            "structure_validation": (
+                "OBSERVED" if structure_accounted else "UNKNOWN"),
+            "llm": "UNKNOWN",
+            "llm_cost_usd": None,
+        },
+    }
 
 
 # --------------------------------------------------------------------------- #

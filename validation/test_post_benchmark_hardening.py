@@ -15,8 +15,9 @@ from unittest import mock
 from agents import schemas
 from agents.reviewer import (
     _apply_causal_tier_demotion, _postcap_direction_shortlist,
-    _rank_reviewed, _target_tier,
+    _candidate_source_coverage, _rank_reviewed, _target_tier,
 )
+from agents.chemist import run_chemist
 from agents.writer import (
     _approval_basis_cell, _citations, _discovery_method_cell, _target_tier_cell,
 )
@@ -326,6 +327,266 @@ class TestEligibilityGate(unittest.TestCase):
         self.assertEqual(route({"eligibility": {"eligible": False}}), END)
         self.assertEqual(route({"eligibility": {"eligible": True}}),
                          "structure_validation")
+
+
+class TestDossierPreflightSelection(unittest.TestCase):
+    def test_pool_larger_than_shortlist_validates_only_selected_paid_lead(self):
+        import main_graph
+
+        selected = {
+            "drug_name": "selected",
+            "strong_match": True,
+            "literature_limitation_blocked": False,
+            "literature_limitation_gate_cleared": True,
+            "paid_validation_eligible": True,
+            "headline_eligible": True,
+            "is_approved_drug": True,
+        }
+        audit_only = [
+            {
+                "drug_name": f"audit-{index}",
+                "strong_match": False,
+                "literature_limitation_blocked": False,
+                "literature_limitation_gate_cleared": False,
+                "paid_validation_eligible": False,
+                "headline_eligible": False,
+                "is_approved_drug": True,
+            }
+            for index in range(
+                main_graph.MAX_LITERATURE_LIMITATION_CANDIDATES + 2)
+        ]
+        state = {
+            "reviewed": {
+                "candidates": [selected, *audit_only],
+                "repurposing_only": True,
+            },
+            "targets": [],
+            "biologist_outputs": [],
+        }
+        with mock.patch.object(main_graph, "_write_json"), mock.patch.object(
+            main_graph.writer, "validate_dossier_inputs"
+        ) as validate:
+            verdict = main_graph.dossier_preflight_node(state)[
+                "dossier_preflight"]
+        self.assertEqual(verdict["n_candidates_checked"], 1)
+        validate.assert_called_once()
+        self.assertIs(validate.call_args.args[0], selected)
+
+    def test_holdout_reviewer_reuses_persisted_frozen_output_even_for_job(self):
+        import main_graph
+
+        frozen = {
+            "formula": {"formula_version": "reviewer-composite-v2"},
+            "candidates": [{"drug_name": "frozen-ranked-lead"}],
+        }
+        with mock.patch.object(
+            main_graph._holdout, "is_active", return_value=True
+        ), mock.patch.object(
+            main_graph, "_load_json", return_value=frozen
+        ), mock.patch.object(
+            main_graph, "run_reviewer"
+        ) as run_reviewer:
+            result = main_graph.reviewer_node({
+                "job_id": "fresh-production-style-job",
+                "chemist_output": {"candidates": [{"drug_name": "changed"}]},
+            })
+        self.assertIs(result["reviewed"], frozen)
+        run_reviewer.assert_not_called()
+
+    def test_cli_reviewer_cache_invalidates_on_input_source_and_formula(self):
+        import main_graph
+        import api.policy_contracts as policy
+
+        base_chemist = {
+            "candidates": [],
+            "source_status": {
+                "chembl": {"status": "complete"},
+                "gtopdb": {"status": "complete"},
+                "drugcentral": {"status": "complete"},
+                "bindingdb": {"status": "complete"},
+            },
+        }
+        cached = {
+            "reviewer_input_fingerprint":
+                policy.reviewer_input_fingerprint(base_chemist),
+            "formula": {
+                "formula_version": policy.REVIEWER_FORMULA_VERSION,
+            },
+            "safety_schema_version": policy.SAFETY_SCHEMA_VERSION,
+            "literature_schema_version": policy.LITERATURE_SCHEMA_VERSION,
+            "report_contract_version": policy.REPORT_CONTRACT_VERSION,
+            "candidates": [],
+        }
+        with mock.patch.object(
+            main_graph._holdout, "is_active", return_value=False
+        ), mock.patch.object(
+            main_graph, "_load_json", return_value=cached
+        ), mock.patch.object(main_graph, "run_reviewer") as reviewer:
+            reused = main_graph.reviewer_node({"chemist_output": base_chemist})
+        self.assertIs(reused["reviewed"], cached)
+        reviewer.assert_not_called()
+
+        mutations = [
+            {**base_chemist, "candidates": [{"drug_name": "changed input"}]},
+            {
+                **base_chemist,
+                "source_status": {
+                    **base_chemist["source_status"],
+                    "chembl": {"status": "failed", "error": "down"},
+                },
+            },
+        ]
+        for changed in mutations:
+            with self.subTest(changed=changed), mock.patch.object(
+                main_graph._holdout, "is_active", return_value=False
+            ), mock.patch.object(
+                main_graph, "_load_json", return_value=cached
+            ), mock.patch.object(
+                main_graph, "run_reviewer", return_value=[]
+            ) as reviewer, mock.patch.object(
+                main_graph, "validate_reviewer_handoff"
+            ), mock.patch.object(main_graph, "_write_json"):
+                main_graph.reviewer_node({"chemist_output": changed})
+            reviewer.assert_called_once()
+
+        with mock.patch.object(
+            policy, "REVIEWER_FORMULA_VERSION", "future-reviewer-formula"
+        ), mock.patch.object(
+            main_graph._holdout, "is_active", return_value=False
+        ), mock.patch.object(
+            main_graph, "_load_json", return_value=cached
+        ), mock.patch.object(
+            main_graph, "run_reviewer", return_value=[]
+        ) as reviewer, mock.patch.object(
+            main_graph, "validate_reviewer_handoff"
+        ), mock.patch.object(main_graph, "_write_json"):
+            main_graph.reviewer_node({"chemist_output": base_chemist})
+        reviewer.assert_called_once()
+
+    def test_missing_frozen_artifact_fails_closed_without_reviewer(self):
+        import main_graph
+
+        with mock.patch.object(
+            main_graph._holdout, "is_active", return_value=True
+        ), mock.patch.object(
+            main_graph, "_load_json", return_value=None
+        ), mock.patch.object(
+            main_graph, "run_reviewer"
+        ) as run_reviewer:
+            with self.assertRaisesRegex(
+                RuntimeError, "provenance/integrity failure"
+            ):
+                main_graph.reviewer_node({
+                    "job_id": "frozen-without-artifact",
+                    "chemist_output": {"candidates": []},
+                })
+        run_reviewer.assert_not_called()
+
+
+class TestKTargetCompleteness(unittest.TestCase):
+    @staticmethod
+    def _healthy_sources():
+        return {
+            source: {"status": "complete", "error": None}
+            for source in ("bindingdb", "chembl", "drugcentral", "gtopdb")
+        }
+
+    def test_missing_uniprot_returns_explicit_unevaluated_sources(self):
+        result = run_chemist({
+            "target": {
+                "target_symbol": "MISSING",
+                "disease_name": "Synthetic disease",
+            },
+        })
+        self.assertIn("error", result)
+        self.assertEqual(
+            set(result["source_status"]),
+            {"bindingdb", "chembl", "drugcentral", "gtopdb"},
+        )
+        self.assertTrue(all(
+            row["status"] == "unavailable" and row["evaluated"] is False
+            for row in result["source_status"].values()
+        ))
+
+    def test_disjoint_biologist_and_chemist_failures_form_union(self):
+        import main_graph
+
+        targets = [
+            {"target_symbol": symbol, "uniprot_id": f"P{index}"}
+            for index, symbol in enumerate(("BIOFAIL", "CHEMFAIL", "HEALTHY"))
+        ]
+        bios = [
+            {"target": targets[0], "error": "biologist failed"},
+            {"target": targets[1]},
+            {"target": targets[2]},
+        ]
+        surviving = {
+            "drug_name": "survivor",
+            "target_symbol": "HEALTHY",
+            "uniprot_id": "P2",
+        }
+
+        def chemist_result(bio, **_kwargs):
+            symbol = bio["target"]["target_symbol"]
+            if symbol == "CHEMFAIL":
+                raise RuntimeError("chemist failed")
+            return {
+                "target": bio["target"],
+                "candidates": [surviving] if symbol == "HEALTHY" else [],
+                "source_status": self._healthy_sources(),
+                "approved_reference_set_size": 0,
+                "approval_gate": {"excluded": []},
+            }
+
+        state = {
+            "targets": targets,
+            "target": targets[0],
+            "biologist_outputs": bios,
+            "biologist_output": bios[0],
+            "repurposing_only": True,
+            "k_bio_failed": 1,
+        }
+        with mock.patch.object(
+            main_graph, "run_chemist", side_effect=chemist_result
+        ), mock.patch.object(
+            main_graph, "merge_chemist_candidates",
+            side_effect=lambda rows: rows,
+        ), mock.patch.object(
+            main_graph, "validate_chemist_handoff"
+        ), mock.patch.object(main_graph, "_write_json"):
+            output = main_graph.chemist_node(state)["chemist_output"]
+
+        summary = output["k_target_summary"]
+        self.assertEqual(summary["k_failed"], 2)
+        self.assertEqual(
+            set(summary["failed_targets"]), {"BIOFAIL", "CHEMFAIL"})
+        coverage = _candidate_source_coverage(output["source_status"])
+        self.assertFalse(coverage["complete"])
+        self.assertTrue(any(
+            row["source"] == "target_evaluation"
+            for row in coverage["failures"]
+        ))
+
+        reviewed_survivor = {
+            **surviving,
+            "is_approved_drug": True,
+            "strong_match": True,
+            "literature_limitation_blocked": False,
+            "literature_limitation_gate_cleared": True,
+            "paid_validation_eligible": True,
+            "headline_eligible": True,
+        }
+        with mock.patch.object(main_graph, "_write_json"):
+            verdict = main_graph.eligibility_gate_node({
+                "repurposing_only": True,
+                "reviewed": {
+                    "repurposing_only": True,
+                    "candidates": [reviewed_survivor],
+                },
+                "chemist_output": output,
+            })["eligibility"]
+        self.assertFalse(verdict["eligible"])
+        self.assertEqual(verdict["terminal_status"], "source_unavailable")
 
 
 class TestDossierDisclosure(unittest.TestCase):

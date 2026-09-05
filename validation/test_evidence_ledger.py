@@ -27,7 +27,37 @@ from data_sources.evidence_ledger import (  # noqa: E402
     normalize_name, inchikey_block, normalize_evidence,
     evidence_quality, efficacy_confidence, safety_confidence,
     candidate_identity, merge_candidates,
+    qualified_target_chembl_activity_ids,
 )
+
+
+class QualifiedTargetActivityIdTest(unittest.TestCase):
+    def test_malformed_cross_target_row_cannot_leak_activity_id(self):
+        base = {
+            "provider": "chembl",
+            "source_type": "bioactivity_assay",
+            "qualification_status": "qualified",
+            "target_species": "Homo sapiens",
+            "target_symbol": "ABCC9",
+            "target_accession": "O60706",
+        }
+        records = [
+            {
+                **base,
+                "target_evidence_scope": "cross_target",
+                "source_activity_ids": ["MALFORMED-CROSS"],
+            },
+            {
+                **base,
+                "target_evidence_scope": "target_qualified",
+                "source_activity_ids": ["QUALIFIED-DIRECT"],
+            },
+        ]
+        self.assertEqual(
+            qualified_target_chembl_activity_ids(
+                records, target_symbol="ABCC9", target_accession="O60706"),
+            ["QUALIFIED-DIRECT"],
+        )
 
 
 # --- shared InChIKeys ------------------------------------------------------
@@ -79,14 +109,14 @@ class NormalizationTests(unittest.TestCase):
         self.assertIsNone(rec(measurement_value=float("nan")).measurement_value)
 
 
-class SaltIdentityTests(unittest.TestCase):
-    def test_salt_forms_share_identity(self):
+class StereochemicalIdentityTests(unittest.TestCase):
+    def test_same_parent_block_preserves_distinct_full_identity(self):
         a = rec(inchikey=_FREE_BASE, molecule_name="Drug X")
         b = rec(inchikey=_HCL_SALT, molecule_name="Drug X hydrochloride")
-        self.assertEqual(candidate_identity(a), candidate_identity(b))
-        self.assertTrue(candidate_identity(a).startswith("moiety:"))
+        self.assertNotEqual(candidate_identity(a), candidate_identity(b))
+        self.assertTrue(candidate_identity(a).startswith("inchikey:"))
 
-    def test_salt_forms_merge_to_one_candidate(self):
+    def test_parent_equivalence_is_metadata_not_deduplication(self):
         recs = [
             rec(provider="chembl", inchikey=_FREE_BASE, molecule_name="Drug X",
                 molecule_id="CHEMBL1", target_symbol="EGFR"),
@@ -94,7 +124,11 @@ class SaltIdentityTests(unittest.TestCase):
                 molecule_id="CHEMBL2", target_symbol="EGFR"),
         ]
         merged = merge_candidates(recs)
-        self.assertEqual(len(merged), 1)
+        self.assertEqual(len(merged), 2)
+        for candidate in merged:
+            equivalence = candidate["parent_active_moiety_equivalence"]
+            self.assertEqual(equivalence["blocks"], [_MOIETY_BLOCK])
+            self.assertFalse(equivalence["used_for_deduplication"])
 
     def test_unrelated_structures_do_not_merge(self):
         a = rec(inchikey=_FREE_BASE, molecule_name="Same Name")
@@ -106,17 +140,25 @@ class SaltIdentityTests(unittest.TestCase):
 class NoStructureIdentityTests(unittest.TestCase):
     def test_provider_id_used_when_no_structure(self):
         a = rec(provider="chembl", molecule_id="CHEMBL99", molecule_name="Foo")
-        self.assertEqual(candidate_identity(a), "molid:chembl:chembl99")
+        self.assertEqual(candidate_identity(a),
+                         "molid:chembl:chembl99|target:UNATTRIBUTED")
 
     def test_name_only_last_resort(self):
         a = rec(molecule_name="Aspirin")
-        self.assertEqual(candidate_identity(a), "name:aspirin")
+        self.assertEqual(candidate_identity(a),
+                         "name:aspirin|target:UNATTRIBUTED")
 
     def test_name_records_merge_but_only_without_structure(self):
         a = rec(molecule_name="Aspirin", target_symbol="PTGS1")
         b = rec(molecule_name="aspirin ", target_symbol="PTGS2")
         merged = merge_candidates([a, b])
-        self.assertEqual(len(merged), 1)
+        self.assertEqual(len(merged), 2)
+
+    def test_glyburide_glibenclamide_aliases_merge_on_same_target(self):
+        a = rec(molecule_name="glyburide", target_accession="O60706")
+        b = rec(molecule_name="glibenclamide", target_accession="O60706")
+        self.assertEqual(candidate_identity(a), candidate_identity(b))
+        self.assertEqual(len(merge_candidates([a, b])), 1)
 
     def test_structure_record_not_merged_into_name_bucket(self):
         # A record WITH structure must never merge into a name-only bucket.
@@ -322,7 +364,7 @@ class AggregateAndPreservationTests(unittest.TestCase):
                 source_type="bioactivity_assay", measurement_type="pchembl",
                 measurement_value=7.5, evidence_role="efficacy",
                 qualification_status="qualified", disease_name="NSCLC"),
-            rec(provider="chembl", inchikey=_HCL_SALT, molecule_name="Drug X HCl",
+            rec(provider="chembl", inchikey=_FREE_BASE, molecule_name="Drug X",
                 molecule_id="CHEMBL26", target_symbol="EGFR",
                 target_accession="P00533", assay_id="A2",
                 source_type="bioactivity_assay", measurement_type="pchembl",
@@ -388,9 +430,31 @@ class AggregateAndPreservationTests(unittest.TestCase):
             rec(inchikey=_FREE_BASE, target_symbol="ERBB2", target_accession="P04626",
                 assay_id="A2"),
         ]
-        led = merge_candidates(recs)[0]["_evidence_ledger"]
-        self.assertEqual(set(led["target_symbols"]), {"EGFR", "ERBB2"})
-        self.assertEqual(set(led["target_accessions"]), {"P00533", "P04626"})
+        merged = merge_candidates(recs)
+        self.assertEqual(len(merged), 2)
+        self.assertEqual(
+            {candidate["uniprot_id"] for candidate in merged},
+            {"P00533", "P04626"},
+        )
+
+    def test_same_compound_cross_target_evidence_never_changes_target_score(self):
+        direct = rec(
+            inchikey=_FREE_BASE, target_symbol="ABCC9",
+            target_accession="O60706", source_type="mechanism",
+            evidence_role="target_link", qualification_status="qualified",
+        )
+        off_target = rec(
+            inchikey=_FREE_BASE, target_symbol="KCNJ8",
+            target_accession="Q15842", source_type="bioactivity_assay",
+            evidence_role="efficacy", qualification_status="qualified",
+            target_evidence_scope="cross_target", measurement_type="pchembl",
+            measurement_value=9.0,
+        )
+        merged = merge_candidates([direct, off_target])
+        self.assertEqual(len(merged), 2)
+        by_target = {candidate["uniprot_id"]: candidate for candidate in merged}
+        self.assertEqual(by_target["O60706"]["efficacy_confidence"], 0.85)
+        self.assertIsNone(by_target["Q15842"]["efficacy_confidence"])
 
 
 class DeterminismTests(unittest.TestCase):

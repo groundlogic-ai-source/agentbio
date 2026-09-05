@@ -82,7 +82,7 @@ def _gtopdb_candidate():
     }
 
 
-def _drugcentral_candidate(inchikey=_HCL_SALT):
+def _drugcentral_candidate(inchikey=_FREE_BASE):
     return {
         "source": "drugcentral",
         "struct_id": 4321,
@@ -163,6 +163,47 @@ class ConverterTests(unittest.TestCase):
             _gtopdb_env(status="unavailable", error="boom"))
         self.assertEqual(recs, [])
 
+    def test_cantu_abcc9_fixture_keeps_abcc9_and_cross_target_separate(self):
+        """Glyburide evidence in a mixed channel response stays target-scoped."""
+        abcc9 = _drugcentral_candidate()
+        abcc9.update({
+            "name": "glibenclamide",
+            "gene": "ABCC9",
+            "accession": "O60706",
+            "target_name": "ATP-binding cassette sub-family C member 9",
+        })
+        kcnj8 = dict(abcc9)
+        kcnj8.update({
+            "gene": "KCNJ8",
+            "accession": "Q15842",
+            "target_name": "ATP-sensitive inward rectifier potassium channel 8",
+            "evidence": [dict(abcc9["evidence"][0], act_id=89)],
+        })
+        recs = msc.records_from_drugcentral_envelope(
+            _drugcentral_env(candidates=[abcc9, kcnj8]),
+            uniprot_id="O60706", gene="ABCC9",
+            disease_name="Cantú syndrome", ot_score=0.91,
+        )
+        merged = merge_candidates(recs)
+        self.assertEqual(
+            {candidate["uniprot_id"] for candidate in merged},
+            {"O60706", "Q15842"},
+        )
+        by_target = {candidate["uniprot_id"]: candidate for candidate in merged}
+        abcc9_records = by_target["O60706"]["_evidence_ledger"]["records"]
+        kcnj8_records = by_target["Q15842"]["_evidence_ledger"]["records"]
+        self.assertTrue(all(
+            record["target_evidence_scope"] == "target_qualified"
+            for record in abcc9_records
+        ))
+        self.assertTrue(any(
+            record["target_evidence_scope"] == "cross_target"
+            for record in kcnj8_records
+        ))
+        self.assertEqual(by_target["O60706"]["ot_association_score"], 0.91)
+        self.assertIsNone(by_target["Q15842"]["ot_association_score"])
+        self.assertIsNone(by_target["Q15842"]["efficacy_confidence"])
+
 
 class ChemblEnrichedTests(unittest.TestCase):
     def test_separate_pchembl_and_confidence_records(self):
@@ -218,18 +259,63 @@ class UnionTests(unittest.TestCase):
         return result, g, d
 
     def test_union_across_sources_by_inchikey(self):
-        # Same moiety (salt vs free base) from all three sources -> ONE candidate.
+        # Same full stereochemical compound and target from all sources -> one.
         result, _, _ = self._collect(
             _gtopdb_env(candidates=[_gtopdb_candidate()]),          # free base
-            _drugcentral_env(candidates=[_drugcentral_candidate()]),  # HCl salt
+            _drugcentral_env(candidates=[_drugcentral_candidate()]),
             chembl=[_chembl_enriched()])
         cands = result["candidates"]
         self.assertEqual(len(cands), 1)
         cand = cands[0]
         providers = cand["_evidence_ledger"]["providers"]
         self.assertEqual(set(providers), {"gtopdb", "drugcentral", "chembl"})
-        # Structural union keyed on the shared 14-char block.
-        self.assertTrue(cand["_evidence_ledger"]["identity"].endswith(_BLOCK))
+        self.assertIn(_FREE_BASE, cand["_evidence_ledger"]["identity"])
+
+    def test_stereochemical_variants_are_not_collapsed(self):
+        result, _, _ = self._collect(
+            _gtopdb_env(candidates=[_gtopdb_candidate()]),
+            _drugcentral_env(candidates=[_drugcentral_candidate(_HCL_SALT)]),
+        )
+        self.assertEqual(len(result["candidates"]), 2)
+        self.assertEqual(
+            {candidate["parent_active_moiety_equivalence"]["blocks"][0]
+             for candidate in result["candidates"]},
+            {_BLOCK},
+        )
+
+    def test_cross_target_candidate_is_disclosed_but_not_rankable(self):
+        direct = _drugcentral_candidate()
+        direct.update({"gene": "ABCC9", "accession": "O60706"})
+        cross = dict(direct)
+        cross.update({
+            "gene": "KCNJ8", "accession": "Q15842",
+            "evidence": [dict(direct["evidence"][0], act_id=99)],
+        })
+        empty = _gtopdb_env(status="empty")
+        with mock.patch.object(msc.gtopdb, "get_target_interactions",
+                               return_value=empty), \
+             mock.patch.object(msc.drugcentral_v2, "get_target_interactions",
+                               return_value=_drugcentral_env(
+                                   candidates=[direct, cross])), \
+             mock.patch.object(msc.bindingdb, "get_target_interactions",
+                               return_value={
+                                   "source": "bindingdb", "status": "empty",
+                                   "candidates": [], "error": None,
+                                   "release": None,
+                               }):
+            result = msc.collect_target_candidates(
+                "O60706", "ABCC9", "Cantú syndrome", 0.91,
+                "genetic_association", chembl_enriched=[],
+            )
+        self.assertEqual(
+            {candidate["uniprot_id"] for candidate in result["candidates"]},
+            {"O60706"},
+        )
+        self.assertEqual(
+            {candidate["uniprot_id"]
+             for candidate in result["cross_target_candidates"]},
+            {"Q15842"},
+        )
 
     def test_remerge_with_extra_evidence_preserves_approval_and_passthrough(self):
         """Adding a label must not erase the existing approval ledger."""
@@ -434,9 +520,12 @@ class UnionTests(unittest.TestCase):
 
         merged = msc.merge_chemist_candidates([generic, process])
 
-        self.assertEqual(len(merged), 1)
-        candidate = merged[0]
-        self.assertEqual(candidate["pchembl_value"], 9.0)
+        self.assertEqual(len(merged), 2)
+        candidate = next(
+            item for item in merged
+            if item.get("mechanism_class") == "GABA-A receptor signaling"
+        )
+        self.assertIsNone(candidate["pchembl_value"])
         self.assertEqual(
             candidate["mechanism_class"], "GABA-A receptor signaling"
         )

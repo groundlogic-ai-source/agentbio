@@ -35,7 +35,16 @@ from data_sources.clinicaltrials import check_prior_trials  # noqa: F401
 from data_sources.evidence_ledger import qualified_target_chembl_activity_ids
 
 REPORTS_DIR = os.path.join(OUTPUT_DIR, "reports")
-DOSSIER_CONTRACT_VERSION = "flagship-dossier-evidence-v1"
+DOSSIER_CONTRACT_VERSION = "flagship-dossier-evidence-v2"
+
+
+def _normalized_compound_alias(value: Any) -> str:
+    """Normalize presentation aliases without conflating unrelated drugs."""
+    name = str(value or "").strip().casefold()
+    return {
+        "glyburide": "glibenclamide",
+        "glibenclamide": "glibenclamide",
+    }.get(name, name)
 
 
 def _slug(text: str) -> str:
@@ -72,14 +81,21 @@ def validate_dossier_inputs(
     candidate_accession = str(candidate.get("uniprot_id") or "").upper()
 
     contract = candidate.get("dossier_evidence_contract")
+    production_contract = False
     if not isinstance(contract, dict):
         errors.append("missing dossier_evidence_contract")
         contract = {}
-    elif contract.get("contract_version") != DOSSIER_CONTRACT_VERSION:
+    elif contract.get("contract_version") not in {
+        DOSSIER_CONTRACT_VERSION,
+        "flagship-dossier-evidence-v1",  # frozen benchmark compatibility
+    }:
         errors.append(
             "unsupported dossier contract "
             f"{contract.get('contract_version')!r}"
         )
+    else:
+        production_contract = (
+            contract.get("contract_version") == DOSSIER_CONTRACT_VERSION)
 
     context = contract.get("disease_mechanism_context") or {}
     contract_target = str(context.get("target_symbol") or "").upper()
@@ -130,6 +146,19 @@ def validate_dossier_inputs(
         and not candidate.get("unapproved_cap_applied")
     ):
         errors.append("unapproved candidate lacks the required score cap")
+    if production_contract and candidate.get(
+            "target_applicability") in {"PATHWAY_ONLY", "UNKNOWN"}:
+        errors.append(
+            "target applicability does not permit a headline or paid validation")
+    if production_contract and (candidate.get("availability_gate") or {}).get(
+            "blocks_prioritization"):
+        errors.append("active ingredient is confirmed globally unavailable")
+    coverage = candidate.get("candidate_source_coverage") or {}
+    if production_contract and coverage.get("complete") is not True:
+        errors.append("enabled candidate-source coverage is incomplete or unknown")
+    if production_contract and candidate.get("paid_validation_eligible") is not True:
+        errors.append(
+            "candidate did not clear the final deterministic paid-validation gate")
 
     method = str(candidate.get("target_discovery_method") or "").lower()
     score_components = candidate.get("score_components") or {}
@@ -147,7 +176,12 @@ def validate_dossier_inputs(
     if readiness.get("status") == "HYPOTHESIS_REQUIRES_EXPERIMENTAL_VALIDATION":
         errors.append("dossier contract mandates experimental validation")
 
-    candidate_name = str(candidate.get("drug_name") or "").strip().casefold()
+    candidate_name = _normalized_compound_alias(candidate.get("drug_name"))
+    candidate_names = {
+        candidate_name,
+        *(_normalized_compound_alias(value)
+          for value in candidate.get("compound_aliases", [])),
+    }
     candidate_ids = {
         str(value).strip().casefold()
         for value in (
@@ -160,7 +194,7 @@ def validate_dossier_inputs(
     }
     for row in (contract.get("comparators") or {}).get(
             "target_approved_drugs", []):
-        row_name = str(row.get("name") or "").strip().casefold()
+        row_name = _normalized_compound_alias(row.get("name"))
         row_ids = {
             str(value).strip().casefold()
             for value in (
@@ -170,7 +204,7 @@ def validate_dossier_inputs(
             )
             if value
         }
-        if row_name == candidate_name or candidate_ids.intersection(row_ids):
+        if row_name in candidate_names or candidate_ids.intersection(row_ids):
             errors.append("lead candidate appears in its own comparator set")
             break
 
@@ -870,13 +904,14 @@ def _safety_lane_state(
 
 def _assay_audit_table(candidate: dict[str, Any]) -> str:
     """Render ledger assay summaries without presenting aggregates as raw rows."""
-    rows = []
+    target_rows = []
+    cross_rows = []
     for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
         if not isinstance(record, dict):
             continue
         if str(record.get("source_type") or "") != "bioactivity_assay":
             continue
-        rows.append((
+        row = (
             _audit_value(record.get("provider")),
             _audit_value(record.get("assay_id") or record.get("source_id")),
             _audit_value(record.get("target_symbol") or record.get("target_accession")),
@@ -885,8 +920,13 @@ def _assay_audit_table(candidate: dict[str, Any]) -> str:
             _audit_value(record.get("measurement_unit")),
             _audit_value(record.get("target_species")),
             _audit_value(record.get("qualification_status")),
-        ))
-    if not rows:
+        )
+        scope = str(
+            record.get("target_evidence_scope") or "target_qualified"
+        ).casefold()
+        (cross_rows if scope in {"cross_target", "off_target"}
+         else target_rows).append(row)
+    if not target_rows and not cross_rows:
         return ("No ledger bioactivity-assay rows were available. This is an "
                 "explicit absence of reportable rows, not evidence of no binding.")
     activity_ids = [
@@ -894,6 +934,8 @@ def _assay_audit_table(candidate: dict[str, Any]) -> str:
         if _valid_citation_id(value)
     ]
     lines = [
+        "**Target-qualified assay evidence**",
+        "",
         "Rows below are the persisted ledger representation. A row may summarize "
         "multiple source activities; it is not a raw assay export.",
         "- Underlying source activity IDs: "
@@ -901,12 +943,27 @@ def _assay_audit_table(candidate: dict[str, Any]) -> str:
         "| Provider | Record / assay ID | Target | Measurement | Value | Unit | Species | Qualification |",
         "| --- | --- | --- | --- | ---: | --- | --- | --- |",
     ]
-    for row in sorted(set(rows)):
+    for row in sorted(set(target_rows)):
         # Persisted free-text context/identifiers may contain a pipe; escape it
         # so one malformed provider value cannot corrupt the Markdown table.
         lines.append("| " + " | ".join(
             str(value).replace("|", r"\|").replace("\n", " ")
             for value in row) + " |")
+    if not target_rows:
+        lines.append("| NONE | — | — | — | — | — | — | — |")
+    lines += [
+        "",
+        "**Cross-target assay records (audit only; never scored)**",
+        "",
+        "| Provider | Record / assay ID | Other target | Measurement | Value | Unit | Species | Qualification |",
+        "| --- | --- | --- | --- | ---: | --- | --- | --- |",
+    ]
+    for row in sorted(set(cross_rows)):
+        lines.append("| " + " | ".join(
+            str(value).replace("|", r"\|").replace("\n", " ")
+            for value in row) + " |")
+    if not cross_rows:
+        lines.append("| NONE | — | — | — | — | — | — | — |")
     return "\n".join(lines)
 
 
@@ -915,7 +972,12 @@ def _filter_approved_target_comparators(
     rows: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     """Remove the lead candidate from target-approved comparison rows."""
-    candidate_name = str(candidate.get("drug_name") or "").strip().casefold()
+    candidate_name = _normalized_compound_alias(candidate.get("drug_name"))
+    candidate_names = {
+        candidate_name,
+        *(_normalized_compound_alias(value)
+          for value in candidate.get("compound_aliases", [])),
+    }
     candidate_ids = {
         str(value).strip().casefold()
         for value in (
@@ -928,7 +990,7 @@ def _filter_approved_target_comparators(
     }
     filtered: list[dict[str, Any]] = []
     for row in rows:
-        if str(row.get("name") or "").strip().casefold() == candidate_name:
+        if _normalized_compound_alias(row.get("name")) in candidate_names:
             continue
         row_ids = {
             str(value).strip().casefold()
@@ -957,7 +1019,7 @@ def _comparator_table(candidate: dict[str, Any],
     target_drugs = _filter_approved_target_comparators(
         candidate, target_drugs or [])
     selected = comparators.get("selected_candidates", [])
-    lines = ["| Comparator | Source / relationship | Approval or score |",
+    lines = ["| Comparator | Source / relationship | Regulatory context |",
              "| --- | --- | --- |"]
     seen: set[str] = set()
 
@@ -980,7 +1042,13 @@ def _comparator_table(candidate: dict[str, Any],
             name,
             flags=re.IGNORECASE,
         ).strip()
-        return f"name:{base.casefold()}", base or name
+        alias = _normalized_compound_alias(base)
+        display = (
+            "glibenclamide (glyburide)"
+            if alias == "glibenclamide"
+            else (base or name)
+        )
+        return f"name:{alias}", display
 
     for row in target_drugs or []:
         name = _audit_value(row.get("name"))
@@ -1000,37 +1068,25 @@ def _comparator_table(candidate: dict[str, Any],
             continue
         seen.update((key, display_key))
         lines.append(
-            f"| {display_name} | current reviewed-pool candidate | "
-            f"composite {_audit_value(row.get('composite_score'))}; approval "
-            f"{_audit_value(row.get('approval_basis'))} |")
+            f"| {display_name} | same-target context (not a rank or efficacy comparison) | "
+            f"approval basis {_audit_value(row.get('approval_basis'))} |")
     if len(lines) == 2:
         lines.append("| NONE RECORDED | No biologist approved-drug or reviewed-pool comparator was supplied | UNKNOWN |")
     return "\n".join(lines)
 
 
 def _comparator_rationale(candidate: dict[str, Any]) -> str:
-    """State the ranking comparison using persisted fields, not class lore."""
+    """State comparator scope without implying rank or comparative efficacy."""
     contract = candidate.get("dossier_evidence_contract") or {}
     comparators = contract.get("comparators") or {}
     selected = comparators.get("selected_candidates") or []
     if not selected:
-        return ("Comparator rationale: no alternative selected-candidate score "
-                "was persisted for this target; no comparative superiority is claimed.")
-    values = [
-        row.get("composite_score") for row in selected
-        if isinstance(row.get("composite_score"), (int, float))
-    ]
-    basis = (
-        "the persisted composite score and the target-matched ChEMBL activity "
-        "audit; it does not establish clinical efficacy or safety superiority"
+        return ("Comparator context: no alternative same-target candidate was "
+                "persisted; no comparative efficacy or superiority is claimed.")
+    return (
+        "Comparator context: rows only disclose other compounds observed for the "
+        "same target. The table is not a rank, efficacy, safety, or superiority comparison."
     )
-    if str(candidate.get("drug_name") or "").casefold() == "nisoldipine":
-        return ("Nisoldipine-vs-alternatives rationale: this ordering is based only on "
-                f"{basis}. Compared alternatives have persisted score(s) "
-                + (", ".join(_fmt(v, 4) for v in values) if values else "UNKNOWN")
-                + ".")
-    return ("Comparator rationale: relative ordering is based only on "
-            f"{basis}.")
 
 
 def _apply_matched_biologist_context(
@@ -1168,12 +1224,31 @@ def _literature_limitation_audit(candidate: dict[str, Any]) -> str:
                 f"| {source_cell} | "
                 f"{_audit_value(', '.join(row.get('publication_types') or []))} | "
                 f"{_audit_value(row.get('publication_year'))} | "
-                f"{_display_token(row.get('label'))} | “{quote}” |"
+                f"{_display_token(row.get('exact_use_label') or row.get('label'))} | “{quote}” |"
             )
     else:
         lines.append(
             "- No mechanically verified quotation was persisted for this state."
         )
+    related = (finding.get("related_support") or {}).get("evidence") or []
+    if related:
+        lines.extend([
+            "",
+            "**Related support (disclosure only; zero score boost)**",
+            "",
+            "| PMID / source | Evidence level | Applicability | Exact quotation |",
+            "| --- | --- | --- | --- |",
+        ])
+        for row in related:
+            pmid = _audit_value(row.get("pmid"))
+            source = row.get("source_url")
+            source_cell = f"[{pmid}]({source})" if source else pmid
+            quote = str(row.get("quote") or "").replace("|", "\\|")
+            lines.append(
+                f"| {source_cell} | {_display_token(row.get('evidence_level'))} | "
+                "Not applicable to this exact candidate/use | "
+                f"“{quote}” |"
+            )
     lines.append(
         "- **Policy boundary:** this is a post-benchmark production gate. It "
         "does not alter or recompute frozen benchmark results."
@@ -1203,6 +1278,7 @@ def _trial_safety_applicability_audit(candidate: dict[str, Any]) -> str:
     else:
         lines.append("- No individual trial rows were returned (this does not establish novelty).")
     l1, l2 = candidate.get("safety_layer1") or {}, candidate.get("safety_layer2") or {}
+    availability = candidate.get("availability_gate") or {}
     lines += [
         "\n### Safety and applicability matrix\n",
         "| Domain | Existing evidence | State |",
@@ -1213,6 +1289,10 @@ def _trial_safety_applicability_audit(candidate: dict[str, Any]) -> str:
         f"{_safety_lane_state(l1, structured=True)} |",
         f"| Independent safety lane | {_audit_value(l2.get('disclosure_text'))} | "
         f"{_safety_lane_state(l2)} |",
+        f"| Active-ingredient availability | {_audit_value(availability.get('reason'))} | "
+        f"{_display_token(availability.get('status'))} |",
+        f"| Target applicability | {_display_token(candidate.get('target_applicability'))} | "
+        f"{'ELIGIBLE' if candidate.get('headline_eligible') else 'NOT HEADLINE-ELIGIBLE'} |",
         f"| Route / modality | {_modality_cell(candidate)} | "
         f"{'OBSERVED' if candidate.get('chembl_molecule_type') is not None else 'UNKNOWN'} |",
         "| Relevant tissue/cell/compartment exposure | Not assessed by this pipeline | UNKNOWN |",
@@ -1242,7 +1322,12 @@ checkpoint gates completion of the record — the structure prediction (the
 expensive step) has already run by the time a person is asked. This document
 is a prioritised starting point for expert review, not a clinical conclusion.
 
-**Therapeutic applicability is not scored.** The ranking does not assess
+**Therapeutic applicability is not scored as a general compatibility term.**
+Target applicability is gated separately and is
+classified as direct causal, direct disease-associated, cross-target
+functionally supported, pathway-only, or unknown. Pathway-only and unknown
+rows receive no directional bonus and cannot headline or enter paid validation.
+The ranking otherwise does not assess
 whether a drug reaches the relevant tissue, cell, or compartment at an
 effective, tolerable human exposure. Route, dose, pharmacokinetics (PK),
 disease stage/subtype, and therapeutic window require expert review.
@@ -1259,8 +1344,8 @@ number. **STRONG_MATCH** requires a composite at or above the
 threshold shown in Section 4 *and* no hard cap in effect.
 
 **Hard caps.** Certain findings cap the score at 0.400 no matter how strong the
-rest of the evidence is: a *safety cap* (withdrawn status or black-box-class
-signal), a *mechanism-direction cap* (the drug acts on the target in the
+rest of the evidence is: a *safety cap* (authority-confirmed, identity- and
+scope-matched safety withdrawal), or a *mechanism-direction cap* (the drug acts on the target in the
 opposite direction to what the disease biology requires), and an
 *unapproved-compound cap* (the hit is not an approved drug, so it is not a
 repurposing candidate at all). Where a cap applies, Section 4 shows both the

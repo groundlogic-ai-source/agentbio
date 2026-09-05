@@ -247,12 +247,14 @@ def _normalize_candidate(act_row: dict[str, Any],
 
 def _build_candidates(act_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Filter to Homo sapiens, resolve structures, keep established products,
-    normalise, and dedup by struct_id (merging evidence for repeat activities).
+    normalise, and dedup only inside a (struct_id, target) pair (merging repeat
+    activities). The same drug observed at ABCC9 and KCNJ8 must remain two
+    independently scoped candidates.
 
     Structures are resolved once per struct_id (memoised) so a drug with many
     activity rows against the target does not re-fetch its structure."""
     struct_cache: dict[Any, Optional[dict[str, Any]]] = {}
-    by_struct: dict[Any, dict[str, Any]] = {}
+    by_compound_target: dict[tuple[Any, str], dict[str, Any]] = {}
 
     for row in act_rows:
         if not _is_homo_sapiens(row):
@@ -267,15 +269,19 @@ def _build_candidates(act_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if structure is None or not _is_established(structure):
             continue
 
-        if struct_id in by_struct:
-            # Same drug, another activity row → merge evidence only.
-            by_struct[struct_id]["evidence"].extend(
+        target_key = str(
+            row.get("accession") or row.get("gene") or row.get("target_id") or ""
+        ).strip().casefold()
+        pair_key = (struct_id, target_key)
+        if pair_key in by_compound_target:
+            # Same drug-target pair, another activity row → merge evidence only.
+            by_compound_target[pair_key]["evidence"].extend(
                 _normalize_candidate(row, structure)["evidence"])
             continue
 
-        by_struct[struct_id] = _normalize_candidate(row, structure)
+        by_compound_target[pair_key] = _normalize_candidate(row, structure)
 
-    return list(by_struct.values())
+    return list(by_compound_target.values())
 
 
 def get_target_interactions(uniprot_id: str,

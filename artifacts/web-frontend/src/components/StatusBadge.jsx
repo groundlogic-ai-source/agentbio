@@ -2,6 +2,7 @@ const STYLES = {
   queued:          { label: "Queued",          color: "var(--ink-muted)" },
   running:         { label: "In progress",     color: "var(--ink-muted)" },
   awaiting_review: { label: "Awaiting review", color: "var(--brass)"  },
+  reviewing:       { label: "Review in progress", color: "var(--brass)" },
   error:           { label: "Error",           color: "var(--oxide)"  },
   // Ran correctly, found nothing recommendable — not an error, not a sign-off.
   no_eligible_candidate: { label: "No eligible candidate", color: "var(--ink-muted)" },
@@ -30,7 +31,7 @@ export default function StatusBadge({ status, decision }) {
     }
   }
 
-  const live = status === "running" || status === "queued";
+  const live = status === "running" || status === "queued" || status === "reviewing";
 
   return (
     <span

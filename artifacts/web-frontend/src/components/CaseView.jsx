@@ -57,7 +57,12 @@ function CaseHeader({ job, cost }) {
             <span>Opened {formatDate(job.created_at)}</span>
             {liveCost != null && (
               <span style={{ color: "var(--brass-deep)" }}>
-                Run cost {formatCost(liveCost)}
+                Metered structure cost {formatCost(liveCost)} · LLM cost unknown
+              </span>
+            )}
+            {liveCost == null && (
+              <span style={{ color: "var(--ink-muted)" }}>
+                Run cost unknown
               </span>
             )}
           </div>
@@ -85,7 +90,8 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
   }
 
   const status = job.status;
-  const canPrint = status === "completed" || status === "awaiting_review";
+  const canPrint =
+    status === "completed" || status === "awaiting_review" || status === "reviewing";
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 fade-in">
@@ -109,6 +115,36 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
       </div>
 
       <CaseHeader job={job} cost={cost} />
+
+      {!job.actionable &&
+        (status === "awaiting_review" || status === "completed") && (
+          <Paper className="mb-6">
+            <div
+              className="border-l-4 p-5"
+              style={{
+                borderColor: "var(--oxide)",
+                backgroundColor: "var(--oxide-glow)",
+              }}
+            >
+              <div className="text-lg font-semibold" style={{ color: "var(--oxide)" }}>
+                Superseded policy snapshot
+              </div>
+              <p className="mt-1 text-sm font-semibold" style={{ color: "var(--ink)" }}>
+                Historical only — cannot be approved.
+              </p>
+              {job.stale_reasons?.length > 0 && (
+                <ul
+                  className="mt-3 list-disc pl-5 text-sm"
+                  style={{ color: "var(--ink-muted)" }}
+                >
+                  {job.stale_reasons.map((reason) => (
+                    <li key={reason}>{reason}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </Paper>
+        )}
 
       {status === "error" && <ErrorPanel message={job.error_message} />}
 
@@ -186,18 +222,21 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
         </Paper>
       )}
 
-      {(status === "queued" || status === "running") && (
+      {(status === "queued" || status === "running" || status === "reviewing") && (
         <Paper>
           <div className="p-6">
             <div className="text-lg font-semibold" style={{ color: "var(--ink)" }}>
-              Pipeline in progress
+              {status === "reviewing"
+                ? "Review decision in progress"
+                : "Pipeline in progress"}
             </div>
             <p
               className="mb-6 mt-1.5 text-sm leading-relaxed"
               style={{ color: "var(--ink-muted)" }}
             >
-              Each stage builds the evidence base for a falsifiable hypothesis.
-              This view refreshes automatically every few seconds.
+              {status === "reviewing"
+                ? "Another request has atomically claimed this sign-off. Duplicate actions are disabled while the durable decision is recorded."
+                : "Each stage builds the evidence base for a falsifiable hypothesis. This view refreshes automatically every few seconds."}
             </p>
             <Stepper status={status} currentStage={job.current_stage} />
           </div>
@@ -225,6 +264,8 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
             onResume={onResume}
             busy={resuming}
             diseaseName={job.disease_name || ""}
+            disabled={!job.actionable}
+            disabledReasons={job.stale_reasons || []}
           />
         </div>
       )}

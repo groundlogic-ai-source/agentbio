@@ -229,9 +229,19 @@ Two honesty rules are load-bearing here:
     COMPATIBLE / DIRECTIONALLY_INCOMPATIBLE / INSUFFICIENT_INFO) caps only on
     an incompatible verdict. This gate exists because of a real archetype:
     miglitol vs. GSD1c — right pathway keywords, wrong cellular mechanism.
-  - *Safety cap* — withdrawn/black-box signals from structured sources (layer
-    1) plus an independent web-search check on the top 3 (layer 2).
-    Disagreements between layers are preserved as a visible audit object.
+  - *Safety cap* — structured-source signals (layer 1) plus an independent
+    web-search check on the top 3 (layer 2). Layer 2 uses the versioned
+    `safety-v3` evidence contract: only an exact, in-context quote from a
+    recognized regulator can confirm `WITHDRAWN_FOR_SAFETY` or
+    `SAFETY_DISCONTINUED`, and the evidence must identify the active ingredient,
+    jurisdiction, and affected formulation. Brand/manufacturer discontinuation,
+    not-marketed or ingredient-unavailable notices, ordinary warnings, and
+    formal boxed warnings remain distinct disclosure states and cannot confirm
+    safety withdrawal. Contrary evidence (for example, available generics or
+    an explicit statement that no formal withdrawal occurred) yields
+    `CONFLICT`, never a confirmed result. Glyburide and glibenclamide are
+    normalized as the same active-ingredient identity. Legacy Layer 2 fields
+    remain compatibility projections of this richer record.
 
 **Post-benchmark literature-limitation gate.** Before a candidate can proceed
 to paid structure validation, the top three candidates receive a separate

@@ -61,7 +61,10 @@ TOP_TARGETS_PER_DISEASE = 5
 PATHWAY_NEIGHBOR_MAX_SOURCES = 5     # expand from the first N eligible targets
 PATHWAY_NEIGHBOR_PER_SOURCE = 4      # neighbors considered per source target
 PATHWAY_NEIGHBOR_MAX_ADDED = 10      # total neighbor targets per disease
-PATHWAY_NEIGHBOR_ASSOC_SCORE = 0.05  # below the 0.1 genetic-association gate
+# A pathway neighbor has no disease-target association merely because it shares
+# a pathway with a causal target. Keep it score-neutral until its own
+# association is retrieved; do not manufacture or inherit a causal score.
+PATHWAY_NEIGHBOR_ASSOC_SCORE = 0.0
 # Only drug-free discovery lanes may seed expansion (disease-blind boundary).
 PATHWAY_NEIGHBOR_SOURCE_METHODS = frozenset({
     "genetic_association", "literature_mechanism_class"})
@@ -671,6 +674,12 @@ def _expand_pathway_neighbors(
                 "target_symbol": n.get("gene_name"),
                 "uniprot_id": nuid,
                 "association_score": PATHWAY_NEIGHBOR_ASSOC_SCORE,
+                "own_target_association_score": None,
+                "own_target_association_status": "unavailable",
+                "association_provenance": (
+                    "No own disease-target association available; pathway "
+                    "co-membership does not inherit the source target's score."
+                ),
                 "target_discovery_method": "pathway_neighbor",
                 "pathway_neighbor_of": src.get("target_symbol"),
                 "pathway_neighbor_tier": n.get("specificity_tier"),

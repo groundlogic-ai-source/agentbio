@@ -8,7 +8,7 @@ const POLL_MS = 4000;
 // happens at the awaiting_review checkpoint — the human sign-off that follows
 // is not required. This is deliberately broader than lib/stages.js's
 // isTerminal(), which answers a different question ("is the job over?").
-const AUDITABLE = new Set(["awaiting_review", "completed"]);
+const AUDITABLE = new Set(["awaiting_review", "reviewing", "completed"]);
 
 function stageLabel(job) {
   if (!job) return "Queued";

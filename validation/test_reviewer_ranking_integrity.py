@@ -187,24 +187,106 @@ class WithdrawalReconciliationTest(unittest.TestCase):
             "black_box_advisory": False, "citation": "https://example.test/l2",
         })
         self.assertFalse(row["safety_cap_applied"])
-        self.assertEqual(row["safety_reconciliation"]["status"], "disputed")
+        self.assertEqual(
+            row["safety_reconciliation"]["status"],
+            "unconfirmed_structured_signal",
+        )
         self.assertGreater(row["composite_score"], reviewer.SAFETY_CAP)
 
-    def test_unclear_independent_result_keeps_conservative_cap(self):
+    def test_unclear_independent_result_does_not_create_v3_cap(self):
         row = self._run({
             "confirmed": False, "verdict": "UNCLEAR",
             "black_box_advisory": False, "citation": None,
         })
-        self.assertTrue(row["safety_cap_applied"])
-        self.assertIsNone(row["safety_reconciliation"])
-        self.assertEqual(row["composite_score"], reviewer.SAFETY_CAP)
+        self.assertFalse(row["safety_cap_applied"])
+        self.assertEqual(
+            row["safety_reconciliation"]["status"],
+            "unconfirmed_structured_signal",
+        )
+        self.assertGreater(row["composite_score"], reviewer.SAFETY_CAP)
 
     def test_independent_withdrawal_confirmation_keeps_cap(self):
         row = self._run({
+            "schema_version": "safety-v3",
             "confirmed": True, "verdict": "YES",
             "black_box_advisory": False, "citation": "https://example.test/l2",
+            "authoritative_source": {"verified_regulator_domain": True},
+            "scope": {
+                "identity_matches": True,
+                "jurisdiction": "United States",
+                "formulation": "tablets",
+            },
         })
         self.assertTrue(row["safety_cap_applied"])
+        self.assertEqual(row["composite_score"], reviewer.SAFETY_CAP)
+
+    def test_frozen_sort_is_rank_equal_to_legacy_score_order(self):
+        rows = [
+            {
+                "drug_name": "pathway-high",
+                "target_applicability": "PATHWAY_ONLY",
+                "composite_score": 0.9,
+                "pre_cap_score": 0.9,
+            },
+            {
+                "drug_name": "direct-low",
+                "target_applicability": "DIRECT_CAUSAL",
+                "composite_score": 0.7,
+                "pre_cap_score": 0.7,
+            },
+        ]
+        expected = sorted(
+            (dict(row) for row in rows),
+            key=lambda row: (
+                row["composite_score"], row["pre_cap_score"]),
+            reverse=True,
+        )
+        with patch.object(reviewer._holdout, "is_active", return_value=True):
+            reviewer._sort_reviewed(rows)
+        self.assertEqual(
+            [row["drug_name"] for row in rows],
+            [row["drug_name"] for row in expected],
+        )
+
+    def test_frozen_pathway_direction_bonus_matches_legacy_behavior(self):
+        row = {
+            "target_applicability": "PATHWAY_ONLY",
+            "composite_score": 0.5,
+            "score_components": {},
+            "mechanism_direction": {
+                "verdict": "DIRECTIONALLY_COMPATIBLE",
+                "action_type_used": "INHIBITOR",
+                "disease_mechanism_summary": "Target activity is increased.",
+                "reason": "Inhibition opposes increased target activity.",
+                "search_citations": "PMID:1",
+            },
+        }
+        with patch.object(reviewer._holdout, "is_active", return_value=True):
+            self.assertTrue(reviewer._apply_directional_bonus(row))
+        self.assertEqual(
+            row["score_components"]["qualified_directional_bonus"],
+            reviewer.QUALIFIED_DIRECTIONAL_BONUS,
+        )
+
+    def test_frozen_safety_reconciliation_retains_v2_cap_behavior(self):
+        row = {
+            "composite_score": 0.8,
+            "strong_match": True,
+            "unapproved_cap_applied": False,
+        }
+        layer1 = {
+            "confirmed": True,
+            "black_box_advisory": False,
+            "source_url": "https://chembl.example/compound",
+        }
+        layer2 = {
+            "confirmed": False,
+            "verdict": "UNCLEAR",
+            "black_box_advisory": False,
+        }
+        with patch.object(reviewer._holdout, "is_active", return_value=True):
+            self.assertTrue(
+                reviewer._reconcile_safety(row, layer1, layer2))
         self.assertEqual(row["composite_score"], reviewer.SAFETY_CAP)
 
 

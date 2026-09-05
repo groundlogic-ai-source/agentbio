@@ -19,6 +19,7 @@ Output: output/reviewed_candidates.json
 import json
 import math
 import os
+import re
 import sys
 import threading
 import time
@@ -136,7 +137,7 @@ SAFETY_CAP = 0.40
 # verdict semantics change; snapshots stamped with an older version are
 # treated as unverified by the audit layer (api/audit.py) until refreshed
 # (scripts/refresh_pool_safety.py).
-SAFETY_SCHEMA_VERSION = "safety-v2"
+SAFETY_SCHEMA_VERSION = "safety-v3"
 # Mechanism-direction gate uses the same cap as the safety gate:
 # a DIRECTIONALLY_INCOMPATIBLE verdict prevents STRONG_MATCH just as a
 # safety flag does. COMPATIBLE and INSUFFICIENT_INFO never trigger the cap.
@@ -621,7 +622,11 @@ def _apply_directional_bonus(candidate: dict[str, Any]) -> bool:
     """Apply the bonus once, only for an auditable compatible result."""
     components = candidate.setdefault("score_components", {})
     qualified = _auditable_compatible_direction(
-        candidate.get("mechanism_direction"))
+        candidate.get("mechanism_direction")) and (
+            _holdout.is_active()
+            or candidate.get("target_applicability")
+            not in {"PATHWAY_ONLY", "UNKNOWN"}
+        )
     old_bonus = float(components.get("qualified_directional_bonus") or 0.0)
     new_bonus = QUALIFIED_DIRECTIONAL_BONUS if qualified else 0.0
     components["qualified_directional"] = qualified
@@ -676,6 +681,8 @@ def run_reviewer(
 ) -> list[dict[str, Any]]:
     candidates = chemist_output.get("candidates", [])
     disease = chemist_output.get("target", {}).get("disease_name", "")
+    source_coverage = _candidate_source_coverage(
+        chemist_output.get("source_status"))
 
     bios = biologist_outputs or ([biologist_output] if biologist_output else [])
 
@@ -958,6 +965,7 @@ def run_reviewer(
             # HOW each primary target was surfaced. Without this the field drops here
             # and shows as None in every downstream artifact.
             "target_discovery_method": c.get("target_discovery_method"),
+            "target_applicability": _target_applicability(c),
             # Causal-anchor tier (see _target_tier).  Disclosure + rank-only
             # demotion; never a score change.
             "target_tier": _target_tier(c.get("target_discovery_method")),
@@ -996,6 +1004,13 @@ def run_reviewer(
             "literature_limitation_blocked": False,
             "literature_limitation_gate_cleared": False,
             "externally_prioritizable": False,
+            "availability_gate": {
+                "status": "UNKNOWN",
+                "blocks_prioritization": False,
+                "reason": "Global active-ingredient availability was not established.",
+            },
+            "candidate_source_coverage": source_coverage,
+            "exclusion_reasons": [],
             "provenance": {
                 "counted_once": new_ids,
                 "collapsed_as_duplicate": collapsed_ids,
@@ -1008,6 +1023,11 @@ def run_reviewer(
             "source_types": c.get("source_types", []),
             "source_health": c.get("source_health", {}),
             "target_memberships": c.get("target_memberships", []),
+            "canonical_compound_identity": c.get("canonical_compound_identity"),
+            "compound_identity_mode": c.get("compound_identity_mode"),
+            "compound_aliases": c.get("compound_aliases", []),
+            "parent_active_moiety_equivalence": c.get(
+                "parent_active_moiety_equivalence"),
             "_evidence_ledger": c.get("_evidence_ledger", {}),
             "_prefetched_safety_layer1": context["safety_layer1"],
         })
@@ -1327,6 +1347,7 @@ def run_reviewer(
 
         if _reconcile_safety(r, layer1, layer2):
             needs_resort = True
+        r["availability_gate"] = _availability_gate(layer1, layer2)
     # ── End safety-disclosure pass ────────────────────────────────────────────
 
     if needs_resort:
@@ -1355,7 +1376,12 @@ def run_reviewer(
                 "post_benchmark_production_gate": True,
             }
             r["literature_limitation_gate_cleared"] = True
-            r["externally_prioritizable"] = bool(r.get("strong_match"))
+            r["externally_prioritizable"] = bool(
+                r.get("strong_match")
+                and _applicability_allows_prioritization(r)
+                and not r["availability_gate"]["blocks_prioritization"]
+                and source_coverage["complete"]
+            )
     else:
         shortlist = reviewed[:MAX_LITERATURE_LIMITATION_CANDIDATES]
         for r in shortlist:
@@ -1380,6 +1406,7 @@ def run_reviewer(
                 action_type,
                 mechanism,
                 intended_use,
+                drug_aliases=r.get("compound_aliases") or [],
             )
             blocked = bool(limitation.get("blocked"))
             cleared = bool(limitation.get("gate_cleared"))
@@ -1389,7 +1416,10 @@ def run_reviewer(
             if blocked:
                 _remove_directional_bonus_for_limitation(r)
             r["externally_prioritizable"] = bool(
-                r.get("strong_match") and cleared and not blocked)
+                r.get("strong_match") and cleared and not blocked
+                and _applicability_allows_prioritization(r)
+                and not r["availability_gate"]["blocks_prioritization"]
+                and source_coverage["complete"])
             print(
                 f"[reviewer] literature-limitation: {r['drug_name']} / {disease} "
                 f"→ {limitation.get('verdict')} "
@@ -1398,7 +1428,7 @@ def run_reviewer(
             )
         for r in reviewed[MAX_LITERATURE_LIMITATION_CANDIDATES:]:
             r["literature_limitation"] = {
-                "schema_version": "literature-limitation-v2",
+                "schema_version": "literature-limitation-v3",
                 "verdict": LITERATURE_NOT_ASSESSED,
                 "source_status": "NOT_ASSESSED_OUTSIDE_BOUNDED_SHORTLIST",
                 "blocked": False,
@@ -1412,6 +1442,46 @@ def run_reviewer(
             }
             r["literature_limitation_gate_cleared"] = False
             r["externally_prioritizable"] = False
+
+    # Re-run the deterministic eligibility projection after every score cap and
+    # disclosure gate. Every row keeps explicit reasons, including rows outside
+    # the paid-validation shortlist.
+    _rank_reviewed(reviewed)
+    for r in reviewed:
+        if _holdout.is_active():
+            # Compatibility projection only. Production gates are intentionally
+            # absent from frozen benchmark eligibility/ranking calculations.
+            r["exclusion_reasons"] = []
+            r["paid_validation_eligible"] = bool(
+                r.get("strong_match")
+                and r.get("literature_limitation_gate_cleared") is True
+            )
+            r["headline_eligible"] = r["paid_validation_eligible"]
+            r["externally_prioritizable"] = r["paid_validation_eligible"]
+            continue
+        reasons: list[str] = []
+        if r.get("is_approved_drug") is not True:
+            reasons.append("approval_not_established")
+        if not source_coverage["complete"]:
+            reasons.append("candidate_source_coverage_incomplete")
+        if not _applicability_allows_prioritization(r):
+            reasons.append(
+                "target_applicability_" +
+                str(r.get("target_applicability") or "UNKNOWN").lower())
+        if (r.get("availability_gate") or {}).get("blocks_prioritization"):
+            reasons.append("globally_unavailable_active_ingredient")
+        if r.get("literature_limitation_blocked"):
+            reasons.append("applicable_literature_limitation")
+        if r.get("literature_limitation_gate_cleared") is not True:
+            reasons.append("literature_gate_not_cleared")
+        if not r.get("strong_match"):
+            reasons.append("below_strong_match_threshold")
+        r["exclusion_reasons"] = reasons
+        r["paid_validation_eligible"] = not reasons
+        r["headline_eligible"] = bool(
+            r["paid_validation_eligible"]
+            and _applicability_allows_prioritization(r))
+        r["externally_prioritizable"] = r["paid_validation_eligible"]
 
     # This is a pure, post-gate view of existing records.  It deliberately runs
     # after both safety and mechanism passes so the dossier cannot describe a
@@ -1435,6 +1505,9 @@ def _build_dossier_evidence_contract(
     unknown = "UNKNOWN"
     direct_assay = any(
         str(record.get("source_type") or "") == "bioactivity_assay"
+        and str(record.get(
+            "target_evidence_scope") or "target_qualified"
+        ) == "target_qualified"
         and str(record.get("qualification_status") or "").lower() == "qualified"
         and str(record.get("target_species") or "").lower() == "homo sapiens"
         and (
@@ -1504,9 +1577,8 @@ def _build_dossier_evidence_contract(
             "active_moiety_id": row.get("active_moiety_id"),
             "source_molecule_chembl_ids": row.get(
                 "source_molecule_chembl_ids", []),
-            "composite_score": row.get("composite_score"),
             "approval_basis": row.get("approval_basis", unknown),
-            "relationship": "selected_candidate",
+            "relationship": "same_target_context_only",
         }
         for row in reviewed_pool
         if (str(row.get("drug_name") or "").casefold()
@@ -1540,8 +1612,17 @@ def _build_dossier_evidence_contract(
                 "exposure/PK assessment at a tolerable dose",
             ],
         }
+    production_v2 = bool(
+        not _holdout.is_active()
+        and candidate.get("target_applicability")
+        and candidate.get("candidate_source_coverage") is not None
+        and candidate.get("paid_validation_eligible") is not None
+    )
     return {
-        "contract_version": "flagship-dossier-evidence-v1",
+        "contract_version": (
+            "flagship-dossier-evidence-v2"
+            if production_v2 else "flagship-dossier-evidence-v1"
+        ),
         "unknown_state": unknown,
         "evidence_stage_verdict": (
             "PRIORITIZED_HYPOTHESIS"
@@ -1559,15 +1640,26 @@ def _build_dossier_evidence_contract(
                 "OBSERVED" if direct_assay else unknown
             ),
             "mutation_specific_evidence": unknown,
-            "disease_model_evidence": unknown,
-            "clinical_efficacy_evidence": unknown,
+            "disease_model_evidence": (
+                "OBSERVED_SUPPORT"
+                if any(row.get("evidence_level") == "disease_model"
+                       for row in _observed_literature_support(candidate))
+                else unknown
+            ),
+            "clinical_efficacy_evidence": (
+                "OBSERVED_SUPPORT"
+                if any(row.get("evidence_level") == "case_report_clinical"
+                       for row in _observed_literature_support(candidate))
+                else unknown
+            ),
+            "observed_support": _observed_literature_support(candidate),
             "structure_prediction": (
                 "NOT_YET_AVAILABLE"  # structure stage augments the rendered view
             ),
             "blocking_gates": caps,
         },
         "literature_limitation": candidate.get("literature_limitation") or {
-            "schema_version": "literature-limitation-v2",
+            "schema_version": "literature-limitation-v3",
             "verdict": LITERATURE_NOT_ASSESSED,
             "source_status": "NOT_ASSESSED",
             "blocked": False,
@@ -1579,6 +1671,8 @@ def _build_dossier_evidence_contract(
             "target_symbol": candidate.get("target_symbol", unknown),
             "target_discovery_method": candidate.get(
                 "target_discovery_method", unknown),
+            "target_applicability": candidate.get(
+                "target_applicability", "UNKNOWN"),
             "therapeutic_role": candidate.get("therapeutic_role", unknown),
             "mechanism_class": candidate.get("mechanism_class", unknown),
             "process_support": candidate.get("process_support", []),
@@ -1591,6 +1685,20 @@ def _build_dossier_evidence_contract(
             "target_approved_drugs": approved,
             "selected_candidates": pool_comparators,
             "scope": "biologist approved-drug lookup plus current reviewed pool",
+        },
+        "target_evidence": {
+            "target_qualified_records": [
+                row for row in
+                (candidate.get("_evidence_ledger") or {}).get("records", [])
+                if row.get("target_evidence_scope", "target_qualified")
+                == "target_qualified"
+            ],
+            "cross_target_records": [
+                row for row in
+                (candidate.get("_evidence_ledger") or {}).get("records", [])
+                if row.get("target_evidence_scope") in {"cross_target", "off_target"}
+            ],
+            "cross_target_scoring_boost": 0,
         },
         "timothy_syndrome_cardiac_scope": timothy_scope,
         "trial_audit": candidate.get("trial_audit", {
@@ -1613,26 +1721,71 @@ def _reconcile_safety(r: dict[str, Any], layer1: dict[str, Any],
     # explicit Layer-2 NO is a source disagreement: disclose it and do not
     # hard-cap until a withdrawal is independently corroborated.
     l1_withdrawn = layer1.get("confirmed", False)
-    l1_hit = (
-        l1_withdrawn
-        and (layer2 is None or layer2.get("verdict") != "NO")
+    if _holdout.is_active():
+        l1_hit = bool(
+            l1_withdrawn
+            and (layer2 is None or layer2.get("verdict") != "NO")
+        )
+        l2_hit = bool(layer2 and layer2.get("confirmed"))
+        safety_triggered = l1_hit or l2_hit
+        r["safety_reconciliation"] = (
+            {
+                "status": "disputed",
+                "reason": (
+                    "Frozen safety-v2 reconciliation: structured withdrawal "
+                    "conflicted with an independent NO."
+                ),
+                "layer1_source": layer1.get("source_url"),
+                "layer2_citation": (layer2 or {}).get("citation"),
+            }
+            if l1_withdrawn and layer2 is not None
+            and layer2.get("verdict") == "NO"
+            else None
+        )
+        return _finish_safety_reconciliation(
+            r, layer1, layer2, l1_hit, l2_hit, safety_triggered)
+    # safety-v3 caps only an authority-confirmed, identity- and scope-matched
+    # safety withdrawal. ChEMBL's broad withdrawn_flag remains a disclosure and
+    # reconciliation input, but is not itself regulator confirmation.
+    l1_hit = False
+    l2_hit = bool(
+        layer2
+        and layer2.get("schema_version") == SAFETY_SCHEMA_VERSION
+        and layer2.get("confirmed") is True
+        and (layer2.get("authoritative_source") or {}).get(
+            "verified_regulator_domain") is True
+        and (layer2.get("scope") or {}).get("identity_matches") is True
+        and (layer2.get("scope") or {}).get("jurisdiction")
+        and (layer2.get("scope") or {}).get("formulation")
     )
-    l2_hit = layer2 is not None and layer2.get("confirmed", False)
-    safety_triggered = l1_hit or l2_hit
-    if l1_withdrawn and layer2 is not None and layer2.get("verdict") == "NO":
+    safety_triggered = l2_hit
+    if l1_withdrawn and not l2_hit:
         r["safety_reconciliation"] = {
-            "status": "disputed",
+            "status": "unconfirmed_structured_signal",
             "reason": (
-                "ChEMBL structured data reports withdrawn_flag=True, but "
-                "the independent web safety check returned WITHDRAWAL: NO. "
-                "No hard cap was applied; this conflict requires review."
+                "ChEMBL structured data reports withdrawn_flag=True, but no "
+                "authority-confirmed safety-v3 identity-and-scope match was "
+                "established. No hard cap was applied; review the disclosure."
             ),
             "layer1_source": layer1.get("source_url"),
-            "layer2_citation": layer2.get("citation"),
+            "layer2_citation": (layer2 or {}).get("citation"),
         }
     else:
         r["safety_reconciliation"] = None
 
+    return _finish_safety_reconciliation(
+        r, layer1, layer2, l1_hit, l2_hit, safety_triggered)
+
+
+def _finish_safety_reconciliation(
+    r: dict[str, Any],
+    layer1: dict[str, Any],
+    layer2: Optional[dict[str, Any]],
+    l1_hit: bool,
+    l2_hit: bool,
+    safety_triggered: bool,
+) -> bool:
+    """Apply the cap/badge shared by frozen-v2 and production-v3 decisions."""
     # Black-box advisory: a boxed warning was found (by L1 structured data
     # or by L2's separate BLACK_BOX verdict) but NO withdrawal was
     # confirmed.  Surface as a disclosure note; do NOT apply the hard cap.
@@ -1700,6 +1853,187 @@ _PRECEDENT_DISCOVERY_METHODS = frozenset({
 
 #: Discovery methods that only reach the target indirectly.
 _EXPLORATORY_DISCOVERY_METHODS = frozenset({"pathway_neighbor"})
+
+_TARGET_APPLICABILITIES = frozenset({
+    "DIRECT_CAUSAL",
+    "DIRECT_DISEASE_ASSOCIATED",
+    "CROSS_TARGET_FUNCTIONALLY_SUPPORTED",
+    "PATHWAY_ONLY",
+    "UNKNOWN",
+})
+
+
+def _target_applicability(candidate: dict[str, Any]) -> str:
+    """Return an explicit production applicability label.
+
+    Upstream explicit labels win. The only compatibility projections are from
+    provenance-bearing discovery methods; pathway adjacency is always
+    PATHWAY_ONLY and an unattributed/class-analog row remains UNKNOWN.
+    """
+    explicit = str(candidate.get("target_applicability") or "").upper()
+    if explicit in _TARGET_APPLICABILITIES:
+        return explicit
+    method = str(candidate.get("target_discovery_method") or "").strip().lower()
+    if method == "genetic_association":
+        return "DIRECT_DISEASE_ASSOCIATED"
+    if method in _PRECEDENT_DISCOVERY_METHODS:
+        return "DIRECT_DISEASE_ASSOCIATED"
+    if method == "pathway_neighbor":
+        return "PATHWAY_ONLY"
+    return "UNKNOWN"
+
+
+def _applicability_allows_prioritization(candidate: dict[str, Any]) -> bool:
+    return candidate.get("target_applicability") in {
+        "DIRECT_CAUSAL",
+        "DIRECT_DISEASE_ASSOCIATED",
+        "CROSS_TARGET_FUNCTIONALLY_SUPPORTED",
+    }
+
+
+def _applicability_order(candidate: dict[str, Any]) -> int:
+    applicability = candidate.get("target_applicability")
+    if applicability in {"DIRECT_CAUSAL", "DIRECT_DISEASE_ASSOCIATED"}:
+        return 2
+    if applicability == "CROSS_TARGET_FUNCTIONALLY_SUPPORTED":
+        return 1
+    return 0
+
+
+def _candidate_source_coverage(source_status: Any) -> dict[str, Any]:
+    """Fail closed for any enabled missing, unavailable, or partial source."""
+    required = {"chembl", "gtopdb", "drugcentral", "bindingdb"}
+    seen: dict[str, dict[str, Any]] = {}
+    target_failures: list[dict[str, Any]] = []
+
+    def visit(value: Any) -> None:
+        if not isinstance(value, dict):
+            return
+        for key, child in value.items():
+            if (
+                key == "_target"
+                and isinstance(child, dict)
+                and str(child.get("status") or "").casefold()
+                not in {"ok", "healthy", "success", "complete"}
+            ):
+                target_failures.append({
+                    "source": "target_evaluation",
+                    "status": child.get("status", "missing"),
+                    "error": child.get("error"),
+                    "target_index": child.get("target_index"),
+                })
+            if key.casefold() in required and isinstance(child, dict):
+                # Multiple target envelopes: the worst state wins.
+                name = key.casefold()
+                prior = seen.get(name)
+                if prior is None or not _source_row_healthy(child):
+                    seen[name] = child
+            if isinstance(child, dict):
+                visit(child)
+
+    visit(source_status)
+    failures = list(target_failures)
+    enabled = []
+    for name in sorted(required):
+        row = seen.get(name)
+        if row and str(row.get("status") or "").casefold() == "disabled":
+            continue
+        enabled.append(name)
+        if row is None or not _source_row_healthy(row):
+            failures.append({
+                "source": name,
+                "status": (row or {}).get("status", "missing"),
+                "error": (row or {}).get("error"),
+            })
+    return {
+        "complete": not failures,
+        "enabled_sources": enabled,
+        "failures": failures,
+    }
+
+
+def _source_row_healthy(row: dict[str, Any]) -> bool:
+    status = str(row.get("status") or "").strip().casefold()
+    if status not in {"ok", "empty", "healthy", "available", "success", "complete"}:
+        return False
+    if row.get("partial") is True or row.get("materially_partial") is True:
+        return False
+    if row.get("complete") is False:
+        return False
+    completeness_status = str(
+        row.get("completeness_status") or row.get("coverage_status") or ""
+    ).casefold()
+    if "partial" in completeness_status or "incomplete" in completeness_status:
+        return False
+    completeness = row.get("completeness")
+    if isinstance(completeness, (int, float)) and completeness < 1:
+        return False
+    return True
+
+
+def _availability_gate(layer1: dict[str, Any],
+                       layer2: Optional[dict[str, Any]]) -> dict[str, Any]:
+    """Separate active-ingredient availability from safety withdrawal."""
+    s2 = layer2 or {}
+    status = str(s2.get("safety_status") or "").upper()
+    scope = s2.get("scope") or {}
+    authority = s2.get("authoritative_source") or {}
+    jurisdiction = str(scope.get("jurisdiction") or "").casefold()
+    global_scope = bool(re.search(
+        r"\b(global|globally|worldwide|all (?:markets|jurisdictions|countries))\b",
+        jurisdiction))
+    confirmed_global = bool(
+        status == "INGREDIENT_UNAVAILABLE"
+        and authority.get("verified_regulator_domain") is True
+        and scope.get("identity_matches") is True
+        and scope.get("fetched_identity_verified") is True
+        and scope.get("jurisdiction_verified") is True
+        and scope.get("formulation_verified") is True
+        and s2.get("quote_verified_in_fetched_source") is True
+        and global_scope
+    )
+    if confirmed_global:
+        return {
+            "status": "GLOBALLY_UNAVAILABLE_ACTIVE_INGREDIENT",
+            "blocks_prioritization": True,
+            "reason": "An authoritative source confirms global active-ingredient unavailability.",
+        }
+    if status in {"BRAND_DISCONTINUED", "MANUFACTURER_DISCONTINUED",
+                  "NOT_MARKETED", "INGREDIENT_UNAVAILABLE"}:
+        return {
+            "status": "REGIONAL_OR_PRODUCT_DISCLOSURE",
+            "blocks_prioritization": False,
+            "reason": "A product/region availability notice was found, but global active-ingredient unavailability was not confirmed.",
+        }
+    if layer1.get("availability_type") == -1:
+        return {
+            "status": "MANUFACTURER_DISCONTINUED",
+            "blocks_prioritization": False,
+            "reason": "Manufacturer discontinuation is disclosure-only; generic active ingredient may remain available.",
+        }
+    return {
+        "status": "UNKNOWN",
+        "blocks_prioritization": False,
+        "reason": "Global active-ingredient availability was not established.",
+    }
+
+
+def _observed_literature_support(candidate: dict[str, Any]) -> list[dict[str, Any]]:
+    finding = candidate.get("literature_limitation") or {}
+    # Related/non-applicable support is deliberately excluded: it may be
+    # disclosed in the dossier but cannot satisfy exact-use readiness.
+    rows = [
+        row for row in finding.get("evidence", [])
+        if row.get("exact_use_label") == "APPLICABLE_SUPPORT"
+        and row.get("exact_applicability") is True
+    ]
+    return [{
+        "pmid": row.get("pmid"),
+        "evidence_level": row.get("evidence_level"),
+        "exact_use_label": row.get("exact_use_label"),
+        "exact_applicability": bool(row.get("exact_applicability")),
+        "score_boost": 0,
+    } for row in rows]
 
 
 def _target_tier(method: Optional[str]) -> str:
@@ -1833,8 +2167,20 @@ def _sort_reviewed(reviewed: list[dict[str, Any]]) -> None:
     ranked above a weak one at the same floor, without changing which
     candidates pass STRONG_MATCH.
     """
+    if _holdout.is_active():
+        reviewed.sort(
+            key=lambda r: (
+                r["composite_score"], r.get("pre_cap_score") or 0.0),
+            reverse=True,
+        )
+        return
     reviewed.sort(
-        key=lambda r: (r["composite_score"], r.get("pre_cap_score") or 0.0),
+        key=lambda r: (
+            _applicability_order(r),
+            r["composite_score"], r.get("pre_cap_score") or 0.0,
+            str(r.get("canonical_compound_identity") or r.get("drug_name") or ""),
+            str(r.get("uniprot_id") or r.get("target_symbol") or ""),
+        ),
         reverse=True,
     )
 
@@ -1857,7 +2203,7 @@ def main() -> None:
 
     payload = {
         "formula": {
-            "formula_version": "reviewer-composite-v2",
+            "formula_version": "reviewer-composite-v3-production",
             "safety_schema_version": SAFETY_SCHEMA_VERSION,
             "composite_weights": COMPOSITE_WEIGHTS,
             "lipinski_penalty": LIPINSKI_PENALTY,

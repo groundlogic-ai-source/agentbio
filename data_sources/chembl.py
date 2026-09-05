@@ -473,7 +473,7 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
     # as duplicate candidates or self-comparators downstream.
     # repurposing_only is part of the cache key so the approved-only and mixed
     # pools never collide in the cache.
-    cache_key = make_key("get_target_candidate_compounds_v3", uniprot_id,
+    cache_key = make_key("get_target_candidate_compounds_v4", uniprot_id,
                          max_compounds, repurposing_only)
     cached = get(cache_key)
     if cached is not None:
@@ -484,12 +484,18 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
         "target_chembl_ids": [],
         "pooled_across_multiple_targets": False,
         "repurposing_only": repurposing_only,
+        "source_status": "unknown",
+        "source_error": None,
     }
 
     try:
         target_ids = _resolve_target_chembl_id(uniprot_id)
         if not target_ids:
             # Ambiguous empty (genuine no-match vs degraded 200) — not cached.
+            result["source_status"] = "unavailable"
+            result["source_error"] = (
+                "ChEMBL target resolution returned no verifiable target identifier."
+            )
             return result
 
         result["target_chembl_ids"] = target_ids
@@ -583,6 +589,8 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
 
     except Exception as e:
         print(f"[chembl] WARNING: candidate compound query failed for '{uniprot_id}': {e}")
+        result["source_status"] = "unavailable"
+        result["source_error"] = f"{type(e).__name__}: {e}"
         # Do NOT cache failures: a transient error would otherwise be cached
         # for 7 days as an empty candidate pool.
         return result
@@ -593,7 +601,16 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
     # (ChEMBL outage), and caching it would zero the pool for 7 days
     # (MTOR/TSC incident, 2026-07).
     if result["compounds"] or saw_activity_payload:
+        result["source_status"] = "complete"
         cache_set(cache_key, result, ttl_days=7)
+    else:
+        # A zero-row payload is explicitly ambiguous in this adapter (genuine
+        # empty vs degraded HTTP 200). Complete coverage cannot be claimed.
+        result["source_status"] = "unavailable"
+        result["source_error"] = (
+            "No verifiable ChEMBL activity payload was observed for the "
+            "resolved target."
+        )
     return result
 
 

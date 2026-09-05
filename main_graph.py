@@ -25,6 +25,7 @@ Resume a paused run:  python resume_review.py <thread_id> <approve|reject|edit> 
 """
 
 import json
+import hashlib
 import os
 import re
 import sqlite3
@@ -60,13 +61,22 @@ from agents.reviewer import (
     PCHEMBL_NORM_MIN,
     PCHEMBL_NORM_MAX,
     MAX_LITERATURE_LIMITATION_CANDIDATES,
+    _candidate_source_coverage,
 )
 from agents.schemas import validate_chemist_handoff, validate_reviewer_handoff
 from agents import provenance
 from data_sources.afdb import get_structure_confidence
 from data_sources.uniprot import get_protein_sequence
 from data_sources import boltz_api
+from data_sources import holdout as _holdout
 from agents import writer
+from api.policy_contracts import (
+    LITERATURE_SCHEMA_VERSION,
+    REPORT_CONTRACT_VERSION,
+    REVIEWER_FORMULA_VERSION,
+    reviewer_input_fingerprint,
+    canonical_json_bytes,
+)
 
 REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
 CHECKPOINT_DB = os.path.join(REPO_ROOT, "checkpoints.db")
@@ -174,6 +184,7 @@ def _target_from_row(r: dict[str, Any]) -> dict[str, Any]:
         # neighbor primary targets.  Falls back only when the source row
         # genuinely has no method recorded (should not happen in practice).
         "target_discovery_method": discovery_method or "genetic_association",
+        "target_applicability": r.get("target_applicability"),
         "mechanism_class": r.get("mechanism_class"),
         "therapeutic_role": r.get("therapeutic_role", "disease_modifying"),
         "process_support": r.get("process_support", []),
@@ -471,8 +482,21 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
     fresh = FORCE_RECOMPUTE or bool(state.get("job_id"))
     targets = state.get("targets") or [state["target"]]
     bio_outputs = state.get("biologist_outputs") or [state["biologist_output"]]
-    # Guard: align lengths (truncate to shorter of the two)
-    k = min(len(targets), len(bio_outputs))
+    # Every selected target must retain an auditable result slot. Missing
+    # biologist rows are explicit failures, never silently truncated away.
+    k = len(targets)
+    if len(bio_outputs) < k:
+        bio_outputs = list(bio_outputs) + [
+            {
+                "target": targets[i],
+                "interacting_genes": [],
+                "literature_hits": [],
+                "pathway_neighbor_targets": [],
+                "druggability_context": {},
+                "error": "Biologist output missing for selected target.",
+            }
+            for i in range(len(bio_outputs), k)
+        ]
 
     if k == 1 and not fresh:
         existing = _load_json("chemist_output.json")
@@ -516,6 +540,16 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
                     "target": targets[idx],
                     "candidates": [],
                     "error": str(e),
+                    "source_status": {
+                        source: {
+                            "status": "failed",
+                            "error": str(e),
+                            "release": None,
+                            "evaluated": False,
+                        }
+                        for source in (
+                            "bindingdb", "chembl", "drugcentral", "gtopdb")
+                    },
                 }
 
     # Pool all candidates from all K targets into a single chemist_output.
@@ -528,29 +562,52 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
             if res.get("pooled_across_multiple_targets"):
                 has_any_pooled = True
 
-    # Active-moiety union across all pursued targets. This collapses salt forms
-    # and cross-source/cross-target duplicates by structure and evidence lineage
-    # while preserving every target membership in the ledger.
+    # Canonical stereochemical compound+target union. The same compound remains
+    # a separate ranked unit for every pursued target.
     all_candidates = merge_chemist_candidates(all_candidates)
 
     # Track which targets succeeded (had no error AND produced a result object).
-    n_chem_failed = sum(
-        1 for r in chemist_results if r and r.get("error")
-    )
-    # Biologist failures (empty stubs injected above) also count as partial failures.
-    n_bio_failed = state.get("k_bio_failed", 0)
-    n_any_failed = max(n_chem_failed, n_bio_failed)
+    healthy_source_states = {
+        "ok", "empty", "healthy", "available", "success", "complete", "disabled"}
+
+    def chemist_target_failed(result: Optional[dict[str, Any]]) -> bool:
+        if result is None or result.get("error"):
+            return True
+        for envelope in (result.get("source_status") or {}).values():
+            if not isinstance(envelope, dict):
+                continue
+            status = str(envelope.get("status") or "").strip().casefold()
+            if (
+                status not in healthy_source_states
+                or envelope.get("partial") is True
+                or envelope.get("materially_partial") is True
+                or envelope.get("complete") is False
+            ):
+                return True
+        return False
+
+    chem_failed_indices = {
+        i for i, result in enumerate(chemist_results)
+        if chemist_target_failed(result)
+    }
+    bio_failed_indices = {
+        i for i in range(k)
+        if i >= len(bio_outputs) or bio_outputs[i].get("error")
+    }
+    failed_indices = bio_failed_indices | chem_failed_indices
+    n_any_failed = len(failed_indices)
     n_ok = k - n_any_failed
     failed_syms = [
-        targets[i].get("target_symbol", str(i))
-        for i, r in enumerate(chemist_results)
-        if r and r.get("error")
+        targets[i].get("target_symbol") or targets[i].get("uniprot_id") or str(i)
+        for i in sorted(failed_indices)
     ]
     k_target_summary = {
         "k_requested": TOP_K_TARGETS,
         "k_pursued": k,
         "k_succeeded": n_ok,
         "k_failed": n_any_failed,
+        "n_any_failed": n_any_failed,
+        "failed_target_indices": sorted(failed_indices),
         "failed_targets": failed_syms,
         "note": (
             f"{n_ok} of {k} target(s) successfully evaluated"
@@ -577,12 +634,31 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
         # and the dossier can report what the union boundary excluded across
         # ALL K targets, not just the last one.
         "approval_gate": _pool_approval_gates(chemist_results),
+        "excluded_candidates": [
+            row
+            for result in chemist_results if result
+            for row in result.get("excluded_candidates", [])
+        ],
         "source_status": {
-            f"target_{i + 1}_{targets[i].get('target_symbol', i)}": (
-                (chemist_results[i] or {}).get("source_status", {})
-            )
+            f"target_{i + 1}_{targets[i].get('target_symbol', i)}": {
+                "_target": {
+                    "status": (
+                        "failed" if i in failed_indices else "complete"),
+                    "error": (
+                        (chemist_results[i] or {}).get("error")
+                        or bio_outputs[i].get("error")
+                    ),
+                    "target_index": i,
+                },
+                **((chemist_results[i] or {}).get("source_status", {})),
+            }
             for i in range(k)
         },
+        "cross_target_candidates": [
+            row
+            for result in chemist_results if result
+            for row in result.get("cross_target_candidates", [])
+        ],
         "reference_set_note": (
             f"Candidates pooled from {k} targets for the same disease "
             f"(TOP_K_TARGETS={TOP_K_TARGETS}). Pathway-neighbor candidates "
@@ -599,13 +675,49 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
 
 def reviewer_node(state: PipelineState) -> dict[str, Any]:
     fresh = FORCE_RECOMPUTE or bool(state.get("job_id"))
-    existing = None if fresh else _load_json("reviewed_candidates.json")
-    if existing is not None:
-        cached_candidates = existing.get("candidates") or []
-        if cached_candidates and any(
-            "literature_limitation_gate_cleared" not in row
-            for row in cached_candidates
+    expected_input_fingerprint = reviewer_input_fingerprint(
+        state["chemist_output"])
+    # Frozen benchmarks are immutable and consume the persisted reviewer
+    # artifact even when production callers request a fresh run.
+    existing = (
+        _load_json("reviewed_candidates.json")
+        if _holdout.is_active()
+        else (None if fresh else _load_json("reviewed_candidates.json"))
+    )
+    if _holdout.is_active():
+        if (
+            isinstance(existing, dict)
+            and (existing.get("formula") or {}).get("formula_version")
+            == "reviewer-composite-v2"
         ):
+            return {"reviewed": existing}
+        raise RuntimeError(
+            "Frozen benchmark provenance/integrity failure: the exact immutable "
+            "reviewer-composite-v2 persisted artifact is missing or has an "
+            "unexpected formula version. Current run_reviewer is forbidden."
+        )
+    if existing is not None:
+        cached_candidates = (existing or {}).get("candidates") or []
+        cached_formula = existing.get("formula") or {}
+        cache_policy_stale = (
+            cached_formula.get("formula_version") != REVIEWER_FORMULA_VERSION
+            or existing.get("safety_schema_version") != SAFETY_SCHEMA_VERSION
+            or existing.get("literature_schema_version")
+            != LITERATURE_SCHEMA_VERSION
+            or existing.get("report_contract_version")
+            != REPORT_CONTRACT_VERSION
+        )
+        if (
+            existing.get("reviewer_input_fingerprint")
+            != expected_input_fingerprint
+        ) or cache_policy_stale or (cached_candidates and any(
+                "literature_limitation_gate_cleared" not in row
+                or row.get("target_applicability") is None
+                or row.get("candidate_source_coverage") is None
+                or (row.get("dossier_evidence_contract") or {}).get(
+                    "contract_version") != writer.DOSSIER_CONTRACT_VERSION
+                for row in cached_candidates
+        )):
             print(
                 "[graph] reviewer: cached artifact predates the required "
                 "literature-limitation gate — ignoring it and rescoring",
@@ -634,9 +746,11 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
     )
     # Runtime schema validation at the reviewer→writer handoff.
     validate_reviewer_handoff(reviewed)
+    source_coverage = _candidate_source_coverage(
+        state["chemist_output"].get("source_status", {}))
     payload = {
         "formula": {
-            "formula_version": "reviewer-composite-v2",
+            "formula_version": REVIEWER_FORMULA_VERSION,
             "safety_schema_version": SAFETY_SCHEMA_VERSION,
             "composite_weights": COMPOSITE_WEIGHTS,
             "lipinski_penalty": LIPINSKI_PENALTY,
@@ -661,7 +775,35 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
         "n_strong_matches": sum(1 for r in reviewed if r["strong_match"]),
         "repurposing_only": state["chemist_output"].get("repurposing_only", False),
         "safety_schema_version": SAFETY_SCHEMA_VERSION,
+        "literature_schema_version": LITERATURE_SCHEMA_VERSION,
+        "report_contract_version": REPORT_CONTRACT_VERSION,
+        "reviewer_input_fingerprint": expected_input_fingerprint,
+        "source_coverage_complete": source_coverage["complete"],
+        "source_failure_details": source_coverage["failures"],
+        "actionable": False,
+        "provenance_scope": (
+            "CLI/cache artifact; non-actionable without durable API job "
+            "snapshot and immutable job-scoped report provenance."
+        ),
         "candidates": reviewed,
+        "cross_target_candidates": state["chemist_output"].get(
+            "cross_target_candidates", []),
+        "excluded_candidates": state["chemist_output"].get(
+            "excluded_candidates",
+            (state["chemist_output"].get("approval_gate") or {}).get(
+                "excluded", []),
+        ),
+        "run_accounting": {
+            "candidate_sources": state["chemist_output"].get("source_status", {}),
+            "llm": {
+                "status": "UNKNOWN",
+                "reason": (
+                    "Existing telemetry is event-based and is not safely "
+                    "attributable to this run without process-global leakage."
+                ),
+                "cost_usd": None,
+            },
+        },
     }
     # Thread the K-target evaluation summary through to the writer so it can
     # include a visible "N of K targets successfully evaluated" note in reports.
@@ -705,16 +847,32 @@ def _pool_approval_gates(
 def _source_failure_details(source_status: Any) -> list[dict[str, Any]]:
     """Extract failed provider envelopes without treating a genuine empty as one."""
     failures: list[dict[str, Any]] = []
+    candidate_sources = {"chembl", "gtopdb", "drugcentral", "bindingdb"}
+    healthy_states = {"ok", "empty", "healthy", "available", "success", "complete"}
     failed_states = {
         "failed", "failure", "error", "unavailable", "timeout", "degraded",
-        "classifier_integrity_failed",
+        "classifier_integrity_failed", "partial", "materially_partial",
     }
 
     def visit(value: Any, path: str = "") -> None:
         if not isinstance(value, dict):
             return
         status = str(value.get("status") or "").strip().casefold()
-        if status in failed_states:
+        source_name = path.rsplit(".", 1)[-1].casefold()
+        incomplete = (
+            value.get("partial") is True
+            or value.get("materially_partial") is True
+            or (
+                isinstance(value.get("completeness"), (int, float))
+                and value["completeness"] < 1
+            )
+        )
+        candidate_source_unhealthy = (
+            source_name in candidate_sources
+            and status != "disabled"
+            and status not in healthy_states
+        )
+        if status in failed_states or incomplete or candidate_source_unhealthy:
             failures.append({
                 "source": path or "unknown",
                 "status": value.get("status"),
@@ -743,6 +901,16 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
         reviewed.get("repurposing_only") or state.get("repurposing_only"))
 
     def _eligible(c: dict[str, Any]) -> bool:
+        if _holdout.is_active():
+            return (
+                not repurposing_only
+                or c.get("is_approved_drug") is True
+            )
+        if (
+            "paid_validation_eligible" in c
+            and c.get("paid_validation_eligible") is not True
+        ):
+            return False
         literature_ok = (
             not c.get("literature_limitation_blocked")
             and c.get("literature_limitation_gate_cleared") is True
@@ -754,8 +922,11 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
         return c.get("is_approved_drug") is True
 
     eligible = [c for c in candidates if _eligible(c)]
-    source_failures = _source_failure_details(
-        (state.get("chemist_output") or {}).get("source_status")
+    source_failures = (
+        []
+        if _holdout.is_active()
+        else _source_failure_details(
+            (state.get("chemist_output") or {}).get("source_status"))
     )
     shortlist = candidates[:MAX_LITERATURE_LIMITATION_CANDIDATES]
     classifier_failures = [
@@ -770,11 +941,13 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
     ]
     terminal_status = "no_eligible_candidate"
 
-    if not candidates and source_failures:
+    if source_failures:
         terminal_status = "source_unavailable"
         reason = (
-            "No candidate can be assessed because one or more enabled candidate "
-            "sources were unavailable; retry after source recovery."
+            "No candidate may be externally prioritized or enter paid validation "
+            "because one or more enabled candidate sources were unavailable or "
+            "materially partial; surviving candidates cannot mask incomplete "
+            "coverage because the missing source could change eligibility."
         )
     elif not eligible and shortlist and len(classifier_failures) == len(shortlist):
         terminal_status = "degraded_unscorable"
@@ -782,17 +955,6 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
             "No candidate can be authorized because every bounded shortlist "
             "literature-limitation classifier search failed; retry after classifier "
             "or source recovery."
-        )
-    elif not eligible and source_failures:
-        # A partial candidate-source outage cannot support a genuine "no
-        # eligible" conclusion: the missing source may have supplied an
-        # approved, literature-clear candidate even though other sources
-        # returned rows.
-        terminal_status = "source_unavailable"
-        reason = (
-            "No candidate can be authorized as eligible while one or more "
-            "enabled candidate sources were unavailable; retry after source "
-            "recovery because the missing source could change eligibility."
         )
     elif not candidates:
         terminal_status = "no_eligible_candidate"
@@ -827,8 +989,9 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
         terminal_status = "completed"
         reason = ""
 
+    authorized = bool(eligible) and terminal_status == "completed"
     verdict = {
-        "eligible": bool(eligible),
+        "eligible": authorized,
         "reason": reason,
         "n_candidates": len(candidates),
         "n_eligible": len(eligible),
@@ -857,11 +1020,24 @@ def _route_after_eligibility(state: PipelineState) -> str:
 
 def dossier_preflight_node(state: PipelineState) -> dict[str, Any]:
     """Reconcile report inputs before any metered structure prediction."""
+    if _holdout.is_active():
+        verdict = {
+            "valid": True,
+            "n_candidates_checked": 0,
+            "compatibility_mode": "frozen_benchmark_v1",
+        }
+        _write_json("dossier_preflight.json", verdict)
+        return {"dossier_preflight": verdict}
     reviewed = state.get("reviewed") or {}
-    candidates = reviewed.get("candidates") or []
     repurposing_only = bool(
         reviewed.get("repurposing_only") or state.get("repurposing_only"))
     targets = state.get("targets") or [state.get("target") or {}]
+    candidates = _selected_for_structure(
+        reviewed, len(targets), actionable_job=bool(state.get("job_id")))
+    if state.get("job_id") and len(candidates) != 1:
+        raise RuntimeError(
+            "Actionable API dossier preflight requires exactly one selected "
+            f"candidate; found {len(candidates)}.")
     bios = state.get("biologist_outputs") or [
         state.get("biologist_output") or {}
     ]
@@ -880,8 +1056,6 @@ def dossier_preflight_node(state: PipelineState) -> dict[str, Any]:
 
     checked = 0
     for candidate in candidates:
-        if repurposing_only and candidate.get("is_approved_drug") is not True:
-            continue
         writer.validate_dossier_inputs(
             candidate,
             matched(bios, candidate, nested_target=True),
@@ -897,10 +1071,18 @@ def dossier_preflight_node(state: PipelineState) -> dict[str, Any]:
 
 def _select_candidates(reviewed: dict[str, Any]) -> list[dict[str, Any]]:
     cands = reviewed.get("candidates", [])
-    eligible = [
+    eligible = list(cands) if _holdout.is_active() else [
         c for c in cands
         if not c.get("literature_limitation_blocked")
         and c.get("literature_limitation_gate_cleared") is True
+        and (
+            "paid_validation_eligible" not in c
+            or c.get("paid_validation_eligible") is True
+        )
+        and (
+            "headline_eligible" not in c
+            or c.get("headline_eligible") is True
+        )
     ]
     strong = [c for c in eligible if c.get("strong_match")]
     if strong:
@@ -911,11 +1093,31 @@ def _select_candidates(reviewed: dict[str, Any]) -> list[dict[str, Any]]:
     return eligible[:1]
 
 
+def _selected_for_structure(
+    reviewed: dict[str, Any],
+    target_count: int,
+    actionable_job: bool = False,
+) -> list[dict[str, Any]]:
+    """Return the exact candidates that the metered structure node will use."""
+    selected = _select_candidates(reviewed)
+    if actionable_job:
+        return selected[:1]
+    if target_count > 1 and len(selected) > 1:
+        return selected[:1]
+    return selected
+
+
 def structure_validation_node(state: PipelineState) -> dict[str, Any]:
     reviewed = state["reviewed"]
-    selected = _select_candidates(reviewed)
+    targets = state.get("targets") or [state.get("target", {})]
+    selected = _selected_for_structure(
+        reviewed, len(targets), actionable_job=bool(state.get("job_id")))
 
     if not selected:
+        if state.get("job_id"):
+            raise RuntimeError(
+                "Actionable API job requires exactly one structure-validation "
+                "candidate; none was selected.")
         print("[graph] structure_validation: no STRONG_MATCH candidates and "
               "STAGE3_STRONG_ONLY=1 — nothing to validate")
         return {"selected": [], "structure_results": {}}
@@ -923,13 +1125,6 @@ def structure_validation_node(state: PipelineState) -> dict[str, Any]:
     # COST GUARDRAIL: when pursuing K > 1 targets, hard-cap at 1 Boltz call
     # (the single top-ranked candidate).  With K=1 the existing MAX_STRUCTURE_CANDIDATES
     # cap applies.  This prevents a K×MAX cost spike on every run.
-    targets = state.get("targets") or [state.get("target", {})]
-    if len(targets) > 1 and len(selected) > 1:
-        print(f"[graph] structure_validation: K={len(targets)} targets — "
-              f"applying cost guardrail: capping Boltz predictions to 1 "
-              f"(was {len(selected)} candidates)")
-        selected = selected[:1]
-
     # AFDB apo pre-check: use each candidate's own uniprot_id because with K targets
     # pooled candidates may come from different target proteins.
     structure_results: dict[str, Any] = {}
@@ -1046,6 +1241,10 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
 
     job_id = state.get("job_id")
     if job_id:
+        if len(selected) != 1:
+            raise RuntimeError(
+                "Actionable API writer requires exactly one selected candidate "
+                f"and dossier; found {len(selected)}.")
         # API reports are snapshots, not the old disease_drug cache.  Apart from
         # preventing same-pair runs from overwriting one another, exclusive
         # creation means graph replay cannot silently alter an already-reviewed
@@ -1053,32 +1252,47 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
         # location and behavior below.
         if not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", job_id):
             raise ValueError("job_id contains unsafe path characters")
-        job_reports_dir = os.path.join(writer.REPORTS_DIR, "jobs", job_id)
+        job_reports_dir = os.path.join(REPO_ROOT, "output", "job_reports", job_id)
         os.makedirs(job_reports_dir, exist_ok=True)
         reports = []
         formula = reviewed.get("formula", {}) or {}
         repurposing_only = bool(reviewed.get("repurposing_only", False))
-        for index, candidate in enumerate(selected, start=1):
+        snapshot_sha256 = hashlib.sha256(
+            canonical_json_bytes(reviewed)).hexdigest()
+        for candidate in selected:
             drug = candidate.get("drug_name", "unknown")
             disease = candidate.get("disease_name", "unknown")
-            filename = f"{index:02d}_{writer._slug(disease)}_{writer._slug(drug)}.md"
-            path = os.path.join(job_reports_dir, filename)
+            path = os.path.join(job_reports_dir, "report.md")
+            markdown = writer.build_report_markdown(
+                candidate, (structure_results or {}).get(drug, {}), formula,
+                _bio_for(candidate), _target_for(candidate),
+                repurposing_only=repurposing_only,
+                k_target_summary=reviewed.get("k_target_summary"),
+            )
+            markdown = (
+                "<!-- AgentBio immutable decision provenance -->\n"
+                f"Candidate snapshot SHA-256: `{snapshot_sha256}`\n\n"
+                f"{markdown}"
+            )
             if not os.path.exists(path):
-                markdown = writer.build_report_markdown(
-                    candidate, (structure_results or {}).get(drug, {}), formula,
-                    _bio_for(candidate), _target_for(candidate),
-                    repurposing_only=repurposing_only,
-                    k_target_summary=reviewed.get("k_target_summary"),
-                )
                 # x is the immutable-storage guard. Existing files are never
                 # rewritten, including if a checkpointed node is replayed.
                 with open(path, "x", encoding="utf-8") as report_file:
                     report_file.write(markdown)
+            else:
+                with open(path, encoding="utf-8") as report_file:
+                    if report_file.read() != markdown:
+                        raise RuntimeError(
+                            "Existing immutable API dossier does not match the "
+                            "selected candidate/snapshot.")
             reports.append({
                 "drug": drug, "disease": disease, "path": path,
                 "strong_match": bool(candidate.get("strong_match")),
             })
         print(f"[graph] writer: wrote {len(reports)} immutable report(s) for job {job_id}")
+        if len(reports) != 1:
+            raise RuntimeError(
+                "Actionable API writer did not produce exactly one dossier.")
     else:
         reports = writer.run_writer(
             reviewed, selected, structure_results, primary_bio,

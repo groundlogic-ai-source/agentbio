@@ -23,7 +23,7 @@ def _text_response(text: str) -> MagicMock:
     return response
 
 
-def _run_check(classify_text: str) -> dict:
+def _run_check(classify_text: str, search_text: str | None = None) -> dict:
     with patch.dict(os.environ, {
         "AI_INTEGRATIONS_ANTHROPIC_BASE_URL": "http://example.invalid",
         "AI_INTEGRATIONS_ANTHROPIC_API_KEY": "test-only",
@@ -37,11 +37,20 @@ def _run_check(classify_text: str) -> dict:
         # Step 2 classification moved to the provider round-robin helper in
         # Amendment 3 (5f0a55e) — mock it where safety_check looks it up.
         safety_check, "chat_text", return_value=(classify_text, "mock")
+    ), patch.object(
+        safety_check, "_fetch_regulator_source", return_value={
+            "verified": True,
+            "text": (
+                "FDA withdrew ControlDrug tablets for safety reasons. "
+                "United States tablets."
+            ),
+            "reason": None,
+        },
     ):
         client = MagicMock()
-        client.messages.create.side_effect = [
-            _text_response("Search results about the drug's regulatory history."),
-        ]
+        client.messages.create.side_effect = [_text_response(
+            search_text or "Search results about the drug's regulatory history."
+        )]
         constructor.return_value = client
         return safety_check.web_safety_check("ControlDrug")
 
@@ -60,19 +69,24 @@ class Layer2SplitVerdictTest(unittest.TestCase):
         )
 
     def test_withdrawal_yes_caps(self):
+        quote = "FDA withdrew ControlDrug tablets for safety reasons."
         result = _run_check(
-            "WITHDRAWAL: YES\nBLACK_BOX: UNCLEAR\n"
-            "CITATION: https://example.com/withdrawn"
+            "SAFETY_STATUS: WITHDRAWN_FOR_SAFETY\nWITHDRAWAL: YES\n"
+            "BLACK_BOX: UNCLEAR\nSOURCE_NAME: FDA\n"
+            "SOURCE_URL: https://www.fda.gov/drugs/control\n"
+            f"EXACT_QUOTE: {quote}\nJURISDICTION: United States\n"
+            "FORMULATION: tablets\nMATCHED_IDENTITY: ControlDrug",
+            f"{quote} https://www.fda.gov/drugs/control",
         )
         self.assertTrue(result["confirmed"])
         self.assertFalse(result["black_box_advisory"])
         self.assertIn("MARKET WITHDRAWAL", result["disclosure_text"])
 
     def test_legacy_verdict_line_still_parsed(self):
-        # Model ignores the two-question format and answers old-style.
+        # A legacy answer remains parseable but cannot satisfy v3 provenance.
         result = _run_check("VERDICT: YES\nCITATION: https://example.com/x")
-        self.assertTrue(result["confirmed"])
-        self.assertEqual(result["verdict"], "YES")
+        self.assertFalse(result["confirmed"])
+        self.assertEqual(result["verdict"], "NO")
 
     def test_unclear_never_caps(self):
         result = _run_check(

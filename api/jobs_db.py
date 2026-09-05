@@ -22,6 +22,7 @@ schema to LangGraph internals, so they stay apart.
 """
 
 import json
+import hashlib
 import os
 import threading
 import time
@@ -31,6 +32,8 @@ from typing import Any, Iterator, Optional
 
 import psycopg2
 import psycopg2.extras
+
+from api.policy_contracts import canonical_json_bytes
 
 _DATABASE_URL = os.environ["DATABASE_URL"]
 
@@ -43,6 +46,7 @@ VALID_STATUSES = (
     "queued",
     "running",
     "awaiting_review",
+    "reviewing",
     "completed",
     "no_eligible_candidate",
     "source_unavailable",
@@ -81,6 +85,11 @@ _COLUMNS = (
     "review_notes",
     "repurposing_only",
     "archived",
+    "decision_contract_version",
+    "report_contract_version",
+    "report_sha256",
+    "candidate_snapshot_sha256",
+    "reviewer_input_fingerprint",
 )
 
 
@@ -149,17 +158,29 @@ def _seed_if_empty() -> None:
                 row["total_cost_usd"] = 0.0
             if row.get("archived") is None:
                 row["archived"] = 0
+            # Committed seed rows predate actionable dossier provenance. Keep
+            # their evidence, but never seed them into the live review queue.
+            if (
+                row.get("status") == "awaiting_review"
+                and not row.get("decision_contract_version")
+            ):
+                row["archived"] = 1
             cur.execute(
                 """
                 INSERT INTO jobs (job_id, thread_id, disease_name, status,
                     current_stage, created_at, updated_at, error_message,
                     total_cost_usd, report_path, decision, review_notes,
-                    repurposing_only, archived)
+                    repurposing_only, archived, decision_contract_version,
+                    report_contract_version, report_sha256,
+                    candidate_snapshot_sha256, reviewer_input_fingerprint)
                 VALUES (%(job_id)s, %(thread_id)s, %(disease_name)s, %(status)s,
                     %(current_stage)s, %(created_at)s, %(updated_at)s,
                     %(error_message)s, %(total_cost_usd)s, %(report_path)s,
                     %(decision)s, %(review_notes)s, %(repurposing_only)s,
-                    %(archived)s)
+                    %(archived)s, %(decision_contract_version)s,
+                    %(report_contract_version)s, %(report_sha256)s,
+                    %(candidate_snapshot_sha256)s,
+                    %(reviewer_input_fingerprint)s)
                 ON CONFLICT (job_id) DO NOTHING
                 """,
                 row,
@@ -256,6 +277,45 @@ def save_candidate_snapshot(job_id: str, payload: dict[str, Any]) -> None:
     """
     now = _now()
     with _conn(lock=True) as conn, conn.cursor() as cur:
+        # Serialize against report finalization. Once report provenance exists,
+        # the snapshot becomes immutable; exact-content retries remain safe.
+        cur.execute(
+            """
+            SELECT report_sha256, candidate_snapshot_sha256
+            FROM jobs WHERE job_id = %s FOR UPDATE
+            """,
+            (job_id,),
+        )
+        job_row = cur.fetchone()
+        if not job_row:
+            raise ValueError(f"job not found: {job_id}")
+        cur.execute(
+            """
+            SELECT payload_json FROM job_candidate_snapshots
+            WHERE job_id = %s FOR UPDATE
+            """,
+            (job_id,),
+        )
+        existing_row = cur.fetchone()
+        existing_payload = existing_row[0] if existing_row else None
+        if isinstance(existing_payload, str):
+            existing_payload = json.loads(existing_payload)
+        incoming_hash = hashlib.sha256(
+            canonical_json_bytes(payload)).hexdigest()
+        existing_hash = (
+            hashlib.sha256(canonical_json_bytes(existing_payload)).hexdigest()
+            if isinstance(existing_payload, dict) else None
+        )
+        report_sha = job_row[0]
+        bound_snapshot_sha = job_row[1]
+        if report_sha and existing_hash != incoming_hash:
+            raise ValueError(
+                "candidate snapshot is immutable after report finalization")
+        if report_sha and bound_snapshot_sha != incoming_hash:
+            raise ValueError(
+                "candidate snapshot does not match finalized report metadata")
+        if existing_hash == incoming_hash:
+            return
         cur.execute(
             """
             INSERT INTO job_candidate_snapshots
@@ -267,6 +327,88 @@ def save_candidate_snapshot(job_id: str, payload: dict[str, Any]) -> None:
             """,
             (job_id, psycopg2.extras.Json(payload), now, now),
         )
+
+
+def claim_job_for_review(job_id: str) -> Optional[dict[str, Any]]:
+    """Atomically claim one awaiting-review job; exactly one caller can win."""
+    with _conn(lock=True) as conn, conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        cur.execute(
+            """
+            UPDATE jobs
+            SET status = 'reviewing', current_stage = 'awaiting_review',
+                updated_at = %s
+            WHERE job_id = %s AND status = 'awaiting_review'
+            RETURNING *
+            """,
+            (_now(), job_id),
+        )
+        row = cur.fetchone()
+    return dict(row) if row else None
+
+
+def finalize_job_report(
+        job_id: str,
+        *,
+        report_path: str,
+        decision_contract_version: str,
+        report_contract_version: str,
+        report_sha256: str,
+        candidate_snapshot_sha256: str,
+        reviewer_input_fingerprint: str,
+) -> dict[str, Any]:
+    """Atomically bind report metadata to the currently locked snapshot."""
+    with _conn(lock=True) as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT job_id FROM jobs WHERE job_id = %s FOR UPDATE",
+            (job_id,),
+        )
+        if not cur.fetchone():
+            raise ValueError(f"job not found: {job_id}")
+        cur.execute(
+            "SELECT payload_json FROM job_candidate_snapshots "
+            "WHERE job_id = %s FOR UPDATE",
+            (job_id,),
+        )
+        row = cur.fetchone()
+        if not row:
+            raise ValueError("durable candidate snapshot missing at finalization")
+        payload = row[0]
+        if isinstance(payload, str):
+            payload = json.loads(payload)
+        actual_hash = hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
+        if actual_hash != candidate_snapshot_sha256:
+            raise ValueError(
+                "candidate snapshot changed during report finalization")
+        now = _now()
+        cur.execute(
+            """
+            UPDATE jobs SET report_path = %s,
+                decision_contract_version = %s,
+                report_contract_version = %s,
+                report_sha256 = %s,
+                candidate_snapshot_sha256 = %s,
+                reviewer_input_fingerprint = %s,
+                updated_at = %s
+            WHERE job_id = %s
+            RETURNING *
+            """,
+            (
+                report_path, decision_contract_version,
+                report_contract_version, report_sha256,
+                candidate_snapshot_sha256, reviewer_input_fingerprint,
+                now, job_id,
+            ),
+        )
+        finalized = cur.fetchone()
+        if not finalized:
+            raise ValueError(f"job not found: {job_id}")
+    return dict(finalized) if isinstance(finalized, dict) else {
+        "job_id": job_id,
+        "report_path": report_path,
+        "report_sha256": report_sha256,
+        "candidate_snapshot_sha256": candidate_snapshot_sha256,
+    }
 
 
 def get_candidate_snapshot(job_id: str) -> Optional[dict[str, Any]]:
@@ -399,7 +541,22 @@ def reap_orphaned_running_jobs() -> int:
             "WHERE status='running'",
             (msg, _now()),
         )
-        return cur.rowcount
+        reaped = cur.rowcount
+        review_msg = (
+            "Uncertain review outcome: server restarted while the job was in "
+            "reviewing state. The decision/checkpoint may have had side effects; "
+            "the job was not restored to awaiting_review. Attempt context: "
+        )
+        cur.execute(
+            """
+            UPDATE jobs SET status='error',
+                error_message=%s || COALESCE(error_message, decision, 'unavailable'),
+                updated_at=%s
+            WHERE status='reviewing'
+            """,
+            (review_msg, _now()),
+        )
+        return reaped + cur.rowcount
 
 
 def claim_next_unexplored(
