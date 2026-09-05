@@ -649,6 +649,20 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
                         or bio_outputs[i].get("error")
                     ),
                     "target_index": i,
+                    "target_symbol": targets[i].get("target_symbol"),
+                    "uniprot_id": targets[i].get("uniprot_id"),
+                    "target_discovery_method": targets[i].get(
+                        "target_discovery_method"),
+                    "pathway_neighbor_tier": targets[i].get(
+                        "pathway_neighbor_tier",
+                        targets[i].get("specificity_tier")),
+                    # Direct disease targets are mandatory coverage. Pathway
+                    # expansion is exploratory: its failure only applies to a
+                    # candidate actually discovered on that neighbor.
+                    "coverage_required": (
+                        targets[i].get("target_discovery_method")
+                        != "pathway_neighbor"
+                    ),
                 },
                 **((chemist_results[i] or {}).get("source_status", {})),
             }
@@ -845,7 +859,11 @@ def _pool_approval_gates(
 
 
 def _source_failure_details(source_status: Any) -> list[dict[str, Any]]:
-    """Extract failed provider envelopes without treating a genuine empty as one."""
+    """Extract global (required-target) failed provider envelopes.
+
+    Exploratory pathway target failures are retained in source_status for audit,
+    but cannot globally veto causal/direct target candidates.
+    """
     failures: list[dict[str, Any]] = []
     candidate_sources = {"chembl", "gtopdb", "drugcentral", "bindingdb"}
     healthy_states = {"ok", "empty", "healthy", "available", "success", "complete"}
@@ -854,9 +872,12 @@ def _source_failure_details(source_status: Any) -> list[dict[str, Any]]:
         "classifier_integrity_failed", "partial", "materially_partial",
     }
 
-    def visit(value: Any, path: str = "") -> None:
+    def visit(value: Any, path: str = "", required_scope: bool = True) -> None:
         if not isinstance(value, dict):
             return
+        target = value.get("_target")
+        if isinstance(target, dict):
+            required_scope = target.get("coverage_required") is not False
         status = str(value.get("status") or "").strip().casefold()
         source_name = path.rsplit(".", 1)[-1].casefold()
         incomplete = (
@@ -872,7 +893,8 @@ def _source_failure_details(source_status: Any) -> list[dict[str, Any]]:
             and status != "disabled"
             and status not in healthy_states
         )
-        if status in failed_states or incomplete or candidate_source_unhealthy:
+        if required_scope and (
+                status in failed_states or incomplete or candidate_source_unhealthy):
             failures.append({
                 "source": path or "unknown",
                 "status": value.get("status"),
@@ -880,7 +902,7 @@ def _source_failure_details(source_status: Any) -> list[dict[str, Any]]:
             })
         for key, child in value.items():
             if isinstance(child, dict):
-                visit(child, f"{path}.{key}" if path else key)
+                visit(child, f"{path}.{key}" if path else key, required_scope)
 
     visit(source_status)
     return failures

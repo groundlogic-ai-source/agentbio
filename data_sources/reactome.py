@@ -137,10 +137,18 @@ def get_pathway_neighbors(
                         all_shared_pathways_metabolic}
         Returns [] gracefully on any API failure (never crashes the pipeline).
     """
-    cache_key = make_key("reactome_pathway_neighbors_v2", uniprot_id, max_neighbors)
+    # v3 requires an explicit tier.  v2 rows predate specificity classification
+    # and must not be allowed to silently enter pathway expansion.
+    cache_key = make_key("reactome_pathway_neighbors_v3", uniprot_id, max_neighbors)
     cached = get(cache_key)
     if cached is not None:
-        return cached
+        valid_tiers = {"direct", "moderate", "broad_metabolic"}
+        if (isinstance(cached, list)
+                and all(isinstance(row, dict)
+                        and row.get("specificity_tier") in valid_tiers
+                        for row in cached)):
+            return cached
+        print(f"[reactome] ignoring malformed/stale neighbor cache for {uniprot_id}")
 
     # Step 1: fetch all pathways the protein participates in.
     # _get returns None on failure — distinguish failure from a genuine empty

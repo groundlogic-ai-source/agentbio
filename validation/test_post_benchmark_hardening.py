@@ -589,6 +589,70 @@ class TestKTargetCompleteness(unittest.TestCase):
         self.assertEqual(verdict["terminal_status"], "source_unavailable")
 
 
+class TestScopeAwareTargetCoverage(unittest.TestCase):
+    @staticmethod
+    def _sources(status="complete"):
+        return {
+            source: {"status": status, "error": "no verifiable ChEMBL target"
+                     if status != "complete" else None}
+            for source in ("bindingdb", "chembl", "drugcentral", "gtopdb")
+        }
+
+    def _status(self):
+        targets = [
+            ("ABCC9", "O60706", "genetic_association", None, "complete"),
+            ("KCNJ8", "Q15842", "genetic_association", None, "complete"),
+            ("KCNJ11", "P48048", "genetic_association", None, "complete"),
+            ("ABCA10", "Q8WWZ7", "pathway_neighbor", "direct", "failed"),
+            ("ABCA12", "Q86UK0", "pathway_neighbor", "moderate", "failed"),
+        ]
+        return {
+            f"target_{i}_{symbol}": {
+                "_target": {
+                    "status": target_status, "target_index": i,
+                    "target_symbol": symbol, "uniprot_id": accession,
+                    "target_discovery_method": method,
+                    "pathway_neighbor_tier": tier,
+                    "coverage_required": method != "pathway_neighbor",
+                },
+                **self._sources(
+                    "unavailable" if target_status == "failed" else "complete"),
+            }
+            for i, (symbol, accession, method, tier, target_status)
+            in enumerate(targets, 1)
+        }
+
+    def test_unrelated_exploratory_failures_warn_not_veto_causal_candidate(self):
+        coverage = _candidate_source_coverage(
+            self._status(), {
+                "drug_name": "glibenclamide",
+                "target_symbol": "ABCC9", "uniprot_id": "O60706",
+            })
+        self.assertTrue(coverage["complete"])
+        self.assertTrue(coverage["warnings"])
+        self.assertIn("ABCA10", {row["target_symbol"] for row in coverage["warnings"]})
+
+        # Eligibility's global source projection has the same scope: failed
+        # ABCA branches must not turn a complete ABCC9 lead into
+        # source_unavailable.
+        import main_graph
+        self.assertEqual(main_graph._source_failure_details(self._status()), [])
+
+    def test_failed_exploratory_target_vetoes_its_own_candidate(self):
+        coverage = _candidate_source_coverage(
+            self._status(), {"target_symbol": "ABCA10", "uniprot_id": "Q8WWZ7"})
+        self.assertFalse(coverage["complete"])
+        self.assertIn("ABCA10", {row["target_symbol"] for row in coverage["failures"]})
+
+    def test_required_target_failure_vetoes_every_candidate(self):
+        status = self._status()
+        status["target_1_ABCC9"]["chembl"]["status"] = "unavailable"
+        coverage = _candidate_source_coverage(
+            status, {"target_symbol": "KCNJ11", "uniprot_id": "P48048"})
+        self.assertFalse(coverage["complete"])
+        self.assertIn("ABCC9", {row["target_symbol"] for row in coverage["failures"]})
+
+
 class TestDossierDisclosure(unittest.TestCase):
     """The dossier must not assert traceability or provenance it lacks."""
 

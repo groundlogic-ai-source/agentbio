@@ -667,7 +667,13 @@ def _expand_pathway_neighbors(
             nuid = n.get("uniprot_id")
             if not nuid or nuid in seen:
                 continue
-            if n.get("specificity_tier") == "broad_metabolic":
+            tier = n.get("specificity_tier")
+            if tier not in {"direct", "moderate"}:
+                log(
+                    f"  SKIP pathway-neighbor {n.get('gene_name') or nuid} "
+                    f"({nuid}): specificity_tier={tier!r}; only explicit "
+                    "direct/moderate neighbors may be expanded"
+                )
                 continue
             seen.add(nuid)
             added.append({
@@ -682,7 +688,7 @@ def _expand_pathway_neighbors(
                 ),
                 "target_discovery_method": "pathway_neighbor",
                 "pathway_neighbor_of": src.get("target_symbol"),
-                "pathway_neighbor_tier": n.get("specificity_tier"),
+                "pathway_neighbor_tier": tier,
                 "pathway_neighbor_pathways": n.get("shared_pathway_names", [])[:3],
                 "pathway_neighbor_count": n.get("pathway_count", 0),
             })

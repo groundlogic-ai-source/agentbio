@@ -681,9 +681,6 @@ def run_reviewer(
 ) -> list[dict[str, Any]]:
     candidates = chemist_output.get("candidates", [])
     disease = chemist_output.get("target", {}).get("disease_name", "")
-    source_coverage = _candidate_source_coverage(
-        chemist_output.get("source_status"))
-
     bios = biologist_outputs or ([biologist_output] if biologist_output else [])
 
     def _matched_bio(candidate: dict[str, Any]) -> Optional[dict[str, Any]]:
@@ -1009,7 +1006,8 @@ def run_reviewer(
                 "blocks_prioritization": False,
                 "reason": "Global active-ingredient availability was not established.",
             },
-            "candidate_source_coverage": source_coverage,
+            "candidate_source_coverage": _candidate_source_coverage(
+                chemist_output.get("source_status"), c),
             "exclusion_reasons": [],
             "provenance": {
                 "counted_once": new_ids,
@@ -1380,7 +1378,7 @@ def run_reviewer(
                 r.get("strong_match")
                 and _applicability_allows_prioritization(r)
                 and not r["availability_gate"]["blocks_prioritization"]
-                and source_coverage["complete"]
+                and r["candidate_source_coverage"]["complete"]
             )
     else:
         shortlist = reviewed[:MAX_LITERATURE_LIMITATION_CANDIDATES]
@@ -1419,7 +1417,7 @@ def run_reviewer(
                 r.get("strong_match") and cleared and not blocked
                 and _applicability_allows_prioritization(r)
                 and not r["availability_gate"]["blocks_prioritization"]
-                and source_coverage["complete"])
+                and r["candidate_source_coverage"]["complete"])
             print(
                 f"[reviewer] literature-limitation: {r['drug_name']} / {disease} "
                 f"→ {limitation.get('verdict')} "
@@ -1462,7 +1460,7 @@ def run_reviewer(
         reasons: list[str] = []
         if r.get("is_approved_drug") is not True:
             reasons.append("approval_not_established")
-        if not source_coverage["complete"]:
+        if not r["candidate_source_coverage"]["complete"]:
             reasons.append("candidate_source_coverage_incomplete")
         if not _applicability_allows_prioritization(r):
             reasons.append(
@@ -1900,55 +1898,99 @@ def _applicability_order(candidate: dict[str, Any]) -> int:
     return 0
 
 
-def _candidate_source_coverage(source_status: Any) -> dict[str, Any]:
-    """Fail closed for any enabled missing, unavailable, or partial source."""
+def _candidate_source_coverage(
+        source_status: Any, candidate: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    """Assess provider coverage in the target scope applicable to a candidate.
+
+    Direct/required target failures fail every candidate. An exploratory
+    pathway-neighbor failure fails only a candidate targeting that neighbor;
+    unrelated exploratory failures remain explicit warnings. Flat legacy
+    source-status input has no target scope and deliberately retains the
+    original fail-closed behavior.
+    """
     required = {"chembl", "gtopdb", "drugcentral", "bindingdb"}
-    seen: dict[str, dict[str, Any]] = {}
+    scoped: list[tuple[dict[str, Any], dict[str, Any]]] = []
     target_failures: list[dict[str, Any]] = []
+    warnings: list[dict[str, Any]] = []
+
+    def _norm(value: Any) -> str:
+        return "".join(str(value or "").upper().split())
+
+    candidate_symbols = {_norm(candidate.get("target_symbol"))} if candidate else set()
+    candidate_accessions = {_norm(candidate.get("uniprot_id"))} if candidate else set()
+    if candidate:
+        for membership in candidate.get("target_memberships") or []:
+            if isinstance(membership, dict):
+                candidate_symbols.add(_norm(membership.get("target_symbol")))
+                candidate_accessions.add(_norm(membership.get("uniprot_id")))
+    candidate_symbols.discard("")
+    candidate_accessions.discard("")
+
+    def applies_to_candidate(target: dict[str, Any]) -> bool:
+        if target.get("coverage_required") is not False:
+            return True
+        if candidate is None:
+            return False
+        return bool(
+            _norm(target.get("target_symbol")) in candidate_symbols
+            or _norm(target.get("uniprot_id")) in candidate_accessions
+        )
 
     def visit(value: Any) -> None:
         if not isinstance(value, dict):
             return
+        target = value.get("_target")
+        if isinstance(target, dict):
+            scoped.append((target, value))
+            return
         for key, child in value.items():
-            if (
-                key == "_target"
-                and isinstance(child, dict)
-                and str(child.get("status") or "").casefold()
-                not in {"ok", "healthy", "success", "complete"}
-            ):
-                target_failures.append({
-                    "source": "target_evaluation",
-                    "status": child.get("status", "missing"),
-                    "error": child.get("error"),
-                    "target_index": child.get("target_index"),
-                })
-            if key.casefold() in required and isinstance(child, dict):
-                # Multiple target envelopes: the worst state wins.
-                name = key.casefold()
-                prior = seen.get(name)
-                if prior is None or not _source_row_healthy(child):
-                    seen[name] = child
             if isinstance(child, dict):
                 visit(child)
 
     visit(source_status)
-    failures = list(target_failures)
-    enabled = []
-    for name in sorted(required):
-        row = seen.get(name)
-        if row and str(row.get("status") or "").casefold() == "disabled":
-            continue
-        enabled.append(name)
-        if row is None or not _source_row_healthy(row):
-            failures.append({
-                "source": name,
-                "status": (row or {}).get("status", "missing"),
-                "error": (row or {}).get("error"),
-            })
+    # Preserve old single-target/flat payload semantics.
+    if not scoped:
+        scoped = [({"coverage_required": True}, source_status or {})]
+    failures: list[dict[str, Any]] = []
+    enabled: set[str] = set()
+    for target, envelope in scoped:
+        applies = applies_to_candidate(target)
+        target_label = (target.get("target_symbol") or target.get("uniprot_id")
+                        or target.get("target_index"))
+        target_bad = str(target.get("status") or "").casefold() not in {
+            "ok", "healthy", "success", "complete"}
+        if target_bad:
+            detail = {
+                "source": "target_evaluation",
+                "status": target.get("status", "missing"),
+                "error": target.get("error"),
+                "target_index": target.get("target_index"),
+                "target_symbol": target.get("target_symbol"),
+                "uniprot_id": target.get("uniprot_id"),
+            }
+            (failures if applies else warnings).append(detail)
+        for name in sorted(required):
+            row = envelope.get(name)
+            if row and str(row.get("status") or "").casefold() == "disabled":
+                continue
+            enabled.add(name)
+            if row is None or not _source_row_healthy(row):
+                detail = {
+                    "source": name,
+                    "status": (row or {}).get("status", "missing"),
+                    "error": (row or {}).get("error"),
+                    "target": target_label,
+                    "target_index": target.get("target_index"),
+                    "target_symbol": target.get("target_symbol"),
+                    "uniprot_id": target.get("uniprot_id"),
+                }
+                (failures if applies else warnings).append(detail)
     return {
         "complete": not failures,
-        "enabled_sources": enabled,
+        "enabled_sources": sorted(enabled),
         "failures": failures,
+        "warnings": warnings,
     }
 
 

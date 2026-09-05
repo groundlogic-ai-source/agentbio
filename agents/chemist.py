@@ -524,6 +524,11 @@ def run_chemist(biologist_output: dict[str, Any],
             nbr_sym = nbr.get("target_symbol", nbr_uid)
             if not nbr_uid:
                 continue
+            if nbr.get("specificity_tier") not in {"direct", "moderate"}:
+                print(f"[chemist] SKIP pathway_neighbor {nbr_sym} ({nbr_uid}): "
+                      f"specificity_tier={nbr.get('specificity_tier')!r}; "
+                      "only explicit direct/moderate neighbors may be expanded")
+                continue
             try:
                 nbr_cc = get_target_candidate_compounds(
                     nbr_uid, repurposing_only=repurposing_only)
