@@ -1,6 +1,7 @@
 import unittest
 import subprocess
 import tempfile
+import io
 from pathlib import Path
 
 from api.report_pdf import render_case_pdf
@@ -39,6 +40,42 @@ class ReportPdfTests(unittest.TestCase):
         self.assertIn("abc123", text)
         self.assertNotIn("| --- |", text)
         self.assertIn(b"AgentBio Case Dossier", payload)
+        # Visible URLs are insufficient for a usable dossier: fpdf2 must emit
+        # real external URI annotations that PDF viewers can activate.
+        self.assertIn(b"/Annots", payload)
+        self.assertIn(b"/URI", payload)
+        self.assertIn(b"https://example.org/evidence", payload)
+        self.assertIn("Linked resources", text)
+        # Resolve annotation objects structurally rather than accepting a raw
+        # marker that could appear in unrelated PDF content.
+        try:
+            try:
+                from pypdf import PdfReader
+            except ImportError:
+                from PyPDF2 import PdfReader
+            reader = PdfReader(io.BytesIO(payload))
+            uris = []
+            for page in reader.pages:
+                for annotation_ref in page.get("/Annots", []):
+                    annotation = annotation_ref.get_object()
+                    self.assertEqual(annotation.get("/Subtype"), "/Link")
+                    action = annotation["/A"].get_object()
+                    self.assertEqual(action.get("/S"), "/URI")
+                    uris.append(str(action.get("/URI")))
+        except ImportError:
+            # fpdf2 emits annotation dictionaries directly in the page's
+            # /Annots array. Parse that object boundary and validate the full
+            # Link -> Action -> URI structure, not merely a global marker.
+            import re
+            arrays = re.findall(rb"/Annots \[(.*?)\]\s*/Contents", payload, re.S)
+            self.assertTrue(arrays)
+            uris = []
+            for array in arrays:
+                for match in re.finditer(
+                        rb"/A\s*<<\s*/S\s*/URI\s*/URI\s*\(([^)]*)\)\s*>>"
+                        rb".*?/Subtype\s*/Link", array, re.S):
+                    uris.append(match.group(1).decode("latin-1"))
+        self.assertIn("https://example.org/evidence", uris)
 
 
 if __name__ == "__main__":

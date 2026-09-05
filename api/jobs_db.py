@@ -92,6 +92,156 @@ _COLUMNS = (
     "reviewer_input_fingerprint",
 )
 
+# ``job_artifacts`` is deliberately schema-managed with the other durable job
+# tables.  Keep this DDL here (rather than executing it on application startup)
+# so the development database migration is reviewable and Publish can apply the
+# same delta to production.
+#
+# Development DDL:
+# CREATE TABLE job_artifacts (
+#   job_id TEXT NOT NULL REFERENCES jobs(job_id) ON DELETE RESTRICT,
+#   kind TEXT NOT NULL,
+#   artifact_id TEXT NOT NULL,
+#   content_sha256 TEXT NOT NULL,
+#   filename TEXT NOT NULL,
+#   content_type TEXT NOT NULL,
+#   size_bytes BIGINT NOT NULL CHECK (size_bytes >= 0),
+#   payload BYTEA NOT NULL,
+#   report_sha256 TEXT NOT NULL,
+#   candidate_snapshot_sha256 TEXT NOT NULL,
+#   created_at TEXT NOT NULL,
+#   PRIMARY KEY (job_id, kind, artifact_id),
+#   CHECK (artifact_id ~ '^[a-f0-9]{64}$'),
+#   CHECK (content_sha256 ~ '^[a-f0-9]{64}$')
+# );
+# CREATE UNIQUE INDEX job_artifacts_singleton_kind_uq
+#   ON job_artifacts (job_id, kind)
+#   WHERE kind IN ('report_md', 'report_pdf', 'evidence_zip');
+JOB_ARTIFACTS_DEVELOPMENT_DDL = """\
+CREATE TABLE job_artifacts (
+  job_id TEXT NOT NULL REFERENCES jobs(job_id) ON DELETE RESTRICT,
+  kind TEXT NOT NULL,
+  artifact_id TEXT NOT NULL,
+  content_sha256 TEXT NOT NULL,
+  filename TEXT NOT NULL,
+  content_type TEXT NOT NULL,
+  size_bytes BIGINT NOT NULL CHECK (size_bytes >= 0),
+  payload BYTEA NOT NULL,
+  report_sha256 TEXT NOT NULL,
+  candidate_snapshot_sha256 TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (job_id, kind, artifact_id),
+  CHECK (artifact_id ~ '^[a-f0-9]{64}$'),
+  CHECK (content_sha256 ~ '^[a-f0-9]{64}$')
+);
+CREATE UNIQUE INDEX job_artifacts_singleton_kind_uq
+  ON job_artifacts (job_id, kind)
+  WHERE kind IN ('report_md', 'report_pdf', 'evidence_zip');
+CREATE FUNCTION job_artifacts_immutable() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN RAISE EXCEPTION 'job_artifacts rows are immutable'; END; $$;
+CREATE TRIGGER job_artifacts_no_update BEFORE UPDATE ON job_artifacts
+  FOR EACH ROW EXECUTE FUNCTION job_artifacts_immutable();
+CREATE TRIGGER job_artifacts_no_delete BEFORE DELETE ON job_artifacts
+  FOR EACH ROW EXECUTE FUNCTION job_artifacts_immutable();
+"""
+
+ARTIFACT_KINDS = frozenset(("report_md", "report_pdf", "evidence_zip", "cif"))
+_SINGLETON_ARTIFACT_KINDS = frozenset(("report_md", "report_pdf", "evidence_zip"))
+# These are deliberately below typical reverse-proxy limits.  A dossier must
+# not turn the database into an unbounded general-purpose file store.
+_ARTIFACT_MAX_BYTES = {
+    "report_md": 10 * 1024 * 1024,
+    "report_pdf": 25 * 1024 * 1024,
+    "evidence_zip": 100 * 1024 * 1024,
+    "cif": 10 * 1024 * 1024,
+}
+
+
+def finalize_job_artifact_bundle(
+    job_id: str, *, artifacts: list[dict[str, Any]],
+    report_path: str, decision_contract_version: str,
+    report_contract_version: str, report_sha256: str,
+    candidate_snapshot_sha256: str, reviewer_input_fingerprint: str,
+) -> dict[str, Any]:
+    """Atomically establish a complete immutable dossier bundle.
+
+    This is the only writer used by finalization.  It intentionally does not
+    call ``save_job_artifact``: there is no committed state in which a current
+    report can observe just one member of a bundle.
+    """
+    required = {"report_md", "report_pdf", "evidence_zip"}
+    kinds = [str(a.get("kind")) for a in artifacts]
+    if not required.issubset(kinds) or len(kinds) != len(set(
+            (a.get("kind"), a.get("artifact_id")) for a in artifacts)):
+        raise ValueError("incomplete or duplicate immutable artifact bundle")
+    normalized: list[dict[str, Any]] = []
+    for item in artifacts:
+        kind, payload = item.get("kind"), item.get("payload")
+        if kind not in ARTIFACT_KINDS or not isinstance(payload, bytes):
+            raise ValueError("invalid artifact bundle item")
+        digest = hashlib.sha256(payload).hexdigest()
+        if item.get("artifact_id", digest) != digest or len(payload) > _ARTIFACT_MAX_BYTES[kind]:
+            raise ValueError("invalid immutable artifact bytes")
+        normalized.append({**item, "artifact_id": digest, "content_sha256": digest,
+                           "size_bytes": len(payload)})
+    report = next(a for a in normalized if a["kind"] == "report_md")
+    if report["content_sha256"] != report_sha256:
+        raise ValueError("report markdown hash does not match metadata")
+    with _conn(lock=True) as conn, conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        cur.execute("SELECT * FROM jobs WHERE job_id = %s FOR UPDATE", (job_id,))
+        job = cur.fetchone()
+        if not job:
+            raise ValueError(f"job not found: {job_id}")
+        cur.execute("SELECT payload_json FROM job_candidate_snapshots WHERE job_id=%s FOR UPDATE",
+                    (job_id,))
+        snap = cur.fetchone()
+        if not snap:
+            raise ValueError("durable candidate snapshot missing at finalization")
+        payload = snap["payload_json"] if isinstance(snap, dict) else snap[0]
+        if isinstance(payload, str):
+            payload = json.loads(payload)
+        if hashlib.sha256(canonical_json_bytes(payload)).hexdigest() != candidate_snapshot_sha256:
+            raise ValueError("candidate snapshot changed during report finalization")
+        cur.execute("SELECT * FROM job_artifacts WHERE job_id=%s FOR UPDATE", (job_id,))
+        existing = [dict(row) for row in cur.fetchall()]
+        if existing:
+            # A retry is valid only for the exact full bundle and exact job
+            # provenance.  A partial set cannot be repaired in place.
+            if (len(existing) != len(normalized)
+                    or { (r["kind"], r["artifact_id"]) for r in existing }
+                       != { (r["kind"], r["artifact_id"]) for r in normalized }
+                    or any(bytes(r["payload"]) != next(a["payload"] for a in normalized
+                                                        if a["kind"] == r["kind"]
+                                                        and a["artifact_id"] == r["artifact_id"])
+                           for r in existing)
+                    or job["report_sha256"] != report_sha256
+                    or job["candidate_snapshot_sha256"] != candidate_snapshot_sha256
+                    or job.get("report_path") != report_path
+                    or job.get("decision_contract_version") != decision_contract_version
+                    or job.get("report_contract_version") != report_contract_version
+                    or job.get("reviewer_input_fingerprint")
+                    != reviewer_input_fingerprint):
+                raise ValueError("partial or different immutable artifact bundle exists")
+            return dict(job)
+        for item in normalized:
+            cur.execute("""INSERT INTO job_artifacts
+                (job_id,kind,artifact_id,content_sha256,filename,content_type,size_bytes,
+                 payload,report_sha256,candidate_snapshot_sha256,created_at)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (job_id, item["kind"], item["artifact_id"], item["content_sha256"],
+                 item["filename"], item["content_type"], item["size_bytes"],
+                 psycopg2.Binary(item["payload"]), report_sha256,
+                 candidate_snapshot_sha256, _now()))
+        cur.execute("""UPDATE jobs SET report_path=%s, decision_contract_version=%s,
+            report_contract_version=%s, report_sha256=%s,
+            candidate_snapshot_sha256=%s, reviewer_input_fingerprint=%s,
+            updated_at=%s WHERE job_id=%s RETURNING *""",
+            (report_path, decision_contract_version, report_contract_version,
+             report_sha256, candidate_snapshot_sha256, reviewer_input_fingerprint,
+             _now(), job_id))
+        return dict(cur.fetchone())
+
 
 def _connect() -> "psycopg2.extensions.connection":
     return psycopg2.connect(_DATABASE_URL)
@@ -327,6 +477,145 @@ def save_candidate_snapshot(job_id: str, payload: dict[str, Any]) -> None:
             """,
             (job_id, psycopg2.extras.Json(payload), now, now),
         )
+
+
+def save_job_artifact(
+    job_id: str,
+    kind: str,
+    payload: bytes,
+    *,
+    filename: str,
+    content_type: str,
+    report_sha256: str,
+    candidate_snapshot_sha256: str,
+    artifact_id: Optional[str] = None,
+) -> dict[str, Any]:
+    """Persist one immutable dossier artifact.
+
+    Repeating an interrupted finalization with byte-for-byte identical content is
+    safe.  Supplying different bytes for an existing logical artifact is not:
+    the caller must create a new job rather than silently rewrite evidence.
+    """
+    if kind not in ARTIFACT_KINDS:
+        raise ValueError(f"unsupported artifact kind: {kind}")
+    if not isinstance(payload, bytes):
+        raise ValueError("artifact payload must be bytes")
+    if not filename or "/" in filename or "\\" in filename or "\x00" in filename:
+        raise ValueError("artifact filename must be a basename")
+    if not content_type or "\r" in content_type or "\n" in content_type:
+        raise ValueError("invalid artifact content type")
+    if len(payload) > _ARTIFACT_MAX_BYTES[kind]:
+        raise ValueError(f"{kind} artifact exceeds maximum size")
+    content_sha256 = hashlib.sha256(payload).hexdigest()
+    artifact_id = artifact_id or content_sha256
+    if artifact_id != content_sha256:
+        # Artifact URLs use a content-addressed ID.  Permitting an unrelated ID
+        # would make an immutable cache URL claim the wrong bytes.
+        raise ValueError("artifact_id must equal payload SHA-256")
+    if len(report_sha256) != 64 or len(candidate_snapshot_sha256) != 64:
+        raise ValueError("artifact provenance hashes must be SHA-256 values")
+
+    with _conn(lock=True) as conn, conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        cur.execute("SELECT job_id FROM jobs WHERE job_id = %s FOR UPDATE", (job_id,))
+        if not cur.fetchone():
+            raise ValueError(f"job not found: {job_id}")
+        # The partial unique index in the DDL is the cross-instance guarantee;
+        # this lock produces a useful immutable-content error before an insert.
+        if kind in _SINGLETON_ARTIFACT_KINDS:
+            cur.execute(
+                """SELECT * FROM job_artifacts WHERE job_id = %s AND kind = %s
+                   FOR UPDATE""",
+                (job_id, kind),
+            )
+        else:
+            cur.execute(
+                """SELECT * FROM job_artifacts
+                   WHERE job_id = %s AND kind = %s AND artifact_id = %s FOR UPDATE""",
+                (job_id, kind, artifact_id),
+            )
+        existing = cur.fetchone()
+        if existing:
+            existing = dict(existing)
+            if (existing["content_sha256"] != content_sha256
+                    or bytes(existing["payload"]) != payload
+                    or existing["report_sha256"] != report_sha256
+                    or existing["candidate_snapshot_sha256"]
+                    != candidate_snapshot_sha256):
+                raise ValueError("immutable artifact already exists with different content")
+            return _artifact_metadata(existing)
+        cur.execute(
+            """INSERT INTO job_artifacts
+               (job_id, kind, artifact_id, content_sha256, filename, content_type,
+                size_bytes, payload, report_sha256, candidate_snapshot_sha256, created_at)
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+               RETURNING *""",
+            (job_id, kind, artifact_id, content_sha256, filename, content_type,
+             len(payload), psycopg2.Binary(payload), report_sha256,
+             candidate_snapshot_sha256, _now()),
+        )
+        saved = cur.fetchone()
+    return _artifact_metadata(dict(saved))
+
+
+def _artifact_metadata(row: dict[str, Any]) -> dict[str, Any]:
+    """Return public-safe artifact metadata; never leak PostgreSQL BYTEA."""
+    return {key: row[key] for key in (
+        "job_id", "kind", "artifact_id", "content_sha256", "filename",
+        "content_type", "size_bytes", "report_sha256",
+        "candidate_snapshot_sha256", "created_at",
+    )}
+
+
+def get_job_artifact(
+    job_id: str, kind: str, artifact_id: Optional[str] = None,
+) -> Optional[dict[str, Any]]:
+    """Fetch one artifact including payload for an API response."""
+    if kind not in ARTIFACT_KINDS:
+        return None
+    if kind in _SINGLETON_ARTIFACT_KINDS:
+        artifact_id = None
+    with _conn() as conn, conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        if artifact_id:
+            cur.execute(
+                """SELECT * FROM job_artifacts WHERE job_id = %s AND kind = %s
+                   AND artifact_id = %s""", (job_id, kind, artifact_id),
+            )
+        else:
+            cur.execute(
+                "SELECT * FROM job_artifacts WHERE job_id = %s AND kind = %s",
+                (job_id, kind),
+            )
+        row = cur.fetchone()
+    return dict(row) if row else None
+
+
+def list_job_artifacts(job_id: str, kind: Optional[str] = None) -> list[dict[str, Any]]:
+    """List public metadata for a job's durable artifacts, without payloads."""
+    if kind is not None and kind not in ARTIFACT_KINDS:
+        return []
+    with _conn() as conn, conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        if kind:
+            cur.execute(
+                "SELECT * FROM job_artifacts WHERE job_id = %s AND kind = %s "
+                "ORDER BY created_at, artifact_id", (job_id, kind),
+            )
+        else:
+            cur.execute(
+                "SELECT * FROM job_artifacts WHERE job_id = %s "
+                "ORDER BY kind, created_at, artifact_id", (job_id,),
+            )
+        rows = cur.fetchall()
+    return [_artifact_metadata(dict(row)) for row in rows]
+
+
+# Compact aliases retain a natural API for callers/tests while keeping the
+# explicit names above clear at call sites.
+save_artifact = save_job_artifact
+get_artifact = get_job_artifact
+list_artifacts = list_job_artifacts
 
 
 def claim_job_for_review(job_id: str) -> Optional[dict[str, Any]]:

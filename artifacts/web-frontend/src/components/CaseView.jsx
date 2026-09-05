@@ -92,6 +92,7 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
   const status = job.status;
   const canPrint =
     status === "completed" || status === "awaiting_review" || status === "reviewing";
+  const artifacts = job.artifacts || {};
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 fade-in">
@@ -106,15 +107,41 @@ export default function CaseView({ job, cost, onBack, onResume, resuming }) {
         </button>
         {canPrint && (
           <a
-            href={`/api/runs/${encodeURIComponent(job.job_id)}/report.pdf`}
+            href={artifacts.report_pdf?.url || `/api/runs/${encodeURIComponent(job.job_id)}/report.pdf`}
             className="btn btn-ghost btn-sm ml-auto"
           >
             Download PDF
           </a>
         )}
+        {artifacts.evidence_zip?.url && (
+          <a
+            href={artifacts.evidence_zip.url}
+            className="btn btn-ghost btn-sm"
+          >
+            Download evidence package
+          </a>
+        )}
       </div>
 
       <CaseHeader job={job} cost={cost} />
+      {artifacts.cifs?.length > 0 && (
+        <Paper className="mb-6">
+          <div className="p-4 text-sm">
+            <div className="font-semibold" style={{ color: "var(--ink)" }}>
+              Durable structure artifacts
+            </div>
+            <ul className="mt-2 list-disc pl-5">
+              {artifacts.cifs.map((artifact) => (
+                <li key={artifact.artifact_id}>
+                  <a href={artifact.url} className="underline">
+                    View/Download CIF: {artifact.filename}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Paper>
+      )}
 
       {!job.actionable &&
         (status === "awaiting_review" || status === "completed") && (

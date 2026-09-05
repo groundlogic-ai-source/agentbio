@@ -75,11 +75,35 @@ class ActionableJobProvenanceTests(unittest.TestCase):
             "candidate_snapshot_sha256": snapshot_hash,
             "reviewer_input_fingerprint": "fingerprint-1",
         }
+        pdf = b"%PDF-current"
+        bundle = main._deterministic_evidence_zip(
+            "job-current", report_bytes, pdf, self.snapshot, [],
+            self.job["report_sha256"], snapshot_hash)
+        self.artifacts = {
+            "report_md": {"payload": report_bytes,
+                "content_type": "text/markdown; charset=utf-8",
+                "content_sha256": self.job["report_sha256"],
+                "report_sha256": self.job["report_sha256"],
+                "candidate_snapshot_sha256": snapshot_hash},
+            "report_pdf": {"payload": pdf,
+                "content_type": "application/pdf",
+                "content_sha256": hashlib.sha256(pdf).hexdigest(),
+                "report_sha256": self.job["report_sha256"],
+                "candidate_snapshot_sha256": snapshot_hash},
+            "evidence_zip": {"payload": bundle,
+                "content_type": "application/zip",
+                "content_sha256": hashlib.sha256(bundle).hexdigest(),
+                "report_sha256": self.job["report_sha256"],
+                "candidate_snapshot_sha256": snapshot_hash},
+        }
 
     def _resume(self, job, snapshot):
         with mock.patch.object(main.jobs_db, "get_job", return_value=job), \
              mock.patch.object(main.jobs_db, "get_candidate_snapshot",
                                return_value=snapshot), \
+              mock.patch.object(main.jobs_db, "get_job_artifact",
+                                side_effect=lambda _job, kind, *_id:
+                                self.artifacts.get(kind)), \
              mock.patch.object(main, "resume_run",
                                return_value={"decision": "approve"}) as resume, \
              mock.patch.object(main.jobs_db, "claim_job_for_review",
@@ -114,7 +138,7 @@ class ActionableJobProvenanceTests(unittest.TestCase):
         with self.assertRaises(HTTPException) as caught:
             self._resume(tampered, self.snapshot)
         self.assertEqual(caught.exception.status_code, 409)
-        self.assertIn("report hash", str(caught.exception.detail))
+        self.assertIn("provenance", str(caught.exception.detail))
 
     def test_report_binding_mismatch_cannot_approve(self):
         with open(self.path, "wb") as fh:
@@ -128,7 +152,7 @@ class ActionableJobProvenanceTests(unittest.TestCase):
         with self.assertRaises(HTTPException) as caught:
             self._resume(rebound, self.snapshot)
         self.assertEqual(caught.exception.status_code, 409)
-        self.assertIn("exact candidate snapshot binding",
+        self.assertIn("report hash",
                       str(caught.exception.detail))
 
     def test_missing_snapshot_cannot_approve(self):
@@ -471,13 +495,13 @@ class MultiCandidateApiIntegrationTests(unittest.TestCase):
                 main.jobs_db, "get_candidate_snapshot",
                 return_value=reviewed,
             ), mock.patch.object(
-                main.jobs_db, "finalize_job_report"
+                main.jobs_db, "finalize_job_artifact_bundle"
             ) as finalize:
                 metadata = main._persist_actionable_report(
                     "job-three", reports[0]["path"])
             finalize.assert_called_once()
-            self.assertEqual(metadata["report_path"], reports[0]["path"])
-            with open(metadata["report_path"], encoding="utf-8") as fh:
+            self.assertEqual(metadata["report_path"], "artifact://job-three/report.md")
+            with open(reports[0]["path"], encoding="utf-8") as fh:
                 report_text = fh.read()
             self.assertIn("Candidate snapshot SHA-256", report_text)
             self.assertIn("# Top dossier", report_text)
@@ -493,6 +517,10 @@ class MultiCandidateApiIntegrationTests(unittest.TestCase):
                  mock.patch.object(
                      main.jobs_db, "get_candidate_snapshot",
                      return_value=reviewed), \
+                 mock.patch.object(main, "_actionability",
+                                   return_value={"actionable": True,
+                                                 "stale_policy": None,
+                                                 "stale_reasons": []}), \
                  mock.patch.object(
                      main.jobs_db, "claim_job_for_review",
                      return_value={**job, "status": "reviewing"}), \

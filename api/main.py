@@ -15,14 +15,19 @@ Run:
 
 import hashlib
 import hmac
+import ipaddress
+import io
 import json
 import os
 import re
+import stat
 import subprocess
 import sys
 import threading
+import zipfile
 from datetime import datetime, timezone
 from typing import Any, Optional
+from urllib.parse import urlparse
 
 import sweep_manager
 
@@ -72,6 +77,8 @@ _JOB_REPORT_ROOT = os.path.join(
 _STALE_POLICY = (
     "Superseded policy snapshot — historical only — cannot be approved."
 )
+_DEFAULT_PUBLIC_APP_URL = "https://agentbio.groundlogic.ai"
+_SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
 
 
 def _job_report_path(job_id: str) -> str:
@@ -83,6 +90,286 @@ def _job_report_path(job_id: str) -> str:
 
 def _snapshot_binding_line(snapshot_sha256: str) -> str:
     return f"Candidate snapshot SHA-256: `{snapshot_sha256}`"
+
+
+def _public_origin() -> str:
+    """Return only the verified canonical HTTPS origin, never request headers."""
+    value = os.environ.get("PUBLIC_APP_URL", _DEFAULT_PUBLIC_APP_URL)
+    if not value or value != value.strip() or any(
+            ch.isspace() or ord(ch) < 32 for ch in value):
+        raise RuntimeError("PUBLIC_APP_URL must be an absolute HTTPS origin without path/query")
+    try:
+        parsed = urlparse(value)
+        hostname = parsed.hostname
+        port = parsed.port  # forces malformed/non-numeric/range validation
+    except ValueError as exc:
+        raise RuntimeError(
+            "PUBLIC_APP_URL must contain a valid hostname and port") from exc
+    valid_host = False
+    if hostname:
+        try:
+            ipaddress.ip_address(hostname)
+            valid_host = True
+        except ValueError:
+            labels = hostname.rstrip(".").split(".")
+            valid_host = bool(labels) and all(
+                re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?", label)
+                for label in labels)
+    if (parsed.scheme != "https" or not parsed.netloc or not valid_host
+            or parsed.username
+            or parsed.password or parsed.path
+            or parsed.params or parsed.query or parsed.fragment):
+        raise RuntimeError("PUBLIC_APP_URL must be an absolute HTTPS origin without path/query")
+    # urlparse has now validated port and bracketed IPv6. Preserve an explicitly
+    # configured valid port in the canonical origin.
+    return f"https://{parsed.netloc}" if port is not None else f"https://{parsed.netloc}"
+
+
+def _artifact_url(job_id: str, kind: str, artifact_id: Optional[str] = None) -> str:
+    public_kind = {"report_md": "report.md", "report_pdf": "report.pdf",
+                   "evidence_zip": "evidence.zip"}.get(kind, kind)
+    path = f"/api/runs/{job_id}/artifacts/{public_kind}"
+    if kind == "cif":
+        if not artifact_id or not _SHA256_RE.fullmatch(artifact_id):
+            raise ValueError("CIF artifact id must be a SHA-256")
+        path += f"/{artifact_id}"
+    return _public_origin() + path
+
+
+def _safe_local_cif(filename: str) -> Optional[tuple[str, bytes]]:
+    """Read one CIF from the owned cache without following names or symlinks."""
+    if (not filename or os.path.basename(filename) != filename or "\x00" in filename
+            or not filename.lower().endswith(".cif")):
+        return None
+    root = os.path.realpath(_STRUCTURES_DIR)
+    path = os.path.join(root, filename)
+    try:
+        if os.path.islink(path) or not os.path.isfile(path):
+            return None
+        if os.path.commonpath([root, os.path.realpath(path)]) != root:
+            return None
+        size = os.path.getsize(path)
+        if size < 1 or size > 10 * 1024 * 1024:
+            return None
+        with open(path, "rb") as fh:
+            value = fh.read(10 * 1024 * 1024 + 1)
+        return (filename, value) if len(value) == size else None
+    except OSError:
+        return None
+
+
+def _deterministic_evidence_zip(
+        job_id: str, report: bytes, pdf: bytes, snapshot: dict[str, Any],
+        cifs: list[dict[str, Any]], report_sha256: str, snapshot_sha256: str,
+) -> bytes:
+    """Create a reproducible evidence package; ZIP metadata never uses wall time."""
+    entries: list[tuple[str, bytes, str]] = [
+        ("report.md", report, "text/markdown; charset=utf-8"),
+        ("report.pdf", pdf, "application/pdf"),
+        ("candidate_snapshot.json", canonical_json_bytes(snapshot), "application/json"),
+    ]
+    for cif in sorted(cifs, key=lambda item: str(item["artifact_id"])):
+        entries.append((f"cif/{cif['filename']}", bytes(cif["payload"]), cif["content_type"]))
+    manifest = {
+        "schema_version": "agentbio-evidence-bundle-v1",
+        "job_id": job_id,
+        "production_dossier_url": _artifact_url(job_id, "report_pdf"),
+        "report_sha256": report_sha256,
+        "candidate_snapshot_sha256": snapshot_sha256,
+        "pdf_sha256": hashlib.sha256(pdf).hexdigest(),
+        "files": [
+            {"filename": "report.md", "content_type": "text/markdown; charset=utf-8",
+             "size_bytes": len(report), "sha256": report_sha256},
+            {"filename": "report.pdf", "content_type": "application/pdf",
+             "size_bytes": len(pdf), "sha256": hashlib.sha256(pdf).hexdigest()},
+            {"filename": "candidate_snapshot.json", "content_type": "application/json",
+             "size_bytes": len(canonical_json_bytes(snapshot)),
+             "sha256": snapshot_sha256},
+        ],
+        "cifs": [{
+            "artifact_id": item["artifact_id"], "sha256": item["content_sha256"],
+            "filename": item["filename"], "content_type": item["content_type"],
+            "size_bytes": item["size_bytes"],
+        } for item in sorted(cifs, key=lambda item: str(item["artifact_id"]))],
+        "policy_contract_versions": {
+            "decision": DECISION_CONTRACT_VERSION,
+            "report": REPORT_CONTRACT_VERSION,
+            "reviewer_formula": REVIEWER_FORMULA_VERSION,
+            "safety": SAFETY_SCHEMA_VERSION,
+            "literature": LITERATURE_SCHEMA_VERSION,
+        },
+    }
+    entries.append(("manifest.json", canonical_json_bytes(manifest), "application/json"))
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED,
+                         compresslevel=9, strict_timestamps=True) as archive:
+        for name, payload, _content_type in entries:
+            info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = (stat.S_IFREG | 0o644) << 16
+            archive.writestr(info, payload, compress_type=zipfile.ZIP_DEFLATED,
+                             compresslevel=9)
+    return out.getvalue()
+
+
+def _rewrite_structure_artifacts(
+        report_text: str, job_id: str) -> tuple[str, list[dict[str, Any]]]:
+    """Replace every transient structure reference and collect safe CIF bytes."""
+    marker = "Structure artifact unavailable in frozen package."
+    unavailable = False
+    by_digest: dict[str, dict[str, Any]] = {}
+
+    def local_tail(tail: str) -> str:
+        nonlocal unavailable
+        filename = tail.split("?", 1)[0].split("#", 1)[0]
+        if not re.fullmatch(r"[A-Za-z0-9._-]+\.cif", filename, re.IGNORECASE):
+            unavailable = True
+            return marker
+        local = _safe_local_cif(filename)
+        if not local:
+            unavailable = True
+            return marker
+        name, payload = local
+        digest = hashlib.sha256(payload).hexdigest()
+        by_digest.setdefault(digest, {
+            "artifact_id": digest, "filename": name, "payload": payload,
+            "content_sha256": digest, "content_type": "chemical/x-cif",
+            "size_bytes": len(payload),
+        })
+        return _artifact_url(job_id, "cif", digest)
+
+    def local_link(match: re.Match[str]) -> str:
+        replacement = local_tail(match.group(1).split("/api/structures/", 1)[1])
+        return marker if replacement == marker else f"[Download durable CIF]({replacement})"
+
+    report_text = re.sub(
+        r"\[[^\]]*\]\(((?:https?://[^/\s)]+)?/api/structures/[^)]*)\)",
+        local_link, report_text, flags=re.IGNORECASE)
+    report_text = re.sub(
+        r"(?:https?://[^/\s)\]]+)?/api/structures/([^\s)\]>'\"]*)",
+        lambda match: local_tail(match.group(1)), report_text, flags=re.IGNORECASE)
+
+    def remote(_match: re.Match[str]) -> str:
+        nonlocal unavailable
+        unavailable = True
+        return marker
+
+    report_text = re.sub(
+        r"\[[^\]]*(?:cif|structure)[^\]]*\]\(https?://[^)]+\)",
+        remote, report_text, flags=re.IGNORECASE)
+    report_text = re.sub(
+        r"https?://[^\s)\]]+\.cif(?:\?[^\s)\]]*)?",
+        remote, report_text, flags=re.IGNORECASE)
+    if unavailable:
+        report_text += f"\n\n> **{marker}**\n"
+    return report_text, sorted(by_digest.values(), key=lambda row: row["artifact_id"])
+
+
+def _validate_evidence_zip(
+    job: dict[str, Any], snapshot: dict[str, Any], report: dict[str, Any],
+    pdf: dict[str, Any], evidence: dict[str, Any], cifs: list[dict[str, Any]],
+) -> None:
+    """Deeply verify the closed evidence package against database authorities."""
+    raw = bytes(evidence["payload"])
+    if len(raw) > 100 * 1024 * 1024:
+        raise ValueError("evidence ZIP exceeds limit")
+    with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+        infos = archive.infolist()
+        if len(infos) > 128 or sum(i.file_size for i in infos) > 150 * 1024 * 1024:
+            raise ValueError("evidence ZIP expansion exceeds limit")
+        names = [i.filename for i in infos]
+        if len(names) != len(set(names)):
+            raise ValueError("duplicate ZIP entry")
+        for info in infos:
+            name = info.filename
+            if (not name or name.startswith(("/", "\\"))
+                    or "\\" in name or any(ord(ch) < 32 for ch in name)
+                    or ".." in name.split("/") or info.flag_bits & 0x1):
+                raise ValueError("unsafe ZIP entry")
+        manifest_raw = archive.read("manifest.json")
+        manifest = json.loads(manifest_raw)
+        expected_contracts = {
+            "decision": DECISION_CONTRACT_VERSION,
+            "report": REPORT_CONTRACT_VERSION,
+            "reviewer_formula": REVIEWER_FORMULA_VERSION,
+            "safety": SAFETY_SCHEMA_VERSION,
+            "literature": LITERATURE_SCHEMA_VERSION,
+        }
+        if (manifest.get("schema_version") != "agentbio-evidence-bundle-v1"
+                or manifest.get("job_id") != job.get("job_id")
+                or manifest.get("production_dossier_url")
+                != _artifact_url(str(job.get("job_id")), "report_pdf")
+                or manifest.get("report_sha256") != job.get("report_sha256")
+                or manifest.get("candidate_snapshot_sha256")
+                != job.get("candidate_snapshot_sha256")
+                or manifest.get("pdf_sha256") != pdf.get("content_sha256")
+                or manifest.get("policy_contract_versions") != expected_contracts):
+            raise ValueError("manifest provenance mismatch")
+        for artifact in (report, pdf, evidence, *cifs):
+            payload = bytes(artifact["payload"])
+            if (hashlib.sha256(payload).hexdigest() != artifact["content_sha256"]
+                    or len(payload) != artifact.get("size_bytes", len(payload))
+                    or artifact.get("report_sha256") != job.get("report_sha256")
+                    or artifact.get("candidate_snapshot_sha256")
+                    != job.get("candidate_snapshot_sha256")):
+                raise ValueError("database artifact binding mismatch")
+        expected = {
+            "report.md": (bytes(report["payload"]), report["content_type"]),
+            "report.pdf": (bytes(pdf["payload"]), pdf["content_type"]),
+            "candidate_snapshot.json": (
+                canonical_json_bytes(snapshot), "application/json"),
+        }
+        cif_manifest = manifest.get("cifs")
+        if not isinstance(cif_manifest, list):
+            raise ValueError("CIF manifest missing")
+        declared_cif_ids = [row.get("artifact_id") for row in cif_manifest
+                            if isinstance(row, dict)]
+        declared_cif_names = [row.get("filename") for row in cif_manifest
+                              if isinstance(row, dict)]
+        if (len(declared_cif_ids) != len(cif_manifest)
+                or len(declared_cif_ids) != len(set(declared_cif_ids))
+                or len(declared_cif_names) != len(set(declared_cif_names))):
+            raise ValueError("duplicate CIF declaration")
+        by_id = {row["artifact_id"]: row for row in cifs}
+        if (len(by_id) != len(cifs)
+                or set(declared_cif_ids) != set(by_id)
+                or {row["filename"] for row in cifs} != set(declared_cif_names)):
+            raise ValueError("CIF declaration mismatch")
+        for declared in cif_manifest:
+            db = by_id[declared["artifact_id"]]
+            name = f"cif/{db['filename']}"
+            if (declared.get("filename") != db["filename"]
+                    or declared.get("content_type") != db["content_type"]
+                    or declared.get("sha256") != db["content_sha256"]
+                    or declared.get("size_bytes") != db["size_bytes"]):
+                raise ValueError("CIF metadata mismatch")
+            expected[name] = (bytes(db["payload"]), db["content_type"])
+        required_names = set(expected) | {"manifest.json"}
+        if set(names) != required_names:
+            raise ValueError("unexpected or missing ZIP entry")
+        file_manifest = manifest.get("files")
+        if not isinstance(file_manifest, list):
+            raise ValueError("file manifest missing")
+        file_names = [row.get("filename") for row in file_manifest
+                      if isinstance(row, dict)]
+        if (len(file_names) != len(file_manifest)
+                or len(file_names) != len(set(file_names))):
+            raise ValueError("duplicate file declaration")
+        declared_files = {row.get("filename"): row for row in file_manifest}
+        if set(declared_files) != {"report.md", "report.pdf", "candidate_snapshot.json"}:
+            raise ValueError("file declarations invalid")
+        for name, (payload, content_type) in expected.items():
+            actual = archive.read(name)
+            if actual != payload:
+                raise ValueError("ZIP entry differs from database artifact")
+            if name in declared_files:
+                declared = declared_files[name]
+                if (declared.get("sha256") != hashlib.sha256(actual).hexdigest()
+                        or declared.get("size_bytes") != len(actual)
+                        or declared.get("content_type") != content_type):
+                    raise ValueError("file manifest hash/size/type mismatch")
+        if archive.read("candidate_snapshot.json") != canonical_json_bytes(snapshot):
+            raise ValueError("snapshot JSON is noncanonical")
 
 
 def _persist_actionable_report(
@@ -131,31 +418,14 @@ def _persist_actionable_report(
         if generated_report.startswith(binding_prefix)
         else f"{binding_prefix}{generated_report}".encode("utf-8")
     )
-    report_path = _job_report_path(job_id)
-    os.makedirs(os.path.dirname(report_path), exist_ok=True)
-    if os.path.exists(report_path):
-        with open(report_path, "rb") as fh:
-            if fh.read() != report_bytes:
-                raise RuntimeError(
-                    "Immutable job-scoped report already exists with different "
-                    "content.")
-    temp_path = f"{report_path}.{threading.get_ident()}.tmp"
-    with open(temp_path, "wb") as fh:
-        fh.write(report_bytes)
-        fh.flush()
-        os.fsync(fh.fileno())
-    try:
-        os.link(temp_path, report_path)
-    except FileExistsError:
-        with open(report_path, "rb") as fh:
-            if fh.read() != report_bytes:
-                raise RuntimeError(
-                    "Immutable job-scoped report race produced different "
-                    "content.")
-    finally:
-        os.unlink(temp_path)
+    # Expiring/local structure URLs must never survive inside an immutable
+    # dossier.  Persist only safely read cache files and replace their links
+    # with content-addressed durable artifact URLs.
+    report_text = report_bytes.decode("utf-8")
+    report_text, cif_rows = _rewrite_structure_artifacts(report_text, job_id)
+    report_bytes = report_text.encode("utf-8")
     metadata = {
-        "report_path": report_path,
+        "report_path": f"artifact://{job_id}/report.md",
         "decision_contract_version": DECISION_CONTRACT_VERSION,
         "report_contract_version": REPORT_CONTRACT_VERSION,
         "report_sha256": hashlib.sha256(report_bytes).hexdigest(),
@@ -163,21 +433,30 @@ def _persist_actionable_report(
         "reviewer_input_fingerprint":
             snapshot.get("reviewer_input_fingerprint"),
     }
-    try:
-        jobs_db.finalize_job_report(job_id, **metadata)
-    except Exception:
-        # If the snapshot changed in the narrow pre-finalization window, do not
-        # leave an unbound file blocking a safe retry. Remove only our exact
-        # bytes; never remove a report another finalizer may have established.
-        try:
-            with open(report_path, "rb") as fh:
-                owns_unbound_file = fh.read() == report_bytes
-            current_job = jobs_db.get_job(job_id)
-            if owns_unbound_file and not (current_job or {}).get("report_sha256"):
-                os.unlink(report_path)
-        except OSError:
-            pass
-        raise
+    # Generate every byte before the single database transaction.  There is
+    # never a committed partial artifact set.
+    frozen_job = {"job_id": job_id, "disease_name": snapshot.get("disease_name"),
+                  "report_sha256": metadata["report_sha256"]}
+    pdf = render_case_pdf(report_text, frozen_job)
+    evidence = _deterministic_evidence_zip(
+        job_id, report_bytes, pdf, snapshot, cif_rows,
+        metadata["report_sha256"], snapshot_hash)
+    jobs_db.finalize_job_artifact_bundle(
+            job_id, report_path=f"artifact://{job_id}/report.md",
+            **{key: metadata[key] for key in (
+                "decision_contract_version", "report_contract_version",
+                "report_sha256", "candidate_snapshot_sha256",
+                "reviewer_input_fingerprint")},
+            artifacts=[
+                {"kind": "report_md", "payload": report_bytes,
+                 "filename": "report.md", "content_type": "text/markdown; charset=utf-8"},
+                {"kind": "report_pdf", "payload": pdf, "filename": "report.pdf",
+                 "content_type": "application/pdf"},
+                {"kind": "evidence_zip", "payload": evidence, "filename": "evidence.zip",
+                 "content_type": "application/zip"},
+                *[{"kind": "cif", "payload": row["payload"], "filename": row["filename"],
+                   "content_type": row["content_type"]} for row in cif_rows],
+            ])
     return metadata
 
 
@@ -246,28 +525,15 @@ def _actionability(job: dict[str, Any]) -> dict[str, Any]:
                 actual_snapshot_hash, str(job.get("candidate_snapshot_sha256"))):
             reasons.append("candidate snapshot hash is missing or mismatched")
 
-    report_path = job.get("report_path")
+    report_artifact = None
     try:
-        expected_path = os.path.abspath(_job_report_path(str(job["job_id"])))
-        actual_path = os.path.abspath(str(report_path)) if report_path else ""
-        resolved_path = os.path.realpath(actual_path) if actual_path else ""
-        resolved_root = os.path.realpath(_JOB_REPORT_ROOT)
-        path_is_scoped = (
-            actual_path == expected_path
-            and not os.path.islink(actual_path)
-            and os.path.commonpath([resolved_path, resolved_root])
-            == resolved_root
-        )
-    except (KeyError, ValueError):
-        expected_path, actual_path, path_is_scoped = "", "", False
-    if not path_is_scoped:
-        reasons.append("report is not an immutable job-scoped report")
-    report_bytes: Optional[bytes] = None
-    if path_is_scoped and os.path.isfile(actual_path):
-        with open(actual_path, "rb") as fh:
-            report_bytes = fh.read()
-    else:
-        reasons.append("job-scoped report snapshot is missing")
+        report_artifact = jobs_db.get_job_artifact(str(job.get("job_id")), "report_md")
+    except Exception:
+        pass
+    if not report_artifact:
+        reasons.append("persisted report Markdown artifact is missing")
+    report_bytes: Optional[bytes] = (bytes(report_artifact["payload"])
+                                     if report_artifact else None)
     if report_bytes is not None:
         actual_hash = hashlib.sha256(report_bytes).hexdigest()
         if not job.get("report_sha256") or not hmac.compare_digest(
@@ -284,6 +550,39 @@ def _actionability(job: dict[str, Any]) -> dict[str, Any]:
                 f"{expected_binding}\n"):
             reasons.append(
                 "report does not contain the exact candidate snapshot binding")
+    # A current dossier is actionable only when its final PDF and evidence
+    # package are durable and bind to the same frozen report/snapshot pair.
+    try:
+        pdf_artifact = jobs_db.get_job_artifact(str(job.get("job_id")), "report_pdf")
+        zip_artifact = jobs_db.get_job_artifact(str(job.get("job_id")), "evidence_zip")
+    except Exception:
+        pdf_artifact = zip_artifact = None
+    for label, artifact in (("persisted report PDF", pdf_artifact),
+                            ("persisted evidence ZIP", zip_artifact)):
+        if not artifact:
+            reasons.append(f"{label} is missing")
+        elif (artifact.get("report_sha256") != job.get("report_sha256")
+              or artifact.get("candidate_snapshot_sha256")
+              != job.get("candidate_snapshot_sha256")
+              or hashlib.sha256(bytes(artifact.get("payload") or b"")).hexdigest()
+              != artifact.get("content_sha256")):
+            reasons.append(f"{label} provenance is mismatched")
+    if zip_artifact:
+        try:
+            if not (snapshot and report_artifact and pdf_artifact):
+                raise ValueError("bound authorities missing")
+            cif_artifacts = []
+            for metadata in jobs_db.list_job_artifacts(
+                    str(job.get("job_id")), "cif"):
+                artifact = jobs_db.get_job_artifact(
+                    str(job.get("job_id")), "cif", metadata["artifact_id"])
+                if artifact:
+                    cif_artifacts.append(artifact)
+            _validate_evidence_zip(job, snapshot, report_artifact, pdf_artifact,
+                                   zip_artifact, cif_artifacts)
+        except (KeyError, OSError, TypeError, ValueError, json.JSONDecodeError,
+                zipfile.BadZipFile):
+            reasons.append("evidence ZIP manifest is invalid")
     return {
         "actionable": not reasons,
         "stale_policy": None if not reasons else _STALE_POLICY,
@@ -678,7 +977,21 @@ def get_run(job_id: str) -> dict[str, Any]:
         job["retryable"] = job["status"] in (
             "source_unavailable", "degraded_unscorable")
     if job["status"] in ("awaiting_review", "completed"):
-        job["report"] = _read_report(job.get("report_path"))
+        report_artifact = jobs_db.get_job_artifact(job_id, "report_md")
+        job["report"] = (bytes(report_artifact["payload"]).decode("utf-8")
+                         if report_artifact else _read_report(job.get("report_path")))
+    artifacts = jobs_db.list_job_artifacts(job_id)
+    artifact_view: dict[str, Any] = {"cifs": []}
+    for artifact in artifacts:
+        item = dict(artifact)
+        item["url"] = _artifact_url(
+            job_id, item["kind"],
+            item["artifact_id"] if item["kind"] == "cif" else None)
+        if item["kind"] == "cif":
+            artifact_view["cifs"].append(item)
+        else:
+            artifact_view[item["kind"]] = item
+    job["artifacts"] = artifact_view
     job.update(_actionability(job))
     structure_accounted = (
         job.get("current_stage") in {
@@ -714,6 +1027,9 @@ def download_case_report_pdf(job_id: str) -> Response:
     job = jobs_db.get_job(job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="job not found")
+    artifact = jobs_db.get_job_artifact(job_id, "report_pdf")
+    if artifact:
+        return _artifact_response(artifact)
     report = _read_report(job.get("report_path"))
     if not report:
         raise HTTPException(status_code=404, detail="persisted report snapshot not found")
@@ -746,6 +1062,43 @@ def download_case_report_pdf(job_id: str) -> Response:
             "Cache-Control": "private, no-store",
         },
     )
+
+
+def _artifact_response(artifact: dict[str, Any]) -> Response:
+    """Serve immutable database bytes with content-addressed HTTP semantics."""
+    filename = re.sub(r'[^A-Za-z0-9._-]', "_", str(artifact["filename"]))
+    return Response(
+        content=bytes(artifact["payload"]),
+        media_type=str(artifact["content_type"]),
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "X-Content-Type-Options": "nosniff",
+            "ETag": f'"{artifact["content_sha256"]}"',
+            "Cache-Control": "public,max-age=31536000,immutable",
+        },
+    )
+
+
+@app.get("/api/runs/{job_id}/artifacts/{kind}")
+def download_artifact(job_id: str, kind: str) -> Response:
+    kind = {"report.md": "report_md", "report.pdf": "report_pdf",
+            "evidence.zip": "evidence_zip"}.get(kind, kind)
+    if kind not in ("report_md", "report_pdf", "evidence_zip"):
+        raise HTTPException(status_code=404, detail="artifact kind not found")
+    artifact = jobs_db.get_job_artifact(job_id, kind)
+    if not artifact:
+        raise HTTPException(status_code=404, detail="artifact not found")
+    return _artifact_response(artifact)
+
+
+@app.get("/api/runs/{job_id}/artifacts/cif/{artifact_id}")
+def download_cif_artifact(job_id: str, artifact_id: str) -> Response:
+    if not _SHA256_RE.fullmatch(artifact_id):
+        raise HTTPException(status_code=404, detail="artifact not found")
+    artifact = jobs_db.get_job_artifact(job_id, "cif", artifact_id)
+    if not artifact:
+        raise HTTPException(status_code=404, detail="artifact not found")
+    return _artifact_response(artifact)
 
 
 @app.post("/api/runs/{job_id}/resume")

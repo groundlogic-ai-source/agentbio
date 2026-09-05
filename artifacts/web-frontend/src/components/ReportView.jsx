@@ -5,7 +5,8 @@ import { hasTherapeuticApplicabilityDisclosure } from "../therapeuticApplicabili
 
 function SafeLink({ href, children }) {
   const value = String(href || "");
-  const isInternal = value.startsWith("/api/structures/");
+  const isInternal =
+    value.startsWith("/api/structures/") || value.startsWith("/api/runs/");
   const isWeb = /^https?:\/\//i.test(value);
   if (!isInternal && !isWeb) return <span>{children}</span>;
   return (

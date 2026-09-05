@@ -7,11 +7,15 @@ DOM, so a download is reproducible and does not depend on a client's printer.
 from __future__ import annotations
 
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from fpdf import FPDF
 from fpdf.fonts import FontFace
+
+_MARKDOWN_URL = re.compile(r"\[[^\]]+\]\((https?://[^)\s]+|/[^)\s]+)\)")
+_BARE_URL = re.compile(r"(?<!\]\()(?<!\w)(https?://[^\s<>()]+)")
 
 
 def _plain_markdown(text: str) -> str:
@@ -35,6 +39,18 @@ def _split_table_row(line: str) -> list[str]:
 def _is_table_separator(line: str) -> bool:
     cells = _split_table_row(line)
     return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells)
+
+
+def _resource_urls(markdown: str) -> list[str]:
+    """Extract URLs in first-seen order for PDF link annotations."""
+    urls: list[str] = []
+    seen: set[str] = set()
+    for match in list(_MARKDOWN_URL.finditer(markdown)) + list(_BARE_URL.finditer(markdown)):
+        url = match.group(1).rstrip(".,;:")
+        if url and url not in seen:
+            seen.add(url)
+            urls.append(url)
+    return urls
 
 
 class DossierPDF(FPDF):
@@ -72,6 +88,13 @@ def render_case_pdf(markdown: str, job: dict[str, Any]) -> bytes:
     pdf.set_keywords("AgentBio, case dossier, research hypothesis, persisted snapshot")
     pdf.set_lang("en-US")
     pdf.set_display_mode("fullwidth", "continuous")
+    # fpdf2 otherwise inserts the render wall-clock time, making an interrupted
+    # finalization produce different bytes on retry.
+    try:
+        created_at = datetime.fromisoformat(created.replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        created_at = datetime(1980, 1, 1, tzinfo=timezone.utc)
+    pdf.set_creation_date(created_at)
     pdf.add_page()
     def block(height: float, text: str) -> None:
         # fpdf2 leaves the cursor at the right edge after multi_cell; reset it
@@ -91,6 +114,7 @@ def render_case_pdf(markdown: str, job: dict[str, Any]) -> bytes:
         f"SHA-256: {job.get('report_sha256') or 'legacy snapshot; hash unavailable'}",
     )
     pdf.ln(3)
+    resource_urls = _resource_urls(markdown)
 
     lines = markdown.splitlines()
     index = 0
@@ -156,5 +180,25 @@ def render_case_pdf(markdown: str, job: dict[str, Any]) -> bytes:
         line = re.sub(r"^[-*]\s+", "", line)
         # FPDF wraps at whitespace; no character-level token splitting.
         block(4.8, prefix + _plain_markdown(line))
+
+    # Body text remains deliberately plain for reliable table/layout rendering.
+    # This section makes every resource both readable and an actual PDF URI
+    # annotation, including the dossier, evidence bundle and durable structures
+    # added during finalization.
+    if resource_urls:
+        if pdf.get_y() > pdf.h - pdf.b_margin - 30:
+            pdf.add_page()
+        pdf.ln(4)
+        pdf.set_font("DejaVu", "B", 11)
+        pdf.set_text_color(26, 27, 29)
+        block(6, "Linked resources")
+        pdf.set_font("DejaVu", "", 8)
+        pdf.set_text_color(30, 84, 145)
+        for url in resource_urls:
+            # FPDF's external link argument emits /Annots with /URI; write()
+            # wraps the visible text while preserving a clickable rectangle.
+            pdf.set_x(pdf.l_margin)
+            pdf.write(4.5, url, link=url)
+            pdf.ln(5)
 
     return bytes(pdf.output())
