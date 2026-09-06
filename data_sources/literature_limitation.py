@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import hashlib
 import re
+import unicodedata
 import xml.etree.ElementTree as ET
 from typing import Any, Callable, Optional
 
@@ -79,10 +80,17 @@ _TERM_STOPWORDS = {
 }
 
 
+def _fold_text(value: Any) -> str:
+    """Fold Unicode accents before applying ASCII-oriented token matching."""
+    return unicodedata.normalize("NFKD", str(value or "")).encode(
+        "ascii", "ignore"
+    ).decode("ascii")
+
+
 def _terms(value: Any) -> set[str]:
     return {
         token.casefold()
-        for token in re.findall(r"[A-Za-z0-9]+", str(value or ""))
+        for token in re.findall(r"[A-Za-z0-9]+", _fold_text(value))
         if len(token) >= 3 and token.casefold() not in _TERM_STOPWORDS
     }
 
@@ -94,8 +102,12 @@ def _phrase_or_term_match(
     minimum_overlap: int = 1,
     minimum_fraction: float = 0.75,
 ) -> bool:
-    normalized_text = " ".join(re.findall(r"[A-Za-z0-9]+", text)).casefold()
-    normalized_value = " ".join(re.findall(r"[A-Za-z0-9]+", value)).casefold()
+    normalized_text = " ".join(
+        re.findall(r"[A-Za-z0-9]+", _fold_text(text))
+    ).casefold()
+    normalized_value = " ".join(
+        re.findall(r"[A-Za-z0-9]+", _fold_text(value))
+    ).casefold()
     if normalized_value and normalized_value in normalized_text:
         return True
     wanted = _terms(value)
@@ -245,8 +257,12 @@ Allowed exact_use_label values:
   limitation for this exact disease/use.
 - APPLICABLE_SUPPORT: reports benefit for this exact drug (or an alias) and exact use.
 - NOT_APPLICABLE_TO_EXACT_DRUG_USE: related class/mechanistic evidence, wrong
-  drug, disease/subtype/use, or merely insufficient evidence.
+  drug, disease/subtype/use, tool/probe use rather than treatment, or merely
+  insufficient evidence. Use this when the abstract is clear but not applicable;
+  do not use UNKNOWN just because it is not an efficacy study.
 - UNKNOWN/INTEGRITY_FAILED: the supplied abstract cannot support a reliable extraction.
+  Reserve this for unreadable, internally contradictory, or genuinely ambiguous
+  text where none of the other labels can be assigned safely.
 
 Return one JSON object and nothing else:
 {{"exact_use_label":"...","quote":"exact contiguous quote from abstract or empty",
@@ -297,8 +313,10 @@ EXPLICIT_LIMITATION = explicit ineffective/failed/not recommended/no benefit/
 mechanistic limitation for the exact disease and use.
 APPLICABLE_SUPPORT = benefit for the exact drug (or an alias) and exact use.
 NOT_APPLICABLE_TO_EXACT_DRUG_USE = related class/mechanistic evidence, wrong
-drug, subtype/use, or only insufficient evidence.
+ drug, subtype/use, tool/probe use rather than treatment, or only insufficient
+ evidence. Use this for a clear but non-applicable abstract.
 UNKNOWN/INTEGRITY_FAILED = no reliable extraction can be made.
+Reserve this for unreadable, contradictory, or genuinely ambiguous text.
 
 Return one JSON object only:
 {{"findings":[{{"pmid":"retrieved PMID","exact_use_label":"...",
@@ -682,7 +700,7 @@ def check_literature_limitation(
     """Retrieve, classify, mechanically verify, and aggregate limitation evidence."""
     intended = intended_use or f"treatment of {disease_name}"
     cache_key = make_key(
-        "literature_limitation_v3_batch8_policy2",
+        "literature_limitation_v4_batch8_recovery_accent",
         drug_name, disease_name, target_symbol,
         action_type or "", mechanism_of_action or "", intended,
         sorted(drug_aliases or []),
@@ -723,6 +741,58 @@ def check_literature_limitation(
                 intended_use=intended,
                 target_symbol=target_symbol,
             )
+            # Batch classification is efficient, but a long mixed batch can
+            # cause the model to emit UNKNOWN for records it could safely mark
+            # as unrelated or for which it omitted a required verbatim quote.
+            # Retry only those rows with the stricter one-record prompt. Never
+            # turn an unresolved row into a favorable result: if recovery also
+            # returns UNKNOWN or malformed output, aggregate_findings still
+            # fails closed.
+            def _needs_record_recovery(row: dict[str, Any]) -> bool:
+                label = canonical_exact_use_label(
+                    row.get("exact_use_label")
+                    if row.get("exact_use_label") is not None
+                    else row.get("label")
+                )
+                if label == UNKNOWN_INTEGRITY_FAILED:
+                    return True
+                if label in {EXPLICIT_LIMITATION, APPLICABLE_SUPPORT}:
+                    return (
+                        len(str(row.get("quote") or "").strip()) < 20
+                        or any(
+                            row.get(key) is not True
+                            for key in (
+                                "disease_match",
+                                "use_match",
+                                "drug_or_class_match",
+                            )
+                        )
+                    )
+                return False
+
+            for index, (record, classification) in enumerate(
+                zip(records, classifications)
+            ):
+                if not _needs_record_recovery(classification):
+                    continue
+                try:
+                    recovered = classify_record(
+                        record,
+                        drug_name=drug_name,
+                        drug_class=drug_class,
+                        disease_name=disease_name,
+                        intended_use=intended,
+                        target_symbol=target_symbol,
+                    )
+                except Exception:
+                    continue
+                recovered_label = canonical_exact_use_label(
+                    recovered.get("exact_use_label")
+                    if recovered.get("exact_use_label") is not None
+                    else recovered.get("label")
+                )
+                if recovered_label != UNKNOWN_INTEGRITY_FAILED:
+                    classifications[index] = recovered
         else:
             classifications = [
                 classifier(

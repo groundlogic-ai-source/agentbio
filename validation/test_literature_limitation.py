@@ -1,5 +1,6 @@
 """Adversarial deterministic tests for the post-benchmark literature gate."""
 
+import json
 import unittest
 from unittest.mock import patch
 
@@ -230,6 +231,77 @@ class LiteratureLimitationTests(unittest.TestCase):
         )
         self.assertEqual(result["verdict"], VERDICT_FAILED)
         self.assertFalse(result["gate_cleared"])
+
+    @patch("data_sources.literature_limitation.chat_text")
+    def test_unknown_batch_row_is_retried_per_record(self, mock_chat):
+        record = _record(
+            "77",
+            abstract=(
+                "Nisoldipine improved cardiac electrophysiology in Timothy "
+                "syndrome participants in this study."
+            ),
+        )
+        mock_chat.side_effect = [
+            (
+                json.dumps({
+                    "findings": [{
+                        "pmid": "77",
+                        "exact_use_label": "UNKNOWN/INTEGRITY_FAILED",
+                        "quote": "",
+                        "disease_match": True,
+                        "subtype_match": True,
+                        "use_match": True,
+                        "drug_or_class_match": True,
+                        "reason": "Unresolved in batch.",
+                    }]
+                }),
+                "batch",
+            ),
+            (
+                json.dumps({
+                    "exact_use_label": "APPLICABLE_SUPPORT",
+                    "quote": record["abstract"],
+                    "disease_match": True,
+                    "subtype_match": True,
+                    "use_match": True,
+                    "drug_or_class_match": True,
+                    "evidence_level": "case_report_clinical",
+                    "reason": "Exact support.",
+                }),
+                "record",
+            ),
+        ]
+        result = check_literature_limitation(
+            "Nisoldipine",
+            "Timothy syndrome",
+            "CACNA1C",
+            "BLOCKER",
+            "calcium channel blocker",
+            "cardiac electrophysiology in Timothy syndrome",
+            retriever=lambda *args, **kwargs: (["q"], [record]),
+        )
+        self.assertEqual(result["support_count"], 1)
+        self.assertEqual(result["verdict"], VERDICT_NONE)
+        self.assertTrue(result["gate_cleared"])
+
+    def test_accented_disease_name_matches_unaccented_pubmed_text(self):
+        record = _record(
+            "78",
+            abstract=(
+                "Glibenclamide improved cardiac function in Cantu syndrome "
+                "participants in this study."
+            ),
+        )
+        result = _aggregate(
+            [record],
+            [_classification(record, label="SUPPORT")],
+            drug_name="glibenclamide",
+            drug_class="sulfonylurea",
+            disease_name="Cantú syndrome",
+            intended_use="cardiac function in Cantú syndrome",
+        )
+        self.assertEqual(result["support_count"], 1)
+        self.assertTrue(result["gate_cleared"])
 
     def test_negative_quote_mislabeled_support_cannot_cancel_limitation(self):
         good = _record("20", pub_types=["Practice Guideline"])

@@ -7,6 +7,7 @@ disclosure surface and must never be interpreted as candidate efficacy.
 from __future__ import annotations
 
 import re
+import unicodedata
 from typing import Any, Iterable
 
 
@@ -33,7 +34,10 @@ INTERVENTION_IDENTITIES = {
 
 
 def normalized_phrase(value: Any) -> str:
-    return " ".join(re.findall(r"[A-Za-z0-9]+", str(value or ""))).casefold()
+    folded = unicodedata.normalize("NFKD", str(value or "")).encode(
+        "ascii", "ignore"
+    ).decode("ascii")
+    return " ".join(re.findall(r"[A-Za-z0-9]+", folded)).casefold()
 
 
 def phrase_present(text: Any, value: Any) -> bool:
