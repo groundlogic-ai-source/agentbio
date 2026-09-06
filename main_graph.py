@@ -957,6 +957,11 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
             "verdict": (c.get("literature_limitation") or {}).get("verdict"),
             "source_status": (c.get("literature_limitation") or {}).get("source_status"),
             "reason": (c.get("literature_limitation") or {}).get("reason"),
+            "records_screened": (c.get("literature_limitation") or {}).get(
+                "records_screened"),
+            "classifier_integrity_failures": (
+                c.get("literature_limitation") or {}
+            ).get("classifier_integrity_failures"),
         }
         for c in shortlist
         if (c.get("literature_limitation") or {}).get("verdict") == "SEARCH_FAILED"
@@ -973,11 +978,26 @@ def eligibility_gate_node(state: PipelineState) -> dict[str, Any]:
         )
     elif not eligible and shortlist and len(classifier_failures) == len(shortlist):
         terminal_status = "degraded_unscorable"
-        reason = (
-            "No candidate can be authorized because every bounded shortlist "
-            "literature-limitation classifier search failed; retry after classifier "
-            "or source recovery."
+        integrity_only = all(
+            failure.get("source_status") == "CLASSIFIER_INTEGRITY_FAILED"
+            for failure in classifier_failures
         )
+        if integrity_only:
+            reason = (
+                "No candidate can be authorized because literature records were "
+                "retrieved for every bounded-shortlist candidate, but each "
+                "candidate had one or more classifier-integrity failures: the "
+                "returned findings could not all be mechanically reconciled with "
+                "verbatim, exact-use evidence. The result is unknown, not a "
+                "negative scientific finding; retry after classifier recovery."
+            )
+        else:
+            reason = (
+                "No candidate can be authorized because every bounded shortlist "
+                "literature-limitation search failed before producing a "
+                "mechanically valid result; retry after classifier or source "
+                "recovery."
+            )
     elif not candidates:
         terminal_status = "no_eligible_candidate"
         reason = ("No candidate compound was found for the selected target(s) "

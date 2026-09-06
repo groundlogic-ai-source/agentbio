@@ -49,6 +49,8 @@ class TestDegradedEligibility(unittest.TestCase):
         self.assertEqual(verdict["terminal_status"], "degraded_unscorable")
         self.assertTrue(verdict["retryable"])
         self.assertEqual(len(verdict["classifier_failures"]), 2)
+        self.assertIn("records were retrieved", verdict["terminal_reason"])
+        self.assertIn("classifier-integrity failures", verdict["terminal_reason"])
 
     def test_partial_source_failure_cannot_produce_no_eligible_conclusion(self):
         candidate = {
