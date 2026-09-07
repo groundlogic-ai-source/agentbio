@@ -19,6 +19,10 @@ _BARE_URL = re.compile(r"(?<!\]\()(?<!\w)(https?://[^\s<>()]+)")
 
 
 def _plain_markdown(text: str) -> str:
+    # HTML comments carry machine-readable provenance in the Markdown
+    # snapshot, but are not reader-facing content and must never appear in the
+    # PDF text layer.
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
     text = re.sub(r"!\[([^\]]*)\]\([^)]+\)", r"\1", text)
     text = re.sub(
         r"\[([^\]]+)\]\(((?:https?://|/)[^)]+)\)",

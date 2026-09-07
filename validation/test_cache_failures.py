@@ -86,7 +86,7 @@ class TestPoolAndCountCacheGates(unittest.TestCase):
     UID = "U_FAKE_SWEEP_B"
 
     def setUp(self):
-        self.pool_key = make_key("get_target_candidate_compounds_v3",
+        self.pool_key = make_key("get_target_candidate_compounds_v4",
                                  self.UID, 25, True)
         self.count_key = make_key("get_target_bioactivity_count", self.UID)
         _purge(self.pool_key, self.count_key)

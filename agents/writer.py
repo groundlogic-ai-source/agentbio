@@ -517,6 +517,35 @@ def _cif_link(cx: dict[str, Any]) -> str:
     return "n/a"
 
 
+def _affinity_provenance(candidate: dict[str, Any]) -> str:
+    """Name the persisted providers behind the quantitative affinity value."""
+    providers: set[str] = set()
+    for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
+        if not isinstance(record, dict):
+            continue
+        if record.get("qualification_status") not in (None, "", "qualified"):
+            continue
+        if record.get("source_type") != "bioactivity_assay":
+            continue
+        if str(record.get("target_evidence_scope") or "target_qualified").casefold() \
+                not in {"target_qualified", "direct"}:
+            continue
+        if str(record.get("measurement_type") or "").casefold() not in {
+            "pchembl", "pchembl_equivalent", "pchembl-equivalent",
+        }:
+            continue
+        provider = str(record.get("provider") or "").strip()
+        if provider:
+            providers.add(provider)
+    labels = {
+        "bindingdb": "BindingDB",
+        "chembl": "ChEMBL",
+        "gtopdb": "GtoPdb",
+    }
+    names = [labels.get(value.casefold(), value) for value in sorted(providers)]
+    return ", ".join(names) if names else "source not recorded"
+
+
 def _mutation_specificity_cell(candidate: dict[str, Any]) -> str:
     """
     Render the mutation-specificity DISCLOSURE flag for the evidence table.
@@ -667,7 +696,10 @@ def _efficacy_provenance_cell(candidate: dict[str, Any]) -> str:
     source = (candidate.get("score_components") or {}).get("efficacy_evidence_source")
     assay_backed = "bioactivity assay" in modalities
     if source == "legacy_pchembl_assay_confidence":
-        return "assay-backed legacy pChEMBL + assay-confidence calculation"
+        return (
+            "assay-backed legacy pChEMBL + assay-confidence calculation "
+            f"({_affinity_provenance(candidate)})"
+        )
     if modalities:
         basis = ", ".join(sorted(modalities))
         prefix = "assay-backed" if assay_backed else "not direct-assay-backed"
@@ -692,7 +724,9 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
     ) if ae else "none reported"
 
     rows = [
-        ("ChEMBL median pChEMBL affinity", _fmt(candidate.get("pchembl_value"), 2)),
+        ("Target-qualified median pChEMBL-equivalent affinity",
+         f"{_fmt(candidate.get('pchembl_value'), 2)} "
+         f"({_affinity_provenance(candidate)})"),
         ("Assay confidence score (0-9)", _fmt(candidate.get("confidence_score"))),
         ("Direct ChEMBL activity basis", _direct_chembl_activity_note(candidate)),
         ("Candidate-support evidence-confidence provenance",
@@ -735,9 +769,9 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
         ("Boltz ADME — permeability", _fmt(adme.get("permeability"))),
         ("Boltz ADME — solubility", _fmt(adme.get("solubility"))),
         ("openFDA adverse-event signal (FAERS)", ae_str),
-        ("Prior trials for this exact drug+disease",
+        ("ClinicalTrials.gov exact drug+disease trial count",
          ("⚠ query failed (API unreachable) — trial count unavailable; the "
-          "trial term was excluded from the score as a coverage gap "
+           "ClinicalTrials.gov trial term was excluded from the score as a coverage gap "
           "(neither credited nor penalised)"
           if candidate.get("trials_query_failed")
           else _fmt(candidate.get("prior_trial_count")))),
@@ -849,8 +883,9 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
         f"{_fmt(plddt_complex)}) and an AFDB apo mean pLDDT of {_fmt(apo_plddt, 1)}; "
         f"the AFDB model contains NO ligand, so the protein-ligand pose is entirely "
         f"a Boltz prediction.",
-        "- **Assay-type and species caveats.** The affinity is a median pChEMBL over "
-        "Homo sapiens IC50/Ki assays at confidence ≥ 8; assay heterogeneity and the "
+        "- **Assay-type and species caveats.** The target-qualified quantitative "
+        f"affinity summary is a median pChEMBL-equivalent value from "
+        f"{_affinity_provenance(candidate)} records; assay heterogeneity and the "
         "bounded approved-drug reference set for Tanimoto still apply.",
         "- **Absence of evidence is not evidence of absence.** A zero prior-trial "
         "count or no adverse-event signal may reflect that the pair has simply never "
@@ -1130,6 +1165,25 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
     structure_state = ("AVAILABLE (prediction only)"
                        if cx.get("available") is True else
                        readiness.get("structure_prediction", "UNKNOWN"))
+    evidence = candidate.get("literature_limitation") or {}
+    exact_rows = [
+        row for row in evidence.get("evidence", [])
+        if row.get("exact_applicability") is True
+    ]
+    has_support = any(
+        str(row.get("exact_use_label") or "").upper() == "APPLICABLE_SUPPORT"
+        for row in exact_rows
+    )
+    has_limitation = any(
+        str(row.get("exact_use_label") or "").upper() == "EXPLICIT_LIMITATION"
+        for row in exact_rows
+    )
+    # Keep the persisted contract authoritative when present, but repair legacy
+    # snapshots at render time rather than presenting support as clean efficacy
+    # evidence when the same exact-use dossier contains a limitation.
+    clinical_state = readiness.get("clinical_efficacy_evidence")
+    if has_support and has_limitation:
+        clinical_state = "MIXED_CONFLICTING"
     lines = [
         "### Evidence-stage verdict and scientific readiness\n",
         f"- **Evidence-stage verdict:** {_display_token(contract.get('evidence_stage_verdict'))}.",
@@ -1139,7 +1193,7 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
         "This establishes target pharmacology only, not rescue of the disease-causing variant.",
         f"- **Mutation-specific evidence:** {_display_token(readiness.get('mutation_specific_evidence'))}.",
         f"- **Disease-model evidence:** {_display_token(readiness.get('disease_model_evidence'))}.",
-        f"- **Clinical efficacy evidence:** {_display_token(readiness.get('clinical_efficacy_evidence'))}.",
+        f"- **Clinical efficacy evidence:** {_display_token(clinical_state)}.",
         f"- **Structure evidence:** {_display_token(structure_state)}.",
         "- **Automated score-capping flags:** "
         + (", ".join(_display_token(gate) for gate in gates)
@@ -1264,7 +1318,24 @@ def _trial_safety_applicability_audit(candidate: dict[str, Any]) -> str:
              f"- Trial query state: `{_audit_value(audit.get('query_status'))}`.",
              f"- Negative repurposing result: `{_audit_value(audit.get('negative_repurposing_result'))}`.",
              f"- Exact drug+disease trials returned: "
-             f"{_audit_value(audit.get('trial_count'))}."]
+             f"{_audit_value(audit.get('trial_count'))} "
+             "(ClinicalTrials.gov exact drug+disease query).",
+             f"- ClinicalTrials.gov exact drug+disease trial count is "
+             f"registry-scoped; the separate literature-publication count below "
+             f"is broader."]
+    literature_count = audit.get("literature_trial_count")
+    if literature_count is not None:
+        pmids = ", ".join(str(value) for value in audit.get(
+            "literature_trial_pmids", [])) or "none recorded"
+        lines += [
+            f"- Exact-use clinical-trial publications found in the literature gate: "
+            f"`{_audit_value(literature_count)}` (PMIDs: {pmids}).",
+            f"- Literature trial limitation affecting the score: "
+            f"`{_audit_value(audit.get('literature_negative_trial_evidence'))}`.",
+            "- The registry count and literature-publication count are separate "
+            "observations; a zero ClinicalTrials.gov result is not a global zero "
+            "for prior human evidence.",
+        ]
     if trials:
         lines += ["| NCT | Title | Status | Results posted | Stop reason | Stop classification |",
                   "| --- | --- | --- | --- | --- | --- |"]
@@ -1370,9 +1441,10 @@ quantity and the source that produced it.
   genetics and pathway context are scored or disclosed separately and do not
   inflate this term. It is not a measured probability of efficacy. The table
   states whether direct qualifying ChEMBL activity supports it.
-- **pChEMBL** — −log10 of molar potency from ChEMBL assays; higher = more
-  potent. Reported as a median over *Homo sapiens* IC50/Ki assays at ChEMBL
-  confidence ≥ 8.
+- **pChEMBL-equivalent affinity** — a source-qualified −log10 molar potency
+  summary; higher = more potent. The evidence table names whether the persisted
+  target-qualified assay records came from ChEMBL, BindingDB, or another source.
+  Assay type, species, confidence, and aggregation rules remain source-specific.
 - **Tanimoto similarity** — structural fingerprint similarity (0–1) to
   approved drugs known to act on the same target. It is computed **within the
   retrieved candidate pool only**: a low value means "unlike the other drugs

@@ -255,12 +255,19 @@ def _rewrite_structure_artifacts(
         return marker
 
     report_text = re.sub(
-        r"\[[^\]]*(?:cif|structure)[^\]]*\]\(https?://[^)]+\)",
+        r"\[[^\]]*(?:cif|structure)[^\]]*\]\("
+        r"(?!(?:https?://[^/\s)]+)?/api/runs/[^/\s)]+/artifacts/cif/"
+        r"[a-f0-9]{64}(?:[?#][^)]*)?\))"
+        r"https?://[^)]+\)",
         remote, report_text, flags=re.IGNORECASE)
     report_text = re.sub(
+        r"(?<!/api/runs/)"
         r"https?://[^\s)\]]+\.cif(?:\?[^\s)\]]*)?",
         remote, report_text, flags=re.IGNORECASE)
-    if unavailable:
+    # A mixed report can contain one malformed/transient reference alongside
+    # a successfully captured durable CIF.  Do not append a package-level
+    # "unavailable" claim when the package contains a durable structure.
+    if unavailable and not by_digest:
         report_text += f"\n\n> **{marker}**\n"
     return report_text, sorted(by_digest.values(), key=lambda row: row["artifact_id"])
 
@@ -435,8 +442,17 @@ def _persist_actionable_report(
     }
     # Generate every byte before the single database transaction.  There is
     # never a committed partial artifact set.
-    frozen_job = {"job_id": job_id, "disease_name": snapshot.get("disease_name"),
-                  "report_sha256": metadata["report_sha256"]}
+    source_job = jobs_db.get_job(job_id) or {}
+    frozen_job = {
+        "job_id": job_id,
+        "disease_name": snapshot.get("disease_name") or source_job.get("disease_name"),
+        "created_at": source_job.get("created_at"),
+        # Use the durable job update timestamp as the snapshot timestamp.  It
+        # is stable across retry rendering and avoids the 1980 fpdf2 fallback.
+        "report_snapshot_at": source_job.get("updated_at")
+        or source_job.get("created_at"),
+        "report_sha256": metadata["report_sha256"],
+    }
     pdf = render_case_pdf(report_text, frozen_job)
     evidence = _deterministic_evidence_zip(
         job_id, report_bytes, pdf, snapshot, cif_rows,

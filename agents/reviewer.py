@@ -498,6 +498,107 @@ def _trial_evidence_term(trials: dict[str, Any]) -> Optional[bool]:
     return not trials.get("has_negative_repurposing_result", False)
 
 
+def _literature_clinical_trial_rows(
+    candidate: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Return mechanically verified, exact-use clinical-trial publications.
+
+    ClinicalTrials.gov is only one registry.  The bounded PubMed literature
+    gate can find a completed human study whose registration is outside that
+    registry (or whose registration is not recoverable).  Keep that evidence
+    separate from the registry rows, but do not let a registry-only zero
+    masquerade as "no prior human trial".
+    """
+    finding = candidate.get("literature_limitation") or {}
+    rows: list[dict[str, Any]] = []
+    for row in finding.get("evidence", []):
+        if (
+            not isinstance(row, dict)
+            or row.get("mechanically_verified") is not True
+            or row.get("exact_applicability") is not True
+        ):
+            continue
+        publication_types = {
+            str(value).casefold()
+            for value in (row.get("publication_types") or [])
+        }
+        if any(
+            "clinical trial" in value
+            or "randomized controlled trial" in value
+            for value in publication_types
+        ):
+            rows.append(row)
+    return rows
+
+
+def _reconcile_literature_trial_evidence(candidate: dict[str, Any]) -> None:
+    """Reconcile PubMed human-trial evidence with the prior-trial score.
+
+    The ClinicalTrials.gov lane remains auditable as a registry-specific
+    observation.  An exact-use clinical-trial publication found by the
+    literature gate is a broader human-trial observation and must prevent the
+    positive "no prior failed trial" credit when it reports an applicable
+    explicit limitation.
+    """
+    rows = _literature_clinical_trial_rows(candidate)
+    audit = candidate.setdefault("trial_audit", {})
+    audit["registry_name"] = "ClinicalTrials.gov"
+    audit["registry_query_scope"] = "exact drug+disease"
+    audit["literature_trial_count"] = len(rows)
+    audit["literature_trial_pmids"] = sorted(
+        {str(row.get("pmid")) for row in rows if row.get("pmid") is not None}
+    )
+    audit["literature_trial_evidence"] = (
+        "OBSERVED" if rows else "NOT_OBSERVED"
+    )
+    negative_rows = [
+        row for row in rows
+        if str(row.get("exact_use_label") or "").upper()
+        == "EXPLICIT_LIMITATION"
+    ]
+    audit["literature_negative_trial_evidence"] = bool(negative_rows)
+    if not negative_rows:
+        return
+
+    components = candidate.setdefault("score_components", {})
+    if components.get("no_failed_trial") == 0:
+        return
+
+    # The literature gate runs after the initial reviewer score. Recompute the
+    # complete score from persisted components so the breakdown remains exact,
+    # including renormalization, bonuses, penalties, and any already-applied
+    # hard caps.
+    components["no_failed_trial"] = 0
+    components["trial_evidence_observed"] = True
+    components["trial_evidence_basis"] = (
+        "literature_gate_exact_use_clinical_trial_limitation"
+    )
+    composite, coverage = _coverage_aware_composite(
+        float(components.get("efficacy_evidence") or 0.0),
+        components.get("normalized_ot_association"),
+        components.get("normalized_tanimoto"),
+        False,
+    )
+    if candidate.get("lipinski_penalty_applied"):
+        composite -= LIPINSKI_PENALTY
+    composite += float(components.get("qualified_directional_bonus") or 0.0)
+    pre_cap_score = round(composite, 4)
+    cap = 1.0
+    if candidate.get("unapproved_cap_applied"):
+        cap = min(cap, 0.4)
+    if candidate.get("mechanism_cap_applied"):
+        cap = min(cap, MECHANISM_DIRECTION_CAP)
+    if candidate.get("safety_cap_applied"):
+        cap = min(cap, SAFETY_CAP)
+    candidate["evidence_weight_coverage"] = round(coverage, 4)
+    candidate["pre_cap_score"] = pre_cap_score
+    candidate["composite_score"] = round(min(composite, cap), 4)
+    candidate["strong_match"] = (
+        candidate["composite_score"] >= STRONG_MATCH_THRESHOLD
+    )
+    components["evidence_weight_coverage"] = round(coverage, 4)
+
+
 def _measured_ot_association(candidate: dict[str, Any]) -> Optional[float]:
     """Measured OT association, or None when the score is a stamped constant.
 
@@ -1411,6 +1512,7 @@ def run_reviewer(
             r["literature_limitation"] = limitation
             r["literature_limitation_blocked"] = blocked
             r["literature_limitation_gate_cleared"] = cleared
+            _reconcile_literature_trial_evidence(r)
             if blocked:
                 _remove_directional_bonus_for_limitation(r)
             r["externally_prioritizable"] = bool(
@@ -1616,6 +1718,34 @@ def _build_dossier_evidence_contract(
         and candidate.get("candidate_source_coverage") is not None
         and candidate.get("paid_validation_eligible") is not None
     )
+    exact_literature_rows = [
+        row for row in (candidate.get("literature_limitation") or {}).get(
+            "evidence", [])
+        if row.get("exact_applicability") is True
+    ]
+    has_clinical_support = any(
+        row.get("exact_use_label") == "APPLICABLE_SUPPORT"
+        and row.get("evidence_level") == "case_report_clinical"
+        for row in exact_literature_rows
+    )
+    has_clinical_limitation = any(
+        row.get("exact_use_label") == "EXPLICIT_LIMITATION"
+        and (
+            any(
+                "clinical trial" in str(value).casefold()
+                or "randomized controlled trial" in str(value).casefold()
+                for value in (row.get("publication_types") or [])
+            )
+            or row.get("evidence_level") == "case_report_clinical"
+        )
+        for row in exact_literature_rows
+    )
+    clinical_efficacy_state = (
+        "MIXED_CONFLICTING"
+        if has_clinical_support and has_clinical_limitation
+        else ("OBSERVED_SUPPORT" if has_clinical_support else unknown)
+    )
+
     return {
         "contract_version": (
             "flagship-dossier-evidence-v2"
@@ -1644,12 +1774,7 @@ def _build_dossier_evidence_contract(
                        for row in _observed_literature_support(candidate))
                 else unknown
             ),
-            "clinical_efficacy_evidence": (
-                "OBSERVED_SUPPORT"
-                if any(row.get("evidence_level") == "case_report_clinical"
-                       for row in _observed_literature_support(candidate))
-                else unknown
-            ),
+            "clinical_efficacy_evidence": clinical_efficacy_state,
             "observed_support": _observed_literature_support(candidate),
             "structure_prediction": (
                 "NOT_YET_AVAILABLE"  # structure stage augments the rendered view
@@ -1875,7 +2000,10 @@ def _target_applicability(candidate: dict[str, Any]) -> str:
     if method == "genetic_association":
         return "DIRECT_DISEASE_ASSOCIATED"
     if method in _PRECEDENT_DISCOVERY_METHODS:
-        return "DIRECT_DISEASE_ASSOCIATED"
+        # A pharmacological precedent is evidence that the target's
+        # pharmacology may transfer across a disease-relevant channel/pathway.
+        # It is not a direct causal-gene or disease-target association.
+        return "CROSS_TARGET_FUNCTIONALLY_SUPPORTED"
     if method == "pathway_neighbor":
         return "PATHWAY_ONLY"
     return "UNKNOWN"
