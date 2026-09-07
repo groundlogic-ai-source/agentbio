@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import logging
 import re
 import unicodedata
 import xml.etree.ElementTree as ET
@@ -45,6 +46,7 @@ VERDICT_CONFLICTING = "CONFLICTING_EVIDENCE"
 VERDICT_NONE = "NO_QUALIFYING_LIMITATION_FOUND"
 VERDICT_FAILED = "SEARCH_FAILED"
 VERDICT_NOT_ASSESSED = "NOT_ASSESSED"
+_LOGGER = logging.getLogger(__name__)
 
 _HIGH_AUTHORITY_TYPES = {
     "guideline",
@@ -61,7 +63,10 @@ _ALLOWED_LABELS = {
 _NEGATIVE_WORDS = re.compile(
     r"\b(ineffective|not effective|failed|no benefit|did not improve|"
     r"does not improve|lack(?:ed|s)? efficacy|not recommended|"
-    r"poor response|resistan(?:t|ce)|worsen(?:ed|s|ing)?)\b",
+    r"poor response|resistan(?:t|ce)|worsen(?:ed|s|ing)|"
+    r"abolish(?:es|ed)?|incomplet(?:e|ely) effective|"
+    r"no significant (?:change|changes|improvement|difference)s?|"
+    r"mixed (?:effect|effects|result|results)|unclear)\b",
     re.IGNORECASE,
 )
 _SUPPORT_WORDS = re.compile(
@@ -399,6 +404,57 @@ def _mechanical_evidence_level(
     return "mechanistic"
 
 
+def _recover_unknown_label(
+    label: str,
+    *,
+    quote: Any,
+    valid_quote: bool,
+    classifier_match: bool,
+    deterministic_disease: bool,
+    deterministic_intervention: bool,
+    deterministic_use: bool,
+    exact_drug_identity: bool,
+) -> str:
+    """Recover only classifier labels supported by source text and mechanics.
+
+    A model sometimes emits a valid verbatim extraction while leaving the
+    categorical label at UNKNOWN. This is not a quote-integrity failure. The
+    recovery is deliberately narrow: applicable support/limitation requires
+    exact lexical identity and deterministic disease/use matching; unrelated
+    evidence requires an explicit deterministic mismatch. Everything else
+    remains unresolved and fail-closed.
+    """
+    if label != UNKNOWN_INTEGRITY_FAILED:
+        return label
+    quote_text = str(quote or "")
+    if valid_quote and deterministic_disease and deterministic_intervention:
+        if (
+            deterministic_use
+            and exact_drug_identity
+            and _NEGATIVE_WORDS.search(quote_text)
+        ):
+            return EXPLICIT_LIMITATION
+        if (
+            deterministic_use
+            and exact_drug_identity
+            and _SUPPORT_WORDS.search(quote_text)
+            and not _NEGATIVE_WORDS.search(quote_text)
+        ):
+            return APPLICABLE_SUPPORT
+    if (
+        not classifier_match
+        and (
+            not deterministic_disease
+            or not deterministic_intervention
+            or not deterministic_use
+        )
+        and not _NEGATIVE_WORDS.search(quote_text)
+        and not _SUPPORT_WORDS.search(quote_text)
+    ):
+        return NOT_APPLICABLE_TO_EXACT_DRUG_USE
+    return label
+
+
 def aggregate_findings(
     records: list[dict[str, Any]],
     classifications: list[dict[str, Any]],
@@ -495,13 +551,39 @@ def aggregate_findings(
         source_has_negative_language = bool(
             _NEGATIVE_WORDS.search(str(record.get("abstract") or "")))
         requested_label = label
-        exact_support_match = bool(limitation_match and exact_drug_identity)
+        original_label = label
+        label = _recover_unknown_label(
+            label,
+            quote=quote,
+            valid_quote=valid_quote,
+            classifier_match=classifier_match,
+            deterministic_disease=deterministic_disease,
+            deterministic_intervention=deterministic_intervention,
+            deterministic_use=deterministic_use,
+            exact_drug_identity=exact_drug_identity,
+        )
+        recovered_from_unknown = (
+            original_label == UNKNOWN_INTEGRITY_FAILED
+            and label != UNKNOWN_INTEGRITY_FAILED
+        )
+        valid_label = label in _ALLOWED_LABELS
+        mechanically_exact_match = bool(
+            limitation_match
+            or (
+                recovered_from_unknown
+                and deterministic_disease
+                and deterministic_intervention
+                and deterministic_use
+            )
+        )
+        exact_support_match = bool(mechanically_exact_match and exact_drug_identity)
         if label == APPLICABLE_SUPPORT and not exact_support_match:
             # Class, disease-model, and adjacent-use support is useful context,
             # but is not evidence for the exact candidate drug/use.
             label = NOT_APPLICABLE_TO_EXACT_DRUG_USE
         exact_match = (
-            limitation_match if label in {EXPLICIT_LIMITATION, "CAUTION"}
+            mechanically_exact_match
+            if label in {EXPLICIT_LIMITATION, "CAUTION"}
             else exact_support_match
         )
         valid = (
@@ -510,7 +592,10 @@ def aggregate_findings(
             and (
                 (
                     label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
-                    and requested_label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
+                    and (
+                        requested_label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
+                        or recovered_from_unknown
+                    )
                 )
                 or (exact_match and valid_quote)
                 or (
@@ -572,6 +657,25 @@ def aggregate_findings(
             "mechanically_verified": valid,
             "citation_verified": valid_citation,
         }
+        if not valid:
+            _LOGGER.warning(
+                "[literature_gate] reconciliation_failed pmid=%s "
+                "raw_label=%r canonical_label=%r valid_quote=%r "
+                "classifier_match=%r deterministic=%r quote=%r abstract=%r",
+                pmid,
+                raw_label,
+                label,
+                valid_quote,
+                classifier_match,
+                {
+                    "disease": deterministic_disease,
+                    "use": deterministic_use,
+                    "drug_or_class": deterministic_intervention,
+                    "exact_drug": exact_drug_identity,
+                },
+                quote,
+                record.get("abstract"),
+            )
         (evidence if valid else rejected).append(row)
         if not valid:
             classifier_integrity_failures += 1
@@ -700,7 +804,7 @@ def check_literature_limitation(
     """Retrieve, classify, mechanically verify, and aggregate limitation evidence."""
     intended = intended_use or f"treatment of {disease_name}"
     cache_key = make_key(
-        "literature_limitation_v4_batch8_recovery_accent",
+        "literature_limitation_v5_unknown_quote_recovery",
         drug_name, disease_name, target_symbol,
         action_type or "", mechanism_of_action or "", intended,
         sorted(drug_aliases or []),

@@ -10,6 +10,7 @@ from data_sources.literature_limitation import (
     VERDICT_CONFLICTING,
     VERDICT_FAILED,
     VERDICT_NONE,
+    UNKNOWN_INTEGRITY_FAILED,
     aggregate_findings,
     check_literature_limitation,
 )
@@ -302,6 +303,113 @@ class LiteratureLimitationTests(unittest.TestCase):
         )
         self.assertEqual(result["support_count"], 1)
         self.assertTrue(result["gate_cleared"])
+
+    def test_unknown_label_with_verbatim_clinical_limitation_is_recovered(self):
+        quote = (
+            "However, in the clinical trial, the effects on hypertrichosis were "
+            "mixed, and there were no significant changes in cardiac phenotype "
+            "or leg edema."
+        )
+        record = _record(
+            "40399303",
+            title=(
+                "Treatment of overactive KATP channels with glibenclamide in a "
+                "clinical trial in humans with Cantu syndrome."
+            ),
+            abstract=(
+                "This study explores the efficacy of glibenclamide for treating "
+                "Cantu syndrome. " + quote
+            ),
+        )
+        result = aggregate_findings(
+            [record],
+            [{
+                "pmid": "40399303",
+                "exact_use_label": UNKNOWN_INTEGRITY_FAILED,
+                "quote": quote,
+                "disease_match": True,
+                "subtype_match": True,
+                "use_match": True,
+                "drug_or_class_match": True,
+                "reason": "The supplied trial reports a limitation.",
+            }],
+            disease_name="Cantú syndrome",
+            drug_name="glibenclamide",
+            drug_class="KATP channel inhibitor",
+            intended_use="treatment of Cantú syndrome",
+        )
+        self.assertEqual(result["verdict"], VERDICT_CAUTION)
+        self.assertEqual(result["explicit_limitation_count"], 1)
+        self.assertTrue(result["gate_cleared"])
+
+    def test_unknown_label_with_mutation_specific_limitation_is_recovered(self):
+        quote = (
+            "both Kir6.1(V65M) and Kir6.2(V64M) mutations essentially abolish "
+            "high-affinity sensitivity to the KATP blocker glibenclamide"
+        )
+        record = _record(
+            "28842488",
+            title="Disease-associated mutations of the ATP-sensitive potassium channel",
+            abstract=(
+                "Cantu syndrome is associated with mutations in KCNJ8. "
+                "Sulfonylurea inhibitors such as glibenclamide are potential "
+                "therapies for Cantu syndrome. " + quote + " in cells."
+            ),
+        )
+        result = aggregate_findings(
+            [record],
+            [{
+                "pmid": "28842488",
+                "exact_use_label": UNKNOWN_INTEGRITY_FAILED,
+                "quote": quote,
+                "disease_match": True,
+                "subtype_match": False,
+                "use_match": True,
+                "drug_or_class_match": True,
+                "reason": "Mutation-specific loss of sensitivity.",
+            }],
+            disease_name="Cantú syndrome",
+            drug_name="glibenclamide",
+            drug_class="KATP blocker",
+            target_symbol="KCNJ8",
+            intended_use="treatment of Cantú syndrome",
+        )
+        self.assertEqual(result["verdict"], VERDICT_CAUTION)
+        self.assertEqual(result["explicit_limitation_count"], 1)
+        self.assertTrue(result["gate_cleared"])
+
+    def test_unknown_label_with_clear_probe_record_becomes_not_applicable(self):
+        quote = (
+            "Pinacidil was used as an electrophysiology probe to characterize "
+            "KATP channel activity in Cantu syndrome."
+        )
+        record = _record(
+            "36980270",
+            title="KATP channel electrophysiology in Cantu syndrome",
+            abstract=quote,
+        )
+        result = aggregate_findings(
+            [record],
+            [{
+                "pmid": "36980270",
+                "exact_use_label": UNKNOWN_INTEGRITY_FAILED,
+                "quote": quote,
+                "disease_match": True,
+                "subtype_match": True,
+                "use_match": False,
+                "drug_or_class_match": False,
+                "reason": "Probe use, not glibenclamide treatment.",
+            }],
+            disease_name="Cantú syndrome",
+            drug_name="glibenclamide",
+            drug_class="KATP blocker",
+            intended_use="treatment of Cantú syndrome",
+        )
+        self.assertEqual(result["verdict"], VERDICT_NONE)
+        self.assertEqual(result["classifier_integrity_failures"], 0)
+        self.assertTrue(result["gate_cleared"])
+        self.assertEqual(result["evidence"][0]["exact_use_label"],
+                         "NOT_APPLICABLE_TO_EXACT_DRUG_USE")
 
     def test_negative_quote_mislabeled_support_cannot_cancel_limitation(self):
         good = _record("20", pub_types=["Practice Guideline"])
