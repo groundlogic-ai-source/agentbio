@@ -128,6 +128,14 @@ def predict_complex(protein_sequence: str, ligand_smiles: str,
     if cached is not None:
         print(f"[boltz] predict_complex CACHE HIT (no spend) "
               f"seq_len={len(protein_sequence)} smiles={ligand_smiles[:24]}")
+        # The cached payload retains the estimate from the original submission,
+        # but this invocation creates no new Boltz charge.  Return a detached
+        # per-run projection so API accounting cannot count that old estimate
+        # again on a later case.
+        if isinstance(cached, dict):
+            cache_hit = dict(cached)
+            cache_hit["estimated_cost_usd"] = 0.0
+            return cache_hit
         return cached
 
     client, err = _client()
