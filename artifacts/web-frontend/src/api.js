@@ -47,6 +47,14 @@ export function getCost(jobId) {
   return request(`/api/runs/${jobId}/cost`);
 }
 
+export function flagshipPreflight(diseaseName) {
+  return request("/api/flagship/preflight", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ disease_name: diseaseName }),
+  });
+}
+
 export function openCase(diseaseName) {
   const body = diseaseName ? { disease_name: diseaseName } : {};
   return request("/api/runs", {

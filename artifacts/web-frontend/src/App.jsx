@@ -14,6 +14,7 @@ import {
   getRun,
   getCost,
   openCase,
+  flagshipPreflight,
   resumeCase,
   archiveCase,
   startBatch,
@@ -150,6 +151,11 @@ export default function App() {
       }
     },
     [refreshList, handleOpenCase],
+  );
+
+  const handleFlagshipPreflight = useCallback(
+    (disease) => flagshipPreflight(disease),
+    [],
   );
 
   const handleArchive = useCallback(
@@ -322,6 +328,7 @@ export default function App() {
       <NewCaseDialog
         open={dialogOpen}
         busy={busy}
+        onPreflight={handleFlagshipPreflight}
         onClose={() => setDialogOpen(false)}
         onOpen={handleNewCase}
       />

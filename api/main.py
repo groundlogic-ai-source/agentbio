@@ -47,6 +47,8 @@ from api.policy_contracts import (
 )
 
 from main_graph import build_graph
+from agents.flagship_readiness import evaluate_target_preflight
+from agents.target_selection import DiseaseNotInUniverse, preflight_for_disease
 from resume_review import resume_run
 
 from api import jobs_db
@@ -644,6 +646,10 @@ class RunRequest(BaseModel):
     disease_name: Optional[str] = None
 
 
+class FlagshipPreflightRequest(BaseModel):
+    disease_name: str
+
+
 class ResumeRequest(BaseModel):
     action: str  # "approve" or "reject"
     notes: Optional[str] = None
@@ -865,6 +871,32 @@ def get_limits() -> dict:
     return _guardrails.limits_summary(jobs_db.count_jobs_today)
 
 
+@app.post("/api/flagship/preflight")
+def flagship_preflight(req: FlagshipPreflightRequest) -> dict[str, Any]:
+    """Run the non-metered flagship-readiness screen for one disease.
+
+    This deliberately stops after Stage 1 target selection.  It creates no job,
+    does not consume run guardrails, and never reaches candidate review or
+    structure prediction.  A full case remains an explicit user choice.
+    """
+    disease = (req.disease_name or "").strip()
+    if not disease:
+        raise HTTPException(status_code=422, detail="disease_name is required")
+    try:
+        rows = preflight_for_disease(disease)
+    except DiseaseNotInUniverse as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Flagship preflight could not establish authoritative "
+                f"disease-target context: {exc}"
+            ),
+        ) from exc
+    return evaluate_target_preflight(rows, requested_disease=disease)
+
+
 @app.post("/api/runs")
 def start_run(request: Request, req: RunRequest) -> dict[str, str]:
     """
@@ -1009,6 +1041,12 @@ def get_run(job_id: str) -> dict[str, Any]:
             artifact_view[item["kind"]] = item
     job["artifacts"] = artifact_view
     job.update(_actionability(job))
+    snapshot = jobs_db.get_candidate_snapshot(job_id)
+    if isinstance(snapshot, dict):
+        snapshot_candidates = snapshot.get("candidates") or []
+        lead = snapshot_candidates[0] if snapshot_candidates else {}
+        if lead.get("flagship_readiness"):
+            job["flagship_readiness"] = lead["flagship_readiness"]
     structure_accounted = (
         job.get("current_stage") in {
             "structure_validation", "writer", "awaiting_review", "done"}

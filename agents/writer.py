@@ -1159,6 +1159,8 @@ def _apply_matched_biologist_context(
 def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
     contract = candidate.get("dossier_evidence_contract") or {}
     readiness = contract.get("scientific_readiness") or {}
+    flagship = contract.get("flagship_readiness") or candidate.get(
+        "flagship_readiness") or {}
     context = contract.get("disease_mechanism_context") or {}
     cx = (struct or {}).get("complex") or {}
     gates = readiness.get("blocking_gates") or []
@@ -1199,6 +1201,22 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
         + (", ".join(_display_token(gate) for gate in gates)
            if gates else "None recorded")
         + ". This does not mean experimental or clinical validation is complete.",
+        "\n### Flagship readiness\n",
+        f"- **Flagship verdict:** {_display_token(flagship.get('verdict'))}. "
+        "This is a differentiation/readiness screen, not an efficacy verdict.",
+        f"- **Flagship next action:** {_audit_value(flagship.get('next_action'))}.",
+        "- **Flagship gaps:** " + (
+            "; ".join(str(item) for item in
+                      (flagship.get("missing_evidence") or []))
+            or "None recorded"
+        ) + ".",
+        *[
+            f"- **Flagship finding ({_display_token(code)}):** {_audit_value(reason)}"
+            for code, reason in zip(
+                flagship.get("reason_codes") or [],
+                flagship.get("reasons") or [],
+            )
+        ],
         "\n### Disease and mechanism context\n",
         f"- Disease: {_audit_value(context.get('disease_name', candidate.get('disease_name')))}; "
         f"target: {_audit_value(context.get('target_symbol', candidate.get('target_symbol')))}.",

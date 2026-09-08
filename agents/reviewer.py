@@ -67,6 +67,7 @@ from data_sources.literature_limitation import (
 from data_sources import holdout as _holdout
 from data_sources.pubchem import get_compound_data
 from data_sources.evidence_ledger import qualified_target_chembl_activity_ids
+from agents.flagship_readiness import evaluate_candidate_readiness
 
 # ---- Auditable scoring constants (edit here to adjust the policy) -------------
 _DEFAULT_COMPOSITE_WEIGHTS: dict[str, float] = {
@@ -1589,6 +1590,11 @@ def run_reviewer(
     for r in reviewed:
         r["dossier_evidence_contract"] = _build_dossier_evidence_contract(
             r, _matched_bio(r), reviewed)
+        r["flagship_readiness"] = evaluate_candidate_readiness(
+            r, r["dossier_evidence_contract"])
+        r["dossier_evidence_contract"]["flagship_readiness"] = (
+            r["flagship_readiness"]
+        )
     return reviewed
 
 

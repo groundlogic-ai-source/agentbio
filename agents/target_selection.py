@@ -702,6 +702,74 @@ def _expand_pathway_neighbors(
     return top_targets + added
 
 
+def preflight_for_disease(query: str) -> list[dict[str, Any]]:
+    """Resolve the minimum Stage 1 context needed by flagship preflight.
+
+    This intentionally does not call the full manual selector.  In particular,
+    it skips pharmacological-precedent expansion, literature mechanism-class
+    discovery, Reactome neighbors, ChEMBL tractability calls, and all candidate
+    collection.  The caller must treat the returned rows as preflight context,
+    not as the ordinary research ranking.
+    """
+    candidates = _matchable_universe()
+    disease = _match_disease(query, candidates)
+    if disease is None:
+        efo_direct = search_disease_efo(query)
+        if efo_direct:
+            orpha_code = get_disease_orphanet_code(efo_direct)
+            if orpha_code:
+                disease = next(
+                    (item for item in candidates
+                     if str(item.get("orpha_code")) == str(orpha_code)),
+                    None,
+                )
+    if disease is None:
+        raise DiseaseNotInUniverse(
+            f"'{query}' was not found in the rare-disease / neglected-tropical-disease "
+            "universe this system covers."
+        )
+
+    disease_name = disease["name"]
+    efo_id = _resolve_efo_id(disease_name, orig_query=query)
+    if not efo_id:
+        raise RuntimeError(
+            f"'{disease_name}' is in the rare/NTD universe but could not be "
+            "matched to an Open Targets EFO ID."
+        )
+    overlap = _efo_name_overlap(disease_name, efo_id)
+    if overlap is not None and overlap <= _EFO_HARD_STOP_THRESHOLD:
+        canonical = get_ot_canonical_disease_name(efo_id) or efo_id
+        raise RuntimeError(
+            f"EFO RESOLUTION MISMATCH — '{disease_name}' resolved to "
+            f"'{canonical}' with no meaningful name overlap."
+        )
+
+    treatment = get_disease_known_drugs(efo_id)
+    targets = get_target_disease_score(efo_id)
+    genetic_targets = [
+        target for target in targets
+        if target.get("association_score", 0.0) >= 0.1
+    ][:TOP_TARGETS_PER_DISEASE]
+    return [{
+        "disease_name": disease_name,
+        "orpha_code": disease.get("orpha_code"),
+        "disease_source": disease.get("source", "orphanet"),
+        "target_symbol": target.get("target_symbol")
+        or target.get("gene_symbol") or target.get("symbol"),
+        "uniprot_id": target.get("uniprot_id")
+        or target.get("target_id") or target.get("id"),
+        "ot_association_score": target.get("association_score"),
+        "target_discovery_method": "genetic_association",
+        "has_approved_treatment": treatment.get("has_approved_treatment"),
+        "approved_drug_names": treatment.get("approved_drug_names", []),
+        "preflight_source_status": {
+            "disease_resolution": "complete",
+            "open_targets_associations": "complete",
+            "treatment_context": treatment.get("status", "observed"),
+        },
+    } for target in genetic_targets]
+
+
 def select_for_disease(query: str) -> list[dict[str, Any]]:
     """
     Manual mode: look up a single disease in the rare/NTD universe and score its

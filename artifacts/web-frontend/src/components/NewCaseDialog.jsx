@@ -1,27 +1,64 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
+export default function NewCaseDialog({
+  open,
+  onClose,
+  onOpen,
+  onPreflight,
+  busy,
+}) {
   const [disease, setDisease] = useState("");
+  const [preflight, setPreflight] = useState(null);
+  const [checking, setChecking] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    if (open && inputRef.current) inputRef.current.focus();
+    if (open) {
+      setPreflight(null);
+      setChecking(false);
+      if (inputRef.current) inputRef.current.focus();
+    }
   }, [open]);
 
   useEffect(() => {
     function onKey(e) {
-      if (e.key === "Escape" && !busy) onClose();
+      if (e.key === "Escape" && !busy && !checking) onClose();
     }
     if (open) window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, busy, onClose]);
+  }, [open, busy, checking, onClose]);
 
   if (!open) return null;
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
-    onOpen(disease.trim());
+    const value = disease.trim();
+    if (!value || !onPreflight) {
+      onOpen(value);
+      return;
+    }
+    setChecking(true);
+    try {
+      setPreflight(await onPreflight(value));
+    } catch (error) {
+      setPreflight({
+        error: error?.message || "Flagship preflight could not be completed.",
+      });
+    } finally {
+      setChecking(false);
+    }
   }
+
+  const verdict = preflight?.verdict;
+  const verdictLabel = verdict
+    ? verdict.replaceAll("_", " ")
+    : "";
+  const verdictTone =
+    verdict === "FLAGSHIP_READY"
+      ? "var(--success)"
+      : verdict === "NOT_FLAGSHIP_READY"
+        ? "var(--oxide)"
+        : "var(--brass-deep)";
 
   return (
     <div
@@ -57,7 +94,7 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
               New case
             </span>
           </div>
-          {!busy && (
+          {!busy && !checking && (
             <button
               type="button"
               onClick={onClose}
@@ -117,22 +154,101 @@ export default function NewCaseDialog({ open, onClose, onOpen, busy }) {
             }}
           />
 
+          {preflight && (
+            <div
+              className="mt-5 rounded-md border px-3.5 py-3"
+              style={{
+                borderColor: preflight.error
+                  ? "var(--oxide-border)"
+                  : "var(--brass-border)",
+                backgroundColor: preflight.error
+                  ? "var(--oxide-glow)"
+                  : "var(--brass-glow)",
+              }}
+              aria-live="polite"
+            >
+              {preflight.error ? (
+                <p className="text-sm" style={{ color: "var(--oxide)" }}>
+                  {preflight.error}
+                </p>
+              ) : (
+                <>
+                  <div
+                    className="font-mono text-[0.62rem] uppercase tracking-[0.12em]"
+                    style={{ color: verdictTone }}
+                  >
+                    Flagship preflight · {verdictLabel}
+                  </div>
+                  <p
+                    className="mt-2 text-sm leading-relaxed"
+                    style={{ color: "var(--ink-base)" }}
+                  >
+                    {preflight.next_action}
+                  </p>
+                  {(preflight.reasons || []).length > 0 && (
+                    <ul
+                      className="mt-2 list-disc space-y-1 pl-4 text-xs leading-relaxed"
+                      style={{ color: "var(--ink-muted)" }}
+                    >
+                      {preflight.reasons.slice(0, 4).map((reason) => (
+                        <li key={reason}>{reason}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {(preflight.missing_evidence || []).length > 0 && (
+                    <p
+                      className="mt-2 font-mono text-[0.62rem] leading-relaxed"
+                      style={{ color: "var(--ink-muted)" }}
+                    >
+                      Missing: {preflight.missing_evidence.slice(0, 5).join("; ")}
+                    </p>
+                  )}
+                  <p
+                    className="mt-3 text-xs leading-relaxed"
+                    style={{ color: "var(--ink-muted)" }}
+                  >
+                    This is a readiness screen, not an efficacy verdict. You can
+                    still run the full case explicitly as a research hypothesis.
+                  </p>
+                </>
+              )}
+            </div>
+          )}
+
           <div className="mt-6 flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              disabled={busy}
+              disabled={busy || checking}
               className="btn btn-ghost btn-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={busy}
+              disabled={busy || checking}
               className="btn btn-primary btn-sm"
             >
-              {busy ? "Opening…" : "Open new case"}
+              {busy
+                ? "Opening…"
+                : checking
+                  ? "Checking…"
+                  : preflight
+                    ? "Check again"
+                    : disease.trim()
+                      ? "Check flagship fit"
+                      : "Open research case"}
             </button>
+            {preflight && !preflight.error && (
+              <button
+                type="button"
+                onClick={() => onOpen(disease.trim())}
+                disabled={busy || checking}
+                className="btn btn-primary btn-sm"
+              >
+                Run research case
+              </button>
+            )}
           </div>
         </div>
       </form>
