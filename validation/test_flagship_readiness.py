@@ -162,6 +162,63 @@ class FlagshipReadinessTests(unittest.TestCase):
             "CONDITIONAL",
         )
 
+    def test_expert_use_case_is_persisted_but_unverified_in_preflight(self):
+        result = evaluate_target_preflight(
+            [_stage1_row()],
+            requested_disease="Example disease",
+            flagship_use_case={
+                "subgroup": "genotype-defined subgroup",
+                "stage": "relapsed",
+                "treatment_setting": "specialist care",
+                "proposed_advantage": "lower exposure burden",
+            },
+        )
+        self.assertEqual(
+            result["flagship_use_case"]["proposed_advantage"],
+            "lower exposure burden",
+        )
+        self.assertEqual(
+            result["flagship_use_case_claims"]["subgroup"]["status"], "UNKNOWN"
+        )
+        self.assertEqual(
+            result["criteria"]["proposed_advantage"]["status"], "UNKNOWN"
+        )
+        self.assertIn("independent support", " ".join(result["missing_evidence"]))
+
+    def test_expert_use_case_cannot_create_final_score_or_verdict(self):
+        result = evaluate_candidate_readiness(
+            _candidate(flagship_candidate_advantage=None),
+            {
+                "disease_mechanism_context": {
+                    "disease_name": "NPM1-mutated AML",
+                    "target_symbol": "FLT3",
+                },
+                "scientific_readiness": {
+                    "disease_model_evidence": "UNKNOWN",
+                    "clinical_efficacy_evidence": "UNKNOWN",
+                },
+                "comparators": {},
+            },
+            flagship_use_case={
+                "subgroup": "NPM1-mutated",
+                "stage": "relapsed",
+                "treatment_setting": "salvage therapy",
+                "proposed_advantage": "better tolerability",
+            },
+        )
+        self.assertEqual(result["flagship_use_case"]["stage"], "relapsed")
+        self.assertEqual(
+            result["flagship_use_case_claims"]["proposed_advantage"]["status"],
+            "UNKNOWN",
+        )
+        self.assertEqual(
+            result["criteria"]["candidate_advantage"]["status"], "UNKNOWN"
+        )
+        self.assertEqual(
+            result["criteria"]["proposed_advantage"]["status"], "UNKNOWN"
+        )
+        self.assertEqual(result["verdict"], "CONDITIONAL_REVIEW")
+
     def test_stage1_preflight_avoids_full_target_expansion(self):
         disease = {
             "name": "Example disease",

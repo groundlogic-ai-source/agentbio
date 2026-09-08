@@ -114,6 +114,7 @@ class PipelineState(TypedDict, total=False):
     job_id: Optional[str]
     repurposing_only: bool
     requested_disease: str
+    flagship_use_case: dict[str, Any]
     # Primary (top-ranked) target — kept for backwards compat with nodes that
     # only need a single target (structure_validation uses its uniprot_id for
     # AFDB; the marker/invalidation logic uses disease_name + target_symbol).
@@ -757,6 +758,7 @@ def reviewer_node(state: PipelineState) -> dict[str, Any]:
         state["chemist_output"],
         state.get("biologist_output"),
         state.get("biologist_outputs"),
+        flagship_use_case=state.get("flagship_use_case"),
     )
     # Runtime schema validation at the reviewer→writer handoff.
     validate_reviewer_handoff(reviewed)

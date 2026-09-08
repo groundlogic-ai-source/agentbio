@@ -136,11 +136,11 @@ export default function App() {
   }, [refreshList]);
 
   const handleNewCase = useCallback(
-    async (disease) => {
+    async (disease, flagshipUseCase) => {
       setBusy(true);
       setError(null);
       try {
-        const { job_id } = await openCase(disease);
+        const { job_id } = await openCase(disease, flagshipUseCase);
         setDialogOpen(false);
         await refreshList();
         await handleOpenCase(job_id);
@@ -154,7 +154,7 @@ export default function App() {
   );
 
   const handleFlagshipPreflight = useCallback(
-    (disease) => flagshipPreflight(disease),
+    (disease, flagshipUseCase) => flagshipPreflight(disease, flagshipUseCase),
     [],
   );
 

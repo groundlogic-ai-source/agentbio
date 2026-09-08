@@ -34,7 +34,7 @@ import sweep_manager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 import api.guardrails as _guardrails
 from api.policy_contracts import (
@@ -642,12 +642,21 @@ def _auto_start_sweep() -> None:
 # --------------------------------------------------------------------------- #
 # Request/response models
 # --------------------------------------------------------------------------- #
+class FlagshipUseCaseRequest(BaseModel):
+    subgroup: Optional[str] = Field(default=None, max_length=300)
+    stage: Optional[str] = Field(default=None, max_length=200)
+    treatment_setting: Optional[str] = Field(default=None, max_length=300)
+    proposed_advantage: Optional[str] = Field(default=None, max_length=500)
+
+
 class RunRequest(BaseModel):
     disease_name: Optional[str] = None
+    flagship_use_case: Optional[FlagshipUseCaseRequest] = None
 
 
 class FlagshipPreflightRequest(BaseModel):
     disease_name: str
+    flagship_use_case: Optional[FlagshipUseCaseRequest] = None
 
 
 class ResumeRequest(BaseModel):
@@ -701,7 +710,11 @@ def _sum_structure_cost(structure_results: dict[str, Any]) -> float:
     return total
 
 
-def _run_graph(job_id: str, thread_id: str) -> None:
+def _run_graph(
+    job_id: str,
+    thread_id: str,
+    flagship_use_case: Optional[dict[str, Any]] = None,
+) -> None:
     """
     Drive the LangGraph pipeline on a background thread, updating jobs.db after
     each node completes so current_stage reflects real progress (not a single
@@ -738,7 +751,12 @@ def _run_graph(job_id: str, thread_id: str) -> None:
         # Live API jobs are always repurposing-only: the pool is restricted to
         # approved drugs (existing human safety profile), never research-grade
         # tool compounds. The CLI path keeps the mixed pool (see chemist_node).
-        initial_state: dict[str, Any] = {"job_id": job_id, "repurposing_only": True}
+        initial_state: dict[str, Any] = {
+            "job_id": job_id,
+            "repurposing_only": True,
+        }
+        if flagship_use_case:
+            initial_state["flagship_use_case"] = flagship_use_case
         if requested:
             initial_state["requested_disease"] = requested
 
@@ -894,7 +912,14 @@ def flagship_preflight(req: FlagshipPreflightRequest) -> dict[str, Any]:
                 f"disease-target context: {exc}"
             ),
         ) from exc
-    return evaluate_target_preflight(rows, requested_disease=disease)
+    return evaluate_target_preflight(
+        rows,
+        requested_disease=disease,
+        flagship_use_case=(
+            req.flagship_use_case.model_dump(exclude_none=True)
+            if req.flagship_use_case else None
+        ),
+    )
 
 
 @app.post("/api/runs")
@@ -920,10 +945,14 @@ def start_run(request: Request, req: RunRequest) -> dict[str, str]:
     _guardrails.check_ip_rate_limit(request)
     _guardrails.check_daily_cap(jobs_db.count_jobs_today)
 
+    use_case = (
+        req.flagship_use_case.model_dump(exclude_none=True)
+        if req.flagship_use_case else None
+    )
     job = jobs_db.create_job(disease_name=req.disease_name)
     thread = threading.Thread(
         target=_run_graph,
-        args=(job["job_id"], job["thread_id"]),
+        args=(job["job_id"], job["thread_id"], use_case),
         daemon=True,
     )
     thread.start()

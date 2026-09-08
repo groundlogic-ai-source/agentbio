@@ -780,6 +780,8 @@ def run_reviewer(
     chemist_output: dict[str, Any],
     biologist_output: Optional[dict[str, Any]] = None,
     biologist_outputs: Optional[list[dict[str, Any]]] = None,
+    *,
+    flagship_use_case: Optional[dict[str, Any]] = None,
 ) -> list[dict[str, Any]]:
     candidates = chemist_output.get("candidates", [])
     disease = chemist_output.get("target", {}).get("disease_name", "")
@@ -1591,7 +1593,11 @@ def run_reviewer(
         r["dossier_evidence_contract"] = _build_dossier_evidence_contract(
             r, _matched_bio(r), reviewed)
         r["flagship_readiness"] = evaluate_candidate_readiness(
-            r, r["dossier_evidence_contract"])
+            r,
+            r["dossier_evidence_contract"],
+            flagship_use_case=flagship_use_case,
+        )
+        r["flagship_use_case"] = r["flagship_readiness"]["flagship_use_case"]
         r["dossier_evidence_contract"]["flagship_readiness"] = (
             r["flagship_readiness"]
         )

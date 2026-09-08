@@ -14,7 +14,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 
-FLAGSHIP_READINESS_VERSION = "flagship-readiness-v1"
+FLAGSHIP_READINESS_VERSION = "flagship-readiness-v2"
 
 # Conservative allow-list of targets whose direct inhibition is commonly a
 # general cytotoxic/proliferation signal.  This is a disclosure/readiness
@@ -38,6 +38,7 @@ _SCOPE_MARKERS = (
     "metastatic", "localized", "cutaneous", "cardiac", "renal",
     "pediatric", "adult", "deficient", "deficiency",
 )
+_USE_CASE_FIELDS = ("subgroup", "stage", "treatment_setting", "proposed_advantage")
 
 
 def _criterion(
@@ -70,6 +71,77 @@ def _has_scope_marker(value: str) -> bool:
     return any(marker in normalized for marker in _SCOPE_MARKERS)
 
 
+def _normalize_flagship_use_case(value: Any) -> dict[str, Optional[str]]:
+    """Return bounded, display-safe expert framing without treating it as evidence."""
+    raw = value if isinstance(value, dict) else {}
+    differentiator = raw.get("proposed_advantage") or raw.get("differentiator")
+    return {
+        "subgroup": str(raw.get("subgroup") or "").strip() or None,
+        "stage": str(raw.get("stage") or "").strip() or None,
+        "treatment_setting": str(
+            raw.get("treatment_setting") or raw.get("setting") or ""
+        ).strip() or None,
+        "proposed_advantage": str(differentiator or "").strip() or None,
+    }
+
+
+def _use_case_claims(
+    use_case: dict[str, Optional[str]],
+) -> dict[str, dict[str, Optional[str]]]:
+    """Make both absent and supplied-but-unverified claims explicit UNKNOWN."""
+    return {
+        field: {
+            "value": use_case.get(field),
+            "status": "UNKNOWN",
+            "source": "expert_input" if use_case.get(field) else "not_supplied",
+            "verification": "not_established_by_preflight",
+        }
+        for field in _USE_CASE_FIELDS
+    }
+
+
+def _use_case_criteria(
+    use_case: dict[str, Optional[str]],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    claims = _use_case_claims(use_case)
+    scoped = any(use_case.get(field) for field in (
+        "subgroup", "stage", "treatment_setting"
+    ))
+    scope = _criterion(
+        "UNKNOWN",
+        (
+            "An expert supplied a subgroup, stage, or treatment setting, but "
+            "preflight cannot independently support that claim."
+            if scoped else
+            "No scoped subgroup, stage, or treatment setting was supplied."
+        ),
+        evidence=[{
+            "claims": {
+                field: claims[field] for field in (
+                    "subgroup", "stage", "treatment_setting"
+                )
+            },
+            "source": "expert_input",
+        }] if scoped else [],
+        missing=["independent support for the scoped use case"],
+    )
+    advantage = _criterion(
+        "UNKNOWN",
+        (
+            "An expert proposed a differentiator, but no comparative evidence "
+            "supports it yet."
+            if use_case.get("proposed_advantage") else
+            "No proposed advantage over current care was supplied."
+        ),
+        evidence=[{
+            "claim": claims["proposed_advantage"],
+            "source": "expert_input",
+        }] if use_case.get("proposed_advantage") else [],
+        missing=["comparative evidence for the proposed advantage"],
+    )
+    return scope, advantage
+
+
 def _next_experiment(
     disease_name: str,
     target_symbol: str,
@@ -96,6 +168,7 @@ def _next_experiment(
 def evaluate_target_preflight(
     rows: list[dict[str, Any]],
     requested_disease: str = "",
+    flagship_use_case: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
     """Evaluate whether a disease is worth a full flagship case attempt.
 
@@ -104,6 +177,7 @@ def evaluate_target_preflight(
     later candidate evaluator is required before a dossier can be called
     flagship-ready.
     """
+    use_case = _normalize_flagship_use_case(flagship_use_case)
     if not rows:
         return {
             "schema_version": FLAGSHIP_READINESS_VERSION,
@@ -113,6 +187,8 @@ def evaluate_target_preflight(
             "missing_evidence": ["disease_target_context", "leading_target"],
             "criteria": {},
             "targets": [],
+            "flagship_use_case": use_case,
+            "flagship_use_case_claims": _use_case_claims(use_case),
             "next_action": "Do not start a full flagship case until target context recovers.",
         }
 
@@ -188,18 +264,26 @@ def evaluate_target_preflight(
             missing=["authoritative treatment landscape"],
         )
 
+    expert_scope, expert_advantage = _use_case_criteria(use_case)
     scope = _criterion(
         "PASS" if _has_scope_marker(disease) else "CONDITIONAL",
         (
             "The disease input carries a visible subtype, stage, mutation, or "
             "treatment-setting qualifier."
             if _has_scope_marker(disease)
+            else expert_scope["summary"]
+            if any(use_case.get(field) for field in (
+                "subgroup", "stage", "treatment_setting"
+            ))
             else "The disease input is broad; a flagship claim needs an explicit "
                  "subgroup, stage, or treatment-setting scope."
         ),
-        missing=[] if _has_scope_marker(disease) else [
-            "defined subgroup, stage, or treatment setting"
-        ],
+        evidence=expert_scope["evidence"] if not _has_scope_marker(disease)
+        else [],
+        missing=[] if _has_scope_marker(disease) else (
+            expert_scope["missing_evidence"] or
+            ["defined subgroup, stage, or treatment setting"]
+        ),
     )
 
     process_support = lead.get("process_support") or []
@@ -244,6 +328,8 @@ def evaluate_target_preflight(
         "scope_clarity": scope,
         "disease_specific_evidence": evidence_maturity,
         "candidate_advantage": advantage,
+        "scoped_use_case": expert_scope,
+        "proposed_advantage": expert_advantage,
         "next_experiment": next_experiment,
     }
     failures = [
@@ -287,6 +373,8 @@ def evaluate_target_preflight(
         } for row in top],
         "lead_target": target,
         "disease_name": disease,
+        "flagship_use_case": use_case,
+        "flagship_use_case_claims": _use_case_claims(use_case),
         "next_experiment": experiment,
         "next_action": (
             "Choose another disease or define a differentiated use case before "
@@ -305,9 +393,17 @@ def evaluate_target_preflight(
 def evaluate_candidate_readiness(
     candidate: dict[str, Any],
     contract: Optional[dict[str, Any]] = None,
+    flagship_use_case: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
     """Evaluate final differentiation using the persisted dossier contract."""
     contract = contract or candidate.get("dossier_evidence_contract") or {}
+    raw_use_case = (
+        flagship_use_case
+        if flagship_use_case is not None
+        else candidate.get("flagship_use_case")
+        or contract.get("flagship_use_case")
+    )
+    use_case = _normalize_flagship_use_case(raw_use_case)
     context = contract.get("disease_mechanism_context") or {}
     scientific = contract.get("scientific_readiness") or {}
     comparators = contract.get("comparators") or {}
@@ -376,17 +472,25 @@ def evaluate_candidate_readiness(
         missing=["candidate-specific advantage over current care"],
     )
 
+    expert_scope, expert_advantage = _use_case_criteria(use_case)
     scope = _criterion(
         "PASS" if _has_scope_marker(disease) else "CONDITIONAL",
         (
             "The final disease context is explicitly scoped."
             if _has_scope_marker(disease) else
+            expert_scope["summary"]
+            if any(use_case.get(field) for field in (
+                "subgroup", "stage", "treatment_setting"
+            )) else
             "The final case remains broad and does not identify a subgroup, stage, "
             "or treatment setting."
         ),
-        missing=[] if _has_scope_marker(disease) else [
-            "defined subgroup, stage, or treatment setting"
-        ],
+        evidence=expert_scope["evidence"] if not _has_scope_marker(disease)
+        else [],
+        missing=[] if _has_scope_marker(disease) else (
+            expert_scope["missing_evidence"] or
+            ["defined subgroup, stage, or treatment setting"]
+        ),
     )
 
     model = str(scientific.get("disease_model_evidence") or "UNKNOWN").upper()
@@ -421,8 +525,18 @@ def evaluate_candidate_readiness(
     else:
         advantage = _criterion(
             "UNKNOWN",
-            "No candidate-specific advantage over current care was established.",
-            missing=["comparative efficacy, safety, exposure, or access advantage"],
+            (
+                "An expert proposed a differentiator, but no comparative evidence "
+                "supports it yet."
+                if use_case.get("proposed_advantage") else
+                "No candidate-specific advantage over current care was established."
+            ),
+            evidence=expert_advantage["evidence"],
+            missing=(
+                expert_advantage["missing_evidence"]
+                if use_case.get("proposed_advantage")
+                else ["comparative efficacy, safety, exposure, or access advantage"]
+            ),
         )
 
     experiment = _next_experiment(disease, target, drug)
@@ -448,6 +562,9 @@ def evaluate_candidate_readiness(
         "candidate_advantage": advantage,
         "next_experiment": experiment_criterion,
     }
+    if any(use_case.values()):
+        criteria["scoped_use_case"] = expert_scope
+        criteria["proposed_advantage"] = expert_advantage
     failures = [
         name for name, value in criteria.items()
         if value["status"] == "FAIL"
@@ -475,6 +592,8 @@ def evaluate_candidate_readiness(
         "disease_name": disease,
         "drug_name": drug,
         "lead_target": target,
+        "flagship_use_case": use_case,
+        "flagship_use_case_claims": _use_case_claims(use_case),
         "next_experiment": experiment,
         "next_action": (
             "Do not present this candidate as a flagship; use it only as a "

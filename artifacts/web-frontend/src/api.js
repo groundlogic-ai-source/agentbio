@@ -47,16 +47,22 @@ export function getCost(jobId) {
   return request(`/api/runs/${jobId}/cost`);
 }
 
-export function flagshipPreflight(diseaseName) {
+export function flagshipPreflight(diseaseName, flagshipUseCase) {
   return request("/api/flagship/preflight", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ disease_name: diseaseName }),
+    body: JSON.stringify({
+      disease_name: diseaseName,
+      ...(flagshipUseCase ? { flagship_use_case: flagshipUseCase } : {}),
+    }),
   });
 }
 
-export function openCase(diseaseName) {
+export function openCase(diseaseName, flagshipUseCase) {
   const body = diseaseName ? { disease_name: diseaseName } : {};
+  if (flagshipUseCase && diseaseName) {
+    body.flagship_use_case = flagshipUseCase;
+  }
   return request("/api/runs", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

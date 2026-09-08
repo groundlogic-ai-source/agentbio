@@ -8,6 +8,12 @@ export default function NewCaseDialog({
   busy,
 }) {
   const [disease, setDisease] = useState("");
+  const [useCase, setUseCase] = useState({
+    subgroup: "",
+    stage: "",
+    treatment_setting: "",
+    proposed_advantage: "",
+  });
   const [preflight, setPreflight] = useState(null);
   const [checking, setChecking] = useState(false);
   const inputRef = useRef(null);
@@ -16,6 +22,12 @@ export default function NewCaseDialog({
     if (open) {
       setPreflight(null);
       setChecking(false);
+      setUseCase({
+        subgroup: "",
+        stage: "",
+        treatment_setting: "",
+        proposed_advantage: "",
+      });
       if (inputRef.current) inputRef.current.focus();
     }
   }, [open]);
@@ -33,13 +45,18 @@ export default function NewCaseDialog({
   async function submit(e) {
     e.preventDefault();
     const value = disease.trim();
+    const framing = Object.fromEntries(
+      Object.entries(useCase)
+        .map(([key, fieldValue]) => [key, fieldValue.trim()])
+        .filter(([, fieldValue]) => fieldValue),
+    );
     if (!value || !onPreflight) {
-      onOpen(value);
+      onOpen(value, value ? framing : null);
       return;
     }
     setChecking(true);
     try {
-      setPreflight(await onPreflight(value));
+      setPreflight(await onPreflight(value, framing));
     } catch (error) {
       setPreflight({
         error: error?.message || "Flagship preflight could not be completed.",
@@ -70,7 +87,7 @@ export default function NewCaseDialog({
     >
       <form
         onSubmit={submit}
-        className="w-full max-w-md rounded-lg border fade-in"
+        className="w-full max-w-lg rounded-lg border fade-in"
         style={{
           backgroundColor: "var(--surface)",
           borderColor: "var(--border)",
@@ -154,6 +171,79 @@ export default function NewCaseDialog({
             }}
           />
 
+          <div className="mt-5 border-t pt-4" style={{ borderColor: "var(--border-light)" }}>
+            <div
+              className="font-mono text-[0.62rem] uppercase tracking-wider"
+              style={{ color: "var(--ink-base)" }}
+            >
+              Optional differentiated use case
+            </div>
+            <p className="mt-1 text-xs leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+              Give experts a concrete population and setting to evaluate. These
+              claims are recorded as UNKNOWN until independent evidence supports them.
+            </p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {[
+                ["subgroup", "Subgroup", "e.g. TS1 p.G406R / exon 8A"],
+                ["stage", "Stage or disease state", "e.g. relapsed or refractory"],
+                ["treatment_setting", "Treatment setting", "e.g. genotype-matched cardiac care"],
+              ].map(([key, label, placeholder]) => (
+                <label key={key} className="block">
+                  <span
+                    className="mb-1 block font-mono text-[0.58rem] uppercase tracking-wider"
+                    style={{ color: "var(--ink-muted)" }}
+                  >
+                    {label}
+                  </span>
+                  <input
+                    type="text"
+                    value={useCase[key]}
+                    onChange={(e) => {
+                      setUseCase((current) => ({
+                        ...current,
+                        [key]: e.target.value,
+                      }));
+                      setPreflight(null);
+                    }}
+                    placeholder={placeholder}
+                    className="w-full rounded border p-2.5 text-sm outline-none"
+                    style={{
+                      borderColor: "var(--border)",
+                      backgroundColor: "var(--paper-warm)",
+                      color: "var(--ink-base)",
+                    }}
+                  />
+                </label>
+              ))}
+            </div>
+            <label className="mt-3 block">
+              <span
+                className="mb-1 block font-mono text-[0.58rem] uppercase tracking-wider"
+                style={{ color: "var(--ink-muted)" }}
+              >
+                Proposed advantage / differentiator
+              </span>
+              <textarea
+                value={useCase.proposed_advantage}
+                onChange={(e) => {
+                  setUseCase((current) => ({
+                    ...current,
+                    proposed_advantage: e.target.value,
+                  }));
+                  setPreflight(null);
+                }}
+                placeholder="e.g. a cardiac benefit without requiring CNS exposure"
+                rows={2}
+                className="w-full resize-y rounded border p-2.5 text-sm outline-none"
+                style={{
+                  borderColor: "var(--border)",
+                  backgroundColor: "var(--paper-warm)",
+                  color: "var(--ink-base)",
+                }}
+              />
+            </label>
+          </div>
+
           {preflight && (
             <div
               className="mt-5 rounded-md border px-3.5 py-3"
@@ -203,6 +293,15 @@ export default function NewCaseDialog({
                       Missing: {preflight.missing_evidence.slice(0, 5).join("; ")}
                     </p>
                   )}
+                  {preflight.flagship_use_case_claims && (
+                    <p
+                      className="mt-2 text-xs leading-relaxed"
+                      style={{ color: "var(--ink-muted)" }}
+                    >
+                      Expert framing is persisted with this verdict; supplied
+                      claims remain UNKNOWN until independently supported.
+                    </p>
+                  )}
                   <p
                     className="mt-3 text-xs leading-relaxed"
                     style={{ color: "var(--ink-muted)" }}
@@ -242,7 +341,14 @@ export default function NewCaseDialog({
             {preflight && !preflight.error && (
               <button
                 type="button"
-                onClick={() => onOpen(disease.trim())}
+                onClick={() => {
+                  const framing = Object.fromEntries(
+                    Object.entries(useCase)
+                      .map(([key, fieldValue]) => [key, fieldValue.trim()])
+                      .filter(([, fieldValue]) => fieldValue),
+                  );
+                  onOpen(disease.trim(), framing);
+                }}
                 disabled={busy || checking}
                 className="btn btn-primary btn-sm"
               >
