@@ -1201,9 +1201,10 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
         + (", ".join(_display_token(gate) for gate in gates)
            if gates else "None recorded")
         + ". This does not mean experimental or clinical validation is complete.",
-        "\n### Flagship readiness\n",
-        f"- **Flagship verdict:** {_display_token(flagship.get('verdict'))}. "
-        "This is a differentiation/readiness screen, not an efficacy verdict.",
+         "\n### Flagship hypothesis\n",
+        f"- **Flagship hypothesis verdict:** {_display_token(flagship.get('verdict'))}. "
+        "This is a computational hypothesis screen, not an efficacy, exposure, "
+        "safety, or clinical-benefit verdict.",
         f"- **Flagship next action:** {_audit_value(flagship.get('next_action'))}.",
         "- **Flagship gaps:** " + (
             "; ".join(str(item) for item in

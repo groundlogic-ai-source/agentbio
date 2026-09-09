@@ -76,13 +76,13 @@ Two run modes, decided in the `target_selection` node:
   runs cannot pick the same pair. Repeated blank runs walk down the ranked
   universe.
 
-### Flagship readiness is a separate screen
+### Flagship hypothesis is a separate screen
 
 Named cases can first use `POST /api/flagship/preflight`. This is a
-non-metered Stage 1 screen: it resolves the disease and reviews target
-specificity, current-treatment overlap, scope, evidence maturity, and whether a
-falsifiable next experiment can be stated. It creates no job and never starts
-candidate collection or structure prediction.
+non-metered Stage 1 screen: it resolves the disease and reviews direct target
+specificity, current-treatment overlap, hypothesis scope, a testable
+differentiator, and whether a falsifiable next experiment can be stated. It
+creates no job and never starts candidate collection or structure prediction.
 
 The preflight returns one of `FLAGSHIP_READY`, `CONDITIONAL_REVIEW`,
 `NOT_FLAGSHIP_READY`, or `INSUFFICIENT_EVIDENCE`. Unknown evidence remains
@@ -90,13 +90,15 @@ unknown. A user may stop after the screen or explicitly continue as an ordinary
 research hypothesis; the screen never auto-starts a billed run.
 
 After candidate review, the same versioned policy runs again using the
-persisted dossier evidence contract. The final candidate-level verdict is
+persisted dossier evidence contract. The candidate-level hypothesis verdict is
 rendered separately from `composite_score`, `STRONG_MATCH`, and
 `paid_validation_eligible`. A high prioritization score is not an efficacy
-probability and cannot by itself establish flagship readiness. In particular,
-generic cytotoxic/proliferation targets, standard-of-care-concordant
-hypotheses, broad unqualified disease inputs, and missing disease-model or
-candidate-specific evidence remain visible as limitations.
+probability and cannot by itself establish hypothesis readiness. The gate can
+reject generic or pathway-only targets, missing candidate identity, and
+unscoped or non-differentiated hypotheses. It does **not** require disease-model
+efficacy, clinical efficacy, exposure, safety, or comparative-advantage evidence:
+those remain explicit UNKNOWN validation states for the external work that the
+flagship hypothesis is meant to initiate.
 
 ---
 

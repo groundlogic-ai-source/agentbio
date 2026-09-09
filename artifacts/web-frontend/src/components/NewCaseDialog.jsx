@@ -176,11 +176,11 @@ export default function NewCaseDialog({
               className="font-mono text-[0.62rem] uppercase tracking-wider"
               style={{ color: "var(--ink-base)" }}
             >
-              Optional differentiated use case
+              Optional flagship hypothesis framing
             </div>
             <p className="mt-1 text-xs leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-              Give experts a concrete population and setting to evaluate. These
-              claims are recorded as UNKNOWN until independent evidence supports them.
+              Give experts a concrete population, setting, and testable
+              differentiator. These are hypothesis inputs, not efficacy evidence.
             </p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {[
@@ -267,7 +267,7 @@ export default function NewCaseDialog({
                     className="font-mono text-[0.62rem] uppercase tracking-[0.12em]"
                     style={{ color: verdictTone }}
                   >
-                    Flagship preflight · {verdictLabel}
+                    Flagship hypothesis screen · {verdictLabel}
                   </div>
                   <p
                     className="mt-2 text-sm leading-relaxed"
@@ -298,16 +298,17 @@ export default function NewCaseDialog({
                       className="mt-2 text-xs leading-relaxed"
                       style={{ color: "var(--ink-muted)" }}
                     >
-                      Expert framing is persisted with this verdict; supplied
-                      claims remain UNKNOWN until independently supported.
+                       Expert framing is persisted with this verdict; supplied
+                       claims remain hypotheses until independently validated.
                     </p>
                   )}
                   <p
                     className="mt-3 text-xs leading-relaxed"
                     style={{ color: "var(--ink-muted)" }}
                   >
-                    This is a readiness screen, not an efficacy verdict. You can
-                    still run the full case explicitly as a research hypothesis.
+                    This gate evaluates computational hypothesis readiness, not
+                    efficacy, exposure, safety, or clinical benefit. You can still
+                    run the full case explicitly as a research hypothesis.
                   </p>
                 </>
               )}

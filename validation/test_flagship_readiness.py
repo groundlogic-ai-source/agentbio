@@ -106,7 +106,10 @@ class FlagshipReadinessTests(unittest.TestCase):
         )
         self.assertEqual(result["verdict"], "CONDITIONAL_REVIEW")
         self.assertIn("candidate_advantage", result["reason_codes"])
-        self.assertIn("disease-model", " ".join(result["missing_evidence"]))
+        self.assertEqual(
+            result["criteria"]["disease_specific_evidence"]["status"], "PASS"
+        )
+        self.assertNotIn("disease-model", " ".join(result["missing_evidence"]))
 
     def test_missing_candidate_identity_keeps_next_experiment_unknown(self):
         result = evaluate_candidate_readiness(
@@ -139,7 +142,7 @@ class FlagshipReadinessTests(unittest.TestCase):
             result["criteria"]["scope_clarity"]["status"], "CONDITIONAL"
         )
         self.assertEqual(
-            result["criteria"]["candidate_advantage"]["status"], "UNKNOWN"
+            result["criteria"]["candidate_advantage"]["status"], "CONDITIONAL"
         )
         self.assertEqual(result["next_experiment"]["status"], "SPECIFIABLE")
 
@@ -162,6 +165,26 @@ class FlagshipReadinessTests(unittest.TestCase):
             "CONDITIONAL",
         )
 
+    def test_existing_treatment_does_not_block_differentiated_hypothesis(self):
+        result = evaluate_target_preflight(
+            [_stage1_row(
+                disease_name="Example disease",
+                has_approved_treatment=True,
+                approved_drug_names=["Current treatment"],
+            )],
+            requested_disease="Example disease",
+            flagship_use_case={
+                "subgroup": "genotype-defined subgroup",
+                "stage": "refractory",
+                "treatment_setting": "after current treatment",
+                "proposed_advantage": "oral option with a distinct safety profile",
+            },
+        )
+        self.assertEqual(
+            result["criteria"]["standard_of_care_overlap"]["status"], "PASS"
+        )
+        self.assertEqual(result["verdict"], "FLAGSHIP_READY")
+
     def test_expert_use_case_is_persisted_but_unverified_in_preflight(self):
         result = evaluate_target_preflight(
             [_stage1_row()],
@@ -181,9 +204,13 @@ class FlagshipReadinessTests(unittest.TestCase):
             result["flagship_use_case_claims"]["subgroup"]["status"], "UNKNOWN"
         )
         self.assertEqual(
-            result["criteria"]["proposed_advantage"]["status"], "UNKNOWN"
+            result["criteria"]["scope_clarity"]["status"], "PASS"
         )
-        self.assertIn("independent support", " ".join(result["missing_evidence"]))
+        self.assertEqual(
+            result["criteria"]["proposed_advantage"]["status"], "PASS"
+        )
+        self.assertNotIn("independent support", " ".join(result["missing_evidence"]))
+        self.assertNotIn("disease-model", " ".join(result["missing_evidence"]))
 
     def test_expert_use_case_cannot_create_final_score_or_verdict(self):
         result = evaluate_candidate_readiness(
@@ -212,12 +239,13 @@ class FlagshipReadinessTests(unittest.TestCase):
             "UNKNOWN",
         )
         self.assertEqual(
-            result["criteria"]["candidate_advantage"]["status"], "UNKNOWN"
+            result["criteria"]["candidate_advantage"]["status"], "PASS"
         )
         self.assertEqual(
-            result["criteria"]["proposed_advantage"]["status"], "UNKNOWN"
+            result["criteria"]["proposed_advantage"]["status"], "PASS"
         )
-        self.assertEqual(result["verdict"], "CONDITIONAL_REVIEW")
+        self.assertEqual(result["criteria"]["disease_specific_evidence"]["status"], "PASS")
+        self.assertEqual(result["verdict"], "FLAGSHIP_READY")
 
     def test_stage1_preflight_avoids_full_target_expansion(self):
         disease = {
@@ -279,7 +307,7 @@ class FlagshipReadinessTests(unittest.TestCase):
             {"composite_weights": {}, "formula_version": "test"},
             None,
         )
-        self.assertIn("Flagship readiness", report)
+        self.assertIn("Flagship hypothesis", report)
         self.assertIn("Not flagship ready", report)
         self.assertIn("composite score", report.casefold())
 

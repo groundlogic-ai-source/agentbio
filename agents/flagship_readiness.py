@@ -1,12 +1,14 @@
-"""Separate flagship-readiness policy for AgentBio.
+"""Computational flagship-hypothesis gate for AgentBio.
 
-This module deliberately does not participate in candidate ranking.  It answers
-a narrower product question: is there enough differentiation and evidence
-context to spend a full case attempt on an outreach flagship?
+This module deliberately does not participate in candidate ranking. It answers
+a narrower, computationally decidable product question: is there a sufficiently
+specific, mechanism-linked, testable hypothesis to take forward as a flagship
+research case?
 
-The preflight evaluator consumes Stage 1 rows and is intentionally conservative:
-unknown evidence stays unknown, and a strong target score cannot turn a generic
-or standard-of-care-concordant hypothesis into a flagship.
+This is not an efficacy, clinical-readiness, or partner-approval gate. Disease
+models, human efficacy, exposure, safety, and comparative advantage remain
+explicit evidence states for later validation; requiring them here would make
+the gate circular.
 """
 
 from __future__ import annotations
@@ -14,7 +16,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 
-FLAGSHIP_READINESS_VERSION = "flagship-readiness-v2"
+FLAGSHIP_READINESS_VERSION = "flagship-readiness-v3"
 
 # Conservative allow-list of targets whose direct inhibition is commonly a
 # general cytotoxic/proliferation signal.  This is a disclosure/readiness
@@ -108,12 +110,13 @@ def _use_case_criteria(
         "subgroup", "stage", "treatment_setting"
     ))
     scope = _criterion(
-        "UNKNOWN",
+        "PASS" if scoped else "CONDITIONAL",
         (
-            "An expert supplied a subgroup, stage, or treatment setting, but "
-            "preflight cannot independently support that claim."
+            "A bounded subgroup, stage, or treatment setting is supplied as the "
+            "computational hypothesis scope; it remains an expert framing claim, "
+            "not independently established evidence."
             if scoped else
-            "No scoped subgroup, stage, or treatment setting was supplied."
+            "No bounded subgroup, stage, or treatment setting was supplied."
         ),
         evidence=[{
             "claims": {
@@ -123,21 +126,25 @@ def _use_case_criteria(
             },
             "source": "expert_input",
         }] if scoped else [],
-        missing=["independent support for the scoped use case"],
+        missing=[] if scoped else [
+            "bounded subgroup, stage, or treatment-setting hypothesis"
+        ],
     )
     advantage = _criterion(
-        "UNKNOWN",
+        "PASS" if use_case.get("proposed_advantage") else "CONDITIONAL",
         (
-            "An expert proposed a differentiator, but no comparative evidence "
-            "supports it yet."
+            "A testable differentiator is supplied as a hypothesis; comparative "
+            "evidence is outside this computational gate."
             if use_case.get("proposed_advantage") else
-            "No proposed advantage over current care was supplied."
+            "No testable differentiator over current care was supplied."
         ),
         evidence=[{
             "claim": claims["proposed_advantage"],
             "source": "expert_input",
         }] if use_case.get("proposed_advantage") else [],
-        missing=["comparative evidence for the proposed advantage"],
+        missing=[] if use_case.get("proposed_advantage") else [
+            "testable differentiating hypothesis"
+        ],
     )
     return scope, advantage
 
@@ -233,18 +240,26 @@ def evaluate_target_preflight(
     has_approved = lead.get("has_approved_treatment")
     precedent = "precedent" in method or "pharmacological" in method
     if precedent or has_approved is True:
+        differentiated = bool(use_case.get("proposed_advantage"))
         overlap = _criterion(
-            "CONDITIONAL",
-            "Approved treatment or pharmacological precedent is already present; "
-            "a flagship must demonstrate an advantage rather than repeat the "
-            "existing mechanism.",
+            "PASS" if differentiated else "CONDITIONAL",
+            (
+                "Existing treatment or pharmacological precedent is disclosed, "
+                "and the supplied differentiator makes this a testable hypothesis "
+                "rather than a silent rediscovery."
+                if differentiated else
+                "Approved treatment or pharmacological precedent is already "
+                "present; a differentiated use case is still needed."
+            ),
             evidence=[{
                 "approved_treatment_observed": has_approved,
                 "approved_drug_names": approved_names[:12],
                 "target_discovery_method": lead.get("target_discovery_method"),
                 "source": "stage_1_target_selection",
             }],
-            missing=["candidate-specific advantage over current care"],
+            missing=[] if differentiated else [
+                "testable differentiating hypothesis"
+            ],
         )
     elif has_approved is False:
         overlap = _criterion(
@@ -265,53 +280,55 @@ def evaluate_target_preflight(
         )
 
     expert_scope, expert_advantage = _use_case_criteria(use_case)
-    scope = _criterion(
-        "PASS" if _has_scope_marker(disease) else "CONDITIONAL",
-        (
+    scope = (
+        _criterion(
+            "PASS",
             "The disease input carries a visible subtype, stage, mutation, or "
-            "treatment-setting qualifier."
-            if _has_scope_marker(disease)
-            else expert_scope["summary"]
-            if any(use_case.get(field) for field in (
-                "subgroup", "stage", "treatment_setting"
-            ))
-            else "The disease input is broad; a flagship claim needs an explicit "
-                 "subgroup, stage, or treatment-setting scope."
-        ),
-        evidence=expert_scope["evidence"] if not _has_scope_marker(disease)
-        else [],
-        missing=[] if _has_scope_marker(disease) else (
-            expert_scope["missing_evidence"] or
-            ["defined subgroup, stage, or treatment setting"]
-        ),
+            "treatment-setting qualifier.",
+        )
+        if _has_scope_marker(disease)
+        else expert_scope
     )
 
     process_support = lead.get("process_support") or []
-    if process_support or method in {"literature_mechanism_class", "genetic_association"}:
+    if (
+        method in {"genetic_association", "literature_mechanism_class"}
+        and isinstance(association, (int, float))
+        and association >= 0.1
+    ):
         evidence_maturity = _criterion(
-            "CONDITIONAL",
-            "Disease-linked mechanistic or association evidence is present, but "
-            "disease-model and clinical candidate evidence are not established "
-            "by Stage 1.",
+            "PASS",
+            "Direct disease-target evidence is sufficient to state a computational "
+            "hypothesis. Disease-model, exposure, and clinical evidence are outside "
+            "this gate and remain explicitly unknown in the dossier.",
             evidence=[{
                 "target_discovery_method": lead.get("target_discovery_method"),
                 "process_support_count": len(process_support),
+                "validation_scope": "outside_computational_flagship_gate",
                 "source": "stage_1_target_selection",
             }],
-            missing=["disease-model evidence", "candidate-specific clinical evidence"],
         )
     else:
         evidence_maturity = _criterion(
-            "UNKNOWN",
-            "The preflight could not establish disease-specific evidence maturity.",
-            missing=["disease-specific model or clinical evidence"],
+            "CONDITIONAL",
+            "The preflight has some target context, but not enough direct "
+            "disease-linked evidence for a computational flagship hypothesis.",
+            missing=["direct disease-target evidence"],
         )
 
-    advantage = _criterion(
-        "UNKNOWN",
-        "The candidate has not been reviewed yet, so advantage over current care "
-        "cannot be inferred from Stage 1.",
-        missing=["candidate-specific efficacy or safety advantage"],
+    advantage = (
+        _criterion(
+            "PASS",
+            "A candidate-level differentiator is stated as a testable hypothesis; "
+            "comparative efficacy, safety, and exposure remain future validation.",
+            evidence=expert_advantage["evidence"],
+        )
+        if use_case.get("proposed_advantage")
+        else _criterion(
+            "CONDITIONAL",
+            "No candidate-level differentiator is stated yet.",
+            missing=["testable differentiating hypothesis"],
+        )
     )
 
     experiment = _next_experiment(disease, target)
@@ -377,14 +394,17 @@ def evaluate_target_preflight(
         "flagship_use_case_claims": _use_case_claims(use_case),
         "next_experiment": experiment,
         "next_action": (
-            "Choose another disease or define a differentiated use case before "
-            "spending a full flagship attempt."
+            "Choose another disease or define a direct, differentiated hypothesis "
+            "before spending a full flagship attempt."
             if verdict == "NOT_FLAGSHIP_READY"
             else (
-                "Continue only as a scoped research hypothesis; final flagship "
-                "readiness requires candidate-level review."
+                "Continue as a conditional flagship hypothesis after resolving the "
+                "listed computational gaps."
                 if verdict == "CONDITIONAL_REVIEW"
-                else "Proceed to full candidate-level review; final readiness is pending."
+                else (
+                    "Proceed as a computational flagship hypothesis. This does not "
+                    "establish efficacy, exposure, safety, or clinical benefit."
+                )
             )
         ),
     }
@@ -445,21 +465,19 @@ def evaluate_candidate_readiness(
         candidate.get("flagship_candidate_advantage")
         or candidate.get("differentiation_evidence")
     )
+    proposed_differentiator = advantage_value or use_case.get("proposed_advantage")
     overlap_status = (
-        "PASS" if comparator_rows and advantage_value else
-        "CONDITIONAL" if comparator_rows else
-        "UNKNOWN"
+        "PASS" if proposed_differentiator else
+        "CONDITIONAL"
     )
     overlap = _criterion(
         overlap_status,
         (
-            "A comparator is present and the candidate-specific advantage is "
-            "explicitly stated."
-            if comparator_rows and advantage_value else
-            "Approved or same-target comparator drugs are present; the candidate "
-            "must show a defined advantage over current care."
-            if comparator_rows else
-            "No reliable comparator context was persisted."
+            "A candidate-specific differentiator is explicitly stated as a "
+            "testable hypothesis; comparator selection and validation remain "
+            "downstream work."
+            if proposed_differentiator else
+            "No candidate-specific differentiator is stated against current care."
         ),
         evidence=[{
             "comparator_count": len(comparator_rows),
@@ -469,7 +487,9 @@ def evaluate_candidate_readiness(
             ],
             "source": "dossier_evidence_contract",
         }] if comparator_rows else [],
-        missing=["candidate-specific advantage over current care"],
+        missing=[] if proposed_differentiator else [
+            "candidate-specific differentiating hypothesis"
+        ],
     )
 
     expert_scope, expert_advantage = _use_case_criteria(use_case)
@@ -497,46 +517,49 @@ def evaluate_candidate_readiness(
     clinical = str(
         scientific.get("clinical_efficacy_evidence") or "UNKNOWN"
     ).upper()
-    if model == "OBSERVED_SUPPORT" or clinical == "OBSERVED_SUPPORT":
-        evidence_status = "PASS"
-        evidence_summary = "Disease-specific model or clinical support is persisted."
-        missing = []
-    elif model == "MIXED_CONFLICTING" or clinical == "MIXED_CONFLICTING":
-        evidence_status = "CONDITIONAL"
-        evidence_summary = "Disease-specific evidence is mixed or conflicting."
-        missing = ["resolve conflicting disease-specific evidence"]
-    else:
+    if model == "MIXED_CONFLICTING" or clinical == "MIXED_CONFLICTING":
         evidence_status = "CONDITIONAL"
         evidence_summary = (
-            "The dossier has target pharmacology but no observed disease-model or "
-            "clinical efficacy evidence."
+            "The dossier records mixed or conflicting disease-specific evidence; "
+            "this does not block a computational hypothesis but requires explicit "
+            "expert review."
         )
-        missing = ["disease-model or candidate-specific clinical evidence"]
+        missing = ["resolve conflicting disease-specific evidence"]
+    elif model == "OBSERVED_SUPPORT" or clinical == "OBSERVED_SUPPORT":
+        evidence_status = "PASS"
+        evidence_summary = (
+            "Disease-specific model or clinical support is persisted. This is "
+            "additional context, not a requirement of the computational gate."
+        )
+        missing = []
+    else:
+        evidence_status = "PASS"
+        evidence_summary = (
+            "No disease-model or clinical efficacy evidence is required for this "
+            "computational hypothesis gate; those states remain UNKNOWN for "
+            "external validation."
+        )
+        missing = []
     evidence_maturity = _criterion(
         evidence_status, evidence_summary, missing=missing
     )
 
-    if advantage_value:
+    if proposed_differentiator:
         advantage = _criterion(
             "PASS",
-            "A candidate-specific advantage over current care was explicitly supplied.",
-            evidence=[{"value": advantage_value, "source": "candidate_review"}],
+            "A candidate-specific differentiator was supplied as a testable "
+            "hypothesis; comparative evidence is outside this gate.",
+            evidence=[{
+                "value": proposed_differentiator,
+                "source": "candidate_review"
+                if advantage_value else "expert_input",
+            }],
         )
     else:
         advantage = _criterion(
-            "UNKNOWN",
-            (
-                "An expert proposed a differentiator, but no comparative evidence "
-                "supports it yet."
-                if use_case.get("proposed_advantage") else
-                "No candidate-specific advantage over current care was established."
-            ),
-            evidence=expert_advantage["evidence"],
-            missing=(
-                expert_advantage["missing_evidence"]
-                if use_case.get("proposed_advantage")
-                else ["comparative efficacy, safety, exposure, or access advantage"]
-            ),
+            "CONDITIONAL",
+            "No candidate-specific differentiator was supplied.",
+            missing=["candidate-specific differentiating hypothesis"],
         )
 
     experiment = _next_experiment(disease, target, drug)
@@ -596,15 +619,17 @@ def evaluate_candidate_readiness(
         "flagship_use_case_claims": _use_case_claims(use_case),
         "next_experiment": experiment,
         "next_action": (
-            "Do not present this candidate as a flagship; use it only as a "
-            "qualified research hypothesis unless a differentiated use case is "
-            "added."
+            "Do not present this candidate as a flagship hypothesis until a direct "
+            "target and differentiating use case are supplied."
             if verdict == "NOT_FLAGSHIP_READY"
             else (
-                "Keep this as conditional expert review until the missing evidence "
-                "is resolved."
+                "Keep this as conditional expert review until the missing "
+                "computational framing is resolved."
                 if verdict == "CONDITIONAL_REVIEW"
-                else "Eligible for flagship human review; this is not an efficacy verdict."
+                else (
+                    "Eligible as a computational flagship hypothesis; this is not "
+                    "an efficacy, exposure, safety, or clinical-benefit verdict."
+                )
             )
         ),
     }
