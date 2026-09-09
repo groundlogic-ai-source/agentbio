@@ -1322,6 +1322,42 @@ def _literature_limitation_audit(candidate: dict[str, Any]) -> str:
                 "Not applicable to this exact candidate/use | "
                 f"“{quote}” |"
             )
+    context = finding.get("pharmacology_context") or {}
+    if context and context.get("status") != "NOT_REQUESTED":
+        lines.extend([
+            "",
+            "### Generic drug-pharmacology context (disclosure only)",
+            f"- **Source state:** {_display_token(context.get('status'))}.",
+            f"- **Coverage:** {_audit_value(context.get('records_screened'))} "
+            "PubMed record(s) screened for the explicitly framed exposure, "
+            "compartment, or selectivity question.",
+            f"- **Boundary:** {_audit_value(context.get('reason'))}",
+            "- These records are generic drug-level context. They are not exact "
+            "disease/use evidence and do not change the score, literature gate, "
+            "or paid-validation eligibility.",
+        ])
+        context_evidence = context.get("evidence") or []
+        if context_evidence:
+            lines.extend([
+                "",
+                "| PMID / source | Year | Context | Exact quotation |",
+                "| --- | ---: | --- | --- |",
+            ])
+            for row in context_evidence:
+                pmid = _audit_value(row.get("pmid"))
+                source = row.get("source_url")
+                source_cell = f"[{pmid}]({source})" if source else pmid
+                quote = str(row.get("quote") or "").replace("|", "\\|")
+                lines.append(
+                    f"| {source_cell} | {_audit_value(row.get('publication_year'))} | "
+                    "Generic drug-level pharmacology | “"
+                    f"{quote}” |"
+                )
+        else:
+            lines.append(
+                "- No exact context quotation was extracted; the relevant "
+                "exposure/selectivity question remains unresolved."
+            )
     lines.append(
         "- **Policy boundary:** this is a post-benchmark production gate. It "
         "does not alter or recompute frozen benchmark results."

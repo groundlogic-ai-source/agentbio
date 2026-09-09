@@ -10,7 +10,7 @@ DECISION_CONTRACT_VERSION = "actionable-decision-v1"
 REPORT_CONTRACT_VERSION = "flagship-dossier-evidence-v2"
 REVIEWER_FORMULA_VERSION = "reviewer-composite-v3-production"
 SAFETY_SCHEMA_VERSION = "safety-v3"
-LITERATURE_SCHEMA_VERSION = "literature-v3"
+LITERATURE_SCHEMA_VERSION = "literature-v4"
 TARGET_APPLICABILITY_POLICY_VERSION = "target-applicability-v1"
 CANDIDATE_IDENTITY_POLICY_VERSION = "candidate-identity-v3"
 

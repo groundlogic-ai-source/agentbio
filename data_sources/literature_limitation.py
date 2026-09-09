@@ -84,6 +84,21 @@ _TERM_STOPWORDS = {
     "modulate", "modulator",
 }
 
+_PHARMACOLOGY_CONTEXT_MARKERS = re.compile(
+    r"\b(?:cns|central nervous|neurolog\w*|brain|blood[- ]brain|bbb|"
+    r"p[- ]glycoprotein|abc[bc]1|compartment|tissue|exposure|penetration|"
+    r"pharmacokinetic|distribution|selectiv(?:e|ity)|subtype|subunit|"
+    r"isoform)\b",
+    re.IGNORECASE,
+)
+_PHARMACOLOGY_CONTEXT_QUOTE_MARKERS = re.compile(
+    r"\b(?:blood[- ]brain barrier|brain penetration|brain exposure|"
+    r"cns penetration|cns exposure|p[- ]glycoprotein|abc[bc]1|"
+    r"pharmacokinetic|pharmacokinetics|exposure|tissue distribution|"
+    r"selectiv(?:e|ity)|subtype|subunit|isoform)\b",
+    re.IGNORECASE,
+)
+
 
 def _fold_text(value: Any) -> str:
     """Fold Unicode accents before applying ASCII-oriented token matching."""
@@ -203,6 +218,103 @@ def _query_families(
         f"{disease} AND ({target}{mechanism}) AND "
         "(genotype OR mutation OR gating OR trafficking OR response)",
     ]
+
+
+def _pharmacology_context_queries(
+    drug_name: str,
+    target_symbol: str,
+    hypothesis_context: Any,
+) -> list[str]:
+    """Build bounded drug-level context searches from explicit hypothesis claims.
+
+    These searches are intentionally separate from the disease/use limitation
+    gate. They surface pharmacology facts for expert review, but generic
+    exposure or selectivity papers must never become an automatic disease-
+    specific veto.
+    """
+    if isinstance(hypothesis_context, dict):
+        context = " ".join(
+            str(value or "") for value in hypothesis_context.values())
+    else:
+        context = str(hypothesis_context or "")
+    if not _PHARMACOLOGY_CONTEXT_MARKERS.search(context):
+        return []
+
+    drug = f'"{drug_name}"'
+    target = f'"{target_symbol}"'
+    queries: list[str] = []
+    if re.search(
+        r"\b(?:cns|central nervous|neurolog\w*|brain|blood[- ]brain|bbb|"
+        r"p[- ]glycoprotein|abc[bc]1|compartment|tissue|exposure|penetration|"
+        r"pharmacokinetic|distribution)\b",
+        context,
+        re.IGNORECASE,
+    ):
+        queries.extend([
+            f"{drug} AND (\"blood-brain barrier\" OR \"brain penetration\" "
+            "OR \"brain exposure\" OR CNS OR \"P-glycoprotein\" OR ABCB1)",
+            f"{drug} AND (pharmacokinetic OR exposure OR distribution OR "
+            "penetration OR compartment)",
+        ])
+    if re.search(
+        r"\b(?:selectiv(?:e|ity)|subtype|subunit|isoform)\b",
+        context,
+        re.IGNORECASE,
+    ):
+        queries.extend([
+            f"{drug} AND (selectivity OR subtype OR subunit OR isoform)",
+            f"{target} AND (selectivity OR subtype OR subunit OR isoform)",
+        ])
+    return list(dict.fromkeys(queries))
+
+
+def retrieve_pharmacology_context(
+    drug_name: str,
+    target_symbol: str,
+    hypothesis_context: Any,
+    *,
+    retmax_per_query: int = 5,
+) -> tuple[list[str], list[dict[str, Any]]]:
+    """Retrieve generic drug-level pharmacology for disclosure-only review."""
+    queries = _pharmacology_context_queries(
+        drug_name, target_symbol, hypothesis_context)
+    pmids: list[str] = []
+    seen: set[str] = set()
+    for query in queries:
+        for pmid in _esearch(query, retmax_per_query):
+            if pmid not in seen:
+                seen.add(pmid)
+                pmids.append(pmid)
+    return queries, _fetch_records(pmids)
+
+
+def _pharmacology_context_evidence(
+    records: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Extract exact context sentences without making applicability claims."""
+    evidence: list[dict[str, Any]] = []
+    for record in records:
+        abstract = str(record.get("abstract") or "")
+        sentences = re.split(r"(?<=[.!?])\s+", abstract)
+        quotes = [
+            sentence.strip() for sentence in sentences
+            if len(sentence.strip()) >= 20
+            and _PHARMACOLOGY_CONTEXT_QUOTE_MARKERS.search(sentence)
+        ]
+        if not quotes:
+            continue
+        evidence.append({
+            "pmid": record.get("pmid"),
+            "title": record.get("title"),
+            "publication_year": record.get("publication_year"),
+            "publication_types": record.get("publication_types", []),
+            "source_url": record.get("source_url"),
+            "quote": " ".join(quotes[:2]),
+            "context_type": "generic_drug_pharmacology",
+            "disclosure_only": True,
+            "exact_disease_use_applicability": False,
+        })
+    return evidence
 
 
 def retrieve_literature(
@@ -811,7 +923,7 @@ def aggregate_findings(
             "this is not evidence of novelty, efficacy, or safety."
         )
     return {
-        "schema_version": "literature-limitation-v3",
+        "schema_version": "literature-limitation-v4",
         "verdict": verdict,
         "source_status": (
             "CLASSIFIER_INTEGRITY_FAILED"
@@ -846,22 +958,24 @@ def check_literature_limitation(
     intended_use: Optional[str] = None,
     *,
     drug_aliases: Optional[list[str]] = None,
+    hypothesis_context: Any = None,
     retriever: Callable[..., tuple[list[str], list[dict[str, Any]]]] = retrieve_literature,
     classifier: Callable[..., dict[str, Any]] = classify_record,
 ) -> dict[str, Any]:
     """Retrieve, classify, mechanically verify, and aggregate limitation evidence."""
     intended = intended_use or f"treatment of {disease_name}"
     cache_key = make_key(
-        "literature_limitation_v5_unknown_quote_recovery",
+        "literature_limitation_v6_pharmacology_context",
         drug_name, disease_name, target_symbol,
         action_type or "", mechanism_of_action or "", intended,
         sorted(drug_aliases or []),
+        hypothesis_context or {},
     )
     if retriever is retrieve_literature and classifier is classify_record:
         cached = get(cache_key)
         if (
             isinstance(cached, dict)
-            and cached.get("schema_version") == "literature-limitation-v3"
+            and cached.get("schema_version") == "literature-limitation-v4"
             and cached.get("source_status") == "HEALTHY"
             and isinstance(cached.get("gate_cleared"), bool)
             and isinstance(cached.get("blocked"), bool)
@@ -968,6 +1082,46 @@ def check_literature_limitation(
             intended_use=intended,
             drug_aliases=drug_aliases,
         )
+        context_result: dict[str, Any] = {
+            "status": "NOT_REQUESTED",
+            "queries": [],
+            "records_screened": 0,
+            "evidence": [],
+            "disclosure_only": True,
+        }
+        if hypothesis_context:
+            try:
+                context_queries, context_records = retrieve_pharmacology_context(
+                    drug_name,
+                    target_symbol,
+                    hypothesis_context,
+                )
+                context_result = {
+                    "status": "HEALTHY" if context_queries else "NOT_REQUESTED",
+                    "queries": context_queries,
+                    "records_screened": len(context_records),
+                    "evidence": _pharmacology_context_evidence(context_records),
+                    "disclosure_only": True,
+                    "reason": (
+                        "Generic drug-level pharmacology was retrieved for expert "
+                        "review; it is not exact disease/use evidence and does not "
+                        "alter the limitation gate, ranking, or score."
+                    ),
+                }
+            except Exception as context_exc:
+                context_result = {
+                    "status": "FAILED",
+                    "queries": [],
+                    "records_screened": 0,
+                    "evidence": [],
+                    "disclosure_only": True,
+                    "reason": (
+                        f"Generic drug-level pharmacology search failed: "
+                        f"{context_exc}. Exposure and selectivity remain unknown; "
+                        "the exact disease/use gate result is unchanged."
+                    ),
+                }
+        result["pharmacology_context"] = context_result
         result["source_record_fingerprint"] = hashlib.sha256(
             json.dumps(
                 [{
@@ -980,7 +1134,12 @@ def check_literature_limitation(
                 ensure_ascii=True,
             ).encode("utf-8")
         ).hexdigest()
-        if retriever is retrieve_literature and classifier is classify_record:
+        if (
+            retriever is retrieve_literature
+            and classifier is classify_record
+            and (result.get("pharmacology_context") or {}).get("status")
+            != "FAILED"
+        ):
             # Authorization evidence is a short-lived source snapshot, not an
             # indefinitely reusable negative finding.
             cache_set(cache_key, result, ttl_days=7)
@@ -989,7 +1148,7 @@ def check_literature_limitation(
         # Source/classifier failures are not cached: a transient outage must not
         # become a durable "no limitation found" result.
         return {
-            "schema_version": "literature-limitation-v3",
+            "schema_version": "literature-limitation-v4",
             "verdict": VERDICT_FAILED,
             "source_status": "FAILED",
             "blocked": False,
@@ -1007,6 +1166,13 @@ def check_literature_limitation(
                 "efficacy_score_boost": 0,
                 "evidence": [],
                 "count": 0,
+            },
+            "pharmacology_context": {
+                "status": "FAILED" if hypothesis_context else "NOT_REQUESTED",
+                "queries": [],
+                "records_screened": 0,
+                "evidence": [],
+                "disclosure_only": True,
             },
             "post_benchmark_production_gate": True,
         }

@@ -13,6 +13,7 @@ from data_sources.literature_limitation import (
     UNKNOWN_INTEGRITY_FAILED,
     aggregate_findings,
     check_literature_limitation,
+    retrieve_pharmacology_context,
 )
 from main_graph import _select_candidates
 
@@ -58,6 +59,78 @@ def _aggregate(records, classifications, **overrides):
 
 
 class LiteratureLimitationTests(unittest.TestCase):
+    @patch("data_sources.literature_limitation._fetch_records")
+    @patch(
+        "data_sources.literature_limitation._esearch",
+        side_effect=[["101"], ["102"]],
+    )
+    def test_pharmacology_context_queries_are_bounded_and_explicit(
+        self, _esearch, fetch_records
+    ):
+        fetch_records.return_value = [
+            _record(
+                "101",
+                abstract=(
+                    "Eliglustat has limited brain distribution. "
+                    "P-glycoprotein contributes to efflux."
+                ),
+            )
+        ]
+        queries, records = retrieve_pharmacology_context(
+            "Eliglustat",
+            "UGCG",
+            {"proposed_advantage": "address persistent neurological disease"},
+        )
+        self.assertEqual(len(queries), 2)
+        self.assertTrue(any("blood-brain barrier" in query for query in queries))
+        self.assertEqual([row["pmid"] for row in records], ["101"])
+        self.assertEqual(fetch_records.call_count, 1)
+
+    @patch("data_sources.literature_limitation.retrieve_pharmacology_context")
+    def test_pharmacology_context_is_disclosure_only_and_does_not_block_gate(
+        self, retrieve_context
+    ):
+        exact = _record(
+            "1",
+            abstract=(
+                "Eliglustat improved systemic disease markers in Gaucher disease "
+                "type 3 participants."
+            ),
+        )
+        context = _record(
+            "2",
+            abstract=(
+                "Eliglustat has limited brain distribution. "
+                "P-glycoprotein contributes to efflux."
+            ),
+        )
+        retrieve_context.return_value = (["generic query"], [context])
+        result = check_literature_limitation(
+            "Eliglustat",
+            "Gaucher disease type 3",
+            "UGCG",
+            "inhibitor",
+            "glucosylceramide synthase inhibitor",
+            "treatment of Gaucher disease type 3",
+            hypothesis_context={
+                "proposed_advantage": "address persistent neurological disease",
+            },
+            retriever=lambda *args: (["exact query"], [exact]),
+            classifier=lambda record, **kwargs: _classification(
+                record,
+                label="APPLICABLE_SUPPORT",
+            ),
+        )
+        self.assertEqual(result["verdict"], VERDICT_NONE)
+        self.assertFalse(result["blocked"])
+        self.assertEqual(
+            result["pharmacology_context"]["status"], "HEALTHY")
+        self.assertTrue(
+            result["pharmacology_context"]["evidence"][0]["disclosure_only"])
+        self.assertFalse(
+            result["pharmacology_context"]["evidence"][0][
+                "exact_disease_use_applicability"])
+
     def test_timothy_consensus_is_confirmed_applicable_limitation(self):
         record = _record(
             title="Timothy syndrome management guidelines consensus statement",

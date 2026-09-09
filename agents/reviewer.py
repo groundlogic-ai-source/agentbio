@@ -1509,6 +1509,7 @@ def run_reviewer(
                 mechanism,
                 intended_use,
                 drug_aliases=r.get("compound_aliases") or [],
+                hypothesis_context=flagship_use_case,
             )
             blocked = bool(limitation.get("blocked"))
             cleared = bool(limitation.get("gate_cleared"))
@@ -1531,7 +1532,7 @@ def run_reviewer(
             )
         for r in reviewed[MAX_LITERATURE_LIMITATION_CANDIDATES:]:
             r["literature_limitation"] = {
-                "schema_version": "literature-limitation-v3",
+                "schema_version": "literature-limitation-v4",
                 "verdict": LITERATURE_NOT_ASSESSED,
                 "source_status": "NOT_ASSESSED_OUTSIDE_BOUNDED_SHORTLIST",
                 "blocked": False,
@@ -1541,6 +1542,13 @@ def run_reviewer(
                     "pre-structure shortlist; it is not authorized for paid validation."
                 ),
                 "evidence": [],
+                "pharmacology_context": {
+                    "status": "NOT_REQUESTED",
+                    "queries": [],
+                    "records_screened": 0,
+                    "evidence": [],
+                    "disclosure_only": True,
+                },
                 "post_benchmark_production_gate": True,
             }
             r["literature_limitation_gate_cleared"] = False
@@ -1794,7 +1802,7 @@ def _build_dossier_evidence_contract(
             "blocking_gates": caps,
         },
         "literature_limitation": candidate.get("literature_limitation") or {
-            "schema_version": "literature-limitation-v3",
+            "schema_version": "literature-limitation-v4",
             "verdict": LITERATURE_NOT_ASSESSED,
             "source_status": "NOT_ASSESSED",
             "blocked": False,
