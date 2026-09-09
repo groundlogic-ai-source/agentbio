@@ -376,6 +376,45 @@ def _quote_is_verbatim(quote: Any, abstract: Any) -> bool:
     return len(quote_norm) >= 20 and quote_norm in abstract_norm
 
 
+def _support_quote_has_candidate_negative_language(
+    quote: Any,
+    *,
+    drug_name: str,
+    drug_class: str,
+    aliases: list[str],
+) -> bool:
+    """Reject support only when negative language applies to this intervention.
+
+    Disease descriptions often contain phrases such as "ERT-resistant symptoms".
+    The generic resistance detector must not turn that baseline description into
+    a contradiction of a different candidate's positive result.
+    """
+    text = str(quote or "")
+    intervention_terms = [
+        value for value in (drug_name, drug_class, *aliases)
+        if str(value or "").strip()
+    ]
+    for match in _NEGATIVE_WORDS.finditer(text):
+        token = match.group(0).casefold()
+        if "resistan" not in token:
+            return True
+        # Keep the window tight enough not to associate resistance to prior
+        # therapy with a later candidate mentioned in the same abstract.
+        context = text[max(0, match.start() - 45):match.end() + 45]
+        if any(
+            _phrase_or_term_match(
+                context,
+                value,
+                minimum_overlap=1 if value == drug_name else 2,
+                minimum_fraction=0.8 if value == drug_name else 0.6,
+            )
+            for value in intervention_terms
+            if _terms(value)
+        ):
+            return True
+    return False
+
+
 def _mechanical_evidence_level(
     record: dict[str, Any], classification: dict[str, Any],
 ) -> str:
@@ -546,7 +585,16 @@ def aggregate_findings(
         valid_citation = bool(
             pmid.isdigit() and record.get("source_url") == expected_url)
         valid_label = label in _ALLOWED_LABELS
-        explicit_language = bool(_NEGATIVE_WORDS.search(str(quote or "")))
+        explicit_language = (
+            _support_quote_has_candidate_negative_language(
+                quote,
+                drug_name=drug_name,
+                drug_class=drug_class,
+                aliases=aliases,
+            )
+            if label == APPLICABLE_SUPPORT else
+            bool(_NEGATIVE_WORDS.search(str(quote or "")))
+        )
         supportive_language = bool(_SUPPORT_WORDS.search(str(quote or "")))
         source_has_negative_language = bool(
             _NEGATIVE_WORDS.search(str(record.get("abstract") or "")))

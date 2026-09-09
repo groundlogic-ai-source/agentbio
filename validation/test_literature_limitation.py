@@ -342,6 +342,30 @@ class LiteratureLimitationTests(unittest.TestCase):
         self.assertEqual(result["explicit_limitation_count"], 1)
         self.assertTrue(result["gate_cleared"])
 
+    def test_support_is_not_rejected_by_resistance_to_prior_therapy(self):
+        quote = (
+            "Patients with Gaucher disease type 3 often suffer from symptoms "
+            "resistant to enzyme replacement therapy. Adding eliglustat improved "
+            "the disease-relevant biomarker."
+        )
+        record = _record(
+            "35782609",
+            title="Eliglustat in Gaucher disease type 3",
+            abstract=quote,
+        )
+        result = _aggregate(
+            [record],
+            [_classification(record, label="APPLICABLE_SUPPORT")],
+            disease_name="Gaucher disease type 3",
+            drug_name="eliglustat",
+            drug_class="substrate reduction therapy",
+            target_symbol="GBA1",
+            intended_use="treatment of Gaucher disease type 3",
+        )
+        self.assertEqual(result["support_count"], 1)
+        self.assertEqual(result["verdict"], VERDICT_NONE)
+        self.assertTrue(result["gate_cleared"])
+
     def test_unknown_label_with_mutation_specific_limitation_is_recovered(self):
         quote = (
             "both Kir6.1(V65M) and Kir6.2(V64M) mutations essentially abolish "
