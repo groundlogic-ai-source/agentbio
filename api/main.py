@@ -652,6 +652,7 @@ class FlagshipUseCaseRequest(BaseModel):
 class RunRequest(BaseModel):
     disease_name: Optional[str] = None
     flagship_use_case: Optional[FlagshipUseCaseRequest] = None
+    hypothesis_only: bool = False
 
 
 class FlagshipPreflightRequest(BaseModel):
@@ -716,6 +717,7 @@ def _run_graph(
     job_id: str,
     thread_id: str,
     flagship_use_case: Optional[dict[str, Any]] = None,
+    hypothesis_only: bool = False,
 ) -> None:
     """
     Drive the LangGraph pipeline on a background thread, updating jobs.db after
@@ -724,7 +726,20 @@ def _run_graph(
     """
     try:
         jobs_db.update_job_status(job_id, status="running")
-        source_health = probe_required_sources()
+        source_health = probe_required_sources() if not hypothesis_only else {
+            "healthy": True,
+            "cached": False,
+            "sources": {
+                "chembl": {
+                    "available": False,
+                    "error": "disabled for hypothesis-only run",
+                },
+                "ncbi_pubmed": {
+                    "available": True,
+                    "error": None,
+                },
+            },
+        }
         if not source_health["healthy"]:
             unavailable = [
                 f"{name} ({status.get('error') or 'unavailable'})"
@@ -757,6 +772,15 @@ def _run_graph(
             "job_id": job_id,
             "repurposing_only": True,
         }
+        if hypothesis_only:
+            # ChEMBL is deliberately excluded, not considered healthy.  The
+            # target-first union still uses independent approved-drug lanes
+            # (GtoPdb, DrugCentral, BindingDB) and carries the disabled status
+            # into the dossier for an explicit coverage limitation.
+            initial_state["hypothesis_only"] = True
+            initial_state["enabled_sources"] = [
+                "gtopdb", "drugcentral", "bindingdb",
+            ]
         if flagship_use_case:
             initial_state["flagship_use_case"] = flagship_use_case
         if requested:
@@ -944,6 +968,16 @@ def start_run(request: Request, req: RunRequest) -> dict[str, str]:
       day across all IPs → HTTP 503 + Retry-After.
     See GET /api/limits for current usage and full documentation.
     """
+    if req.hypothesis_only and not (req.disease_name or "").strip():
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Hypothesis-only mode requires a named disease. "
+                "Blank auto-explore uses the ChEMBL-ranked universe and "
+                "cannot be presented as a ChEMBL-independent hypothesis."
+            ),
+        )
+
     _guardrails.check_ip_rate_limit(request)
     _guardrails.check_daily_cap(jobs_db.count_jobs_today)
 
@@ -954,7 +988,7 @@ def start_run(request: Request, req: RunRequest) -> dict[str, str]:
     job = jobs_db.create_job(disease_name=req.disease_name)
     thread = threading.Thread(
         target=_run_graph,
-        args=(job["job_id"], job["thread_id"], use_case),
+        args=(job["job_id"], job["thread_id"], use_case, req.hypothesis_only),
         daemon=True,
     )
     thread.start()

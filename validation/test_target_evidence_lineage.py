@@ -5,6 +5,38 @@ from agents import target_selection
 from data_sources import reactome
 
 
+class ChemblDisabledScoringTests(unittest.TestCase):
+    def test_score_pair_marks_chembl_disabled_without_measuring_zero(self):
+        with mock.patch.object(
+                target_selection, "get_target_bioactivity_count",
+                side_effect=AssertionError(
+                    "hypothesis-only scoring must not call ChEMBL")), \
+             mock.patch.object(
+                 target_selection, "get_structure_confidence",
+                 return_value={"has_structure": True, "mean_pLDDT": 90.0}), \
+             mock.patch.object(
+                 target_selection, "check_prior_trials",
+                 return_value={
+                     "has_negative_repurposing_result": False,
+                     "trial_count": 0,
+                 }):
+            row = target_selection._score_pair(
+                disease_name="Example rare disease",
+                target={
+                    "target_symbol": "GENE1",
+                    "uniprot_id": "P00001",
+                },
+                association_score=0.8,
+                has_approved_treatment=False,
+                prevalence=None,
+                chembl_enabled=False,
+            )
+
+        self.assertEqual(row["chembl_activity_count"], 0)
+        self.assertIsNone(row["median_pchembl"])
+        self.assertEqual(row["chembl_activity_status"], "disabled")
+
+
 class PathwayNeighborAssociationTests(unittest.TestCase):
     def test_neighbor_does_not_inherit_or_manufacture_association_score(self):
         direct = [{

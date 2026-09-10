@@ -58,10 +58,13 @@ export function flagshipPreflight(diseaseName, flagshipUseCase) {
   });
 }
 
-export function openCase(diseaseName, flagshipUseCase) {
+export function openCase(diseaseName, flagshipUseCase, hypothesisOnly = false) {
   const body = diseaseName ? { disease_name: diseaseName } : {};
   if (flagshipUseCase && diseaseName) {
     body.flagship_use_case = flagshipUseCase;
+  }
+  if (hypothesisOnly) {
+    body.hypothesis_only = true;
   }
   return request("/api/runs", {
     method: "POST",

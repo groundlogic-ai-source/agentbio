@@ -658,6 +658,57 @@ class EnabledSourcesTests(unittest.TestCase):
 class ChemistPassthroughTests(unittest.TestCase):
     """run_chemist forwards enabled_sources to collect_target_candidates."""
 
+    def test_hypothesis_only_source_set_skips_chembl_pool(self):
+        from agents import chemist as chem_mod
+
+        bio = {"target": {
+            "uniprot_id": "P23219", "target_symbol": "PTGS1",
+            "disease_name": "inflammation", "ot_association_score": 0.42,
+            "target_discovery_method": "genetic_association",
+        }}
+
+        def _fake_collect(*args, **kwargs):
+            self.assertEqual(
+                kwargs.get("enabled_sources"),
+                ["gtopdb", "drugcentral", "bindingdb"],
+            )
+            return {
+                "candidates": [],
+                "source_status": {
+                    "gtopdb": {"status": "empty"},
+                    "drugcentral": {"status": "empty"},
+                    "bindingdb": {"status": "empty"},
+                    "chembl": {"status": "disabled"},
+                },
+            }
+
+        with mock.patch.object(
+                chem_mod, "get_target_candidate_compounds",
+                side_effect=AssertionError(
+                    "hypothesis-only mode must not call ChEMBL")), \
+             mock.patch.object(
+                 chem_mod, "get_mechanism_only_approved_drugs",
+                 side_effect=AssertionError(
+                     "hypothesis-only mode must not call ChEMBL")), \
+             mock.patch.object(chem_mod, "get_pathway_neighbor_targets",
+                               side_effect=AssertionError(
+                                   "hypothesis-only mode must not expand via ChEMBL")), \
+             mock.patch.object(chem_mod, "_anthropic_client",
+                               return_value=None), \
+             mock.patch.object(chem_mod, "collect_target_candidates",
+                               side_effect=_fake_collect):
+            result = chem_mod.run_chemist(
+                bio,
+                repurposing_only=True,
+                enabled_sources=["gtopdb", "drugcentral", "bindingdb"],
+            )
+
+        self.assertEqual(result["candidates"], [])
+        self.assertFalse(result["pooled_across_multiple_targets"])
+        self.assertEqual(result["enabled_sources"], [
+            "bindingdb", "drugcentral", "gtopdb",
+        ])
+
     def test_run_chemist_forwards_enabled_sources(self):
         from agents import chemist as chem_mod
 

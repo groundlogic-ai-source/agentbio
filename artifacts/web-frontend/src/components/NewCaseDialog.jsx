@@ -14,6 +14,7 @@ export default function NewCaseDialog({
     treatment_setting: "",
     proposed_advantage: "",
   });
+  const [hypothesisOnly, setHypothesisOnly] = useState(false);
   const [preflight, setPreflight] = useState(null);
   const [checking, setChecking] = useState(false);
   const inputRef = useRef(null);
@@ -28,6 +29,7 @@ export default function NewCaseDialog({
         treatment_setting: "",
         proposed_advantage: "",
       });
+      setHypothesisOnly(false);
       if (inputRef.current) inputRef.current.focus();
     }
   }, [open]);
@@ -51,7 +53,7 @@ export default function NewCaseDialog({
         .filter(([, fieldValue]) => fieldValue),
     );
     if (!value || !onPreflight) {
-      onOpen(value, value ? framing : null);
+      onOpen(value, value ? framing : null, hypothesisOnly);
       return;
     }
     setChecking(true);
@@ -244,6 +246,41 @@ export default function NewCaseDialog({
             </label>
           </div>
 
+          <label
+            className="mt-5 flex cursor-pointer items-start gap-2.5 rounded-md border px-3.5 py-3"
+            style={{
+              borderColor: hypothesisOnly
+                ? "var(--brass-border)"
+                : "var(--border-light)",
+              backgroundColor: hypothesisOnly
+                ? "var(--brass-glow)"
+                : "transparent",
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={hypothesisOnly}
+              onChange={(e) => setHypothesisOnly(e.target.checked)}
+              className="mt-0.5"
+            />
+            <span>
+              <span
+                className="block text-sm font-medium"
+                style={{ color: "var(--ink-base)" }}
+              >
+                Run with ChEMBL disabled
+              </span>
+              <span
+                className="mt-1 block text-xs leading-relaxed"
+                style={{ color: "var(--ink-muted)" }}
+              >
+                Build a clearly marked hypothesis from GtoPdb, DrugCentral,
+                BindingDB, and literature. Missing ChEMBL affinity and safety
+                coverage will remain an explicit limitation.
+              </span>
+            </span>
+          </label>
+
           {preflight && (
             <div
               className="mt-5 rounded-md border px-3.5 py-3"
@@ -348,7 +385,7 @@ export default function NewCaseDialog({
                       .map(([key, fieldValue]) => [key, fieldValue.trim()])
                       .filter(([, fieldValue]) => fieldValue),
                   );
-                  onOpen(disease.trim(), framing);
+                  onOpen(disease.trim(), framing, hypothesisOnly);
                 }}
                 disabled={busy || checking}
                 className="btn btn-primary btn-sm"

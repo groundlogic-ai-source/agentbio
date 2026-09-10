@@ -770,7 +770,10 @@ def preflight_for_disease(query: str) -> list[dict[str, Any]]:
     } for target in genetic_targets]
 
 
-def select_for_disease(query: str) -> list[dict[str, Any]]:
+def select_for_disease(
+    query: str,
+    enabled_sources: Optional[list[str]] = None,
+) -> list[dict[str, Any]]:
     """
     Manual mode: look up a single disease in the rare/NTD universe and score its
     top targets with the EXACT SAME formulas used by the ranking sweep.
@@ -784,6 +787,10 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
         RuntimeError         — the disease is in-universe but has no Open Targets
                                EFO mapping or no associated targets to score.
     """
+    chembl_enabled = (
+        enabled_sources is None
+        or "chembl" in {str(source).lower() for source in enabled_sources}
+    )
     candidates = _matchable_universe()
     disease = _match_disease(query, candidates)
 
@@ -1016,8 +1023,11 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
     # Path B — pharmacological precedent: approved-drug MOA targets from ChEMBL.
     # Uses approved_drug_names already fetched from OT (avoids EFO/MONDO format issues).
     # Only adds targets not already covered by the OT genetic pool (dedup by UniProt ID).
-    pharm_targets = get_pharmacological_targets_for_disease(
-        efo_id, approved_drug_names=approved_drug_names or None
+    pharm_targets = (
+        get_pharmacological_targets_for_disease(
+            efo_id, approved_drug_names=approved_drug_names or None
+        )
+        if chembl_enabled else []
     )
     seen_uniprots = {t.get("uniprot_id") for t in genetic_targets if t.get("uniprot_id")}
     new_pharm = [
@@ -1029,8 +1039,11 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
     # Only runs when the specific subtype had no approved-drug links and a parent
     # umbrella EFO did (umbrella_approved_drug_names populated above).
     if umbrella_approved_drug_names:
-        _umbrella_pharm_raw = get_pharmacological_targets_for_disease(
-            umbrella_efo_id, approved_drug_names=umbrella_approved_drug_names
+        _umbrella_pharm_raw = (
+            get_pharmacological_targets_for_disease(
+                umbrella_efo_id, approved_drug_names=umbrella_approved_drug_names
+            )
+            if chembl_enabled else []
         )
         _seen_after_direct = seen_uniprots | {t.get("uniprot_id") for t in new_pharm
                                               if t.get("uniprot_id")}
@@ -1135,6 +1148,7 @@ def select_for_disease(query: str) -> list[dict[str, Any]]:
             disease_source=disease.get("source", "orphanet"),
             approved_drug_names=approved_drug_names,
             ot_treatment_unconfirmed=ot_treatment_unconfirmed,
+            chembl_enabled=chembl_enabled,
         ))
 
     rows.sort(key=lambda x: (x["tractability_score"] + x["unmet_need_score"]), reverse=True)
@@ -1229,6 +1243,7 @@ def _score_pair(
     disease_source: str = "orphanet",
     approved_drug_names: Optional[list] = None,
     ot_treatment_unconfirmed: bool = False,
+    chembl_enabled: bool = True,
 ) -> dict[str, Any]:
     """
     Compute all raw numbers and both scores for one (disease, target) pair.
@@ -1246,14 +1261,17 @@ def _score_pair(
     uniprot_id = target.get("uniprot_id")
 
     chembl_data: dict[str, Any] = {"count": 0, "median_pchembl": None}
+    chembl_activity_status = "disabled" if not chembl_enabled else "unavailable"
     afdb_data: dict[str, Any] = {"has_structure": False, "mean_pLDDT": None}
     trial_data: dict[str, Any] = {"has_negative_repurposing_result": False, "trial_count": 0}
 
     if uniprot_id:
-        try:
-            chembl_data = get_target_bioactivity_count(uniprot_id)
-        except Exception as e:
-            _log(f"  WARN chembl {uniprot_id}: {e}")
+        if chembl_enabled:
+            try:
+                chembl_data = get_target_bioactivity_count(uniprot_id)
+                chembl_activity_status = "observed"
+            except Exception as e:
+                _log(f"  WARN chembl {uniprot_id}: {e}")
 
         try:
             afdb_data = get_structure_confidence(uniprot_id)
@@ -1294,6 +1312,7 @@ def _score_pair(
         "chembl_activity_count": chembl_data.get("count", 0),
         "median_pchembl": chembl_data.get("median_pchembl"),
         "chembl_pooled_multi_target": chembl_data.get("pooled_across_multiple_targets", False),
+        "chembl_activity_status": chembl_activity_status,
         "afdb_has_structure": afdb_data.get("has_structure", False),
         "afdb_mean_plddt": afdb_data.get("mean_pLDDT"),
         "prior_trial_count": trial_data.get("trial_count", 0),

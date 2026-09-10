@@ -442,22 +442,32 @@ def run_chemist(biologist_output: dict[str, Any],
             },
         }
 
-    cc = get_target_candidate_compounds(uniprot, repurposing_only=repurposing_only)
-    compounds = cc["compounds"]
-    chembl_source_status = {
-        "status": (
-            cc.get("source_status")
-            or ("ok" if compounds else "unavailable")
-        ),
-        "error": (
-            cc.get("source_error")
-            or (
-                None if compounds
-                else "ChEMBL returned no verifiable complete candidate payload"
-            )
-        ),
-        "release": None,
-    }
+    chembl_enabled = "chembl" in enabled
+    if chembl_enabled:
+        cc = get_target_candidate_compounds(
+            uniprot, repurposing_only=repurposing_only)
+        compounds = cc["compounds"]
+        chembl_source_status = {
+            "status": (
+                cc.get("source_status")
+                or ("ok" if compounds else "unavailable")
+            ),
+            "error": (
+                cc.get("source_error")
+                or (
+                    None if compounds
+                    else "ChEMBL returned no verifiable complete candidate payload"
+                )
+            ),
+            "release": None,
+        }
+    else:
+        compounds = []
+        chembl_source_status = {
+            "status": "disabled",
+            "error": "ChEMBL disabled for hypothesis-only source coverage",
+            "release": None,
+        }
     if repurposing_only:
         print(f"[chemist] repurposing_only mode: pool restricted to "
               f"{len(compounds)} approved compound(s) (unapproved tool "
@@ -471,7 +481,7 @@ def run_chemist(biologist_output: dict[str, Any],
     # each such candidate so reviewer/writer can disclose the weaker,
     # mechanism-only evidence basis. Fail-soft: lane errors never block the
     # activity pool.
-    if not _v2_lanes_disabled():
+    if chembl_enabled and not _v2_lanes_disabled():
         try:
             mech = get_mechanism_only_approved_drugs(uniprot)
             existing_ids = {c.get("molecule_chembl_id") for c in compounds}
@@ -506,7 +516,13 @@ def run_chemist(biologist_output: dict[str, Any],
         and _is_max_phase_approved(c.get("max_phase"))
     )
     neighbor_enriched: list[dict[str, Any]] = []
-    if n_primary_approved >= PATHWAY_NEIGHBOR_MIN_APPROVED:
+    if not chembl_enabled:
+        print(
+            f"[chemist] pathway-neighbor expansion SKIPPED for {symbol}: "
+            "ChEMBL is disabled and neighbor expansion requires its "
+            "ChEMBL-backed pool"
+        )
+    elif n_primary_approved >= PATHWAY_NEIGHBOR_MIN_APPROVED:
         print(
             f"[chemist] pathway-neighbor expansion SKIPPED for {symbol}: "
             f"primary pool has {n_primary_approved} approved compound(s) "
@@ -850,7 +866,10 @@ def run_chemist(biologist_output: dict[str, Any],
     return {
         "target": target,
         "candidates": results,
-        "pooled_across_multiple_targets": cc["pooled_across_multiple_targets"],
+        "pooled_across_multiple_targets": (
+            cc.get("pooled_across_multiple_targets", False)
+            if chembl_enabled else False
+        ),
         "repurposing_only": repurposing_only,
         "enabled_sources": sorted(enabled),
         "approved_reference_set_size": len(approved_fps),

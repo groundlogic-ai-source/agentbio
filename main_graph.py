@@ -113,6 +113,8 @@ TOP_K_MAX      = int(os.environ.get("TOP_K_MAX", "10"))
 class PipelineState(TypedDict, total=False):
     job_id: Optional[str]
     repurposing_only: bool
+    hypothesis_only: bool
+    enabled_sources: list[str]
     requested_disease: str
     flagship_use_case: dict[str, Any]
     # Primary (top-ranked) target — kept for backwards compat with nodes that
@@ -347,7 +349,15 @@ def target_selection_node(state: PipelineState) -> dict[str, Any]:
         # raises DiseaseNotInUniverse / RuntimeError, which surfaces to the caller
         # as a clean job error rather than a silent auto-pick fallback.
         print(f"[graph] target_selection: manual disease request '{requested}'")
-        all_rows = select_for_disease(requested)
+        enabled_sources = state.get("enabled_sources")
+        all_rows = (
+            select_for_disease(
+                requested,
+                enabled_sources=enabled_sources,
+            )
+            if enabled_sources is not None
+            else select_for_disease(requested)
+        )
         top_rows = _apply_k_cutoff(all_rows)
     else:
         rows = _blank_mode_rows()
@@ -509,8 +519,14 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
     # for the CLI/standalone path, unless explicitly overridden in state.
     repurposing_only = state.get("repurposing_only", bool(state.get("job_id")))
 
+    enabled_sources = state.get("enabled_sources")
+
     if k == 1:
-        out = run_chemist(bio_outputs[0], repurposing_only=repurposing_only)
+        out = run_chemist(
+            bio_outputs[0],
+            repurposing_only=repurposing_only,
+            enabled_sources=enabled_sources,
+        )
         # Runtime schema validation: catch field-dropout bugs at the boundary
         # rather than discovering them in a downstream report.
         validate_chemist_handoff(out.get("candidates", []))
@@ -524,7 +540,8 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
     with ThreadPoolExecutor(max_workers=k) as exe:
         future_to_idx = {
             exe.submit(run_chemist, bio_outputs[i],
-                       repurposing_only=repurposing_only): i
+                       repurposing_only=repurposing_only,
+                       enabled_sources=enabled_sources): i
             for i in range(k)
         }
         for fut in as_completed(future_to_idx):
