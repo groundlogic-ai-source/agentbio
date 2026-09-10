@@ -666,6 +666,8 @@ class ResumeRequest(BaseModel):
 
 class BatchRequest(BaseModel):
     n: int = 3  # number of blank-mode cases to run sequentially (clamped to 1-10)
+    flagship_use_case: Optional[FlagshipUseCaseRequest] = None
+    disease_names: Optional[list[str]] = None
 
 
 class AuditRequest(BaseModel):
@@ -967,9 +969,13 @@ def get_runs(include_archived: bool = False) -> list[dict[str, Any]]:
 @app.post("/api/runs/batch")
 def start_batch(request: Request, req: BatchRequest) -> dict[str, Any]:
     """
-    Queue N blank-mode auto-explore cases and run them sequentially on a
+    Queue N cases and run them sequentially on a
     background thread.  Returns immediately with batch_id + all pre-created
     job_ids so the UI can poll individual job progress via GET /api/runs/{job_id}.
+
+    When ``disease_names`` is supplied, it must contain exactly N names from
+    the existing rare/NTD universe and each case runs in manual disease mode.
+    Without it, cases use the normal blank-mode auto-selection.
 
     Cases run in order; each case waits for the previous one to finish (including
     the human-review pause) before the next case's graph starts.  This keeps
@@ -985,12 +991,30 @@ def start_batch(request: Request, req: BatchRequest) -> dict[str, Any]:
     Clamped: n is clamped server-side to [1, 10] regardless of the request value.
     """
     n = max(1, min(10, req.n))
+    disease_names = [
+        name.strip() for name in (req.disease_names or [])
+        if isinstance(name, str) and name.strip()
+    ]
+    if disease_names and len(disease_names) != n:
+        raise HTTPException(
+            status_code=400,
+            detail="disease_names must contain exactly n non-empty names",
+        )
     _guardrails.check_ip_rate_limit(request)
     _guardrails.check_daily_cap(jobs_db.count_jobs_today)
+    use_case = (
+        req.flagship_use_case.model_dump(exclude_none=True)
+        if req.flagship_use_case else None
+    )
 
     # Pre-create all N jobs so their IDs are known before the background thread
     # starts — the caller can begin polling immediately.
-    job_rows = [jobs_db.create_job(disease_name=None) for _ in range(n)]
+    job_rows = [
+        jobs_db.create_job(
+            disease_name=disease_names[index] if disease_names else None
+        )
+        for index in range(n)
+    ]
     job_ids  = [j["job_id"]  for j in job_rows]
     thread_ids = [j["thread_id"] for j in job_rows]
 
@@ -1007,7 +1031,7 @@ def start_batch(request: Request, req: BatchRequest) -> dict[str, Any]:
     def _run_batch() -> None:
         for job_id, thread_id in zip(job_ids, thread_ids):
             try:
-                _run_graph(job_id, thread_id)
+                _run_graph(job_id, thread_id, use_case)
             except Exception as exc:
                 print(f"[batch] job {job_id} failed with {type(exc).__name__}: {exc}")
             _batch_progress[batch_id]["completed"] += 1
