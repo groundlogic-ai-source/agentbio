@@ -314,6 +314,31 @@ def run(max_successes: int, max_expensive_checks: int) -> dict[str, Any]:
 
     payload = _load_or_create(max_successes, max_expensive_checks)
     payload["stage1"]["total"] = len(rows)
+    # An earlier runner version interleaved Stage 1 and Stage 2.  If that
+    # version stopped on the expensive-check cap before the bulk queue was
+    # complete, its Stage 2 results are not representative of the queue.
+    # Preserve a compact diagnostic record, reset that budget, and finish the
+    # LLM-free bulk pass before starting Stage 2.
+    if (
+        payload["stage1"].get("completed", 0) < len(rows)
+        and payload["stage2"].get("checks")
+    ):
+        payload["superseded_stage2_diagnostic"] = [
+            {
+                "disease_name": check.get("disease_name"),
+                "drug_name": (check.get("candidate") or {}).get("drug_name"),
+                "verdict": (check.get("direction") or {}).get("verdict"),
+            }
+            for check in payload["stage2"].get("checks") or []
+        ]
+        payload["stage2"] = {
+            "expensive_checks": 0,
+            "successes": [],
+            "checks": [],
+            "stop_reason": None,
+        }
+        _atomic_write(RESULT_PATH, payload)
+
     completed_names = {
         row.get("disease_name")
         for row in payload["stage1"].get("rows") or []
@@ -323,12 +348,6 @@ def run(max_successes: int, max_expensive_checks: int) -> dict[str, Any]:
         disease = row["disease_name"]
         if disease in completed_names:
             continue
-        if len(payload["stage2"].get("successes") or []) >= max_successes:
-            payload["stage2"]["stop_reason"] = "max_successes_reached"
-            break
-        if payload["stage2"].get("expensive_checks", 0) >= max_expensive_checks:
-            payload["stage2"]["stop_reason"] = "max_expensive_checks_reached"
-            break
 
         print(
             f"[bounded-screen] Stage 1 {index}/{len(rows)}: {disease}",
@@ -355,70 +374,108 @@ def run(max_successes: int, max_expensive_checks: int) -> dict[str, Any]:
         payload["updated_at_utc"] = dt.datetime.now(dt.timezone.utc).isoformat()
         _atomic_write(RESULT_PATH, payload)
 
-        # Stage 2 is intentionally entered only after the disease-level bulk
-        # gates. One top approved molecule is one expensive check; if it is
-        # incompatible, the next molecule consumes the next bounded slot.
-        for survivor in stage1.get("survivors") or []:
-            for candidate in survivor.get("candidates") or []:
-                if len(payload["stage2"].get("successes") or []) >= max_successes:
-                    payload["stage2"]["stop_reason"] = "max_successes_reached"
-                    break
-                if payload["stage2"].get("expensive_checks", 0) >= max_expensive_checks:
-                    payload["stage2"]["stop_reason"] = "max_expensive_checks_reached"
-                    break
-
-                target = survivor["target"]
-                drug_name = candidate.get("drug_name") or candidate.get("pref_name")
-                if not drug_name:
-                    continue
-                print(
-                    f"[bounded-screen] Stage 2 check "
-                    f"{payload['stage2']['expensive_checks'] + 1}/"
-                    f"{max_expensive_checks}: {disease} / {drug_name}",
-                    flush=True,
-                )
-                direction = check_mechanism_direction(
-                    drug_name=drug_name,
-                    target_symbol=target.get("target_symbol") or "",
-                    action_type=candidate.get("action_type"),
-                    mechanism_of_action=candidate.get("mechanism_of_action"),
-                    disease_name=disease,
-                    candidate_chembl_ids=(
-                        [candidate["molecule_chembl_id"]]
-                        if candidate.get("molecule_chembl_id")
-                        else None
+    # Do not spend any LLM calls until every disease has received the cheap
+    # Stage 1 checks.  This prevents alphabetical ordering or an early
+    # survivor from consuming the whole expensive budget.
+    if payload["stage1"].get("completed") >= payload["stage1"].get("total"):
+        stage1_survivors = [
+            completed
+            for completed in payload["stage1"].get("rows") or []
+            if completed.get("stage1_status") == "survivor"
+        ]
+        # Literature sparsity is not measured in Stage 1.  The smallest
+        # approved pool is the only cheap, auditable sparsity proxy available,
+        # so examine those rows first.
+        stage1_survivors.sort(
+            key=lambda completed: (
+                min(
+                    (
+                        target.get("candidate_count", 10**9)
+                        for target in completed.get("survivors") or []
                     ),
-                    candidate_inchikey=candidate.get("inchikey"),
-                )
-                check = {
-                    "disease_name": disease,
-                    "orpha_code": row.get("orpha_code"),
-                    "target": target,
-                    "candidate": {
-                        key: candidate.get(key)
-                        for key in (
-                            "drug_name",
-                            "molecule_chembl_id",
-                            "inchikey",
-                            "action_type",
-                            "mechanism_of_action",
-                            "pchembl_value",
-                            "confidence_score",
-                        )
-                    },
-                    "direction": direction,
-                }
-                payload["stage2"]["checks"].append(check)
-                payload["stage2"]["expensive_checks"] += 1
-                if direction.get("compatible") is True:
-                    payload["stage2"]["successes"].append(check)
-                    # One compatible drug is enough to surface the disease;
-                    # do not spend more checks on alternate drugs for it.
+                    default=10**9,
+                ),
+                str(completed.get("disease_name") or "").casefold(),
+            )
+        )
+        checked_keys = {
+            (
+                check.get("disease_name"),
+                (check.get("target") or {}).get("target_symbol"),
+                (check.get("candidate") or {}).get("drug_name"),
+            )
+            for check in payload["stage2"].get("checks") or []
+        }
+        for survivor_row in stage1_survivors:
+            disease = survivor_row["disease_name"]
+            for survivor in survivor_row.get("survivors") or []:
+                target = survivor["target"]
+                for candidate in survivor.get("candidates") or []:
+                    if len(payload["stage2"].get("successes") or []) >= max_successes:
+                        payload["stage2"]["stop_reason"] = "max_successes_reached"
+                        break
+                    if payload["stage2"].get("expensive_checks", 0) >= max_expensive_checks:
+                        payload["stage2"]["stop_reason"] = "max_expensive_checks_reached"
+                        break
+
+                    drug_name = candidate.get("drug_name") or candidate.get("pref_name")
+                    check_key = (disease, target.get("target_symbol"), drug_name)
+                    if not drug_name or check_key in checked_keys:
+                        continue
+                    print(
+                        f"[bounded-screen] Stage 2 check "
+                        f"{payload['stage2']['expensive_checks'] + 1}/"
+                        f"{max_expensive_checks}: {disease} / {drug_name}",
+                        flush=True,
+                    )
+                    direction = check_mechanism_direction(
+                        drug_name=drug_name,
+                        target_symbol=target.get("target_symbol") or "",
+                        action_type=candidate.get("action_type"),
+                        mechanism_of_action=candidate.get("mechanism_of_action"),
+                        disease_name=disease,
+                        candidate_chembl_ids=(
+                            [candidate["molecule_chembl_id"]]
+                            if candidate.get("molecule_chembl_id")
+                            else None
+                        ),
+                        candidate_inchikey=candidate.get("inchikey"),
+                    )
+                    check = {
+                        "disease_name": disease,
+                        "orpha_code": survivor_row.get("orpha_code"),
+                        "target": target,
+                        "candidate": {
+                            key: candidate.get(key)
+                            for key in (
+                                "drug_name",
+                                "molecule_chembl_id",
+                                "inchikey",
+                                "action_type",
+                                "mechanism_of_action",
+                                "pchembl_value",
+                                "confidence_score",
+                            )
+                        },
+                        "direction": direction,
+                    }
+                    payload["stage2"]["checks"].append(check)
+                    payload["stage2"]["expensive_checks"] += 1
+                    checked_keys.add(check_key)
+                    if direction.get("compatible") is True:
+                        payload["stage2"]["successes"].append(check)
+                        # One compatible drug is enough to surface the disease.
+                        break
+                    payload["updated_at_utc"] = dt.datetime.now(
+                        dt.timezone.utc
+                    ).isoformat()
+                    _atomic_write(RESULT_PATH, payload)
+                if (
+                    len(payload["stage2"].get("successes") or []) >= max_successes
+                    or payload["stage2"].get("expensive_checks", 0)
+                    >= max_expensive_checks
+                ):
                     break
-                payload["updated_at_utc"] = dt.datetime.now(
-                    dt.timezone.utc
-                ).isoformat()
-                _atomic_write(RESULT_PATH, payload)
             if (
                 len(payload["stage2"].get("successes") or []) >= max_successes
                 or payload["stage2"].get("expensive_checks", 0)
@@ -426,16 +483,13 @@ def run(max_successes: int, max_expensive_checks: int) -> dict[str, Any]:
             ):
                 break
 
-        payload["updated_at_utc"] = dt.datetime.now(dt.timezone.utc).isoformat()
-        _atomic_write(RESULT_PATH, payload)
-
-    if payload["stage2"].get("stop_reason") is None:
-        if len(payload["stage2"].get("successes") or []) >= max_successes:
-            payload["stage2"]["stop_reason"] = "max_successes_reached"
-        elif payload["stage2"].get("expensive_checks", 0) >= max_expensive_checks:
-            payload["stage2"]["stop_reason"] = "max_expensive_checks_reached"
-        elif payload["stage1"].get("completed") >= payload["stage1"].get("total"):
-            payload["stage2"]["stop_reason"] = "queue_exhausted"
+        if payload["stage2"].get("stop_reason") is None:
+            if len(payload["stage2"].get("successes") or []) >= max_successes:
+                payload["stage2"]["stop_reason"] = "max_successes_reached"
+            elif payload["stage2"].get("expensive_checks", 0) >= max_expensive_checks:
+                payload["stage2"]["stop_reason"] = "max_expensive_checks_reached"
+            else:
+                payload["stage2"]["stop_reason"] = "queue_exhausted"
     payload["updated_at_utc"] = dt.datetime.now(dt.timezone.utc).isoformat()
     _atomic_write(RESULT_PATH, payload)
     return payload
