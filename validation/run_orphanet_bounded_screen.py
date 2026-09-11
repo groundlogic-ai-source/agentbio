@@ -299,6 +299,21 @@ def _load_or_create(max_successes: int, max_expensive_checks: int) -> dict[str, 
         old_config.get("max_successes") != max_successes
         or old_config.get("max_expensive_checks") != max_expensive_checks
     ):
+        # Permit changing the backup budget while the cheap bulk pass is still
+        # running.  No expensive result has been consumed in this state, so
+        # updating the limits cannot invalidate a Stage 2 conclusion.
+        if (
+            payload.get("stage1", {}).get("completed", 0)
+            < payload.get("stage1", {}).get("total", 0)
+            and not payload.get("stage2", {}).get("checks")
+        ):
+            payload["config"].update(
+                {
+                    "max_successes": max_successes,
+                    "max_expensive_checks": max_expensive_checks,
+                }
+            )
+            return payload
         raise RuntimeError(
             "Existing bounded-screen checkpoint has different stop limits. "
             "Delete output/orphanet_bounded_screen.json only if a fresh run is "
