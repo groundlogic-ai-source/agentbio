@@ -46,6 +46,7 @@ from data_sources.open_targets import (
     get_target_disease_score,
     search_disease_efo,
 )
+from agents.target_selection import _enrich_approved_via_parents
 
 
 QUEUE_PATH = os.path.join(REPO_ROOT, "output", "orphanet_prefilter_queue.json")
@@ -53,6 +54,8 @@ RESULT_PATH = os.path.join(REPO_ROOT, "output", "orphanet_bounded_screen.json")
 CLINICAL_TRIALS_URL = "https://clinicaltrials.gov/api/v2/studies"
 ENABLED_SOURCES = ("chembl", "gtopdb", "drugcentral", "bindingdb")
 SCHEMA_VERSION = "orphanet-bounded-screen-v1"
+_KATP_HYPERINSULINISM_TARGETS = frozenset({"KCNJ11", "ABCC8"})
+_KATP_BLOCKERS = frozenset({"glibenclamide", "glyburide"})
 
 _TRIAL_LOCK = threading.Lock()
 _LAST_TRIAL_REQUEST = 0.0
@@ -176,6 +179,27 @@ def _candidate_sort_key(candidate: dict[str, Any]) -> tuple[float, float, str]:
     )
 
 
+def _cheap_polarity_exclusion(
+    disease_name: str,
+    target_symbol: str,
+    candidate: dict[str, Any],
+) -> str | None:
+    """Exclude a known opposite-polarity KATP pairing before LLM review.
+
+    KCNJ11/ABCC8 loss-of-function hyperinsulinism is the channel-closed
+    disease direction.  Glibenclamide/glyburide is a KATP blocker used in the
+    opposite gain-of-function neonatal-diabetes biology, so it is not a
+    credible discovery candidate for this disease family.
+    """
+    if (
+        target_symbol.upper() in _KATP_HYPERINSULINISM_TARGETS
+        and "hyperinsulinism" in disease_name.casefold()
+        and str(candidate.get("drug_name") or "").casefold() in _KATP_BLOCKERS
+    ):
+        return "opposite_katp_polarity_for_hyperinsulinism"
+    return None
+
+
 def _stage1_row(row: dict[str, Any]) -> dict[str, Any]:
     disease = row["disease_name"]
     result: dict[str, Any] = {
@@ -196,6 +220,21 @@ def _stage1_row(row: dict[str, Any]) -> dict[str, Any]:
         return result
 
     treatment = get_disease_known_drugs(efo_id)
+    (
+        parent_has_approved,
+        parent_approved_names,
+        parent_efo_id,
+        parent_drug_names,
+    ) = _enrich_approved_via_parents(
+        efo_id,
+        treatment.get("has_approved_treatment"),
+        treatment.get("approved_drug_names") or [],
+    )
+    treatment = dict(treatment)
+    treatment["has_approved_treatment"] = parent_has_approved
+    treatment["approved_drug_names"] = parent_approved_names
+    treatment["parent_umbrella_efo_id"] = parent_efo_id
+    treatment["parent_umbrella_approved_drug_names"] = parent_drug_names
     result["approved_treatment"] = treatment
     if treatment.get("has_approved_treatment") is not False:
         result["rejection_reason"] = (
@@ -246,10 +285,31 @@ def _stage1_row(row: dict[str, Any]) -> dict[str, Any]:
             "candidate_count": len(pool.get("candidates") or []),
         }
         if pool_ok:
-            target_result["candidates"] = sorted(
+            kept_candidates = []
+            excluded_candidates = []
+            for candidate in sorted(
                 pool.get("candidates") or [], key=_candidate_sort_key
-            )
-            result["survivors"].append(target_result)
+            ):
+                exclusion = _cheap_polarity_exclusion(
+                    disease,
+                    str(target.get("target_symbol") or ""),
+                    candidate,
+                )
+                if exclusion:
+                    excluded_candidates.append(
+                        {
+                            "drug_name": candidate.get("drug_name"),
+                            "reason": exclusion,
+                        }
+                    )
+                else:
+                    kept_candidates.append(candidate)
+            target_result["candidate_exclusions"] = excluded_candidates
+            target_result["candidates"] = kept_candidates
+            if kept_candidates:
+                result["survivors"].append(target_result)
+            else:
+                target_result["pool_reason"] = "all_candidates_failed_cheap_polarity_gate"
 
     if result["survivors"]:
         result["stage1_status"] = "survivor"
@@ -257,6 +317,103 @@ def _stage1_row(row: dict[str, Any]) -> dict[str, Any]:
     else:
         result["rejection_reason"] = "no_verified_approved_target_pool"
     return result
+
+
+def repair_parent_treatment_reconciliation(
+    payload: dict[str, Any],
+) -> tuple[dict[str, Any], list[str]]:
+    """Repair completed Stage 1 rows written before parent reconciliation.
+
+    This is deliberately a separate cheap operation: it does not repeat the
+    source fan-out or spend mechanism checks.  Any candidate invalidated here
+    is marked in the existing Stage 2 audit rather than pretending the already
+    spent request never happened.
+    """
+    invalidated: list[str] = []
+    for row in payload.get("stage1", {}).get("rows") or []:
+        if row.get("stage1_status") != "survivor" or not row.get("efo_id"):
+            continue
+        treatment = row.get("approved_treatment") or {}
+        if treatment.get("has_approved_treatment") is True:
+            continue
+        (
+            parent_has_approved,
+            parent_approved_names,
+            parent_efo_id,
+            parent_drug_names,
+        ) = _enrich_approved_via_parents(
+            row["efo_id"],
+            treatment.get("has_approved_treatment"),
+            treatment.get("approved_drug_names") or [],
+        )
+        treatment = dict(treatment)
+        treatment["has_approved_treatment"] = parent_has_approved
+        treatment["approved_drug_names"] = parent_approved_names
+        treatment["parent_umbrella_efo_id"] = parent_efo_id
+        treatment["parent_umbrella_approved_drug_names"] = parent_drug_names
+        row["approved_treatment"] = treatment
+        if parent_has_approved is True:
+            disease = row.get("disease_name")
+            row["stage1_status"] = "rejected"
+            row["rejection_reason"] = (
+                "approved_treatment_present_via_parent_umbrella"
+            )
+            row["survivors"] = []
+            invalidated.append(disease)
+
+        for survivor in row.get("survivors") or []:
+            target = survivor.get("target") or {}
+            kept = []
+            excluded = list(survivor.get("candidate_exclusions") or [])
+            for candidate in survivor.get("candidates") or []:
+                exclusion = _cheap_polarity_exclusion(
+                    row.get("disease_name") or "",
+                    str(target.get("target_symbol") or ""),
+                    candidate,
+                )
+                if exclusion:
+                    excluded.append(
+                        {
+                            "drug_name": candidate.get("drug_name"),
+                            "reason": exclusion,
+                        }
+                    )
+                else:
+                    kept.append(candidate)
+            survivor["candidates"] = kept
+            survivor["candidate_exclusions"] = excluded
+            survivor["candidate_count"] = len(kept)
+
+        if row.get("stage1_status") == "survivor":
+            row["survivors"] = [
+                survivor
+                for survivor in row.get("survivors") or []
+                if survivor.get("candidates")
+            ]
+            if not row["survivors"]:
+                row["stage1_status"] = "rejected"
+                row["rejection_reason"] = "no_candidate_after_cheap_polarity_gate"
+                invalidated.append(row.get("disease_name"))
+
+    if invalidated:
+        for check in payload.get("stage2", {}).get("checks") or []:
+            if check.get("disease_name") in invalidated:
+                check["invalidated_stage1_gate"] = (
+                    "approved_treatment_present_via_parent_umbrella"
+                )
+        payload["stage1"]["survivor_count"] = sum(
+            1
+            for row in payload["stage1"].get("rows") or []
+            if row.get("stage1_status") == "survivor"
+        )
+        payload["stage2"]["invalidated_check_count"] = sum(
+            1
+            for check in payload["stage2"].get("checks") or []
+            if check.get("invalidated_stage1_gate")
+        )
+    payload["updated_at_utc"] = dt.datetime.now(dt.timezone.utc).isoformat()
+    _atomic_write(RESULT_PATH, payload)
+    return payload, invalidated
 
 
 def _new_payload(max_successes: int, max_expensive_checks: int) -> dict[str, Any]:
@@ -514,9 +671,33 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--max-successes", type=int, default=3)
     parser.add_argument("--max-expensive-checks", type=int, default=10)
+    parser.add_argument(
+        "--repair-parent-treatment",
+        action="store_true",
+        help="repair completed Stage 1 rows without starting new mechanism checks",
+    )
     args = parser.parse_args()
     if args.max_successes < 1 or args.max_expensive_checks < 1:
         raise SystemExit("stop limits must both be positive integers")
+    if args.repair_parent_treatment:
+        if not os.path.exists(RESULT_PATH):
+            raise SystemExit(f"checkpoint not found: {RESULT_PATH}")
+        with open(RESULT_PATH, encoding="utf-8") as handle:
+            payload = json.load(handle)
+        payload, invalidated = repair_parent_treatment_reconciliation(payload)
+        print(
+            json.dumps(
+                {
+                    "repaired_diseases": invalidated,
+                    "survivors_remaining": payload["stage1"]["survivor_count"],
+                    "invalidated_stage2_checks": payload["stage2"].get(
+                        "invalidated_check_count", 0
+                    ),
+                },
+                indent=2,
+            )
+        )
+        return
     payload = run(args.max_successes, args.max_expensive_checks)
     print(
         json.dumps(
