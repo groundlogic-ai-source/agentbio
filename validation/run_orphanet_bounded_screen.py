@@ -637,6 +637,33 @@ def continue_stage2(additional_expensive_checks: int) -> dict[str, Any]:
     return payload
 
 
+def mark_aborted_stage2_checkpoint() -> dict[str, Any]:
+    """Record and bound a continuation that exceeded its intended cap."""
+    if not os.path.exists(RESULT_PATH):
+        raise RuntimeError(f"checkpoint not found: {RESULT_PATH}")
+    with open(RESULT_PATH, encoding="utf-8") as handle:
+        payload = json.load(handle)
+    checks = int(payload.get("stage2", {}).get("expensive_checks", 0))
+    intended_cap = 40
+    payload["stage2"]["stop_reason"] = (
+        "manual_stop_after_unintended_autorestart"
+    )
+    payload["stage2"]["run_note"] = {
+        "intended_cap": intended_cap,
+        "checks_at_intended_cap": min(checks, intended_cap),
+        "unintended_autorestart_checks": max(0, checks - intended_cap),
+        "aborted_at_check": checks,
+        "reason": (
+            "one-shot continuation workflow auto-restarted; "
+            "workflow stopped and configuration restored"
+        ),
+    }
+    payload.setdefault("config", {})["max_expensive_checks"] = 20
+    payload["updated_at_utc"] = dt.datetime.now(dt.timezone.utc).isoformat()
+    _atomic_write(RESULT_PATH, payload)
+    return payload
+
+
 def run(max_successes: int, max_expensive_checks: int) -> dict[str, Any]:
     with open(QUEUE_PATH, encoding="utf-8") as handle:
         queue = json.load(handle)
@@ -729,6 +756,11 @@ def main() -> None:
         default=0,
         help="append this many Stage 2 checks to the existing checkpoint",
     )
+    parser.add_argument(
+        "--mark-aborted-stage2",
+        action="store_true",
+        help="annotate a checkpoint stopped after an unintended restart",
+    )
     args = parser.parse_args()
     if args.max_successes < 1 or args.max_expensive_checks < 1:
         raise SystemExit("stop limits must both be positive integers")
@@ -738,6 +770,12 @@ def main() -> None:
         raise SystemExit(
             "--repair-parent-treatment and --continue-expensive-checks "
             "cannot be combined"
+        )
+    if args.mark_aborted_stage2 and (
+        args.repair_parent_treatment or args.continue_expensive_checks
+    ):
+        raise SystemExit(
+            "--mark-aborted-stage2 cannot be combined with another checkpoint mode"
         )
     if args.repair_parent_treatment:
         if not os.path.exists(RESULT_PATH):
@@ -753,6 +791,20 @@ def main() -> None:
                     "invalidated_stage2_checks": payload["stage2"].get(
                         "invalidated_check_count", 0
                     ),
+                },
+                indent=2,
+            )
+        )
+        return
+    if args.mark_aborted_stage2:
+        payload = mark_aborted_stage2_checkpoint()
+        print(
+            json.dumps(
+                {
+                    "checks_written": payload["stage2"]["expensive_checks"],
+                    "stop_reason": payload["stage2"]["stop_reason"],
+                    "run_note": payload["stage2"]["run_note"],
+                    "result_path": RESULT_PATH,
                 },
                 indent=2,
             )
