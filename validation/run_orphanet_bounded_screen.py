@@ -56,6 +56,83 @@ ENABLED_SOURCES = ("chembl", "gtopdb", "drugcentral", "bindingdb")
 SCHEMA_VERSION = "orphanet-bounded-screen-v1"
 _KATP_HYPERINSULINISM_TARGETS = frozenset({"KCNJ11", "ABCC8"})
 _KATP_BLOCKERS = frozenset({"glibenclamide", "glyburide"})
+_CHANNEL_OR_RECEPTOR_PREFIXES = (
+    "KCN",
+    "CACNA",
+    "SCN",
+    "TRP",
+    "PIEZO",
+    "GJA",
+    "GJB",
+    "GJC",
+    "NALCN",
+    "ORAI",
+    "CHRN",
+    "GABR",
+    "HTR",
+    "ADRA",
+    "DRD",
+    "GPR",
+    "FGFR",
+    "BMPR",
+    "EGFR",
+    "ERBB",
+)
+_CHANNEL_OR_RECEPTOR_TARGETS = frozenset(
+    {
+        "ABCC8",
+        "PTH1R",
+        "GHSR",
+        "GUCY2C",
+        "EPHA2",
+        "SLC12A2",
+    }
+)
+_ENZYME_LIKE_TARGETS = frozenset(
+    {
+        "ASPH",
+        "CA12",
+        "CTSC",
+        "CTSD",
+        "CYP11B2",
+        "CYP27B1",
+        "CYP2R1",
+        "DHFR",
+        "FBP1",
+        "HDAC6",
+        "LDHA",
+        "MALT1",
+        "PHKG2",
+        "PLD1",
+        "POLA1",
+        "PROC",
+        "PSMB8",
+    }
+)
+_METABOLIC_TERMS = (
+    "metabolic",
+    "mitochond",
+    "glycogen",
+    "vitamin",
+    "chol",
+    "aldoster",
+    "porph",
+    "pyruvate",
+    "phosphoglycerate",
+    "triose",
+    "squalene",
+    "succinate",
+    "coq",
+    "amino",
+    "lipid",
+    "storage",
+    "peroxis",
+    "urea",
+    "organic acid",
+    "rickets",
+    "hypercholan",
+    "hyperchlor",
+)
 
 _TRIAL_LOCK = threading.Lock()
 _LAST_TRIAL_REQUEST = 0.0
@@ -198,6 +275,43 @@ def _cheap_polarity_exclusion(
     ):
         return "opposite_katp_polarity_for_hyperinsulinism"
     return None
+
+
+def _is_channel_or_receptor_target(target_symbol: str) -> bool:
+    symbol = str(target_symbol or "").upper()
+    return symbol in _CHANNEL_OR_RECEPTOR_TARGETS or any(
+        symbol.startswith(prefix) for prefix in _CHANNEL_OR_RECEPTOR_PREFIXES
+    )
+
+
+def _enzyme_metabolic_priority(
+    disease_name: str,
+    target_symbol: str,
+    candidate: dict[str, Any],
+) -> tuple[float, float, str] | None:
+    """Return a deterministic priority key for the focused continuation lane."""
+    if _is_channel_or_receptor_target(target_symbol):
+        return None
+
+    context = f"{disease_name} {target_symbol}".casefold()
+    target_is_enzyme = str(target_symbol or "").upper() in _ENZYME_LIKE_TARGETS
+    if not target_is_enzyme and not any(
+        term in context for term in _METABOLIC_TERMS
+    ):
+        return None
+
+    try:
+        pchembl = float(candidate.get("pchembl_value"))
+    except (TypeError, ValueError):
+        pchembl = -1.0
+    precedent = (
+        1.0
+        if candidate.get("target_discovery_method") == "pharmacological_precedent"
+        else 0.0
+    )
+    # Prefer explicit pharmacological precedent, then measurable activity, while
+    # retaining stable drug-name ordering for ties.
+    return (precedent, pchembl, str(candidate.get("drug_name") or "").casefold())
 
 
 def _stage1_row(row: dict[str, Any]) -> dict[str, Any]:
@@ -483,6 +597,7 @@ def _run_stage2(
     payload: dict[str, Any],
     max_successes: int,
     max_expensive_checks: int,
+    selection_mode: str | None = None,
 ) -> None:
     """Run Stage 2 up to an absolute checkpoint cap.
 
@@ -506,6 +621,53 @@ def _run_stage2(
             str(completed.get("disease_name") or "").casefold(),
         )
     )
+    work_items: list[
+        tuple[
+            dict[str, Any],
+            dict[str, Any],
+            dict[str, Any],
+            str,
+            tuple[float, float, str] | None,
+        ]
+    ] = []
+    for survivor_row in stage1_survivors:
+        disease = survivor_row["disease_name"]
+        for survivor in survivor_row.get("survivors") or []:
+            target = survivor["target"]
+            target_symbol = target.get("target_symbol") or ""
+            for candidate in survivor.get("candidates") or []:
+                drug_name = candidate.get("drug_name") or candidate.get("pref_name")
+                if not drug_name:
+                    continue
+                priority = None
+                if selection_mode == "enzyme_metabolic":
+                    priority = _enzyme_metabolic_priority(
+                        disease, target_symbol, candidate
+                    )
+                    if priority is None:
+                        continue
+                work_items.append(
+                    (
+                        survivor_row,
+                        survivor,
+                        candidate,
+                        drug_name,
+                        priority,
+                    )
+                )
+
+    if selection_mode == "enzyme_metabolic":
+        work_items.sort(
+            key=lambda item: (
+                item[4] is not None,
+                item[4] or (-1.0, -1.0, ""),
+                -int(item[1].get("candidate_count", 10**9)),
+                str(item[0].get("disease_name") or "").casefold(),
+                item[3].casefold(),
+            ),
+            reverse=True,
+        )
+
     checked_keys = {
         (
             check.get("disease_name"),
@@ -514,86 +676,63 @@ def _run_stage2(
         )
         for check in payload["stage2"].get("checks") or []
     }
-    for survivor_row in stage1_survivors:
-        disease = survivor_row["disease_name"]
-        for survivor in survivor_row.get("survivors") or []:
-            target = survivor["target"]
-            for candidate in survivor.get("candidates") or []:
-                if len(payload["stage2"].get("successes") or []) >= max_successes:
-                    payload["stage2"]["stop_reason"] = "max_successes_reached"
-                    break
-                if (
-                    payload["stage2"].get("expensive_checks", 0)
-                    >= max_expensive_checks
-                ):
-                    payload["stage2"]["stop_reason"] = (
-                        "max_expensive_checks_reached"
-                    )
-                    break
-
-                drug_name = candidate.get("drug_name") or candidate.get("pref_name")
-                check_key = (disease, target.get("target_symbol"), drug_name)
-                if not drug_name or check_key in checked_keys:
-                    continue
-                print(
-                    f"[bounded-screen] Stage 2 check "
-                    f"{payload['stage2']['expensive_checks'] + 1}/"
-                    f"{max_expensive_checks}: {disease} / {drug_name}",
-                    flush=True,
-                )
-                direction = check_mechanism_direction(
-                    drug_name=drug_name,
-                    target_symbol=target.get("target_symbol") or "",
-                    action_type=candidate.get("action_type"),
-                    mechanism_of_action=candidate.get("mechanism_of_action"),
-                    disease_name=disease,
-                    candidate_chembl_ids=(
-                        [candidate["molecule_chembl_id"]]
-                        if candidate.get("molecule_chembl_id")
-                        else None
-                    ),
-                    candidate_inchikey=candidate.get("inchikey"),
-                )
-                check = {
-                    "disease_name": disease,
-                    "orpha_code": survivor_row.get("orpha_code"),
-                    "target": target,
-                    "candidate": {
-                        key: candidate.get(key)
-                        for key in (
-                            "drug_name",
-                            "molecule_chembl_id",
-                            "inchikey",
-                            "action_type",
-                            "mechanism_of_action",
-                            "pchembl_value",
-                            "confidence_score",
-                        )
-                    },
-                    "direction": direction,
-                }
-                payload["stage2"]["checks"].append(check)
-                payload["stage2"]["expensive_checks"] += 1
-                checked_keys.add(check_key)
-                if direction.get("compatible") is True:
-                    payload["stage2"]["successes"].append(check)
-                    break
-                payload["updated_at_utc"] = dt.datetime.now(
-                    dt.timezone.utc
-                ).isoformat()
-                _atomic_write(RESULT_PATH, payload)
-            if (
-                len(payload["stage2"].get("successes") or []) >= max_successes
-                or payload["stage2"].get("expensive_checks", 0)
-                >= max_expensive_checks
-            ):
-                break
-        if (
-            len(payload["stage2"].get("successes") or []) >= max_successes
-            or payload["stage2"].get("expensive_checks", 0)
-            >= max_expensive_checks
-        ):
+    for survivor_row, survivor, candidate, drug_name, _priority in work_items:
+        if len(payload["stage2"].get("successes") or []) >= max_successes:
+            payload["stage2"]["stop_reason"] = "max_successes_reached"
             break
+        if payload["stage2"].get("expensive_checks", 0) >= max_expensive_checks:
+            payload["stage2"]["stop_reason"] = "max_expensive_checks_reached"
+            break
+
+        disease = survivor_row["disease_name"]
+        target = survivor["target"]
+        check_key = (disease, target.get("target_symbol"), drug_name)
+        if check_key in checked_keys:
+            continue
+        print(
+            f"[bounded-screen] Stage 2 check "
+            f"{payload['stage2']['expensive_checks'] + 1}/"
+            f"{max_expensive_checks}: {disease} / {drug_name}",
+            flush=True,
+        )
+        direction = check_mechanism_direction(
+            drug_name=drug_name,
+            target_symbol=target.get("target_symbol") or "",
+            action_type=candidate.get("action_type"),
+            mechanism_of_action=candidate.get("mechanism_of_action"),
+            disease_name=disease,
+            candidate_chembl_ids=(
+                [candidate["molecule_chembl_id"]]
+                if candidate.get("molecule_chembl_id")
+                else None
+            ),
+            candidate_inchikey=candidate.get("inchikey"),
+        )
+        check = {
+            "disease_name": disease,
+            "orpha_code": survivor_row.get("orpha_code"),
+            "target": target,
+            "candidate": {
+                key: candidate.get(key)
+                for key in (
+                    "drug_name",
+                    "molecule_chembl_id",
+                    "inchikey",
+                    "action_type",
+                    "mechanism_of_action",
+                    "pchembl_value",
+                    "confidence_score",
+                )
+            },
+            "direction": direction,
+        }
+        payload["stage2"]["checks"].append(check)
+        payload["stage2"]["expensive_checks"] += 1
+        checked_keys.add(check_key)
+        if direction.get("compatible") is True:
+            payload["stage2"]["successes"].append(check)
+        payload["updated_at_utc"] = dt.datetime.now(dt.timezone.utc).isoformat()
+        _atomic_write(RESULT_PATH, payload)
 
     if payload["stage2"].get("stop_reason") is None:
         if len(payload["stage2"].get("successes") or []) >= max_successes:
@@ -607,7 +746,10 @@ def _run_stage2(
             payload["stage2"]["stop_reason"] = "queue_exhausted"
 
 
-def continue_stage2(additional_expensive_checks: int) -> dict[str, Any]:
+def continue_stage2(
+    additional_expensive_checks: int,
+    selection_mode: str | None = None,
+) -> dict[str, Any]:
     """Append one bounded Stage 2 batch to a completed checkpoint."""
     if not os.path.exists(RESULT_PATH):
         raise RuntimeError(f"checkpoint not found: {RESULT_PATH}")
@@ -626,11 +768,13 @@ def continue_stage2(additional_expensive_checks: int) -> dict[str, Any]:
     config = payload.setdefault("config", {})
     config["last_appended_stage2_batch"] = additional_expensive_checks
     config["max_expensive_checks"] = total_cap
+    config["stage2_selection_mode"] = selection_mode or "default"
     payload["stage2"]["stop_reason"] = None
     _run_stage2(
         payload,
         max_successes=config.get("max_successes", 5),
         max_expensive_checks=total_cap,
+        selection_mode=selection_mode,
     )
     payload["updated_at_utc"] = dt.datetime.now(dt.timezone.utc).isoformat()
     _atomic_write(RESULT_PATH, payload)
@@ -761,6 +905,14 @@ def main() -> None:
         action="store_true",
         help="annotate a checkpoint stopped after an unintended restart",
     )
+    parser.add_argument(
+        "--prioritize-enzyme-metabolic",
+        action="store_true",
+        help=(
+            "for continuation, exclude channel/receptor targets and prioritize "
+            "enzyme/metabolic candidates"
+        ),
+    )
     args = parser.parse_args()
     if args.max_successes < 1 or args.max_expensive_checks < 1:
         raise SystemExit("stop limits must both be positive integers")
@@ -772,7 +924,9 @@ def main() -> None:
             "cannot be combined"
         )
     if args.mark_aborted_stage2 and (
-        args.repair_parent_treatment or args.continue_expensive_checks
+        args.repair_parent_treatment
+        or args.continue_expensive_checks
+        or args.prioritize_enzyme_metabolic
     ):
         raise SystemExit(
             "--mark-aborted-stage2 cannot be combined with another checkpoint mode"
@@ -810,8 +964,17 @@ def main() -> None:
             )
         )
         return
+    if args.prioritize_enzyme_metabolic and not args.continue_expensive_checks:
+        raise SystemExit(
+            "--prioritize-enzyme-metabolic requires --continue-expensive-checks"
+        )
     if args.continue_expensive_checks:
-        payload = continue_stage2(args.continue_expensive_checks)
+        payload = continue_stage2(
+            args.continue_expensive_checks,
+            selection_mode=(
+                "enzyme_metabolic" if args.prioritize_enzyme_metabolic else None
+            ),
+        )
         print(
             json.dumps(
                 {
