@@ -479,6 +479,164 @@ def _load_or_create(max_successes: int, max_expensive_checks: int) -> dict[str, 
     return payload
 
 
+def _run_stage2(
+    payload: dict[str, Any],
+    max_successes: int,
+    max_expensive_checks: int,
+) -> None:
+    """Run Stage 2 up to an absolute checkpoint cap.
+
+    Existing checks are keyed and skipped, so callers can safely append a
+    bounded batch without replaying or rewriting the prior mechanism work.
+    """
+    stage1_survivors = [
+        completed
+        for completed in payload["stage1"].get("rows") or []
+        if completed.get("stage1_status") == "survivor"
+    ]
+    stage1_survivors.sort(
+        key=lambda completed: (
+            min(
+                (
+                    target.get("candidate_count", 10**9)
+                    for target in completed.get("survivors") or []
+                ),
+                default=10**9,
+            ),
+            str(completed.get("disease_name") or "").casefold(),
+        )
+    )
+    checked_keys = {
+        (
+            check.get("disease_name"),
+            (check.get("target") or {}).get("target_symbol"),
+            (check.get("candidate") or {}).get("drug_name"),
+        )
+        for check in payload["stage2"].get("checks") or []
+    }
+    for survivor_row in stage1_survivors:
+        disease = survivor_row["disease_name"]
+        for survivor in survivor_row.get("survivors") or []:
+            target = survivor["target"]
+            for candidate in survivor.get("candidates") or []:
+                if len(payload["stage2"].get("successes") or []) >= max_successes:
+                    payload["stage2"]["stop_reason"] = "max_successes_reached"
+                    break
+                if (
+                    payload["stage2"].get("expensive_checks", 0)
+                    >= max_expensive_checks
+                ):
+                    payload["stage2"]["stop_reason"] = (
+                        "max_expensive_checks_reached"
+                    )
+                    break
+
+                drug_name = candidate.get("drug_name") or candidate.get("pref_name")
+                check_key = (disease, target.get("target_symbol"), drug_name)
+                if not drug_name or check_key in checked_keys:
+                    continue
+                print(
+                    f"[bounded-screen] Stage 2 check "
+                    f"{payload['stage2']['expensive_checks'] + 1}/"
+                    f"{max_expensive_checks}: {disease} / {drug_name}",
+                    flush=True,
+                )
+                direction = check_mechanism_direction(
+                    drug_name=drug_name,
+                    target_symbol=target.get("target_symbol") or "",
+                    action_type=candidate.get("action_type"),
+                    mechanism_of_action=candidate.get("mechanism_of_action"),
+                    disease_name=disease,
+                    candidate_chembl_ids=(
+                        [candidate["molecule_chembl_id"]]
+                        if candidate.get("molecule_chembl_id")
+                        else None
+                    ),
+                    candidate_inchikey=candidate.get("inchikey"),
+                )
+                check = {
+                    "disease_name": disease,
+                    "orpha_code": survivor_row.get("orpha_code"),
+                    "target": target,
+                    "candidate": {
+                        key: candidate.get(key)
+                        for key in (
+                            "drug_name",
+                            "molecule_chembl_id",
+                            "inchikey",
+                            "action_type",
+                            "mechanism_of_action",
+                            "pchembl_value",
+                            "confidence_score",
+                        )
+                    },
+                    "direction": direction,
+                }
+                payload["stage2"]["checks"].append(check)
+                payload["stage2"]["expensive_checks"] += 1
+                checked_keys.add(check_key)
+                if direction.get("compatible") is True:
+                    payload["stage2"]["successes"].append(check)
+                    break
+                payload["updated_at_utc"] = dt.datetime.now(
+                    dt.timezone.utc
+                ).isoformat()
+                _atomic_write(RESULT_PATH, payload)
+            if (
+                len(payload["stage2"].get("successes") or []) >= max_successes
+                or payload["stage2"].get("expensive_checks", 0)
+                >= max_expensive_checks
+            ):
+                break
+        if (
+            len(payload["stage2"].get("successes") or []) >= max_successes
+            or payload["stage2"].get("expensive_checks", 0)
+            >= max_expensive_checks
+        ):
+            break
+
+    if payload["stage2"].get("stop_reason") is None:
+        if len(payload["stage2"].get("successes") or []) >= max_successes:
+            payload["stage2"]["stop_reason"] = "max_successes_reached"
+        elif (
+            payload["stage2"].get("expensive_checks", 0)
+            >= max_expensive_checks
+        ):
+            payload["stage2"]["stop_reason"] = "max_expensive_checks_reached"
+        else:
+            payload["stage2"]["stop_reason"] = "queue_exhausted"
+
+
+def continue_stage2(additional_expensive_checks: int) -> dict[str, Any]:
+    """Append one bounded Stage 2 batch to a completed checkpoint."""
+    if not os.path.exists(RESULT_PATH):
+        raise RuntimeError(f"checkpoint not found: {RESULT_PATH}")
+    with open(RESULT_PATH, encoding="utf-8") as handle:
+        payload = json.load(handle)
+    if payload.get("schema_version") != SCHEMA_VERSION:
+        raise RuntimeError("checkpoint schema does not support continuation")
+    if (
+        payload.get("stage1", {}).get("completed", 0)
+        < payload.get("stage1", {}).get("total", 0)
+    ):
+        raise RuntimeError("cannot continue Stage 2 before Stage 1 is complete")
+
+    current_checks = payload["stage2"].get("expensive_checks", 0)
+    total_cap = current_checks + additional_expensive_checks
+    config = payload.setdefault("config", {})
+    config["last_appended_stage2_batch"] = additional_expensive_checks
+    config["max_expensive_checks"] = total_cap
+    payload["stage2"]["stop_reason"] = None
+    _run_stage2(
+        payload,
+        max_successes=config.get("max_successes", 5),
+        max_expensive_checks=total_cap,
+    )
+    payload["updated_at_utc"] = dt.datetime.now(dt.timezone.utc).isoformat()
+    _atomic_write(RESULT_PATH, payload)
+    return payload
+
+
 def run(max_successes: int, max_expensive_checks: int) -> dict[str, Any]:
     with open(QUEUE_PATH, encoding="utf-8") as handle:
         queue = json.load(handle)
@@ -550,118 +708,7 @@ def run(max_successes: int, max_expensive_checks: int) -> dict[str, Any]:
     # Stage 1 checks.  This prevents alphabetical ordering or an early
     # survivor from consuming the whole expensive budget.
     if payload["stage1"].get("completed") >= payload["stage1"].get("total"):
-        stage1_survivors = [
-            completed
-            for completed in payload["stage1"].get("rows") or []
-            if completed.get("stage1_status") == "survivor"
-        ]
-        # Literature sparsity is not measured in Stage 1.  The smallest
-        # approved pool is the only cheap, auditable sparsity proxy available,
-        # so examine those rows first.
-        stage1_survivors.sort(
-            key=lambda completed: (
-                min(
-                    (
-                        target.get("candidate_count", 10**9)
-                        for target in completed.get("survivors") or []
-                    ),
-                    default=10**9,
-                ),
-                str(completed.get("disease_name") or "").casefold(),
-            )
-        )
-        checked_keys = {
-            (
-                check.get("disease_name"),
-                (check.get("target") or {}).get("target_symbol"),
-                (check.get("candidate") or {}).get("drug_name"),
-            )
-            for check in payload["stage2"].get("checks") or []
-        }
-        for survivor_row in stage1_survivors:
-            disease = survivor_row["disease_name"]
-            for survivor in survivor_row.get("survivors") or []:
-                target = survivor["target"]
-                for candidate in survivor.get("candidates") or []:
-                    if len(payload["stage2"].get("successes") or []) >= max_successes:
-                        payload["stage2"]["stop_reason"] = "max_successes_reached"
-                        break
-                    if payload["stage2"].get("expensive_checks", 0) >= max_expensive_checks:
-                        payload["stage2"]["stop_reason"] = "max_expensive_checks_reached"
-                        break
-
-                    drug_name = candidate.get("drug_name") or candidate.get("pref_name")
-                    check_key = (disease, target.get("target_symbol"), drug_name)
-                    if not drug_name or check_key in checked_keys:
-                        continue
-                    print(
-                        f"[bounded-screen] Stage 2 check "
-                        f"{payload['stage2']['expensive_checks'] + 1}/"
-                        f"{max_expensive_checks}: {disease} / {drug_name}",
-                        flush=True,
-                    )
-                    direction = check_mechanism_direction(
-                        drug_name=drug_name,
-                        target_symbol=target.get("target_symbol") or "",
-                        action_type=candidate.get("action_type"),
-                        mechanism_of_action=candidate.get("mechanism_of_action"),
-                        disease_name=disease,
-                        candidate_chembl_ids=(
-                            [candidate["molecule_chembl_id"]]
-                            if candidate.get("molecule_chembl_id")
-                            else None
-                        ),
-                        candidate_inchikey=candidate.get("inchikey"),
-                    )
-                    check = {
-                        "disease_name": disease,
-                        "orpha_code": survivor_row.get("orpha_code"),
-                        "target": target,
-                        "candidate": {
-                            key: candidate.get(key)
-                            for key in (
-                                "drug_name",
-                                "molecule_chembl_id",
-                                "inchikey",
-                                "action_type",
-                                "mechanism_of_action",
-                                "pchembl_value",
-                                "confidence_score",
-                            )
-                        },
-                        "direction": direction,
-                    }
-                    payload["stage2"]["checks"].append(check)
-                    payload["stage2"]["expensive_checks"] += 1
-                    checked_keys.add(check_key)
-                    if direction.get("compatible") is True:
-                        payload["stage2"]["successes"].append(check)
-                        # One compatible drug is enough to surface the disease.
-                        break
-                    payload["updated_at_utc"] = dt.datetime.now(
-                        dt.timezone.utc
-                    ).isoformat()
-                    _atomic_write(RESULT_PATH, payload)
-                if (
-                    len(payload["stage2"].get("successes") or []) >= max_successes
-                    or payload["stage2"].get("expensive_checks", 0)
-                    >= max_expensive_checks
-                ):
-                    break
-            if (
-                len(payload["stage2"].get("successes") or []) >= max_successes
-                or payload["stage2"].get("expensive_checks", 0)
-                >= max_expensive_checks
-            ):
-                break
-
-        if payload["stage2"].get("stop_reason") is None:
-            if len(payload["stage2"].get("successes") or []) >= max_successes:
-                payload["stage2"]["stop_reason"] = "max_successes_reached"
-            elif payload["stage2"].get("expensive_checks", 0) >= max_expensive_checks:
-                payload["stage2"]["stop_reason"] = "max_expensive_checks_reached"
-            else:
-                payload["stage2"]["stop_reason"] = "queue_exhausted"
+        _run_stage2(payload, max_successes, max_expensive_checks)
     payload["updated_at_utc"] = dt.datetime.now(dt.timezone.utc).isoformat()
     _atomic_write(RESULT_PATH, payload)
     return payload
@@ -676,9 +723,22 @@ def main() -> None:
         action="store_true",
         help="repair completed Stage 1 rows without starting new mechanism checks",
     )
+    parser.add_argument(
+        "--continue-expensive-checks",
+        type=int,
+        default=0,
+        help="append this many Stage 2 checks to the existing checkpoint",
+    )
     args = parser.parse_args()
     if args.max_successes < 1 or args.max_expensive_checks < 1:
         raise SystemExit("stop limits must both be positive integers")
+    if args.continue_expensive_checks < 0:
+        raise SystemExit("--continue-expensive-checks cannot be negative")
+    if args.repair_parent_treatment and args.continue_expensive_checks:
+        raise SystemExit(
+            "--repair-parent-treatment and --continue-expensive-checks "
+            "cannot be combined"
+        )
     if args.repair_parent_treatment:
         if not os.path.exists(RESULT_PATH):
             raise SystemExit(f"checkpoint not found: {RESULT_PATH}")
@@ -693,6 +753,24 @@ def main() -> None:
                     "invalidated_stage2_checks": payload["stage2"].get(
                         "invalidated_check_count", 0
                     ),
+                },
+                indent=2,
+            )
+        )
+        return
+    if args.continue_expensive_checks:
+        payload = continue_stage2(args.continue_expensive_checks)
+        print(
+            json.dumps(
+                {
+                    "stage1_survivors": payload["stage1"]["survivor_count"],
+                    "prior_and_new_expensive_checks": payload["stage2"][
+                        "expensive_checks"
+                    ],
+                    "new_batch_size": args.continue_expensive_checks,
+                    "successes": len(payload["stage2"]["successes"]),
+                    "stop_reason": payload["stage2"]["stop_reason"],
+                    "result_path": RESULT_PATH,
                 },
                 indent=2,
             )
