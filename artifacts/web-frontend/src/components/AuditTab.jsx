@@ -451,7 +451,8 @@ function NoCaseResult({ diseaseName, onRunHere, onNewCase }) {
           AgentBio hasn't built a candidate pool for
           <span className="font-medium" style={{ color: "var(--ink-base)" }}> {diseaseName}</span> yet,
           and an audit can only report against a pool the machine produced independently.
-          Run it here and the audit repeats itself the moment the pool exists.
+          A finished case with no eligible candidate is still reusable if its pool was
+          persisted. Run it here only when no finished pool exists yet.
         </p>
       </div>
 

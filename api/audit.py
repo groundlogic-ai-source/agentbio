@@ -447,13 +447,16 @@ def run_audit(
       "absent"        — drug absent; target-mismatch explanation included
       "unresolved"    — drug name could not be resolved to any ChEMBL molecule
                         (typo / brand name / unindexed) — NOT evidence of absence
-      "no_case"       — no completed/awaiting_review job for this disease
+      "no_case"       — no finished job with a reusable candidate pool for this
+                        disease
       "no_candidates" — job exists but candidates file unavailable (pre-persistence)
     """
     if source_deadline_monotonic is None:
         source_deadline_monotonic = time.monotonic() + 30.0
 
-    # 1. Find an existing completed or awaiting_review job
+    # 1. Find an existing finished job. A no_eligible_candidate run is still
+    # auditable when its reviewer snapshot was persisted; it simply means the
+    # discovery pipeline stopped at the eligibility gate.
     if job_id_hint:
         job = jobs_db.get_job(job_id_hint)
     else:

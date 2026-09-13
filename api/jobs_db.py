@@ -353,13 +353,19 @@ def _now() -> str:
 
 
 def find_completed_job_by_disease(disease_name: str) -> Optional[dict[str, Any]]:
-    """Return the most recently created completed or awaiting_review job for a
-    disease, matched case-insensitively. Returns None if no match exists."""
+    """Return the newest finished job with a reusable candidate pool.
+
+    ``no_eligible_candidate`` is a terminal, valid pipeline outcome: the case
+    ran to the eligibility gate but nothing was authorized to proceed. Its
+    persisted candidate snapshot is still a legitimate basis for the Audit
+    surface, so it must be discoverable alongside completed and awaiting-review
+    jobs.
+    """
     with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
         cur.execute(
             """
             SELECT * FROM jobs
-            WHERE status IN ('completed', 'awaiting_review')
+            WHERE status IN ('completed', 'awaiting_review', 'no_eligible_candidate')
               AND LOWER(disease_name) = LOWER(%s)
             ORDER BY created_at DESC
             LIMIT 1

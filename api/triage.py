@@ -1,6 +1,6 @@
 """
 Candidate-list triage: adversarially audit a caller-supplied list of drugs
-against the persisted reviewed-candidates pool of one completed case.
+against the persisted reviewed-candidates pool of one finished case.
 
 This is the "bring your own list" entry of Audit mode. It reuses run_audit()
 verbatim — the same resolution, the same cap fields, the same honest statuses —

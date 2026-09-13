@@ -1345,10 +1345,10 @@ def audit_drug(req: AuditRequest) -> dict[str, Any]:
     Look up where a specific drug stands in AgentBio's reviewed-candidates pool
     for a given disease.
 
-    If a completed or awaiting-review case already exists for the disease, reuses
-    its already-computed pool — does NOT re-run the pipeline.  If no case exists,
-    returns {"status": "no_case"} so the client can submit a new run via
-    POST /api/runs.
+    If a finished case with a persisted candidate pool already exists for the
+    disease—including a case that ended with no eligible candidate—reuses its
+    already-computed pool and does NOT re-run the pipeline. If no such case
+    exists, returns {"status": "no_case"} so the client can submit a new run.
 
     The drug name is resolved via the existing ChEMBL best-match function
     (salt-form / synonym handling).  Cap disclosures use the same fields as the
@@ -1374,7 +1374,7 @@ def audit_drug(req: AuditRequest) -> dict[str, Any]:
 def triage_candidate_list(req: TriageRequest) -> dict[str, Any]:
     """
     Adversarially audit a caller-supplied candidate list (up to 25 drugs)
-    against the persisted reviewed-candidates pool of one completed case.
+    against the persisted reviewed-candidates pool of one finished case.
 
     Reuses run_audit per drug with narration disabled — no pipeline re-run, no
     extra LLM calls, deterministic verdicts. The run is persisted to Postgres
@@ -1470,7 +1470,7 @@ def get_candidate_pool(
     page: int = 1,
     page_size: int = 25,
 ) -> dict[str, Any]:
-    """Paginated reviewed candidates for a completed case; no pipeline rerun."""
+    """Paginated reviewed candidates for a finished case; no pipeline rerun."""
     if not disease_name.strip():
         raise HTTPException(status_code=400, detail="disease_name is required")
     return _audit.candidate_pool(
@@ -1486,7 +1486,7 @@ def get_candidate_evidence(
     drug_name: str,
     job_id: Optional[str] = None,
 ) -> dict[str, Any]:
-    """Normalized per-source evidence for a candidate in a completed case."""
+    """Normalized per-source evidence for a candidate in a finished case."""
     if not disease_name.strip() or not drug_name.strip():
         raise HTTPException(
             status_code=400, detail="disease_name and drug_name are required"

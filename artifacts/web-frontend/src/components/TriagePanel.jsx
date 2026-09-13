@@ -174,7 +174,7 @@ export default function TriagePanel({ onNavigate }) {
         <h3 className="text-lg font-semibold" style={{ color: "var(--ink)" }}>Triage a candidate list</h3>
         <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
           Paste your organization's candidate list (up to 25 drugs). Each drug is
-          adversarially audited against the persisted pool of one completed case —
+          adversarially audited against the persisted pool of one finished case —
           safety caps, direction caps, black-box advisories, XLogP cautions, and
           evidence coverage — with every verdict retrievable later by run id.
         </p>
@@ -199,7 +199,7 @@ export default function TriagePanel({ onNavigate }) {
       >
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wide mb-1.5" style={{ color: "var(--ink-muted)" }}>
-            Disease context (completed case)
+            Disease context (finished case)
           </label>
           <input
             value={disease}
@@ -245,7 +245,7 @@ export default function TriagePanel({ onNavigate }) {
 
       {result && result.status === "no_case" && (
         <div className="rounded-lg border px-4 py-4 text-sm space-y-3" style={{ borderColor: "var(--border)", color: "var(--ink)" }}>
-          <p>No completed case exists for <strong>{disease}</strong>. Triage reports against a pool
+          <p>No finished case exists for <strong>{disease}</strong>. Triage reports against a pool
           the machine built independently of your list, so that pool has to exist first. Run it
           here and your list is re-audited automatically — nothing needs re-entering.</p>
           <InlineCaseRunner disease={disease} onReady={runTriage} />
