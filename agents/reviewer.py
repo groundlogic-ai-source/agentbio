@@ -57,7 +57,12 @@ from agents.target_selection import (
 from agents import provenance
 from data_sources.openfda import get_adverse_events
 from data_sources.clinicaltrials import check_prior_trials
-from data_sources.chembl import get_molecule_safety_flags, get_drug_action_type, get_molecule_data
+from data_sources.chembl import (
+    get_drug_mechanism_identities_for_audit,
+    get_molecule_safety_flags,
+    get_drug_action_type,
+    get_molecule_data,
+)
 from data_sources.safety_check import web_safety_check
 from data_sources.mechanism_direction import check_mechanism_direction
 from data_sources.literature_limitation import (
@@ -67,6 +72,10 @@ from data_sources.literature_limitation import (
 from data_sources import holdout as _holdout
 from data_sources.pubchem import get_compound_data
 from data_sources.evidence_ledger import qualified_target_chembl_activity_ids
+from data_sources.target_family_safety import (
+    KCNH_FAMILY_TARGETS,
+    assess_target_family_safety,
+)
 from agents.flagship_readiness import evaluate_candidate_readiness
 
 # ---- Auditable scoring constants (edit here to adjust the policy) -------------
@@ -1179,6 +1188,54 @@ def run_reviewer(
 
     provenance.log_many(prov_entries)
     _rank_reviewed(reviewed)
+
+    # ── Target-family safety-liability disclosure pass ───────────────────────
+    # A related-protein mechanism can be clinically important even when the
+    # pursued target assay looks directionally compatible.  This is a
+    # disclosure-only check: a ChEMBL mechanism identity does not establish
+    # potency, selectivity, exposure, or a clinical safety verdict.
+    for _family_candidate in reviewed:
+        _family_target = str(
+            _family_candidate.get("target_symbol") or "").upper()
+        if _family_target not in KCNH_FAMILY_TARGETS:
+            _family_candidate["target_family_safety_liability"] = {
+                "schema_version": "target-family-safety-v1",
+                "status": "NOT_APPLICABLE",
+                "pursued_target": _family_target,
+                "liability_target": None,
+                "relationship": None,
+                "evidence": [],
+                "disclosure_only": True,
+                "score_effect": "none",
+            }
+            continue
+        if _holdout.is_active():
+            _family_candidate["target_family_safety_liability"] = {
+                "schema_version": "target-family-safety-v1",
+                "status": "REDACTED",
+                "pursued_target": _family_target,
+                "liability_target": None,
+                "relationship": "Held-out pharmacology is redacted.",
+                "evidence": [],
+                "disclosure_only": True,
+                "score_effect": "none",
+            }
+            continue
+        _family_ids = _candidate_chembl_ids(_family_candidate)
+        _family_mechanisms = get_drug_mechanism_identities_for_audit(
+            _family_candidate["drug_name"],
+            _family_ids[0] if _family_ids else None,
+        )
+        _family_candidate["target_family_safety_liability"] = (
+            assess_target_family_safety(
+                _family_target,
+                mechanism_envelope=_family_mechanisms,
+                ledger_records=(
+                    _family_candidate.get("_evidence_ledger") or {}
+                ).get("records", []),
+            )
+        )
+    # ── End target-family safety-liability disclosure pass ───────────────────
 
     # ── DILI-target whole-pool pre-cap pass ───────────────────────────────────
     # For every target in the ICH S7A/S7B pharmaceutical safety-profiling panel,

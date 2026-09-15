@@ -6,6 +6,7 @@ otherwise claim-audited document. These tests pin that contract.
 """
 
 import unittest
+import unittest.mock
 
 from agents.writer import (
     _READERS_GUIDE_VERSION,

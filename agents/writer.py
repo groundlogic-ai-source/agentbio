@@ -1704,6 +1704,52 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"of the proposed repurposing indication.\n\n"
         )
 
+    # Target-family cross-reactivity disclosure.  This is intentionally
+    # separate from the withdrawal/black-box lane: a related-target mechanism
+    # can create a serious pharmacology concern without being a regulator-
+    # confirmed withdrawal.  It never changes the score or eligibility.
+    family_safety = candidate.get("target_family_safety_liability") or {}
+    if family_safety.get("status") == "FLAGGED":
+        evidence_rows = family_safety.get("evidence") or []
+        mechanism_text = []
+        for row in evidence_rows:
+            mechanism_text.extend(row.get("mechanisms") or [])
+            mechanism_text.extend(row.get("action_types") or [])
+        mechanism_text = ", ".join(dict.fromkeys(str(v) for v in mechanism_text))
+        evidence_clause = (
+            f" Persisted related-target mechanism metadata includes {mechanism_text}."
+            if mechanism_text else
+            " Persisted related-target mechanism metadata was found."
+        )
+        parts.append(
+            f"> ⚠ **Target-family cross-reactivity caution — disclosure only.** "
+            f"**{drug}** has persisted mechanism evidence involving the related "
+            f"cardiac-safety target **{family_safety.get('liability_target') or 'KCNH2/hERG'}** "
+            f"while the pursued target is **{target}**.{evidence_clause} "
+            "This does not establish potency, a selectivity ratio, or clinically "
+            "relevant exposure, but it means the proposed target action cannot be "
+            "treated as a clean selective mechanism. For KCNH-family hypotheses, "
+            "quantitative hERG/QT, PK, dose, and cardiac-safety review is required. "
+            "**This flag does not affect the composite score, hard caps, or "
+            "headline eligibility.**\n\n"
+        )
+    elif family_safety.get("status") in {"UNKNOWN", "NOT_FOUND"}:
+        lookup_clause = (
+            "the related hERG/KCNH2 lookup was unavailable"
+            if family_safety.get("status") == "UNKNOWN"
+            else
+            "no related hERG/KCNH2 mechanism identity was found in the bounded lookup"
+        )
+        parts.append(
+            f"> ⚠ **Target-family selectivity review required — disclosure only.** "
+            f"The pursued target **{target}** is in the KCNH family, and "
+            f"{lookup_clause}. This does not establish selectivity or safety: "
+            "hERG/KCNH2 QT liability, quantitative cross-reactivity, PK, dose, "
+            "and cardiac monitoring requirements must be checked before treating "
+            "the target action as a viable therapeutic mechanism. "
+            "**No score change was applied.**\n\n"
+        )
+
     # DILI-screening target disclosure — surfaced when the candidate's target is
     # a well-known pharmaceutical safety-profiling target (BSEP/ABCB11, hERG/KCNH2,
     # P-gp/ABCB1, CYP enzymes, etc.).  Activity records for these proteins in ChEMBL
