@@ -518,7 +518,7 @@ def _cif_link(cx: dict[str, Any]) -> str:
 
 
 def _affinity_provenance(candidate: dict[str, Any]) -> str:
-    """Name the persisted providers behind the quantitative affinity value."""
+    """Name providers behind the best persisted target-qualified affinity."""
     providers: set[str] = set()
     for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
         if not isinstance(record, dict):
@@ -665,9 +665,10 @@ def _direct_chembl_activity_note(candidate: dict[str, Any]) -> str:
     )
     if identities:
         return (
-            f"Direct assay-backed: {len(identities)} independent qualified "
-            "ChEMBL human target-matched activity observation(s), counted by "
-            "stable activity/source identity"
+            f"Direct assay-backed: {len(identities)} distinct qualified "
+            "ChEMBL human target-matched activity record ID(s), counted by "
+            "stable activity/source identity; this is not an independent-"
+            "publication or independent-experiment count"
         )
     return (
         "No qualified ChEMBL human bioactivity ledger row matched this target; "
@@ -724,7 +725,7 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
     ) if ae else "none reported"
 
     rows = [
-        ("Target-qualified median pChEMBL-equivalent affinity",
+        ("Best target-qualified pChEMBL-equivalent affinity",
          f"{_fmt(candidate.get('pchembl_value'), 2)} "
          f"({_affinity_provenance(candidate)})"),
         ("Assay confidence score (0-9)", _fmt(candidate.get("confidence_score"))),
@@ -883,10 +884,12 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
         f"{_fmt(plddt_complex)}) and an AFDB apo mean pLDDT of {_fmt(apo_plddt, 1)}; "
         f"the AFDB model contains NO ligand, so the protein-ligand pose is entirely "
         f"a Boltz prediction.",
-        "- **Assay-type and species caveats.** The target-qualified quantitative "
-        f"affinity summary is a median pChEMBL-equivalent value from "
-        f"{_affinity_provenance(candidate)} records; assay heterogeneity and the "
-        "bounded approved-drug reference set for Tanimoto still apply.",
+        "- **Assay-type and provenance caveats.** The target-qualified quantitative "
+        "affinity shown above is the best persisted pChEMBL-equivalent value, not "
+        f"a median or a publication-level consensus from {_affinity_provenance(candidate)} "
+        "records. Multiple database records may represent the same underlying "
+        "experiment or publication; assay heterogeneity and the bounded approved-drug "
+        "reference set for Tanimoto still apply.",
         "- **Absence of evidence is not evidence of absence.** A zero prior-trial "
         "count or no adverse-event signal may reflect that the pair has simply never "
         "been studied, not that it is safe or untried.",
@@ -1238,8 +1241,9 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
             f"- Reason: {_audit_value(direction.get('reason')).rstrip('.')}.",
             f"- Citations: {_audit_value(direction.get('search_citations'))}.",
             "- Scope: this is a bounded target-level direction screen, not "
-            "mutation-specific rescue, disease-model validation, clinical efficacy, "
-            "or a prescribing conclusion.",
+            "proof of causal sufficiency, target selectivity, mutation-specific "
+            "rescue, disease-model validation, clinical efficacy, or a prescribing "
+            "conclusion.",
         ])
     scope = contract.get("timothy_syndrome_cardiac_scope")
     if isinstance(scope, dict):

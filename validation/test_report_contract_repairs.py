@@ -108,6 +108,33 @@ class ReportContractRepairTest(unittest.TestCase):
         self.assertIn("BindingDB", table)
         self.assertNotIn("ChEMBL median pChEMBL affinity", table)
 
+    def test_affinity_and_activity_counts_do_not_overclaim(self):
+        candidate = {
+            "pchembl_value": 9.15,
+            "target_symbol": "HDAC6",
+            "uniprot_id": "Q9UBN7",
+            "_evidence_ledger": {"records": [
+                {
+                    "qualification_status": "qualified",
+                    "source_type": "bioactivity_assay",
+                    "provider": "chembl",
+                    "target_evidence_scope": "target_qualified",
+                    "target_species": "Homo sapiens",
+                    "target_symbol": "HDAC6",
+                    "target_accession": "Q9UBN7",
+                    "measurement_type": "pchembl",
+                    "measurement_value": 9.15,
+                    "source_activity_ids": ["3389969", "6371584"],
+                },
+            ]},
+        }
+        table = writer._evidence_table(candidate, {})
+        activity_note = writer._direct_chembl_activity_note(candidate)
+        self.assertIn("Best target-qualified pChEMBL-equivalent affinity", table)
+        self.assertNotIn("median pChEMBL-equivalent", table)
+        self.assertIn("distinct qualified ChEMBL", activity_note)
+        self.assertIn("not an independent-publication", activity_note)
+
     def test_trial_audit_separates_registry_from_literature_count(self):
         rendered = writer._trial_safety_applicability_audit({
             "trial_audit": {
