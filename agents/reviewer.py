@@ -166,8 +166,9 @@ MECHANISM_DIRECTION_CAP = SAFETY_CAP
 #     • pathway_specificity_note is also set if GAA is discovered as a pathway_neighbor
 #       via "Glycogen breakdown (glycogenolysis)" [broad_metabolic tier].
 MAX_MECHANISM_DIRECTION_CANDIDATES = 3
-# Layer 2 (web-search) only runs on this many top candidates to mirror the
-# Boltz validation scope and keep LLM call costs bounded.
+# Layer 2 (web-search) has a hard total call budget. The shortlist prioritizes
+# explicit structured safety signals and unresolved top-ranked candidates, so
+# a ChEMBL outage cannot fan out one expensive web search per candidate.
 MAX_SAFETY_LAYER2_CANDIDATES = 3
 # This post-benchmark production gate runs only on candidates that could reach
 # paid structure prediction. Unchecked candidates are never structure-eligible.
@@ -462,6 +463,48 @@ def _prefetch_candidate_context(
         }
         for index in range(len(candidates))
     ]
+
+
+def _should_run_safety_layer2(
+    drug: str,
+    top_k_names: set[str],
+    layer1: dict[str, Any],
+) -> bool:
+    """Run web safety only when structured safety is unresolved or flagged.
+
+    ChEMBL's observed clear result is already a bounded, cached safety lane.
+    Re-querying a regulator-search LLM for every strong candidate caused
+    unbounded provider transcripts and rate-limit storms. Layer 2 remains
+    mandatory for structured errors and explicit warning/withdrawal signals,
+    and remains available for top-K candidates whose ChEMBL identity could not
+    be resolved.
+    """
+    if (
+        layer1.get("api_error")
+        or layer1.get("black_box_advisory")
+        or layer1.get("confirmed")
+    ):
+        return True
+    unresolved_identity = not layer1.get("chembl_id")
+    return drug in top_k_names and unresolved_identity
+
+
+def _safety_layer2_shortlist(
+    reviewed: list[dict[str, Any]],
+    top_k_names: set[str],
+) -> set[str]:
+    """Select at most the bounded number of Layer 2 safety calls."""
+    selected: set[str] = set()
+    for row in reviewed:
+        drug = row.get("drug_name")
+        layer1 = row.get("_prefetched_safety_layer1") or {}
+        if (
+            drug
+            and _should_run_safety_layer2(drug, top_k_names, layer1)
+            and len(selected) < MAX_SAFETY_LAYER2_CANDIDATES
+        ):
+            selected.add(drug)
+    return selected
 
 
 #: Discovery methods whose ``ot_association_score`` is a STAMPED CONSTANT
@@ -1407,8 +1450,8 @@ def run_reviewer(
     # Top-K selection for Layer 2 is done BEFORE either layer applies any cap,
     # so both layers evaluate the same pre-cap shortlist independently.
     # Layer 1 (ChEMBL structured) runs on every candidate — cheap, 30-day cache.
-    # Layer 2 (Anthropic web search) runs only on top-K strong-match candidates
-    # to mirror Boltz validation scope and keep LLM call costs bounded.
+    # Layer 2 (Anthropic web search) is selected from the pre-cap shortlist,
+    # with a hard total call budget so source outages cannot multiply cost.
     top_k_names: set[str] = set()
     _k_count = 0
     for r in reviewed:
@@ -1416,6 +1459,7 @@ def run_reviewer(
             top_k_names.add(r["drug_name"])
             _k_count += 1
 
+    layer2_names = _safety_layer2_shortlist(reviewed, top_k_names)
     needs_resort = False
     for r in reviewed:
         drug = r["drug_name"]
@@ -1439,12 +1483,7 @@ def run_reviewer(
         #   (d) Withdrawal-reconciliation path: a structured withdrawn_flag can
         #       be wrong for legacy/garbled records.  Layer 2 independently
         #       reconciles every L1 withdrawal before it applies the hard cap.
-        l1_error = layer1.get("api_error", False)
-        l1_bbw   = layer1.get("black_box_advisory", False)
-        l1_withdrawn = layer1.get("confirmed", False)
-        layer2 = web_safety_check(drug) if (
-            drug in top_k_names or l1_error or l1_bbw or l1_withdrawn
-        ) else None
+        layer2 = web_safety_check(drug) if drug in layer2_names else None
         r["safety_layer2"] = layer2
 
         if _reconcile_safety(r, layer1, layer2):

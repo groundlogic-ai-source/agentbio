@@ -32,6 +32,10 @@ _AI_TIMEOUT_SECONDS = 60.0
 _AI_MAX_RETRIES = 0
 _SOURCE_TIMEOUT_SECONDS = 8.0
 _SOURCE_MAX_BYTES = 1_000_000
+# The web-search tool can return full regulator pages in its transcript. Keep
+# the second classification call bounded and fail closed if relevant evidence
+# falls outside the retained prefix.
+_SEARCH_TEXT_MAX_CHARS = 24_000
 
 _DISPOSITIONS = {
     "WITHDRAWN_FOR_SAFETY",
@@ -384,6 +388,16 @@ def _empty_result(drug_name: str, verdict: str = "SKIPPED") -> dict[str, Any]:
     return result
 
 
+def _bound_search_text(search_text: str) -> str:
+    """Keep provider-returned evidence bounded before the classifier sees it."""
+    if len(search_text) <= _SEARCH_TEXT_MAX_CHARS:
+        return search_text
+    return (
+        search_text[:_SEARCH_TEXT_MAX_CHARS]
+        + "\n[search transcript truncated; omitted text is not classified]"
+    )
+
+
 def web_safety_check(drug_name: str) -> dict[str, Any]:
     """Search and conservatively classify scoped market-safety evidence."""
     cache_key = make_key(_CACHE_NAMESPACE, drug_name)
@@ -415,11 +429,13 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
             "ingredient notices, ordinary warnings, boxed warnings, and evidence "
             "that generics remain available or no formal withdrawal occurred. "
             "Give regulator URLs and verbatim quotes, jurisdiction, formulation, "
-            "and the exact active ingredient identity."
+            "and the exact active ingredient identity. Return a concise summary "
+            "with at most five relevant regulator records; do not paste full "
+            "web pages or long unrelated search results."
         )
         response = call_with_backoff(
             lambda: client.messages.create(
-                model="claude-sonnet-4-6", max_tokens=2048,
+                model="claude-sonnet-4-6", max_tokens=1024,
                 tools=[{"type": "web_search_20250305", "name": "web_search"}],
                 messages=[{"role": "user", "content": query}],
             ),
@@ -430,6 +446,7 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
             block.text for block in response.content
             if getattr(block, "text", None)
         ).strip()
+        search_text = _bound_search_text(search_text)
         if not search_text:
             result = _empty_result(drug_name, "UNCLEAR")
             cache_set(cache_key, result, ttl_days=1)
