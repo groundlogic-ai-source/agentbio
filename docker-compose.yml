@@ -1,0 +1,91 @@
+# AgentBio — self-hosted stack (plain VPS path). Written 2026-09-19, UNTESTED
+# (no Docker in the authoring environment) — validate on the real host before
+# relying on it. See agentbio-migration/RUNBOOK.md for full context.
+#
+# If you instead go with a managed platform (Render/Railway/Fly), you likely
+# don't need this file — point that platform at Dockerfile.api and
+# Dockerfile.web as two separate services, and use its own managed Postgres
+# instead of the `db` service below.
+#
+# --- One-time host setup before first `docker compose up` ---
+#   1. Extract runtime_state.zip so its contents land here:
+#        ./data/cache/cache.db
+#        ./data/checkpoints.db
+#        ./data/output/           (the 35 files, preserving structure)
+#      (If any of these three paths don't exist yet, create empty
+#      placeholders — cache.db and checkpoints.db as empty files, output/ as
+#      an empty dir — so Docker doesn't create them as root-owned directories
+#      on first mount.)
+#   2. Copy env.template to .env and fill in real values.
+#   3. Decide DB path:
+#      - Fresh/dev DB: leave `db` service enabled as-is. schema/*.sql and
+#        api/migrations/*.sql auto-run ONCE against an empty data volume via
+#        docker-entrypoint-initdb.d. The app's own self-creating tables
+#        (research_jobs, saved_reports, triage_runs) bootstrap on first request.
+#      - Real production restore: after `db` is up, run the real pg_dump
+#        manually — this is NOT automated here on purpose:
+#          docker compose exec -T db psql -U agentbio -d agentbio < migration_export/agentbio_prod_full.sql
+#        then verify row counts against schema/001_core_tables.sql's table.
+#      - External managed Postgres instead: remove the `db` service, point
+#        DATABASE_URL in .env at it directly.
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: agentbio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: agentbio
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Auto-runs ONLY against a freshly-initialized (empty) data volume, in
+      # filename order. job_artifacts must come after core_tables (FK to jobs).
+      - ./db/schema/001_core_tables.sql:/docker-entrypoint-initdb.d/01_core_tables.sql:ro
+      - ./api/migrations/20260820_job_artifacts.sql:/docker-entrypoint-initdb.d/02_job_artifacts.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentbio"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://agentbio:${POSTGRES_PASSWORD}@db:5432/agentbio
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./data/cache/cache.db:/app/cache/cache.db
+      - ./data/checkpoints.db:/app/checkpoints.db
+      - ./data/output:/app/output
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        BASE_PATH: /
+    restart: unless-stopped
+    environment:
+      # Leave unset for plain-HTTP staging/testing by IP; set to the real
+      # hostname in .env at cutover for automatic Let's Encrypt TLS.
+      AGENTBIO_DOMAIN: ${AGENTBIO_DOMAIN:-:80}
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

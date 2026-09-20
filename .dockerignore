@@ -1,0 +1,45 @@
+# Applies to both Dockerfile.api and artifacts/web-frontend/Dockerfile.
+# Keeps the private git history, runtime state, and large local-only data out
+# of image layers. Runtime state (cache.db, checkpoints.db, output/) must
+# come from the volumes in docker-compose.yml, never baked into the image —
+# otherwise every rebuild would silently reset to stale data.
+
+.git/
+.github/
+
+# Runtime state — comes from bind-mounted volumes at deploy time, not the image
+cache/cache.db
+cache/cache.db-shm
+cache/cache.db-wal
+checkpoints.db*
+output/
+
+# Internal / never-publish (same discipline as the public-mirror export)
+.agents/
+outreach/
+artifacts/mockup-sandbox/
+
+# Large local-only data not needed to run the app (see
+# validation/private_archive_manifest.md — these are LFS/private-archive only)
+data_prep/raw/
+data_prep/output/
+validation/triage_discrimination_studyb_checkpoint.jsonl
+
+# This migration's own scratch space — never part of the app
+migration_export/
+
+# Frontend — irrelevant to the API image, and vice versa
+artifacts/web-frontend/node_modules/
+artifacts/web-frontend/dist/
+node_modules/
+.local/
+.cache/
+.pythonlibs/
+
+# Editors / OS cruft
+.vscode/
+.idea/
+*.pyc
+__pycache__/
+.DS_Store
+Thumbs.db

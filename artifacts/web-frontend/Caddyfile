@@ -1,0 +1,27 @@
+# AgentBio edge — replaces the split Replit previously ran (frontend artifact
+# serving "/", API artifact serving "/api/"+"/internal/", stitched together by
+# Replit's own reverse proxy). One Caddy instance now does both jobs.
+#
+# AGENTBIO_DOMAIN controls TLS:
+#   - unset -> listens on :80, plain HTTP (local dev, staging behind another
+#     proxy, or testing by IP before DNS is cut over)
+#   - set to a real hostname (e.g. agentbio.groundlogic.ai) -> Caddy
+#     automatically provisions and renews a Let's Encrypt cert on :443, no
+#     manual cert management. Set this via docker-compose.yml / the host's env.
+
+{$AGENTBIO_DOMAIN:80} {
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	handle /internal/* {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+		encode gzip
+	}
+}

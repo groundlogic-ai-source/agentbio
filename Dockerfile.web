@@ -1,0 +1,42 @@
+# AgentBio — Stage 5 frontend container (build + serve).
+#
+# Build context must be the REPO ROOT, not artifacts/web-frontend/, because
+# this is a pnpm workspace and web-frontend depends on the sibling
+# @workspace/api-client-react package under lib/.
+#
+# Written 2026-09-19, UNTESTED (no Docker in the authoring environment) — build
+# and smoke-test before relying on it. Final stage serves the static build AND
+# reverse-proxies /api + /internal to the API container, replacing the split
+# Replit previously did with its own reverse proxy (see Caddyfile).
+
+# ---------------------------------------------------------------------------
+FROM node:20-slim AS build
+RUN npm install -g pnpm@9
+
+WORKDIR /workspace
+
+# Manifests first, for layer caching — install shouldn't rerun on source-only changes.
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY lib/ lib/
+COPY scripts/package.json scripts/tsconfig.json scripts/
+COPY artifacts/web-frontend/package.json artifacts/web-frontend/
+RUN pnpm install --frozen-lockfile
+
+COPY artifacts/web-frontend/ artifacts/web-frontend/
+
+# vite.config.ts requires both of these at build time or it throws.
+# BASE_PATH=/ matches the Replit artifact's production config. PORT here is
+# only consumed by vite's config validation, not the runtime server (Caddy
+# serves the built files in the next stage) — any valid port number works.
+ARG BASE_PATH=/
+ARG BUILD_PORT=21854
+ENV BASE_PATH=${BASE_PATH}
+ENV PORT=${BUILD_PORT}
+RUN pnpm --filter @workspace/web-frontend run build
+
+# ---------------------------------------------------------------------------
+FROM caddy:2-alpine
+COPY --from=build /workspace/artifacts/web-frontend/dist/public /srv
+COPY artifacts/web-frontend/Caddyfile /etc/caddy/Caddyfile
+
+EXPOSE 80 443

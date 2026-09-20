@@ -75,3 +75,8 @@ outreach/
 
 # Local PDF rendering scratch output
 --out-dir/
+
+# Migration: real secrets and bind-mounted runtime state for docker-compose —
+# never commit either. See docker-compose.yml and env.template.
+.env
+/data/

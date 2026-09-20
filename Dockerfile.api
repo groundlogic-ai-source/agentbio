@@ -1,0 +1,52 @@
+# AgentBio — Stage 4 API container (FastAPI/Uvicorn)
+#
+# Host-agnostic: builds identically on a plain VPS (docker compose), Render,
+# Railway, or Fly.io. Written 2026-09-19 as part of the Replit migration —
+# UNTESTED (no Docker available in the authoring environment). Build and
+# smoke-test on the actual target host before relying on it.
+#
+# Persistent state this container needs mounted from OUTSIDE the image
+# (see docker-compose.yml): cache/cache.db, checkpoints.db, output/.
+# Everything else (code, requirements, the committed sqlite snapshots under
+# data_sources/) ships baked into the image.
+
+FROM python:3.11-slim
+
+# rdkit and psycopg2 need these at build time; libpq5 covers the psycopg2
+# runtime dependency without pulling in the full postgres client.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+        libxrender1 \
+        libxext6 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code only — not the whole repo (no .git, no node_modules,
+# no migration_export, no frontend). See .dockerignore.
+COPY agents/ agents/
+COPY api/ api/
+COPY data_sources/ data_sources/
+COPY cache/ cache/
+COPY validation/ validation/
+COPY docs/ docs/
+# data_prep is imported lazily by api/main.py (_ensure_research_modules) for the
+# /api/research/* endpoints — hypothesis_registry, features, stats_tests,
+# llm_clients, hypothesis_report, run_discovery. Required, not optional.
+COPY data_prep/ data_prep/
+COPY main_graph.py resume_review.py sweep_manager.py ./
+
+# Placeholders so the app has somewhere to write before volumes are mounted
+# on first run (compose creates the real mounts; this just avoids a crash
+# if the container is run standalone without them).
+RUN mkdir -p /app/output /app/cache
+
+EXPOSE 8000
+
+# Same command the Replit artifact ran, minus the Replit-specific supervisor
+# chain (both prior studies are complete — see agentbio-migration/RUNBOOK.md).
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
