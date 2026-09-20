@@ -31,8 +31,8 @@ def _ac() -> Anthropic:
     global _anthropic
     if _anthropic is None:
         _anthropic = Anthropic(
-            api_key=os.environ["AI_INTEGRATIONS_ANTHROPIC_API_KEY"],
-            base_url=os.environ["AI_INTEGRATIONS_ANTHROPIC_BASE_URL"],
+            api_key=os.environ["ANTHROPIC_API_KEY"],
+            base_url=os.environ.get("ANTHROPIC_BASE_URL"),  # None -> SDK default endpoint
             max_retries=0,
         )
     return _anthropic
@@ -42,8 +42,8 @@ def _oc() -> OpenAI:
     global _openai
     if _openai is None:
         _openai = OpenAI(
-            api_key=os.environ["AI_INTEGRATIONS_OPENAI_API_KEY"],
-            base_url=os.environ["AI_INTEGRATIONS_OPENAI_BASE_URL"],
+            api_key=os.environ["OPENAI_API_KEY"],
+            base_url=os.environ.get("OPENAI_BASE_URL"),  # None -> SDK default endpoint
             max_retries=0,
         )
     return _openai

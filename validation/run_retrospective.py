@@ -438,7 +438,7 @@ def main() -> None:
     if "--only" in sys.argv:
         only = int(sys.argv[sys.argv.index("--only") + 1])
 
-    llm_on = bool(os.environ.get("AI_INTEGRATIONS_ANTHROPIC_API_KEY"))
+    llm_on = bool(os.environ.get("ANTHROPIC_API_KEY"))
     _log(f"Loaded {len(gt)} ground-truth cases (LLM rationale {'ON' if llm_on else 'OFF'})")
     _log(LIMITATION_TEXT)
 

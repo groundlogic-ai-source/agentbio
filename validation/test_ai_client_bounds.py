@@ -10,8 +10,8 @@ from data_sources import clinicaltrials, safety_check
 class AIClientBoundsTest(unittest.TestCase):
     def test_clinicaltrials_client_is_bounded(self):
         with patch.dict(os.environ, {
-            "AI_INTEGRATIONS_ANTHROPIC_BASE_URL": "http://example.invalid",
-            "AI_INTEGRATIONS_ANTHROPIC_API_KEY": "test-only",
+            "ANTHROPIC_BASE_URL": "http://example.invalid",
+            "ANTHROPIC_API_KEY": "test-only",
         }, clear=False), patch.object(
             clinicaltrials.anthropic, "Anthropic"
         ) as constructor:
@@ -33,8 +33,8 @@ class AIClientBoundsTest(unittest.TestCase):
 
     def test_safety_client_is_bounded_and_timeout_does_not_cap(self):
         with patch.dict(os.environ, {
-            "AI_INTEGRATIONS_ANTHROPIC_BASE_URL": "http://example.invalid",
-            "AI_INTEGRATIONS_ANTHROPIC_API_KEY": "test-only",
+            "ANTHROPIC_BASE_URL": "http://example.invalid",
+            "ANTHROPIC_API_KEY": "test-only",
         }, clear=False), patch.object(
             safety_check, "get", return_value=None
         ), patch.object(

@@ -120,7 +120,7 @@ def classify_failures(df: pd.DataFrame) -> dict[str, str]:
     if todo:
         client = _anthropic_client()
         if client is None:
-            raise RuntimeError("Anthropic client unavailable (AI_INTEGRATIONS_ANTHROPIC_* not set)")
+            raise RuntimeError("Anthropic client unavailable (ANTHROPIC_API_KEY not set)")
         for start in range(0, len(todo), BATCH_SIZE):
             chunk = todo[start : start + BATCH_SIZE]
             labels = _classify_batch(chunk, client)

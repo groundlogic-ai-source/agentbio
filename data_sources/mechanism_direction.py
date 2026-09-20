@@ -111,9 +111,9 @@ _DILI_SAFETY_SCREEN_TARGETS: frozenset[str] = frozenset({
 
 
 def _openai_client() -> OpenAI | None:
-    base_url = os.environ.get("AI_INTEGRATIONS_OPENAI_BASE_URL")
-    api_key  = os.environ.get("AI_INTEGRATIONS_OPENAI_API_KEY")
-    if not base_url or not api_key:
+    base_url = os.environ.get("OPENAI_BASE_URL")
+    api_key  = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
         return None
     return OpenAI(
         base_url=base_url,
@@ -207,7 +207,7 @@ def check_mechanism_direction(
     if not client:
         result["reason"] = (
             "Mechanism-direction check skipped — "
-            "AI_INTEGRATIONS_OPENAI_BASE_URL or AI_INTEGRATIONS_OPENAI_API_KEY "
+            "OPENAI_BASE_URL or OPENAI_API_KEY "
             "not configured. " + _NO_INFO_TEXT
         )
         cache_set(cache_key, result, ttl_days=1)

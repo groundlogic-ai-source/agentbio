@@ -25,8 +25,8 @@ def _text_response(text: str) -> MagicMock:
 
 def _run_check(classify_text: str, search_text: str | None = None) -> dict:
     with patch.dict(os.environ, {
-        "AI_INTEGRATIONS_ANTHROPIC_BASE_URL": "http://example.invalid",
-        "AI_INTEGRATIONS_ANTHROPIC_API_KEY": "test-only",
+        "ANTHROPIC_BASE_URL": "http://example.invalid",
+        "ANTHROPIC_API_KEY": "test-only",
     }, clear=False), patch.object(
         safety_check, "get", return_value=None
     ), patch.object(

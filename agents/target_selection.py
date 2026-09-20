@@ -1466,11 +1466,11 @@ def _apply_mechanistic_convergence_cap(
 
 def _narrate_top5(top5: list[dict[str, Any]]) -> str:
     """Single LLM call to narrate the top 5 candidates."""
-    base_url = os.environ.get("AI_INTEGRATIONS_ANTHROPIC_BASE_URL")
-    api_key = os.environ.get("AI_INTEGRATIONS_ANTHROPIC_API_KEY")
+    base_url = os.environ.get("ANTHROPIC_BASE_URL")
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
 
-    if not base_url or not api_key:
-        return "[LLM narration skipped — AI_INTEGRATIONS_ANTHROPIC_BASE_URL or API_KEY not set]"
+    if not api_key:
+        return "[LLM narration skipped — ANTHROPIC_API_KEY not set]"
 
     client = anthropic.Anthropic(
         base_url=base_url, api_key=api_key, max_retries=0)

@@ -28,9 +28,9 @@ MODEL = "claude-sonnet-4-6"
 
 
 def _anthropic_client() -> Optional[anthropic.Anthropic]:
-    base_url = os.environ.get("AI_INTEGRATIONS_ANTHROPIC_BASE_URL")
-    api_key = os.environ.get("AI_INTEGRATIONS_ANTHROPIC_API_KEY")
-    if not base_url or not api_key:
+    base_url = os.environ.get("ANTHROPIC_BASE_URL")
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
         return None
     return anthropic.Anthropic(base_url=base_url, api_key=api_key)
 

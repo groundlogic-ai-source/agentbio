@@ -859,8 +859,8 @@ def _narrate(result: dict) -> str:
         import os as _os
         from anthropic import Anthropic
         client = Anthropic(
-            base_url=_os.environ["AI_INTEGRATIONS_ANTHROPIC_BASE_URL"],
-            api_key=_os.environ["AI_INTEGRATIONS_ANTHROPIC_API_KEY"],
+            base_url=_os.environ.get("ANTHROPIC_BASE_URL"),  # None -> SDK default endpoint
+            api_key=_os.environ["ANTHROPIC_API_KEY"],
             max_retries=0,
         )
         facts = _facts_for_narration(result)

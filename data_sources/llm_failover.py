@@ -201,12 +201,12 @@ def _emit_telemetry(*, provider: Optional[str], model: Optional[str],
 
 
 def _available_providers() -> list[str]:
+    # base_url is an optional override (e.g. for a proxy); its absence no longer
+    # disqualifies a provider — the SDK falls back to the official endpoint.
     providers: list[str] = []
-    if (os.environ.get("AI_INTEGRATIONS_ANTHROPIC_API_KEY")
-            and os.environ.get("AI_INTEGRATIONS_ANTHROPIC_BASE_URL")):
+    if os.environ.get("ANTHROPIC_API_KEY"):
         providers.append("anthropic")
-    if (os.environ.get("AI_INTEGRATIONS_OPENAI_API_KEY")
-            and os.environ.get("AI_INTEGRATIONS_OPENAI_BASE_URL")):
+    if os.environ.get("OPENAI_API_KEY"):
         providers.append("openai")
     return providers
 
@@ -218,16 +218,16 @@ def _get_client(provider: str) -> Any:
             if provider == "anthropic":
                 import anthropic
                 client = anthropic.Anthropic(
-                    base_url=os.environ["AI_INTEGRATIONS_ANTHROPIC_BASE_URL"],
-                    api_key=os.environ["AI_INTEGRATIONS_ANTHROPIC_API_KEY"],
+                    base_url=os.environ.get("ANTHROPIC_BASE_URL"),  # None -> SDK default
+                    api_key=os.environ["ANTHROPIC_API_KEY"],
                     timeout=_TIMEOUT_SECONDS,
                     max_retries=0,  # retries are orchestrated here, not per-call
                 )
             else:
                 from openai import OpenAI
                 client = OpenAI(
-                    base_url=os.environ["AI_INTEGRATIONS_OPENAI_BASE_URL"],
-                    api_key=os.environ["AI_INTEGRATIONS_OPENAI_API_KEY"],
+                    base_url=os.environ.get("OPENAI_BASE_URL"),  # None -> SDK default
+                    api_key=os.environ["OPENAI_API_KEY"],
                     timeout=_TIMEOUT_SECONDS,
                     max_retries=0,
                 )
@@ -308,7 +308,7 @@ def chat_text(prompt: str, *, system: Optional[str] = None,
     if not providers:
         raise RuntimeError(
             "no AI-integration providers configured "
-            "(AI_INTEGRATIONS_ANTHROPIC_* / AI_INTEGRATIONS_OPENAI_*)")
+            "(ANTHROPIC_API_KEY / OPENAI_API_KEY)")
     with _rr_lock:
         start = _rr_counter[0] % len(providers)
         _rr_counter[0] += 1

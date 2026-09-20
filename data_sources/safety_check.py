@@ -406,10 +406,10 @@ def web_safety_check(drug_name: str) -> dict[str, Any]:
             and cached.get("schema_version") == SCHEMA_VERSION):
         return cached
 
-    base_url = os.environ.get("AI_INTEGRATIONS_ANTHROPIC_BASE_URL")
-    api_key = os.environ.get("AI_INTEGRATIONS_ANTHROPIC_API_KEY")
+    base_url = os.environ.get("ANTHROPIC_BASE_URL")
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
     result = _empty_result(drug_name)
-    if not base_url or not api_key:
+    if not api_key:
         result["disclosure_text"] = (
             "Layer 2 web-search check skipped — AI integration not configured. "
             + _NO_INFO_TEXT

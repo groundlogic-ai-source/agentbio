@@ -13,8 +13,8 @@ class MechanismDirectionHoldoutTest(unittest.TestCase):
 
     def test_client_has_explicit_timeout_and_no_retries(self):
         with patch.dict(os.environ, {
-            "AI_INTEGRATIONS_OPENAI_BASE_URL": "http://example.invalid",
-            "AI_INTEGRATIONS_OPENAI_API_KEY": "test-only",
+            "OPENAI_BASE_URL": "http://example.invalid",
+            "OPENAI_API_KEY": "test-only",
         }, clear=False), patch.object(
             mechanism_direction, "OpenAI"
         ) as constructor:
