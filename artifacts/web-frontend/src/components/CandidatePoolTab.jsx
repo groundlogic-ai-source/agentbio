@@ -81,7 +81,7 @@ function EvidenceDrawer({ disease, candidate, onClose }) {
 export default function CandidatePoolTab() {
   const [runs, setRuns] = useState([]);
   const [disease, setDisease] = useState("");
-  const [filters, setFilters] = useState({ query: "", safety: "", evidence: "", xlogp: "", modality: "", sort: "rank", order: "asc" });
+  const [filters, setFilters] = useState({ query: "", safety: "", evidence: "", xlogp: "", sort: "rank", order: "asc" });
   const [pool, setPool] = useState(null);
   const [state, setState] = useState({ loading: false, error: null });
   const [selected, setSelected] = useState(null);
@@ -129,7 +129,7 @@ export default function CandidatePoolTab() {
           <h2>Candidate evidence, safety, and coverage</h2>
           <p>
             Browse persisted reviewed candidates from completed case files. Scores are historical run outputs;
-            XLogP and modality are caution flags only and do not change rank.
+            XLogP is a caution flag only and does not change rank.
           </p>
         </div>
       </header>
@@ -163,11 +163,6 @@ export default function CandidatePoolTab() {
                 <option value="">All</option><option value="flagged">Caution ≥5</option><option value="unresolved">PubChem unresolved</option>
               </select>
             </label>
-            <label><span style={labelStyle}>Modality</span>
-              <select value={filters.modality} onChange={(e) => updateFilter("modality", e.target.value)}>
-                <option value="">All</option><option value="flagged">Non-oral biologic</option><option value="unresolved">Modality unresolved</option>
-              </select>
-            </label>
             <label><span style={labelStyle}>Sort</span>
               <select value={filters.sort} onChange={(e) => updateFilter("sort", e.target.value)}>
                 <option value="rank">Rank</option><option value="score">Score</option><option value="coverage">Coverage</option><option value="drug">Drug</option><option value="xlogp">XLogP</option>
@@ -187,7 +182,7 @@ export default function CandidatePoolTab() {
               </div>
               <div className="candidate-table-wrap">
                 <table className="candidate-table">
-                  <thead><tr><th>Rank</th><th>Candidate</th><th>Target</th><th>Score</th><th>Evidence</th><th>Safety</th><th>XLogP</th><th>Modality</th><th>Provenance</th><th /></tr></thead>
+                  <thead><tr><th>Rank</th><th>Candidate</th><th>Target</th><th>Score</th><th>Evidence</th><th>Safety</th><th>XLogP</th><th>Provenance</th><th /></tr></thead>
                   <tbody>
                     {pool.candidates.map((candidate) => (
                       <tr key={`${candidate.rank}-${candidate.drug_name}`}>
@@ -198,13 +193,6 @@ export default function CandidatePoolTab() {
                         <td><Badge tone={Number(candidate.evidence_weight_coverage) >= .999 ? "safe" : "warning"}>{candidate.evidence_weight_coverage == null ? "not observed" : `${Math.round(candidate.evidence_weight_coverage * 100)}% covered`}</Badge></td>
                         <td>{candidate.safety_cap_applied ? <Badge tone="danger">withdrawal cap</Badge> : candidate.black_box_advisory ? <Badge tone="warning">black-box advisory</Badge> : candidate.mechanism_cap_applied ? <Badge tone="danger">mechanism cap</Badge> : <Badge tone="safe">no cap</Badge>}</td>
                         <td>{candidate.xlogp_status === "flagged" ? <Badge tone="warning">caution {candidate.pubchem_xlogp}</Badge> : candidate.xlogp_status === "unresolved" ? <Badge tone="neutral">unresolved</Badge> : <Badge tone="neutral">{candidate.pubchem_xlogp ?? "—"}</Badge>}</td>
-                        <td>{candidate.modality_status === "flagged"
-                          ? <Badge tone="warning">non-oral biologic</Badge>
-                          : candidate.modality_status === "unresolved"
-                            ? <Badge tone="neutral">unresolved</Badge>
-                            : <Badge tone="neutral">{candidate.chembl_molecule_type
-                                ? `${candidate.chembl_molecule_type === "Small molecule" ? "small mol." : candidate.chembl_molecule_type} / ${candidate.chembl_oral ? "oral" : "non-oral"}`
-                                : "—"}</Badge>}</td>
                         <td>{(candidate.source_types || []).slice(0, 3).map((source) => <Badge key={source} tone="info">{source}</Badge>)}</td>
                         <td><button className="btn btn-xs btn-ghost-brass" onClick={() => setSelected(candidate)}>Evidence</button></td>
                       </tr>
@@ -218,7 +206,6 @@ export default function CandidatePoolTab() {
                 <button className="btn btn-xs btn-ghost" disabled={pool.page >= totalPages || state.loading} onClick={() => load(pool.page + 1)}>Next</button>
               </div>
               <p className="pool-disclosure">XLogP ≥5 is disclosed as a lipophilicity caution. If PubChem did not resolve a compound, the list says “unresolved” rather than silently treating it as low lipophilicity. No XLogP score adjustment is applied.</p>
-              <p className="pool-disclosure">Modality (small molecule vs. non-oral biologic) is shown as classification context only — no score or rank adjustment. Unresolved ChEMBL lookups are shown as “unresolved”, never as clear.</p>
             </>
           )}
         </>

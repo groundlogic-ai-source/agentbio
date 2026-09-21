@@ -665,7 +665,6 @@ def candidate_pool(
     safety: Optional[str] = None,
     evidence: Optional[str] = None,
     xlogp: Optional[str] = None,
-    modality: Optional[str] = None,
     sort: str = "rank",
     order: str = "asc",
     page: int = 1,
@@ -715,10 +714,6 @@ def candidate_pool(
             continue
         if xlogp == "unresolved" and candidate.get("pubchem_xlogp") is not None:
             continue
-        if modality == "flagged" and not candidate.get("nonoral_biologic_flag"):
-            continue
-        if modality == "unresolved" and candidate.get("nonoral_biologic_flag") is not None:
-            continue
 
         components = candidate.get("score_components") or {}
         filtered.append({
@@ -738,12 +733,6 @@ def candidate_pool(
             ),
             "chembl_molecule_type": candidate.get("chembl_molecule_type"),
             "chembl_oral": candidate.get("chembl_oral"),
-            "nonoral_biologic_flag": candidate.get("nonoral_biologic_flag"),
-            "modality_status": (
-                "flagged" if candidate.get("nonoral_biologic_flag")
-                else ("unresolved" if candidate.get("nonoral_biologic_flag") is None
-                      else "clear")
-            ),
             "evidence_weight_coverage": components.get("evidence_weight_coverage"),
             "source_types": candidate.get("source_types") or [],
             "safety_cap_applied": safety_capped,

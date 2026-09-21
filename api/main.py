@@ -1417,7 +1417,6 @@ def get_candidate_pool(
     safety: Optional[str] = None,
     evidence: Optional[str] = None,
     xlogp: Optional[str] = None,
-    modality: Optional[str] = None,
     sort: str = "rank",
     order: str = "asc",
     page: int = 1,
@@ -1428,7 +1427,7 @@ def get_candidate_pool(
         raise HTTPException(status_code=400, detail="disease_name is required")
     return _audit.candidate_pool(
         disease_name.strip(), job_id_hint=job_id, query=query, safety=safety,
-        evidence=evidence, xlogp=xlogp, modality=modality, sort=sort, order=order,
+        evidence=evidence, xlogp=xlogp, sort=sort, order=order,
         page=page, page_size=page_size,
     )
 

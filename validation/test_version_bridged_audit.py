@@ -224,13 +224,10 @@ class FrozenInputIntegrityTest(unittest.TestCase):
         actual = hashlib.sha256(cache.read_bytes()).hexdigest()
         self.assertEqual(actual, manifest["target_universe_cache_sha256"])
 
-    @mock.patch.object(audit, "domain_findings_for", return_value=[])
     @mock.patch.object(audit, "build_audit_context", return_value={"sources": {}})
     @mock.patch.object(audit, "_modality_payload", return_value={
         "chembl_molecule_type": "Small molecule",
         "chembl_oral": True,
-        "modality_findings": [],
-        "modality_status": "clear",
     })
     @mock.patch.object(
         audit, "get_drug_mechanism_identities_for_audit",
@@ -254,7 +251,7 @@ class FrozenInputIntegrityTest(unittest.TestCase):
         return_value={"job_id": "job-1", "disease_name": "Lupus"},
     )
     def test_absent_audit_uses_supplied_drug_mechanism_for_context(
-        self, find_job, load, resolve, mechanism, modality, context, findings,
+        self, find_job, load, resolve, mechanism, modality, context,
     ):
         result = audit.run_audit(
             "Lupus", "Betamethasone", narrate=False)

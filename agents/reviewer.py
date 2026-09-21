@@ -299,21 +299,6 @@ def _candidate_is_heldout(candidate: dict[str, Any]) -> bool:
     )
 
 
-def _modality_flag(
-    molecule_type: Optional[str], oral: Optional[bool]
-) -> Optional[bool]:
-    """True = non-oral biologic (modality caution), False = clear, None = unresolved.
-
-    Mirrors the tested feature_spec all_of[NOT is_small_molecule, NOT is_oral]
-    from registry hypothesis run-704c0cb4-H05: missingness propagates, so an
-    unknown molecule_type or unknown oral route returns None rather than a
-    silent "clear".
-    """
-    if molecule_type is None or oral is None:
-        return None
-    return molecule_type != "Small molecule" and not oral
-
-
 #: Seconds between liveness beats while the prefetch lanes are awaited.
 #: Module-level so tests can patch it down.
 _PREFETCH_HEARTBEAT_SECONDS = 120
@@ -1001,18 +986,16 @@ def run_reviewer(
             _pubchem_xlogp is not None and _pubchem_xlogp >= HIGH_XLOGP_THRESHOLD
         )
 
-        # Modality flag: ChEMBL molecule_type + oral route (cached lookup).
-        # Mirrors the confirmed registry finding run-704c0cb4-H05 — non-oral
-        # biologics have ~0.30x odds of repurposing success (discovery
-        # q=4.7e-2, holdout confirmation p=2.8e-4, survives established-
-        # maturity adjustment). Disclosure only — does NOT affect scoring.
-        # Missingness propagates: unresolved lookups stay None, never
-        # silently count as "not flagged".
+        # Molecule identity (ChEMBL molecule_type + oral route, cached lookup).
+        # No longer paired with a modality caution flag — the caution was
+        # specifically the removed research module's registry finding
+        # run-704c0cb4-H05 (a claim the app can no longer independently
+        # re-verify now that the registry is gone), not an independent
+        # judgment. Removed 2026-09-21, not just its UI surface.
         _mol = context.get("molecule") or {}
         _molecule_type: Optional[str] = _mol.get("molecule_type")
         _oral_raw = _mol.get("oral")
         _oral: Optional[bool] = (None if _oral_raw is None else bool(_oral_raw))
-        _nonoral_biologic_flag: Optional[bool] = _modality_flag(_molecule_type, _oral)
 
         reviewed.append({
             "drug_name": c["drug_name"],
@@ -1042,11 +1025,8 @@ def run_reviewer(
             # confirmation run).
             "pubchem_xlogp": _pubchem_xlogp,
             "high_lipophilicity_flag": _high_lipophilicity_flag,
-            # Modality disclosure (non-oral biologic). Disclosure only — does
-            # NOT affect any score. None = lookup unresolved.
             "chembl_molecule_type": _molecule_type,
             "chembl_oral": _oral,
-            "nonoral_biologic_flag": _nonoral_biologic_flag,
             "adverse_events": adverse.get("adverse_events", [])[:10],
             "prior_trial_count": trials.get("trial_count", 0),
             "has_negative_repurposing_result": trials.get("has_negative_repurposing_result", False),

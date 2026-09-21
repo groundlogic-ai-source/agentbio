@@ -12,8 +12,6 @@ const FLAG_META = {
   BLACK_BOX_ADVISORY:  { label: "Black-box advisory",tone: "warning" },
   XLOGP_CAUTION:       { label: "XLogP ≥5 caution",  tone: "warning" },
   XLOGP_UNRESOLVED:    { label: "XLogP unresolved",  tone: "neutral" },
-  MODALITY_CAUTION:    { label: "Non-oral biologic", tone: "warning" },
-  MODALITY_UNRESOLVED: { label: "Modality unresolved", tone: "neutral" },
   EVIDENCE_PARTIAL:    { label: "Partial evidence",  tone: "info"    },
   ABSENT_FROM_POOL:    { label: "Absent from pool",  tone: "neutral" },
   AUDITABLE_SUPPLIED_ONLY: { label: "Supplied-only audit", tone: "info" },

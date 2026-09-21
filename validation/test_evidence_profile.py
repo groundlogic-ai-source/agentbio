@@ -36,7 +36,7 @@ def _audit(status="found", *, cand=None, findings=(), rank=3, total=40):
         "candidate": cand if cand is not None else {
             "composite_score": 0.7, "pre_cap_score": 0.7,
             "score_components": {"evidence_weight_coverage": 1.0},
-            "pubchem_xlogp": 2.0, "nonoral_biologic_flag": False,
+            "pubchem_xlogp": 2.0,
         },
         "audit_context": {
             "findings": [{"code": c, "status": s, "title": "", "rationale": "",
@@ -58,7 +58,7 @@ class UnresolvedIsNotNegative(unittest.TestCase):
     def test_unresolved_xlogp_is_not_a_caution(self):
         profile = build_profile("X", _audit(cand={
             "score_components": {"evidence_weight_coverage": 1.0},
-            "pubchem_xlogp": None, "nonoral_biologic_flag": False}))
+            "pubchem_xlogp": None}))
         self.assertEqual(profile["dimensions"]["lipophilicity"], "UNRESOLVED")
         self.assertEqual(profile["disposition"], SUPPORTED)
 
@@ -84,7 +84,7 @@ class HardDisqualifiersFire(unittest.TestCase):
         profile = build_profile("X", _audit(cand={
             "mechanism_cap_applied": True,
             "score_components": {"evidence_weight_coverage": 1.0},
-            "pubchem_xlogp": 2.0, "nonoral_biologic_flag": False}))
+            "pubchem_xlogp": 2.0}))
         self.assertEqual(profile["disposition"], DISQUALIFIED)
         self.assertIn("mechanism_direction=INCOMPATIBLE",
                       profile["hard_disqualifiers_fired"])
@@ -95,7 +95,7 @@ class HardDisqualifiersFire(unittest.TestCase):
 
     def test_safety_cap_disqualifies_but_black_box_only_qualifies(self):
         base = {"score_components": {"evidence_weight_coverage": 1.0},
-                "pubchem_xlogp": 2.0, "nonoral_biologic_flag": False}
+                "pubchem_xlogp": 2.0}
         capped = build_profile("X", _audit(
             cand={**base, "safety_cap_applied": True}))
         self.assertEqual(capped["disposition"], DISQUALIFIED)
@@ -133,7 +133,7 @@ class PrimaryIgnoresPool(unittest.TestCase):
             "mechanism_cap_applied": True,
             "safety_cap_applied": True,
             "score_components": {"evidence_weight_coverage": 1.0},
-            "pubchem_xlogp": 2.0, "nonoral_biologic_flag": False}))
+            "pubchem_xlogp": 2.0}))
         self.assertEqual(profile["disposition"], DISQUALIFIED)  # overall
         self.assertEqual(profile["primary_disposition"], SUPPORTED)  # primary
         self.assertEqual(profile["primary_hard_fired"], [])

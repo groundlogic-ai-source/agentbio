@@ -29,8 +29,6 @@ class AuditContextWiringTest(unittest.TestCase):
     @mock.patch.object(audit, "_modality_payload", return_value={
         "chembl_molecule_type": "Small molecule",
         "chembl_oral": True,
-        "modality_findings": [],
-        "modality_status": "clear",
     })
     @mock.patch.object(audit.jobs_db, "find_completed_job_by_disease",
                        return_value=None)
