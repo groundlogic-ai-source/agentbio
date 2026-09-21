@@ -30,8 +30,8 @@ export const TAB_GUIDES = {
     role: "Verification — you supply the drugs",
     what:
       "Takes drug names you provide and reports where each one already stands in a case the " +
-      "machine built independently, before it ever saw your list. Three modes: triage a list of " +
-      "up to 25, interrogate a single drug, or re-verify a saved dossier claim by claim.",
+      "machine built independently, before it ever saw your list. Two modes: triage a list of " +
+      "up to 25, or interrogate a single drug.",
     give: "A disease that has a completed case, plus your own drug names.",
     get:
       "A per-drug verdict — in pool, absent, or name unresolved — with rank, composite and " +
@@ -59,22 +59,17 @@ export const TAB_GUIDES = {
   },
   research: {
     title: "Research",
-    role: "What the system has learned about repurposing in general",
+    role: "The frozen validation evidence, in one place",
     what:
-      "A separate module from the case pipeline. A language model proposes analogical hypotheses " +
-      "about what makes drug repurposing succeed, each is compiled into a testable predicate, and " +
-      "the predicate is tested against a held-out repoDB outcome dataset under cumulative " +
-      "Benjamini–Hochberg false-discovery-rate control across every hypothesis ever tested. " +
-      "Findings that survive both discovery and holdout confirmation become disclosure-only base " +
-      "rates elsewhere in the app.",
-    give: "Nothing — or your own hypothesis, written in plain English.",
-    get:
-      "A registry entry per hypothesis: effect size and confidence interval, raw and FDR-adjusted " +
-      "p-values, confound checks, and a novelty tag.",
-    when: "You want population-level context, not an answer about one disease.",
+      "Read-only summaries of AgentBio's completed, frozen benchmark studies — engineering " +
+      "acceptance, retrospective repurposing-recovery runs, and the audit-trap detection study — " +
+      "each with its methodology, limitations, and (where applicable) provenance verification.",
+    give: "Nothing — this is a fixed, historical record, not an interactive tool.",
+    get: "Summary cards per study: what was tested, the result, and stated limitations.",
+    when: "You want the evidence behind AgentBio's validation claims before trusting a case.",
     notThis:
-      "These are statistical associations in a retrospective dataset. A confirmed finding is " +
-      "context for a reviewer, never a reason to move a candidate up or down.",
+      "These are retrospective, frozen results — not a live re-run, and not evidence about any " +
+      "specific disease or candidate.",
   },
   how: {
     title: "How It Works",
@@ -87,17 +82,6 @@ export const TAB_GUIDES = {
     get: "The full pipeline reference, always in sync with the code.",
     when: "You want to know exactly how a number on any other tab was produced.",
     notThis: "It is documentation, not a runnable surface — it never changes data.",
-  },
-  saved: {
-    title: "Saved Reports",
-    role: "Pinned write-ups of registry findings",
-    what:
-      "Full narrative reports generated from a Research hypothesis and kept for later — the " +
-      "statistics, the confound analysis, and the limitations in prose.",
-    give: "Nothing; this is a shelf for reports you saved from the Research tab.",
-    get: "The report as it read when you saved it.",
-    when: "You want to revisit or share a finding without regenerating it.",
-    notThis: "Reports re-check their gating on every read, so a finding that no longer clears FDR will say so.",
   },
 };
 
@@ -150,11 +134,10 @@ const TAB_MAP = [
     ],
   },
   {
-    group: "The research module",
-    blurb: "Population-level, disease-agnostic. Statistics over thousands of past repurposing outcomes.",
+    group: "Validation evidence",
+    blurb: "The frozen, retrospective studies AgentBio's validation claims are based on.",
     items: [
-      ["Research", "Hypotheses about what makes repurposing succeed, FDR-gated against held-out data."],
-      ["Saved Reports", "Write-ups of those findings, pinned for later."],
+      ["Research", "Read-only summaries of completed benchmark studies, with methodology and limitations."],
     ],
   },
 ];
@@ -163,12 +146,12 @@ function TabMap() {
   return (
     <section className="tab-map" aria-label="What each tab does">
       <div className="eyebrow">New here</div>
-      <h3>Five tabs, two systems</h3>
+      <h3>Case pipeline, plus the evidence behind it</h3>
       <p className="tab-map-intro">
-        AgentBio is a drug-repurposing research system. It generates hypotheses, lets you audit
-        them or your own, and separately studies what makes repurposing succeed at all. Nothing
-        here is a clinical recommendation. Qualified organizations decide whether experiments,
-        translational work, regulatory review, or clinical study are appropriate.
+        AgentBio is a drug-repurposing research system. It generates hypotheses and lets you audit
+        them or your own; the Research tab holds the frozen validation studies behind those
+        claims. Nothing here is a clinical recommendation. Qualified organizations decide whether
+        experiments, translational work, regulatory review, or clinical study are appropriate.
       </p>
       <div className="tab-map-groups">
         {TAB_MAP.map((g) => (

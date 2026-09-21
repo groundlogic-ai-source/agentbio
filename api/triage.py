@@ -18,7 +18,6 @@ from typing import Any, Optional
 
 import api.triage_db as triage_db
 from api.audit import run_audit
-from api.domain_findings import domain_findings_for
 
 MAX_TRIAGE_DRUGS = 25
 
@@ -215,12 +214,6 @@ def run_triage(
 
     verdicts = [_verdict(name, a) for name, a in zip(drugs, audits)]
     summary = _summary(verdicts)
-    # Confirmed research findings for this indication class (base-rate
-    # context only — never touch verdicts). Stored inside the persisted
-    # summary so a retrieved run reproduces exactly what the caller saw.
-    findings = domain_findings_for(disease_name)
-    if findings:
-        summary["domain_findings"] = findings
     summary["audit_context_contract_version"] = "audit-context-v2"
     summary["audit_context_source_states"] = {
         drug: {

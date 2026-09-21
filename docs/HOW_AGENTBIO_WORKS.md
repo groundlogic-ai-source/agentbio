@@ -406,8 +406,7 @@ not a confirmed negative — empty pools get purged by content, not trusted.
 | 3 | Chemist rationale | Sonnet, temp 0 | Restate a candidate's measured numbers in exactly two sentences | Budget-capped (default 25/pool); fact-list prompt banning praise/speculation; disclosure-only — nothing parses it |
 | 4 | Mechanism-direction check | LLM via `mechanism_direction.py` | COMPATIBLE / DIRECTIONALLY_INCOMPATIBLE / INSUFFICIENT_INFO | Top-3 candidates only; only INCOMPATIBLE acts (cap at 0.40); verdict + reason disclosed in the report |
 | 5 | Literature-limitation extraction | LLM via `literature_limitation.py` | Classify a bounded batch of retrieved PubMed abstracts and copy exact limiting/supportive passages | One call per top-3 candidate, at most 8 abstracts each; Python verifies quote + PMID + exact applicability and applies the multi-source/source-authority threshold; failures never become negative findings |
-| 6 | Research module hypothesis proposer ("Sol") | LLM, `data_prep/` | Proposes analogical hypotheses about repurposing success in general | Every hypothesis becomes a testable predicate run against held-out repoDB outcomes under cumulative Benjamini–Hochberg FDR; findings are disclosure-only base rates, never score inputs |
-| 7 | Stage-1 CLI narration | Sonnet | Plain-English summary of the already-written top-30 table | Post-hoc; references only numbers already on disk; not used by the API path |
+| 6 | Stage-1 CLI narration | Sonnet | Plain-English summary of the already-written top-30 table | Post-hoc; references only numbers already on disk; not used by the API path |
 
 What the AI **never** does: calculate any score, rank, or similarity; decide
 caps, literature blocks, or STRONG_MATCH; resolve disease identity; invent or select citations;
@@ -419,9 +418,8 @@ provider-level hard spend limits are documented as the required backstop in
 ### LLM routing tiers and telemetry
 
 `data_sources/llm_failover.py` keeps the existing capable defaults unchanged:
-standard/critical text calls use Sonnet 4.6 and GPT-5.4. Discovery continues to
-own its separate Opus 4.8/GPT-5.6 Sol choices. The module also defines an
-**opt-in** `cheap` tier (`AGENTBIO_ANTHROPIC_CHEAP_TEXT_MODEL` and
+standard/critical text calls use Sonnet 4.6 and GPT-5.4. The module also
+defines an **opt-in** `cheap` tier (`AGENTBIO_ANTHROPIC_CHEAP_TEXT_MODEL` and
 `AGENTBIO_OPENAI_CHEAP_TEXT_MODEL`) for future low-risk classification or
 narration; no current critical or default call is routed there.
 
@@ -493,61 +491,7 @@ Required secrets for a full run: Anthropic (via Replit AI Integrations or
 
 ---
 
-## 8. The research module (bisociation engine)
-
-The case pipeline above answers "which drug for this disease?". The research
-module (`data_prep/`, Research tab) asks the dual question: **what properties
-of a drug predict repurposing success in general?** It is an autonomous
-hypothesis engine with the same division of labor — LLMs propose, code
-decides:
-
-1. **Generation** (`run_discovery.py::generate`). Two independent models —
-   Claude Opus ("A") and GPT-5.6 "Sol" ("B") — each propose 4–5 narrow
-   analogical phenomena NOT already explored, each with 3–4 candidate
-   predictor features reduced to a closed feature DSL (or explicitly marked
-   NEEDS_ENRICHMENT). The exclusion list is two-tier and bounded (recent
-   domains in full detail, all older domains as a names-only roster), and a
-   deterministic exact-name filter rejects any re-proposal of a known domain
-   in code — the prompt list is advisory, the filter is the guarantee.
-   SALVAGEABLE domains (good rationale, wrong feature spec) stay re-proposable
-   by design.
-2. **Lead review** (`lead_review`, chunked Opus): consolidates both models'
-   output, tags each hypothesis READY or DISCARDED with a reason. Code guards
-   ensure no proposed domain vanishes silently.
-3. **Testing** (`stats_tests.py`, `features.py`): every READY hypothesis is
-   computed and tested by plain Python against the **discovery half** of a
-   repoDB-derived dataset (drug-level group-aware split, leave-one-out
-   chronology; `data_prep/` docs). Predictor kinds are allow-listed per op —
-   a misrouted kind fails loudly rather than silently testing nonsense.
-4. **FDR** (`hypothesis_registry.py`): every p-value joins ONE cumulative
-   Benjamini–Hochberg family, recomputed at read time — q-values can move as
-   the family grows. Discovery survivors are re-tested on the held-out
-   **confirmation half**, which has its own cumulative family (chaining
-   batches until something passes would be optional stopping). Registry rows
-   are append-only: re-testing under different methodology creates a new row,
-   never an overwrite; "archived" hides rows in the UI only and never removes
-   them from the FDR family. Optional run labels prefix run IDs to name a
-   research family — naming only, never an FDR scope.
-5. **Confound check** (`confound_check.py`): label-confounding guards run in
-   code (e.g. features derived from prior-repurposing counts are hard-blocked
-   — they are definitionally tied to the outcome label).
-6. **Findings are disclosure-only.** A confirmed finding is a base-rate
-   regularity about the retrospective dataset, shown as context on triage and
-   dossier surfaces. It NEVER changes a candidate score, cap, or verdict.
-7. **Hypothesis reports** (`hypothesis_report.py`): numbers are assembled
-   deterministically from the registry (with read-time FDR); Opus only
-   narrates them and may not introduce any statistic not already present.
-
-**Continuous mode** chains batches until a double pass (discovery AND
-confirmation), a user stop, or a spend bound: a user-set batch cap (default
-10, adjustable in the Research tab up to the absolute 40-batch ceiling) or
-6 hours, whichever comes first. The cap is a cost bound only — it never
-changes what counts as a finding — and the UI reports a cap stop as "search
-did not finish", never as a negative result.
-
----
-
-## 9. Validation posture (why the numbers can be cited)
+## 8. Validation posture (why the numbers can be cited)
 
 The pipeline's claims rest on frozen, provenance-checked artifacts in
 `validation/`, not on the live system:

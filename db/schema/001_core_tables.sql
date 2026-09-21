@@ -14,11 +14,15 @@
 --
 -- SCOPE: only the tables that have NO self-bootstrapping DDL in the app.
 --   Already self-creating at startup (do not duplicate here):
---     research_jobs   -> api/research_db.py
 --     saved_reports   -> api/saved_reports_db.py
 --     triage_runs     -> api/triage_db.py
 --   Already has a committed migration (run it separately, AFTER this file):
 --     job_artifacts   -> api/migrations/20260820_job_artifacts.sql
+--
+-- REMOVED 2026-09-21: hypothesis_log, bisociation_history, registry_reset_backup,
+-- and research_jobs are gone — the beta research/hypothesis-generation module
+-- (never benchmarked, never part of any citable claim) was removed from the
+-- app entirely. See CLAUDE.md and docs/HOW_AGENTBIO_WORKS.md.
 --
 -- ORDER MATTERS: `jobs` must exist before job_artifacts / job_candidate_snapshots
 -- because both carry a foreign key to it.
@@ -83,72 +87,6 @@ CREATE TABLE IF NOT EXISTS explored_targets (
 );
 
 -- ---------------------------------------------------------------------------
--- hypothesis_log — cumulative statistical-test log (data_prep/hypothesis_registry.py)
---
--- Single source of truth for Benjamini-Hochberg FDR across ALL runs. Never
--- truncate per-run: the whole point is that FDR is computed over the entire log.
-CREATE TABLE IF NOT EXISTS hypothesis_log (
-    test_id                 TEXT             NOT NULL,
-    hypothesis_id           TEXT,
-    run_id                  TEXT,
-    run_timestamp           TEXT,
-    hypothesis_text         TEXT,
-    test_type               TEXT,
-    outcome_framing         TEXT,
-    raw_p                   DOUBLE PRECISION,
-    significance_threshold  DOUBLE PRECISION,
-    correction_method       TEXT,
-    locked_at               TEXT,
-    PRIMARY KEY (test_id)
-);
-
--- ---------------------------------------------------------------------------
--- bisociation_history — narrative record of every proposed domain/hypothesis
-CREATE TABLE IF NOT EXISTS bisociation_history (
-    id                        BIGSERIAL        NOT NULL,
-    test_id                   TEXT,
-    hypothesis_id             TEXT,
-    run_id                    TEXT,
-    session_timestamp         TEXT,
-    domain_description        TEXT,
-    proposing_llm             TEXT,
-    resulting_hypothesis_text TEXT,
-    discovery_test_type       TEXT,
-    outcome_framing           TEXT,
-    discovery_raw_p           DOUBLE PRECISION,
-    discovery_fdr_p           DOUBLE PRECISION,
-    discovery_pass            BOOLEAN,
-    confirmation_pass         BOOLEAN,
-    confirmation_raw_p        DOUBLE PRECISION,
-    confound_check_summary    TEXT,
-    outcome_note              TEXT,
-    archived                  BOOLEAN          DEFAULT FALSE,
-    feature_spec              TEXT,
-    novelty_tag               VARCHAR,
-    PRIMARY KEY (id)
-);
-
--- Functional unique index: one row per (hypothesis, outcome framing), treating
--- a NULL framing as ''. Reproduces production's bisociation_history_natkey.
-CREATE UNIQUE INDEX IF NOT EXISTS bisociation_history_natkey
-    ON bisociation_history (hypothesis_id, COALESCE(outcome_framing, ''));
-
--- ---------------------------------------------------------------------------
--- registry_reset_backup — audit backup for /internal/delete-archived
---
--- Rows deleted by a registry reset are copied here (full JSONB payload) first,
--- so the reset stays recoverable and disclosable. Empty in production (0 rows)
--- but the table must exist or the reset endpoint 500s.
-CREATE TABLE IF NOT EXISTS registry_reset_backup (
-    id            BIGSERIAL    NOT NULL,
-    source_table  TEXT         NOT NULL,
-    row_key       TEXT         NOT NULL,
-    payload       JSONB        NOT NULL,
-    deleted_at    TIMESTAMPTZ  NOT NULL DEFAULT now(),
-    PRIMARY KEY (id)
-);
-
--- ---------------------------------------------------------------------------
 -- job_candidate_snapshots — per-job frozen reviewed-candidate pool
 --
 -- ON DELETE CASCADE (unlike job_artifacts' RESTRICT): a snapshot is derived
@@ -167,7 +105,8 @@ COMMIT;
 -- AFTER this file, run:  api/migrations/20260820_job_artifacts.sql
 -- (it creates job_artifacts + its immutability triggers, and FKs to jobs).
 --
--- POST-RESTORE VERIFICATION — expected production row counts:
---   jobs 61 | explored_targets 80 | hypothesis_log 274 | bisociation_history 540
---   job_artifacts 16 | job_candidate_snapshots 12 | research_jobs 12
---   saved_reports 13 | registry_reset_backup 0 | triage_runs 0
+-- POST-RESTORE VERIFICATION — expected production row counts (pre-removal;
+-- hypothesis_log/bisociation_history/registry_reset_backup/research_jobs no
+-- longer apply since the research module was removed):
+--   jobs 61 | explored_targets 80 | job_artifacts 16 | job_candidate_snapshots 12
+--   saved_reports 13 | triage_runs 0

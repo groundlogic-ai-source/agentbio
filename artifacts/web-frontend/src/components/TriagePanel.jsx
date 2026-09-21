@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { triageCandidates } from "../api";
-import DomainFindings from "./DomainFindings";
 import AuditContextFindings from "./AuditContextFindings";
-import ModalityModeToggle from "./ModalityModeToggle";
 import InlineCaseRunner from "./InlineCaseRunner";
 import TherapeuticApplicabilityCaveat from "./TherapeuticApplicabilityCaveat";
-import { useModalityMode } from "../modalityMode";
 
 // ── Flag presentation ─────────────────────────────────────────────────────────
 const FLAG_META = {
@@ -33,8 +30,6 @@ const TONE_STYLE = {
 };
 
 function FlagBadge({ code }) {
-  const [modalityEngaged] = useModalityMode();
-  if (!modalityEngaged && code.startsWith("MODALITY")) return null;
   const meta = FLAG_META[code] || { label: code, tone: "neutral" };
   const t = TONE_STYLE[meta.tone];
   return (
@@ -297,9 +292,6 @@ export default function TriagePanel({ onNavigate }) {
             </p>
           </div>
 
-          <DomainFindings findings={result.domain_findings || result.summary?.domain_findings} />
-          {/* Disengage control lives in-context wherever modality cautions can be hidden */}
-          <ModalityModeToggle />
           <SummaryBar summary={result.summary} />
 
           <div className="rounded-xl border overflow-x-auto" style={{ borderColor: "var(--border)" }}>

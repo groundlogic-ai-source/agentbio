@@ -1,21 +1,9 @@
 import React, { useState } from "react";
 import { auditDrug } from "../api";
 import TriagePanel from "./TriagePanel";
-import DossierPanel from "./DossierPanel";
-import DomainFindings from "./DomainFindings";
 import AuditContextFindings from "./AuditContextFindings";
-import ModalityModeToggle from "./ModalityModeToggle";
 import InlineCaseRunner from "./InlineCaseRunner";
 import TherapeuticApplicabilityCaveat from "./TherapeuticApplicabilityCaveat";
-import { useModalityMode } from "../modalityMode";
-
-// Modality finding card, hidden when the user disengages the mode. Wrapper
-// keeps the hook out of AuditTab's own state list.
-function ModalityFindings({ findings }) {
-  const [engaged] = useModalityMode();
-  if (!engaged) return null;
-  return <DomainFindings findings={findings} />;
-}
 
 // ── Tiny shared primitives ────────────────────────────────────────────────────
 
@@ -701,10 +689,7 @@ function SingleDrugAudit({ onNavigate }) {
       {/* Results */}
       {result && (
         <div className="space-y-4">
-          <DomainFindings findings={result.domain_findings} />
-          <ModalityFindings findings={result.modality_findings} />
           <AuditContextFindings context={result.audit_context} />
-          <ModalityModeToggle />
           {result.status === "found" && <FoundResult data={result} />}
           {result.status === "absent" && <AbsentResult data={result} />}
           {result.status === "unresolved" && <UnresolvedResult data={result} />}
@@ -734,7 +719,6 @@ function SingleDrugAudit({ onNavigate }) {
 const AUDIT_MODES = [
   { id: "triage",  label: "Triage a list" },
   { id: "single",  label: "Single drug" },
-  { id: "dossier", label: "Dossiers" },
 ];
 
 export default function AuditTab({ onNavigate }) {
@@ -746,7 +730,7 @@ export default function AuditTab({ onNavigate }) {
         <h2 className="text-2xl font-semibold" style={{ color: "var(--ink)" }}>Audit</h2>
         <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
           Independent verification, not discovery: triage your own candidate list,
-          audit a single drug, or re-verify saved dossiers claim by claim.
+          or audit a single drug.
         </p>
       </div>
 
@@ -769,7 +753,6 @@ export default function AuditTab({ onNavigate }) {
 
       {mode === "triage" && <TriagePanel onNavigate={onNavigate} />}
       {mode === "single" && <SingleDrugAudit onNavigate={onNavigate} />}
-      {mode === "dossier" && <DossierPanel />}
     </div>
   );
 }

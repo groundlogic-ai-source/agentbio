@@ -34,10 +34,6 @@ COPY data_sources/ data_sources/
 COPY cache/ cache/
 COPY validation/ validation/
 COPY docs/ docs/
-# data_prep is imported lazily by api/main.py (_ensure_research_modules) for the
-# /api/research/* endpoints — hypothesis_registry, features, stats_tests,
-# llm_clients, hypothesis_report, run_discovery. Required, not optional.
-COPY data_prep/ data_prep/
 COPY main_graph.py resume_review.py sweep_manager.py ./
 
 # Placeholders so the app has somewhere to write before volumes are mounted

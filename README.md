@@ -406,6 +406,16 @@ available to qualified evaluators on request. A few oversized raw archives are
 omitted from the mirror and are listed, with SHA-256, in
 `validation/private_archive_manifest.md`.
 
+## Third-party data attribution
+
+AgentBio queries the **IUPHAR/BPS Guide to PHARMACOLOGY (GtoPdb)** REST API for
+curated ligand–target interaction data. GtoPdb's database is licensed under the
+[Open Data Commons Open Database License (ODbL)](https://www.guidetopharmacology.org/about.jsp#license),
+with its contents under a
+[Creative Commons Attribution-ShareAlike 4.0 International License](https://www.guidetopharmacology.org/about.jsp#license)
+(CC BY-SA). Per their attribution request: data sourced from the
+[Guide to PHARMACOLOGY](https://www.guidetopharmacology.org/), IUPHAR/BPS.
+
 ## Beta status & bug reports
 
 AgentBio is in **beta**. Dossiers are machine-generated hypotheses for expert

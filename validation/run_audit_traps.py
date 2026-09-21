@@ -4,9 +4,12 @@ as an AUDIT tool (not discovery accuracy).
 
 Pre-registered in validation/audit_traps_preregistration.md (v1, frozen
 2026-08-03). Offline-first: every trap drives production code
-(api.audit / api.triage / api.dossier / agents.reviewer /
+(api.audit / api.triage / api.claim_verification / agents.reviewer /
 data_sources.multisource_candidates) against stubbed inputs. No live
 ChEMBL/PubChem/LLM calls.
+# NOTE 2026-09-21: api.claim_verification was extracted from the removed
+# api.dossier module (see api/claim_verification.py's docstring) — the trap
+# logic and expected results are unchanged, only the import path moved.
 
 LABEL GUARD: runs ONLY under --label audit_trap_benchmark. This artifact must
 never be reported as benchmark v2 or as discovery accuracy.
@@ -166,7 +169,7 @@ def _t3_direction_incompatible() -> bool:
 
 def _t4_label_artifact_screen() -> bool:
     """Admin-exclude-class association must be called an artifact, not a signal."""
-    from api.dossier import audit_status_for, parse_reviewer_tag
+    from api.claim_verification import audit_status_for, parse_reviewer_tag
 
     tag = parse_reviewer_tag(
         "LABEL_ARTIFACT_SUSPECT: admin-only replay reproduces the effect", True
@@ -178,7 +181,7 @@ def _t4_label_artifact_screen() -> bool:
 
 def _t5_confirmation_discipline() -> bool:
     """Discovery-significant but holdout-failed is NOT confirmed."""
-    from api.dossier import audit_status_for
+    from api.claim_verification import audit_status_for
 
     facts = {
         "passed_both": False,
@@ -283,7 +286,7 @@ def _c1_clean_candidate() -> bool:
 
 def _c2_verified_hypothesis() -> bool:
     """Fully confirmed + all computable confounds survived => VERIFIED."""
-    from api.dossier import audit_status_for
+    from api.claim_verification import audit_status_for
 
     facts = {
         "passed_both": True,

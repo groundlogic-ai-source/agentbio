@@ -4,7 +4,6 @@ import BetaBanner from "./components/BetaBanner.jsx";
 import CaseView from "./components/CaseView.jsx";
 import NewCaseDialog from "./components/NewCaseDialog.jsx";
 import ResearchTab from "./components/ResearchTab.jsx";
-import SavedReportsTab from "./components/SavedReportsTab.jsx";
 import AuditTab from "./components/AuditTab.jsx";
 import CandidatePoolTab from "./components/CandidatePoolTab.jsx";
 import HowItWorksTab from "./components/HowItWorksTab.jsx";
@@ -29,13 +28,12 @@ const POLL_MS = 4000;
 // unmounts the whole nav and strands the user on the tab they just opened.
 const TABS = [
   // Two product surfaces, visually grouped: the case pipeline
-  // (Case Files + Audit + Candidates) and the research module.
+  // (Case Files + Audit + Candidates + How It Works) and frozen benchmarks.
   { id: "dashboard", label: "Case Files", group: "case" },
   { id: "audit", label: "Audit", group: "case" },
   { id: "candidates", label: "Candidates", group: "case" },
+  { id: "how", label: "How It Works", group: "case" },
   { id: "research", label: "Research", group: "research" },
-  { id: "saved", label: "Saved Reports", group: "research" },
-  { id: "how", label: "How It Works", group: "research" },
 ];
 
 const TAB_IDS = new Set(TABS.map((t) => t.id));
@@ -295,10 +293,6 @@ export default function App() {
 
       {view === "research" && (
         <ResearchTab />
-      )}
-
-      {view === "saved" && (
-        <SavedReportsTab />
       )}
 
       {view === "audit" && (

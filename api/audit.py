@@ -20,7 +20,6 @@ from typing import Any, Optional
 
 import api.jobs_db as jobs_db
 from api.audit_context import build_audit_context
-from api.domain_findings import domain_findings_for, modality_finding_for
 from agents.reviewer import SAFETY_SCHEMA_VERSION
 from data_sources.llm_failover import call_with_backoff
 from data_sources.chembl import (
@@ -382,25 +381,19 @@ def _cap_reason(c: dict) -> Optional[str]:
 # ── Main audit function ───────────────────────────────────────────────────────
 
 def _modality_payload(drug_name: str) -> dict[str, Any]:
-    """Modality finding fields for a drug, via the cached ChEMBL lookup.
+    """Modality fields for a drug, via the cached ChEMBL lookup.
 
     Applies to the DRUG, not the indication, so it is attached on every audit
     path — including early returns where no case or candidate pool exists.
-    Unresolved lookups are stated, never silently "clear". Disclosure only.
+    Unresolved lookups are stated, never silently "clear".
     """
     mol = get_molecule_data(drug_name)
     mtype = mol.get("molecule_type")
     oral_raw = mol.get("oral")
     oral = None if oral_raw is None else bool(oral_raw)
-    findings = modality_finding_for(mtype, oral)
     return {
         "chembl_molecule_type": mtype,
         "chembl_oral": oral,
-        "modality_findings": findings,
-        "modality_status": (
-            "flagged" if findings
-            else ("unresolved" if (mtype is None or oral is None) else "clear")
-        ),
     }
 
 
@@ -629,13 +622,8 @@ def run_audit(
         "data, not a real biological judgment against it."
     )
 
-    # 7. Confirmed research findings applicable to this indication class
-    # (base-rate context — disclosure only, never a score or verdict change).
-    result["domain_findings"] = domain_findings_for(canonical_disease)
-
-    # 8. Modality finding: applies to the DRUG, not the indication. Live cached
-    # lookup so out-of-pool drugs get the same disclosure as reviewed
-    # candidates; unresolved lookups are stated, never silently "clear".
+    # 7. Modality fields: apply to the DRUG, not the indication. Live cached
+    # lookup so out-of-pool drugs get the same fields as reviewed candidates.
     result.update(modality_payload or _modality_payload(drug_name))
 
     # 9. Structured regulatory + entity-linked literature context. This uses

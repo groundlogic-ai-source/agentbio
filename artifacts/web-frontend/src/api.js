@@ -101,99 +101,10 @@ export const TERMINAL_STATUSES = new Set([
   "degraded_unscorable",
 ]);
 
-// ── Research hypothesis registry (Feature 3) ──────────────────────────────────
-
-export function getResearchHypotheses() {
-  return request("/api/research/hypotheses");
-}
-
-export function archiveHypothesis(hypothesisId, archived = true) {
-  return request(
-    `/api/research/hypotheses/${encodeURIComponent(hypothesisId)}/archive?archived=${archived}`,
-    { method: "PATCH" },
-  );
-}
-
-export function archiveAllHypotheses(archived = true) {
-  return request(
-    `/api/research/hypotheses/archive-all?archived=${archived}`,
-    { method: "PATCH" },
-  );
-}
-
-export function submitResearchHypothesis(hypothesisText) {
-  return request("/api/research/hypotheses", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ hypothesis_text: hypothesisText }),
-  });
-}
-
-export function getResearchJob(jobId) {
-  return request(`/api/research/jobs/${jobId}`);
-}
-
-// Start a full autonomous discovery batch (two generators + lead review, no
-// user-provided hypothesis). Returns { job_id }; poll with getResearchJob.
-export function runDiscoveryBatch(runLabel = null) {
-  return request("/api/research/discovery-batch", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(runLabel ? { run_label: runLabel } : {}),
-  });
-}
-
-// Start continuous autonomous discovery: chains batches until a double-pass is
-// found, the batch cap is reached (default 10, hard ceiling 40), the 6-hour
-// time bound is hit, or the run is stopped. Returns { job_id }; poll with
-// getResearchJob for live progress.
-export function runContinuousDiscovery(runLabel = null, maxBatches = null) {
-  const body = {};
-  if (runLabel) body.run_label = runLabel;
-  // != null (not truthiness): an entered 0 must reach the server clamp (-> 1),
-  // not be silently swapped for the default. Blank/unparseable stays null.
-  if (maxBatches != null) body.max_batches = maxBatches;
-  return request("/api/research/discovery-continuous", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-}
-
 // Fetch one frozen validation report (markdown) for in-app reading from the
 // benchmark cards. Ids are allow-listed server-side; unknown ids 404.
 export function getBenchmarkReport(reportId) {
   return request(`/api/research/benchmark-report/${encodeURIComponent(reportId)}`);
-}
-
-// Signal a running continuous discovery job to stop after its current batch.
-// Returns immediately; the job finishes the in-flight batch before stopping.
-export function stopContinuousDiscovery(jobId) {
-  return request(
-    `/api/research/discovery-continuous/${encodeURIComponent(jobId)}/stop`,
-    { method: "POST" },
-  );
-}
-
-// Registry reset: permanently delete archived bisociation history plus the
-// test-ledger rows of hypotheses left with no surviving entry. dryRun=true
-// only counts. Deleted rows are backed up server-side (registry_reset_backup).
-export function deleteArchivedRegistry(dryRun = true) {
-  return request(`/internal/delete-archived?dry_run=${dryRun ? "true" : "false"}`, {
-    method: "POST",
-  });
-}
-
-// Generate (or fetch cached) the full auditable write-up for a hypothesis that
-// passed BOTH discovery and confirmation. Triggers a single Opus 4.8 call the
-// first time, so expect a few seconds. Returns { hypothesis_id, facts,
-// report_markdown, generated_at, cached }.
-export function generateHypothesisReport(hypothesisId, { refresh = false } = {}) {
-  const qs = refresh ? "?refresh=true" : "";
-  return request(
-    `/api/research/hypotheses/${encodeURIComponent(hypothesisId)}/report${qs}`,
-    { method: "POST" },
-  );
 }
 
 // ── Candidate audit (Part A) ──────────────────────────────────────────────
@@ -245,7 +156,7 @@ export function getBenchmarkStatus() {
   return request("/internal/benchmark-status");
 }
 
-// ── Audit mode: list triage + dossier workspace ─────────────────────────────
+// ── Audit mode: triage ───────────────────────────────────────────────────────
 // Triage audits a caller-supplied drug list against one completed case's
 // persisted pool. The run is persisted server-side and retrievable by run id.
 export function triageCandidates(diseaseName, drugNames, jobId = null, claimContexts = {}) {
@@ -265,34 +176,4 @@ export function listTriageRuns() {
 
 export function getTriageRun(runId) {
   return request(`/api/audit/triage/${encodeURIComponent(runId)}`);
-}
-
-export function getAuditDossiers() {
-  return request("/api/audit/dossiers");
-}
-
-export function getDossierClaims(hypothesisId) {
-  return request(`/api/audit/dossiers/${encodeURIComponent(hypothesisId)}/claims`);
-}
-
-// ── Saved reports ──────────────────────────────────────────────────────────
-// Freeze a generated report as a permanent snapshot. Returns the stored row.
-export function saveReport(payload) {
-  return request("/api/reports", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-}
-
-export function listSavedReports() {
-  return request("/api/reports");
-}
-
-export function getSavedReport(reportId) {
-  return request(`/api/reports/${encodeURIComponent(reportId)}`);
-}
-
-export function deleteSavedReport(reportId) {
-  return request(`/api/reports/${encodeURIComponent(reportId)}`, { method: "DELETE" });
 }
