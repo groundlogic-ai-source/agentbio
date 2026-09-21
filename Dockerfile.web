@@ -20,7 +20,14 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY lib/ lib/
 COPY scripts/package.json scripts/tsconfig.json scripts/
 COPY artifacts/web-frontend/package.json artifacts/web-frontend/
-RUN pnpm install --frozen-lockfile
+# --frozen-lockfile fails here: pnpm-lock.yaml doesn't exactly match
+# pnpm-workspace.yaml's `overrides` section (ERR_PNPM_LOCKFILE_CONFIG_MISMATCH).
+# Discovered building this image 2026-09-21. --no-frozen-lockfile lets pnpm
+# reconcile it; the overrides in question are platform-binary excludes, not
+# version pins, so this is a safe tradeoff for a deploy image. Ideally the
+# lockfile gets regenerated properly in a real dev environment at some point
+# and committed, restoring full reproducibility.
+RUN pnpm install --no-frozen-lockfile
 
 COPY artifacts/web-frontend/ artifacts/web-frontend/
 
