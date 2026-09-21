@@ -31,12 +31,23 @@ Common return envelope (shared shape across the v2 source adapters):
   }
 """
 
+import os
 import requests
 from typing import Any, Optional
 
 from cache.cache import get, set as cache_set, make_key
 
 BASE_URL = "https://www.guidetopharmacology.org/services"
+
+# GtoPdb started requiring a registered API key at some point after this
+# adapter was written and verified against the "public" API (discovered
+# 2026-09-21 — every call was failing with HTTP 401 "API key is missing").
+# Not Replit- or migration-specific: this is an upstream provider policy
+# change that would have broken on any host. Free key: register a user
+# account, then request a key via the site's "Contact us" link. Sent as the
+# recommended header (GTP-API-Key), not the query-param alternative, per
+# GtoPdb's own guidance (query params risk ending up in logs/browser history).
+_API_KEY = os.environ.get("GTOPDB_API_KEY")
 
 # Cache key version. Bump when the normalized candidate shape or the caching
 # gate changes so stale rows from an older schema can never be served.
@@ -80,9 +91,11 @@ def _get_json(path: str, params: Optional[dict] = None,
     Every other endpoint keeps the strict behavior: a 204 there still raises.
     """
     url = f"{BASE_URL}{path}"
+    headers = {"Accept": "application/json"}
+    if _API_KEY:
+        headers["GTP-API-Key"] = _API_KEY
     try:
-        resp = requests.get(url, params=params,
-                            headers={"Accept": "application/json"}, timeout=30)
+        resp = requests.get(url, params=params, headers=headers, timeout=30)
     except requests.exceptions.RequestException as e:
         raise _SourceUnavailable(f"request to {url} failed: {e}") from e
 
@@ -93,6 +106,11 @@ def _get_json(path: str, params: Optional[dict] = None,
     if resp.status_code in _TRANSIENT_STATUSES:
         raise _SourceUnavailable(
             f"{url} returned transient HTTP {resp.status_code}")
+    if resp.status_code == 401 and not _API_KEY:
+        raise _SourceUnavailable(
+            f"{url} returned HTTP 401 — GtoPdb now requires a registered API "
+            f"key. Set GTOPDB_API_KEY (see comment near the top of this file "
+            f"for how to obtain one).")
     if resp.status_code != 200:
         # Any other non-200 is unexpected; treat as unavailable rather than
         # silently coercing to empty.
