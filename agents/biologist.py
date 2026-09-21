@@ -134,10 +134,12 @@ def get_druggability_literature(
             msg = call_with_backoff(
                 lambda: client.messages.create(
                     model=SCREENING_MODEL, max_tokens=120,
-                    # temperature=0: YES/NO classifier that gates which abstracts enter
-                    # supporting_pmids. Pinned for reproducibility; non-zero temperature
-                    # could produce different outcomes on borderline abstracts across runs.
-                    temperature=0,
+                    # temperature intentionally omitted, not set to 0: this model/SDK
+                    # combination rejects the temperature kwarg outright (see
+                    # data_prep/llm_clients.py's docstring — discovered 2026-09,
+                    # affects claude-sonnet-4-6 too, not just opus). Relying on
+                    # default sampling instead; this classifier's binary YES/NO
+                    # output is stable enough in practice without an explicit pin.
                     messages=[{"role": "user", "content": prompt}]),
                 label="biologist-druggability-screen", provider="anthropic",
                 model=SCREENING_MODEL,
@@ -186,7 +188,9 @@ def get_druggability_literature(
     try:
         msg = call_with_backoff(
             lambda: client.messages.create(
-                model=HAIKU_MODEL, max_tokens=512, temperature=0,
+                model=HAIKU_MODEL, max_tokens=512,
+                # temperature omitted — see comment above; this SDK/model
+                # combination rejects it outright rather than accepting 0.
                 messages=[{"role": "user", "content": summary_prompt}]),
             label="biologist-druggability-summary", provider="anthropic",
             model=HAIKU_MODEL,

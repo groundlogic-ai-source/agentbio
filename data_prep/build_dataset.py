@@ -87,7 +87,9 @@ def _classify_batch(texts: list[str], client) -> list[str]:
         resp = call_with_backoff(
             lambda: client.messages.create(
                 model=HAIKU_MODEL, max_tokens=8 * len(texts) + 50,
-                temperature=0, messages=[{"role": "user", "content": prompt}]),
+                # temperature omitted — this SDK/model combination rejects the
+                # kwarg outright, even at 0. See data_prep/llm_clients.py.
+                messages=[{"role": "user", "content": prompt}]),
             label="dataset-why-stopped-classification", provider="anthropic",
             model=HAIKU_MODEL,
         )

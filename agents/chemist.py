@@ -182,7 +182,9 @@ def _llm_rationale(client: Optional[anthropic.Anthropic], c: dict[str, Any],
     try:
         msg = call_with_backoff(
             lambda: client.messages.create(
-                model=MODEL, max_tokens=256, temperature=0,
+                model=MODEL, max_tokens=256,
+                # temperature omitted — this SDK/model combination rejects the
+                # kwarg outright, even at 0. See data_prep/llm_clients.py.
                 messages=[{"role": "user", "content": prompt}]),
             label="chemist-rationale", provider="anthropic", model=MODEL,
         )

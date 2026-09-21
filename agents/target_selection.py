@@ -1504,9 +1504,8 @@ def _narrate_top5(top5: list[dict[str, Any]]) -> str:
         message = call_with_backoff(
             lambda: client.messages.create(
                 model="claude-sonnet-4-6", max_tokens=512,
-                # temperature=0: narrative-only, does not affect scores or rankings,
-                # but pinned for overall run reproducibility.
-                temperature=0,
+                # temperature omitted — this SDK/model combination rejects the
+                # kwarg outright, even at 0. See data_prep/llm_clients.py.
                 messages=[{"role": "user", "content": prompt}]),
             label="target-selection-narration", provider="anthropic",
             model="claude-sonnet-4-6",

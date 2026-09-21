@@ -264,7 +264,10 @@ def _anthropic_text(prompt: str, system: Optional[str], max_tokens: int,
     kwargs: dict[str, Any] = {
         "model": model,
         "max_tokens": max_tokens,
-        "temperature": 0,
+        # temperature omitted — this SDK/model combination rejects the kwarg
+        # outright, even at 0 (TypeError, not a 400). Discovered 2026-09-21
+        # deploying off Replit; likely masked there by an older pinned SDK
+        # version. Relying on default sampling instead.
         "messages": [{"role": "user", "content": prompt}],
     }
     if system:
