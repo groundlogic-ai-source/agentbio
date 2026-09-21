@@ -35,7 +35,7 @@ export const TAB_GUIDES = {
     give: "A disease that has a completed case, plus your own drug names.",
     get:
       "A per-drug verdict — in pool, absent, or name unresolved — with rank, composite and " +
-      "pre-cap score, the reason for any cap, black-box advisories, XLogP and modality cautions, " +
+      "pre-cap score, the reason for any cap, black-box advisories, XLogP cautions, " +
       "and evidence coverage. Every triage run gets a run id so the exact verdict set can be " +
       "retrieved later.",
     when: "You have a shortlist and want an adversarial second opinion on it.",
@@ -50,12 +50,12 @@ export const TAB_GUIDES = {
       "Browse and filter every candidate a completed case ranked — not just the few that were " +
       "written up in the dossier. Open any drug's evidence ledger to see the normalized source " +
       "records behind it: identifiers, measurements, actions and stated limitations.",
-    give: "Pick a case, then filter by safety cap, evidence coverage, XLogP, modality, or free text.",
+    give: "Pick a case, then filter by safety cap, evidence coverage, XLogP, or free text.",
     get: "The ranked table with caution flags, and a per-drug evidence ledger with source links.",
     when: "You want the long tail below the headline candidates, or want to see what got capped and why.",
     notThis:
-      "Scores here are historical outputs of that run. XLogP and modality are disclosure flags — " +
-      "they never change rank.",
+      "Scores here are historical outputs of that run. XLogP is a disclosure flag — " +
+      "it never changes rank.",
   },
   research: {
     title: "Research",

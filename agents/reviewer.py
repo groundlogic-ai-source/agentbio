@@ -975,10 +975,10 @@ def run_reviewer(
                 })
 
         # Lipophilicity flag: fetch PubChem XLogP (cached) and flag if >= 5.
-        # Threshold of 5 matches the Lipinski Rule-of-5 logP boundary and the
-        # bisociation benchmark split (run-629a01b9) which found XLogP >= 5
-        # associated with 0.426x odds of repurposing success (Fisher p = 3e-9,
-        # holdout-confirmed p = 0.009). Disclosure only — does NOT affect scoring.
+        # Threshold of 5 is Lipinski's Rule of Five (Lipinski et al., 1997,
+        # Adv. Drug Deliv. Rev. 23:3-25): LogP > 5 is one of four criteria
+        # historically associated with poor oral absorption/permeability.
+        # Disclosure only — does NOT affect scoring.
         HIGH_XLOGP_THRESHOLD = 5.0
         _pc = context["pubchem"]
         _pubchem_xlogp: Optional[float] = _pc.get("xlogp")
@@ -1017,12 +1017,9 @@ def run_reviewer(
                 "Lipinski/Veber are soft developability flags, NOT a hard ADME "
                 "prediction."
             ),
-            # High-lipophilicity disclosure (XLogP >= 5). Disclosure only — does NOT
-            # affect any score. The bisociation analysis (run-629a01b9) found XLogP >= 5
-            # is associated with 0.426x odds of repurposing success (p = 3e-9,
-            # holdout-confirmed p = 0.009). The direction of effect is empirical and
-            # an unresolved incumbency-confound caveat remains (see task-14 for
-            # confirmation run).
+            # High-lipophilicity disclosure (XLogP >= 5), per Lipinski's Rule of
+            # Five (Lipinski et al., 1997, Adv. Drug Deliv. Rev. 23:3-25).
+            # Disclosure only — does NOT affect any score.
             "pubchem_xlogp": _pubchem_xlogp,
             "high_lipophilicity_flag": _high_lipophilicity_flag,
             "chembl_molecule_type": _molecule_type,

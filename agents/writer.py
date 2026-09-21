@@ -1775,31 +1775,24 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
         )
 
     # High-lipophilicity DISCLOSURE — surfaced when PubChem XLogP >= 5.
-    # The bisociation analysis (run-629a01b9) found XLogP >= 5 is associated
-    # with 0.426x odds of repurposing success (broad-framing Fisher's exact
-    # p = 3×10⁻⁹, holdout-confirmed p = 0.009, survives adjustment for
-    # established-product status and CNS-area membership). Direction is opposite
-    # to the original hypothesis — lipophilic drugs are LESS likely to succeed.
-    # An incumbency-confound caveat is unresolved (Task 14 confirmation run).
+    # Threshold of 5 is Lipinski's Rule of Five (Lipinski, Lombardo, Dominy &
+    # Feeney, 1997, Adv. Drug Deliv. Rev. 23:3-25): LogP > 5 is one of four
+    # criteria historically associated with poor oral absorption/permeability.
     # This banner is disclosure only — it does NOT affect any score.
     if candidate.get("high_lipophilicity_flag"):
         _xlogp_val = candidate.get("pubchem_xlogp")
         _xlogp_str = f"{_xlogp_val:.2f}" if _xlogp_val is not None else "≥ 5"
         parts.append(
-            f"> ⚠ **High lipophilicity (XLogP = {_xlogp_str}) — empirical caution flag.** "
+            f"> ⚠ **High lipophilicity (XLogP = {_xlogp_str}) — disclosure flag.** "
             f"**{drug}** has a PubChem XLogP of {_xlogp_str}, above the threshold of 5. "
-            f"A dataset-derived analysis (repoDB, n ≈ 8,700 drug–disease pairs) found that "
-            f"drugs with XLogP ≥ 5 have **0.426× the odds of repurposing success** "
-            f"(Fisher's exact p = 3×10⁻⁹; holdout p = 0.009; survives adjustment for "
-            f"established-product status and CNS-area membership). The direction of effect "
-            f"is opposite to the original hypothesis — high-lipophilicity drugs repurpose "
-            f"*less* often, not more. "
-            f"**Unresolved caveat:** an incumbency-confound (lipophilic drugs are "
-            f"disproportionately represented in historically studied disease areas) has not "
-            f"yet been fully ruled out; treat this as an alert rather than a disqualifier. "
+            f"This crosses one of the four criteria in **Lipinski's Rule of Five** "
+            f"(Lipinski, Lombardo, Dominy & Feeney, 1997, *Advanced Drug Delivery "
+            f"Reviews* 23:3–25), a widely used medicinal-chemistry heuristic under "
+            f"which LogP > 5 is associated with poor oral absorption and permeability. "
             f"**This flag does not affect the composite score.** "
             f"The reviewer must judge whether lipophilicity is a material concern in the "
-            f"context of the proposed repurposing indication.\n\n"
+            f"context of the proposed repurposing indication and its intended route of "
+            f"administration.\n\n"
         )
 
     # Mutation-specificity DISCLOSURE caveat — surfaced whenever the drug's
