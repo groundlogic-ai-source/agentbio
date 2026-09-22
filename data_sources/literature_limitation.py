@@ -708,8 +708,21 @@ def aggregate_findings(
             bool(_NEGATIVE_WORDS.search(str(quote or "")))
         )
         supportive_language = bool(_SUPPORT_WORDS.search(str(quote or "")))
-        source_has_negative_language = bool(
-            _NEGATIVE_WORDS.search(str(record.get("abstract") or "")))
+        # Scoped to the candidate drug/class, not a raw whole-abstract search:
+        # background/mechanism abstracts routinely contain words like
+        # "resistance" or "unclear" describing disease biology or an unrelated
+        # experimental control (e.g. a dihydropyridine-resistant channel mutant
+        # used to isolate a current), not a negative finding about this
+        # candidate's use. An unscoped search flags nearly every such record,
+        # exactly the false-positive pattern _support_quote_has_candidate_
+        # negative_language was already built to avoid for the APPLICABLE_
+        # SUPPORT path — reused here for the same reason.
+        source_has_negative_language = _support_quote_has_candidate_negative_language(
+            record.get("abstract"),
+            drug_name=drug_name,
+            drug_class=drug_class,
+            aliases=aliases,
+        )
         requested_label = label
         original_label = label
         label = _recover_unknown_label(

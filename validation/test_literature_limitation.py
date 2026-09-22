@@ -475,6 +475,72 @@ class LiteratureLimitationTests(unittest.TestCase):
         self.assertEqual(result["explicit_limitation_count"], 1)
         self.assertTrue(result["gate_cleared"])
 
+    def test_incidental_resistance_language_in_background_abstract_does_not_block(self):
+        # Real abstract from a live Timothy syndrome run (2026-09-22): a porcine
+        # TS1 model paper unrelated to the candidate drug's clinical use.
+        # "dihydropyridine resistance" here describes an engineered
+        # DHP-resistant channel mutant used as an experimental control, not a
+        # negative finding about nisoldipine. The classifier correctly labeled
+        # it NOT_APPLICABLE_TO_EXACT_DRUG_USE; the whole-abstract negative-word
+        # scan used to treat that as a classifier-integrity failure anyway,
+        # because "resistance" appears anywhere in the abstract.
+        abstract = (
+            "Timothy syndrome (TS) is a disease of excessive cellular Ca(2+) "
+            "entry and life-threatening arrhythmias caused by a mutation in the "
+            "primary cardiac L-type Ca(2+) channel (Ca(V)1.2). We developed an "
+            "adult rat ventricular myocyte model of TS (G406R). The exogenous "
+            "Ca(V)1.2 contained a mutation (T1066Y) conferring dihydropyridine "
+            "resistance, so we could silence endogenous Ca(V)1.2 with nifedipine "
+            "and maintain peak I(Ca) at control levels in infected cells."
+        )
+        quote = (
+            "The exogenous Ca(V)1.2 contained a mutation (T1066Y) conferring "
+            "dihydropyridine resistance, so we could silence endogenous Ca(V)1.2 "
+            "with nifedipine and maintain peak I(Ca) at control levels in "
+            "infected cells."
+        )
+        record = _record("19001023", abstract=abstract)
+        result = _aggregate(
+            [record],
+            [{
+                "pmid": "19001023",
+                "exact_use_label": "NOT_APPLICABLE_TO_EXACT_DRUG_USE",
+                "quote": quote,
+                "disease_match": True,
+                "use_match": False,
+                "drug_or_class_match": True,
+                "reason": "Mechanistic probe study, not a nisoldipine outcome.",
+            }],
+        )
+        self.assertEqual(result["classifier_integrity_failures"], 0)
+        self.assertEqual(result["evidence"][0]["exact_use_label"],
+                         "NOT_APPLICABLE_TO_EXACT_DRUG_USE")
+
+    def test_candidate_specific_negative_language_still_blocks_not_applicable(self):
+        # The safety net this guard exists for must still fire: a record with
+        # a genuine negative finding *about the candidate drug itself* must not
+        # be allowed to disappear behind a NOT_APPLICABLE label.
+        abstract = (
+            "In this cohort, nisoldipine showed no significant improvement in "
+            "action potential duration among Timothy syndrome cardiomyocytes, "
+            "and clinical response was inconsistent across patients."
+        )
+        record = _record("99999999", abstract=abstract)
+        result = _aggregate(
+            [record],
+            [{
+                "pmid": "99999999",
+                "exact_use_label": "NOT_APPLICABLE_TO_EXACT_DRUG_USE",
+                "quote": abstract,
+                "disease_match": True,
+                "use_match": False,
+                "drug_or_class_match": True,
+                "reason": "Mislabeled by the classifier as not applicable.",
+            }],
+        )
+        self.assertGreaterEqual(result["classifier_integrity_failures"], 1)
+        self.assertEqual(result["verdict"], VERDICT_FAILED)
+
     def test_unknown_label_with_clear_probe_record_becomes_not_applicable(self):
         quote = (
             "Pinacidil was used as an electrophysiology probe to characterize "
