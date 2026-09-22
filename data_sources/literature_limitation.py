@@ -497,9 +497,14 @@ def _support_quote_has_candidate_negative_language(
 ) -> bool:
     """Reject support only when negative language applies to this intervention.
 
-    Disease descriptions often contain phrases such as "ERT-resistant symptoms".
-    The generic resistance detector must not turn that baseline description into
-    a contradiction of a different candidate's positive result.
+    Disease descriptions and background/mechanism text routinely contain
+    negative-sounding words that have nothing to do with this intervention's
+    efficacy -- "ERT-resistant symptoms", "the organ-level dynamics ... remain
+    unclear", an engineered drug-resistant channel mutant used as a lab
+    control. Every negative-word match gets the same treatment regardless of
+    which word matched: only one appearing near this drug/class counts. A
+    match elsewhere in the text is disease or methodology background, not a
+    finding about the candidate.
     """
     text = str(quote or "")
     intervention_terms = [
@@ -507,11 +512,8 @@ def _support_quote_has_candidate_negative_language(
         if str(value or "").strip()
     ]
     for match in _NEGATIVE_WORDS.finditer(text):
-        token = match.group(0).casefold()
-        if "resistan" not in token:
-            return True
-        # Keep the window tight enough not to associate resistance to prior
-        # therapy with a later candidate mentioned in the same abstract.
+        # Keep the window tight enough not to associate negative language
+        # elsewhere in the same abstract with this candidate.
         context = text[max(0, match.start() - 45):match.end() + 45]
         if any(
             _phrase_or_term_match(

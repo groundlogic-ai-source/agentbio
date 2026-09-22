@@ -475,6 +475,47 @@ class LiteratureLimitationTests(unittest.TestCase):
         self.assertEqual(result["explicit_limitation_count"], 1)
         self.assertTrue(result["gate_cleared"])
 
+    def test_incidental_unclear_and_efficacy_language_in_background_abstract_does_not_block(self):
+        # Real abstract from the same live Timothy syndrome run, a second,
+        # distinct record that survived the first fix -- "unclear" here
+        # describes incomplete scientific understanding of disease dynamics,
+        # not the candidate drug's efficacy; "benchmark for assessing
+        # treatment efficacy" is methodology description, not a finding.
+        # This is why the proximity scoping must apply to every negative-word
+        # match, not just resistan*-family tokens.
+        abstract = (
+            "Timothy syndrome 1 (TS1) is a multi-organ form of long QT "
+            "syndrome associated with life-threatening cardiac arrhythmias, "
+            "the organ-level dynamics of which remain unclear. In this "
+            "study, we developed and characterized a novel porcine model of "
+            "TS1 carrying the causative p.Gly406Arg mutation in CACNA1C. "
+            "This signature substrate of TS1 was reliably identified using "
+            "the reentry vulnerability index, which, we further demonstrate, "
+            "can be used as a benchmark for assessing treatment efficacy, as "
+            "shown by testing of multiple clinical and preclinical "
+            "anti-arrhythmic compounds."
+        )
+        record = _record("38665938", abstract=abstract)
+        result = _aggregate(
+            [record],
+            [{
+                "pmid": "38665938",
+                "exact_use_label": "NOT_APPLICABLE_TO_EXACT_DRUG_USE",
+                "quote": (
+                    "can be used as a benchmark for assessing treatment "
+                    "efficacy, as shown by testing of multiple clinical and "
+                    "preclinical anti-arrhythmic compounds."
+                ),
+                "disease_match": True,
+                "use_match": False,
+                "drug_or_class_match": False,
+                "reason": "Model-characterization study, not a nisoldipine outcome.",
+            }],
+        )
+        self.assertEqual(result["classifier_integrity_failures"], 0)
+        self.assertEqual(result["evidence"][0]["exact_use_label"],
+                         "NOT_APPLICABLE_TO_EXACT_DRUG_USE")
+
     def test_incidental_resistance_language_in_background_abstract_does_not_block(self):
         # Real abstract from a live Timothy syndrome run (2026-09-22): a porcine
         # TS1 model paper unrelated to the candidate drug's clinical use.
