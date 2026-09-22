@@ -206,6 +206,82 @@ class SafetyV3Test(unittest.TestCase):
         self.assertEqual(
             gate["status"], "GLOBALLY_UNAVAILABLE_ACTIVE_INGREDIENT")
 
+    def test_confirmed_single_jurisdiction_market_exit_blocks_prioritization(self):
+        # Panobinostat/Farydak-class case: an authority-verified, scope-matched
+        # market exit in one named jurisdiction (not "global"/"worldwide"
+        # wording, so it can never reach the confirmed_global branch), with no
+        # alternative-supply evidence found. This must still block
+        # prioritization even though safety_status isn't a safety withdrawal --
+        # BRAND_DISCONTINUED/MANUFACTURER_DISCONTINUED/NOT_MARKETED never set
+        # confirmed=True (safety-v3's deliberate scope), so this can only be
+        # caught by the availability gate, not the safety cap.
+        quote = "Secura Bio withdrew panobinostat from the United States market."
+        with patch(
+            "data_sources.safety_check._fetch_regulator_source",
+            return_value={
+                "verified": True,
+                "text": f"{quote} United States oral capsules.",
+                "reason": None,
+            },
+        ):
+            result = classify_safety_evidence(
+                "panobinostat",
+                "model-provided search text is not trusted",
+                _answer(
+                    safety_status="MANUFACTURER_DISCONTINUED",
+                    withdrawal="NO",
+                    source_name="FDA",
+                    source_url="https://www.fda.gov/drugs/example",
+                    exact_quote=quote,
+                    jurisdiction="United States",
+                    formulation="oral capsules",
+                    matched_identity="panobinostat",
+                ),
+            )
+        self.assertFalse(result["confirmed"])
+        gate = _availability_gate({}, result)
+        self.assertTrue(gate["blocks_prioritization"])
+        self.assertEqual(
+            gate["status"], "CONFIRMED_MARKET_EXIT_NO_ALTERNATIVE_SUPPLY")
+
+    def test_cantu_style_market_exit_with_alternative_supply_does_not_block(self):
+        # Same shape as the case above -- authority-verified, scope-matched,
+        # non-safety market exit -- but this time the fetched regulator text
+        # itself discloses that generic supply continues. This must NOT block,
+        # exactly like the original Cantu/glibenclamide false-positive this
+        # gate must never reproduce.
+        quote = "Sanofi has discontinued Daonil 5mg tablets."
+        with patch(
+            "data_sources.safety_check._fetch_regulator_source",
+            return_value={
+                "verified": True,
+                "text": (
+                    f"{quote} United Kingdom Daonil 5mg tablets. "
+                    "Other manufacturers continue to supply generic "
+                    "glibenclamide tablets."
+                ),
+                "reason": None,
+            },
+        ):
+            result = classify_safety_evidence(
+                "glyburide",
+                "model-provided search text is not trusted",
+                _answer(
+                    safety_status="BRAND_DISCONTINUED",
+                    withdrawal="NO",
+                    source_name="MHRA",
+                    source_url="https://www.gov.uk/drug-safety-update/example",
+                    exact_quote=quote,
+                    jurisdiction="United Kingdom",
+                    formulation="Daonil 5mg tablets",
+                    matched_identity="glibenclamide",
+                ),
+            )
+        self.assertFalse(result["confirmed"])
+        gate = _availability_gate({}, result)
+        self.assertFalse(gate["blocks_prioritization"])
+        self.assertEqual(gate["status"], "REGIONAL_OR_PRODUCT_DISCLOSURE")
+
     def test_missing_scope_or_non_verbatim_quote_is_unclear(self):
         text = (
             "FDA withdrew glyburide tablets for safety reasons. "

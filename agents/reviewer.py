@@ -2261,6 +2261,46 @@ def _availability_gate(layer1: dict[str, Any],
             "blocks_prioritization": True,
             "reason": "An authoritative source confirms global active-ingredient unavailability.",
         }
+    # Scope-verified, uncontradicted market exit in a *named* (non-global)
+    # jurisdiction: the confirmed_global branch above requires "global"/
+    # "worldwide" wording, which a single-jurisdiction market exit will never
+    # have — this is what let panobinostat's 2022 FDA market withdrawal pass
+    # through disclosure-only (REGIONAL_OR_PRODUCT_DISCLOSURE, below) even
+    # though the search found no alternative-supply evidence for it. It must
+    # not swallow the Cantu/glibenclamide case, where "other manufacturers
+    # continue to supply generic glibenclamide" is exactly the kind of
+    # contradiction this checks for, so this branch requires positive
+    # scope-verification AND an explicit absence of any such contradiction —
+    # silence about alternative supply is not evidence it exists.
+    _NO_ALT_SUPPLY_SIGNALS = {
+        "generics remain available", "generic alternatives available",
+        "generic supply continues", "no formal withdrawal",
+        "not withdrawn", "remains marketed",
+    }
+    confirmed_uncontradicted_exit = bool(
+        status in {"BRAND_DISCONTINUED", "MANUFACTURER_DISCONTINUED",
+                   "NOT_MARKETED"}
+        and authority.get("verified_regulator_domain") is True
+        and scope.get("identity_matches") is True
+        and scope.get("fetched_identity_verified") is True
+        and scope.get("jurisdiction_verified") is True
+        and scope.get("formulation_verified") is True
+        and s2.get("quote_verified_in_fetched_source") is True
+        and jurisdiction
+        and not _NO_ALT_SUPPLY_SIGNALS.intersection(
+            str(c).casefold() for c in (s2.get("contradictions") or []))
+    )
+    if confirmed_uncontradicted_exit:
+        return {
+            "status": "CONFIRMED_MARKET_EXIT_NO_ALTERNATIVE_SUPPLY",
+            "blocks_prioritization": True,
+            "reason": (
+                f"An authoritative, scope-verified source confirms this "
+                f"product exited the market in {scope.get('jurisdiction')}, "
+                f"with no evidence found of continued or alternative supply "
+                f"there."
+            ),
+        }
     if status in {"BRAND_DISCONTINUED", "MANUFACTURER_DISCONTINUED",
                   "NOT_MARKETED", "INGREDIENT_UNAVAILABLE"}:
         return {

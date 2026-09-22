@@ -278,8 +278,20 @@ def classify_safety_evidence(
         == normalize_drug_identity(drug_name)
     )
     candidate_yes = status in _CONFIRMING and withdrawal == "YES"
+    # Market-exit statuses (a confirmed product discontinuation that isn't a
+    # *safety* withdrawal) also need independent source verification: the
+    # reviewer's availability gate uses the same verified/jurisdiction/quote
+    # fields to decide whether a confirmed, uncontradicted market exit should
+    # block flagship prioritization even though it never sets `confirmed`.
+    # Without this, those fields silently stay False for every market-exit
+    # status regardless of whether the source was real, and that gate could
+    # never fire.
     source_verification_required = (
-        candidate_yes or status == "INGREDIENT_UNAVAILABLE")
+        candidate_yes
+        or status == "INGREDIENT_UNAVAILABLE"
+        or status in {"BRAND_DISCONTINUED", "MANUFACTURER_DISCONTINUED",
+                      "NOT_MARKETED"}
+    )
     retrieval = (
         _fetch_regulator_source(source_url)
         if source_verification_required and source_url
