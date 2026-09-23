@@ -14,11 +14,16 @@ FROM python:3.11-slim
 
 # rdkit and psycopg2 need these at build time; libpq5 covers the psycopg2
 # runtime dependency without pulling in the full postgres client.
+# fonts-dejavu-core provides /usr/share/fonts/truetype/dejavu/DejaVuSans*.ttf,
+# which api/report_pdf.py hardcodes — present in Replit's base image, absent
+# from this slim image, and never audited during the migration (found live,
+# 2026-09-22: dossier PDF export failed with "TTF Font file not found").
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         libpq-dev \
         libxrender1 \
         libxext6 \
+        fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
