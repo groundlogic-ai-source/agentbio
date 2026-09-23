@@ -293,6 +293,37 @@ bonus, and separately marks the candidate not externally prioritizable. Frozen
 holdout studies bypass this post-benchmark gate so their semantics are never
 changed retroactively.
 
+**Post-benchmark EFO cross-reference admission (added 2026-09-23).** Stage 1
+hard-stops when the Orphanet disease name and Open Targets' canonical name for
+the resolved EFO/MONDO node share no meaningful tokens, on the reasoning that a
+zero-overlap resolution has probably landed on a different disease entirely.
+That heuristic cannot distinguish a wrong resolution from the same disease
+named differently in two ontologies, which is routine in rare disease
+nomenclature — Orphanet often carries a descriptive name where EFO/MONDO
+carries an eponym or classification name. ORPHA:88660 is the worked example:
+Orphanet's "Hypertension due to gain-of-function mutations in the
+mineralocorticoid receptor" versus MONDO_0011517's "pseudohyperaldosteronism
+type 2" — zero shared tokens, yet Orphanet lists the second as a synonym of the
+first and the MONDO node cross-references ORPHA:88660 directly.
+
+Before hard-stopping, Stage 1 now asks whether the resolved node's own Orphanet
+cross-reference matches the Orphanet code that was resolved. An explicit
+ontology cross-reference establishes identity more reliably than name
+similarity, so a match admits the pair. The check is one-directional: it can
+only admit pairs the name heuristic would have rejected, never reject a pair it
+accepted, and it touches no score. A missing, unreadable, or non-matching
+cross-reference leaves the name heuristic in force, so genuine wrong-disease
+resolutions still stop.
+
+This is disclosed as a post-benchmark modification. The frozen v1 benchmark
+contains two rows — Trichinellosis/Prednisone and Trichinellosis/Triamcinolone
+— recorded as `status="error"` precisely because this hard stop fired on the
+same zero-shared-token synonym problem ("Trichinellosis" versus "trichinosis").
+Admitting those pairs would make the frozen artifacts non-reproducible from
+current code, so frozen and holdout studies bypass the cross-reference check and
+keep the original name-only semantics, exactly as the literature-limitation gate
+above does. No frozen benchmark result changes.
+
 `STRONG_MATCH` = composite ≥ 0.70 **and** no cap. The pipeline keeps both
 `pre_cap_score` and the capped `composite_score`, so "weak candidate" is
 distinguishable from "strong candidate blocked by a gate".

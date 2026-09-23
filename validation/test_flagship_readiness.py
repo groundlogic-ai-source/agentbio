@@ -290,6 +290,93 @@ class FlagshipReadinessTests(unittest.TestCase):
             "complete",
         )
 
+    def _preflight_with_zero_overlap(self, orpha_code="88660", **xref_kwargs):
+        """Run preflight where the EFO name shares no tokens with Orphanet's.
+
+        xref_kwargs is passed straight to the get_disease_orphanet_code patch,
+        so callers choose return_value=... or side_effect=... explicitly.
+        """
+        disease = {
+            "name": ("Hypertension due to gain-of-function mutations in the "
+                     "mineralocorticoid receptor"),
+            "orpha_code": orpha_code,
+            "source": "orphanet",
+        }
+        xref_patch = patch(
+            "agents.target_selection.get_disease_orphanet_code", **xref_kwargs)
+        with patch(
+            "agents.target_selection._matchable_universe",
+            return_value=[disease],
+        ), patch(
+            "agents.target_selection._match_disease",
+            return_value=disease,
+        ), patch(
+            "agents.target_selection._resolve_efo_id",
+            return_value="MONDO_0011517",
+        ), patch(
+            "agents.target_selection._efo_name_overlap",
+            return_value=0.0,
+        ), patch(
+            "agents.target_selection.get_ot_canonical_disease_name",
+            return_value="pseudohyperaldosteronism type 2",
+        ), xref_patch, patch(
+            "agents.target_selection.get_disease_known_drugs",
+            return_value={
+                "has_approved_treatment": False,
+                "approved_drug_names": [],
+                "status": "complete",
+            },
+        ), patch(
+            "agents.target_selection.get_target_disease_score",
+            return_value=[{
+                "target_symbol": "NR3C2",
+                "uniprot_id": "P08235",
+                "association_score": 0.8,
+            }],
+        ):
+            return preflight_for_disease(
+                "Hypertension due to gain-of-function mutations in the "
+                "mineralocorticoid receptor")
+
+    def test_matching_orphanet_xref_admits_zero_token_overlap_synonym(self):
+        # ORPHA:88660 is named descriptively by Orphanet and by eponym in
+        # MONDO ("pseudohyperaldosteronism type 2"). Zero shared tokens, but
+        # the EFO node cross-references ORPHA:88660 directly, so the mapping
+        # is correct and the name heuristic must not hard-stop it.
+        rows = self._preflight_with_zero_overlap(return_value="88660")
+        self.assertEqual(rows[0]["target_symbol"], "NR3C2")
+
+    def test_non_matching_orphanet_xref_still_hard_stops(self):
+        # A genuinely wrong EFO resolution: the node cross-references a
+        # different Orphanet disease. The hard stop must still fire.
+        with self.assertRaises(RuntimeError) as ctx:
+            self._preflight_with_zero_overlap(return_value="99999")
+        self.assertIn("EFO RESOLUTION MISMATCH", str(ctx.exception))
+
+    def test_absent_orphanet_xref_still_hard_stops(self):
+        # No cross-reference available => no confirmation => name heuristic
+        # stays in force. Silence must not be read as agreement.
+        with self.assertRaises(RuntimeError) as ctx:
+            self._preflight_with_zero_overlap(return_value=None)
+        self.assertIn("EFO RESOLUTION MISMATCH", str(ctx.exception))
+
+    def test_xref_lookup_failure_fails_closed(self):
+        # A transient lookup error must never open the gate.
+        with self.assertRaises(RuntimeError) as ctx:
+            self._preflight_with_zero_overlap(
+                side_effect=RuntimeError("open targets unavailable"))
+        self.assertIn("EFO RESOLUTION MISMATCH", str(ctx.exception))
+
+    def test_holdout_keeps_original_name_only_semantics(self):
+        # Frozen/holdout studies must not gain the xref admission. The frozen
+        # v1 benchmark recorded Trichinellosis rows as errors because this hard
+        # stop fired; re-running under holdout must still reproduce that.
+        with patch("agents.target_selection._holdout.is_active",
+                   return_value=True):
+            with self.assertRaises(RuntimeError) as ctx:
+                self._preflight_with_zero_overlap(return_value="88660")
+        self.assertIn("EFO RESOLUTION MISMATCH", str(ctx.exception))
+
     def test_report_renders_flagship_verdict_separately_from_score(self):
         candidate = _candidate(
             composite_score=0.9087,

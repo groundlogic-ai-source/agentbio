@@ -503,6 +503,52 @@ def _efo_name_overlap(queried: str, efo_id: str) -> Optional[float]:
     return len(q_tok & n_tok) / len(q_tok)
 
 
+def _efo_xref_confirms_orphanet(efo_id: str, orpha_code: Any) -> bool:
+    """Does the EFO node's own Orphanet cross-reference match the resolved code?
+
+    The name-overlap hard stop below is a string heuristic. It cannot separate
+    "the EFO lookup landed on a different disease" from "the same disease is
+    named differently in the two ontologies" — the latter being routine in rare
+    disease nomenclature, where Orphanet often carries a descriptive name and
+    EFO/MONDO an eponym or classification name. ORPHA:88660 is the worked
+    example: Orphanet calls it "Hypertension due to gain-of-function mutations
+    in the mineralocorticoid receptor", MONDO_0011517 calls it
+    "pseudohyperaldosteronism type 2". Zero shared tokens, yet Orphanet lists
+    the second as a synonym of the first, and the EFO node cross-references
+    ORPHA:88660 directly.
+
+    An explicit ontology cross-reference settles identity better than name
+    similarity can: if the EFO node declares itself equivalent to the Orphanet
+    disease that was resolved, the mapping is right however the names read.
+    This only ever *confirms*; a missing, unreadable, or non-matching xref
+    leaves the name heuristic in force, so genuine wrong-disease resolutions
+    still hard-stop.
+
+    Post-benchmark production policy, and why the holdout bypass is required:
+    this check only ever ADMITS disease/EFO pairs the name heuristic would have
+    rejected, so in production it is purely permissive. But "admits more" is
+    still a behaviour change, and the frozen v1 benchmark contains two rows
+    (Trichinellosis/Prednisone and Trichinellosis/Triamcinolone) that were
+    recorded as `status="error"` precisely because this hard stop fired —
+    Orphanet's "Trichinellosis" against OT's "trichinosis", the same
+    zero-shared-token synonym problem. Letting the xref admit those pairs would
+    make the frozen artifacts non-reproducible from current code. So frozen and
+    holdout studies keep the original name-only semantics, exactly as the
+    post-benchmark literature-limitation gate does.
+    """
+    if _holdout.is_active():
+        # Frozen/holdout studies predate this check. Never let it change their
+        # resolution semantics after the fact.
+        return False
+    if not orpha_code:
+        return False
+    try:
+        xref = get_disease_orphanet_code(efo_id)
+    except Exception:  # noqa: BLE001 — a lookup failure must never open the gate
+        return False
+    return bool(xref) and str(xref).strip() == str(orpha_code).strip()
+
+
 def _efo_name_mismatch_warning(queried: str, efo_id: str) -> Optional[str]:
     """
     Post-resolution sanity check: returns a Limitations-section warning string
@@ -737,7 +783,11 @@ def preflight_for_disease(query: str) -> list[dict[str, Any]]:
             "matched to an Open Targets EFO ID."
         )
     overlap = _efo_name_overlap(disease_name, efo_id)
-    if overlap is not None and overlap <= _EFO_HARD_STOP_THRESHOLD:
+    if (
+        overlap is not None
+        and overlap <= _EFO_HARD_STOP_THRESHOLD
+        and not _efo_xref_confirms_orphanet(efo_id, disease.get("orpha_code"))
+    ):
         canonical = get_ot_canonical_disease_name(efo_id) or efo_id
         raise RuntimeError(
             f"EFO RESOLUTION MISMATCH — '{disease_name}' resolved to "
@@ -877,7 +927,11 @@ def select_for_disease(
     # after stop-word removal).  Partial mismatches (0 < overlap < 0.5) still
     # proceed but receive a prominent Limitations warning.
     _efo_overlap = _efo_name_overlap(disease_name, efo_id)
-    if _efo_overlap is not None and _efo_overlap <= _EFO_HARD_STOP_THRESHOLD:
+    if (
+        _efo_overlap is not None
+        and _efo_overlap <= _EFO_HARD_STOP_THRESHOLD
+        and not _efo_xref_confirms_orphanet(efo_id, disease.get("orpha_code"))
+    ):
         _ot_canonical = get_ot_canonical_disease_name(efo_id) or efo_id
         raise RuntimeError(
             f"EFO RESOLUTION MISMATCH — cannot proceed.\n"
@@ -1584,7 +1638,11 @@ def run() -> None:
         # (wrong OT node — scoring would reflect the wrong biology).
         # Attach a Limitations warning for partial mismatches (0 < overlap < 0.5).
         _sweep_overlap = _efo_name_overlap(disease_name, efo_id)
-        if _sweep_overlap is not None and _sweep_overlap <= _EFO_HARD_STOP_THRESHOLD:
+        if (
+            _sweep_overlap is not None
+            and _sweep_overlap <= _EFO_HARD_STOP_THRESHOLD
+            and not _efo_xref_confirms_orphanet(efo_id, disease.get("orpha_code"))
+        ):
             _ot_canonical = get_ot_canonical_disease_name(efo_id) or efo_id
             _log(
                 f"    → EFO HARD MISMATCH: '{disease_name}' resolved to {efo_id} "
