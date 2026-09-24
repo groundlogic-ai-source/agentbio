@@ -36,6 +36,9 @@ import requests
 from typing import Any, Optional
 
 from cache.cache import get, set as cache_set, make_key
+from data_sources.provider_request_policy import (
+    ProviderCircuitOpen, request as provider_request,
+)
 
 BASE_URL = "https://www.guidetopharmacology.org/services"
 
@@ -95,7 +98,17 @@ def _get_json(path: str, params: Optional[dict] = None,
     if _API_KEY:
         headers["GTP-API-Key"] = _API_KEY
     try:
-        resp = requests.get(url, params=params, headers=headers, timeout=30)
+        # Routed through the shared provider policy rather than calling
+        # requests directly: GtoPdb rate-limits a large reviewer fan-out into
+        # sustained 429s, and an unthrottled, non-retrying call turns that into
+        # blocking coverage failures for the whole run. The policy layer adds
+        # the process-wide interval, bounded retries with Retry-After support,
+        # and the circuit breaker that the other rate-limited providers use.
+        resp = provider_request(
+            "gtopdb", requests.get, url, params=params, headers=headers,
+            timeout=30)
+    except ProviderCircuitOpen as e:
+        raise _SourceUnavailable(f"{url} skipped — {e}") from e
     except requests.exceptions.RequestException as e:
         raise _SourceUnavailable(f"request to {url} failed: {e}") from e
 
