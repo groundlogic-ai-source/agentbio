@@ -324,6 +324,37 @@ current code, so frozen and holdout studies bypass the cross-reference check and
 keep the original name-only semantics, exactly as the literature-limitation gate
 above does. No frozen benchmark result changes.
 
+**Post-benchmark scoping of the persistence coverage gate (added 2026-09-24).**
+Required-source coverage is assessed per candidate and is deliberately scoped by
+target role: a failure on a direct disease target fails every candidate, while a
+failure on an exploratory pathway-neighbor target is meant to fail only the
+candidates discovered on that neighbor. Stage 3 marks neighbors
+`coverage_required=False` for exactly this reason, and the reviewer honours it —
+an incompletely covered candidate carries `candidate_source_coverage_incomplete`
+among its `exclusion_reasons` and is barred from being promoted.
+
+The gate that freezes a report as actionable did not honour that scoping. It
+required *every pooled* candidate to be completely covered, which made an
+exploratory neighbor's failure fatal to the whole run. A single transient HTTP
+429 from GtoPdb on NR3C1 — a pathway neighbor contributing 6 compounds to a
+210-candidate pool, on a case whose promoted candidate sat on the direct target
+NR3C2 with complete coverage — discarded a finished run after full LLM and
+structure-validation spend.
+
+The gate now requires complete coverage only of candidates the report actually
+advances (`paid_validation_eligible`, `headline_eligible`, or
+`externally_prioritizable`). Candidate dossier-contract versioning remains
+pool-wide; only coverage was rescoped. The invariant that matters is unchanged:
+nothing a report promotes may rest on incomplete evidence. A report that
+promotes no candidate — "no candidate can be authorized" — remains a legitimate
+and citable outcome.
+
+No frozen benchmark result changes, and no holdout bypass is needed here: this
+gate lives in the API's run-persistence path (`api/main.py`), which no frozen
+validation harness executes. It governs whether a finished report may be frozen,
+never how any candidate is scored. Regression cover:
+`validation/test_promoted_candidate_coverage_gate.py`.
+
 `STRONG_MATCH` = composite ≥ 0.70 **and** no cap. The pipeline keeps both
 `pre_cap_score` and the capped `composite_score`, so "weak candidate" is
 distinguishable from "strong candidate blocked by a gate".

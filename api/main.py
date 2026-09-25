@@ -378,6 +378,36 @@ def _validate_evidence_zip(
             raise ValueError("snapshot JSON is noncanonical")
 
 
+def _promoted_candidates(
+        candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Candidates the report actually advances, rather than merely pools.
+
+    Post-benchmark correction (added 2026-09-24). Required source coverage is
+    scoped per candidate by `_candidate_source_coverage`: a direct disease
+    target's failure fails every candidate, while an exploratory
+    pathway-neighbor failure is meant to fail only the candidates discovered on
+    that neighbor (`main_graph.py` sets `coverage_required=False` for them).
+    The reviewer already honours that scoping — an incompletely covered
+    candidate carries `candidate_source_coverage_incomplete` in its
+    `exclusion_reasons` and is barred from `paid_validation_eligible` /
+    `headline_eligible` / `externally_prioritizable`.
+
+    This gate previously required *every pooled* candidate to be complete,
+    which cancelled that scoping out: one transient 429 on a pathway neighbor
+    contributing a handful of the pool's candidates discarded an entire run
+    after full LLM and structure spend, even when the promoted candidate sat on
+    the direct target and was fully covered. Checking only promoted candidates
+    restores the documented intent while keeping the invariant that matters —
+    nothing the report advances may rest on incomplete evidence.
+    """
+    return [
+        candidate for candidate in candidates
+        if candidate.get("paid_validation_eligible")
+        or candidate.get("headline_eligible")
+        or candidate.get("externally_prioritizable")
+    ]
+
+
 def _persist_actionable_report(
         job_id: str, generated_path: str) -> dict[str, Any]:
     """Freeze the writer output only after its durable reviewer snapshot exists."""
@@ -401,9 +431,12 @@ def _persist_actionable_report(
         or any(
             (candidate.get("dossier_evidence_contract") or {}).get(
                 "contract_version") != REPORT_CONTRACT_VERSION
-            or (candidate.get("candidate_source_coverage") or {}).get(
-                "complete") is not True
             for candidate in snapshot_candidates
+        )
+        or any(
+            (candidate.get("candidate_source_coverage") or {}).get(
+                "complete") is not True
+            for candidate in _promoted_candidates(snapshot_candidates)
         )
     ):
         raise RuntimeError(
@@ -524,16 +557,17 @@ def _actionability(job: dict[str, Any]) -> dict[str, Any]:
                    for version in candidate_contracts)
         ):
             reasons.append("candidate dossier contract is missing or superseded")
+        # Scoped to promoted candidates only; see _promoted_candidates.
         candidate_coverage = [
             candidate.get("candidate_source_coverage") or {}
-            for candidate in snapshot.get("candidates", [])
+            for candidate in _promoted_candidates(
+                snapshot.get("candidates", []))
         ]
-        if (
-            not candidate_coverage
-            or any(coverage.get("complete") is not True
-                   for coverage in candidate_coverage)
-        ):
-            reasons.append("candidate-level required source coverage is incomplete")
+        if any(coverage.get("complete") is not True
+               for coverage in candidate_coverage):
+            reasons.append(
+                "required source coverage is incomplete for a promoted "
+                "candidate")
         actual_snapshot_hash = hashlib.sha256(
             canonical_json_bytes(snapshot)).hexdigest()
         if not job.get("candidate_snapshot_sha256") or not hmac.compare_digest(
