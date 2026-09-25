@@ -355,6 +355,43 @@ validation harness executes. It governs whether a finished report may be frozen,
 never how any candidate is scored. Regression cover:
 `validation/test_promoted_candidate_coverage_gate.py`.
 
+**Post-benchmark leader-convergence direction pass (added 2026-09-24).** The
+mechanism-direction check is bounded: it screens the top
+`MAX_MECHANISM_DIRECTION_CANDIDATES` chemically distinct candidates, then, after
+caps force a re-rank, up to that many newly promoted ones. Both passes spend
+their budget on the candidates they cap, and every cap re-sorts the pool. A pool
+whose entire head is directionally incompatible therefore exhausts the budget
+capping it and leaves the lead to a candidate no pass ever reached.
+
+The NR3C2 S810L run is the worked example. The check correctly capped six
+steroid agonists in sequence — progesterone, dexamethasone, prednisolone,
+spironolactone, and both desoxycorticosterone esters — exhausting the 2×3 call
+budget. The list re-sorted a final time and promoted a seventh compound,
+drospirenone, which carries no mechanism-direction record at all. The hole opens
+precisely *because* the gate is working, and it opens onto the one candidate
+whose screening matters most: the one the report will promote.
+
+A third pass now re-checks the promotable leader until it has been checked,
+bounded by `MAX_DIRECTION_LEADER_PASSES`. Each iteration checks exactly one
+candidate and an incompatible verdict caps it out of `strong_match`, so the
+list of uncapped leaders strictly shortens and the loop converges. The
+three passes share one `_direction_check_candidate` helper so they cannot drift
+apart in how a drug's action on the evaluated target is labeled.
+
+This is disclosed as a post-benchmark modification, and frozen/holdout studies
+bypass the pass entirely (`_holdout.is_active()`), exactly as the
+literature-limitation and EFO cross-reference gates above do, so frozen
+benchmark semantics are unchanged and no frozen result moves. The bounded
+passes themselves are untouched. Regression cover:
+`validation/test_direction_leader_convergence.py`.
+
+Note that this closes a *coverage* hole, not a reasoning one. The check remains
+literature-anchored, so its power is greatest on drug-disease pairs someone has
+already written about and weakest on genuinely novel ones — which is the
+opposite of where a discovery system most needs it. A candidate whose class
+behaviour inverts for a mutation-specific reason that no source states
+explicitly will still return `INSUFFICIENT_INFO` and, by design, pass uncapped.
+
 `STRONG_MATCH` = composite ≥ 0.70 **and** no cap. The pipeline keeps both
 `pre_cap_score` and the capped `composite_score`, so "weak candidate" is
 distinguishable from "strong candidate blocked by a gate".

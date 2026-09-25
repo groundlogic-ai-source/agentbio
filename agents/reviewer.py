@@ -175,6 +175,10 @@ MECHANISM_DIRECTION_CAP = SAFETY_CAP
 #     • pathway_specificity_note is also set if GAA is discovered as a pathway_neighbor
 #       via "Glycogen breakdown (glycogenolysis)" [broad_metabolic tier].
 MAX_MECHANISM_DIRECTION_CANDIDATES = 3
+# After both bounded passes, the promotable leader may still be unchecked if
+# the passes spent their budget capping the candidates ahead of it. Each extra
+# pass checks exactly one leader, so this bounds the added LLM calls.
+MAX_DIRECTION_LEADER_PASSES = 3
 # Layer 2 (web-search) has a hard total call budget. The shortlist prioritizes
 # explicit structured safety signals and unresolved top-ranked candidates, so
 # a ChEMBL outage cannot fan out one expensive web search per candidate.
@@ -1306,74 +1310,7 @@ def run_reviewer(
 
     _mdc_needs_resort = False
     for _top in _mdc_candidates:
-        _target_sym = _top.get("target_symbol") or ""
-        _is_heldout = _candidate_is_heldout(_top)
-        _at_info = (
-            {"source": "holdout_redacted", "action_type": None,
-             "mechanism_of_action": None}
-            if _is_heldout
-            else get_drug_action_type(_top["drug_name"], _target_sym)
-        )
-        _action_t   = _at_info.get("action_type")
-        _moa        = _at_info.get("mechanism_of_action")
-
-        # Prefer a qualified target-specific action from the common evidence
-        # ledger.  This prevents non-ChEMBL curated interactions from being
-        # mislabeled as generic IC50/Ki inhibitors.
-        _ledger_records = (_top.get("_evidence_ledger") or {}).get("records", [])
-        _ledger_action_record = next(
-            (
-                rec for rec in _ledger_records
-                if rec.get("qualification_status") == "qualified"
-                and rec.get("evidence_role") in ("efficacy", "target_link")
-                and rec.get("action")
-                and (
-                    not _target_sym
-                    or str(rec.get("target_symbol") or "").upper() == _target_sym.upper()
-                )
-            ),
-            None,
-        )
-        if _ledger_action_record:
-            _action_t = _ledger_action_record.get("action")
-            _moa = _ledger_action_record.get("context") or _moa
-            _at_info = {
-                **_at_info,
-                "source": f"evidence_ledger:{_ledger_action_record.get('provider')}",
-            }
-
-        # Detect when the mechanism record is for a DIFFERENT protein than the
-        # candidate target being evaluated.  get_drug_action_type returns
-        # source="any_mechanism" when it could not find a mechanism record that
-        # mentions target_symbol — meaning the returned action_type reflects the
-        # drug's PRIMARY pharmacology (e.g. verapamil → "BLOCKER / Voltage-gated
-        # L-type calcium channel blocker" for CACNA1C, not ABCB11/BSEP).
-        # In that case, passing the wrong action_type to the direction check
-        # causes the LLM to reason about calcium channels instead of BSEP, and
-        # may produce INSUFFICIENT_INFO instead of the correct INCOMPATIBLE verdict.
-        # Fix: override with an IC50/Ki-inferred inhibitory label so the LLM
-        # reasons about the actual target-specific interaction.
-        if _at_info.get("source") == "any_mechanism" and _action_t:
-            _action_t = (
-                f"INHIBITOR (inferred from IC50/Ki bioactivity assay data; "
-                f"ChEMBL primary registered mechanism is '{_action_t} / {_moa}' "
-                f"which is for a DIFFERENT protein target — do NOT use this as "
-                f"the drug's action on {_target_sym}; instead reason from the "
-                f"fact that this drug has IC50/Ki binding activity against "
-                f"{_target_sym} in ChEMBL assays, which implies inhibitory interaction)"
-            )
-        elif _at_info.get("source") == "not_found":
-            _action_t = (
-                f"INHIBITOR (inferred: no ChEMBL mechanism record found; "
-                f"drug has IC50/Ki binding activity against {_target_sym})"
-            )
-
-        _direction = check_mechanism_direction(
-            _top["drug_name"], _target_sym, _action_t, _moa, disease,
-            candidate_chembl_ids=_candidate_chembl_ids(_top),
-            candidate_inchikey=_top.get("inchikey"),
-        )
-        _top["mechanism_direction"] = _direction
+        _direction, _at_info = _direction_check_candidate(_top, disease)
         # A direction label is bonus-eligible only when its complete,
         # citation-bearing rationale is persisted.  This is deliberately after
         # the check, never inferred from a ledger action row.
@@ -1412,56 +1349,7 @@ def run_reviewer(
 
     _mdc_second_resort = False
     for _top in _mdc_second_pass:
-        _target_sym = _top.get("target_symbol") or ""
-        _is_heldout = _candidate_is_heldout(_top)
-        _at_info = (
-            {"source": "holdout_redacted", "action_type": None,
-             "mechanism_of_action": None}
-            if _is_heldout
-            else get_drug_action_type(_top["drug_name"], _target_sym)
-        )
-        _action_t   = _at_info.get("action_type")
-        _moa        = _at_info.get("mechanism_of_action")
-        _ledger_action_record = next(
-            (
-                rec for rec in ((_top.get("_evidence_ledger") or {}).get("records", []))
-                if rec.get("qualification_status") == "qualified"
-                and rec.get("evidence_role") in ("efficacy", "target_link")
-                and rec.get("action")
-                and (
-                    not _target_sym
-                    or str(rec.get("target_symbol") or "").upper() == _target_sym.upper()
-                )
-            ),
-            None,
-        )
-        if _ledger_action_record:
-            _action_t = _ledger_action_record.get("action")
-            _moa = _ledger_action_record.get("context") or _moa
-            _at_info = {
-                **_at_info,
-                "source": f"evidence_ledger:{_ledger_action_record.get('provider')}",
-            }
-        if _at_info.get("source") == "any_mechanism" and _action_t:
-            _action_t = (
-                f"INHIBITOR (inferred from IC50/Ki bioactivity assay data; "
-                f"ChEMBL primary registered mechanism is '{_action_t} / {_moa}' "
-                f"which is for a DIFFERENT protein target — do NOT use this as "
-                f"the drug's action on {_target_sym}; instead reason from the "
-                f"fact that this drug has IC50/Ki binding activity against "
-                f"{_target_sym} in ChEMBL assays, which implies inhibitory interaction)"
-            )
-        elif _at_info.get("source") == "not_found":
-            _action_t = (
-                f"INHIBITOR (inferred: no ChEMBL mechanism record found; "
-                f"drug has IC50/Ki binding activity against {_target_sym})"
-            )
-        _direction = check_mechanism_direction(
-            _top["drug_name"], _target_sym, _action_t, _moa, disease,
-            candidate_chembl_ids=_candidate_chembl_ids(_top),
-            candidate_inchikey=_top.get("inchikey"),
-        )
-        _top["mechanism_direction"] = _direction
+        _direction, _at_info = _direction_check_candidate(_top, disease)
         if _apply_directional_bonus(_top):
             _mdc_second_resort = True
         if _direction.get("incompatible"):
@@ -1478,6 +1366,44 @@ def run_reviewer(
 
     if _mdc_second_resort:
         _rank_reviewed(reviewed)
+
+    # ── Leader-convergence direction pass (post-benchmark production policy) ──
+    # Both bounded passes spend their budget on the candidates they cap, and
+    # every cap re-sorts the list. A pool whose entire head is directionally
+    # incompatible therefore exhausts the budget capping it and leaves the lead
+    # to a candidate no pass ever reached: the NR3C2 run capped six steroid
+    # agonists — progesterone, dexamethasone, prednisolone, spironolactone and
+    # both desoxycorticosterone esters — and then promoted a seventh compound
+    # that was never direction-checked at all. The hole opens precisely because
+    # the gate is working, and it opens onto the one candidate that matters.
+    #
+    # So keep checking the promotable leader until it has been checked, bounded
+    # by MAX_DIRECTION_LEADER_PASSES. Each iteration caps at most one candidate
+    # and therefore strictly shortens the list of uncapped leaders, so the loop
+    # converges.
+    if not _holdout.is_active():
+        for _ in range(MAX_DIRECTION_LEADER_PASSES):
+            _leader = _unchecked_direction_leader(reviewed)
+            if _leader is None:
+                break
+            _direction, _at_info = _direction_check_candidate(_leader, disease)
+            _leader_resort = _apply_directional_bonus(_leader)
+            if _direction.get("incompatible"):
+                _leader["composite_score"] = min(
+                    _leader["composite_score"], MECHANISM_DIRECTION_CAP)
+                _leader["mechanism_cap_applied"] = True
+                _leader["strong_match"] = (
+                    _leader["composite_score"] >= STRONG_MATCH_THRESHOLD)
+                _leader_resort = True
+            print(
+                f"[reviewer] mechanism-direction (leader): "
+                f"{_leader['drug_name']} / {disease} "
+                f"→ {_direction.get('verdict')} "
+                f"(action_src={_at_info.get('source')!r}, "
+                f"cap={'YES' if _direction.get('incompatible') else 'no'})"
+            )
+            if _leader_resort:
+                _rank_reviewed(reviewed)
     # ── End mechanism-direction pass ──────────────────────────────────────────
 
     # ── Safety-disclosure pass (Layer 1 + Layer 2) ────────────────────────────
@@ -2359,6 +2285,105 @@ def _target_tier(method: Optional[str]) -> str:
 
 
 _EXPLORATORY_TIERS = frozenset({"exploratory_expansion", "unattributed"})
+
+
+def _direction_check_candidate(
+    candidate: dict[str, Any], disease: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Resolve a candidate's target-specific action, then direction-check it.
+
+    Shared by every direction pass so they cannot drift apart in how the drug's
+    action ON THE EVALUATED TARGET is labeled. Returns the direction verdict and
+    the action-type provenance, and records the verdict on the candidate.
+    """
+    target_sym = candidate.get("target_symbol") or ""
+    at_info = (
+        {"source": "holdout_redacted", "action_type": None,
+         "mechanism_of_action": None}
+        if _candidate_is_heldout(candidate)
+        else get_drug_action_type(candidate["drug_name"], target_sym)
+    )
+    action_t = at_info.get("action_type")
+    moa = at_info.get("mechanism_of_action")
+
+    # Prefer a qualified target-specific action from the common evidence
+    # ledger.  This prevents non-ChEMBL curated interactions from being
+    # mislabeled as generic IC50/Ki inhibitors.
+    ledger_records = (candidate.get("_evidence_ledger") or {}).get("records", [])
+    ledger_action_record = next(
+        (
+            rec for rec in ledger_records
+            if rec.get("qualification_status") == "qualified"
+            and rec.get("evidence_role") in ("efficacy", "target_link")
+            and rec.get("action")
+            and (
+                not target_sym
+                or str(rec.get("target_symbol") or "").upper() == target_sym.upper()
+            )
+        ),
+        None,
+    )
+    if ledger_action_record:
+        action_t = ledger_action_record.get("action")
+        moa = ledger_action_record.get("context") or moa
+        at_info = {
+            **at_info,
+            "source": f"evidence_ledger:{ledger_action_record.get('provider')}",
+        }
+
+    # Detect when the mechanism record is for a DIFFERENT protein than the
+    # candidate target being evaluated.  get_drug_action_type returns
+    # source="any_mechanism" when it could not find a mechanism record that
+    # mentions target_symbol — meaning the returned action_type reflects the
+    # drug's PRIMARY pharmacology (e.g. verapamil → "BLOCKER / Voltage-gated
+    # L-type calcium channel blocker" for CACNA1C, not ABCB11/BSEP).
+    # In that case, passing the wrong action_type to the direction check
+    # causes the LLM to reason about calcium channels instead of BSEP, and
+    # may produce INSUFFICIENT_INFO instead of the correct INCOMPATIBLE verdict.
+    # Fix: override with an IC50/Ki-inferred inhibitory label so the LLM
+    # reasons about the actual target-specific interaction.
+    if at_info.get("source") == "any_mechanism" and action_t:
+        action_t = (
+            f"INHIBITOR (inferred from IC50/Ki bioactivity assay data; "
+            f"ChEMBL primary registered mechanism is '{action_t} / {moa}' "
+            f"which is for a DIFFERENT protein target — do NOT use this as "
+            f"the drug's action on {target_sym}; instead reason from the "
+            f"fact that this drug has IC50/Ki binding activity against "
+            f"{target_sym} in ChEMBL assays, which implies inhibitory interaction)"
+        )
+    elif at_info.get("source") == "not_found":
+        action_t = (
+            f"INHIBITOR (inferred: no ChEMBL mechanism record found; "
+            f"drug has IC50/Ki binding activity against {target_sym})"
+        )
+
+    direction = check_mechanism_direction(
+        candidate["drug_name"], target_sym, action_t, moa, disease,
+        candidate_chembl_ids=_candidate_chembl_ids(candidate),
+        candidate_inchikey=candidate.get("inchikey"),
+    )
+    candidate["mechanism_direction"] = direction
+    return direction, at_info
+
+
+def _unchecked_direction_leader(
+    reviewed: list[dict[str, Any]],
+) -> Optional[dict[str, Any]]:
+    """The promotable leader, when it has never been direction-checked.
+
+    The bounded passes spend their budget on the candidates they cap, and each
+    cap re-sorts the list. A pool whose whole head is directionally
+    incompatible therefore exhausts the budget capping it and hands the lead to
+    a candidate no pass ever reached. Returns that candidate so the caller can
+    close the gap; None when the leader was already checked.
+    """
+    for candidate in reviewed:
+        if not candidate.get("strong_match"):
+            continue
+        if candidate.get("mechanism_direction") is not None:
+            return None
+        return candidate
+    return None
 
 
 def _postcap_direction_shortlist(
