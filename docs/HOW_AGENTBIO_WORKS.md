@@ -392,6 +392,47 @@ opposite of where a discovery system most needs it. A candidate whose class
 behaviour inverts for a mutation-specific reason that no source states
 explicitly will still return `INSUFFICIENT_INFO` and, by design, pass uncapped.
 
+**Post-benchmark target-attribution ranking (added 2026-09-26).** A drug is
+pooled once per target it was retrieved for, across the primary target and its
+pathway neighbors. Those rows are not interchangeable: one may carry a measured
+Open Targets association and a qualified assay, another only a precedent-stamped
+constant with no assay row at all. They were previously ranked independently, so
+the thinner row could win.
+
+Two consecutive runs of the same NR3C2-style case make the effect concrete. The
+first attributed capivasertib to **AKT2** — the gene that causes the disease —
+via `genetic_association`, association 0.787, pChEMBL 8.10 at assay confidence
+9, and scored 0.8183. The second attributed the same drug to **AKT1**, a pathway
+neighbor, with no qualified ChEMBL row, a `tractability_score` of 0.0 and the
+association excluded as a stamped constant — and scored **0.8256**. The dossier
+named the right drug against the wrong gene, cited AKT1 literature to justify
+it, and scored higher for carrying less evidence.
+
+Ranking now resolves attribution before ordering: where the same compound
+appears at several target tiers (`causal_anchor` > `clinical_precedent` >
+`exploratory_expansion`/`unattributed`), the weaker-tier rows are demoted below
+the strongest one. Compound identity is the InChIKey connectivity layer, so salt
+and stereo variants group together. This is rank-only — no score changes, the
+same discipline as the causal-anchor demotion — and frozen/holdout studies
+bypass it via `_holdout.is_active()`.
+
+**Post-benchmark Tanimoto reference scoping (added 2026-09-26).** Tanimoto
+similarity is defined, in both `reference_set_note` and the reader's guide, as
+similarity to approved drugs acting on *the candidate's own target*. The
+implementation built one flat reference set from every approved compound in the
+pooled multi-target set, so one target's approved drugs served as references for
+another target's candidates. In the AKT2 case the nearest "approved drug for
+this target" was reported as **CLOZAPINE**, which has zero AKT2 activity records
+in ChEMBL and entered the pool on a neighbor. The value feeds a weighted scoring
+term, so the mismatch moved scores: it contributed 0.000 in the first run and
+0.191 in the second.
+
+The reference set is now keyed by target symbol and a candidate is only ever
+compared within its own target. `approved_reference_set_size_by_target` records
+the per-target reference counts so a thin reference set is visible rather than
+silently producing a low similarity. Regression cover for both corrections:
+`validation/test_target_attribution_and_reference_scope.py`.
+
 `STRONG_MATCH` = composite ≥ 0.70 **and** no cap. The pipeline keeps both
 `pre_cap_score` and the capped `composite_score`, so "weak candidate" is
 distinguishable from "strong candidate blocked by a gate".

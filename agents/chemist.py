@@ -607,17 +607,25 @@ def run_chemist(biologist_output: dict[str, Any],
           f"{len(neighbor_enriched)} pathway-neighbor compounds "
           f"= {len(all_enriched)} total")
 
-    # Build approved-drug reference fingerprints from the FULL pooled set —
-    # so Tanimoto similarity is computed against the combined approved reference.
+    # Build approved-drug reference fingerprints PER TARGET.  Tanimoto is
+    # defined, and disclosed in reference_set_note and the reader's guide, as
+    # similarity to approved drugs acting on the candidate's own target.  The
+    # pool spans the primary target plus its pathway neighbors, so a single
+    # flat reference set lends one target's approved drugs to another target's
+    # candidates: an AKT2 candidate was scored against CLOZAPINE, which has no
+    # AKT2 pharmacology at all and entered the pool on a neighbor.  That feeds
+    # a weighted scoring term, so the scope has to match the definition.
     # Each entry stores (compound_dict, raw_fp, desalted_fp) so we can exclude
     # salt/hydrate variants of the same active moiety from the reference set.
-    approved_fps: dict[str, tuple[dict[str, Any], Any, Any]] = {}
+    approved_fps: dict[str, dict[str, tuple[dict[str, Any], Any, Any]]] = {}
     for e in all_enriched:
         if e["is_approved_drug"]:
             fp = _fingerprint(e["smiles"])
             if fp is not None:
                 dfp = _desalted_fingerprint(e["smiles"])
-                approved_fps[e["molecule_chembl_id"]] = (e, fp, dfp)
+                approved_fps.setdefault(
+                    e.get("target_symbol", symbol), {},
+                )[e["molecule_chembl_id"]] = (e, fp, dfp)
 
     # Pre-build parent_chembl_id lookup: maps molecule_chembl_id → parent_chembl_id
     # (or self if no parent is recorded).  Used for ChEMBL-hierarchy-based salt
@@ -651,7 +659,8 @@ def run_chemist(biologist_output: dict[str, Any],
         cand_id     = e["molecule_chembl_id"]
         cand_parent = _parent.get(cand_id)
         if cand_fp is not None:
-            for mid, (ref, ref_fp, ref_dfp) in approved_fps.items():
+            for mid, (ref, ref_fp, ref_dfp) in approved_fps.get(
+                    e_sym, {}).items():
                 if mid == cand_id:
                     continue
 
@@ -874,7 +883,11 @@ def run_chemist(biologist_output: dict[str, Any],
         ),
         "repurposing_only": repurposing_only,
         "enabled_sources": sorted(enabled),
-        "approved_reference_set_size": len(approved_fps),
+        "approved_reference_set_size": sum(
+            len(refs) for refs in approved_fps.values()),
+        "approved_reference_set_size_by_target": {
+            target: len(refs) for target, refs in sorted(approved_fps.items())
+        },
         "source_status": multisource["source_status"],
         "cross_target_candidates": multisource.get("cross_target_candidates", []),
         "excluded_candidates": (

@@ -2474,15 +2474,89 @@ def _apply_causal_tier_demotion(reviewed: list[dict[str, Any]]) -> None:
     )
 
 
-def _rank_reviewed(reviewed: list[dict[str, Any]]) -> None:
-    """Score-sort, then apply the rank-only causal-anchor demotion.
+#: How directly a tier ties its candidate to the disease. Higher wins when the
+#: SAME compound was pooled against more than one target.
+_TIER_STRENGTH = {
+    "causal_anchor": 3,
+    "clinical_precedent": 2,
+    "exploratory_expansion": 1,
+    "unattributed": 0,
+}
 
-    Ranking ALWAYS goes through this pair.  Demoting only once at the end would
-    let a candidate reach rank 1 after the bounded mechanism-direction and
+
+def _compound_identity(candidate: dict[str, Any]) -> str:
+    """Structure-first identity, so one drug's rows group across targets."""
+    key = str(candidate.get("inchikey") or "").strip().upper()
+    if key:
+        # Connectivity layer only: salt and stereo variants are the same drug
+        # for the purpose of "which target did we attribute this to".
+        return f"inchikey:{key.split('-')[0]}"
+    return "name:" + str(candidate.get("drug_name") or "").strip().lower()
+
+
+def _demote_weaker_tier_duplicates(reviewed: list[dict[str, Any]]) -> None:
+    """Represent each compound by its best-attributed target row.
+
+    A drug is pooled once per target it was retrieved for, and those rows are
+    not interchangeable: one may carry a measured disease-target association
+    and a qualified assay, another only a stamped precedent constant. Ranked
+    independently, the thin row can win.
+
+    That is what produced the AKT1 dossier for an AKT2 disease. Capivasertib
+    was pooled on AKT2 (genetic_association, measured association 0.787,
+    pChEMBL 8.10) and on AKT1 (a pathway neighbour promoted to precedent, no
+    assay row, association excluded as a stamped constant). The AKT1 row
+    outranked the AKT2 row, so the dossier proposed the right drug against the
+    wrong gene and the reader had no way to see that a better-attributed row
+    existed.
+
+    Rank-only, exactly like the causal-anchor demotion: scores are untouched.
+    """
+    best: dict[str, int] = {}
+    for r in reviewed:
+        ident = _compound_identity(r)
+        strength = _TIER_STRENGTH.get(
+            _target_tier(r.get("target_discovery_method")), 0)
+        best[ident] = max(best.get(ident, -1), strength)
+
+    strongest: list[dict[str, Any]] = []
+    weaker: list[dict[str, Any]] = []
+    for r in reviewed:
+        ident = _compound_identity(r)
+        strength = _TIER_STRENGTH.get(
+            _target_tier(r.get("target_discovery_method")), 0)
+        if strength < best[ident]:
+            r["tier_duplicate_demoted"] = True
+            weaker.append(r)
+        else:
+            r["tier_duplicate_demoted"] = False
+            strongest.append(r)
+
+    if not weaker:
+        return
+    # Score order is preserved within each group.
+    reviewed[:] = strongest + weaker
+    print(
+        f"[reviewer] target-attribution: demoted {len(weaker)} row(s) whose "
+        f"compound is also pooled against a better-attributed target; "
+        f"scores unchanged, rank only"
+    )
+
+
+def _rank_reviewed(reviewed: list[dict[str, Any]]) -> None:
+    """Score-sort, then apply the rank-only demotions.
+
+    Ranking ALWAYS goes through this sequence.  Demoting only once at the end
+    would let a candidate reach rank 1 after the bounded mechanism-direction and
     Layer-2 safety shortlists were already drawn from the old top of the list,
     so the eventual headline could skip both checks.
+
+    Attribution is resolved before the causal-anchor pass so the anchor is
+    chosen from rows that already represent their compound's best target.
     """
     _sort_reviewed(reviewed)
+    if not _holdout.is_active():
+        _demote_weaker_tier_duplicates(reviewed)
     _apply_causal_tier_demotion(reviewed)
 
 
