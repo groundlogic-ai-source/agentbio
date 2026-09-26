@@ -54,6 +54,19 @@ VERDICT_INCOMPATIBLE = "DIRECTIONALLY_INCOMPATIBLE"
 VERDICT_COMPATIBLE   = "DIRECTIONALLY_COMPATIBLE"
 VERDICT_INSUFFICIENT = "INSUFFICIENT_INFO"
 
+#: Only a real verdict is cached (30 days). Failures -- an unconfigured client,
+#: an empty search, or an API exception -- are NOT cached at any TTL.
+#:
+#: They used to be cached for a day, which let a transient outage silently
+#: degrade every later run. During an Anthropic credit exhaustion, checks for
+#: an AKT2 candidate failed and INSUFFICIENT_INFO was memoized; the next run
+#: that day read the cached failure without calling the model, lost the
+#: qualified directional bonus, and produced a dossier 0.05 lower for a reason
+#: that had nothing to do with the biology. A failure means "not determined",
+#: which must be retried, never remembered. Failures return fast and the LLM
+#: layer has its own failover, so retrying costs little.
+_cache_failures_note = None
+
 _NO_INFO_TEXT = (
     "Mechanism-direction check found insufficient information to classify "
     "compatibility; this does not confirm the candidate is directionally compatible."
@@ -210,7 +223,7 @@ def check_mechanism_direction(
             "OPENAI_BASE_URL or OPENAI_API_KEY "
             "not configured. " + _NO_INFO_TEXT
         )
-        cache_set(cache_key, result, ttl_days=1)
+        # Deliberately NOT cached: see _cache_failures_note below.
         return result
 
     try:
@@ -300,7 +313,7 @@ def check_mechanism_direction(
 
         if not search_text:
             result["verdict"] = VERDICT_INSUFFICIENT
-            cache_set(cache_key, result, ttl_days=1)
+            # Deliberately NOT cached: see _cache_failures_note below.
             return result
 
         # ── Step 2: constrained classification ────────────────────────────────
@@ -401,6 +414,6 @@ def check_mechanism_direction(
             f"'{drug_name}'/'{target_symbol}'/'{disease_name}': {e}. "
             f"Treating as INSUFFICIENT_INFO (no cap applied). " + _NO_INFO_TEXT
         )
-        cache_set(cache_key, result, ttl_days=1)
+        # Deliberately NOT cached: see _cache_failures_note below.
 
     return result

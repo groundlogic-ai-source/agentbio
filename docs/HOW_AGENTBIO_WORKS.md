@@ -433,6 +433,33 @@ the per-target reference counts so a thin reference set is visible rather than
 silently producing a low similarity. Regression cover for both corrections:
 `validation/test_target_attribution_and_reference_scope.py`.
 
+**Post-benchmark Tanimoto coverage semantics (added 2026-09-26).** Scoping the
+reference set exposed a second defect it had been masking. The chemist emitted
+`tanimoto_score = 0.0` both when a candidate was genuinely dissimilar to the
+approved drugs at its target and when the target had no approved drug to compare
+against at all. The reviewer has always kept those apart — `None` drops from
+both sides of the weighted sum, a measured `0.0` is adverse structural evidence
+and stays in the denominator — but it never received a `None` to act on.
+
+The cost lands on exactly the targets a repurposing pipeline cares about. AKT2
+has one approved drug with a known mechanism, capivasertib, which is the
+candidate itself; there is no same-target analog in existence to compare it to.
+That unscorable term was consuming a full 0.15 of weight, so the candidate was
+penalised for being the only approved drug at its target. The chemist now emits
+`None` when no reference drug was found, and the term is excluded rather than
+scored as a measured zero.
+
+**Post-benchmark direction-check failure caching (added 2026-09-26).** A real
+verdict is cached for 30 days; failures were cached for one day. That let a
+transient outage silently degrade later runs: during an Anthropic credit
+exhaustion the check for an AKT2 candidate failed, `INSUFFICIENT_INFO` was
+memoized, and the next run that day read the cached failure without calling the
+model — losing the qualified directional bonus and producing a dossier 0.05
+lower for a reason unconnected to the biology. Failures are now not cached at
+any TTL: "not determined" must be retried, never remembered. Successful verdicts
+still cache for 30 days. Regression cover:
+`validation/test_direction_failure_not_cached.py`.
+
 `STRONG_MATCH` = composite ≥ 0.70 **and** no cap. The pipeline keeps both
 `pre_cap_score` and the capped `composite_score`, so "weak candidate" is
 distinguishable from "strong candidate blocked by a gate".

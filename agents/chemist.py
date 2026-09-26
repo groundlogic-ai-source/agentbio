@@ -712,7 +712,17 @@ def run_chemist(biologist_output: dict[str, Any],
             "is_approved_drug": e["is_approved_drug"],
             "atc_codes": e["atc_codes"],
             "most_similar_approved_drug": best_drug,
-            "tanimoto_score": round(best_score, 4),
+            # None when the target had no approved drug to compare against at
+            # all, which is coverage missingness, not a measured dissimilarity.
+            # The reviewer already keeps the two apart -- a measured 0.0 is
+            # adverse structural evidence and stays in the denominator, while
+            # None drops from both sides -- but the distinction was collapsed
+            # here. On a target whose only approved drug is the candidate
+            # itself (AKT2/capivasertib), an unscorable term was costing a full
+            # 0.15 of weight, penalising a candidate for being the sole
+            # approved drug at its target.
+            "tanimoto_score": (
+                round(best_score, 4) if best_drug is not None else None),
             "mutation_specificity": e.get("mutation_specificity")
             or detect_mutation_specificity(""),
             "rationale": rationale,
@@ -844,7 +854,9 @@ def run_chemist(biologist_output: dict[str, Any],
     for candidate in results:
         candidate.setdefault("atc_codes", [])
         candidate.setdefault("most_similar_approved_drug", None)
-        candidate.setdefault("tanimoto_score", 0.0)
+        # None, not 0.0: a candidate that never reached the similarity pass has
+        # an unobserved term, not a measured dissimilarity of zero.
+        candidate.setdefault("tanimoto_score", None)
         candidate.setdefault("mutation_specificity", detect_mutation_specificity(""))
         candidate.setdefault(
             "rationale",
