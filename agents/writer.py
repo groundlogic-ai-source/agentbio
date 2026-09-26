@@ -736,9 +736,7 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
          f"({candidate.get('most_similar_approved_drug') or 'none in set'})"),
         ("Approved / known drug", (
             "⚠ NOT APPROVED FOR THE PROPOSED USE — experimental/unresolved "
-            "status. Do not self-administer or use for self-treatment; any "
-            "research or clinical activity requires qualified professionals "
-            "and applicable institutional/regulatory oversight"
+            "regulatory status"
             if candidate.get("is_approved_drug") is False
             else _fmt(candidate.get("is_approved_drug"))
         )),
@@ -887,15 +885,9 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
         "records. Multiple database records may represent the same underlying "
         "experiment or publication; assay heterogeneity and the bounded approved-drug "
         "reference set for Tanimoto still apply.",
-        "- **Absence of evidence is not evidence of absence.** A zero prior-trial "
-        "count or no adverse-event signal may reflect that the pair has simply never "
-        "been studied, not that it is safe or untried.",
-        "- **This is a repurposing *hypothesis*, not a finding or treatment "
-        "recommendation.** The responsible organization determines whether "
-        "orthogonal experiments or other validation are appropriate. This report "
-        "does not require, authorize, or substitute for wet-lab, translational, "
-        "regulatory, or clinical review. Do not use it to self-treat, change "
-        "medication, prescribe, or obtain/use an unapproved or off-label product.",
+        "- **Zero counts are unqueried, not negative.** A zero prior-trial count "
+        "or absent adverse-event signal records that the pair returned no rows in "
+        "the queried sources, which is distinct from a measured negative result.",
     ]
     if efo_warn:
         # Prepend so the mismatch is the first thing a reviewer reads.
@@ -1239,8 +1231,7 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
             f"- Citations: {_audit_value(direction.get('search_citations'))}.",
             "- Scope: this is a bounded target-level direction screen, not "
             "proof of causal sufficiency, target selectivity, mutation-specific "
-            "rescue, disease-model validation, clinical efficacy, or a prescribing "
-            "conclusion.",
+            "rescue, disease-model validation, or clinical efficacy.",
         ])
     scope = contract.get("timothy_syndrome_cardiac_scope")
     if isinstance(scope, dict):
@@ -1446,8 +1437,7 @@ produced by a staged pipeline (target selection → literature/bioactivity
 evidence → candidate scoring → structure prediction → this report) and then
 held for a mandatory human review before the run is marked complete. The human
 checkpoint gates completion of the record — the structure prediction (the
-expensive step) has already run by the time a person is asked. This document
-is a prioritised starting point for expert review, not a clinical conclusion.
+expensive step) has already run by the time a person is asked.
 
 **Therapeutic applicability is not scored as a general compatibility term.**
 Target applicability is gated separately and is
@@ -1457,10 +1447,9 @@ rows receive no directional bonus and cannot headline or enter paid validation.
 The ranking otherwise does not assess
 whether a drug reaches the relevant tissue, cell, or compartment at an
 effective, tolerable human exposure. Route, dose, pharmacokinetics (PK),
-disease stage/subtype, and therapeutic window require expert review.
-Unknown must not be interpreted as compatible. This
-limitation is disclosure-only: it introduces no tissue-specific score, cap, or
-gate.
+disease stage/subtype and therapeutic window are outside what this pipeline
+measures. This limitation is disclosure-only: it introduces
+no tissue-specific score, cap, or gate.
 
 **Composite score.** A weighted sum of the evidence terms listed in Section
 4's table (calibrated evidence confidence, the Open Targets target–disease association,
@@ -1608,9 +1597,8 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
         "> ⚠ **Therapeutic applicability not assessed.** Ranking does not assess "
         "whether this drug reaches the relevant tissue, cell, or compartment at "
         "an effective, tolerable human exposure. Route, dose, pharmacokinetics "
-        "(PK), disease stage/subtype, and therapeutic window require expert "
-        "review. **Unknown must not be interpreted as "
-        "compatible.**\n\n"
+        "(PK), disease stage/subtype and therapeutic window are outside what "
+        "this pipeline measures.\n\n"
     )
 
     parts.append(header_note)

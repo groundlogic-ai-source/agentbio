@@ -120,7 +120,7 @@ class TestReadersGuideAppendix(unittest.TestCase):
         self.assertIn("relevant tissue, cell, or compartment", md)
         self.assertIn("effective, tolerable human exposure", md)
         self.assertIn("Route, dose, pharmacokinetics (PK)", md)
-        self.assertIn("Unknown must not be interpreted as compatible", md)
+        self.assertIn("outside what this pipeline measures", md)
 
     def test_reader_guide_says_applicability_is_not_scored(self):
         text = _readers_guide_appendix()

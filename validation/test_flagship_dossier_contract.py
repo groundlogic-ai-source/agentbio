@@ -220,14 +220,35 @@ class FlagshipDossierContractTests(unittest.TestCase):
         report = build_report_markdown(_candidate(), {}, {
             "composite_weights": {}, "formula_version": "v",
         }, None)
-        self.assertIn(
-            "responsible organization determines whether orthogonal experiments",
-            report,
-        )
         self.assertNotIn("requires wet-lab", report)
         self.assertNotIn("ultimately, clinical validation", report)
         self.assertNotIn("Hypothesis requires experimental validation", report)
         self.assertNotIn("Required channel/iPSC tests", report)
+
+    def test_report_instructs_the_reader_on_data_never_on_conduct(self):
+        """Dossiers state what the data is; the reader draws the conclusions.
+
+        The audience validates these numbers themselves, so advice about how to
+        act on them, or about how modestly to read them, is not content.
+        """
+        report = build_report_markdown(_candidate(), {}, {
+            "composite_weights": {}, "formula_version": "v",
+        }, None)
+        for phrase in (
+            "self-treat",
+            "self-administer",
+            "prescribe",
+            "responsible organization determines",
+            "does not require, authorize, or substitute",
+            "not a clinical conclusion",
+            "prioritised starting point",
+            "must not be interpreted as compatible",
+            "Absence of evidence is not evidence of absence",
+        ):
+            self.assertNotIn(phrase, report, f"conduct directive present: {phrase}")
+        # Provenance statements are data about the data, and must survive.
+        self.assertIn("NOT a Kd", report)
+        self.assertIn("not a median or a publication-level consensus", report)
 
     def test_direction_reason_has_exactly_one_terminal_period(self):
         candidate = _candidate()
