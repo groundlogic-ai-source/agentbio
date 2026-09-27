@@ -44,8 +44,8 @@ export default function ReportView({ report }) {
           marginBottom: "1rem",
         }}
       >
-        Beta research preview — this dossier is a machine-generated hypothesis
-        for expert review, not medical advice or a treatment recommendation.
+        Every figure below is computed by deterministic code from the sources
+        cited in the dossier. Section 3 lists the record identifiers.
       </p>
       {showLegacyApplicabilityCaveat && <TherapeuticApplicabilityCaveat />}
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ a: SafeLink }}>

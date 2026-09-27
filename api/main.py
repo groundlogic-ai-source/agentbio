@@ -1530,9 +1530,9 @@ def _benchmark_summary(artifact: dict[str, Any], label: str) -> dict[str, Any]:
         "top25_rate": (top25 / total) if total else None,
         "miss_reasons": misses, "fixtures": fixture_rows,
         "limitations": (
-            "Retrospective engineering evidence only. These artifacts predate the "
-            "planned frozen post-upgrade pilot and must not be interpreted as "
-            "prospective discovery accuracy."
+            "Retrospective engineering evidence. These artifacts predate the "
+            "planned frozen post-upgrade pilot and measure retrospective "
+            "recovery, not prospective discovery accuracy."
         ),
     }
 

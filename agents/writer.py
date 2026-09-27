@@ -872,8 +872,8 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
         f"occupy the target; it does NOT establish agonism vs. antagonism, "
         f"functional modulation, or therapeutic benefit.",
         "- **ADME values are model predictions, not measurements.** The Boltz "
-        "lipophilicity/permeability/solubility numbers are computed estimates and "
-        "should not be treated as measured PK or exposure.",
+        "lipophilicity/permeability/solubility numbers are computed estimates, "
+        "not measured PK or exposure.",
         f"- **Structure confidence is bounded.** This hypothesis relies on a Boltz "
         f"structure_confidence of {_fmt(sconf)} (complex pLDDT "
         f"{_fmt(plddt_complex)}) and an AFDB apo mean pLDDT of {_fmt(apo_plddt, 1)}; "
@@ -1192,7 +1192,7 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
         "- **Automated score-capping flags:** "
         + (", ".join(_display_token(gate) for gate in gates)
            if gates else "None recorded")
-        + ". This does not mean experimental or clinical validation is complete.",
+        + ".",
          "\n### Flagship hypothesis\n",
         f"- **Flagship hypothesis verdict:** {_display_token(flagship.get('verdict'))}. "
         "This is a computational hypothesis screen, not an efficacy, exposure, "
@@ -1244,8 +1244,8 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
             "The canonical disease input does not establish TS1 or p.G406R for a specific case.",
             f"- Scope status: {_display_token(scope.get('status'))}; basis: "
             f"{_audit_value(scope.get('scope_basis'))}.",
-            "- The scope and tests below are **proposed for explicit human review** "
-            "and remain **future, unperformed** activities, not results.",
+            "- The scope and tests below are **future, unperformed** activities, "
+            "not results.",
             "- Potential mutation-specific evidence options: " + "; ".join(
                 str(item) for item in scope.get("required_tests", [])) + ".",
             "- Cardiac safety/exposure plan: " + "; ".join(
@@ -1465,9 +1465,7 @@ scope-matched safety withdrawal), or a *mechanism-direction cap* (the drug acts 
 opposite direction to what the disease biology requires), and an
 *unapproved-compound cap* (the hit is not an approved drug, so it is not a
 repurposing candidate at all). Where a cap applies, Section 4 shows both the
-uncapped score (`pre_cap_score`) and the cap that fired. A capped candidate can
-still be scientifically interesting — the cap says "not an approvable
-repurposing pick as-is", not "no biology here".
+uncapped score (`pre_cap_score`) and the cap that fired.
 
 **Coverage renormalization.** When a data source could not be checked for this
 candidate (source unreachable, identifier unresolvable, or the term is a
@@ -1475,7 +1473,7 @@ stamped constant for the whole pool), that term is **dropped from both the
 numerator and the denominator** — it is never silently scored as zero. Section
 4 shows the renormalization explicitly ("covered weight" < 1.0000 means some
 terms were dropped). A renormalized score is comparable in scale but rests on
-less evidence; treat heavy renormalization as "unscored", not "clean".
+fewer observed terms, stated as the covered weight.
 
 **Evidence table (Section 2).** Each row reports one measured or predicted
 quantity and the source that produced it.
@@ -1510,8 +1508,8 @@ identifiers carried in the candidate ledger; model outputs and database-derived
 values are identified by their source family even when no PMID, activity ID, or
 NCT number applies.
 
-**Limitations (Section 5).** The standard caveats that apply to every dossier —
-read them before acting on any number in this report.
+**Limitations (Section 5).** The provenance and scope statements that apply to
+every dossier: what each number is, and what the pipeline did not measure.
 
 _Reader's guide v{_READERS_GUIDE_VERSION}. A longer engineering-level
 description of the pipeline (sources, formulas, and the exact role of each AI
@@ -1563,8 +1561,8 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
         header_note = (
             f"> **NOTE:** This candidate did NOT meet the STRONG_MATCH threshold "
             f"(composite {_fmt(candidate.get('composite_score'), 4)} < "
-            f"{_fmt(threshold, 2)}). It is included as the highest-ranked hypothesis "
-            f"for review; treat it accordingly.\n\n"
+            f"{_fmt(threshold, 2)}). It is the highest-ranked candidate in this "
+            f"pool.\n\n"
         )
     if candidate.get("literature_limitation_blocked"):
         header_note = (
@@ -1684,9 +1682,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"The drug is still approved and available; this warning reflects serious "
             f"risks (sedation, haematological effects, teratogenicity, etc.) that require "
             f"monitoring in its approved indication. "
-            f"**This flag does not affect the composite score.** "
-            f"The reviewer must judge whether these risks are acceptable in the context "
-            f"of the proposed repurposing indication.\n\n"
+            f"**This flag does not affect the composite score.**\n\n"
         )
 
     # Target-family cross-reactivity disclosure.  This is intentionally
@@ -1712,9 +1708,8 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"cardiac-safety target **{family_safety.get('liability_target') or 'KCNH2/hERG'}** "
             f"while the pursued target is **{target}**.{evidence_clause} "
             "This does not establish potency, a selectivity ratio, or clinically "
-            "relevant exposure, but it means the proposed target action cannot be "
-            "treated as a clean selective mechanism. For KCNH-family hypotheses, "
-            "quantitative hERG/QT, PK, dose, and cardiac-safety review is required. "
+            "relevant exposure. Quantitative hERG/QT, cross-reactivity, PK, dose "
+            "and cardiac-safety data are not measured by this pipeline. "
             "**This flag does not affect the composite score, hard caps, or "
             "headline eligibility.**\n\n"
         )
@@ -1728,10 +1723,9 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
         parts.append(
             f"> ⚠ **Target-family selectivity review required — disclosure only.** "
             f"The pursued target **{target}** is in the KCNH family, and "
-            f"{lookup_clause}. This does not establish selectivity or safety: "
-            "hERG/KCNH2 QT liability, quantitative cross-reactivity, PK, dose, "
-            "and cardiac monitoring requirements must be checked before treating "
-            "the target action as a viable therapeutic mechanism. "
+            f"{lookup_clause}. This does not establish selectivity or safety. "
+            "hERG/KCNH2 QT liability, quantitative cross-reactivity, PK, dose "
+            "and cardiac monitoring requirements are not measured here. "
             "**No score change was applied.**\n\n"
         )
 
@@ -1757,8 +1751,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"to treat diseases caused by {target} dysfunction. "
             f"The pChEMBL value in this report may therefore come from a **safety-screening "
             f"assay** (recording a toxicity liability) rather than a therapeutic-intent "
-            f"binding study. Verify the source assay context in ChEMBL before treating "
-            f"this binding data as evidence of a therapeutic mechanism. "
+            f"binding study. The source assay context is recorded in ChEMBL. "
             f"This disclosure does not affect any score.\n\n"
         )
 
@@ -1777,10 +1770,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"(Lipinski, Lombardo, Dominy & Feeney, 1997, *Advanced Drug Delivery "
             f"Reviews* 23:3–25), a widely used medicinal-chemistry heuristic under "
             f"which LogP > 5 is associated with poor oral absorption and permeability. "
-            f"**This flag does not affect the composite score.** "
-            f"The reviewer must judge whether lipophilicity is a material concern in the "
-            f"context of the proposed repurposing indication and its intended route of "
-            f"administration.\n\n"
+            f"**This flag does not affect the composite score.**\n\n"
         )
 
     # Mutation-specificity DISCLOSURE caveat — surfaced whenever the drug's
@@ -1794,8 +1784,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"{drug}'s approved / known indication explicitly names {terms}. "
             "This is a DISCLOSURE flag only: it does NOT assert that the "
             f"repurposing target **{target}** in **{disease}** carries that "
-            "mutation, and it does not change any score. The reviewer must judge "
-            "whether the mutation-scoped precedent transfers to this indication.\n\n"
+            "mutation, and it does not change any score.\n\n"
         )
 
     # 1. Hypothesis summary

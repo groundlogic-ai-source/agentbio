@@ -230,9 +230,9 @@ def run_triage(
         "disclosure": (
             "Triage verdicts are computed against the persisted candidate pool "
             "of one completed AgentBio case — they re-audit evidence, they do "
-            "not re-run discovery. ABSENT_FROM_POOL is a coverage statement, "
-            "not a judgment that the drug is a poor candidate. XLogP flags are "
-            "caution-only disclosures and never adjust scores."
+            "not re-run discovery. ABSENT_FROM_POOL records that the drug was "
+            "not in that pool. XLogP flags are disclosures and never adjust "
+            "scores."
         ),
     }
 

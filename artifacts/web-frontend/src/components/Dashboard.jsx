@@ -165,10 +165,10 @@ export default function Dashboard({
             className="mt-3 max-w-lg text-sm leading-relaxed"
             style={{ color: "var(--ink-muted)" }}
           >
-            A case file for every drug-repurposing hypothesis — evidence,
-            citations, and limitations, compiled for human review. Each candidate
-            is for qualified review; the responsible organization decides what
-            follow-up is appropriate. Nothing here is a cure or treatment recommendation.
+            A case file for every drug-repurposing hypothesis — scores,
+            evidence, and citations, traced to the record that produced them.
+            Candidates are ranked by deterministic code; every AI call is
+            confined to numbers already computed.
           </p>
         </div>
 

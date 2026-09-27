@@ -8,8 +8,40 @@
 #   - set to a real hostname (e.g. agentbio.groundlogic.ai) -> Caddy
 #     automatically provisions and renews a Let's Encrypt cert on :443, no
 #     manual cert management. Set this via docker-compose.yml / the host's env.
+#
+# AGENTBIO_CONSOLE_USER / AGENTBIO_CONSOLE_HASH gate the endpoints that spend
+# money. See the "write auth" block below.
 
 {$AGENTBIO_DOMAIN:80} {
+	# ── Write auth ────────────────────────────────────────────────────────
+	# The API has no authentication of its own ("Single-user hobby project:
+	# no auth, no accounts" — api/main.py). Every mutating endpoint was
+	# therefore reachable by anyone who found the host, and POST /api/runs
+	# starts a metered run: structure prediction plus LLM spend, bounded only
+	# by the IP hourly limit and DAILY_RUN_CAP.
+	#
+	# Reads stay fully open on purpose. A dossier link handed to an outside
+	# reader has to open without a credential, so GET is never gated — only
+	# the methods that create, resume, or delete work.
+	@write method POST PUT PATCH DELETE
+	basic_auth @write {
+		{$AGENTBIO_CONSOLE_USER} {$AGENTBIO_CONSOLE_HASH}
+	}
+
+	# Crawlers: the dossiers are shared deliberately, by link, not found by
+	# search. Served at the edge so it holds for every route including /api/*.
+	handle /robots.txt {
+		header Content-Type text/plain
+		respond "User-agent: *
+Disallow: /
+" 200
+	}
+
+	header {
+		X-Robots-Tag "noindex, nofollow"
+		-Server
+	}
+
 	handle /api/* {
 		reverse_proxy api:8000
 	}

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Dashboard from "./components/Dashboard.jsx";
-import BetaBanner from "./components/BetaBanner.jsx";
+import FeedbackBar from "./components/FeedbackBar.jsx";
 import CaseView from "./components/CaseView.jsx";
 import NewCaseDialog from "./components/NewCaseDialog.jsx";
 import ResearchTab from "./components/ResearchTab.jsx";
@@ -238,7 +238,7 @@ export default function App() {
 
   return (
     <div className="min-h-full">
-      <BetaBanner />
+      <FeedbackBar />
       {error && (
         <div
           className="px-4 py-2 text-center font-mono text-xs"

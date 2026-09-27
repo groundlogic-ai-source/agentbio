@@ -74,18 +74,16 @@ export default function SignOff({
           className="text-base font-semibold leading-snug"
           style={{ color: "var(--ink)" }}
         >
-          This is a falsifiable hypothesis, not a finding.
+          This hypothesis is falsifiable by the experiments named below.
         </p>
         {timothyScope && (
           <p
             className="mt-3 rounded border p-3 text-sm leading-relaxed"
             style={{ borderColor: "var(--brass-border)", color: "var(--ink-muted)" }}
           >
-            For this flagship, explicitly confirm or reject the proposed TS1
-            CACNA1C p.G406R/exon 8A cardiac-electrophysiology scope. State that
-            approval records acceptance of this defined scope for organizational
-            consideration—not neurologic benefit, whole-syndrome modification,
-            clinical efficacy, prescribing, or human-use suitability.
+            This flagship is scoped to TS1 CACNA1C p.G406R/exon 8A cardiac
+            electrophysiology. Approval or rejection is recorded against that
+            scope.
           </p>
         )}
         <p
@@ -93,10 +91,9 @@ export default function SignOff({
           style={{ color: "var(--ink-muted)" }}
         >
           Record your scientific reasoning and your organization&apos;s chosen
-          next step. Approval records the authorized reviewer&apos;s decision; it
-          does not authorize experiments, human use, prescribing, or clinical
-          action. Rejection records this case&apos;s decision and does not
-          establish that the candidate is ineffective.
+          next step. Approval and rejection both record the reviewer&apos;s
+          decision against this case; neither is a measurement of the
+          candidate.
         </p>
 
         <label

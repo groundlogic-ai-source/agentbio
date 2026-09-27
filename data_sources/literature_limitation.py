@@ -906,7 +906,7 @@ def aggregate_findings(
         blocked = False
         reason = (
             "Applicable limitation and supportive findings conflict; the candidate "
-            "is not automatically blocked, and the conflict requires qualified review."
+            "is not automatically blocked. Both findings are recorded below."
         )
     elif authoritative or len({row["pmid"] for row in explicit}) >= 2:
         verdict = VERDICT_CONFIRMED

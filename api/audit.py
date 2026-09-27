@@ -615,11 +615,11 @@ def run_audit(
         # and a long list costs no extra model calls.
         result["narration"] = None
 
-    # 6. Mandatory disclosure, always present regardless of outcome
+    # 6. Scope statement, always present regardless of outcome
     result["disclosure"] = (
-        "A low rank or absence from the pool does not mean the queried drug is a poor "
-        "candidate — it may reflect a gap in public bioactivity or disease-association "
-        "data, not a real biological judgment against it."
+        "Rank and pool membership are computed from public bioactivity and "
+        "disease-association records. A drug absent from those sources is "
+        "unqueried, not measured as inactive."
     )
 
     # 7. Modality fields: apply to the DRUG, not the indication. Live cached

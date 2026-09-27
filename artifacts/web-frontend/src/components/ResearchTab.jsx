@@ -280,7 +280,7 @@ function CitePanel() {
         <code>python3 validation/verify_v2_provenance.py</code>; the missing deployment attestation and
         post-screen list are disclosed provenance limits. The repository also ships a{" "}
         <code>CITATION.cff</code>, so GitHub and reference managers (Zotero, Mendeley) pick this up
-        automatically. Research prototype — not clinically validated.
+        automatically.
       </p>
       <article className="benchmark-card">
         <div className="benchmark-card-title">Suggested citation</div>

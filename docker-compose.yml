@@ -76,6 +76,11 @@ services:
       # Leave unset for plain-HTTP staging/testing by IP; set to the real
       # hostname in .env at cutover for automatic Let's Encrypt TLS.
       AGENTBIO_DOMAIN: ${AGENTBIO_DOMAIN:-:80}
+      # Basic-auth credentials for the mutating endpoints (see Caddyfile).
+      # The hash is bcrypt, produced by `caddy hash-password`. Both must be
+      # set or Caddy will reject the config at startup.
+      AGENTBIO_CONSOLE_USER: ${AGENTBIO_CONSOLE_USER:?set AGENTBIO_CONSOLE_USER in .env}
+      AGENTBIO_CONSOLE_HASH: ${AGENTBIO_CONSOLE_HASH:?set AGENTBIO_CONSOLE_HASH in .env}
     depends_on:
       - api
     ports:

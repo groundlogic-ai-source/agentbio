@@ -502,8 +502,9 @@ claim-audited document. The writer invents nothing: it restates
 numbers already computed, and it re-derives the breakdown from the candidate's
 own `score_components` so the arithmetic is auditable against
 `reviewed_candidates.json`. Every generated dossier also carries a prominent
-therapeutic-applicability disclosure near the top and repeats the boundary in
-the reader's guide: **unknown must not be interpreted as compatible**.
+therapeutic-applicability disclosure near the top and repeats it in the
+reader's guide: route, dose, PK, disease stage/subtype and therapeutic window
+are outside what this pipeline measures.
 
 Flagship dossiers also carry the versioned
 `flagship-dossier-evidence-v1` handoff. It is a deterministic view over
@@ -519,9 +520,7 @@ persisted component arithmetic, including coverage renormalization and caps.
 ### Stage 3c — Human review (`main_graph.py`, `human_review_node`)
 
 The graph interrupts. A person approves, rejects, or annotates. The decision
-is persisted with the job. Every dossier is labeled a machine-generated
-hypothesis for expert review — the system does not call itself clinically
-validated anywhere.
+is persisted with the job.
 
 Note the ordering: this checkpoint sits **after** structure validation. Boltz
 spend has already happened by the time a human is asked — the checkpoint gates

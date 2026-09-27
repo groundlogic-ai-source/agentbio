@@ -244,6 +244,22 @@ class FlagshipDossierContractTests(unittest.TestCase):
             "prioritised starting point",
             "must not be interpreted as compatible",
             "Absence of evidence is not evidence of absence",
+            # Reader-conduct directives removed 2026-09-26.
+            "reviewer must judge",
+            "treat it accordingly",
+            "read them before acting",
+            "treat heavy renormalization",
+            "still be scientifically interesting",
+            "review is required",
+            "must be checked before",
+            "Verify the source assay context",
+            "proposed for explicit human review",
+            "validation is complete",
+            "not medical advice",
+            "treatment recommendation",
+            "for expert review",
+            "research prototype",
+            "not clinically validated",
         ):
             self.assertNotIn(phrase, report, f"conduct directive present: {phrase}")
         # Provenance statements are data about the data, and must survive.

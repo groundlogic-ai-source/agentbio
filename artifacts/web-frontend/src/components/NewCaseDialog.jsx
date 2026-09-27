@@ -335,8 +335,8 @@ export default function NewCaseDialog({
                       className="mt-2 text-xs leading-relaxed"
                       style={{ color: "var(--ink-muted)" }}
                     >
-                       Expert framing is persisted with this verdict; supplied
-                       claims remain hypotheses until independently validated.
+                       The framing you supplied is persisted with this verdict
+                       and is reproduced in the dossier.
                     </p>
                   )}
                   <p
@@ -344,8 +344,8 @@ export default function NewCaseDialog({
                     style={{ color: "var(--ink-muted)" }}
                   >
                     This gate evaluates computational hypothesis readiness, not
-                    efficacy, exposure, safety, or clinical benefit. You can still
-                    run the full case explicitly as a research hypothesis.
+                    efficacy, exposure, safety, or clinical benefit. The full
+                    case can still be run.
                   </p>
                 </>
               )}

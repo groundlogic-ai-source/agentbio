@@ -150,8 +150,7 @@ function TabMap() {
       <p className="tab-map-intro">
         AgentBio is a drug-repurposing research system. It generates hypotheses and lets you audit
         them or your own; the Research tab holds the frozen validation studies behind those
-        claims. Nothing here is a clinical recommendation. Qualified organizations decide whether
-        experiments, translational work, regulatory review, or clinical study are appropriate.
+        claims.
       </p>
       <div className="tab-map-groups">
         {TAB_MAP.map((g) => (

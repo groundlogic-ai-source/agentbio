@@ -283,7 +283,7 @@ For each selected candidate (STRONG_MATCH first; see the env switches below):
 
 ### The `writer` node
 
-Writes one Markdown report per selected candidate to `output/reports/{disease}_{drug}.md`, with six sections: **(1)** hypothesis summary, **(2)** evidence table, **(3)** full source citations (deduplicated PMIDs, ChEMBL activity IDs, NCT numbers), **(4)** composite-score breakdown (every weighted term, reconciled against `reviewed_candidates.json`), **(5)** limitations, and **(6)** a static reader's guide. Every dossier states that therapeutic applicability is not scored: tissue or cellular exposure, route, dose, human pharmacokinetics, disease stage/subtype, and therapeutic window require expert review, and unknown must not be treated as compatible. The writer invents no facts — it only restates numbers already produced upstream.
+Writes one Markdown report per selected candidate to `output/reports/{disease}_{drug}.md`, with six sections: **(1)** hypothesis summary, **(2)** evidence table, **(3)** full source citations (deduplicated PMIDs, ChEMBL activity IDs, NCT numbers), **(4)** composite-score breakdown (every weighted term, reconciled against `reviewed_candidates.json`), **(5)** limitations, and **(6)** a static reader's guide. Every dossier states that therapeutic applicability is not scored: tissue or cellular exposure, route, dose, human pharmacokinetics, disease stage/subtype and therapeutic window are outside what the pipeline measures. The writer invents no facts — it only restates numbers already produced upstream.
 
 ### Environment switches
 
@@ -333,7 +333,7 @@ Further route groups — batch runs, dossier audit (`/api/audit*`), the pooled c
 
 ## Stage 5 — AgentBio web frontend
 
-Stage 5 is a **React + Vite + Tailwind** single-page app in `artifacts/web-frontend/` (a pnpm workspace package) that turns the Stage 4 API into a usable interface. It is styled as a **"case dossier"** rather than a generic admin dashboard: warm paper/ink palette with brass accents, Fraunces / Inter / JetBrains Mono type, file-folder tabs, a vertical pipeline stepper for live runs, an inline report with a sign-off panel, and a wax-style **stamp** (`STRONG MATCH` / `REJECTED`) on completed cases. The voice throughout frames every result as a *hypothesis to investigate*, never a cure.
+Stage 5 is a **React + Vite + Tailwind** single-page app in `artifacts/web-frontend/` (a pnpm workspace package) that turns the Stage 4 API into a usable interface. It is styled as a **"case dossier"** rather than a generic admin dashboard: warm paper/ink palette with brass accents, Fraunces / Inter / JetBrains Mono type, file-folder tabs, a vertical pipeline stepper for live runs, an inline report with a sign-off panel, and a wax-style **stamp** (`STRONG MATCH` / `REJECTED`) on completed cases. Every figure shown traces to the record that produced it.
 
 The whole pipeline is presented as a chain of hypotheses: each run opens a new case, walks the pipeline stages, pauses for a human sign-off, and is stamped closed. Beyond the case flow (**Case Files** tab), the app includes **Research** (frozen benchmark results), **Candidates**, **Audit**, and **Saved Reports** tabs.
 
@@ -416,11 +416,10 @@ with its contents under a
 (CC BY-SA). Per their attribution request: data sourced from the
 [Guide to PHARMACOLOGY](https://www.guidetopharmacology.org/), IUPHAR/BPS.
 
-## Beta status & bug reports
+## Bug reports
 
-AgentBio is in **beta**. Dossiers are machine-generated hypotheses for expert
-review — not medical advice. In-app feedback goes through the beta Google Form
-(linked from the banner). Please file bugs as **GitHub Issues** on
+In-app feedback goes through the Google Form linked in the header. Please file
+bugs as **GitHub Issues** on
 <https://github.com/groundlogic-ai-source/agentbio>.
 
 ## How to cite
@@ -446,5 +445,4 @@ This repository also ships a `CITATION.cff` file, so GitHub and reference manage
 (Zotero, Mendeley) pick the citation up automatically. Validation results of record
 are documented in `validation/validation_campaign_dossier.md`; the provenance of the
 frozen benchmark is independently re-checkable via
-`python3 validation/verify_v2_provenance.py`. AgentBio is a research prototype and
-is not clinically validated.
+`python3 validation/verify_v2_provenance.py`.

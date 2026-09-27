@@ -520,9 +520,9 @@ def evaluate_candidate_readiness(
     if model == "MIXED_CONFLICTING" or clinical == "MIXED_CONFLICTING":
         evidence_status = "CONDITIONAL"
         evidence_summary = (
-            "The dossier records mixed or conflicting disease-specific evidence; "
-            "this does not block a computational hypothesis but requires explicit "
-            "expert review."
+            "The dossier records mixed or conflicting disease-specific evidence. "
+            "This does not block a computational hypothesis; both findings are "
+            "recorded."
         )
         missing = ["resolve conflicting disease-specific evidence"]
     elif model == "OBSERVED_SUPPORT" or clinical == "OBSERVED_SUPPORT":
@@ -619,16 +619,15 @@ def evaluate_candidate_readiness(
         "flagship_use_case_claims": _use_case_claims(use_case),
         "next_experiment": experiment,
         "next_action": (
-            "Do not present this candidate as a flagship hypothesis until a direct "
-            "target and differentiating use case are supplied."
+            "A direct target and a differentiating use case are not supplied."
             if verdict == "NOT_FLAGSHIP_READY"
             else (
-                "Keep this as conditional expert review until the missing "
-                "computational framing is resolved."
+                "The computational framing below is incomplete; the missing "
+                "fields are listed."
                 if verdict == "CONDITIONAL_REVIEW"
                 else (
-                    "Eligible as a computational flagship hypothesis; this is not "
-                    "an efficacy, exposure, safety, or clinical-benefit verdict."
+                    "Eligible as a computational flagship hypothesis. Efficacy, "
+                    "exposure and safety are not measured by this screen."
                 )
             )
         ),
