@@ -7,9 +7,10 @@ then fetches IC50/Ki bioactivity records with confidence_score >= 8.
 import math
 import os
 import statistics
+import threading
 import time
 import requests
-from typing import Any
+from typing import Any, Optional
 from cache.cache import get, set as cache_set, make_key
 from data_sources import holdout
 from data_sources.provider_request_policy import request as provider_request
@@ -105,6 +106,57 @@ def _resolve_target_chembl_id(uniprot_id: str) -> list[str]:
         if "Homo sapiens" in organism or tax_id == 9606:
             ids.append(t["target_chembl_id"])
     return ids
+
+
+#: Canonical data-rich control for liveness probing. CLAUDE.md already names
+#: EGFR P00533 as the entity every new wrapper is validated against, precisely
+#: because wrappers swallow errors and return empty.
+_LIVENESS_ACCESSION = "P00533"
+_LIVENESS_TTL_SECONDS = 300.0
+_liveness_lock = threading.Lock()
+_liveness_cached: Optional[bool] = None
+_liveness_until = 0.0
+
+
+def chembl_is_serving_data() -> bool:
+    """Is ChEMBL returning target data right now?
+
+    An empty result for one accession is ambiguous on its own: ChEMBL may
+    genuinely not track that protein, or it may be serving degraded HTTP 200s
+    with empty bodies — the MTOR/TSC incident of 2026-07, which is why empty
+    was treated as ``unavailable`` everywhere.
+
+    That ambiguity is resolvable. Probing an accession known to be dense
+    separates the two cases: if the control returns targets and the subject
+    does not, the subject's emptiness is an observation about the subject, not
+    about ChEMBL. If the control is also empty, ChEMBL is degraded and
+    fail-closed still applies.
+
+    Treating every genuine absence as an outage is not free. ChEMBL does not
+    track most proteins — FAM20A and DEPDC1B return zero target records — so
+    any disease whose target list includes one failed that target, and a
+    failed target fails the run. An Acrodysostosis case died this way with its
+    real target, PDE4D, fully resolved and carrying 9,541 activities.
+
+    Cached briefly and process-wide: this is a health signal, not evidence
+    about any candidate, and one probe per run is enough.
+    """
+    global _liveness_cached, _liveness_until
+    with _liveness_lock:
+        now = time.monotonic()
+        if _liveness_cached is not None and now < _liveness_until:
+            return _liveness_cached
+        try:
+            live = bool(_resolve_target_chembl_id(_LIVENESS_ACCESSION))
+        except Exception:
+            live = False
+        _liveness_cached = live
+        _liveness_until = now + _LIVENESS_TTL_SECONDS
+        if not live:
+            print("[chembl] liveness probe: control accession "
+                  f"{_LIVENESS_ACCESSION} returned no targets — treating "
+                  "empty results as unavailable, not as observed absence")
+        return live
 
 
 def _fetch_assay_confidence(assay_ids: list[str]) -> dict[str, int]:
@@ -491,11 +543,21 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
     try:
         target_ids = _resolve_target_chembl_id(uniprot_id)
         if not target_ids:
-            # Ambiguous empty (genuine no-match vs degraded 200) — not cached.
-            result["source_status"] = "unavailable"
-            result["source_error"] = (
-                "ChEMBL target resolution returned no verifiable target identifier."
-            )
+            # Empty is only ambiguous while ChEMBL's health is unknown. A live
+            # control turns it into an observation: this protein is not a
+            # ChEMBL target. Not cached either way — a genuine absence is cheap
+            # to re-derive, and caching a degraded answer is what caused the
+            # MTOR/TSC incident.
+            if chembl_is_serving_data():
+                result["source_status"] = "empty"
+                result["source_error"] = None
+                result["target_absent_from_chembl"] = True
+            else:
+                result["source_status"] = "unavailable"
+                result["source_error"] = (
+                    "ChEMBL target resolution returned no verifiable target "
+                    "identifier, and the liveness control also returned none."
+                )
             return result
 
         result["target_chembl_ids"] = target_ids
@@ -603,13 +665,21 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
     if result["compounds"] or saw_activity_payload:
         result["source_status"] = "complete"
         cache_set(cache_key, result, ttl_days=7)
+    elif chembl_is_serving_data():
+        # The target resolved but carries no activity rows. With a live
+        # control that is an observation about this target -- PRKAR1A resolves
+        # to CHEMBL5169 and has zero activities -- not a coverage gap. Left
+        # uncached so a later data load is picked up.
+        result["source_status"] = "empty"
+        result["source_error"] = None
+        result["target_has_no_activities"] = True
     else:
-        # A zero-row payload is explicitly ambiguous in this adapter (genuine
-        # empty vs degraded HTTP 200). Complete coverage cannot be claimed.
+        # A zero-row payload while the control is also empty is exactly the
+        # degraded-200 case. Complete coverage cannot be claimed.
         result["source_status"] = "unavailable"
         result["source_error"] = (
             "No verifiable ChEMBL activity payload was observed for the "
-            "resolved target."
+            "resolved target, and the liveness control returned no targets."
         )
     return result
 

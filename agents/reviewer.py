@@ -885,10 +885,14 @@ def run_reviewer(
         # Fail-closed: unavailable OR holdout-redacted trial evidence cannot
         # establish the absence of a failed prior trial.
         no_failed_trial = _trial_evidence_term(trials)
+        # Three distinct reasons the term can be absent. Collapsing them into
+        # "query_failed" reported a healthy registry as broken once an empty
+        # result started returning None.
         _trial_basis = (
             "observed" if no_failed_trial is not None
-            else ("holdout_redacted" if trials.get("holdout_redacted")
-                  else "query_failed")
+            else "holdout_redacted" if trials.get("holdout_redacted")
+            else "query_failed" if trials.get("query_failed")
+            else "no_registered_trial"
         )
         if no_failed_trial is None:
             print(

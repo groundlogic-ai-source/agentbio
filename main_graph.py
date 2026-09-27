@@ -95,6 +95,14 @@ BOLTZ_NUM_SAMPLES = int(os.environ.get("STAGE3_BOLTZ_SAMPLES", "1"))
 # call as a cost guardrail.  Set TOP_K_TARGETS=1 to restore single-target mode.
 TOP_K_TARGETS = int(os.environ.get("TOP_K_TARGETS", "5"))
 
+#: Source-status values that let a pursued target count as evaluated. Anything
+#: outside this set fails the target, and a failed target can fail the whole
+#: run, so the line between "we observed nothing" and "we could not look"
+#: is drawn here. ``empty`` is healthy on purpose: ChEMBL does not track most
+#: proteins, and a protein it genuinely does not carry is an observation.
+HEALTHY_SOURCE_STATES = frozenset({
+    "ok", "empty", "healthy", "available", "success", "complete", "disabled"})
+
 # Score-decay-relative cutoff (alternative / complement to fixed TOP_K_TARGETS).
 # When TOP_K_FRACTION is set to a value in (0, 1), targets are included only if
 # their combined score (tractability + unmet_need) is >= FRACTION × top_score,
@@ -585,8 +593,7 @@ def chemist_node(state: PipelineState) -> dict[str, Any]:
     all_candidates = merge_chemist_candidates(all_candidates)
 
     # Track which targets succeeded (had no error AND produced a result object).
-    healthy_source_states = {
-        "ok", "empty", "healthy", "available", "success", "complete", "disabled"}
+    healthy_source_states = HEALTHY_SOURCE_STATES
 
     def chemist_target_failed(result: Optional[dict[str, Any]]) -> bool:
         if result is None or result.get("error"):

@@ -695,3 +695,43 @@ The pipeline's claims rest on frozen, provenance-checked artifacts in
 
 A self-hosted run with overridden weights or lanes is a *different instrument*
 — that is why the disclosure banner exists rather than a silent knob.
+
+**Post-benchmark ChEMBL absence-vs-outage disambiguation (added 2026-09-27).**
+An empty ChEMBL result was recorded as `source_status="unavailable"` in both
+the target-resolution and activity-fetch paths. The reasoning was sound in
+isolation: a genuine absence and a degraded HTTP 200 look identical, and
+caching a degraded empty is what zeroed a pool during the MTOR/TSC incident of
+2026-07.
+
+The cost of that conservatism was invisible and large. `unavailable` is outside
+`HEALTHY_SOURCE_STATES`, so it fails the pursued target, and a failed target
+can fail the entire run. ChEMBL does not track most proteins — FAM20A
+(Q96MK3) and DEPDC1B (Q8WUY9) each return **zero** target records, and PRKAR1A
+(P10644) resolves to CHEMBL5169 with **zero** activities. Any disease whose
+target list contained such a protein was therefore unrunnable, regardless of
+how well its real target resolved. An Acrodysostosis case died exactly this
+way, with PDE4D fully resolved and carrying 9,541 activities, killed by three
+co-pursued targets that ChEMBL simply does not carry.
+
+The ambiguity is resolvable. `chembl_is_serving_data()` probes a control
+accession known to be dense — EGFR P00533, the entity CLAUDE.md already
+designates for validating wrappers, precisely because wrappers swallow errors
+and return empty. If the control returns targets and the subject does not, the
+subject's emptiness is an observation about the subject and is recorded as
+`empty`, a healthy state, with `target_absent_from_chembl` or
+`target_has_no_activities` set for disclosure. If the control is also empty,
+ChEMBL is degraded and the original fail-closed `unavailable` still applies.
+The probe is cached process-wide for five minutes: it is a health signal, not
+evidence about any candidate. Neither branch is cached to the candidate cache,
+so a later ChEMBL data load is picked up rather than frozen for seven days.
+
+`HEALTHY_SOURCE_STATES` is now a named module constant in `main_graph.py`
+rather than a literal inside a helper, because the line between "we observed
+nothing" and "we could not look" decides whether a run survives.
+
+This is the fourth instance of one confusion: a definitive negative filed as a
+coverage gap, or the reverse. The others were the trial term (zero registered
+trials credited as evidence of safety), Tanimoto (no approved analog at the
+target scored as maximal dissimilarity), and GtoPdb (a 404 for an accession it
+does not carry reported as source unavailability). Regression cover:
+`validation/test_chembl_absence_vs_outage.py`.
