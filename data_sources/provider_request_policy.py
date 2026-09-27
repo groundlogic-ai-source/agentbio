@@ -106,6 +106,7 @@ def request(
     provider: str,
     request_fn: Callable[..., Any],
     url: str,
+    pass_through_statuses: frozenset[int] = frozenset(),
     **kwargs: Any,
 ) -> Any:
     """Make one provider request under a shared throttle and bounded retries.
@@ -114,6 +115,16 @@ def request(
     A Retry-After header takes precedence over the deterministic exponential
     backoff.  Final transient failures contribute to a short circuit breaker;
     non-transient HTTP errors are raised immediately and do not open it.
+
+    ``pass_through_statuses`` are returned to the caller unraised. Some
+    non-2xx statuses are definitive answers rather than failures: a 404 from a
+    per-accession endpoint means "this record is not in the database", which
+    the caller records as an observed absence. Raising it instead turns a
+    clean negative into an apparent outage. That is what happened when GtoPdb
+    moved behind this throttle in 915001f: its own
+    ``if resp.status_code == 404: return None`` became unreachable, five
+    accessions absent from GtoPdb were reported as source unavailability, and
+    an Acrodysostosis run failed every target on it.
     """
     if provider not in POLICIES:
         raise ValueError(f"unknown provider policy: {provider}")
@@ -140,7 +151,9 @@ def request(
                 response = request_fn(url, **kwargs)
                 transient = _transient_response(response)
                 if not transient:
-                    response.raise_for_status()
+                    if getattr(response, "status_code", None) not in (
+                            pass_through_statuses):
+                        response.raise_for_status()
                     with _lock:
                         _consecutive_failures[provider] = 0
                         _metrics[provider]["successes"] += 1

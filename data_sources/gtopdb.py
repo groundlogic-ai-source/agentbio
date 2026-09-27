@@ -104,9 +104,14 @@ def _get_json(path: str, params: Optional[dict] = None,
         # blocking coverage failures for the whole run. The policy layer adds
         # the process-wide interval, bounded retries with Retry-After support,
         # and the circuit breaker that the other rate-limited providers use.
+        # 404 and 204 come back unraised so the checks below can read them:
+        # both mean "no such record", which is an observed absence, not an
+        # outage. Without this the policy layer's raise_for_status turns an
+        # accession GtoPdb simply does not carry into a source failure that
+        # fails the whole target.
         resp = provider_request(
             "gtopdb", requests.get, url, params=params, headers=headers,
-            timeout=30)
+            timeout=30, pass_through_statuses=frozenset({404, 204}))
     except ProviderCircuitOpen as e:
         raise _SourceUnavailable(f"{url} skipped — {e}") from e
     except requests.exceptions.RequestException as e:
