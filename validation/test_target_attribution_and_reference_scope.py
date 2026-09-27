@@ -136,5 +136,59 @@ class TanimotoReferenceScopeTest(unittest.TestCase):
             "reference set is being iterated flat across all targets")
 
 
+class CandidateRankKeyTest(unittest.TestCase):
+    """Sorting must survive an unmeasurable Tanimoto.
+
+    Emitting None for "no approved drug at this target to compare against"
+    broke the pool sort with `'<' not supported between instances of
+    'NoneType' and 'float'`, which failed every target in an Acrodysostosis
+    run before any scoring happened.
+    """
+
+    @staticmethod
+    def _cand(name, approved=True, pchembl=8.0, tanimoto=0.5):
+        return {
+            "drug_name": name,
+            "is_approved_drug": approved,
+            "pchembl_value": pchembl,
+            "tanimoto_score": tanimoto,
+        }
+
+    def test_pool_with_unmeasurable_tanimoto_sorts(self):
+        from agents.chemist import _candidate_rank_key
+        pool = [
+            self._cand("no-reference", tanimoto=None),
+            self._cand("similar", tanimoto=0.8),
+            self._cand("dissimilar", tanimoto=0.1),
+        ]
+        pool.sort(key=_candidate_rank_key, reverse=True)
+        self.assertEqual(
+            [c["drug_name"] for c in pool],
+            ["similar", "dissimilar", "no-reference"])
+
+    def test_an_all_none_pool_sorts(self):
+        from agents.chemist import _candidate_rank_key
+        pool = [self._cand("a", tanimoto=None, pchembl=7.0),
+                self._cand("b", tanimoto=None, pchembl=9.0)]
+        pool.sort(key=_candidate_rank_key, reverse=True)
+        self.assertEqual([c["drug_name"] for c in pool], ["b", "a"])
+
+    def test_approval_still_outranks_affinity(self):
+        from agents.chemist import _candidate_rank_key
+        pool = [self._cand("unapproved", approved=False, pchembl=9.9),
+                self._cand("approved", approved=True, pchembl=5.0)]
+        pool.sort(key=_candidate_rank_key, reverse=True)
+        self.assertEqual([c["drug_name"] for c in pool],
+                         ["approved", "unapproved"])
+
+    def test_missing_pchembl_does_not_break_the_sort(self):
+        from agents.chemist import _candidate_rank_key
+        pool = [self._cand("none-pchembl", pchembl=None, tanimoto=None),
+                self._cand("has-pchembl", pchembl=8.0)]
+        pool.sort(key=_candidate_rank_key, reverse=True)
+        self.assertEqual([c["drug_name"] for c in pool],
+                         ["has-pchembl", "none-pchembl"])
+
+
 if __name__ == "__main__":
     unittest.main()

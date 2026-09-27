@@ -134,6 +134,27 @@ def _v2_lanes_disabled() -> bool:
     return os.environ.get("AGENTBIO_DISABLE_V2_LANES", "").strip() == "1"
 
 
+def _candidate_rank_key(r: dict[str, Any]) -> tuple[int, float, bool, float]:
+    """Sort key for the candidate pool, ordered best-first under reverse=True.
+
+    Approved drugs first (repurposing needs a prior human safety profile), then
+    affinity, then structural novelty as a tiebreak.
+
+    `tanimoto_score` is None when the target had no approved drug to compare
+    against, so it cannot be ordered against a float -- sorting the pool raised
+    `'<' not supported between instances of 'NoneType' and 'float'` and failed
+    the whole target. It sorts last on its own flag rather than being coerced
+    to 0.0, because an unmeasurable comparison is not maximal dissimilarity.
+    """
+    tanimoto = r.get("tanimoto_score")
+    return (
+        1 if r["is_approved_drug"] else 0,
+        r["pchembl_value"] or 0.0,
+        tanimoto is not None,
+        tanimoto if tanimoto is not None else 0.0,
+    )
+
+
 def _fallback_rationale(c: dict[str, Any], sim_drug: Optional[str], tanimoto: float,
                         network: list[str]) -> str:
     net = ", ".join(network[:6]) if network else "no mapped interactors"
@@ -874,11 +895,7 @@ def run_chemist(biologist_output: dict[str, Any],
     # human safety profile), then by affinity, then structural novelty signal.
     # In repurposing_only mode the pool is already approved-only (gate above);
     # this ordering still matters for the mixed CLI pool.
-    results.sort(key=lambda r: (
-        1 if r["is_approved_drug"] else 0,
-        r["pchembl_value"] or 0.0,
-        r["tanimoto_score"],
-    ), reverse=True)
+    results.sort(key=_candidate_rank_key, reverse=True)
 
     n_mut = sum(1 for r in results
                 if (r.get("mutation_specificity") or {}).get("is_mutation_specific"))
