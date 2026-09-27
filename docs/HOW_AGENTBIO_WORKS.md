@@ -449,6 +449,28 @@ penalised for being the only approved drug at its target. The chemist now emits
 `None` when no reference drug was found, and the term is excluded rather than
 scored as a measured zero.
 
+**Post-benchmark trial-term coverage (added 2026-09-27).** The
+`no_failed_trial` term credited 1.0 whenever a ClinicalTrials.gov query
+succeeded without finding a negative repurposing result — including when it
+found no trials at all. "Nobody has run a trial" is not the observation "it was
+taken into humans and did not fail there", but both scored identically.
+
+That paid novelty twice. A never-attempted pair earned a full 0.15 term for
+free, and excluding an unscorable Tanimoto (above) then renormalized still more
+weight onto it. Capivasertib for AKT2 p.Glu17Lys reached a composite of
+**0.9539** on that basis — above the frozen benchmark's strongest real result,
+tretinoin for acute promyelocytic leukemia at **0.806** — for a pairing that has
+never been given to a patient. The arithmetic was correct; the calibration was
+not, and the ordering it produced fails inspection by anyone who knows the
+field.
+
+An empty registry is now a coverage gap: the term drops from both sides of the
+weighted sum rather than crediting an absence. A trial history that exists and
+contains no negative result still earns the term, and a negative result is still
+penalised. Regression cover: `validation/test_trial_term_coverage.py`, including
+a face-validity test that an untested pair cannot outscore an otherwise
+identical trialled one.
+
 **Post-benchmark direction-check failure caching (added 2026-09-26).** A real
 verdict is cached for 30 days; failures were cached for one day. That let a
 transient outage silently degrade later runs: during an Anthropic credit

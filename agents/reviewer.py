@@ -520,9 +520,12 @@ def _trial_evidence_term(trials: dict[str, Any]) -> Optional[bool]:
 
     Three distinct states, previously collapsed into two:
 
-      * observed, no negative repurposing result -> True  (credit earned)
-      * observed, a negative repurposing result  -> False (adverse evidence,
-        genuinely penalised — this term stays in the denominator)
+      * trials exist, none negative      -> True  (credit earned: the pair has
+        been taken into humans and did not fail there)
+      * trials exist, one is negative    -> False (adverse evidence, genuinely
+        penalised — this term stays in the denominator)
+      * NO trial exists                  -> None  (nothing was tried, so there
+        is no trial outcome to credit or penalise)
       * NOT OBSERVED (API failure or holdout redaction) -> None
 
     The old behaviour returned False for the third state *while keeping the
@@ -534,8 +537,21 @@ def _trial_evidence_term(trials: dict[str, Any]) -> Optional[bool]:
     competitor is redacted, so the penalty lands only on the drug whose rank
     IS the measurement.  ``_coverage_aware_composite`` now treats None as a
     coverage gap, exactly as an unavailable Tanimoto is already handled.
+
+    An empty registry is the same kind of gap (added 2026-09-27). A successful
+    query returning zero trials records that nobody has run one, which is not
+    the observation "it was taken into humans and did not fail" — yet both
+    used to score a flat 1.0. That paid novelty twice: a never-attempted pair
+    earned the term for free, and dropping an unscorable Tanimoto then
+    renormalized still more weight onto it. Capivasertib/AKT2 reached 0.9539
+    that way, above the frozen benchmark's best real result (tretinoin/APL at
+    0.806) despite never having been given to anyone. A drug with no trial
+    history is untested, not proven-safe, so the term now drops from both
+    sides of the sum rather than crediting the absence.
     """
     if trials.get("query_failed") or trials.get("holdout_redacted"):
+        return None
+    if not trials.get("trial_count"):
         return None
     return not trials.get("has_negative_repurposing_result", False)
 
