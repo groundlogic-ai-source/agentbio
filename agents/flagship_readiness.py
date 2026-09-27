@@ -493,23 +493,32 @@ def evaluate_candidate_readiness(
     )
 
     expert_scope, expert_advantage = _use_case_criteria(use_case)
+    # One condition, used for the summary, the evidence and the gap list, so
+    # they cannot disagree. They did: the summary read "a bounded subgroup,
+    # stage, or treatment setting is supplied" while the gap list simultaneously
+    # reported that same field as missing. Two causes -- the gap branch keyed
+    # only off the disease name and ignored the supplied fields entirely, and
+    # `expert_scope["missing_evidence"] or [...]` re-injected the default gap
+    # whenever that list was correctly EMPTY, an empty list being falsy.
+    scope_supplied = bool(
+        _has_scope_marker(disease)
+        or any(use_case.get(field) for field in (
+            "subgroup", "stage", "treatment_setting"))
+    )
     scope = _criterion(
         "PASS" if _has_scope_marker(disease) else "CONDITIONAL",
         (
             "The final disease context is explicitly scoped."
             if _has_scope_marker(disease) else
-            expert_scope["summary"]
-            if any(use_case.get(field) for field in (
-                "subgroup", "stage", "treatment_setting"
-            )) else
+            expert_scope["summary"] if scope_supplied else
             "The final case remains broad and does not identify a subgroup, stage, "
             "or treatment setting."
         ),
         evidence=expert_scope["evidence"] if not _has_scope_marker(disease)
         else [],
-        missing=[] if _has_scope_marker(disease) else (
-            expert_scope["missing_evidence"] or
-            ["defined subgroup, stage, or treatment setting"]
+        missing=[] if scope_supplied else (
+            expert_scope["missing_evidence"]
+            or ["defined subgroup, stage, or treatment setting"]
         ),
     )
 

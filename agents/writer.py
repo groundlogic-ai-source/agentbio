@@ -885,9 +885,12 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
         "records. Multiple database records may represent the same underlying "
         "experiment or publication; assay heterogeneity and the bounded approved-drug "
         "reference set for Tanimoto still apply.",
-        "- **Zero counts are unqueried, not negative.** A zero prior-trial count "
-        "or absent adverse-event signal records that the pair returned no rows in "
-        "the queried sources, which is distinct from a measured negative result.",
+        "- **A zero count is not a measured negative.** A zero prior-trial count "
+        "or absent adverse-event signal records that the queried sources returned "
+        "no rows for this pair. Where a term has no observation to score it is "
+        "dropped from both sides of the weighted sum, which shows up as a covered "
+        "weight below 1.0000 in Section 4, rather than being scored as a zero it "
+        "did not earn.",
     ]
     if efo_warn:
         # Prepend so the mismatch is the first thing a reviewer reads.
@@ -1193,18 +1196,21 @@ def _readiness_and_context(candidate: dict[str, Any], struct: dict[str, Any]) ->
         + (", ".join(_display_token(gate) for gate in gates)
            if gates else "None recorded")
         + ".",
-         "\n### Flagship hypothesis\n",
-        f"- **Flagship hypothesis verdict:** {_display_token(flagship.get('verdict'))}. "
-        "This is a computational hypothesis screen, not an efficacy, exposure, "
+         # "Flagship" is internal pipeline vocabulary for the readiness screen.
+         # It reads as a claim about the result's importance, which is not what
+         # the screen measures, so the dossier names what it actually is.
+         "\n### Hypothesis scope review\n",
+        f"- **Scope review verdict:** {_display_token(flagship.get('verdict'))}. "
+        "This is a computational scope screen, not an efficacy, exposure, "
         "safety, or clinical-benefit verdict.",
-        f"- **Flagship next action:** {_audit_value(flagship.get('next_action'))}.",
-        "- **Flagship gaps:** " + (
+        f"- **Next action:** {_audit_value(flagship.get('next_action'))}.",
+        "- **Gaps:** " + (
             "; ".join(str(item) for item in
                       (flagship.get("missing_evidence") or []))
             or "None recorded"
         ) + ".",
         *[
-            f"- **Flagship finding ({_display_token(code)}):** {_audit_value(reason)}"
+            f"- **Finding ({_display_token(code)}):** {_audit_value(reason)}"
             for code, reason in zip(
                 flagship.get("reason_codes") or [],
                 flagship.get("reasons") or [],
