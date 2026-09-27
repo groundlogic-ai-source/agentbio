@@ -44,7 +44,20 @@ POLICIES = {
     # with a half-second floor keeps a 200-candidate pass inside what the
     # service tolerates; the shared retry path honours Retry-After when it is
     # sent.
-    "gtopdb": ProviderPolicy(concurrency=1, min_interval_seconds=0.50),
+    #
+    # max_attempts is raised above the default 3 because a single unrecovered
+    # 429 is fatal to an entire run, not just to one lookup. A 429 is a real
+    # coverage gap -- unlike a 404, we do not learn what the service would have
+    # said -- so a failed target fails every candidate, by design. That makes
+    # fragility scale with TOP_K_TARGETS: pursuing five targets is five chances
+    # to hit a transient error, any one of which discards the run. An
+    # Achondroplasia run died exactly this way with FGFR3, the causal gene,
+    # fully resolved: one 429 on an FGFR1 structure lookup, 4 of 5 targets
+    # fine, whole run lost. Retrying a cheap GET several more times costs
+    # seconds; losing the run costs the LLM and structure spend already
+    # incurred.
+    "gtopdb": ProviderPolicy(
+        concurrency=1, min_interval_seconds=0.75, max_attempts=6),
 }
 
 _lock = threading.Lock()

@@ -82,5 +82,42 @@ class PassThroughStatusTest(unittest.TestCase):
         self.assertEqual(out.status_code, 200)
 
 
+
+class GtopdbRetryBudgetTest(unittest.TestCase):
+    """A single unrecovered 429 is fatal to a whole run, so retry harder.
+
+    A 429 is a genuine coverage gap -- unlike a 404, the service never tells us
+    what it would have said -- so a failed target fails every candidate by
+    design. Fragility therefore scales with TOP_K_TARGETS. An Achondroplasia
+    run was lost to one 429 on an FGFR1 structure lookup while FGFR3, the
+    causal gene, had resolved fine and 4 of 5 targets succeeded.
+    """
+
+    def test_gtopdb_retries_more_than_the_default(self):
+        default = policy.ProviderPolicy(concurrency=1, min_interval_seconds=0.1)
+        self.assertGreater(
+            policy.POLICIES["gtopdb"].max_attempts, default.max_attempts,
+            "gtopdb must retry beyond the shared default")
+
+    def test_gtopdb_stays_single_flight(self):
+        """Concurrency is what provoked the 429 storm; it must not creep up."""
+        self.assertEqual(policy.POLICIES["gtopdb"].concurrency, 1)
+
+    def test_a_429_recovered_on_a_later_attempt_returns_normally(self):
+        attempts = {"n": 0}
+
+        def _flaky(url, **kw):
+            attempts["n"] += 1
+            return _response(200 if attempts["n"] >= 4 else 429)
+
+        policy._circuit_open_until.clear()
+        policy._consecutive_failures.clear()
+        policy._next_request_at.clear()
+        with mock.patch.object(policy.time, "sleep", lambda *_: None):
+            out = policy.request("gtopdb", _flaky, "https://example.test/x")
+        self.assertEqual(out.status_code, 200)
+        self.assertGreaterEqual(attempts["n"], 4)
+
+
 if __name__ == "__main__":
     unittest.main()
