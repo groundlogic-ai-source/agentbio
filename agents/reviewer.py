@@ -85,6 +85,11 @@ _DEFAULT_COMPOSITE_WEIGHTS: dict[str, float] = {
     # confidence, preserving the old 0.30 + 0.20 contribution exactly.
     "efficacy_evidence": 0.50,
     "ot_association": 0.20,   # ot_association_score direct [0, 1] — no pool normalization
+    # DISCLOSURE-ONLY in production since 2026-09-27; this weight is applied
+    # only under a frozen/holdout study, where the original semantics must be
+    # reproducible. See the call in run_reviewer and the post-benchmark note in
+    # docs/HOW_AGENTBIO_WORKS.md. Tanimoto is still computed and reported in
+    # the evidence table; it no longer moves the composite.
     "tanimoto": 0.15,         # tanimoto_score direct [0, 1] — no pool normalization
     "no_failed_trial": 0.15,  # 1 = looked and found none; 0 = looked and found one;
                               # None = never observed -> term dropped entirely
@@ -935,7 +940,7 @@ def run_reviewer(
         composite, evidence_weight_coverage = _coverage_aware_composite(
             n_efficacy_evidence,
             n_ot,
-            n_tanimoto,
+            n_tanimoto if _holdout.is_active() else None,
             no_failed_trial,
         )
         # A ledger action alone does not earn a directional bonus.  Compatibility

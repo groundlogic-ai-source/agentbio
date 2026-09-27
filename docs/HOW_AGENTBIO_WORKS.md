@@ -735,3 +735,40 @@ trials credited as evidence of safety), Tanimoto (no approved analog at the
 target scored as maximal dissimilarity), and GtoPdb (a 404 for an accession it
 does not carry reported as source unavailability). Regression cover:
 `validation/test_chembl_absence_vs_outage.py`.
+
+**Post-benchmark Tanimoto made disclosure-only (added 2026-09-27).** Structural
+similarity carried a 0.15 scoring weight, measuring a candidate's similarity to
+the approved drugs already pooled for the same target. In a repurposing pool
+every candidate is by construction a known active at that target, so the term
+largely measured **chemotype crowding**: a drug that is one of several
+near-identical analogues scores high against its own siblings, while a
+structurally distinct potent binder scores low and is penalised for it.
+
+An Acrodysostosis run is the worked example. The pool held five methylxanthines,
+and AMINOPHYLLINE — theophylline plus ethylenediamine, with **no measured PDE4D
+potency at all** — outranked ROFLUMILAST, which binds PDE4D at pChEMBL 9.89:
+
+```
+AMINOPHYLLINE  eff 0.8725  tan 0.7436  pChEMBL none   composite 0.8915
+roflumilast    eff 0.9575  tan 0.1720  pChEMBL 9.886  composite 0.8406
+```
+
+The weighted Tanimoto gap (0.0857) was twice roflumilast's weighted evidence
+advantage (0.0425). A term about chemical lookalikes selected the lead candidate
+over both measured affinity and evidence quality.
+
+Tanimoto is still computed, still persisted, and still reported in the evidence
+table, where it is genuinely informative to a reader. It no longer contributes
+to `composite_score`. The weight remains in `COMPOSITE_WEIGHTS` and is applied
+only when `_holdout.is_active()`, so frozen studies reproduce their original
+semantics exactly and no frozen benchmark result changes. Regression cover:
+`validation/test_tanimoto_disclosure_only.py`.
+
+Note what this means for citing benchmark numbers. The frozen benchmark measures
+the pipeline as it stood at freeze time. This is the seventh disclosed
+post-benchmark correction that changes scoring or ordering, so frozen results
+describe the benchmarked version and are **not** a measurement of current
+capability. Establishing current capability requires re-running the frozen case
+list on current code as a separate, newly-labelled study — and that re-run must
+run with the post-benchmark gates ACTIVE, which the holdout bypasses above
+deliberately prevent. That is unbuilt work, not a flag flip.
