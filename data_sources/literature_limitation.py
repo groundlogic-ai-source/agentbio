@@ -500,9 +500,24 @@ def _disease_name_spans(text: str, disease_name: str) -> list[tuple[int, int]]:
     name = str(disease_name or "").strip()
     if len(name) < 8:
         return []
+    # Orphanet names carry qualifier clauses the literature drops:
+    # "Resistance to thyroid hormone DUE TO A MUTATION IN thyroid hormone
+    # receptor beta" is written "resistance to thyroid hormone" in every
+    # abstract about it. Matching only the full string finds nothing, so the
+    # suppression never fires. Try the core name as well.
+    variants = [name]
+    lowered = name.lower()
+    for separator in (" due to ", " caused by ", " secondary to ",
+                      " associated with ", " with ", ", "):
+        index = lowered.find(separator)
+        if index >= 8:
+            variants.append(name[:index].strip())
     spans: list[tuple[int, int]] = []
-    for match in re.finditer(re.escape(name), text, re.IGNORECASE):
-        spans.append((match.start(), match.end()))
+    for variant in variants:
+        if len(variant) < 8:
+            continue
+        for match in re.finditer(re.escape(variant), text, re.IGNORECASE):
+            spans.append((match.start(), match.end()))
     return spans
 
 
