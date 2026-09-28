@@ -488,12 +488,31 @@ def _quote_is_verbatim(quote: Any, abstract: Any) -> bool:
     return len(quote_norm) >= 20 and quote_norm in abstract_norm
 
 
+def _disease_name_spans(text: str, disease_name: str) -> list[tuple[int, int]]:
+    """Character spans where the disease's own name appears in the text.
+
+    Some disease names contain a negative word sitting directly beside the
+    drug class they implicate -- "Resistance to thyroid hormone" pairs
+    "resistance" with "thyroid hormone". Proximity scoping then fires on the
+    disease's own nomenclature in every abstract about it, which is a property
+    of the name, not a finding about any candidate.
+    """
+    name = str(disease_name or "").strip()
+    if len(name) < 8:
+        return []
+    spans: list[tuple[int, int]] = []
+    for match in re.finditer(re.escape(name), text, re.IGNORECASE):
+        spans.append((match.start(), match.end()))
+    return spans
+
+
 def _support_quote_has_candidate_negative_language(
     quote: Any,
     *,
     drug_name: str,
     drug_class: str,
     aliases: list[str],
+    disease_name: str = "",
 ) -> bool:
     """Reject support only when negative language applies to this intervention.
 
@@ -505,13 +524,27 @@ def _support_quote_has_candidate_negative_language(
     which word matched: only one appearing near this drug/class counts. A
     match elsewhere in the text is disease or methodology background, not a
     finding about the candidate.
+
+    A negative word inside the disease's OWN NAME is discounted for the same
+    reason. "Resistance to thyroid hormone" puts "resistance" adjacent to
+    "thyroid hormone", so every abstract about that disease looked like a
+    negative finding about a thyroid hormone analogue, every record failed
+    reconciliation, and the run terminated degraded_unscorable before scoring.
+    The disease being named after a resistance phenotype says nothing about
+    whether a given drug works in it.
     """
     text = str(quote or "")
+    disease_spans = _disease_name_spans(text, disease_name)
     intervention_terms = [
         value for value in (drug_name, drug_class, *aliases)
         if str(value or "").strip()
     ]
     for match in _NEGATIVE_WORDS.finditer(text):
+        # A negative word that is part of the disease's own name is
+        # nomenclature, not a finding. Skip it before proximity scoring.
+        if any(start <= match.start() and match.end() <= end
+               for start, end in disease_spans):
+            continue
         # Keep the window tight enough not to associate negative language
         # elsewhere in the same abstract with this candidate.
         context = text[max(0, match.start() - 45):match.end() + 45]
@@ -705,6 +738,7 @@ def aggregate_findings(
                 drug_name=drug_name,
                 drug_class=drug_class,
                 aliases=aliases,
+                disease_name=disease_name,
             )
             if label == APPLICABLE_SUPPORT else
             bool(_NEGATIVE_WORDS.search(str(quote or "")))
@@ -724,6 +758,7 @@ def aggregate_findings(
             drug_name=drug_name,
             drug_class=drug_class,
             aliases=aliases,
+            disease_name=disease_name,
         )
         requested_label = label
         original_label = label
