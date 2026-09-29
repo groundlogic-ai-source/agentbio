@@ -46,6 +46,34 @@ class PotencyStandardTypesTest(unittest.TestCase):
         self.assertGreaterEqual(len(parts), 3)
 
 
+class CacheInvalidationTest(unittest.TestCase):
+    """Changing the filter must invalidate the caches that stored its results.
+
+    The first attempt at this fix changed the query and not the cache keys.
+    `_fetch_activities_full_v2` holds a 7-day TTL, so the re-run read back the
+    IC50/Ki-only activity list and produced a byte-identical dossier -- same
+    "no qualified row", same composite 0.9165. The filter is part of what the
+    cached value means, so the key has to move with it.
+    """
+
+    def test_activity_cache_key_is_versioned_for_this_change(self):
+        import inspect
+        source = inspect.getsource(chembl)
+        self.assertNotIn('make_key("_fetch_activities_full_v2"', source)
+        self.assertIn("_fetch_activities_full_v3_ec50", source)
+
+    def test_bioactivity_count_cache_key_is_versioned(self):
+        import inspect
+        source = inspect.getsource(chembl)
+        self.assertIn("get_target_bioactivity_count_v2_ec50", source)
+
+    def test_candidate_pool_cache_key_is_versioned(self):
+        import inspect
+        source = inspect.getsource(chembl)
+        self.assertNotIn('make_key("get_target_candidate_compounds_v4"', source)
+        self.assertIn("get_target_candidate_compounds_v5_ec50", source)
+
+
 class AgonistDiseaseRegressionTest(unittest.TestCase):
     """The class of disease this blind spot silently disqualified.
 

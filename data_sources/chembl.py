@@ -254,7 +254,7 @@ def get_target_bioactivity_count(uniprot_id: str) -> dict[str, Any]:
     IMPORTANT: Values are NOT pooled across different target_chembl_ids silently.
     When pooled_across_multiple_targets is True, interpret with caution.
     """
-    cache_key = make_key("get_target_bioactivity_count", uniprot_id)
+    cache_key = make_key("get_target_bioactivity_count_v2_ec50", uniprot_id)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -323,7 +323,7 @@ def _fetch_activities_full(target_chembl_id: str) -> tuple[list[dict[str, Any]],
     empty payload (degraded 200 vs no data; never cached).
     Cache v2 stores {kept, raw_seen}; v1 rows (bare lists) are superseded.
     """
-    cache_key = make_key("_fetch_activities_full_v2", target_chembl_id)
+    cache_key = make_key("_fetch_activities_full_v3_ec50", target_chembl_id)
     cached = get(cache_key)
     if cached is not None:
         return cached["kept"], cached["raw_seen"]
@@ -546,7 +546,7 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
     # as duplicate candidates or self-comparators downstream.
     # repurposing_only is part of the cache key so the approved-only and mixed
     # pools never collide in the cache.
-    cache_key = make_key("get_target_candidate_compounds_v4", uniprot_id,
+    cache_key = make_key("get_target_candidate_compounds_v5_ec50", uniprot_id,
                          max_compounds, repurposing_only)
     cached = get(cache_key)
     if cached is not None:
