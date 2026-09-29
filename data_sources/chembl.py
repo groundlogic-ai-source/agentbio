@@ -1,7 +1,7 @@
 """
 ChEMBL bioactivity data.
 Resolves UniProt IDs to ChEMBL targets (Homo sapiens only),
-then fetches IC50/Ki bioactivity records with confidence_score >= 8.
+then fetches IC50/Ki/EC50 bioactivity records with confidence_score >= 8.
 """
 
 import math
@@ -108,6 +108,27 @@ def _resolve_target_chembl_id(uniprot_id: str) -> list[str]:
     return ids
 
 
+#: Measurement types accepted as target-qualified potency.
+#:
+#: EC50 was missing until 2026-09-28, and its absence was a systematic blind
+#: spot rather than a rounding error. IC50 and Ki measure inhibition and
+#: binding; EC50 is the standard potency measure for an AGONIST. So every
+#: disease whose therapy must ACTIVATE a target had its best candidates scored
+#: as having no assay support at all.
+#:
+#: Resistance to thyroid hormone is the worked example: the therapeutic logic
+#: is agonism potent enough to overcome a dominant-negative block. Resmetirom
+#: carries 7 EC50 records against THRB, human, assay confidence 9 -- and the
+#: dossier still read "No qualified ChEMBL human bioactivity ledger row matched
+#: this target", because none of them were IC50 or Ki. At THRB the filter read
+#: 659 records and ignored 191.
+#:
+#: pChEMBL is -log10(molar) for all three, so they share a scale. They are not
+#: interchangeable in meaning -- a functional EC50 is not a binding Ki -- but
+#: the pool already mixed IC50 with Ki on that same basis, and standard_type is
+#: persisted per record so a dossier can disclose which was used.
+_POTENCY_STANDARD_TYPES = "IC50,Ki,EC50"
+
 #: Canonical data-rich control for liveness probing. CLAUDE.md already names
 #: EGFR P00533 as the entity every new wrapper is validated against, precisely
 #: because wrappers swallow errors and return empty.
@@ -191,7 +212,7 @@ def _fetch_assay_confidence(assay_ids: list[str]) -> dict[str, int]:
 
 def _fetch_activities(target_chembl_id: str) -> tuple[list[dict[str, Any]], bool]:
     """
-    Fetch IC50/Ki activities (pchembl_value present) for a target, then keep
+    Fetch IC50/Ki/EC50 activities (pchembl_value present) for a target, then keep
     only those whose assay confidence_score >= 8. Pulls up to 1000 records.
 
     Returns (kept, raw_seen). raw_seen is True when the upstream payload
@@ -201,7 +222,7 @@ def _fetch_activities(target_chembl_id: str) -> tuple[list[dict[str, Any]], bool
     url = f"{BASE_URL}/activity.json"
     params = {
         "target_chembl_id": target_chembl_id,
-        "standard_type__in": "IC50,Ki",
+        "standard_type__in": _POTENCY_STANDARD_TYPES,
         "pchembl_value__isnull": "false",
         "only": "assay_chembl_id,pchembl_value,standard_type",
         "limit": 1000,
@@ -224,7 +245,7 @@ def _fetch_activities(target_chembl_id: str) -> tuple[list[dict[str, Any]], bool
 def get_target_bioactivity_count(uniprot_id: str) -> dict[str, Any]:
     """
     For a UniProt ID, resolve to Homo sapiens ChEMBL target(s) and return:
-      - count: number of qualifying IC50/Ki records (confidence >= 8)
+      - count: number of qualifying IC50/Ki/EC50 records (confidence >= 8)
       - median_pchembl: median pChEMBL value across qualifying records
       - target_chembl_ids: list of ChEMBL IDs used
       - pooled_across_multiple_targets: bool flag (True if > 1 target ID matched)
@@ -310,7 +331,7 @@ def _fetch_activities_full(target_chembl_id: str) -> tuple[list[dict[str, Any]],
     url = f"{BASE_URL}/activity.json"
     params = {
         "target_chembl_id": target_chembl_id,
-        "standard_type__in": "IC50,Ki",
+        "standard_type__in": _POTENCY_STANDARD_TYPES,
         "pchembl_value__isnull": "false",
         "only": "activity_id,assay_chembl_id,molecule_chembl_id,canonical_smiles,pchembl_value,standard_type",
         "limit": 1000,
@@ -319,7 +340,7 @@ def _fetch_activities_full(target_chembl_id: str) -> tuple[list[dict[str, Any]],
     data = _get_json(url, params)
     activities = data.get("activities", [])
     if not activities:
-        # Empty payload is ambiguous: genuine "no IC50/Ki assays" vs a degraded
+        # Empty payload is ambiguous: genuine "no IC50/Ki/EC50 assays" vs a degraded
         # 200-with-empty-body during a ChEMBL outage. Do NOT cache — a cached
         # empty zeroes the target's candidate pool for 7 days (MTOR/TSC 2026-07).
         return [], False
@@ -491,7 +512,7 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
                                    repurposing_only: bool = False) -> dict[str, Any]:
     """
     Return the actual candidate compounds with bioactivity against a target
-    (Homo sapiens, IC50/Ki, assay confidence_score >= 8), aggregated per molecule.
+    (Homo sapiens, IC50/Ki/EC50, assay confidence_score >= 8), aggregated per molecule.
 
     Returns:
       {
