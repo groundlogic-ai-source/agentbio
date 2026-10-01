@@ -264,7 +264,11 @@ class FlagshipDossierContractTests(unittest.TestCase):
             self.assertNotIn(phrase, report, f"conduct directive present: {phrase}")
         # Provenance statements are data about the data, and must survive.
         self.assertIn("NOT a Kd", report)
-        self.assertIn("not a median or a publication-level consensus", report)
+        # The reported affinity IS a median (chembl.py aggregates per molecule
+        # with statistics.median). The note used to assert the opposite, which
+        # a reader could falsify against ChEMBL in one query.
+        self.assertIn("is the median pChEMBL-equivalent value", report)
+        self.assertNotIn("not a median or a publication-level consensus", report)
 
     def test_direction_reason_has_exactly_one_terminal_period(self):
         candidate = _candidate()

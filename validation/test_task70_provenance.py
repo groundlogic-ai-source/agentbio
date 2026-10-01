@@ -75,7 +75,7 @@ class Task70ProvenanceTests(unittest.TestCase):
                   "qualification_status": "qualified"},
             ]},
         }
-        self.assertIn("1 independent qualified", _direct_chembl_activity_note(candidate))
+        self.assertIn("1 distinct qualified", _direct_chembl_activity_note(candidate))
 
     def test_bonus_requires_complete_compatible_audit(self):
         base = {"verdict": "DIRECTIONALLY_COMPATIBLE", "action_type_used": "BLOCKER",
@@ -121,7 +121,7 @@ class Task70ProvenanceTests(unittest.TestCase):
         )
         self.assertEqual(
             _target_matched_chembl_activity_ids(candidate), ["15373265"])
-        self.assertIn("1 independent qualified",
+        self.assertIn("1 distinct qualified",
                       _direct_chembl_activity_note(candidate))
 
     def test_comparator_table_collapses_salt_forms(self):

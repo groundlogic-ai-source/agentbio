@@ -123,10 +123,23 @@ class TestReadersGuideAppendix(unittest.TestCase):
         self.assertIn("outside what this pipeline measures", md)
 
     def test_reader_guide_says_applicability_is_not_scored(self):
+        """Applicability is still not a SCORE term — but it is now gated.
+
+        The guide used to claim the limitation "introduces no tissue-specific
+        score, cap, or gate". That became false when the compartment-exposure
+        gate shipped: a documented failure to reach the compartment excludes
+        the candidate. A dossier that understates its own method is as wrong as
+        one that overstates it.
+        """
         text = _readers_guide_appendix()
         self.assertIn("Therapeutic applicability is not scored", text)
-        self.assertIn("no tissue-specific score, cap, or", text)
-        self.assertIn("gate", text)
+        self.assertNotIn("no tissue-specific score, cap, or gate", text)
+        # It must say what IS done, and not overclaim what clearing it means.
+        self.assertIn("DOCUMENTED failure to reach that", text)
+        self.assertIn("not evidence of adequate exposure", text)
+        # And must keep disclaiming everything still unassessed.
+        for term in ("Route, dose, pharmacokinetics", "therapeutic window"):
+            self.assertIn(term, text)
 
     def test_appendix_appears_after_limitations(self):
         md = build_report_markdown(_minimal_candidate(), {}, {}, None)

@@ -394,7 +394,7 @@ class FlagshipReadinessTests(unittest.TestCase):
             {"composite_weights": {}, "formula_version": "test"},
             None,
         )
-        self.assertIn("Flagship hypothesis", report)
+        self.assertIn("Hypothesis scope review", report)
         self.assertIn("Not flagship ready", report)
         self.assertIn("composite score", report.casefold())
 

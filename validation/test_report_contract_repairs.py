@@ -130,8 +130,10 @@ class ReportContractRepairTest(unittest.TestCase):
         }
         table = writer._evidence_table(candidate, {})
         activity_note = writer._direct_chembl_activity_note(candidate)
-        self.assertIn("Best target-qualified pChEMBL-equivalent affinity", table)
-        self.assertNotIn("median pChEMBL-equivalent", table)
+        # "Best" was a mislabel: the value is a per-molecule median, so the
+        # source always holds a stronger individual record than the one shown.
+        self.assertIn("Target-qualified pChEMBL-equivalent affinity", table)
+        self.assertNotIn("Best target-qualified", table)
         self.assertIn("distinct qualified ChEMBL", activity_note)
         self.assertIn("not an independent-publication", activity_note)
 

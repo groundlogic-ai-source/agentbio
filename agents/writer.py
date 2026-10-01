@@ -518,7 +518,7 @@ def _cif_link(cx: dict[str, Any]) -> str:
 
 
 def _affinity_provenance(candidate: dict[str, Any]) -> str:
-    """Name providers behind the best persisted target-qualified affinity."""
+    """Name providers behind the reported target-qualified affinity median."""
     providers: set[str] = set()
     for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
         if not isinstance(record, dict):
@@ -544,6 +544,90 @@ def _affinity_provenance(candidate: dict[str, Any]) -> str:
     }
     names = [labels.get(value.casefold(), value) for value in sorted(providers)]
     return ", ".join(names) if names else "source not recorded"
+
+
+def _exposure_matrix_cell(candidate: dict[str, Any]) -> str:
+    """Safety-matrix cells for compartment exposure: evidence, then state.
+
+    The row read "Not assessed by this pipeline | UNKNOWN" unconditionally,
+    which stopped being true for CNS diseases when the exposure gate shipped.
+    """
+    exposure = candidate.get("tissue_exposure") or {}
+    verdict = str(exposure.get("verdict") or "").strip()
+    if verdict == "COMPARTMENT_EXPOSURE_UNLIKELY":
+        return "Documented failure to reach the target compartment | EXCLUDED"
+    if verdict == "COMPARTMENT_EXPOSURE_PLAUSIBLE":
+        return ("No documented barrier found in a bounded search; adequate "
+                "exposure NOT established | NO DOCUMENTED BARRIER")
+    if verdict == "INSUFFICIENT_INFO":
+        return "Bounded search could not establish exposure | UNKNOWN"
+    if verdict == "NO_COMPARTMENT_REQUIREMENT_IDENTIFIED":
+        return ("No CNS requirement identified; other compartments not "
+                "assessed | NOT APPLICABLE")
+    return "Not assessed by this pipeline | UNKNOWN"
+
+
+def _compartment_exposure_disclosure(candidate: dict[str, Any]) -> str:
+    """State what the compartment check actually did for this candidate.
+
+    Clearing this gate is the ABSENCE of a documented barrier, never evidence
+    that the drug arrives at a therapeutic concentration. Saying otherwise
+    would convert a bounded negative search into a positive claim, which is the
+    error this project keeps removing elsewhere.
+    """
+    exposure = candidate.get("tissue_exposure") or {}
+    verdict = str(exposure.get("verdict") or "").strip()
+    if not verdict or verdict == "NOT_ASSESSED":
+        return ""
+
+    compartment = str(exposure.get("compartment") or "target compartment")
+    if verdict == "COMPARTMENT_EXPOSURE_UNLIKELY":
+        body = (
+            f"Retrieved evidence indicates this drug does not reach the "
+            f"{compartment} at a therapeutically meaningful level; the "
+            f"candidate is excluded on that basis."
+        )
+    elif verdict == "COMPARTMENT_EXPOSURE_PLAUSIBLE":
+        body = (
+            f"A bounded search found no documented barrier to reaching the "
+            f"{compartment}. That is the absence of a documented barrier, not "
+            f"evidence of adequate exposure: dose, route, PK and therapeutic "
+            f"window remain unassessed."
+        )
+    elif verdict == "NO_COMPARTMENT_REQUIREMENT_IDENTIFIED":
+        body = (
+            "No central-nervous-system involvement was identified from the "
+            "disease name, so no blood-brain-barrier requirement is asserted. "
+            "Other compartment requirements are not assessed."
+        )
+    else:  # INSUFFICIENT_INFO
+        body = (
+            f"Compartment exposure for the {compartment} could not be "
+            f"established from the bounded search. This is unknown, not a "
+            f"finding that the drug does or does not reach it."
+        )
+    reason = str(exposure.get("reason") or "").strip()
+    detail = f" {reason}" if reason else ""
+    return f"> **Compartment exposure ({verdict}).** {body}{detail}\n\n"
+
+
+def _affinity_statistic_label(candidate: dict[str, Any]) -> str:
+    """Name the statistic actually reported, not a flattering one.
+
+    The per-molecule potency is a MEDIAN over that molecule's qualifying
+    target-matched records. Calling it the "best" value overstates it and is
+    falsifiable against the source in a single query: a reader who pulls the
+    same records sees a higher maximum than the dossier prints.
+    """
+    aggregation = str(candidate.get("pchembl_aggregation") or "").strip().lower()
+    n_records = candidate.get("pchembl_n")
+    if aggregation == "median" and isinstance(n_records, int) and n_records > 0:
+        return (f"Target-qualified pChEMBL-equivalent affinity "
+                f"(median of {n_records} qualified record"
+                f"{'s' if n_records != 1 else ''})")
+    if aggregation == "median":
+        return "Target-qualified pChEMBL-equivalent affinity (median)"
+    return "Target-qualified pChEMBL-equivalent affinity"
 
 
 def _mutation_specificity_cell(candidate: dict[str, Any]) -> str:
@@ -722,7 +806,7 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
     ) if ae else "none reported"
 
     rows = [
-        ("Best target-qualified pChEMBL-equivalent affinity",
+        (_affinity_statistic_label(candidate),
          f"{_fmt(candidate.get('pchembl_value'), 2)} "
          f"({_affinity_provenance(candidate)})"),
         ("Assay confidence score (0-9)", _fmt(candidate.get("confidence_score"))),
@@ -880,9 +964,12 @@ def _limitations(candidate: dict[str, Any], struct: dict[str, Any],
         f"the AFDB model contains NO ligand, so the protein-ligand pose is entirely "
         f"a Boltz prediction.",
         "- **Assay-type and provenance caveats.** The target-qualified quantitative "
-        "affinity shown above is the best persisted pChEMBL-equivalent value, not "
-        f"a median or a publication-level consensus from {_affinity_provenance(candidate)} "
-        "records. Multiple database records may represent the same underlying "
+        "affinity shown above is the median pChEMBL-equivalent value across that "
+        f"molecule's qualifying {_affinity_provenance(candidate)} records, not the "
+        "single strongest record and not a publication-level consensus. The median "
+        "is used because it does not move with one unusually potent assay; the "
+        "strongest individual record in the source is therefore higher than the "
+        "value shown. Multiple database records may represent the same underlying "
         "experiment or publication; assay heterogeneity and the bounded approved-drug "
         "reference set for Tanimoto still apply.",
         "- **A zero count is not a measured negative.** A zero prior-trial count "
@@ -1419,7 +1506,8 @@ def _trial_safety_applicability_audit(candidate: dict[str, Any]) -> str:
         f"{'ELIGIBLE' if candidate.get('headline_eligible') else 'NOT HEADLINE-ELIGIBLE'} |",
         f"| Route / modality | {_modality_cell(candidate)} | "
         f"{'OBSERVED' if candidate.get('chembl_molecule_type') is not None else 'UNKNOWN'} |",
-        "| Relevant tissue/cell/compartment exposure | Not assessed by this pipeline | UNKNOWN |",
+        f"| Relevant tissue/cell/compartment exposure | "
+        f"{_exposure_matrix_cell(candidate)} |",
         "| Effective tolerable human exposure, dose and PK | Not assessed by this pipeline | UNKNOWN |",
         "| Disease stage/subtype and therapeutic window | Not assessed by this pipeline | UNKNOWN |",
     ]
@@ -1454,8 +1542,10 @@ The ranking otherwise does not assess
 whether a drug reaches the relevant tissue, cell, or compartment at an
 effective, tolerable human exposure. Route, dose, pharmacokinetics (PK),
 disease stage/subtype and therapeutic window are outside what this pipeline
-measures. This limitation is disclosure-only: it introduces
-no tissue-specific score, cap, or gate.
+measures. One bounded exception: where the disease has a central-nervous-system
+component, a literature check runs for DOCUMENTED failure to reach that
+compartment, and a documented failure excludes the candidate. Clearing it is
+the absence of a documented barrier, not evidence of adequate exposure.
 
 **Composite score.** A weighted sum of the evidence terms listed in Section
 4's table (calibrated evidence confidence, the Open Targets target–disease association,
@@ -1595,8 +1685,16 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             "its other scores.\n\n"
         )
 
-    # General therapeutic-applicability disclosure. Informational only: this
-    # intentionally adds no tissue-specific score, penalty, cap, or gate.
+    # General therapeutic-applicability disclosure.
+    #
+    # This used to state flatly that ranking does not assess tissue reach, and
+    # the comment here claimed it "intentionally adds no tissue-specific score,
+    # penalty, cap, or gate". Both stopped being true when the compartment
+    # exposure gate shipped: where the disease has a CNS component, a bounded
+    # check now runs and a DOCUMENTED failure to reach that compartment
+    # excludes the candidate. A dossier must not misdescribe its own method, in
+    # either direction -- so the disclosure now names what was checked while
+    # keeping every clause that remains genuinely unassessed.
     parts.append(
         "> ⚠ **Therapeutic applicability not assessed.** Ranking does not assess "
         "whether this drug reaches the relevant tissue, cell, or compartment at "
@@ -1604,6 +1702,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
         "(PK), disease stage/subtype and therapeutic window are outside what "
         "this pipeline measures.\n\n"
     )
+    parts.append(_compartment_exposure_disclosure(candidate))
 
     parts.append(header_note)
 
