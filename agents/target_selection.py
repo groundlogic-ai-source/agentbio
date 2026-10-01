@@ -35,6 +35,7 @@ from data_sources.chembl import (
     redact_holdout_names,
     PHARM_PRECEDENT_UMBRELLA_ASSOC_SCORE,
 )
+from data_sources.gene_locus import positional_association_risk
 from data_sources import holdout as _holdout
 from data_sources.europepmc_mechanisms import discover_disease_process_targets
 from data_sources.afdb import get_structure_confidence
@@ -800,7 +801,7 @@ def preflight_for_disease(query: str) -> list[dict[str, Any]]:
         target for target in targets
         if target.get("association_score", 0.0) >= 0.1
     ][:TOP_TARGETS_PER_DISEASE]
-    return [{
+    rows = [{
         "disease_name": disease_name,
         "orpha_code": disease.get("orpha_code"),
         "disease_source": disease.get("source", "orphanet"),
@@ -818,6 +819,27 @@ def preflight_for_disease(query: str) -> list[dict[str, Any]]:
             "treatment_context": treatment.get("status", "observed"),
         },
     } for target in genetic_targets]
+
+    # Genetic association cannot tell a causal gene from its neighbour. Where
+    # the common mutation is a large deletion, every gene in the interval
+    # inherits a real association for reasons of geography: cystinosis returned
+    # CTNS, SHPK and TRPV1, all inside ~98 kb of chromosome 17. Surfacing this
+    # at preflight is the point -- it is the cheapest possible moment to learn
+    # a target list is positional, before any run is spent on it.
+    try:
+        risk = positional_association_risk(rows)
+        for row in rows:
+            symbol = str(row.get("target_symbol") or "").upper()
+            row["positional_association_risk"] = risk.get(symbol, {})
+    except Exception as e:  # noqa: BLE001 — disclosure must never break preflight
+        print(f"[target_selection] WARNING: positional-association check "
+              f"failed: {e}")
+        for row in rows:
+            row["positional_association_risk"] = {
+                "assessed": False, "flagged": False,
+                "reason": f"Positional check failed: {e}",
+            }
+    return rows
 
 
 def select_for_disease(
@@ -1150,6 +1172,15 @@ def select_for_disease(
                 "target_symbol": p.get("symbol"),
                 "uniprot_id": uid,
                 "association_score": PROCESS_EVIDENCE_ASSOC_SCORE,
+                # PROCESS_EVIDENCE_ASSOC_SCORE is a provisional constant this
+                # module's own comment says must be calibrated before any
+                # benchmark freeze. Downstream it was indistinguishable from a
+                # measured Open Targets association, so a flat 0.50 placeholder
+                # outranked SMPD1's measured 0.4436 and tied UGCG's measured
+                # 0.5006 in a Niemann-Pick type C run -- putting antipsychotics
+                # above the disease-biology candidates. Marking it lets the
+                # reviewer refuse to treat a placeholder as evidence.
+                "ot_association_measured": False,
                 "target_discovery_method": "literature_mechanism_class",
                 "mechanism_class": p.get("mechanism_class"),
                 "therapeutic_role": p.get("therapeutic_role"),
@@ -1363,6 +1394,11 @@ def _score_pair(
         "ensembl_id": target.get("ensembl_id"),
         "uniprot_id": uniprot_id,
         "ot_association_score": round(association_score, 4),
+        # Whether that number is a measured Open Targets association or the
+        # provisional PROCESS_EVIDENCE_ASSOC_SCORE placeholder. Carried through
+        # so the reviewer can refuse to promote on an uncalibrated constant.
+        "ot_association_measured": bool(
+            target.get("ot_association_measured", True)),
         "chembl_activity_count": chembl_data.get("count", 0),
         "median_pchembl": chembl_data.get("median_pchembl"),
         "chembl_pooled_multi_target": chembl_data.get("pooled_across_multiple_targets", False),
