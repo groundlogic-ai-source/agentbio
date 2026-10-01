@@ -161,12 +161,33 @@ class NoStructureIdentityTests(unittest.TestCase):
         self.assertEqual(len(merge_candidates([a, b])), 1)
 
     def test_structure_record_not_merged_into_name_bucket(self):
-        # A record WITH structure must never merge into a name-only bucket.
+        # A record WITH structure must never LOSE its identity to a name-only
+        # bucket. The identity keys stay distinct, which is the property that
+        # matters: name never overrides structure.
+        #
+        # Narrowed 2026-09-30. Since _coalesce_same_moiety, a structureless
+        # group is attached INTO the structural one when the normalized name
+        # and target both match, so the two now merge -- with the STRUCTURAL
+        # identity surviving. DrugCentral supplies neither a ChEMBL id nor an
+        # InChIKey (asenapine "4115", cisapride "660"), which left 9
+        # same-(drug, target) duplicate pairs in one Niemann-Pick type C run.
+        # The guarantees below are what actually protect against
+        # misattribution, and they are asserted directly.
         name_only = rec(molecule_name="Drug X")
         structured = rec(molecule_name="Drug X", inchikey=_FREE_BASE)
         self.assertNotEqual(candidate_identity(name_only),
                             candidate_identity(structured))
-        self.assertEqual(len(merge_candidates([name_only, structured])), 2)
+        merged = merge_candidates([name_only, structured])
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(merged[0].get("canonical_compound_identity"),
+                         _FREE_BASE,
+                         "the structural identity must be the one that survives")
+
+    def test_two_structural_records_never_merge_on_name(self):
+        """Different structures sharing a name stay apart — the real invariant."""
+        a = rec(molecule_name="Drug X", inchikey=_FREE_BASE)
+        b = rec(molecule_name="Drug X", inchikey="ZZZZZZZZZZZZZZ-YYYYYYYYYY-N")
+        self.assertEqual(len(merge_candidates([a, b])), 2)
 
     def test_two_providers_no_structure_do_not_collide(self):
         a = rec(provider="chembl", molecule_id="X1")

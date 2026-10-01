@@ -910,19 +910,156 @@ def merge_candidates(candidates: Iterable[Any]) -> list[dict[str, Any]]:
     dicts, one per active moiety.
     """
     records = [normalize_evidence(c) for c in candidates]
-    groups: dict[str, MergedCandidate] = {}
-
+    grouped: dict[str, list[EvidenceRecord]] = {}
     for rec in records:
-        ident = candidate_identity(rec)
-        mc = groups.get(ident)
-        if mc is None:
-            mc = MergedCandidate(identity=ident)
-            groups[ident] = mc
-        _absorb(mc, rec)
+        grouped.setdefault(candidate_identity(rec), []).append(rec)
+
+    groups: dict[str, MergedCandidate] = {}
+    for ident, recs in _coalesce_same_moiety(grouped).items():
+        mc = MergedCandidate(identity=ident)
+        for rec in recs:
+            _absorb(mc, rec)
+        groups[ident] = mc
 
     # Deterministic order: by identity key.
     ordered = [groups[k] for k in sorted(groups.keys())]
     return [mc.to_chemist_candidate() for mc in ordered]
+
+
+_CHEMBL_ID_RE = re.compile(r"^CHEMBL\d+$", re.IGNORECASE)
+
+
+def _chembl_id(value: Any) -> Optional[str]:
+    text = _s(value).strip().upper()
+    return text if _CHEMBL_ID_RE.match(text) else None
+
+
+def _coalesce_same_moiety(
+    grouped: dict[str, list[EvidenceRecord]],
+) -> dict[str, list[EvidenceRecord]]:
+    """Union groups that are provably the same active moiety on one target.
+
+    ``candidate_identity`` keys on full stereochemical InChIKey first, which is
+    right, but leaves two gaps that split one drug into competing candidates:
+
+    1. A SALT has its own InChIKey, because the key covers the counterion.
+       ELIGLUSTAT (CHEMBL2110588) and ELIGLUSTAT TARTRATE (CHEMBL5723563) both
+       carry parent CHEMBL2110588 and still scored as separate candidates --
+       0.8238 and 0.5002 in one Niemann-Pick type C run, each with its own
+       independently-retrieved gate verdicts.
+    2. A record WITHOUT an InChIKey falls back to a provider-namespaced
+       molecule id, so the same ChEMBL molecule reported through two lanes
+       becomes two candidates. Cariprazine appeared four times in that run:
+       twice for DRD2 and twice for DRD3, all CHEMBL2028019.
+
+    This runs AFTER keying rather than replacing it, so it can only union
+    groups, never split ones that already merge on structure. A ChEMBL id is
+    globally unique, so sharing one is proof of identity rather than an
+    accidental collision between two providers' opaque ids.
+    """
+    # Every ChEMBL identifier a group is known by, molecule and parent alike.
+    ids_of: dict[str, set[str]] = {}
+    target_of: dict[str, str] = {}
+    for ident, recs in grouped.items():
+        ids: set[str] = set()
+        for rec in recs:
+            for value in (rec.molecule_id, rec.parent_molecule_id):
+                chembl = _chembl_id(value)
+                if chembl:
+                    ids.add(chembl)
+        ids_of[ident] = ids
+        target_of[ident] = ident.split("|target:")[-1]
+
+    parent: dict[str, str] = {ident: ident for ident in grouped}
+
+    def find(x: str) -> str:
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    def union(a: str, b: str) -> None:
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            # Lowest key wins so the merged identity stays deterministic.
+            lo, hi = (ra, rb) if ra <= rb else (rb, ra)
+            parent[hi] = lo
+
+    # Same ChEMBL id AND same target is the same candidate.
+    by_id_target: dict[tuple[str, str], str] = {}
+    for ident in sorted(grouped):
+        for chembl in sorted(ids_of[ident]):
+            key = (chembl, target_of[ident])
+            first = by_id_target.get(key)
+            if first is None:
+                by_id_target[key] = ident
+            else:
+                union(first, ident)
+
+    # A group whose provider supplies neither a ChEMBL id nor an InChIKey has
+    # nothing structural to bridge on. DrugCentral reports asenapine as "4115"
+    # and cisapride as "660", so each sat beside its own ChEMBL row as a
+    # duplicate candidate on the same target -- 9 such pairs in a Niemann-Pick
+    # type C run, which both inflates apparent candidate diversity and splits
+    # evidence that belongs to one drug.
+    #
+    # Name is a weak identity and is used here under three constraints that
+    # keep the real safety property intact:
+    #   * only a group with NO structural identity of its own may be attached,
+    #     so a record that knows its own structure is never merged away;
+    #   * the attachment is always INTO the structural group, so the surviving
+    #     identity is the structural one;
+    #   * the target must match, so a shared name cannot pull together rows
+    #     about different proteins.
+    # Two structural groups never merge on name, and two structureless groups
+    # never merge with each other.
+    structural: dict[str, bool] = {}
+    names_of: dict[str, set[str]] = {}
+    for ident, recs in grouped.items():
+        structural[ident] = bool(ids_of[ident]) or any(
+            canonical_inchikey(r.inchikey) for r in recs)
+        names_of[ident] = {
+            normalize_name(r.molecule_name) for r in recs
+            if normalize_name(r.molecule_name)
+        }
+
+    anchor_by_name: dict[tuple[str, str], str] = {}
+    for ident in sorted(grouped):
+        if not structural[ident]:
+            continue
+        for name in sorted(names_of[ident]):
+            anchor_by_name.setdefault((name, target_of[ident]), ident)
+    for ident in sorted(grouped):
+        if structural[ident]:
+            continue
+        for name in sorted(names_of[ident]):
+            anchor = anchor_by_name.get((name, target_of[ident]))
+            if anchor is not None:
+                union(anchor, ident)
+                break
+
+    coalesced: dict[str, list[EvidenceRecord]] = {}
+    for ident, recs in grouped.items():
+        coalesced.setdefault(find(ident), []).extend(recs)
+
+    # The merged candidate takes its canonical identity from the first record
+    # absorbed, so the union has to impose an order or the same inputs in a
+    # different sequence yield a different canonical InChIKey. The PARENT form
+    # leads: a moiety should be identified by its free base, not by whichever
+    # salt happened to arrive first.
+    def _rank(rec: EvidenceRecord) -> tuple:
+        own = _chembl_id(rec.molecule_id)
+        parent = _chembl_id(rec.parent_molecule_id)
+        is_parent_form = bool(own and parent and own == parent)
+        return (
+            0 if is_parent_form else 1,
+            0 if canonical_inchikey(rec.inchikey) else 1,
+            _s(rec.molecule_id).upper(),
+            _s(rec.source_id),
+        )
+
+    return {ident: sorted(recs, key=_rank)
+            for ident, recs in coalesced.items()}
 
 
 def _absorb(mc: MergedCandidate, rec: EvidenceRecord) -> None:
