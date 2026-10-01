@@ -40,6 +40,7 @@ import requests
 from typing import Any, Optional
 
 from cache.cache import get, set as cache_set, make_key
+from data_sources.provider_request_policy import request as provider_request
 
 BASE_URL = "https://rest.ensembl.org"
 
@@ -90,12 +91,20 @@ def get_gene_locus(symbol: str) -> Optional[dict[str, Any]]:
         return cached or None
 
     try:
-        resp = requests.get(
+        # Through the shared throttle: Ensembl answers a breach of its ~15/s
+        # ceiling with 429 + Retry-After, and an unthrottled burst made a whole
+        # disease's coordinates "unavailable", which then read as no positional
+        # risk. 404 passes through unraised because "Ensembl does not know this
+        # symbol" is an answer, not an outage.
+        resp = provider_request(
+            "ensembl",
+            requests.get,
             f"{BASE_URL}/lookup/symbol/homo_sapiens/{gene}",
+            pass_through_statuses=frozenset({404}),
             headers={"Content-Type": "application/json"},
             timeout=_TIMEOUT_SECONDS,
         )
-    except requests.exceptions.RequestException:
+    except Exception:  # noqa: BLE001 — unknown locus, never a positional claim
         return None
 
     if resp.status_code == 404:

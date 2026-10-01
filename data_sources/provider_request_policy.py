@@ -58,6 +58,15 @@ POLICIES = {
     # incurred.
     "gtopdb": ProviderPolicy(
         concurrency=1, min_interval_seconds=0.75, max_attempts=6),
+    # Ensembl publishes a ~15 requests/s ceiling and answers a breach with 429
+    # plus Retry-After. The positional-association check looks up every target
+    # in a disease's list back to back, and screening several diseases in a row
+    # breached it: a Wilson disease screen came back with coordinates
+    # "unavailable" for all five targets, which then read as no positional
+    # risk. An unthrottled lookup turns a rate limit into a clean result, which
+    # is the failure mode this codebase keeps removing.
+    "ensembl": ProviderPolicy(
+        concurrency=1, min_interval_seconds=0.15, max_attempts=5),
 }
 
 _lock = threading.Lock()
