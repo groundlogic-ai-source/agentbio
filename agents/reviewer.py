@@ -69,6 +69,17 @@ from data_sources.literature_limitation import (
     VERDICT_NOT_ASSESSED as LITERATURE_NOT_ASSESSED,
     check_literature_limitation,
 )
+from data_sources.prior_art import (
+    check_prior_art,
+    gate_is_enabled as prior_art_gate_is_enabled,
+)
+from data_sources.tissue_exposure import check_tissue_exposure
+
+#: Discovery methods whose ot_association_score is a MEASURED Open Targets
+#: disease association rather than the provisional
+#: PROCESS_EVIDENCE_ASSOC_SCORE placeholder assigned to precedent-derived and
+#: pathway-neighbour targets.
+_MEASURED_ASSOCIATION_METHODS = {"genetic_association"}
 from data_sources import holdout as _holdout
 from data_sources.pubchem import get_compound_data
 from data_sources.evidence_ledger import qualified_target_chembl_activity_ids
@@ -1162,6 +1173,17 @@ def run_reviewer(
             "literature_limitation": None,
             "literature_limitation_blocked": False,
             "literature_limitation_gate_cleared": False,
+            # Populated by the post-benchmark prior-art pass, and only for a
+            # candidate that clears every other gate. NOT_ASSESSED is the
+            # honest default: most rows never reach the lookup, and an
+            # unchecked pair must not read as an unclaimed one.
+            "prior_art": None,
+            "prior_art_found": False,
+            "prior_art_status": "NOT_ASSESSED",
+            "prior_art_gate_enforced": False,
+            # Populated only for a candidate that clears every other gate.
+            "tissue_exposure": None,
+            "tissue_exposure_status": "NOT_ASSESSED",
             "externally_prioritizable": False,
             "availability_gate": {
                 "status": "UNKNOWN",
@@ -1582,6 +1604,23 @@ def run_reviewer(
     # disclosure gate. Every row keeps explicit reasons, including rows outside
     # the paid-validation shortlist.
     _rank_reviewed(reviewed)
+    # CLAUDE.md's standing "one known live bug": a black-box warning was set on
+    # the candidate and then fed nothing -- not the composite, not a cap, not a
+    # gate -- so it appeared as a footnote while the drug ranked exactly as if
+    # it carried no warning. The documented condition is specifically about
+    # being strictly dominated: carrying a boxed warning when the SAME target
+    # already has an approved drug in this pool WITHOUT one. That is not a
+    # judgement about the warning's severity, which is why it is an eligibility
+    # signal rather than a score change -- the composite stays an evidence
+    # summary and remains comparable.
+    _safer_same_target_alternative: set[str] = {
+        str(row.get("target_symbol") or "").upper()
+        for row in reviewed
+        if row.get("is_approved_drug") is True
+        and not row.get("black_box_advisory")
+        and str(row.get("target_symbol") or "").strip()
+    }
+
     for r in reviewed:
         if _holdout.is_active():
             # Compatibility projection only. Production gates are intentionally
@@ -1611,6 +1650,80 @@ def run_reviewer(
             reasons.append("literature_gate_not_cleared")
         if not r.get("strong_match"):
             reasons.append("below_strong_match_threshold")
+
+        # A target admitted by pharmacological precedent carries no MEASURED
+        # disease association -- it is scored with PROCESS_EVIDENCE_ASSOC_SCORE,
+        # a flat 0.50 that target_selection's own comment calls provisional and
+        # uncalibrated. Downstream that placeholder is indistinguishable from a
+        # real Open Targets number, and it outranks measured evidence: in a
+        # Niemann-Pick type C run DRD2/DRD3/GABRA1 all carried 0.50 against
+        # SMPD1's measured 0.4436, and 37 of the top 40 candidates became
+        # antipsychotics -- drugs used to manage the disease's psychiatric
+        # SYMPTOMS, reaching the pool only because a symptomatic drug binds
+        # that target. That is circular: the target is "relevant" because a
+        # symptom drug hits it. Such rows remain in the pool as precedent
+        # context and are disclosed, but they are not disease-biology
+        # hypotheses and must not be promoted as one.
+        if str(r.get("target_discovery_method") or "").strip().lower() \
+                not in _MEASURED_ASSOCIATION_METHODS:
+            reasons.append("target_association_not_measured")
+
+        # Strictly dominated on safety: this candidate carries a boxed warning
+        # and the same target already has an approved drug in this pool without
+        # one. Nothing here judges how severe the warning is.
+        if r.get("black_box_advisory") and str(
+                r.get("target_symbol") or "").upper() in (
+                    _safer_same_target_alternative):
+            reasons.append("black_box_with_safer_same_target_alternative")
+
+        # Prior art is checked last and ONLY for a candidate that would
+        # otherwise be promoted. It is a network call per candidate, and a
+        # 200-candidate pool has no business making 200 of them to re-reject
+        # rows that another gate already rejected.
+        #
+        # This closes the gap that let a blind RTH-beta run promote RESMETIROM
+        # as unclaimed while three Europe PMC records already paired the two.
+        # The pipeline's other novelty signals count TRIALS, so a preclinical
+        # proposal was invisible to all of them.
+        if not reasons:
+            prior = check_prior_art(
+                str(r.get("drug_name") or ""),
+                str(r.get("disease_name") or ""),
+                drug_aliases=r.get("compound_aliases") or [],
+            )
+            r["prior_art"] = prior
+            r["prior_art_found"] = bool(prior.get("found"))
+            # The finding is always recorded; whether it BLOCKS is configurable
+            # (AGENTBIO_PRIOR_ART_GATE=off). Validating a known hypothesis
+            # needs the same search with the opposite consequence.
+            r["prior_art_gate_enforced"] = prior_art_gate_is_enabled()
+            if prior.get("found") and prior_art_gate_is_enabled():
+                reasons.append("published_prior_art")
+
+            # Engagement is not exposure. A drug can bind the right protein at
+            # single-digit nanomolar and never reach the organ the disease
+            # damages -- ELIGLUSTAT topped a Niemann-Pick type C pool on a
+            # validated target while being actively effluxed from the brain.
+            exposure = check_tissue_exposure(
+                str(r.get("drug_name") or ""),
+                str(r.get("disease_name") or ""),
+                descriptors=r.get("descriptors"),
+                candidate_chembl_ids=r.get("source_chembl_ids") or [],
+                candidate_inchikey=r.get("inchikey"),
+            )
+            r["tissue_exposure"] = exposure
+            r["tissue_exposure_status"] = str(exposure.get("verdict") or "")
+            # Only a DOCUMENTED exposure failure excludes. Unknown stays
+            # fail-open: this pipeline already dies on any of ~12 providers,
+            # and an unretrievable answer is not a finding about the drug.
+            if exposure.get("exposure_unlikely"):
+                reasons.append("compartment_exposure_unlikely")
+            # A failed search is unknown, not absence. It deliberately does not
+            # exclude -- fail-closing here would add another whole-run failure
+            # mode to a pipeline already fragile across ~12 providers -- but
+            # the dossier must never present an unchecked pair as unclaimed.
+            r["prior_art_status"] = str(prior.get("verdict") or "")
+
         r["exclusion_reasons"] = reasons
         r["paid_validation_eligible"] = not reasons
         r["headline_eligible"] = bool(

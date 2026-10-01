@@ -279,16 +279,30 @@ class ReviewerPrefetchTest(unittest.TestCase):
         }))
 
     def test_trial_term_semantics_unchanged_when_visible(self):
+        # trial_count is required for the term to be scored at all: an empty
+        # registry is a coverage gap, not a clean record earning credit (see
+        # test_trial_term_coverage.py). "Visible" therefore means the registry
+        # was queried AND returned rows.
         self.assertTrue(reviewer._trial_evidence_term({
             "query_failed": False,
             "holdout_redacted": False,
             "has_negative_repurposing_result": False,
+            "trial_count": 2,
         }))
         # A MEASURED failed trial is still adverse evidence and still False.
         self.assertFalse(reviewer._trial_evidence_term({
             "query_failed": False,
             "holdout_redacted": False,
             "has_negative_repurposing_result": True,
+            "trial_count": 2,
+        }))
+
+    def test_empty_registry_is_a_coverage_gap_not_credit(self):
+        self.assertIsNone(reviewer._trial_evidence_term({
+            "query_failed": False,
+            "holdout_redacted": False,
+            "has_negative_repurposing_result": False,
+            "trial_count": 0,
         }))
 
     def test_holdout_context_visible_in_trial_worker(self):

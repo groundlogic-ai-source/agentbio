@@ -239,6 +239,10 @@ def filter_repurposing_eligible(
 _LEDGER_AUTHORITATIVE_FIELDS = {
     "drug_name", "molecule_chembl_id", "smiles", "inchikey",
     "pchembl_value", "confidence_score", "efficacy_confidence", "max_phase",
+    # These qualify the pchembl_value on THIS row (which statistic, over how
+    # many records, carried by which activity). Back-filling them from a
+    # sibling row would describe a different number than the one displayed.
+    "pchembl_aggregation", "pchembl_n", "pchembl_anchor_activity_id",
     "is_approved_drug", "source_chembl_ids", "source_activity_ids",
     "target_symbol", "uniprot_id", "target_discovery_method", "disease_name",
     "ot_association_score", "source_types", "source_health",
@@ -779,9 +783,19 @@ def normalize_chembl_enriched(
         # activity ids here (the enriched dict aggregates over a molecule); the
         # ledger's lineage still keeps this ChEMBL assay datum distinct from
         # GtoPdb/DrugCentral evidence while collapsing exact ChEMBL re-imports.
+        #
+        # The anchor must name a record that actually carries `pchembl`, which
+        # is a median over the molecule's qualifying activities. The first
+        # activity id is an arbitrary one whose value is usually NOT the
+        # median, so citing it asserts a number that record does not hold.
+        # With an even record count no single record carries the median, and
+        # the anchor correctly falls back to the molecule.
         act_ids = c.get("source_activity_ids") or []
-        assay_anchor = (f"{molecule_id}:{act_ids[0]}"
-                        if act_ids else molecule_id)
+        median_anchor = c.get("pchembl_anchor_activity_id")
+        if median_anchor is not None:
+            assay_anchor = f"{molecule_id}:{median_anchor}"
+        else:
+            assay_anchor = molecule_id
 
         base = dict(
             provider="chembl",
