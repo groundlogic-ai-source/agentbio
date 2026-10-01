@@ -577,6 +577,100 @@ def _support_quote_has_candidate_negative_language(
     return False
 
 
+def classify_record_validity(
+    *,
+    valid_label: bool,
+    valid_citation: bool,
+    label: str,
+    requested_label: str,
+    recovered_from_unknown: bool,
+    exact_match: bool,
+    valid_quote: bool,
+    explicit_language: bool,
+    supportive_language: bool,
+    source_has_negative_language: bool,
+) -> tuple[bool, bool]:
+    """Split "the classifier misbehaved" from "we could not corroborate it".
+
+    Returns ``(classifier_integrity_ok, mechanically_corroborated)``.
+
+    These were one boolean, and every way of failing it counted as a classifier
+    integrity failure -- which is what escalates to SEARCH_FAILED and blocks a
+    candidate. A Niemann-Pick type C run died there: GPT-5.4 correctly labelled
+    three records APPLICABLE_SUPPORT, but they phrase benefit as "leading to
+    clinical stabilization", "established treatment" and "the only specific
+    drug approved". ``_SUPPORT_WORDS`` matches seven stems and none of those
+    appear, so a gap in our own vocabulary was reported as the model returning
+    unusable output. The gate failed, the strongest candidate (composite
+    0.8315) was excluded, and the run terminated no_eligible_candidate.
+
+    Integrity covers what makes the classifier's OUTPUT untrustworthy: an
+    unknown label, an unverifiable citation, an explicit integrity marker, or a
+    negative finding hidden behind an IRRELEVANT label.
+
+    It also still covers an uncorroborated NEGATIVE claim, and that asymmetry
+    is deliberate. If a record says a drug is ineffective and we cannot
+    establish that it refers to our candidate, the deterministic drug matcher
+    may simply be wrong, and dropping a real limitation is the dangerous
+    direction to err in -- so that remains fatal. An uncorroborated POSITIVE
+    claim is merely uncounted: nothing is lost by declining to credit support
+    we could not confirm, whereas failing the whole search over one is.
+    """
+    structurally_usable = (
+        valid_label
+        and valid_citation
+        and label != UNKNOWN_INTEGRITY_FAILED
+        # A retrieved record containing explicit negative language cannot
+        # silently disappear behind an IRRELEVANT label.
+        and not (
+            label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
+            and source_has_negative_language
+        )
+    )
+    mechanically_corroborated = (
+        (
+            (
+                label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
+                and (
+                    requested_label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
+                    or recovered_from_unknown
+                )
+            )
+            or (exact_match and valid_quote)
+            or (
+                label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
+                and requested_label == APPLICABLE_SUPPORT
+                and valid_quote
+            )
+        )
+        and (label != EXPLICIT_LIMITATION or explicit_language)
+        and (
+            label != APPLICABLE_SUPPORT
+            or (supportive_language and not explicit_language)
+        )
+    )
+
+    # The asymmetry that matters: what was the uncorroborated record CLAIMING?
+    #
+    # An uncorroborated NEGATIVE claim stays fatal. If a paper says a drug is
+    # ineffective and we cannot establish whether it means our candidate, we
+    # must not clear the candidate -- the deterministic drug matcher could be
+    # wrong, and silently dropping a real limitation is the dangerous error.
+    #
+    # An uncorroborated POSITIVE claim costs nothing to drop. We simply do not
+    # credit it as support. Failing the entire search over one is pure loss,
+    # and it is what killed the Niemann-Pick run: three APPLICABLE_SUPPORT
+    # records whose phrasing our seven-stem vocabulary did not recognise.
+    asserts_something_negative = (
+        label in {EXPLICIT_LIMITATION, "CAUTION"}
+        or source_has_negative_language
+    )
+    classifier_integrity_ok = structurally_usable and not (
+        asserts_something_negative and not mechanically_corroborated
+    )
+    return classifier_integrity_ok, mechanically_corroborated
+
+
 def _mechanical_evidence_level(
     record: dict[str, Any], classification: dict[str, Any],
 ) -> str:
@@ -811,38 +905,24 @@ def aggregate_findings(
             if label in {EXPLICIT_LIMITATION, "CAUTION"}
             else exact_support_match
         )
-        valid = (
-            valid_label
-            and valid_citation
-            and (
-                (
-                    label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
-                    and (
-                        requested_label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
-                        or recovered_from_unknown
-                    )
-                )
-                or (exact_match and valid_quote)
-                or (
-                    label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
-                    and requested_label == APPLICABLE_SUPPORT
-                    and valid_quote
-                )
+        # Two separate questions: is the classifier's output usable, and do our
+        # own checks corroborate it? Only the first may fail the search. See
+        # classify_record_validity for why they were split.
+        classifier_integrity_ok, mechanically_corroborated = (
+            classify_record_validity(
+                valid_label=valid_label,
+                valid_citation=valid_citation,
+                label=label,
+                requested_label=requested_label,
+                recovered_from_unknown=recovered_from_unknown,
+                exact_match=exact_match,
+                valid_quote=valid_quote,
+                explicit_language=explicit_language,
+                supportive_language=supportive_language,
+                source_has_negative_language=source_has_negative_language,
             )
-            and (label != EXPLICIT_LIMITATION or explicit_language)
-            and (
-                label != APPLICABLE_SUPPORT
-                or (supportive_language and not explicit_language)
-            )
-            # A retrieved record containing explicit negative language cannot
-            # silently disappear behind an IRRELEVANT label. Without a valid
-            # exact-applicability extraction, classification is unresolved.
-            and not (
-                label == NOT_APPLICABLE_TO_EXACT_DRUG_USE
-                and source_has_negative_language
-            )
-            and label != UNKNOWN_INTEGRITY_FAILED
         )
+        valid = classifier_integrity_ok and mechanically_corroborated
         evidence_level = _mechanical_evidence_level(record, classification)
         row = {
             "pmid": record.get("pmid"),
@@ -881,13 +961,28 @@ def aggregate_findings(
             },
             "mechanically_verified": valid,
             "citation_verified": valid_citation,
+            # Kept distinct so a dossier can say WHICH of the two failed:
+            # unusable classifier output, or a label we could not corroborate.
+            "classifier_integrity_ok": classifier_integrity_ok,
+            "mechanically_corroborated": mechanically_corroborated,
         }
         if not valid:
+            # integrity_ok / corroborated / supportive_language /
+            # explicit_language are logged because every field this line used
+            # to print read True on the records that failed, twice, which sent
+            # two separate investigations looking in the wrong place.
             _LOGGER.warning(
                 "[literature_gate] reconciliation_failed pmid=%s "
+                "integrity_ok=%r corroborated=%r supportive_language=%r "
+                "explicit_language=%r exact_match=%r "
                 "raw_label=%r canonical_label=%r valid_quote=%r "
                 "classifier_match=%r deterministic=%r quote=%r abstract=%r",
                 pmid,
+                classifier_integrity_ok,
+                mechanically_corroborated,
+                supportive_language,
+                explicit_language,
+                exact_match,
                 raw_label,
                 label,
                 valid_quote,
@@ -902,7 +997,10 @@ def aggregate_findings(
                 record.get("abstract"),
             )
         (evidence if valid else rejected).append(row)
-        if not valid:
+        # ONLY a genuine integrity failure may escalate to SEARCH_FAILED. A
+        # record we simply could not corroborate is dropped from evidence and
+        # left at that -- unknown, not broken.
+        if not classifier_integrity_ok:
             classifier_integrity_failures += 1
         if (
             valid_citation and valid_quote
