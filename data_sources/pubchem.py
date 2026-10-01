@@ -9,6 +9,7 @@ import requests
 from typing import Any, Optional
 from cache.cache import get, set as cache_set, make_key
 from data_sources import pubchem_snapshot as _snapshot
+from data_sources.provider_request_policy import request as provider_request
 
 BASE_URL = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 PUG_VIEW_URL = "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound"
@@ -67,12 +68,22 @@ def _get_json(url: str) -> Optional[dict]:
     PubChemTransientError on any other failure so callers cannot confuse
     an outage with a negative answer."""
     try:
-        resp = requests.get(url, timeout=20)
+        # Through the shared throttle, with retry and Retry-After handling.
+        # 404 passes through unraised because it is an authoritative "no such
+        # compound", not an outage -- the distinction this function exists to
+        # preserve. The policy retries 429/5xx before giving up, so a rate
+        # limit no longer presents as a dead source.
+        resp = provider_request(
+            "pubchem",
+            requests.get,
+            url,
+            pass_through_statuses=frozenset({404}),
+            timeout=20,
+        )
         if resp.status_code == 404:
             return None
         if resp.status_code >= 500 or resp.status_code == 429:
             raise PubChemTransientError(f"HTTP {resp.status_code} for {url}")
-        resp.raise_for_status()
         return resp.json()
     except PubChemTransientError:
         raise

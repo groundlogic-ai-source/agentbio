@@ -67,6 +67,16 @@ POLICIES = {
     # is the failure mode this codebase keeps removing.
     "ensembl": ProviderPolicy(
         concurrency=1, min_interval_seconds=0.15, max_attempts=5),
+    # PubChem publishes 5 requests/s and 400/minute. It was called with a bare
+    # requests.get -- no throttle, no backoff, no retry -- and a reviewer pass
+    # over a large candidate pool blows straight through both ceilings. PubChem
+    # answers with 503, which this codebase correctly treats as "source
+    # unavailable", and because PubChem feeds candidate_source_coverage the
+    # fail-closed gate then discards the ENTIRE run. An alpha-1-antitrypsin
+    # deficiency run died exactly this way while PubChem was healthy; ten jobs
+    # sit in source_unavailable. 0.25s at concurrency 1 holds it to ~4/s.
+    "pubchem": ProviderPolicy(
+        concurrency=1, min_interval_seconds=0.25, max_attempts=5),
 }
 
 _lock = threading.Lock()
