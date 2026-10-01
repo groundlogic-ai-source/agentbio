@@ -129,6 +129,34 @@ def _resolve_target_chembl_id(uniprot_id: str) -> list[str]:
 #: persisted per record so a dossier can disclose which was used.
 _POTENCY_STANDARD_TYPES = "IC50,Ki,EC50"
 
+
+def _median_with_anchor(
+    pairs: list[tuple[float, Any]],
+) -> tuple[Optional[float], Optional[Any]]:
+    """Median of paired (value, activity_id), plus the record carrying it.
+
+    The per-molecule potency reported downstream is a MEDIAN, chosen because it
+    resists a single cherry-picked assay. The evidence ledger then cites an
+    activity ID as that value's provenance, so the cited record has to be the
+    one that actually holds the value.
+
+    With an odd count the median IS a real record, and its activity ID is
+    returned. With an even count the median is the mean of the two central
+    records and may correspond to no record at all; the anchor is then None and
+    callers must attribute the value to the molecule rather than to any single
+    activity. Returning a nearby record's ID would assert that the record holds
+    a number it does not hold.
+    """
+    usable = [(value, act_id) for value, act_id in pairs if value is not None]
+    if not usable:
+        return None, None
+    usable.sort(key=lambda pair: pair[0])
+    values = [value for value, _ in usable]
+    median = statistics.median(values)
+    if len(usable) % 2 == 1:
+        return median, usable[len(usable) // 2][1]
+    return median, None
+
 #: Canonical data-rich control for liveness probing. CLAUDE.md already names
 #: EGFR P00533 as the entity every new wrapper is validated against, precisely
 #: because wrappers swallow errors and return empty.
@@ -210,6 +238,101 @@ def _fetch_assay_confidence(assay_ids: list[str]) -> dict[str, int]:
     return confidence
 
 
+#: Cache-key names for the three caches built on the activity ledger.
+#:
+#: Named constants because the literal strings have now gone stale twice.
+#: validation/test_cache_failures.py hardcoded "_fetch_activities_full_v2" and
+#: "get_target_candidate_compounds_v4" long after the code moved past both, so
+#: its setUp purged keys nothing used and one test read another test's cached
+#: rows. Tests reference these names instead of retyping the version.
+ACTIVITIES_FULL_CACHE_KEY = "_fetch_activities_full_v4_paged"
+BIOACTIVITY_COUNT_CACHE_KEY = "get_target_bioactivity_count_v3_paged"
+CANDIDATE_POOL_CACHE_KEY = "get_target_candidate_compounds_v7_paged"
+
+#: ChEMBL's maximum page size for /activity.
+_ACTIVITY_PAGE_SIZE = 1000
+
+#: Hard ceiling on activity rows pulled for one target. EGFR is the largest
+#: realistic case at ~20k qualifying records, so this covers the field while
+#: bounding a pathological target to 25 requests.
+_MAX_ACTIVITY_RECORDS = 25000
+
+#: Per-target record of what the last activity fetch could and could not see.
+#: The fetch helpers keep their two-tuple signatures because frozen validation
+#: harnesses (validation/miss_classifier.py, validation/run_audit_traps.py)
+#: unpack them positionally, so truncation is reported through this side
+#: channel rather than by widening a signature those harnesses depend on.
+_ACTIVITY_FETCH_COVERAGE: dict[str, dict[str, Any]] = {}
+_ACTIVITY_COVERAGE_LOCK = threading.Lock()
+
+
+def activity_fetch_coverage(target_chembl_id: str) -> dict[str, Any]:
+    """What the most recent activity fetch for this target actually retrieved."""
+    with _ACTIVITY_COVERAGE_LOCK:
+        return dict(_ACTIVITY_FETCH_COVERAGE.get(target_chembl_id) or {})
+
+
+def _record_coverage(target_chembl_id: str, **fields: Any) -> None:
+    with _ACTIVITY_COVERAGE_LOCK:
+        _ACTIVITY_FETCH_COVERAGE[target_chembl_id] = fields
+
+
+def _fetch_activity_pages(
+    url: str,
+    params: dict[str, Any],
+    target_chembl_id: str,
+    cap: Optional[int] = None,
+) -> list[dict[str, Any]]:
+    """Page through /activity instead of reading only the first 1000 rows.
+
+    Both activity fetches previously sent ``limit=1000, offset=0`` and stopped.
+    ChEMBL does not order /activity by potency, so for any well-studied target
+    the rows we kept were an arbitrary slice and the strongest compounds could
+    be absent entirely -- silently, with nothing reporting a gap. Measured
+    coverage under the old behaviour: UGCG 165/165, THRB 850/850, but CYP3A4
+    1000/6880 (14.5%), DRD2 1000/14702 (6.8%), EGFR 1000/20384 (4.9%). DRD2 was
+    a live target in a Niemann-Pick type C run.
+
+    Truncation at ``cap`` is recorded rather than hidden: a partial pool is a
+    coverage gap, and this codebase does not let a gap read as an answer.
+    """
+    # Resolved at call time, not bound as a default: a default argument freezes
+    # the module constant at import, which silently defeats any override.
+    cap = cap or _MAX_ACTIVITY_RECORDS
+    rows: list[dict[str, Any]] = []
+    offset = 0
+    total_count: Optional[int] = None
+    truncated = False
+
+    while True:
+        page_params = dict(params)
+        page_params["limit"] = _ACTIVITY_PAGE_SIZE
+        page_params["offset"] = offset
+        data = _get_json(url, page_params)
+        page = data.get("activities", [])
+        if total_count is None:
+            total_count = (data.get("page_meta") or {}).get("total_count")
+        rows.extend(page)
+        if len(page) < _ACTIVITY_PAGE_SIZE:
+            break
+        if len(rows) >= cap:
+            truncated = True
+            print(f"[chembl] WARNING: activity fetch for {target_chembl_id} hit "
+                  f"the {cap}-record ceiling (upstream total_count="
+                  f"{total_count}); pool is PARTIAL for this target.")
+            break
+        offset += _ACTIVITY_PAGE_SIZE
+
+    _record_coverage(
+        target_chembl_id,
+        retrieved=len(rows),
+        upstream_total=total_count,
+        truncated=truncated,
+        complete=(not truncated),
+    )
+    return rows
+
+
 def _fetch_activities(target_chembl_id: str) -> tuple[list[dict[str, Any]], bool]:
     """
     Fetch IC50/Ki/EC50 activities (pchembl_value present) for a target, then keep
@@ -225,11 +348,8 @@ def _fetch_activities(target_chembl_id: str) -> tuple[list[dict[str, Any]], bool
         "standard_type__in": _POTENCY_STANDARD_TYPES,
         "pchembl_value__isnull": "false",
         "only": "assay_chembl_id,pchembl_value,standard_type",
-        "limit": 1000,
-        "offset": 0,
     }
-    data = _get_json(url, params)
-    activities = data.get("activities", [])
+    activities = _fetch_activity_pages(url, params, target_chembl_id)
     if not activities:
         return [], False
 
@@ -254,7 +374,7 @@ def get_target_bioactivity_count(uniprot_id: str) -> dict[str, Any]:
     IMPORTANT: Values are NOT pooled across different target_chembl_ids silently.
     When pooled_across_multiple_targets is True, interpret with caution.
     """
-    cache_key = make_key("get_target_bioactivity_count_v2_ec50", uniprot_id)
+    cache_key = make_key(BIOACTIVITY_COUNT_CACHE_KEY, uniprot_id)
     cached = get(cache_key)
     if cached is not None:
         return cached
@@ -323,9 +443,14 @@ def _fetch_activities_full(target_chembl_id: str) -> tuple[list[dict[str, Any]],
     empty payload (degraded 200 vs no data; never cached).
     Cache v2 stores {kept, raw_seen}; v1 rows (bare lists) are superseded.
     """
-    cache_key = make_key("_fetch_activities_full_v3_ec50", target_chembl_id)
+    cache_key = make_key(ACTIVITIES_FULL_CACHE_KEY, target_chembl_id)
     cached = get(cache_key)
     if cached is not None:
+        # Coverage is restored from the cached payload: the pagination helper
+        # does not run on a cache hit, and a pool whose coverage silently reads
+        # empty is the same blind spot this change exists to remove.
+        if cached.get("coverage"):
+            _record_coverage(target_chembl_id, **cached["coverage"])
         return cached["kept"], cached["raw_seen"]
 
     url = f"{BASE_URL}/activity.json"
@@ -334,11 +459,8 @@ def _fetch_activities_full(target_chembl_id: str) -> tuple[list[dict[str, Any]],
         "standard_type__in": _POTENCY_STANDARD_TYPES,
         "pchembl_value__isnull": "false",
         "only": "activity_id,assay_chembl_id,molecule_chembl_id,canonical_smiles,pchembl_value,standard_type",
-        "limit": 1000,
-        "offset": 0,
     }
-    data = _get_json(url, params)
-    activities = data.get("activities", [])
+    activities = _fetch_activity_pages(url, params, target_chembl_id)
     if not activities:
         # Empty payload is ambiguous: genuine "no IC50/Ki/EC50 assays" vs a degraded
         # 200-with-empty-body during a ChEMBL outage. Do NOT cache — a cached
@@ -357,8 +479,112 @@ def _fetch_activities_full(target_chembl_id: str) -> tuple[list[dict[str, Any]],
 
     # kept may be [] here (all rows below confidence) — that IS a genuine
     # post-filter empty and is cacheable, flagged by raw_seen=True.
-    cache_set(cache_key, {"kept": kept, "raw_seen": True}, ttl_days=7)
+    cache_set(cache_key,
+              {"kept": kept, "raw_seen": True,
+               "coverage": activity_fetch_coverage(target_chembl_id)},
+              ttl_days=7)
     return kept, True
+
+
+def _max_phase(*values: Any) -> Any:
+    """Highest known development phase across salt forms of one moiety.
+
+    ChEMBL returns max_phase as a string ("4.0") or a number depending on
+    endpoint, and None where unknown. Unknown must not outrank a known value,
+    and a known value must not be lost to a string/float comparison.
+    """
+    best: Optional[float] = None
+    best_raw: Any = None
+    for value in values:
+        if value is None:
+            continue
+        try:
+            numeric = float(value)
+        except (TypeError, ValueError):
+            continue
+        if best is None or numeric > best:
+            best, best_raw = numeric, value
+    return best_raw
+
+
+def _collapse_salts_to_parent(
+    by_mol: dict[str, dict[str, Any]],
+    meta: dict[str, dict[str, Any]],
+) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
+    """Merge salt/hydrate forms onto their parent active moiety.
+
+    A salt is the same drug. ChEMBL records it as a separate molecule with its
+    own InChIKey, because the key is computed over the counterion too, so
+    connectivity-block matching cannot relate the two.
+    ``molecule_hierarchy.parent_chembl_id`` can.
+
+    Left unmerged, one drug competes with itself. A Niemann-Pick type C run
+    carried ELIGLUSTAT (CHEMBL2110588) at composite 0.8315 and ELIGLUSTAT
+    TARTRATE (CHEMBL5723563, parent CHEMBL2110588) at 0.5002 as separate rows,
+    each with its own independently-retrieved literature-gate verdict -- one
+    SEARCH_FAILED, the other cleared. Same active moiety, two answers, and the
+    split also divides the activity evidence that should have been pooled.
+
+    Returns ``(by_parent, meta)`` with meta extended to cover any parent that
+    had no activities recorded under its own identifier.
+    """
+    parent_of: dict[str, str] = {}
+    for mid in by_mol:
+        parent_of[mid] = (meta.get(mid, {}) or {}).get("parent_chembl_id") or mid
+
+    missing_parents = sorted(
+        {p for p in parent_of.values() if p not in meta and p not in by_mol})
+    if missing_parents:
+        # The parent may carry no activities of its own (only the salt was
+        # assayed), so its name/structure has to be fetched separately.
+        meta = {**meta, **_fetch_molecule_meta(missing_parents)}
+
+    # The parent's metadata can still be absent -- the backfill can fail, or
+    # ChEMBL may hold no record under the parent identifier. Without this, the
+    # merged row inherits an empty meta entry, loses max_phase, and an APPROVED
+    # drug silently vanishes from a repurposing_only pool. A salt of an
+    # approved drug is the same approved moiety, so approval and identity are
+    # carried up from whichever contributing form has them.
+    meta = dict(meta)
+    for mid, parent in parent_of.items():
+        base = dict(meta.get(parent) or {})
+        form = meta.get(mid) or {}
+        if not base.get("pref_name") and form.get("pref_name"):
+            base["pref_name"] = form["pref_name"]
+        if not base.get("canonical_smiles") and form.get("canonical_smiles"):
+            base["canonical_smiles"] = form["canonical_smiles"]
+        base["max_phase"] = _max_phase(base.get("max_phase"),
+                                       form.get("max_phase"))
+        base["parent_chembl_id"] = parent
+        meta[parent] = base
+
+    by_parent: dict[str, dict[str, Any]] = {}
+    for mid, d in by_mol.items():
+        parent = parent_of[mid]
+        merged = by_parent.get(parent)
+        if merged is None:
+            merged = {
+                "molecule_chembl_id": parent,
+                "pchembls": [],
+                "pchembl_pairs": [],
+                "confidences": [],
+                "activity_ids": [],
+                "assay_ids": set(),
+                "canonical_smiles": None,
+                "source_molecule_chembl_ids": [],
+            }
+            by_parent[parent] = merged
+        merged["pchembls"].extend(d.get("pchembls") or [])
+        merged["pchembl_pairs"].extend(d.get("pchembl_pairs") or [])
+        merged["confidences"].extend(d.get("confidences") or [])
+        merged["activity_ids"].extend(d.get("activity_ids") or [])
+        merged["assay_ids"].update(d.get("assay_ids") or set())
+        merged["source_molecule_chembl_ids"].append(mid)
+        # Prefer the parent's own structure; fall back to any contributing form.
+        if merged["canonical_smiles"] is None or mid == parent:
+            merged["canonical_smiles"] = (
+                d.get("canonical_smiles") or merged["canonical_smiles"])
+    return by_parent, meta
 
 
 def _fetch_molecule_meta(molecule_ids: list[str]) -> dict[str, dict[str, Any]]:
@@ -546,7 +772,11 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
     # as duplicate candidates or self-comparators downstream.
     # repurposing_only is part of the cache key so the approved-only and mixed
     # pools never collide in the cache.
-    cache_key = make_key("get_target_candidate_compounds_v5_ec50", uniprot_id,
+    # v6: compound dicts now carry pchembl_aggregation/pchembl_n/
+    # pchembl_anchor_activity_id. The cached value's SHAPE changed, so the key
+    # has to move with it -- a cached v5 dict would silently omit the fields
+    # and the dossier would fall back to an unqualified affinity label.
+    cache_key = make_key(CANDIDATE_POOL_CACHE_KEY, uniprot_id,
                          max_compounds, repurposing_only)
     cached = get(cache_key)
     if cached is not None:
@@ -559,6 +789,10 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
         "repurposing_only": repurposing_only,
         "source_status": "unknown",
         "source_error": None,
+        # Per-target record of how much of the upstream activity ledger this
+        # pool was actually built from. A truncated pool is a coverage gap and
+        # must be visible, not inferred from a compound count.
+        "activity_coverage": {},
     }
 
     try:
@@ -588,6 +822,9 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
         saw_activity_payload = False  # any non-empty activity payload seen
         for tid in target_ids:
             tid_acts, raw_seen = _fetch_activities_full(tid)
+            coverage = activity_fetch_coverage(tid)
+            if coverage:
+                result["activity_coverage"][tid] = coverage
             if raw_seen:
                 saw_activity_payload = True
             for a in tid_acts:
@@ -597,15 +834,22 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
                 d = by_mol.setdefault(mid, {
                     "molecule_chembl_id": mid,
                     "pchembls": [],
+                    "pchembl_pairs": [],
                     "confidences": [],
                     "activity_ids": [],
                     "assay_ids": set(),
                     "canonical_smiles": a.get("canonical_smiles"),
                 })
                 try:
-                    d["pchembls"].append(float(a["pchembl_value"]))
+                    value = float(a["pchembl_value"])
                 except (TypeError, ValueError, KeyError):
                     pass
+                else:
+                    d["pchembls"].append(value)
+                    # Paired so the reported statistic can name the exact record
+                    # that carries it. `activity_ids` alone is not index-aligned
+                    # with `pchembls`: each skips on a different condition.
+                    d["pchembl_pairs"].append((value, a.get("activity_id")))
                 d["confidences"].append(a.get("_confidence", 0))
                 if a.get("activity_id") is not None:
                     d["activity_ids"].append(a["activity_id"])
@@ -613,20 +857,29 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
                     d["assay_ids"].add(a["assay_chembl_id"])
 
         meta = _fetch_molecule_meta(list(by_mol.keys()))
+        by_mol, meta = _collapse_salts_to_parent(by_mol, meta)
 
         compounds = []
         for mid, d in by_mol.items():
             m = meta.get(mid, {})
             smiles = m.get("canonical_smiles") or d["canonical_smiles"]
             assay_ids = sorted(d["assay_ids"])
+            median_pchembl, pchembl_anchor = _median_with_anchor(
+                d.get("pchembl_pairs") or [])
             compounds.append({
                 "molecule_chembl_id": mid,
                 "parent_chembl_id": m.get("parent_chembl_id") or mid,
-                "source_molecule_chembl_ids": [mid],
+                "source_molecule_chembl_ids": sorted(
+                    d.get("source_molecule_chembl_ids") or [mid]),
                 "pref_name": m.get("pref_name"),
                 "max_phase": m.get("max_phase"),
                 "canonical_smiles": smiles,
-                "pchembl_value": statistics.median(d["pchembls"]) if d["pchembls"] else None,
+                "pchembl_value": median_pchembl,
+                # The statistic is part of what the number means: downstream
+                # prose must not call a median the "best" value.
+                "pchembl_aggregation": "median" if d["pchembls"] else None,
+                "pchembl_n": len(d["pchembls"]),
+                "pchembl_anchor_activity_id": pchembl_anchor,
                 "confidence_score": max(d["confidences"]) if d["confidences"] else None,
                 "n_activities": len(d["activity_ids"]),
                 "source_activity_ids": d["activity_ids"],

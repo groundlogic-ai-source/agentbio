@@ -38,7 +38,7 @@ class TestFetchActivitiesFullRawSeen(unittest.TestCase):
     TID = "CHEMBL_FAKE_SWEEP_A"
 
     def setUp(self):
-        self.key = make_key("_fetch_activities_full_v2", self.TID)
+        self.key = make_key(chembl.ACTIVITIES_FULL_CACHE_KEY, self.TID)
         _purge(self.key)
 
     def tearDown(self):
@@ -86,9 +86,9 @@ class TestPoolAndCountCacheGates(unittest.TestCase):
     UID = "U_FAKE_SWEEP_B"
 
     def setUp(self):
-        self.pool_key = make_key("get_target_candidate_compounds_v4",
+        self.pool_key = make_key(chembl.CANDIDATE_POOL_CACHE_KEY,
                                  self.UID, 25, True)
-        self.count_key = make_key("get_target_bioactivity_count", self.UID)
+        self.count_key = make_key(chembl.BIOACTIVITY_COUNT_CACHE_KEY, self.UID)
         _purge(self.pool_key, self.count_key)
 
     def tearDown(self):

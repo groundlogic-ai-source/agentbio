@@ -56,22 +56,38 @@ class CacheInvalidationTest(unittest.TestCase):
     cached value means, so the key has to move with it.
     """
 
-    def test_activity_cache_key_is_versioned_for_this_change(self):
-        import inspect
-        source = inspect.getsource(chembl)
-        self.assertNotIn('make_key("_fetch_activities_full_v2"', source)
-        self.assertIn("_fetch_activities_full_v3_ec50", source)
+    #: Key names superseded by a change to what the cached value MEANS. A key
+    #: must never return to one of these, or a run replays a pool built under
+    #: a contract the code no longer implements.
+    SUPERSEDED_ACTIVITY_KEYS = {
+        "_fetch_activities_full_v2",       # pre-EC50 (agonist potency unseen)
+        "_fetch_activities_full_v3_ec50",  # pre-pagination (first 1000 rows)
+    }
+    SUPERSEDED_COUNT_KEYS = {
+        "get_target_bioactivity_count",
+        "get_target_bioactivity_count_v2_ec50",
+    }
+
+    def test_activity_cache_key_has_moved_past_every_superseded_shape(self):
+        self.assertNotIn(chembl.ACTIVITIES_FULL_CACHE_KEY,
+                         self.SUPERSEDED_ACTIVITY_KEYS)
 
     def test_bioactivity_count_cache_key_is_versioned(self):
-        import inspect
-        source = inspect.getsource(chembl)
-        self.assertIn("get_target_bioactivity_count_v2_ec50", source)
+        self.assertNotIn(chembl.BIOACTIVITY_COUNT_CACHE_KEY,
+                         self.SUPERSEDED_COUNT_KEYS)
 
     def test_candidate_pool_cache_key_is_versioned(self):
-        import inspect
-        source = inspect.getsource(chembl)
-        self.assertNotIn('make_key("get_target_candidate_compounds_v4"', source)
-        self.assertIn("get_target_candidate_compounds_v5_ec50", source)
+        """The pool key must stay ahead of every shape it has outgrown.
+
+        v4 predates EC50; v5 predates the pchembl_aggregation/pchembl_n/
+        pchembl_anchor_activity_id fields added on 2026-09-29. Reading back a
+        cached dict from either shape drops fields the dossier narrates.
+        """
+        self.assertNotIn(chembl.CANDIDATE_POOL_CACHE_KEY, {
+            "get_target_candidate_compounds_v4",        # pre-EC50
+            "get_target_candidate_compounds_v5_ec50",   # pre-median-anchor
+            "get_target_candidate_compounds_v6_anchor",  # pre-pagination
+        })
 
 
 class AgonistDiseaseRegressionTest(unittest.TestCase):
