@@ -84,11 +84,29 @@ class ExclusionWiringTest(unittest.TestCase):
         self.assertIn('reasons.append("target_association_not_measured")',
                       source)
 
-    def test_the_check_reads_target_discovery_method(self):
+    def test_the_check_resolves_the_target_not_the_candidate_lane(self):
+        """A target's evidence is a property of the TARGET.
+
+        target_discovery_method describes how a CANDIDATE reached the pool.
+        Gating on it per row gave one target two verdicts: every ELANE row in
+        an alpha-1-antitrypsin deficiency run carried the same measured
+        association (0.5465), yet sivelestat -- an actual neutrophil elastase
+        inhibitor and the most apt candidate present -- arrived through the
+        precedent lane and was excluded, while bortezomib, a mechanistically
+        irrelevant proteasome inhibitor, arrived through the genetic lane and
+        was not.
+        """
         import inspect
         from agents import reviewer
         source = inspect.getsource(reviewer)
-        self.assertIn("_MEASURED_ASSOCIATION_METHODS", source)
+        self.assertIn("_measured_targets: set[str] = {", source)
+        self.assertIn(
+            'if str(r.get("target_symbol") or "").upper() not in _measured_targets:',
+            source)
+        self.assertNotIn(
+            'if str(r.get("target_discovery_method") or "").strip().lower() \\\n'
+            '                not in _MEASURED_ASSOCIATION_METHODS:',
+            source)
 
     def test_rows_are_excluded_not_deleted(self):
         """Precedent targets remain visible as context.

@@ -1506,6 +1506,26 @@ def run_reviewer(
     # showed that plausible target-level direction can coexist with an explicit
     # disease/class-level therapeutic limitation. The bounded shortlist is the
     # only set authorized to proceed to paid structure validation.
+    # A TARGET has a measured association; a CANDIDATE has an arrival lane.
+    # target_discovery_method describes the latter, and reading it per row gave
+    # one target two verdicts: in an alpha-1-antitrypsin deficiency run every
+    # ELANE row carried the same measured association (0.5465), yet sivelestat
+    # -- an actual neutrophil elastase inhibitor and the most apt candidate in
+    # the pool -- arrived through the precedent lane and was excluded, while
+    # bortezomib, a mechanistically irrelevant proteasome inhibitor, arrived
+    # through the genetic lane and was not. Resolved pool-wide instead: a
+    # target is measured if ANY candidate reached it by genetic association.
+    #
+    # Hoisted above the literature shortlist because that shortlist has to
+    # spend its budget on candidates that can still be promoted.
+    _measured_targets: set[str] = {
+        str(row.get("target_symbol") or "").upper()
+        for row in reviewed
+        if str(row.get("target_discovery_method") or "").strip().lower()
+        in _MEASURED_ASSOCIATION_METHODS
+        and str(row.get("target_symbol") or "").strip()
+    }
+
     if _holdout.is_active():
         # Frozen/holdout studies predate this gate. Do not query the held-out
         # candidate or change their ranking semantics post hoc.
@@ -1531,7 +1551,30 @@ def run_reviewer(
                 and r["candidate_source_coverage"]["complete"]
             )
     else:
-        shortlist = reviewed[:MAX_LITERATURE_LIMITATION_CANDIDATES]
+        # MAX_LITERATURE_LIMITATION_CANDIDATES is 3, and this is the scarcest
+        # resource in the pipeline: a candidate outside it is recorded
+        # NOT_ASSESSED, never clears the gate, and is excluded without its
+        # evidence ever being looked at.
+        #
+        # Taking the top 3 by rank spent the entire budget on candidates
+        # already destined for exclusion. In an alpha-1-antitrypsin deficiency
+        # run all three were SGLT2 inhibitors on SLC5A2 -- a target carrying
+        # the provisional 0.50 placeholder, admitted by pharmacological
+        # precedent, with no measured association to the disease. Every
+        # candidate on the real target (ELANE, measured 0.5465), sivelestat
+        # included, came back NOT_ASSESSED: not rejected on evidence, simply
+        # never examined.
+        #
+        # Candidates whose target has no measured association cannot be
+        # promoted whatever this gate returns, so they do not get the budget.
+        # Falls back to the plain top-N if that leaves nothing, so a pool with
+        # no measured target still gets assessed rather than silently skipped.
+        _promotable = [
+            r for r in reviewed
+            if str(r.get("target_symbol") or "").upper() in _measured_targets
+        ]
+        shortlist = (_promotable or reviewed)[
+            :MAX_LITERATURE_LIMITATION_CANDIDATES]
         for r in shortlist:
             direction = r.get("mechanism_direction") or {}
             action_type = direction.get("action_type_used")
@@ -1664,8 +1707,7 @@ def run_reviewer(
         # symptom drug hits it. Such rows remain in the pool as precedent
         # context and are disclosed, but they are not disease-biology
         # hypotheses and must not be promoted as one.
-        if str(r.get("target_discovery_method") or "").strip().lower() \
-                not in _MEASURED_ASSOCIATION_METHODS:
+        if str(r.get("target_symbol") or "").upper() not in _measured_targets:
             reasons.append("target_association_not_measured")
 
         # Strictly dominated on safety: this candidate carries a boxed warning
