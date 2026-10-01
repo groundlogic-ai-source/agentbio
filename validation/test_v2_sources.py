@@ -55,6 +55,19 @@ class _FakeResp:
             raise ValueError("no JSON object could be decoded")
         return self._json_data
 
+    def raise_for_status(self):
+        """GtoPdb now goes through the shared provider request policy.
+
+        That policy calls raise_for_status(), which this fake predates -- every
+        GtoPdb test errored with AttributeError rather than exercising the
+        behaviour under test. Mirrors requests.Response: 4xx/5xx raise,
+        everything else is a no-op, so pass_through_statuses (notably GtoPdb's
+        404-means-absent) is still decided by the policy and not by the fake.
+        """
+        if 400 <= self.status_code < 600:
+            raise requests.exceptions.HTTPError(
+                f"{self.status_code} error", response=self)
+
 
 def _make_requests_get(routes, recorder=None):
     """Return a fake requests.get that maps a URL path to a _FakeResp.
