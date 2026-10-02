@@ -77,6 +77,14 @@ POLICIES = {
     # sit in source_unavailable. 0.25s at concurrency 1 holds it to ~4/s.
     "pubchem": ProviderPolicy(
         concurrency=1, min_interval_seconds=0.25, max_attempts=5),
+    # BindingDB is a small academic service, like GtoPdb, and was likewise
+    # called with a bare requests.get. Under a reviewer pass it stops returning
+    # JSON and serves an HTML error page instead, which surfaces as "returned
+    # non-JSON body" -- indistinguishable from a malformed API. A Duchenne
+    # muscular dystrophy run died that way on all five targets while BindingDB
+    # answered a manual probe with HTTP 200 and valid JSON seconds later.
+    "bindingdb": ProviderPolicy(
+        concurrency=1, min_interval_seconds=0.5, max_attempts=5),
 }
 
 _lock = threading.Lock()

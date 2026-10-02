@@ -69,6 +69,7 @@ import requests
 
 from cache.cache import get as cache_get, set as cache_set, make_key
 from data_sources import drugcentral_local
+from data_sources.provider_request_policy import request as provider_request
 
 BASE_URL = "https://bindingdb.org/rest"
 
@@ -135,10 +136,20 @@ def _fetch_affinities(uniprot_id: str, cutoff_nm: int) -> list[dict[str, Any]]:
         "response": "application/json",
     }
     try:
-        resp = requests.get(url, params=params,
-                            headers={"Accept": "application/json"},
-                            timeout=60)
-    except requests.exceptions.RequestException as e:
+        # Through the shared throttle: unthrottled, BindingDB serves an HTML
+        # error page under load, which reads as "non-JSON body" and fails the
+        # coverage gate for every candidate in the pool.
+        resp = provider_request(
+            "bindingdb",
+            requests.get,
+            url,
+            params=params,
+            headers={"Accept": "application/json"},
+            timeout=60,
+        )
+    except _SourceUnavailable:
+        raise
+    except Exception as e:  # noqa: BLE001 — policy exhaustion is unavailability
         raise _SourceUnavailable(f"request to {url} failed: {e}") from e
 
     if resp.status_code in _TRANSIENT_STATUSES:
