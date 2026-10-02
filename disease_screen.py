@@ -36,6 +36,7 @@ import sys
 from typing import Any, Optional
 
 from agents.target_selection import DiseaseNotInUniverse, preflight_for_disease
+from data_sources.chembl import get_approved_drugs_for_target
 from data_sources.tissue_exposure import requires_cns_exposure
 
 #: Discovery methods whose association is MEASURED rather than the provisional
@@ -71,6 +72,7 @@ def _target_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "target_symbol": symbol.upper(),
             "discovery_method": str(row.get("target_discovery_method") or ""),
             "ot_association_score": row.get("ot_association_score"),
+            "uniprot_id": str(row.get("uniprot_id") or "").strip(),
             "measured": str(row.get("target_discovery_method") or "").strip().lower()
             in MEASURED_METHODS,
             "positional_flagged": bool(risk.get("flagged")),
@@ -141,7 +143,28 @@ def screen_disease(disease_name: str) -> dict[str, Any]:
     alternatives = [t for t in usable
                     if not causal or t["target_symbol"] != causal["target_symbol"]]
     alternatives.sort(key=lambda t: -(t["ot_association_score"] or 0.0))
+
+    # A target with almost no approved ligands cannot yield a NOVEL pair --
+    # there is nothing untried to find. This is what actually killed the last
+    # three hunts, and association strength alone does not show it:
+    #
+    #   Friedreich ataxia  NFE2L2  2 candidates, both already FA drugs
+    #   RTH-beta           THRB    thyroid analogues only, all standard or legacy
+    #   AATD               ELANE   a handful of elastase inhibitors
+    #
+    # versus DRD2, which carried 168. Repurposing needs somewhere to look.
+    for alt in alternatives:
+        try:
+            env = get_approved_drugs_for_target(alt["uniprot_id"] or "")
+            alt["approved_drug_count"] = env.get("approved_drug_count")
+        except Exception:  # noqa: BLE001 — unknown count, never a claim
+            alt["approved_drug_count"] = None
+
     best_alt = alternatives[0] if alternatives else None
+    # Richest usable alternative: the one with somewhere to actually look.
+    with_drugs = [a for a in alternatives if (a.get("approved_drug_count") or 0) > 0]
+    with_drugs.sort(key=lambda t: -(t.get("approved_drug_count") or 0))
+    richest_alt = with_drugs[0] if with_drugs else None
 
     base.update({
         "in_universe": True,
@@ -158,6 +181,12 @@ def screen_disease(disease_name: str) -> dict[str, Any]:
         "best_alternative_target": best_alt["target_symbol"] if best_alt else None,
         "best_alternative_assoc": (
             best_alt["ot_association_score"] if best_alt else None),
+        "richest_alternative_target": (
+            richest_alt["target_symbol"] if richest_alt else None),
+        "richest_alternative_drugs": (
+            richest_alt.get("approved_drug_count") if richest_alt else None),
+        "richest_alternative_assoc": (
+            richest_alt.get("ot_association_score") if richest_alt else None),
     })
 
     if not measured:
@@ -233,9 +262,12 @@ def rank_key(result: dict[str, Any]) -> tuple:
     candidate space rather than disqualifying the disease.
     """
     return (
-        # The strongest non-causal intervention point leads: that is what
-        # distinguishes a disease with somewhere else to aim from one whose
-        # candidate space is already exhausted by its causal gene's ligands.
+        # Approved ligands on a usable alternative target lead. Association
+        # strength says the target is real; the drug count says there is
+        # anything untried to find on it. Friedreich ataxia had a strong
+        # alternative (NFE2L2, 0.547) carrying exactly two candidates, both
+        # already its own drugs -- a real target with an empty shelf.
+        -int(result.get("richest_alternative_drugs") or 0),
         -float(result.get("best_alternative_assoc") or 0.0),
         -int(result.get("n_usable") or 0),
         int(result.get("n_positional_flagged") or 0),
@@ -255,17 +287,20 @@ def format_table(results: list[dict[str, Any]]) -> str:
 
     lines = [
         f"{'disease':38s} {'verdict':26s} {'causal':>14s} "
-        f"{'best alternative':>22s} {'pos':>4s} {'CNS':>4s}",
-        "-" * 120,
+        f"{'best alternative':>22s} {'richest alt (drugs)':>24s} {'CNS':>4s}",
+        "-" * 130,
     ]
     for r in results:
         causal = f"{r.get('causal_target') or '—'} {num(r.get('causal_assoc'))}"
         alt = (f"{r.get('best_alternative_target') or '—'} "
                f"{num(r.get('best_alternative_assoc'))}")
+        n_drugs = r.get("richest_alternative_drugs")
+        rich = (f"{r.get('richest_alternative_target') or '—'} "
+                f"({n_drugs if n_drugs is not None else '—'})")
         lines.append(
             f"{str(r['disease_name'])[:38]:38s} {r['verdict'][:26]:26s} "
             f"{causal:>14s} {alt:>22s} "
-            f"{r['n_positional_flagged']:>4d} {r.get('n_positional_unknown',0):>4d} "
+            f"{rich:>24s} "
             f"{'yes' if r['requires_cns_exposure'] else 'no':>4s}")
     return "\n".join(lines)
 
