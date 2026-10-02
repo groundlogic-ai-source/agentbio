@@ -21,7 +21,7 @@ from typing import Any, Callable, Optional
 import requests
 
 from cache.cache import get, make_key, set as cache_set
-from data_sources.llm_failover import MODEL_TIER_CRITICAL, chat_text
+from data_sources.llm_failover import MODEL_TIER_CHEAP, chat_text
 from data_sources.pubmed import BASE_URL, _api_key_params, _esearch
 from data_sources.provider_request_policy import request as provider_request
 from data_sources.literature_semantics import (
@@ -395,7 +395,7 @@ Title: {record.get('title')}
 Abstract:
 {str(record.get('abstract') or '')[:6000]}"""
     raw, provider = chat_text(
-        prompt, max_tokens=500, model_tier=MODEL_TIER_CRITICAL,
+        prompt, max_tokens=500, model_tier=MODEL_TIER_CHEAP,
         operation_label="literature-limitation-record-classification")
     parsed = _extract_json(raw) or {}
     if "label" not in parsed and "exact_use_label" in parsed:
@@ -447,7 +447,7 @@ Use only supplied text. Never omit a PMID and never use outside knowledge.
 
 {supplied}"""
     raw, provider = chat_text(
-        prompt, max_tokens=2400, model_tier=MODEL_TIER_CRITICAL,
+        prompt, max_tokens=2400, model_tier=MODEL_TIER_CHEAP,
         operation_label="literature-limitation-batch-classification")
     parsed = _extract_json(raw)
     if parsed is None or not isinstance(parsed.get("findings"), list):

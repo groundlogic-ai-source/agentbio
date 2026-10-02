@@ -50,7 +50,7 @@ _MODEL_TIERS = frozenset({
     MODEL_TIER_CRITICAL, MODEL_TIER_STANDARD, MODEL_TIER_CHEAP,
 })
 
-ANTHROPIC_CRITICAL_TEXT_MODEL = "claude-sonnet-4-6"
+ANTHROPIC_CRITICAL_TEXT_MODEL = "claude-sonnet-5"
 OPENAI_CRITICAL_TEXT_MODEL = "gpt-5.4"
 # Standard is currently identical to critical for capability preservation.
 ANTHROPIC_STANDARD_TEXT_MODEL = ANTHROPIC_CRITICAL_TEXT_MODEL
@@ -254,6 +254,33 @@ def _is_transient(exc: Exception) -> bool:
     return False
 
 
+def _is_provider_exhausted(exc: Exception) -> bool:
+    """Has THIS provider run out of money/quota?
+
+    Distinct from transient. Retrying the same provider is pointless -- the
+    balance will not refill between attempts -- but the OTHER provider may be
+    funded, which is exactly what failover is for. Treating it as
+    non-transient, as this did, raised immediately and never tried the
+    alternative: a Duchenne muscular dystrophy run lost its whole literature
+    gate to an empty Anthropic balance without once asking OpenAI.
+
+    The two providers report it incompatibly, which is why this is matched on
+    message rather than status:
+      Anthropic  400 invalid_request_error "credit balance is too low"
+      OpenAI     429 "You have no credits remaining"
+    A 400 is normally a permanent validation error and a 429 is normally a
+    rate limit, so neither status alone identifies this condition.
+    """
+    msg = str(exc).lower()
+    return (
+        "credit balance is too low" in msg
+        or "no credits remaining" in msg
+        or "billing" in msg and "credit" in msg
+        or "insufficient_quota" in msg
+        or "exceeded your current quota" in msg
+    )
+
+
 def _backoff_sleep(attempt: int) -> None:
     delay = _BASE_DELAY_SECONDS * (2 ** attempt) + random.uniform(0, 1.5)
     time.sleep(min(delay, 60.0))
@@ -318,8 +345,16 @@ def chat_text(prompt: str, *, system: Optional[str] = None,
     order = providers[start:] + providers[:start]
 
     last_exc: Optional[Exception] = None
+    # Providers whose balance is spent. Skipped rather than retried: the
+    # balance will not refill mid-call, and burning attempts on it starves the
+    # funded provider of the retries it might need.
+    exhausted: set[str] = set()
     for attempt in range(_MAX_ATTEMPTS):
         provider = order[attempt % len(order)]
+        if provider in exhausted:
+            if all(p in exhausted for p in order):
+                break
+            continue
         model = text_model_for(provider, model_tier)
         started = time.monotonic()
         try:
@@ -344,12 +379,28 @@ def chat_text(prompt: str, *, system: Optional[str] = None,
                 operation=operation_label or "chat_text", attempt=attempt + 1,
                 latency_seconds=time.monotonic() - started, success=False,
                 error=exc)
+            if _is_provider_exhausted(exc):
+                # Not transient and not fatal to the call: switch providers
+                # immediately, with no backoff, since waiting cannot help.
+                exhausted.add(provider)
+                print(f"[llm_failover] {provider} is out of credit; "
+                      f"failing over", flush=True)
+                if all(p in exhausted for p in order):
+                    break
+                continue
             if not _is_transient(exc):
                 raise
             print(f"[llm_failover] {provider} transient error "
                   f"(attempt {attempt + 1}/{_MAX_ATTEMPTS}): "
                    f"{type(exc).__name__}", flush=True)
             _backoff_sleep(attempt)
+    if exhausted and all(p in exhausted for p in order):
+        # Named explicitly: this reads as a search/source failure everywhere
+        # downstream, and billing is not an infrastructure problem.
+        raise RuntimeError(
+            "every configured LLM provider is out of credit "
+            f"({', '.join(sorted(exhausted))}); this is a billing state, "
+            "not a source outage") from last_exc
     raise RuntimeError(
         f"chat_text exhausted {_MAX_ATTEMPTS} attempts across providers "
         f"{providers}") from last_exc
