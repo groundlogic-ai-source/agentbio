@@ -201,7 +201,13 @@ MAX_DIRECTION_LEADER_PASSES = 3
 MAX_SAFETY_LAYER2_CANDIDATES = 3
 # This post-benchmark production gate runs only on candidates that could reach
 # paid structure prediction. Unchecked candidates are never structure-eligible.
-MAX_LITERATURE_LIMITATION_CANDIDATES = 3
+MAX_LITERATURE_LIMITATION_CANDIDATES = 10
+
+#: How many measured-target candidates get the free Europe PMC prior-art
+#: screen before the paid literature budget is allocated. Bounded because it
+#: is one HTTP call per candidate; generous because removing a claimed pair
+#: here costs nothing and saves an LLM call below.
+MAX_PRIOR_ART_PRESCREEN = 60
 #: Env-overridable so long-running batch contexts (prod study supervisors)
 #: can soften egress pressure without touching the API server's default.
 def _env_int(name: str, default: int) -> int:
@@ -1573,7 +1579,38 @@ def run_reviewer(
             r for r in reviewed
             if str(r.get("target_symbol") or "").upper() in _measured_targets
         ]
-        shortlist = (_promotable or reviewed)[
+
+        # Prior art is screened FIRST, because it is the cheap gate.
+        #
+        # It is a Europe PMC search with no LLM call; the literature-limitation
+        # gate below is the expensive one and is capped at
+        # MAX_LITERATURE_LIMITATION_CANDIDATES. Running the free filter AFTER
+        # the paid one, as this did, spends the entire paid budget on candidates
+        # a free search would have removed. A Duchenne muscular dystrophy run
+        # showed the cost: 102 candidates on NR3C1, the top three by rank were
+        # the corticosteroids already used to treat it, and prednisolone --
+        # standard of care -- consumed a slot before prior art ever ran.
+        #
+        # Ranking puts the best-characterised, most potent approved drugs on
+        # top, and on a well-drugged target those are precisely the ones already
+        # tried. Screening prior art first removes them for free and leaves the
+        # paid budget for pairs that are actually unclaimed.
+        for r in _promotable[:MAX_PRIOR_ART_PRESCREEN]:
+            prior = check_prior_art(
+                str(r.get("drug_name") or ""),
+                str(r.get("disease_name") or ""),
+                drug_aliases=r.get("compound_aliases") or [],
+            )
+            r["prior_art"] = prior
+            r["prior_art_found"] = bool(prior.get("found"))
+            r["prior_art_status"] = str(prior.get("verdict") or "")
+            r["prior_art_gate_enforced"] = prior_art_gate_is_enabled()
+
+        _unclaimed = [
+            r for r in _promotable
+            if not (r.get("prior_art_found") and prior_art_gate_is_enabled())
+        ]
+        shortlist = (_unclaimed or _promotable or reviewed)[
             :MAX_LITERATURE_LIMITATION_CANDIDATES]
         for r in shortlist:
             direction = r.get("mechanism_direction") or {}
@@ -1728,7 +1765,10 @@ def run_reviewer(
         # The pipeline's other novelty signals count TRIALS, so a preclinical
         # proposal was invisible to all of them.
         if not reasons:
-            prior = check_prior_art(
+            # Reuse the pre-screen result where one exists; only candidates
+            # outside that bounded pass still need the lookup. The search is
+            # cached either way, so this is about not re-walking the pool.
+            prior = r.get("prior_art") or check_prior_art(
                 str(r.get("drug_name") or ""),
                 str(r.get("disease_name") or ""),
                 drug_aliases=r.get("compound_aliases") or [],

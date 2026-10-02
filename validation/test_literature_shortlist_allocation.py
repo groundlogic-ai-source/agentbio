@@ -49,7 +49,38 @@ class ShortlistAllocationTest(unittest.TestCase):
         candidate, turning a narrowing optimisation into a blanket skip.
         """
         source = inspect.getsource(reviewer.run_reviewer)
-        self.assertIn("(_promotable or reviewed)[", source)
+        self.assertIn("(_unclaimed or _promotable or reviewed)[", source)
+
+    def test_prior_art_is_screened_before_the_paid_budget(self):
+        """The free gate must run first.
+
+        Prior art is a Europe PMC search with no LLM call; the
+        literature-limitation gate is the paid one and is capped. Running the
+        free filter after the paid one spends the whole budget on candidates a
+        free search would have removed -- on Duchenne muscular dystrophy the
+        top three by rank were the corticosteroids already used to treat it,
+        and prednisolone took a slot before prior art ever ran.
+        """
+        source = inspect.getsource(reviewer.run_reviewer)
+        self.assertLess(
+            source.index("for r in _promotable[:MAX_PRIOR_ART_PRESCREEN]"),
+            source.index("shortlist = ("),
+            "prior art must be screened before the shortlist is drawn")
+
+    def test_claimed_pairs_do_not_consume_the_budget(self):
+        source = inspect.getsource(reviewer.run_reviewer)
+        self.assertIn("_unclaimed = [", source)
+        self.assertIn(
+            'if not (r.get("prior_art_found") and prior_art_gate_is_enabled())',
+            source)
+
+    def test_the_prescreen_is_bounded(self):
+        """One HTTP call per candidate, so the pass cannot run unbounded."""
+        self.assertIsInstance(reviewer.MAX_PRIOR_ART_PRESCREEN, int)
+        self.assertGreaterEqual(
+            reviewer.MAX_PRIOR_ART_PRESCREEN,
+            reviewer.MAX_LITERATURE_LIMITATION_CANDIDATES,
+            "the prescreen must be able to supply a full shortlist")
 
     def test_measured_targets_is_resolved_before_the_shortlist(self):
         """Order matters: the filter cannot use a set built after it."""
@@ -59,13 +90,13 @@ class ShortlistAllocationTest(unittest.TestCase):
             source.index("_promotable = ["),
             "the measured-target set must be built before the shortlist")
 
-    def test_the_budget_constant_is_unchanged(self):
-        """The fix reallocates the budget; it does not quietly enlarge it.
+    def test_the_budget_matches_the_benchmark_hit_definition(self):
+        """10 mirrors how a benchmark hit is defined: rediscovery within top-10.
 
-        Raising the cap would spend more on every run, including the ones this
-        change already makes cheaper.
+        Raised from 3 once prior art was screened first: on a well-drugged
+        target the top 3 by rank are the drugs already used for the disease.
         """
-        self.assertEqual(reviewer.MAX_LITERATURE_LIMITATION_CANDIDATES, 3)
+        self.assertEqual(reviewer.MAX_LITERATURE_LIMITATION_CANDIDATES, 10)
 
     def test_holdout_path_is_untouched(self):
         """Frozen studies predate this gate and must keep their semantics."""
