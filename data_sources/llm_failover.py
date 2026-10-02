@@ -50,7 +50,16 @@ _MODEL_TIERS = frozenset({
     MODEL_TIER_CRITICAL, MODEL_TIER_STANDARD, MODEL_TIER_CHEAP,
 })
 
-ANTHROPIC_CRITICAL_TEXT_MODEL = "claude-sonnet-5"
+# CRITICAL/STANDARD are PINNED to the models the frozen benchmark ran on.
+# STANDARD inherits from CRITICAL and is the default tier, so changing either
+# silently swaps the model under benchmark-era components -- the biologist's
+# PubMed gating (data_sources/pubmed.py), safety classification
+# (data_sources/safety_check.py) and trial relevance
+# (data_sources/clinicaltrials.py) all call chat_text with no tier. Newer
+# models exist (Sonnet 5.5, claude-sonnet-5-5) and must NOT be adopted here:
+# the frozen results would no longer describe the system that produced them.
+# Post-benchmark gates opt into CHEAP instead, which is free to move.
+ANTHROPIC_CRITICAL_TEXT_MODEL = "claude-sonnet-4-6"
 OPENAI_CRITICAL_TEXT_MODEL = "gpt-5.4"
 # Standard is currently identical to critical for capability preservation.
 ANTHROPIC_STANDARD_TEXT_MODEL = ANTHROPIC_CRITICAL_TEXT_MODEL
@@ -59,8 +68,15 @@ OPENAI_STANDARD_TEXT_MODEL = OPENAI_CRITICAL_TEXT_MODEL
 # Environment overrides make the tier deploy-configurable without changing code.
 ANTHROPIC_CHEAP_TEXT_MODEL = os.environ.get(
     "AGENTBIO_ANTHROPIC_CHEAP_TEXT_MODEL", "claude-haiku-4-5")
+# gpt-5.6-luna is OpenAI's current cost tier at $0.20/$1.20 per 1M tokens,
+# roughly 4x cheaper than the GPT-5.4 Mini generation this replaced. Safe to
+# move because CHEAP is opt-in and currently used only by the post-benchmark
+# literature gate, which verifies every label deterministically in Python.
+# Anthropic's cheap slot stays on Haiku 4.5: Sonnet 5.5 is cheaper per task
+# than Sonnet 5 but is still an order of magnitude above Haiku, so it does not
+# belong in this tier.
 OPENAI_CHEAP_TEXT_MODEL = os.environ.get(
-    "AGENTBIO_OPENAI_CHEAP_TEXT_MODEL", "gpt-5-mini")
+    "AGENTBIO_OPENAI_CHEAP_TEXT_MODEL", "gpt-5.6-luna")
 
 # Backward-compatible internal names retained for callers/tests that imported
 # them before tiers were introduced.
