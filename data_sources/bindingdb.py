@@ -62,6 +62,7 @@ Return envelope (shared v2 adapter shape):
 from __future__ import annotations
 
 import math
+import time
 import re
 from typing import Any, Optional
 
@@ -101,6 +102,18 @@ _RELATION_RE = re.compile(
 # The provider's actual response key has a typo ("Linds").  Accept the
 # corrected spelling too so an upstream fix is not an outage.
 _RESPONSE_KEYS = ("getLindsByUniprotsResponse", "getLigandsByUniprotsResponse")
+
+
+#: Last malformed-body error per URL, for diagnostics only.
+_LAST_MALFORMED: dict[str, str] = {}
+
+#: Attempts for a 200 whose body will not parse. Small: the retry exists for a
+#: truncated transfer, not to grind against a genuinely broken contract.
+_MALFORMED_BODY_ATTEMPTS = 3
+
+
+class _MalformedBody(Exception):
+    """A 200 whose body will not parse. Retryable transport failure."""
 
 
 class _SourceUnavailable(Exception):
@@ -162,7 +175,14 @@ def _fetch_affinities(uniprot_id: str, cutoff_nm: int) -> list[dict[str, Any]]:
     try:
         data = resp.json()
     except ValueError as e:
-        raise _SourceUnavailable(f"{url} returned non-JSON body: {e}") from e
+        # A 200 with a malformed body is a TRANSPORT failure, not a dead
+        # source. The shared policy retries on status code, and this arrives as
+        # HTTP 200, so it was never retried -- one bad body failed the coverage
+        # gate for every candidate in the pool and discarded the whole run.
+        # The JAK1 payload is ~5.8 MB and the body comes back truncated under
+        # load; the same accession returns valid JSON seconds later.
+        _LAST_MALFORMED[url] = str(e)
+        raise _MalformedBody(f"{url} returned non-JSON body: {e}") from e
 
     inner = None
     if isinstance(data, dict):
@@ -184,6 +204,30 @@ def _fetch_affinities(uniprot_id: str, cutoff_nm: int) -> list[dict[str, Any]]:
             f"{url} returned {len(rows)} affinity rows, none matching the "
             "verified row contract")
     return rows
+
+
+def _fetch_affinities_retrying(
+    uniprot_id: str, cutoff_nm: int,
+    attempts: int = _MALFORMED_BODY_ATTEMPTS,
+) -> list[dict[str, Any]]:
+    """Fetch, retrying only a 200 whose body will not parse.
+
+    Transient HTTP is already retried by the shared policy. A truncated body
+    arrives as HTTP 200 and so was never retried: one of them failed the
+    coverage gate for all 212 candidates and discarded an entire Duchenne
+    muscular dystrophy run, while the same accession returned valid JSON on a
+    manual probe moments later. After the attempts are spent the source is
+    genuinely unavailable and still fails closed.
+    """
+    last: Optional[Exception] = None
+    for attempt in range(max(1, attempts)):
+        try:
+            return _fetch_affinities(uniprot_id, cutoff_nm)
+        except _MalformedBody as e:
+            last = e
+            if attempt + 1 < attempts:
+                time.sleep(1.0 * (attempt + 1))
+    raise _SourceUnavailable(str(last) if last else "malformed body")
 
 
 def _row_shape_ok(row: Any) -> bool:
@@ -277,7 +321,7 @@ def get_target_interactions(
         return cached
 
     try:
-        rows = _fetch_affinities(accession, cutoff_nm)
+        rows = _fetch_affinities_retrying(accession, cutoff_nm)
         approved_map: dict[str, dict[str, Any]] = {}
         if repurposing_only:
             # A missing/corrupt snapshot (or broken RDKit) makes the approved
