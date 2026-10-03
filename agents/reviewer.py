@@ -2309,6 +2309,20 @@ def _candidate_source_coverage(
     candidate_accessions.discard("")
 
     def applies_to_candidate(target: dict[str, Any]) -> bool:
+        # A target with NO UniProt accession was never evaluable and therefore
+        # contributed no candidates -- there is nothing for it to have told us
+        # about a candidate sourced from somewhere else. Treating it as a
+        # required-coverage failure invalidated an entire pool: a Steinert
+        # myotonic dystrophy run died source_unavailable with 219 candidates
+        # across seven fully-evaluated targets (SCN5A, SCN4A, SCN8A, DMPK,
+        # ASPH, ABCC9, ATP1A1), every one marked incomplete by an eighth target
+        # that produced nothing. That is a target-SELECTION gap, not a
+        # candidate-evidence gap, and it stays a disclosed warning.
+        if not _norm(target.get("uniprot_id")) and not any(
+            _norm(target.get("target_symbol")) == symbol
+            for symbol in candidate_symbols
+        ):
+            return False
         if target.get("coverage_required") is not False:
             return True
         if candidate is None:
