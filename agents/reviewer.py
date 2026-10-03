@@ -73,7 +73,10 @@ from data_sources.prior_art import (
     check_prior_art,
     gate_is_enabled as prior_art_gate_is_enabled,
 )
-from data_sources.tissue_exposure import check_tissue_exposure
+from data_sources.tissue_exposure import (
+    check_tissue_exposure,
+    systemic_route_check,
+)
 
 #: Discovery methods whose ot_association_score is a MEASURED Open Targets
 #: disease association rather than the provisional
@@ -1190,6 +1193,7 @@ def run_reviewer(
             # Populated only for a candidate that clears every other gate.
             "tissue_exposure": None,
             "tissue_exposure_status": "NOT_ASSESSED",
+            "systemic_route_check": None,
             "externally_prioritizable": False,
             "availability_gate": {
                 "status": "UNKNOWN",
@@ -1800,6 +1804,16 @@ def run_reviewer(
             # and an unretrievable answer is not a finding about the drug.
             if exposure.get("exposure_unlikely"):
                 reasons.append("compartment_exposure_unlikely")
+
+            # Deterministic, free, and orthogonal to the CNS check above: a
+            # drug whose approved formulation is topical or inhaled cannot
+            # treat a systemic disease. Four inhaled/topical corticosteroids
+            # were promoted for Duchenne muscular dystrophy before this
+            # existed, led by one at ~40 pM with ~1% oral bioavailability.
+            route = systemic_route_check(r)
+            r["systemic_route_check"] = route
+            if route.get("assessed") and not route.get("systemic_route"):
+                reasons.append("no_systemic_route_of_administration")
             # A failed search is unknown, not absence. It deliberately does not
             # exclude -- fail-closing here would add another whole-run failure
             # mode to a pipeline already fragile across ~12 providers -- but

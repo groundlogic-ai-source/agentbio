@@ -247,7 +247,7 @@ def _fetch_assay_confidence(assay_ids: list[str]) -> dict[str, int]:
 #: rows. Tests reference these names instead of retyping the version.
 ACTIVITIES_FULL_CACHE_KEY = "_fetch_activities_full_v4_paged"
 BIOACTIVITY_COUNT_CACHE_KEY = "get_target_bioactivity_count_v3_paged"
-CANDIDATE_POOL_CACHE_KEY = "get_target_candidate_compounds_v7_paged"
+CANDIDATE_POOL_CACHE_KEY = "get_target_candidate_compounds_v8_routes"
 
 #: ChEMBL's maximum page size for /activity.
 _ACTIVITY_PAGE_SIZE = 1000
@@ -624,6 +624,15 @@ def _fetch_molecule_meta(molecule_ids: list[str]) -> dict[str, dict[str, Any]]:
                 "molecule_type": m.get("molecule_type"),
                 "canonical_smiles": struct.get("canonical_smiles"),
                 "parent_chembl_id": parent_id,
+                # Route-of-administration flags. A drug formulated for LOCAL
+                # action cannot treat a systemic disease however potent it is
+                # at the target, and nothing in the pipeline checked this: a
+                # Duchenne muscular dystrophy run promoted fluticasone
+                # propionate at pChEMBL 10.40 (~40 pM) when its oral
+                # bioavailability is ~1% by design.
+                "route_oral": m.get("oral"),
+                "route_topical": m.get("topical"),
+                "route_parenteral": m.get("parenteral"),
             }
     return meta
 
@@ -873,6 +882,9 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
                     d.get("source_molecule_chembl_ids") or [mid]),
                 "pref_name": m.get("pref_name"),
                 "max_phase": m.get("max_phase"),
+                "route_oral": m.get("route_oral"),
+                "route_topical": m.get("route_topical"),
+                "route_parenteral": m.get("route_parenteral"),
                 "canonical_smiles": smiles,
                 "pchembl_value": median_pchembl,
                 # The statistic is part of what the number means: downstream

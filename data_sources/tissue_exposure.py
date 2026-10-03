@@ -154,6 +154,67 @@ def descriptor_disclosure(descriptors: Optional[dict[str, Any]]) -> dict[str, An
     }
 
 
+VERDICT_NO_SYSTEMIC_ROUTE = "NO_SYSTEMIC_ROUTE_OF_ADMINISTRATION"
+
+
+def systemic_route_check(candidate: dict[str, Any]) -> dict[str, Any]:
+    """Can this drug's approved formulation reach the body at all?
+
+    The compartment check above asks whether a drug crosses the blood-brain
+    barrier. It answers nothing for a disease outside the CNS, and that gap
+    produced a false headline: a Duchenne muscular dystrophy run promoted
+    FLUTICASONE PROPIONATE at pChEMBL 10.40 (~40 pM against NR3C1, assay
+    confidence 9, direction compatible, no prior art). Fluticasone propionate
+    has ~1% oral bioavailability by design -- near-complete hepatic first-pass
+    metabolism is the point of the molecule, which exists for local airway
+    action. DMD needs chronic SYSTEMIC glucocorticoid exposure to skeletal and
+    cardiac muscle. All four promoted candidates were inhaled or topical
+    steroids.
+
+    The signal is deterministic and free: ChEMBL carries route flags, and they
+    separate the false positives from the real drugs cleanly.
+
+        fluticasone propionate  oral=False topical=False parenteral=False
+        halcinonide             oral=False topical=False parenteral=False
+        prednisolone            oral=TRUE     <- DMD standard of care
+        deflazacort             oral=TRUE     <- FDA-approved for DMD
+
+    A drug with no systemic route cannot treat a systemic disease. Unknown
+    flags are NOT a finding: absent data clears nothing, it only means the
+    check could not be made.
+    """
+    oral = candidate.get("route_oral")
+    parenteral = candidate.get("route_parenteral")
+    topical = candidate.get("route_topical")
+    known = [v for v in (oral, parenteral, topical) if v is not None]
+    if not known:
+        return {
+            "assessed": False,
+            "systemic_route": None,
+            "reason": ("ChEMBL route-of-administration flags were unavailable, "
+                       "so systemic exposure could not be checked. This is "
+                       "unknown, not a clear result."),
+        }
+    systemic = bool(oral) or bool(parenteral)
+    return {
+        "assessed": True,
+        "systemic_route": systemic,
+        "route_oral": oral,
+        "route_parenteral": parenteral,
+        "route_topical": topical,
+        "reason": (
+            "ChEMBL records no oral or parenteral route for this drug, so its "
+            "approved formulation acts locally and cannot deliver systemic "
+            "exposure. Target potency does not substitute for reaching the "
+            "tissue."
+            if not systemic else
+            "ChEMBL records a systemic route (oral or parenteral). This "
+            "establishes that a systemic formulation exists, not that it "
+            "achieves a therapeutic concentration at the diseased tissue."
+        ),
+    }
+
+
 def _openai_client() -> OpenAI | None:
     base_url = os.environ.get("OPENAI_BASE_URL")
     api_key = os.environ.get("OPENAI_API_KEY")

@@ -86,7 +86,8 @@ class CacheInvalidationTest(unittest.TestCase):
         self.assertNotIn(chembl.CANDIDATE_POOL_CACHE_KEY, {
             "get_target_candidate_compounds_v4",        # pre-EC50
             "get_target_candidate_compounds_v5_ec50",   # pre-median-anchor
-            "get_target_candidate_compounds_v6_anchor",  # pre-pagination
+            "get_target_candidate_compounds_v6_anchor",   # pre-pagination
+            "get_target_candidate_compounds_v7_paged",   # pre-route-flags
         })
 
 
