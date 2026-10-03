@@ -36,7 +36,10 @@ import sys
 from typing import Any, Optional
 
 from agents.target_selection import DiseaseNotInUniverse, preflight_for_disease
-from data_sources.chembl import get_approved_drugs_for_target
+from data_sources.chembl import (
+    _fetch_molecule_meta,
+    get_approved_drugs_for_target,
+)
 from data_sources.tissue_exposure import requires_cns_exposure
 
 #: Discovery methods whose association is MEASURED rather than the provisional
@@ -81,6 +84,34 @@ def _target_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "positional_distance_bp": risk.get("distance_bp"),
         })
     return out
+
+
+def _count_systemic(approved_drugs: list[dict[str, Any]]) -> Optional[int]:
+    """How many of a target's approved ligands can actually reach the body.
+
+    The raw ligand count overstates the shelf. NR3C1 carries 65 approved drugs,
+    which is why Duchenne muscular dystrophy was picked -- but most are topical
+    or inhaled corticosteroids, and the run promoted four of them for a
+    systemic muscle disease. Fluticasone propionate has ~1% oral
+    bioavailability by design.
+
+    Counting route-adjusted gives the shelf that exists for a systemic disease,
+    using the same ChEMBL flags the reviewer's route gate uses, at screen time
+    instead of after a run.
+    """
+    ids = [str(d.get("molecule_chembl_id") or "").strip()
+           for d in approved_drugs]
+    ids = [i for i in ids if i]
+    if not ids:
+        return None
+    meta = _fetch_molecule_meta(ids)
+    if not meta:
+        return None
+    systemic = 0
+    for row in meta.values():
+        if bool(row.get("route_oral")) or bool(row.get("route_parenteral")):
+            systemic += 1
+    return systemic
 
 
 def screen_disease(disease_name: str) -> dict[str, Any]:
@@ -157,8 +188,11 @@ def screen_disease(disease_name: str) -> dict[str, Any]:
         try:
             env = get_approved_drugs_for_target(alt["uniprot_id"] or "")
             alt["approved_drug_count"] = env.get("approved_drug_count")
+            alt["systemic_drug_count"] = _count_systemic(
+                env.get("approved_drugs") or [])
         except Exception:  # noqa: BLE001 — unknown count, never a claim
             alt["approved_drug_count"] = None
+            alt["systemic_drug_count"] = None
 
     best_alt = alternatives[0] if alternatives else None
     # Richest usable alternative: the one with somewhere to actually look.
@@ -187,6 +221,18 @@ def screen_disease(disease_name: str) -> dict[str, Any]:
             richest_alt.get("approved_drug_count") if richest_alt else None),
         "richest_alternative_assoc": (
             richest_alt.get("ot_association_score") if richest_alt else None),
+        "richest_alternative_systemic": (
+            richest_alt.get("systemic_drug_count") if richest_alt else None),
+        # Whether the disease has an APPROVED therapy, as distinct from an
+        # off-label standard of care. The two were conflated through five
+        # hunts and behave differently: an approved drug means pharma is
+        # already there and prior-art density is high (DMD had vamorolone, NPC
+        # had arimoclomol), whereas off-label-only means thin attention, and
+        # thin attention is the only place an unclaimed pair survives.
+        "has_approved_treatment": (rows[0].get("has_approved_treatment")
+                                   if rows else None),
+        "approved_drug_names": (rows[0].get("approved_drug_names") or []
+                                if rows else []),
     })
 
     if not measured:
@@ -262,12 +308,17 @@ def rank_key(result: dict[str, Any]) -> tuple:
     candidate space rather than disqualifying the disease.
     """
     return (
-        # Approved ligands on a usable alternative target lead. Association
-        # strength says the target is real; the drug count says there is
-        # anything untried to find on it. Friedreich ataxia had a strong
-        # alternative (NFE2L2, 0.547) carrying exactly two candidates, both
-        # already its own drugs -- a real target with an empty shelf.
-        -int(result.get("richest_alternative_drugs") or 0),
+        # Off-label-only diseases first. An approved therapy means pharma is
+        # already working the space and prior art is dense; off-label-only
+        # means thin attention, which is the only condition under which an
+        # unclaimed pair survives long enough to be found.
+        0 if result.get("has_approved_treatment") is False else 1,
+        # Then the ROUTE-ADJUSTED shelf. The raw ligand count overstates it:
+        # NR3C1's 65 approved drugs are mostly topical or inhaled steroids,
+        # and counting them whole is what put Duchenne at the top and promoted
+        # four drugs that cannot reach muscle.
+        -int(result.get("richest_alternative_systemic")
+             or result.get("richest_alternative_drugs") or 0),
         -float(result.get("best_alternative_assoc") or 0.0),
         -int(result.get("n_usable") or 0),
         int(result.get("n_positional_flagged") or 0),
@@ -287,7 +338,7 @@ def format_table(results: list[dict[str, Any]]) -> str:
 
     lines = [
         f"{'disease':38s} {'verdict':26s} {'causal':>14s} "
-        f"{'best alternative':>22s} {'richest alt (drugs)':>24s} {'CNS':>4s}",
+        f"{'best alternative':>22s} {'richest alt (sys/all)':>22s} {'therapy':>9s} {'CNS':>4s}",
         "-" * 130,
     ]
     for r in results:
@@ -295,20 +346,50 @@ def format_table(results: list[dict[str, Any]]) -> str:
         alt = (f"{r.get('best_alternative_target') or '—'} "
                f"{num(r.get('best_alternative_assoc'))}")
         n_drugs = r.get("richest_alternative_drugs")
+        n_sys = r.get("richest_alternative_systemic")
         rich = (f"{r.get('richest_alternative_target') or '—'} "
-                f"({n_drugs if n_drugs is not None else '—'})")
+                f"({n_sys if n_sys is not None else '—'}"
+                f"/{n_drugs if n_drugs is not None else '—'})")
+        approved = r.get("has_approved_treatment")
+        label = "off-label" if approved is False else (
+            "approved" if approved is True else "?")
         lines.append(
             f"{str(r['disease_name'])[:38]:38s} {r['verdict'][:26]:26s} "
             f"{causal:>14s} {alt:>22s} "
-            f"{rich:>24s} "
+            f"{rich:>22s} {label:>9s} "
             f"{'yes' if r['requires_cns_exposure'] else 'no':>4s}")
     return "\n".join(lines)
 
 
+def universe_sample(limit: int, offset: int = 0) -> list[str]:
+    """Disease names straight from the Orphanet/NTD universe.
+
+    Hand-picking was the weakest part of the method: roughly 25 diseases chosen
+    from recall, which selects for the ones well-studied enough to be
+    memorable -- and therefore most likely already claimed. The universe holds
+    ~11,645, the screen costs seconds each and makes no LLM call, so there is
+    no reason to trust recall over enumeration.
+    """
+    from agents.target_selection import _matchable_universe
+    names = [str(d.get("name") or "").strip()
+             for d in _matchable_universe()]
+    names = [n for n in names if n]
+    return names[offset:offset + limit]
+
+
 if __name__ == "__main__":
-    names = sys.argv[1:]
+    argv = sys.argv[1:]
+    if argv and argv[0] == "--universe":
+        limit = int(argv[1]) if len(argv) > 1 else 100
+        offset = int(argv[2]) if len(argv) > 2 else 0
+        names = universe_sample(limit, offset)
+        print(f"# screening {len(names)} diseases from the universe "
+              f"(offset {offset})", flush=True)
+    else:
+        names = argv
     if not names:
         print("usage: python disease_screen.py 'Disease A' 'Disease B' ...")
+        print("       python disease_screen.py --universe N [OFFSET]")
         raise SystemExit(2)
     screened = screen_many(names)
     print(format_table(screened))
