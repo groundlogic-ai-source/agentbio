@@ -437,7 +437,15 @@ def universe_sample(limit: int, offset: int = 0) -> list[str]:
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
-    if argv and argv[0] == "--universe":
+    if argv and argv[0] == "--from-file":
+        # A shortlist produced by an earlier stage is a file, not 78 shell
+        # arguments. Blank lines and '#' comments are skipped so the file can
+        # carry its own provenance header.
+        with open(argv[1], encoding="utf-8") as handle:
+            names = [line.split("\t")[0].strip() for line in handle
+                     if line.strip() and not line.startswith("#")]
+        print(f"# screening {len(names)} diseases from {argv[1]}", flush=True)
+    elif argv and argv[0] == "--universe":
         limit = int(argv[1]) if len(argv) > 1 else 100
         offset = int(argv[2]) if len(argv) > 2 else 0
         names = universe_sample(limit, offset)
