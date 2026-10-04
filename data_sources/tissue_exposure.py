@@ -186,6 +186,27 @@ def systemic_route_check(candidate: dict[str, Any]) -> dict[str, Any]:
     oral = candidate.get("route_oral")
     parenteral = candidate.get("route_parenteral")
     topical = candidate.get("route_topical")
+
+    # Resolve on demand when the candidate's lane did not carry them. Only the
+    # ChEMBL activity lane populates these, so a DrugCentral/GtoPdb/BindingDB
+    # candidate arrived with none and the gate reported "not assessed" --
+    # TETRACAINE, topical-only, was promoted for a systemic muscle disease that
+    # way. Resolving here makes the check lane-independent rather than correct
+    # in one lane and blind in the rest.
+    if all(v is None for v in (oral, parenteral, topical)):
+        from data_sources.chembl import get_molecule_routes
+        for ident in (
+            candidate.get("molecule_chembl_id"),
+            candidate.get("parent_chembl_id"),
+            *(candidate.get("source_molecule_chembl_ids") or []),
+        ):
+            routes = get_molecule_routes(str(ident or ""))
+            if any(v is not None for v in routes.values()):
+                oral = routes.get("route_oral")
+                parenteral = routes.get("route_parenteral")
+                topical = routes.get("route_topical")
+                break
+
     known = [v for v in (oral, parenteral, topical) if v is not None]
     if not known:
         return {

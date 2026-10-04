@@ -507,6 +507,38 @@ def _max_phase(*values: Any) -> Any:
     return best_raw
 
 
+def get_molecule_routes(chembl_id: str) -> dict[str, Any]:
+    """Route-of-administration flags for one molecule, by ChEMBL id.
+
+    The pool carries these only for candidates built from the ChEMBL activity
+    lane. A candidate arriving through DrugCentral, GtoPdb or BindingDB has no
+    route flags, so the systemic-route gate silently reported "not assessed"
+    and waved it through -- TETRACAINE, a topical-only anaesthetic
+    (oral=False, topical=True, parenteral=False), was promoted for a systemic
+    muscle disease exactly that way.
+
+    Resolving on demand here makes the gate lane-independent rather than
+    correct in one lane and blind in the others, which is how the same defect
+    reached a headline twice.
+    """
+    mid = str(chembl_id or "").strip().upper()
+    if not mid:
+        return {}
+    cache_key = make_key("molecule_routes_v1", mid)
+    cached = get(cache_key)
+    if cached is not None:
+        return cached
+    meta = _fetch_molecule_meta([mid]).get(mid) or {}
+    routes = {
+        "route_oral": meta.get("route_oral"),
+        "route_topical": meta.get("route_topical"),
+        "route_parenteral": meta.get("route_parenteral"),
+    }
+    if any(v is not None for v in routes.values()):
+        cache_set(cache_key, routes, ttl_days=30)
+    return routes
+
+
 def _collapse_salts_to_parent(
     by_mol: dict[str, dict[str, Any]],
     meta: dict[str, dict[str, Any]],

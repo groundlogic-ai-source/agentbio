@@ -133,5 +133,66 @@ class WiringTest(unittest.TestCase):
             self.assertIn(f'"{field}"', source)
 
 
+
+class LaneIndependenceTest(unittest.TestCase):
+    """The gate must work regardless of which provider lane supplied the row.
+
+    Route flags are populated only by the ChEMBL activity lane. A candidate
+    arriving through DrugCentral, GtoPdb or BindingDB carried none, so the gate
+    reported "not assessed" and waved it through: TETRACAINE
+    (oral=False, topical=True, parenteral=False) was promoted for Steinert
+    myotonic dystrophy, a systemic muscle disease, with
+    systemic_route_check -> None.
+
+    That is the SECOND time a fix was applied in one lane and left blind in the
+    others -- the salt collapse had the same shape. The gate now resolves routes
+    from the candidate's ChEMBL identifiers on demand, so lane coverage is not
+    something that has to be remembered per provider.
+    """
+
+    def test_routes_are_resolved_when_the_lane_did_not_supply_them(self):
+        from unittest import mock
+        from data_sources import chembl
+        with mock.patch.object(
+            chembl, "get_molecule_routes",
+            return_value={"route_oral": False, "route_topical": True,
+                          "route_parenteral": False},
+        ) as resolve:
+            result = systemic_route_check(
+                {"molecule_chembl_id": "CHEMBL1255654"})
+        resolve.assert_called()
+        self.assertTrue(result["assessed"])
+        self.assertFalse(result["systemic_route"],
+                         "a topical-only drug must not pass as systemic")
+
+    def test_no_lookup_when_the_lane_already_supplied_them(self):
+        from unittest import mock
+        from data_sources import chembl
+        with mock.patch.object(chembl, "get_molecule_routes") as resolve:
+            systemic_route_check({"route_oral": True})
+        resolve.assert_not_called()
+
+    def test_parent_and_source_ids_are_tried_too(self):
+        """A coalesced row may carry the identifier on the parent."""
+        from unittest import mock
+        from data_sources import chembl
+        with mock.patch.object(
+            chembl, "get_molecule_routes",
+            side_effect=[{}, {"route_oral": True, "route_topical": None,
+                              "route_parenteral": None}],
+        ):
+            result = systemic_route_check(
+                {"molecule_chembl_id": "", "parent_chembl_id": "CHEMBL1404"})
+        self.assertTrue(result["systemic_route"])
+
+    def test_still_unassessed_when_nothing_resolves(self):
+        from unittest import mock
+        from data_sources import chembl
+        with mock.patch.object(chembl, "get_molecule_routes", return_value={}):
+            result = systemic_route_check({"molecule_chembl_id": "CHEMBL_X"})
+        self.assertFalse(result["assessed"])
+        self.assertIn("not a clear result", result["reason"])
+
+
 if __name__ == "__main__":
     unittest.main()
