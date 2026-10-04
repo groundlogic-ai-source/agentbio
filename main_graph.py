@@ -903,6 +903,19 @@ def _source_failure_details(source_status: Any) -> list[dict[str, Any]]:
             return
         target = value.get("_target")
         if isinstance(target, dict):
+            # A target with NO UniProt accession is never queried and
+            # contributes no candidates, so its providers were not "down" --
+            # they were never asked. Counting it as a global source failure
+            # vetoed an entire pool: a Steinert myotonic dystrophy run carried
+            # 219 candidates across seven fully-evaluated targets and still
+            # terminated source_unavailable.
+            #
+            # The reviewer's per-candidate coverage already exempts this case,
+            # which is why that run reported coverage complete for 219/219 and
+            # was killed anyway: this gate reads chemist_output.source_status
+            # directly and is a separate path. Both have to agree.
+            if not str(target.get("uniprot_id") or "").strip():
+                return
             required_scope = target.get("coverage_required") is not False
         status = str(value.get("status") or "").strip().casefold()
         source_name = path.rsplit(".", 1)[-1].casefold()

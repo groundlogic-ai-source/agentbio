@@ -117,5 +117,47 @@ def json_dumps(value):
     return json.dumps(value, default=str)
 
 
+class GraphGateAgreesWithReviewerTest(unittest.TestCase):
+    """Both gates must exempt the same case, or the fix is invisible.
+
+    The reviewer's per-candidate coverage and the graph's eligibility gate read
+    DIFFERENT paths: candidate_source_coverage versus
+    chemist_output.source_status. Fixing only the reviewer produced a run that
+    reported coverage complete for 219 of 219 and still terminated
+    source_unavailable, because the graph gate counted the same unevaluable
+    target as a global provider failure.
+    """
+
+    def test_graph_gate_ignores_a_target_with_no_accession(self):
+        from main_graph import _source_failure_details
+        status = {
+            "t0": {
+                "_target": {"target_symbol": "SCN5A", "uniprot_id": "Q14524",
+                            "status": "ok"},
+                "chembl": {"status": "ok"},
+                "bindingdb": {"status": "ok"},
+            },
+            "t1": {
+                "_target": {"target_symbol": "", "uniprot_id": "",
+                            "status": "failed"},
+                "chembl": {"status": "unavailable"},
+                "bindingdb": {"status": "unavailable"},
+            },
+        }
+        self.assertEqual(_source_failure_details(status), [])
+
+    def test_graph_gate_still_reports_a_real_outage(self):
+        from main_graph import _source_failure_details
+        status = {
+            "t0": {
+                "_target": {"target_symbol": "SCN5A", "uniprot_id": "Q14524",
+                            "status": "ok"},
+                "chembl": {"status": "unavailable",
+                           "error": "ChEMBL returned HTTP 503"},
+            },
+        }
+        self.assertTrue(_source_failure_details(status))
+
+
 if __name__ == "__main__":
     unittest.main()
