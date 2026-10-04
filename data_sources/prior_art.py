@@ -91,9 +91,10 @@ _PROXIMITY_WINDOW = 400
 # hits by proximity, then adding the corroboration rule and
 # requires_human_review. An older entry would replay a verdict computed under
 # a contract this code no longer implements.
-_CACHE_VERSION = "prior_art_v3_corroboration"
+_CACHE_VERSION = "prior_art_v4_synonyms"
 _TTL_DAYS = 7
 _PAGE_SIZE = 25
+_TIMEOUT_SECONDS = 30
 _TRANSIENT_STATUSES = {429, 500, 502, 503, 504}
 
 #: Orphanet writes qualifier clauses that the literature drops. "Resistance to
@@ -160,6 +161,84 @@ def _contains_term(haystack: str, term: str) -> bool:
     return re.search(pattern, haystack, re.IGNORECASE) is not None
 
 
+_OT_GRAPHQL = "https://api.platform.opentargets.org/api/v4/graphql"
+_SYNONYM_CACHE_VERSION = "prior_art_disease_synonyms_v1"
+
+
+def disease_synonyms(disease_name: str) -> list[str]:
+    """Literature-used names for a disease, from Open Targets.
+
+    Orphanet's label is frequently NOT what papers call the disease, and the
+    gate searched the Orphanet string verbatim. That produced a false novelty
+    claim on the worst possible pair: a Steinert myotonic dystrophy run
+    reported NO_PRIOR_ART_FOUND for mexiletine, a drug with a published
+    randomised controlled trial in that disease.
+
+        "Steinert myotonic dystrophy"  ->  0 Europe PMC hits
+        "Myotonic dystrophy type 1"    ->  8
+        "myotonic dystrophy"           -> 19
+
+    Open Targets carries both -- its canonical label is "myotonic dystrophy
+    type 1" and its exact synonyms include "Steinert myotonic dystrophy" --
+    so resolving one to the other closes the gap.
+
+    Only the canonical name and EXACT synonyms are used. Broad synonyms would
+    match a whole disease family ("muscular dystrophy") and manufacture prior
+    art; abbreviations are dropped by the length floor in disease_terms.
+    """
+    name = _normalize(disease_name)
+    if not name:
+        return []
+    cache_key = make_key(_SYNONYM_CACHE_VERSION, name.casefold())
+    cached = get(cache_key)
+    if cached is not None:
+        return list(cached)
+
+    def _post(query: str) -> dict[str, Any]:
+        resp = requests.post(_OT_GRAPHQL, json={"query": query},
+                             timeout=_TIMEOUT_SECONDS)
+        if resp.status_code != 200:
+            raise _SourceUnavailable(f"Open Targets HTTP {resp.status_code}")
+        return resp.json()
+
+    try:
+        safe = name.replace('"', " ")
+        hits = (_post(
+            '{search(queryString:"%s",entityNames:["disease"])'
+            '{hits{id name}}}' % safe
+        ).get("data") or {}).get("search", {}).get("hits") or []
+        if not hits:
+            return []
+        payload = (_post(
+            '{disease(efoId:"%s"){name synonyms{relation terms}}}'
+            % str(hits[0].get("id") or "")
+        ).get("data") or {}).get("disease") or {}
+    except Exception:  # noqa: BLE001 — unknown synonyms, never a claim
+        return []
+
+    names: list[str] = []
+    canonical = _normalize(payload.get("name"))
+    if canonical:
+        names.append(canonical)
+    for block in payload.get("synonyms") or []:
+        if str(block.get("relation") or "") != "hasExactSynonym":
+            continue
+        for term in block.get("terms") or []:
+            text = _normalize(term)
+            if text:
+                names.append(text)
+
+    seen: set[str] = set()
+    unique = []
+    for term in names:
+        key = term.casefold()
+        if key not in seen:
+            seen.add(key)
+            unique.append(term)
+    cache_set(cache_key, unique, ttl_days=90)
+    return unique
+
+
 def disease_terms(disease_name: str, extra_aliases: Any = None) -> list[str]:
     """Search terms for a disease: the full name plus its qualifier-stripped core."""
     name = _normalize(disease_name)
@@ -173,6 +252,12 @@ def disease_terms(disease_name: str, extra_aliases: Any = None) -> list[str]:
                 core = name[:index].strip()
                 if len(core) >= _MIN_DISEASE_TERM:
                     terms.append(core)
+    # Literature-used names, not just the Orphanet label. Without these the
+    # gate searched "Steinert myotonic dystrophy" and found nothing while
+    # "myotonic dystrophy" returned 19 records.
+    for synonym in disease_synonyms(name):
+        if len(synonym) >= _MIN_DISEASE_TERM:
+            terms.append(synonym)
     for alias in (extra_aliases or []):
         alias_text = _normalize(alias)
         if len(alias_text) >= _MIN_DISEASE_TERM:
