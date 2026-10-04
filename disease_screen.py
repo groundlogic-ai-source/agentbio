@@ -10,6 +10,7 @@ step:
   AKT2           independent convergence on an idea we already knew
   Cystinosis     3 of 5 targets were co-deletion artifacts on chromosome 17
   Niemann-Pick C eliglustat cannot cross the blood-brain barrier
+  Myotonic dyst.1 136 registered trials and a recruiting phase 3 from Lupin
 
 A full run costs hours, can fail on any of ~12 providers, and in one case took
 eight attempts. The gates built for those failures compute most of the same
@@ -21,6 +22,13 @@ WHAT IT DOES AND DOES NOT DO
 It screens DISEASES. It does not name, rank or evaluate drugs -- that is the
 pipeline's job, and doing it here would mean the run was no longer blind and
 the credit for any hit would not belong to AgentBio.
+
+ORDER OF CHECKS
+---------------
+Research attention runs first and short-circuits, because it is both the
+cheapest check and the one that disqualifies the most diseases. Every other
+gate in this repo asks about a drug; this one asks whether anybody is already
+here. Five of the six failures above passed every drug-level gate.
 
 It deliberately emits no composite score. This codebase has just finished
 removing an uncalibrated 0.50 constant that was competing with measured
@@ -39,6 +47,11 @@ from agents.target_selection import DiseaseNotInUniverse, preflight_for_disease
 from data_sources.chembl import (
     _fetch_molecule_meta,
     get_approved_drugs_for_target,
+)
+from data_sources.research_attention import (
+    VERDICT_DORMANT,
+    VERDICT_UNKNOWN as ATTENTION_UNKNOWN,
+    attention_verdict,
 )
 from data_sources.tissue_exposure import requires_cns_exposure
 
@@ -61,6 +74,9 @@ VERDICT_ALL_MEASURED_POSITIONAL = "ALL_MEASURED_TARGETS_POSITIONAL"
 #: codebase keeps removing.
 VERDICT_POSITIONAL_UNKNOWN = "POSITIONAL_RISK_UNKNOWN"
 VERDICT_CAUSAL_TARGET_ONLY = "CAUSAL_TARGET_ONLY"
+#: Somebody is already working here. Reported verbatim from the attention
+#: module so the reason survives into the table.
+VERDICT_ATTENTION = "RESEARCH_ATTENTION"
 VERDICT_VIABLE = "VIABLE"
 
 
@@ -138,6 +154,36 @@ def screen_disease(disease_name: str) -> dict[str, Any]:
     }
     if not name:
         base["notes"].append("No disease name supplied.")
+        return base
+
+    # Attention runs FIRST, and short-circuits. It is the only gate that would
+    # have killed both of the last two hunts before a run was spent: DM1 had
+    # 136 registered trials and a recruiting phase 3 from Lupin while every
+    # drug-level gate read clean, and RTH-beta's space was likewise occupied.
+    # It is also the cheapest -- a handful of count queries, no LLM, no
+    # Ensembl, no Open Targets association pull -- so paying for Stage-1
+    # preflight on an occupied disease is pure waste.
+    attention = attention_verdict(name)
+    base["attention"] = attention
+    base["attention_verdict"] = attention.get("verdict")
+    trials = attention.get("trials") or {}
+    literature = attention.get("literature") or {}
+    base.update({
+        "n_registered_trials": trials.get("n_interventional"),
+        "n_open_trials": trials.get("n_open"),
+        "n_industry_trials": trials.get("n_industry_sponsored"),
+        "n_publications": literature.get("n_publications"),
+        "n_recent_publications": literature.get("n_recent_publications"),
+        "recent_publication_share": literature.get("recent_share"),
+    })
+    if attention.get("verdict") != VERDICT_DORMANT:
+        # An unmeasurable disease is NOT a dormant one. It gets its own
+        # verdict and is excluded, not promoted -- the whole reason this
+        # module exists is that an unknown kept being read as a clean result.
+        base["verdict"] = (ATTENTION_UNKNOWN
+                           if attention.get("verdict") == ATTENTION_UNKNOWN
+                           else VERDICT_ATTENTION)
+        base["notes"].append(str(attention.get("reason") or ""))
         return base
 
     try:
@@ -308,6 +354,11 @@ def rank_key(result: dict[str, Any]) -> tuple:
     candidate space rather than disqualifying the disease.
     """
     return (
+        # Dormancy outranks everything. A disease with a clinical program
+        # already in it cannot satisfy the conditional this whole exercise
+        # protects -- that the patients would have gone without -- however
+        # good its target list looks.
+        0 if result.get("attention_verdict") == VERDICT_DORMANT else 1,
         # Off-label-only diseases first. An approved therapy means pharma is
         # already working the space and prior art is dense; off-label-only
         # means thin attention, which is the only condition under which an
@@ -337,11 +388,17 @@ def format_table(results: list[dict[str, Any]]) -> str:
         return f"{value:.3f}" if isinstance(value, (int, float)) else "—"
 
     lines = [
-        f"{'disease':38s} {'verdict':26s} {'causal':>14s} "
+        f"{'disease':38s} {'verdict':26s} {'trials(open/ind)':>17s} "
+        f"{'papers(recent)':>16s} {'causal':>14s} "
         f"{'best alternative':>22s} {'richest alt (sys/all)':>22s} {'therapy':>9s} {'CNS':>4s}",
-        "-" * 130,
+        "-" * 165,
     ]
     for r in results:
+        def _n(key: str) -> str:
+            value = r.get(key)
+            return str(value) if isinstance(value, int) else "?"
+        trials = f"{_n('n_registered_trials')}({_n('n_open_trials')}/{_n('n_industry_trials')})"
+        papers = f"{_n('n_publications')}({_n('n_recent_publications')})"
         causal = f"{r.get('causal_target') or '—'} {num(r.get('causal_assoc'))}"
         alt = (f"{r.get('best_alternative_target') or '—'} "
                f"{num(r.get('best_alternative_assoc'))}")
@@ -355,6 +412,7 @@ def format_table(results: list[dict[str, Any]]) -> str:
             "approved" if approved is True else "?")
         lines.append(
             f"{str(r['disease_name'])[:38]:38s} {r['verdict'][:26]:26s} "
+            f"{trials:>17s} {papers:>16s} "
             f"{causal:>14s} {alt:>22s} "
             f"{rich:>22s} {label:>9s} "
             f"{'yes' if r['requires_cns_exposure'] else 'no':>4s}")

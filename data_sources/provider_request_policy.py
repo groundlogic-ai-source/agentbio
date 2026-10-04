@@ -85,6 +85,19 @@ POLICIES = {
     # answered a manual probe with HTTP 200 and valid JSON seconds later.
     "bindingdb": ProviderPolicy(
         concurrency=1, min_interval_seconds=0.5, max_attempts=5),
+    # ClinicalTrials.gov answers a burst with 429. The disease-attention
+    # screen makes four count queries per disease name and runs over hundreds
+    # of diseases back to back, which is a far heavier pattern than the
+    # per-candidate trial audit that preceded it. A 429 here is the dangerous
+    # direction: the screen's whole purpose is to certify that a disease has
+    # NO trials, so an unanswered query that fell through as zero would
+    # manufacture exactly the dormancy it is meant to verify.
+    "clinicaltrials": ProviderPolicy(
+        concurrency=1, min_interval_seconds=0.35, max_attempts=5),
+    # Europe PMC, same reasoning on the literature axis. The prior-art gate
+    # still calls it directly with bare requests; that path is unchanged.
+    "europepmc": ProviderPolicy(
+        concurrency=1, min_interval_seconds=0.25, max_attempts=5),
 }
 
 _lock = threading.Lock()
