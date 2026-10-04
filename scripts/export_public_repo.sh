@@ -30,6 +30,8 @@ cd "$DST"
 
 git filter-repo --force \
   --path .agents --path outreach --path artifacts/mockup-sandbox \
+  --path research \
+  --path output \
   --path cache/cache.db \
   --path-glob 'checkpoints.db*' \
   --path data_prep/raw/dc_dump.sql.gz \
@@ -51,6 +53,18 @@ echo "internal paths remaining in history: $(git rev-list --objects --all | grep
 # the strip rather than trusting it -- the previous bug was invisible precisely
 # because nothing checked.
 echo "checkpoint db/wal/shm objects remaining: $(git rev-list --objects --all | grep -cE ' checkpoints\.db(-wal|-shm)?$' || true)"
+# research/ holds disease-selection reasoning and notes on other organisations
+# working in this space. It says nothing about how the system works, and a
+# public repo should carry the machine and its evidence, not the strategy
+# behind which diseases to chase. It postdates the last export, so nothing in
+# the strip list covered it and a push would have published it.
+echo "research/ paths remaining in history: $(git rev-list --objects --all | grep -cE ' research(/|$)' || true)"
+# output/ is generated run artifacts, not the machine: 65 tracked files of old
+# dossiers and internal dev reports. It is also where presigned-URL credentials
+# keep reappearing (output/structure_validation.json carried a live
+# X-Amz-Credential), so not publishing it is better than relying on text
+# redaction to catch every one.
+echo "output/ paths remaining in history: $(git rev-list --objects --all | grep -cE ' output(/|$)' || true)"
 echo "LFS pointers remaining in all refs: $(git lfs ls-files --all 2>/dev/null | wc -l)"
 echo "blobs >20MB remaining: $(git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectsize)' 2>/dev/null | awk '$1=="blob" && $2>20000000' | wc -l)"
 for term in REMEDi4ALL "Rare Beacon" REPO4EU "Every Cure"; do
