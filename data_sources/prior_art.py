@@ -91,7 +91,7 @@ _PROXIMITY_WINDOW = 400
 # hits by proximity, then adding the corroboration rule and
 # requires_human_review. An older entry would replay a verdict computed under
 # a contract this code no longer implements.
-_CACHE_VERSION = "prior_art_v4_synonyms"
+_CACHE_VERSION = "prior_art_v5_incidental_unconfirmed"
 _TTL_DAYS = 7
 _PAGE_SIZE = 25
 _TIMEOUT_SECONDS = 30
@@ -255,9 +255,14 @@ def disease_terms(disease_name: str, extra_aliases: Any = None) -> list[str]:
     # Literature-used names, not just the Orphanet label. Without these the
     # gate searched "Steinert myotonic dystrophy" and found nothing while
     # "myotonic dystrophy" returned 19 records.
-    for synonym in disease_synonyms(name):
-        if len(synonym) >= _MIN_DISEASE_TERM:
-            terms.append(synonym)
+    # Only expand a name long enough to identify a disease on its own. Looking
+    # up synonyms for "MS" or "ALS" means resolving an ambiguous string against
+    # a disease index and inheriting whatever it guesses -- which would
+    # manufacture prior art from the wrong disease entirely.
+    if len(name) >= _MIN_DISEASE_TERM:
+        for synonym in disease_synonyms(name):
+            if len(synonym) >= _MIN_DISEASE_TERM:
+                terms.append(synonym)
     for alias in (extra_aliases or []):
         alias_text = _normalize(alias)
         if len(alias_text) >= _MIN_DISEASE_TERM:
@@ -526,19 +531,36 @@ def check_prior_art(
             hits=hits, hit_count=len(hits),
             incidental_hits=incidental, incidental_hit_count=len(incidental),
             query=query)
+    elif incidental:
+        # A distant co-occurrence is NOT a clean negative. The asymmetry
+        # matters more than the precision here: over-calling costs one
+        # candidate, under-calling puts a false novelty claim in front of a
+        # reviewer. A lacosamide / myotonic dystrophy check returned
+        # NO_PRIOR_ART_FOUND while holding a dropped record titled "Drug
+        # treatment for myotonia" -- a review of myotonia drug treatment that
+        # names lacosamide, 3998 characters from the disease term. Review
+        # articles are exactly where "has anyone proposed X for Y" is answered,
+        # and their abstracts spread drugs and diseases far apart by nature.
+        titles = "; ".join(
+            f"{h['title']} ({h.get('year') or 'n.d.'})"
+            for h in incidental[:3])
+        result = _envelope(
+            VERDICT_UNCONFIRMED,
+            f"{len(incidental)} Europe PMC record(s) mention this drug and "
+            f"this disease without discussing them closely together: {titles}. "
+            "Too distant to count as a proposal, too close to call the pair "
+            "unclaimed. A human must read these before any novelty claim.",
+            incidental_hits=incidental, incidental_hit_count=len(incidental),
+            query=query)
+        cache_set(cache_key, result, ttl_days=_TTL_DAYS)
+        return result
     else:
-        note = ""
-        if incidental:
-            note = (f" {len(incidental)} record(s) mention both terms far "
-                    "apart without relating them; these are disclosed, not "
-                    "counted as prior art.")
         result = _envelope(
             VERDICT_NONE,
-            "No Europe PMC record discussed this drug together with this "
+            "No Europe PMC record mentioned this drug together with this "
             "disease in a bounded title/abstract search. This is not evidence "
-            "of novelty; prior art may exist in sources outside this index."
-            + note,
-            incidental_hits=incidental, incidental_hit_count=len(incidental),
+            "of novelty; prior art may exist in sources outside this index.",
+            incidental_hits=[], incidental_hit_count=0,
             query=query)
 
     cache_set(cache_key, result, ttl_days=_TTL_DAYS)
