@@ -12,7 +12,30 @@ The one-paragraph mental model:
 > and gate; language models are confined to narrow jobs (literature
 > relevance screening, cited summarization, fact-restatement prose, and a
 > constrained mechanism-direction verdict); a human sign-off node is a real,
-> pausing stage in the graph — not a UI decoration.
+> pausing stage in the graph, not a UI decoration.
+
+**Disease scope.** Two populations, one engine. The universe is the Orphanet
+rare-disease list plus the 20 WHO neglected tropical diseases, unified by
+`agents/target_selection.py::_build_candidate_universe`. NTDs are not a
+special case anywhere downstream: they carry no ORPHA code, are never group
+entries, and otherwise run through the same resolution, scoring, gating and
+reporting path as every rare disease. Nothing in the scoring is conditioned on
+which list a disease came from.
+
+Sizes, as the Stage 1 build logs them:
+
+```
+Orphanet fetched                                              11,645
+  less administrative prefixes (OBSOLETE / NON RARE IN EUROPE) -1,207
+  less "group of disorders" umbrella entries                   -2,267
+WHO NTDs                                                         +20
+scorable candidate universe                                    8,191
+```
+
+The two exclusions matter when reading any coverage number. A group-of-
+disorders entry is a family heading, not a disease a run can be spent on, so
+counting from the raw 11,645 overstates what the pipeline will actually
+accept by about 30%.
 
 ---
 
@@ -24,7 +47,7 @@ Three processes make up the running product:
 | --- | --- | --- | --- |
 | Web frontend | `pnpm --filter @workspace/web-frontend run dev` (Vite) | 21854 | The React UI at `/` |
 | API server | `uvicorn api.main:app --port 8000` | 8000 | Everything under `/api/` and `/internal/` |
-| LangGraph pipeline | not a server — runs as a background thread inside the API process | — | The six-stage case pipeline |
+| LangGraph pipeline | not a server - runs as a background thread inside the API process | - | The six-stage case pipeline |
 
 Code layout:
 
@@ -50,7 +73,7 @@ docs/              this document
    (`DAILY_RUN_CAP`, default 50/day, counted from PostgreSQL so it survives
    restarts). Rejections are 429/503 with `Retry-After`.
 3. **A job row is created** in PostgreSQL (`api/jobs_db.py`) with
-   `status=queued`, `current_stage=NULL` — NULL on purpose, so the UI never
+   `status=queued`, `current_stage=NULL` - NULL on purpose, so the UI never
    shows stage 1 as done while it is still running.
 4. **A background thread runs the LangGraph graph** (`main_graph.py`), and the
    HTTP request returns immediately with a `job_id`. The UI polls
@@ -111,7 +134,7 @@ target_selection → biologist → chemist → reviewer
                  → structure_validation → writer → human_review
 ```
 
-### Stage 1 — Target selection (`agents/target_selection.py`)
+### Stage 1 - Target selection (`agents/target_selection.py`)
 
 **No AI is used for any number in this stage.** One optional LLM call at the
 very end of the CLI sweep narrates the already-written table; the API path
@@ -126,9 +149,9 @@ discovery lanes**:
 | --- | --- | --- | --- |
 | A. Genetic association | Open Targets target–disease scores, gate `association_score ≥ 0.1` | `genetic_association` | yes |
 | B. Pharmacological precedent | Approved drugs linked to the disease in Open Targets → their mechanism targets in ChEMBL | `pharmacological_precedent` | uses approval data |
-| B-ext. Parent-umbrella precedent | Same as B, but via a parent EFO when the subtype has no drug links — only if the parent has ≤ 100 descendant diseases | `pharmacological_precedent_via_parent_umbrella` | uses approval data |
-| C. Literature mechanism class | Europe PMC disease/process literature → mechanism classes (e.g. channel families, nucleotide metabolism) | `literature_mechanism_class` | yes — never queries a drug name |
-| D. Pathway neighbors | Reactome co-pathway proteins of lane A/C targets (never of lane B targets, so the lane can't rediscover the known drug through its own mechanism); fixed association 0.05, half the lane-A gate | `pathway_neighbor` | yes — protein co-participation only |
+| B-ext. Parent-umbrella precedent | Same as B, but via a parent EFO when the subtype has no drug links - only if the parent has ≤ 100 descendant diseases | `pharmacological_precedent_via_parent_umbrella` | uses approval data |
+| C. Literature mechanism class | Europe PMC disease/process literature → mechanism classes (e.g. channel families, nucleotide metabolism) | `literature_mechanism_class` | yes - never queries a drug name |
+| D. Pathway neighbors | Reactome co-pathway proteins of lane A/C targets (never of lane B targets, so the lane can't rediscover the known drug through its own mechanism); fixed association 0.05, half the lane-A gate | `pathway_neighbor` | yes - protein co-participation only |
 
 Every row is scored with two **separate** numbers that are never blended into
 one opaque value at collection time:
@@ -146,7 +169,7 @@ unmet_need_score    = 0.7 × treatment_component + 0.3 × log-scaled prevalence
 ```
 
 Ranking key: `tractability_score + unmet_need_score`. A mechanistic-convergence
-cap demotes rows whose support collapses onto one mechanism (rank only —
+cap demotes rows whose support collapses onto one mechanism (rank only -
 scores unchanged).
 
 **Top-K pursuit.** One run pursues up to `TOP_K_TARGETS` targets for the same
@@ -164,11 +187,11 @@ name, and a prominent Limitations warning in the partial-overlap band.
 Orphanet "Group of disorders" umbrella terms and administrative entries
 ("OBSOLETE:", "NON RARE IN EUROPE:") are rejected as unscoreable.
 
-### Stage 2a — Biologist (`agents/biologist.py`)
+### Stage 2a - Biologist (`agents/biologist.py`)
 
 For each pursued target:
 
-- **BioGRID** physical/genetic interactors — always labeled *network context,
+- **BioGRID** physical/genetic interactors - always labeled *network context,
   not mechanism*.
 - **PubMed** target↔disease literature, screened by a constrained LLM gate:
   the model sees one retrieved abstract and answers YES/NO whether it
@@ -182,12 +205,12 @@ For each pursued target:
 - **Reactome pathway neighbors** forwarded to the chemist, tagged
   `pathway_neighbor`, with `broad_metabolic` co-pathway-only neighbors flagged.
 
-### Stage 2b — Chemist (`agents/chemist.py`)
+### Stage 2b - Chemist (`agents/chemist.py`)
 
 Builds the candidate compound pool per target:
 
 1. **Candidate collection.** ChEMBL bioactivity (IC50/Ki, human, assay
-   confidence ≥ 8 — joined from the assay endpoint, because the activity
+   confidence ≥ 8 - joined from the assay endpoint, because the activity
    endpoint silently ignores that filter), plus the machine-v2 multisource
    fan-out (`data_sources/multisource_candidates.py`): **GtoPdb**, the pinned
    **DrugCentral 2023 snapshot**, and **BindingDB**, each normalized into the
@@ -215,14 +238,14 @@ Every candidate carries an **evidence ledger**
 deterministic lineage key, so the same underlying assay/PMID/label/trial seen
 through two providers counts once, never twice.
 
-### Stage 2c — Reviewer (`agents/reviewer.py`)
+### Stage 2c - Reviewer (`agents/reviewer.py`)
 
 The scoring stage. For each candidate:
 
 - RDKit descriptors (MW, logP, HBD/HBA, TPSA, rotatable bonds, Lipinski/Veber).
 - openFDA adverse events; ClinicalTrials.gov prior trials for the exact
   drug+disease pair; ChEMBL safety flags, action type, molecule type/orality.
-- PubChem XLogP (caution flag at ≥ 5 — disclosure only) and a non-oral
+- PubChem XLogP (caution flag at ≥ 5 - disclosure only) and a non-oral
   biologic flag (disclosure only). Neither moves the score.
 
 **Composite formula** (fixed reference ranges so scores compare across runs):
@@ -241,19 +264,19 @@ Two honesty rules are load-bearing here:
 
 - **Unobserved ≠ measured zero.** If a term was never measured (lookup failed,
   structure unresolvable), it is dropped from *both* sides of the weighted sum
-  and the remaining terms are renormalized over the covered weight — the
+  and the remaining terms are renormalized over the covered weight - the
   report shows the coverage fraction. A *measured* zero still counts against
   the candidate.
 - **Hard caps beat the formula.** `composite = min(composite, 0.40)` when any
   of these fire, and each is disclosed as an explicit row in the report:
-  - *Unapproved-compound cap* — non-approved compounds can't reach
+  - *Unapproved-compound cap* - non-approved compounds can't reach
     STRONG_MATCH.
-  - *Mechanism-direction cap* — the LLM direction checker
+  - *Mechanism-direction cap* - the LLM direction checker
     (`data_sources/mechanism_direction.py`, top-3 candidates, verdicts
     COMPATIBLE / DIRECTIONALLY_INCOMPATIBLE / INSUFFICIENT_INFO) caps only on
     an incompatible verdict. This gate exists because of a real archetype:
-    miglitol vs. GSD1c — right pathway keywords, wrong cellular mechanism.
-  - *Safety cap* — structured-source signals (layer 1) plus an independent
+    miglitol vs. GSD1c - right pathway keywords, wrong cellular mechanism.
+  - *Safety cap* - structured-source signals (layer 1) plus an independent
     web-search check on the top 3 (layer 2). Layer 2 uses the versioned
     `safety-v3` evidence contract: only an exact, in-context quote from a
     recognized regulator can confirm `WITHDRAWN_FOR_SAFETY` or
@@ -299,11 +322,11 @@ the resolved EFO/MONDO node share no meaningful tokens, on the reasoning that a
 zero-overlap resolution has probably landed on a different disease entirely.
 That heuristic cannot distinguish a wrong resolution from the same disease
 named differently in two ontologies, which is routine in rare disease
-nomenclature — Orphanet often carries a descriptive name where EFO/MONDO
+nomenclature - Orphanet often carries a descriptive name where EFO/MONDO
 carries an eponym or classification name. ORPHA:88660 is the worked example:
 Orphanet's "Hypertension due to gain-of-function mutations in the
 mineralocorticoid receptor" versus MONDO_0011517's "pseudohyperaldosteronism
-type 2" — zero shared tokens, yet Orphanet lists the second as a synonym of the
+type 2" - zero shared tokens, yet Orphanet lists the second as a synonym of the
 first and the MONDO node cross-references ORPHA:88660 directly.
 
 Before hard-stopping, Stage 1 now asks whether the resolved node's own Orphanet
@@ -316,8 +339,8 @@ cross-reference leaves the name heuristic in force, so genuine wrong-disease
 resolutions still stop.
 
 This is disclosed as a post-benchmark modification. The frozen v1 benchmark
-contains two rows — Trichinellosis/Prednisone and Trichinellosis/Triamcinolone
-— recorded as `status="error"` precisely because this hard stop fired on the
+contains two rows - Trichinellosis/Prednisone and Trichinellosis/Triamcinolone
+- recorded as `status="error"` precisely because this hard stop fired on the
 same zero-shared-token synonym problem ("Trichinellosis" versus "trichinosis").
 Admitting those pairs would make the frozen artifacts non-reproducible from
 current code, so frozen and holdout studies bypass the cross-reference check and
@@ -329,16 +352,16 @@ Required-source coverage is assessed per candidate and is deliberately scoped by
 target role: a failure on a direct disease target fails every candidate, while a
 failure on an exploratory pathway-neighbor target is meant to fail only the
 candidates discovered on that neighbor. Stage 3 marks neighbors
-`coverage_required=False` for exactly this reason, and the reviewer honours it —
+`coverage_required=False` for exactly this reason, and the reviewer honours it -
 an incompletely covered candidate carries `candidate_source_coverage_incomplete`
 among its `exclusion_reasons` and is barred from being promoted.
 
 The gate that freezes a report as actionable did not honour that scoping. It
 required *every pooled* candidate to be completely covered, which made an
 exploratory neighbor's failure fatal to the whole run. A single transient HTTP
-429 from GtoPdb on NR3C1 — a pathway neighbor contributing 6 compounds to a
+429 from GtoPdb on NR3C1 - a pathway neighbor contributing 6 compounds to a
 210-candidate pool, on a case whose promoted candidate sat on the direct target
-NR3C2 with complete coverage — discarded a finished run after full LLM and
+NR3C2 with complete coverage - discarded a finished run after full LLM and
 structure-validation spend.
 
 The gate now requires complete coverage only of candidates the report actually
@@ -346,7 +369,7 @@ advances (`paid_validation_eligible`, `headline_eligible`, or
 `externally_prioritizable`). Candidate dossier-contract versioning remains
 pool-wide; only coverage was rescoped. The invariant that matters is unchanged:
 nothing a report promotes may rest on incomplete evidence. A report that
-promotes no candidate — "no candidate can be authorized" — remains a legitimate
+promotes no candidate - "no candidate can be authorized" - remains a legitimate
 and citable outcome.
 
 No frozen benchmark result changes, and no holdout bypass is needed here: this
@@ -364,8 +387,8 @@ whose entire head is directionally incompatible therefore exhausts the budget
 capping it and leaves the lead to a candidate no pass ever reached.
 
 The NR3C2 S810L run is the worked example. The check correctly capped six
-steroid agonists in sequence — progesterone, dexamethasone, prednisolone,
-spironolactone, and both desoxycorticosterone esters — exhausting the 2×3 call
+steroid agonists in sequence - progesterone, dexamethasone, prednisolone,
+spironolactone, and both desoxycorticosterone esters - exhausting the 2×3 call
 budget. The list re-sorted a final time and promoted a seventh compound,
 drospirenone, which carries no mechanism-direction record at all. The hole opens
 precisely *because* the gate is working, and it opens onto the one candidate
@@ -387,7 +410,7 @@ passes themselves are untouched. Regression cover:
 
 Note that this closes a *coverage* hole, not a reasoning one. The check remains
 literature-anchored, so its power is greatest on drug-disease pairs someone has
-already written about and weakest on genuinely novel ones — which is the
+already written about and weakest on genuinely novel ones - which is the
 opposite of where a discovery system most needs it. A candidate whose class
 behaviour inverts for a mutation-specific reason that no source states
 explicitly will still return `INSUFFICIENT_INFO` and, by design, pass uncapped.
@@ -400,11 +423,11 @@ constant with no assay row at all. They were previously ranked independently, so
 the thinner row could win.
 
 Two consecutive runs of the same NR3C2-style case make the effect concrete. The
-first attributed capivasertib to **AKT2** — the gene that causes the disease —
+first attributed capivasertib to **AKT2** - the gene that causes the disease -
 via `genetic_association`, association 0.787, pChEMBL 8.10 at assay confidence
 9, and scored 0.8183. The second attributed the same drug to **AKT1**, a pathway
 neighbor, with no qualified ChEMBL row, a `tractability_score` of 0.0 and the
-association excluded as a stamped constant — and scored **0.8256**. The dossier
+association excluded as a stamped constant - and scored **0.8256**. The dossier
 named the right drug against the wrong gene, cited AKT1 literature to justify
 it, and scored higher for carrying less evidence.
 
@@ -412,8 +435,8 @@ Ranking now resolves attribution before ordering: where the same compound
 appears at several target tiers (`causal_anchor` > `clinical_precedent` >
 `exploratory_expansion`/`unattributed`), the weaker-tier rows are demoted below
 the strongest one. Compound identity is the InChIKey connectivity layer, so salt
-and stereo variants group together. This is rank-only — no score changes, the
-same discipline as the causal-anchor demotion — and frozen/holdout studies
+and stereo variants group together. This is rank-only - no score changes, the
+same discipline as the causal-anchor demotion - and frozen/holdout studies
 bypass it via `_holdout.is_active()`.
 
 **Post-benchmark Tanimoto reference scoping (added 2026-09-26).** Tanimoto
@@ -437,9 +460,9 @@ silently producing a low similarity. Regression cover for both corrections:
 reference set exposed a second defect it had been masking. The chemist emitted
 `tanimoto_score = 0.0` both when a candidate was genuinely dissimilar to the
 approved drugs at its target and when the target had no approved drug to compare
-against at all. The reviewer has always kept those apart — `None` drops from
+against at all. The reviewer has always kept those apart - `None` drops from
 both sides of the weighted sum, a measured `0.0` is adverse structural evidence
-and stays in the denominator — but it never received a `None` to act on.
+and stays in the denominator - but it never received a `None` to act on.
 
 The cost lands on exactly the targets a repurposing pipeline cares about. AKT2
 has one approved drug with a known mechanism, capivasertib, which is the
@@ -451,15 +474,15 @@ scored as a measured zero.
 
 **Post-benchmark trial-term coverage (added 2026-09-27).** The
 `no_failed_trial` term credited 1.0 whenever a ClinicalTrials.gov query
-succeeded without finding a negative repurposing result — including when it
+succeeded without finding a negative repurposing result - including when it
 found no trials at all. "Nobody has run a trial" is not the observation "it was
 taken into humans and did not fail there", but both scored identically.
 
 That paid novelty twice. A never-attempted pair earned a full 0.15 term for
 free, and excluding an unscorable Tanimoto (above) then renormalized still more
 weight onto it. Capivasertib for AKT2 p.Glu17Lys reached a composite of
-**0.9539** on that basis — above the frozen benchmark's strongest real result,
-tretinoin for acute promyelocytic leukemia at **0.806** — for a pairing that has
+**0.9539** on that basis - above the frozen benchmark's strongest real result,
+tretinoin for acute promyelocytic leukemia at **0.806** - for a pairing that has
 never been given to a patient. The arithmetic was correct; the calibration was
 not, and the ordering it produced fails inspection by anyone who knows the
 field.
@@ -476,7 +499,7 @@ verdict is cached for 30 days; failures were cached for one day. That let a
 transient outage silently degrade later runs: during an Anthropic credit
 exhaustion the check for an AKT2 candidate failed, `INSUFFICIENT_INFO` was
 memoized, and the next run that day read the cached failure without calling the
-model — losing the qualified directional bonus and producing a dossier 0.05
+model - losing the qualified directional bonus and producing a dossier 0.05
 lower for a reason unconnected to the biology. Failures are now not cached at
 any TTL: "not determined" must be retried, never remembered. Successful verdicts
 still cache for 30 days. Regression cover:
@@ -486,10 +509,10 @@ still cache for 30 days. Regression cover:
 `pre_cap_score` and the capped `composite_score`, so "weak candidate" is
 distinguishable from "strong candidate blocked by a gate".
 
-### Stage 3a — Structure validation (`main_graph.py`, `structure_validation_node`)
+### Stage 3a - Structure validation (`main_graph.py`, `structure_validation_node`)
 
 Only for selected candidates (strong matches, capped at
-`STAGE3_MAX_CANDIDATES`, default 3 — and hard-capped at **1** when K > 1, a
+`STAGE3_MAX_CANDIDATES`, default 3 - and hard-capped at **1** when K > 1, a
 cost guardrail):
 
 - **AlphaFold DB** apo-structure confidence for the candidate's *own* UniProt
@@ -510,13 +533,13 @@ therapeutic window remain explicit expert-review questions. This is a general
 limitation rather than a blood-brain-barrier-specific rule, and it introduces
 no new score, cap, or gate.
 
-### Stage 3b — Writer (`agents/writer.py`)
+### Stage 3b - Writer (`agents/writer.py`)
 
 Compiles one Markdown dossier per selected candidate into `output/reports/`,
-with five sections — hypothesis summary, evidence table, full citations
+with five sections - hypothesis summary, evidence table, full citations
 (deduplicated PMIDs / ChEMBL activity IDs / NCT numbers), the **complete
 composite breakdown** (every term, weight, contribution, penalty, cap,
-coverage note), and limitations — plus a static sixth section, **"How to read
+coverage note), and limitations - plus a static sixth section, **"How to read
 this dossier"**: a versioned reader's guide that explains the format and
 vocabulary only. It is deliberately claim-free (no candidate-specific
 content), so it cannot introduce an unverifiable statement into an otherwise
@@ -530,7 +553,7 @@ are outside what this pipeline measures.
 
 Flagship dossiers also carry the versioned
 `flagship-dossier-evidence-v1` handoff. It is a deterministic view over
-already collected evidence — it makes **no additional provider or LLM calls**.
+already collected evidence - it makes **no additional provider or LLM calls**.
 It records an evidence-stage verdict and scientific-readiness state, disease /
 mechanism context, ledger-native assay rows, target-approved and reviewed-pool
 comparators, individual ClinicalTrials.gov rows, and a safety/applicability
@@ -539,13 +562,13 @@ matrix. Missing data is rendered as explicit `UNKNOWN`, `NOT ASSESSED`, or
 The score section stamps the formula and safety-schema versions and replays the
 persisted component arithmetic, including coverage renormalization and caps.
 
-### Stage 3c — Human review (`main_graph.py`, `human_review_node`)
+### Stage 3c - Human review (`main_graph.py`, `human_review_node`)
 
 The graph interrupts. A person approves, rejects, or annotates. The decision
 is persisted with the job.
 
 Note the ordering: this checkpoint sits **after** structure validation. Boltz
-spend has already happened by the time a human is asked — the checkpoint gates
+spend has already happened by the time a human is asked - the checkpoint gates
 *completion* of the run (whether the dossier is accepted into the record), not
 the expensive computation. The `human_review` node itself makes zero API
 calls before the interrupt, so resuming can never re-spend money.
@@ -560,7 +583,7 @@ calls before the interrupt, so resuming can never re-spend money.
 | Open Targets | `open_targets.py` | EFO resolution, target–disease association scores, approved-treatment status, parent/descendant ontology walks | Stage 1, always |
 | ChEMBL | `chembl.py` | Bioactivity counts (tractability), mechanism-of-action precedent targets, the candidate compound pool, approved drugs per target, safety flags, action types, molecule type/orality | Stages 1–2, always (small-molecule lanes) |
 | AlphaFold DB | `afdb.py` | Mean pLDDT (tractability term); apo structure pre-check | Stage 1 + Stage 3, whenever a UniProt ID exists |
-| ClinicalTrials.gov | `clinicaltrials.py` | Prior/negative repurposing trials (Stage 1 penalty, Reviewer term, Writer citations) | Stages 1, 2c, 3b — always |
+| ClinicalTrials.gov | `clinicaltrials.py` | Prior/negative repurposing trials (Stage 1 penalty, Reviewer term, Writer citations) | Stages 1, 2c, 3b - always |
 | PubMed (E-utilities) | `pubmed.py` + `literature_limitation.py` | Abstracts for target–disease literature, druggability history, and the pre-structure exact-use limitation gate | Biologist always; Reviewer bounded top-3 gate |
 | Europe PMC | `europepmc_mechanisms.py` | Path C literature mechanism-class targets | Stage 1, always |
 | BioGRID | `biogrid.py` | Physical/genetic interactors (network context) | Biologist, always (needs `BIOGRID_API_KEY`; degrades gracefully) |
@@ -570,8 +593,8 @@ calls before the interrupt, so resuming can never re-spend money.
 | UniProt | `uniprot.py` | Protein sequence for complex prediction | Stage 3, selected candidates only |
 | Boltz | `boltz_api.py` | Paid complex structure/binding/affinity + ADME predictions | Stage 3, selected candidates only (hard caps) |
 | GtoPdb | `gtopdb.py` | Machine-v2 candidate lane (curated ligand–target interactions) | Chemist multisource fan-out; per-lane disable-able |
-| DrugCentral | `drugcentral_v2.py` / `drugcentral_local.py` + pinned `drugcentral_2023_snapshot.sqlite` | Machine-v2 candidate lane (approvals, activities, indications) from a SHA-256-pinned local snapshot — fail-closed, `DRUGCENTRAL_FORCE_LIVE=1` escape hatch | Chemist multisource fan-out |
-| BindingDB | `bindingdb.py` | Machine-v2 candidate lane (nM affinities; moiety identity via fragment-parent canonical SMILES — this environment's RDKit has no InChI support) | Chemist multisource fan-out |
+| DrugCentral | `drugcentral_v2.py` / `drugcentral_local.py` + pinned `drugcentral_2023_snapshot.sqlite` | Machine-v2 candidate lane (approvals, activities, indications) from a SHA-256-pinned local snapshot - fail-closed, `DRUGCENTRAL_FORCE_LIVE=1` escape hatch | Chemist multisource fan-out |
+| BindingDB | `bindingdb.py` | Machine-v2 candidate lane (nM affinities; moiety identity via fragment-parent canonical SMILES - this environment's RDKit has no InChI support) | Chemist multisource fan-out |
 | PubTator | `pubtator_assertions.py` | Literature assertion extraction for the audit lanes | Audit path, not the case pipeline |
 | Web search | `safety_check.py` | Safety layer 2: independent withdrawal/black-box check | Reviewer, top-3 candidates only |
 | Anthropic / OpenAI | `llm_failover.py` + per-agent clients | The constrained AI calls listed in §5 | Per call site, with failover |
@@ -581,17 +604,17 @@ Every adapter is **cache-first** (`cache/cache.py`): a SHA-256 key over
 bounded-lock hybrid writer so a stuck SQLite handle can never freeze the
 network lanes. Two cache rules are hard-won and enforced: **transient failures
 are never cached**, and a **degraded 200-with-empty-payload is a failure**,
-not a confirmed negative — empty pools get purged by content, not trusted.
+not a confirmed negative - empty pools get purged by content, not trusted.
 
 ---
 
-## 5. Exactly where AI acts — and its leash
+## 5. Exactly where AI acts - and its leash
 
 | # | Call site | Model | Job | Hard constraints |
 | --- | --- | --- | --- | --- |
 | 1 | Biologist literature screen | Sonnet, temp 0 | YES/NO: does this retrieved abstract specifically discuss the target–disease relationship? | One abstract in, verdict out; the model cannot cite anything not retrieved |
 | 2 | Biologist druggability summary | Haiku, temp 0 | 2–3 sentences of historical-difficulty context | Only if ≥ 2 abstracts passed gate 1; may only use supplied abstracts + one ChEMBL fact; **cannot affect any score** |
-| 3 | Chemist rationale | Sonnet, temp 0 | Restate a candidate's measured numbers in exactly two sentences | Budget-capped (default 25/pool); fact-list prompt banning praise/speculation; disclosure-only — nothing parses it |
+| 3 | Chemist rationale | Sonnet, temp 0 | Restate a candidate's measured numbers in exactly two sentences | Budget-capped (default 25/pool); fact-list prompt banning praise/speculation; disclosure-only - nothing parses it |
 | 4 | Mechanism-direction check | LLM via `mechanism_direction.py` | COMPATIBLE / DIRECTIONALLY_INCOMPATIBLE / INSUFFICIENT_INFO | Top-3 candidates only; only INCOMPATIBLE acts (cap at 0.40); verdict + reason disclosed in the report |
 | 5 | Literature-limitation extraction | LLM via `literature_limitation.py` | Classify a bounded batch of retrieved PubMed abstracts and copy exact limiting/supportive passages | One call per top-3 candidate, at most 8 abstracts each; Python verifies quote + PMID + exact applicability and applies the multi-source/source-authority threshold; failures never become negative findings |
 | 6 | Stage-1 CLI narration | Sonnet | Plain-English summary of the already-written top-30 table | Post-hoc; references only numbers already on disk; not used by the API path |
@@ -645,7 +668,7 @@ bugs were found three times the hard way.
 ## 7. Configuration knobs (self-hosting)
 
 The hosted public instance keeps conservative caps because every run spends
-real money. Self-hosters can widen them via environment variables — **all
+real money. Self-hosters can widen them via environment variables - **all
 overrides are logged loudly at startup, and weight overrides are stamped into
 the run's output and disclosed in every dossier** (see the banner in the
 score breakdown), because a run with non-default weights is not comparable to
@@ -665,16 +688,16 @@ the frozen benchmark.
 | `AGENTBIO_LLM_MIN_INTERVAL_SECONDS` | 0.25 | Shared LLM scheduler minimum interval between starts per provider |
 | `AGENTBIO_ANTHROPIC_CHEAP_TEXT_MODEL` / `AGENTBIO_OPENAI_CHEAP_TEXT_MODEL` | Haiku 4.5 / GPT-5 mini | Opt-in low-risk routing tier only; current default/critical calls are unchanged |
 | `AGENTBIO_PREFETCH_WORKERS` | 8 | Reviewer prefetch concurrency per source |
-| `AGENTBIO_DISABLE_V2_LANES` | — | If 1, restore machine-v1 pool semantics (ChEMBL-only) |
+| `AGENTBIO_DISABLE_V2_LANES` | - | If 1, restore machine-v1 pool semantics (ChEMBL-only) |
 | `AGENTBIO_TRACTABILITY_WEIGHTS` | `{"chembl_log_count":0.40,"afdb_plddt":0.35,"trial_penalty":0.25}` | JSON object overriding Stage-1 tractability weights |
 | `AGENTBIO_COMPOSITE_WEIGHTS` | `{"efficacy_evidence":0.50,"ot_association":0.20,"tanimoto":0.15,"no_failed_trial":0.15}` | JSON object overriding Reviewer composite weights |
 | `RATE_LIMIT_PER_HOUR` | 3 | Per-IP new-case limit (hosted cost guardrail) |
 | `DAILY_RUN_CAP` | 50 | Global new-case cap per UTC day (hosted cost guardrail) |
-| `STRICT_VALIDATION` | — | If true, handoff schema problems hard-fail the run |
-| `DRUGCENTRAL_FORCE_LIVE` | — | If 1, bypass the pinned DrugCentral snapshot (not recommended) |
+| `STRICT_VALIDATION` | - | If true, handoff schema problems hard-fail the run |
+| `DRUGCENTRAL_FORCE_LIVE` | - | If 1, bypass the pinned DrugCentral snapshot (not recommended) |
 
 Required secrets for a full run: `ANTHROPIC_API_KEY` and `OPENAI_API_KEY`
-(both — the failover path round-robins across providers and several checks use
+(both - the failover path round-robins across providers and several checks use
 a provider-bound web-search tool on each side), `BIOGRID_API_KEY`,
 `BOLTZ_API_KEY`, `OPENFDA_API_KEY`, plus `DATABASE_URL` for the API.
 
@@ -688,14 +711,14 @@ The pipeline's claims rest on frozen, provenance-checked artifacts in
 - A **pre-registered, holdout-redacted retrospective benchmark** (case list
   frozen under a git tag *before* the run; results SHA-256-pinned;
   `python3 validation/verify_v2_provenance.py` re-checks tag/blob identity,
-  pre-run dates, row identity, and funnel arithmetic — 8 checks).
+  pre-run dates, row identity, and funnel arithmetic - 8 checks).
 - **Audit claim-set studies**: v1 FAILED honestly and stays published
   unedited; v2 passed and is the result of record.
 - Frozen studies are never rerun or regenerated; post-freeze hardening ships
   as amendments with the results hash untouched.
 
 A self-hosted run with overridden weights or lanes is a *different instrument*
-— that is why the disclosure banner exists rather than a silent knob.
+- that is why the disclosure banner exists rather than a silent knob.
 
 **Post-benchmark ChEMBL absence-vs-outage disambiguation (added 2026-09-27).**
 An empty ChEMBL result was recorded as `source_status="unavailable"` in both
@@ -706,7 +729,7 @@ caching a degraded empty is what zeroed a pool during the MTOR/TSC incident of
 
 The cost of that conservatism was invisible and large. `unavailable` is outside
 `HEALTHY_SOURCE_STATES`, so it fails the pursued target, and a failed target
-can fail the entire run. ChEMBL does not track most proteins — FAM20A
+can fail the entire run. ChEMBL does not track most proteins - FAM20A
 (Q96MK3) and DEPDC1B (Q8WUY9) each return **zero** target records, and PRKAR1A
 (P10644) resolves to CHEMBL5169 with **zero** activities. Any disease whose
 target list contained such a protein was therefore unrunnable, regardless of
@@ -715,7 +738,7 @@ way, with PDE4D fully resolved and carrying 9,541 activities, killed by three
 co-pursued targets that ChEMBL simply does not carry.
 
 The ambiguity is resolvable. `chembl_is_serving_data()` probes a control
-accession known to be dense — EGFR P00533, the entity CLAUDE.md already
+accession known to be dense - EGFR P00533, the entity CLAUDE.md already
 designates for validating wrappers, precisely because wrappers swallow errors
 and return empty. If the control returns targets and the subject does not, the
 subject's emptiness is an observation about the subject and is recorded as
@@ -746,8 +769,8 @@ near-identical analogues scores high against its own siblings, while a
 structurally distinct potent binder scores low and is penalised for it.
 
 An Acrodysostosis run is the worked example. The pool held five methylxanthines,
-and AMINOPHYLLINE — theophylline plus ethylenediamine, with **no measured PDE4D
-potency at all** — outranked ROFLUMILAST, which binds PDE4D at pChEMBL 9.89:
+and AMINOPHYLLINE - theophylline plus ethylenediamine, with **no measured PDE4D
+potency at all** - outranked ROFLUMILAST, which binds PDE4D at pChEMBL 9.89:
 
 ```
 AMINOPHYLLINE  eff 0.8725  tan 0.7436  pChEMBL none   composite 0.8915
@@ -770,6 +793,6 @@ the pipeline as it stood at freeze time. This is the seventh disclosed
 post-benchmark correction that changes scoring or ordering, so frozen results
 describe the benchmarked version and are **not** a measurement of current
 capability. Establishing current capability requires re-running the frozen case
-list on current code as a separate, newly-labelled study — and that re-run must
+list on current code as a separate, newly-labelled study - and that re-run must
 run with the post-benchmark gates ACTIVE, which the holdout bypasses above
 deliberately prevent. That is unbuilt work, not a flag flip.

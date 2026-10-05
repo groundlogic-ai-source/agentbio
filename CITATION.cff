@@ -1,24 +1,45 @@
 cff-version: 1.2.0
 message: If you use this software in your work, please cite it using the following metadata.
 type: software
-title: "AgentBio: an audited drug-repurposing research pipeline for rare and neglected diseases"
+title: "AgentBio: an audited drug-repurposing research pipeline for rare and neglected tropical diseases"
 authors:
   - family-names: Britto
     given-names: Evan
-version: benchmark-freeze-v2
-date-released: 2026-08-09
+# Date-based, because this project has no release process and inventing a
+# semantic version would imply one. It previously read "benchmark-freeze-v2",
+# which was wrong twice over: no such tag exists in the repository (the tags
+# are benchmark-cases-v1, benchmark-cases-v2 and benchmark-freeze-v1), and
+# naming the software version after a benchmark freeze told the reader the
+# code was unchanged since that benchmark. It was not. 117 commits have
+# touched agents/, data_sources/, main_graph.py and api/ since 2026-08-09.
+#
+# The benchmark artifacts ARE frozen; the code is not. Those are separate
+# facts and the citation now keeps them separate.
+version: "2026.10.04"
+date-released: 2026-10-04
+repository-code: https://github.com/groundlogic-ai-source/agentbio
 license: MIT
 keywords:
   - drug repurposing
   - rare diseases
+  - neglected tropical diseases
   - computational biology
   - validation methodology
 abstract: >-
-  AgentBio is a drug-repurposing research pipeline for rare and neglected
-  diseases with an independently validated audit layer. Validation results of
-  record: rediscovery benchmark v2 (6/22 in-scope, all hits top-10, frozen
-  2026-08-09) and audit claim-set v2 (defect recall 60/60, control false-flag
-  2/40, frozen 2026-08-11). Full evidence trail, published failures, and
-  rerunnable provenance verification: validation/validation_campaign_dossier.md
-  and validation/verify_v2_provenance.py. Research prototype; not clinically
+  AgentBio is a drug-repurposing research pipeline for rare diseases and WHO
+  neglected tropical diseases, with an independently validated audit layer.
+  Disease coverage is the Orphanet rare-disease universe plus the 20 WHO NTDs;
+  both run through the same scoring and evidence engine.
+
+  Validation results of record, frozen and separate from the evolving code:
+  rediscovery benchmark v2 (6/22 in-scope, all hits top-10, frozen 2026-08-09,
+  pinned by tags benchmark-cases-v2 and benchmark-freeze-v1) and audit
+  claim-set v2 (defect recall 60/60, control false-flag 2/40, frozen
+  2026-08-11). The code has continued to change since those freezes; the
+  artifacts have not, and validation/verify_v2_provenance.py re-derives them
+  from the committed files on demand.
+
+  Full evidence trail, published failures, and rerunnable provenance
+  verification: validation/validation_campaign_dossier.md and
+  validation/verify_v2_provenance.py. Research prototype; not clinically
   validated.
