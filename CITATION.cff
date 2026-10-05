@@ -5,16 +5,9 @@ title: "AgentBio: an audited drug-repurposing research pipeline for rare and neg
 authors:
   - family-names: Britto
     given-names: Evan
-# Date-based, because this project has no release process and inventing a
-# semantic version would imply one. It previously read "benchmark-freeze-v2",
-# which was wrong twice over: no such tag exists in the repository (the tags
-# are benchmark-cases-v1, benchmark-cases-v2 and benchmark-freeze-v1), and
-# naming the software version after a benchmark freeze told the reader the
-# code was unchanged since that benchmark. It was not. 117 commits have
-# touched agents/, data_sources/, main_graph.py and api/ since 2026-08-09.
-#
-# The benchmark artifacts ARE frozen; the code is not. Those are separate
-# facts and the citation now keeps them separate.
+# Date-based: this project has no release process, and a semantic version
+# would imply one. The benchmark artifacts are frozen at the tags named in
+# the abstract; the code is not, and the two are kept separate on purpose.
 version: "2026.10.04"
 date-released: 2026-10-04
 repository-code: https://github.com/groundlogic-ai-source/agentbio
