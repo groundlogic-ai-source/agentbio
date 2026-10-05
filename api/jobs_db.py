@@ -37,7 +37,17 @@ import psycopg2.extras
 
 from api.policy_contracts import canonical_json_bytes
 
-_DATABASE_URL = os.environ["DATABASE_URL"]
+try:
+    _DATABASE_URL = os.environ["DATABASE_URL"]
+except KeyError:  # a bare KeyError at import time says nothing useful
+    raise RuntimeError(
+        "DATABASE_URL is not set. Stage 4 (the FastAPI service) stores job "
+        "state in PostgreSQL; Stages 1-3 do not need it and run without it. "
+        "Set it to a libpq connection string, e.g. "
+        "postgresql://user:pass@host:5432/agentbio, and create the schema "
+        "with db/schema/001_core_tables.sql plus "
+        "api/migrations/20260820_job_artifacts.sql."
+    ) from None
 
 # Committed historical snapshot, imported into a fresh (empty) database exactly
 # once. Lives next to this module so it is always bundled with the deploy image.
