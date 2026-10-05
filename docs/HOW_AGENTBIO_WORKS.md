@@ -630,7 +630,7 @@ limit rather than sharing one global request slot.
 
 | Store | Technology | Holds | Durability rule |
 | --- | --- | --- | --- |
-| Job store | Replit PostgreSQL (`api/jobs_db.py`) | Jobs, status, stage, cost, decisions, `explored_targets` | Durable across deploys; schema owned by dev DB + Publish diff (no startup DDL); seeded once from `api/seed_jobs.json` on an empty DB |
+| Job store | PostgreSQL (`api/jobs_db.py`) | Jobs, status, stage, cost, decisions, `explored_targets` | Durable across deploys; schema owned by dev DB + Publish diff (no startup DDL); seeded once from `api/seed_jobs.json` on an empty DB |
 | Graph checkpoints | SQLite `checkpoints.db` (LangGraph `SqliteSaver`) | Full graph state per thread | Enables pause/resume without re-spend |
 | Response cache | SQLite `cache/cache.db` | External API responses with TTLs | Best-effort; a lost write only costs a refetch; failures never cached |
 | Materialized artifacts | `output/*.json`, `output/reports/*.md` | Stage outputs and dossiers | Target-specific artifacts are invalidated whenever the selected target changes, so a new target can never inherit the previous one's biology |
@@ -673,9 +673,10 @@ the frozen benchmark.
 | `STRICT_VALIDATION` | — | If true, handoff schema problems hard-fail the run |
 | `DRUGCENTRAL_FORCE_LIVE` | — | If 1, bypass the pinned DrugCentral snapshot (not recommended) |
 
-Required secrets for a full run: Anthropic (via Replit AI Integrations or
-`AI_INTEGRATIONS_ANTHROPIC_*`), `BIOGRID_API_KEY`, `BOLTZ_API_KEY`,
-`OPENFDA_API_KEY`, plus `DATABASE_URL` for the API.
+Required secrets for a full run: `ANTHROPIC_API_KEY` and `OPENAI_API_KEY`
+(both — the failover path round-robins across providers and several checks use
+a provider-bound web-search tool on each side), `BIOGRID_API_KEY`,
+`BOLTZ_API_KEY`, `OPENFDA_API_KEY`, plus `DATABASE_URL` for the API.
 
 ---
 

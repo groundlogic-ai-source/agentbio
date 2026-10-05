@@ -1,16 +1,18 @@
 """
 Job tracking for the AgentBio FastAPI backend (Stage 4).
 
-Storage is Replit-managed PostgreSQL (via DATABASE_URL), NOT a local SQLite file.
+Storage is PostgreSQL (via DATABASE_URL), NOT a local SQLite file.
 Cloud Run's per-instance disk is ephemeral, so any job history written to a local
 file is silently reset on every redeploy / instance recycle / cold start.
 PostgreSQL is durable and survives all of those, so both the `jobs` table and the
 `explored_targets` table live there.
 
-Schema ownership: the two tables are created in the *development* database via the
-Replit database tooling and propagated to *production* by the Replit Publish diff
-(which introspects both databases and applies the delta). This module therefore
-intentionally does NOT run DDL at startup — production schema is not the
+Schema ownership: this module intentionally does NOT run DDL at startup. The two
+tables were originally created by external database tooling that introspected dev
+and production and applied the delta, so the application never owned the schema.
+That tooling is gone; `db/schema/001_core_tables.sql` and
+`api/migrations/20260820_job_artifacts.sql` reconstruct the DDL for a fresh
+deployment. Startup DDL is still deliberately absent — production schema is not the
 application's responsibility. It DOES perform a one-time, idempotent DATA seed of
 historical jobs (see `_seed_if_empty`) so that a brand-new/empty database is
 populated from the committed snapshot in `api/seed_jobs.json`.

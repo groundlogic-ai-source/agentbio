@@ -16,7 +16,7 @@
 # passed (e.g. an urgent security bugfix), you can add it to the
 # `minimumReleaseAgeExclude` allowlist below. Only consider doing this for
 # packages released by trusted organizations with an impeccable security
-# posture (e.g. Replit packsges, react from Meta, typescript from Microsoft). Even then,
+# posture (e.g. react from Meta, typescript from Microsoft). Even then,
 # remove the exclusion once the 1-day window has passed.
 #
 # Example:
@@ -28,9 +28,13 @@
 minimumReleaseAge: 1440
 
 minimumReleaseAgeExclude:
-  # Exclude @replit scoped packages from the minimum release age check.
-  # These are published by Replit and trusted — the supply-chain attack vector
-  # this setting guards against does not apply to our own packages.
+  # Legacy exclusion for @replit scoped packages. These were first-party when
+  # the project ran on Replit; they are not any more, so the trust rationale
+  # that justified skipping the release-age check no longer holds. The three
+  # @replit Vite plugins are also dead code -- vite.config.ts gates them on
+  # process.env.REPL_ID, which is never set now -- so the correct fix is to
+  # drop the dependencies and this exclusion together, which needs a
+  # `pnpm install` to regenerate pnpm-lock.yaml.
   - '@replit/*'
   - stripe-replit-sync
 
@@ -75,7 +79,7 @@ onlyBuiltDependencies:
   - unrs-resolver
 
 overrides:
-  # replit uses linux-x64 only, we can exclude all other platforms
+  # Deployment is linux-x64 only, so every other platform binary is excluded
   "esbuild>@esbuild/darwin-arm64": "-"
   "esbuild>@esbuild/darwin-x64": "-"
   "esbuild>@esbuild/freebsd-arm64": "-"

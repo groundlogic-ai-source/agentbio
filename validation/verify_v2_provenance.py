@@ -51,10 +51,39 @@ def _truthy(v: object) -> bool:
     return str(v).strip().lower() == "true"
 
 
+def _artifact_bytes() -> tuple[bytes, str]:
+    """The committed artifact's bytes, not whatever the checkout wrote to disk.
+
+    The pin is a hash of the artifact as committed. On Windows, git's
+    core.autocrlf rewrites LF to CRLF on checkout, so hashing the working-tree
+    file reports a different digest for a completely clean repository -- and
+    the public mirror has no .gitattributes to prevent it, because the export
+    strips that file. The verifier therefore accused the benchmark of being
+    tampered with on any Windows checkout, which is the single worst way for
+    an integrity check to be wrong: it is the first thing an external reviewer
+    runs, and a false alarm there discredits evidence that is actually intact.
+
+    `git show HEAD:<path>` returns the stored blob, unaffected by checkout
+    filters. Outside a git checkout (a release tarball, say) fall back to the
+    file and normalise CRLF to LF, which recovers the committed bytes for a
+    text artifact.
+    """
+    rel = os.path.relpath(RESULTS, _REPO).replace(os.sep, "/")
+    out = subprocess.run(["git", "show", f"HEAD:{rel}"],
+                         capture_output=True, cwd=_REPO)
+    if out.returncode == 0 and out.stdout:
+        return out.stdout, "git blob at HEAD"
+    disk = open(RESULTS, "rb").read()
+    if b"\r\n" in disk:
+        return disk.replace(b"\r\n", b"\n"), "working tree, CRLF normalised"
+    return disk, "working tree"
+
+
 def main() -> int:
-    raw = open(RESULTS, "rb").read()
+    raw, _source = _artifact_bytes()
     sha = hashlib.sha256(raw).hexdigest()
-    check("1. results SHA-256 == repository pin", sha == EXPECTED_SHA256, sha)
+    check("1. results SHA-256 == repository pin", sha == EXPECTED_SHA256,
+          f"{sha}  (source: {_source})")
 
     res = json.loads(raw)
     meta = {k: v for k, v in res.items() if k != "cases"}

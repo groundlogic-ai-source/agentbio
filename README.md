@@ -55,12 +55,16 @@ pip install -r requirements.txt --break-system-packages
 
 ### Environment variables
 
-The LLM steps use Replit AI Integrations (Anthropic). These are set automatically:
+The LLM steps call Anthropic and OpenAI directly. Both are required: the
+failover path in `data_sources/llm_failover.py` round-robins across providers
+and fails over on a 429, and several checks use a provider-bound web-search
+tool on each side, so one key alone will not complete a run.
 
-| Variable | Purpose |
-|---|---|
-| `AI_INTEGRATIONS_ANTHROPIC_BASE_URL` | Replit proxy URL for Anthropic |
-| `AI_INTEGRATIONS_ANTHROPIC_API_KEY`  | Dummy key (handled by proxy) |
+| Variable | Required? | Purpose |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | **Required** | Anthropic models |
+| `OPENAI_API_KEY`    | **Required** | OpenAI models, and the 429 failover partner |
+| `ANTHROPIC_BASE_URL` / `OPENAI_BASE_URL` | Optional | Override the API endpoint (proxy or gateway) |
 
 All Stage 1 data sources are publicly accessible — no keys required. Stage 2 adds two keys:
 
@@ -306,11 +310,11 @@ The API layer never reimplements pipeline logic. It imports `build_graph` from `
 uvicorn api.main:app --host 0.0.0.0 --port $PORT
 ```
 
-`PORT` is provided by Replit (defaults to `8000` locally). On Replit the **AgentBio API** workflow runs this for you; open the webview and append `/docs`.
+`PORT` defaults to `8000`. Open `/docs` for the interactive API reference.
 
 ### Job tracking
 
-Job metadata lives in a **PostgreSQL** store (Replit's built-in database) — kept separate from the LangGraph `checkpoints.db` (graph state, SQLite) so the API schema never couples to LangGraph internals. The `jobs` table tracks `status` (`queued` → `running` → `awaiting_review` → `completed` / `error`) and `current_stage`, which is updated **after each graph node actually completes** (`target_selection` → `biologist` → `chemist` → `reviewer` → `structure_validation` → `writer` → `awaiting_review` → `done`) by hooking into LangGraph's `stream()` output — not a single flip from running to done.
+Job metadata lives in a **PostgreSQL** store — kept separate from the LangGraph `checkpoints.db` (graph state, SQLite) so the API schema never couples to LangGraph internals. The `jobs` table tracks `status` (`queued` → `running` → `awaiting_review` → `completed` / `error`) and `current_stage`, which is updated **after each graph node actually completes** (`target_selection` → `biologist` → `chemist` → `reviewer` → `structure_validation` → `writer` → `awaiting_review` → `done`) by hooking into LangGraph's `stream()` output — not a single flip from running to done.
 
 ### Endpoints
 
@@ -343,7 +347,7 @@ The whole pipeline is presented as a chain of hypotheses: each run opens a new c
 pnpm --filter @workspace/web-frontend run dev   # Vite dev server on :21854
 ```
 
-On Replit the **web** workflow runs this for you; run the API alongside it (`uvicorn api.main:app --host 0.0.0.0 --port 8000`). The app calls relative `/api/*` paths only — no hardcoded hosts.
+Run the API alongside it (`uvicorn api.main:app --host 0.0.0.0 --port 8000`). The app calls relative `/api/*` paths only — no hardcoded hosts.
 
 ### Build (production)
 
@@ -351,7 +355,7 @@ On Replit the **web** workflow runs this for you; run the API alongside it (`uvi
 PORT=21854 BASE_PATH=/ pnpm --filter @workspace/web-frontend run build
 ```
 
-In deployment the frontend artifact serves `/` and the API artifact serves `/api/*` as two separate processes behind Replit's reverse proxy; the FastAPI service no longer serves static files.
+In deployment the frontend artifact serves `/` and the API artifact serves `/api/*` as two separate processes behind a reverse proxy; the FastAPI service no longer serves static files.
 
 ### How the UI talks to the API
 

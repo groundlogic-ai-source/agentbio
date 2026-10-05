@@ -36,6 +36,13 @@ git filter-repo --force \
   --path-glob 'checkpoints.db*' \
   --path data_prep/raw/dc_dump.sql.gz \
   --path validation/triage_discrimination_studyb_checkpoint.jsonl \
+  --path-glob 'validation/triage_discrimination_checkpoint*.jsonl' \
+  --path validation/engineering_acceptance_only_phenobarbital.json \
+  --path validation/canonical_validation_2026-07-11.json \
+  --path publication/submission \
+  --path replit.md --path .replit --path .replitignore \
+  --path MIGRATION_NOTES.md \
+  --path-glob 'artifacts/*/.replit-artifact/*' \
   --path .gitattributes \
   --invert-paths \
   --strip-blobs-bigger-than 20M \
@@ -65,6 +72,20 @@ echo "research/ paths remaining in history: $(git rev-list --objects --all | gre
 # X-Amz-Credential), so not publishing it is better than relying on text
 # redaction to catch every one.
 echo "output/ paths remaining in history: $(git rev-list --objects --all | grep -cE ' output(/|$)' || true)"
+# publication/submission held the cover letter, journal shortlist, bioRxiv
+# checklist and reviewer-response template. That is submission strategy, not
+# the machine, and the repo is meant to carry the machine and its evidence.
+echo "publication/submission paths remaining: $(git rev-list --objects --all | grep -cE ' publication/submission(/|$)' || true)"
+# Dead Replit config: the migration finished, nothing imports these, and a
+# stale replit.md duplicated the README while documenting AI_INTEGRATIONS_*
+# environment variables that no longer exist anywhere in the codebase --
+# following it was a guaranteed failed setup.
+echo "replit config paths remaining: $(git rev-list --objects --all | grep -cE ' (replit\.md|\.replit|\.replitignore|MIGRATION_NOTES\.md)$|\.replit-artifact/' || true)"
+# Orphaned validation blobs: referenced by no code and no document, 880KB
+# between them. Study resume-checkpoints are intermediate state, not results;
+# the studyb one was already stripped and the others were not, which was just
+# an oversight.
+echo "orphaned validation blobs remaining: $(git rev-list --objects --all | grep -cE ' validation/(engineering_acceptance_only_phenobarbital\.json|canonical_validation_2026-07-11\.json|triage_discrimination_checkpoint.*\.jsonl)$' || true)"
 echo "LFS pointers remaining in all refs: $(git lfs ls-files --all 2>/dev/null | wc -l)"
 echo "blobs >20MB remaining: $(git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectsize)' 2>/dev/null | awk '$1=="blob" && $2>20000000' | wc -l)"
 for term in REMEDi4ALL "Rare Beacon" REPO4EU "Every Cure"; do

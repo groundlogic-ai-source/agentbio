@@ -19,7 +19,7 @@ Alert delivery
 --------------
 When the daily cap is reached, _fire_alert() is called:
   - Always: prints a prominent message to stderr and appends to
-    /tmp/agentbio_alerts.log (visible in Replit's console).
+    /tmp/agentbio_alerts.log.
   - Optional SMTP email: set all four env vars to enable:
         ALERT_EMAIL_TO      recipient address
         ALERT_SMTP_HOST     SMTP server hostname
@@ -70,7 +70,7 @@ _window_lock = threading.Lock()
 def _client_ip(request: Request) -> str:
     """
     Extract the real client IP, preferring the X-Forwarded-For / X-Real-IP
-    headers set by Replit's reverse proxy.  Falls back to the direct peer
+    headers set by the reverse proxy.  Falls back to the direct peer
     address if neither header is present.
     """
     xff = request.headers.get("x-forwarded-for")

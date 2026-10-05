@@ -8,7 +8,7 @@ B. Every record returned by this wrapper is labelled accordingly, and downstream
 code / LLM prompts must not describe these edges as activating/inhibiting unless
 BioGRID's own EXPERIMENTAL_SYSTEM data explicitly says so.
 
-Requires BIOGRID_API_KEY from the environment (Replit Secrets).
+Requires BIOGRID_API_KEY from the environment.
 """
 
 import os

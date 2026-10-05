@@ -80,7 +80,8 @@ def render_case_pdf(markdown: str, job: dict[str, Any]) -> bytes:
     font_root = Path("/usr/share/fonts/truetype/dejavu")
     pdf.add_font("DejaVu", "", str(font_root / "DejaVuSans.ttf"))
     pdf.add_font("DejaVu", "B", str(font_root / "DejaVuSans-Bold.ttf"))
-    # The Replit runtime ships the regular and bold DejaVu faces. Registering
+    # Dockerfile.api installs fonts-dejavu-core, which provides the regular and
+    # bold faces at this path but no oblique one. Registering
     # the regular face for italic requests retains Unicode coverage and avoids
     # a deployment-only dependency on an absent oblique font file.
     pdf.add_font("DejaVu", "I", str(font_root / "DejaVuSans.ttf"))
