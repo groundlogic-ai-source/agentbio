@@ -69,7 +69,7 @@ while true; do
   fi
   # Prefetch resilience: fewer concurrent lane workers (5 lanes x 8 workers
   # = 40 in-flight calls reproducibly wedges this VM's egress), and a
-  # 15-min zero-progress stall budget — on stall the runner self-terminates
+  # 15-min zero-progress stall budget - on stall the runner self-terminates
   # and this loop restarts it; completed lane calls are cached, so each
   # retry resumes where the last one froze instead of starting over.
   # nice -19: on the 1-vCPU reserved VM the prefetch/scoring phases saturate
@@ -85,7 +85,7 @@ while true; do
     echo "complete" > "$DONE"
     break
   fi
-  # Freeze violation is a hard stop — never auto-retry a frozen-study breach.
+  # Freeze violation is a hard stop - never auto-retry a frozen-study breach.
   if tail -n 50 "$LOG" | grep -q "FREEZE VIOLATION"; then
     echo "FREEZE VIOLATION — manual intervention required" >> "$LOG"
     echo "freeze_violation" > "$DONE"

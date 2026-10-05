@@ -3,13 +3,13 @@ Cost-safety guardrails for the AgentBio API.
 
 Two independent limits gate POST /api/runs:
 
-  1. Per-IP sliding window — at most IP_HOURLY_LIMIT new runs per IP per
+  1. Per-IP sliding window - at most IP_HOURLY_LIMIT new runs per IP per
      rolling 60-minute window.  State lives in process memory (thread-safe).
      A server restart resets the window, which is acceptable for a
      single-instance deployment.  Override the limit via:
          RATE_LIMIT_PER_HOUR=N  (default 3)
 
-  2. Global daily cap — at most DAILY_RUN_CAP new runs per UTC calendar day
+  2. Global daily cap - at most DAILY_RUN_CAP new runs per UTC calendar day
      across all IPs.  State is queried from PostgreSQL (the same jobs table)
      so it survives restarts.  Once the cap is hit every POST /api/runs
      returns 503 and a one-per-day alert is fired.  Override via:
@@ -27,7 +27,7 @@ When the daily cap is reached, _fire_alert() is called:
         ALERT_SMTP_USER     SMTP login
         ALERT_SMTP_PASS     SMTP password
 
-IMPORTANT — application limits are not a substitute for provider-level caps.
+IMPORTANT - application limits are not a substitute for provider-level caps.
 Configure hard spend limits independently at:
   • Anthropic Console → Settings → Billing → Spend limits
   • OpenAI Platform  → Settings → Limits → Monthly budget
@@ -204,7 +204,7 @@ def _fire_alert(msg: str) -> None:
     smtp_port = int(os.environ.get("ALERT_SMTP_PORT", "587"))
 
     if not (to_addr and smtp_host and smtp_user and smtp_pass):
-        return  # email not configured — skip silently
+        return  # email not configured - skip silently
 
     try:
         em = EmailMessage()

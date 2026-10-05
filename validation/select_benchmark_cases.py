@@ -1,4 +1,4 @@
-"""Mechanical benchmark case selection — implements
+"""Mechanical benchmark case selection - implements
 validation/benchmark_case_selection_criteria.md exactly.
 
 Deterministic: SEED fixed, all filters mechanical, selection reproducible
@@ -83,21 +83,21 @@ def main() -> None:
     rows = list(csv.DictReader(open(DATASET)))
     step("0. dataset rows", rows)
 
-    # I1 — confirmed repurposing: approved for indication B after original A.
+    # I1 - confirmed repurposing: approved for indication B after original A.
     rows = step("I1. status=Approved & label=repurposed-success",
                 [r for r in rows if r["status"] == "Approved"
                  and r["label"] == "repurposed-success"])
 
-    # E2 — combination products (mechanical heuristic: '+' in drug name).
+    # E2 - combination products (mechanical heuristic: '+' in drug name).
     rows = step("E2. combination products excluded ('+' in name)",
                 [r for r in rows if "+" not in r["drug_name"]])
 
-    # E1/I2 — small molecules resolvable in ChEMBL, judged from the enriched
+    # E1/I2 - small molecules resolvable in ChEMBL, judged from the enriched
     # CSV. Pairs with EMPTY molecule_type (enrichment-era ChEMBL failures) are
     # excluded as unresolved per I2 with the count disclosed: live
     # re-resolution at selection time was REJECTED (see criteria doc I2
     # amendment) because selection must be reproducible regardless of
-    # transient API health — ChEMBL was down during the first selection
+    # transient API health - ChEMBL was down during the first selection
     # attempt (2026-07-31) and the run ground to a halt on timeouts.
     sm = [r for r in rows if r["chembl_molecule_type"] == "Small molecule"]
     n_empty = sum(1 for r in rows if not r["chembl_molecule_type"])
@@ -108,12 +108,12 @@ def main() -> None:
           f"(disclosed)", flush=True)
     rows = sm
 
-    # E3 — development-suite drugs excluded (drug-level, contamination-proof).
+    # E3 - development-suite drugs excluded (drug-level, contamination-proof).
     dev_drugs = _dev_suite_drugs()
     rows = step(f"E3. development-suite drugs excluded ({len(dev_drugs)} drugs)",
                 [r for r in rows if _norm(r["drug_name"]) not in dev_drugs])
 
-    # I3a — Orphanet rare-disease universe membership (normalized name match).
+    # I3a - Orphanet rare-disease universe membership (normalized name match).
     from data_sources.orphadata import (
         get_rare_disease_list, get_disease_prevalence)
     universe = {_norm(d["name"]): d for d in get_rare_disease_list()}
@@ -122,7 +122,7 @@ def main() -> None:
     for r in rows:
         r["_orpha"] = universe[_norm(r["ind_name"])]["orpha_code"]
 
-    # E4 — one case per drug: keep the lowest-prevalence indication
+    # E4 - one case per drug: keep the lowest-prevalence indication
     # (unknown prevalence = +inf; full ties broken alphabetically).
     prev_cache: dict[str, float | None] = {}
 
@@ -149,7 +149,7 @@ def main() -> None:
         _write_attrition(attrition, offline=True)
         return
 
-    # I3b — EFO resolution via the same v3 pipeline the system uses.
+    # I3b - EFO resolution via the same v3 pipeline the system uses.
     from agents.target_selection import _resolve_efo_id
     resolved = []
     for r in rows:
@@ -159,7 +159,7 @@ def main() -> None:
             resolved.append(r)
     rows = step("I3b. EFO resolved (v3 pipeline)", resolved)
 
-    # I4 — disease has at least one target in the discovery universe.
+    # I4 - disease has at least one target in the discovery universe.
     # Failures are COVERAGE failures: counted and disclosed, never counted as
     # discovery failures, and excluded from the primary set per the criteria.
     from data_sources.open_targets import (
@@ -187,7 +187,7 @@ def main() -> None:
     print(f"[select] coverage failures (no target universe): "
           f"{len(coverage_failures)}", flush=True)
 
-    # §5 — stratified sampling, seed-fixed, stratum cap 40%.
+    # §5 - stratified sampling, seed-fixed, stratum cap 40%.
     rng = random.Random(SEED)
     strata: dict[str, list] = {}
     for r in rows:

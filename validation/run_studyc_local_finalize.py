@@ -4,7 +4,7 @@ Runs the real ``validation.run_triage_discrimination_studyc.main()`` against
 the checkpoint snapshot pulled from prod, with ONE environmental difference:
 ``git rev-parse HEAD`` is made to fail, exactly replicating the prod
 deployment snapshot (which ships without git, so the runner's commit-pin
-check fails open there by design — see the freeze manifest). Every other
+check fails open there by design - see the freeze manifest). Every other
 check (cases_sha256, rule_fingerprint, per-record hash binding, health
 gate) runs unchanged.
 

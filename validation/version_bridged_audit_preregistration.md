@@ -1,4 +1,4 @@
-# Version-Bridged Audit Upgrade — Pre-registration
+# Version-Bridged Audit Upgrade - Pre-registration
 
 **Registered:** 2026-08-20, before implementation or an acceptance run.  
 **Study label:** `version_bridged_audit_acceptance_v1`  
@@ -21,7 +21,7 @@ pre-change audit, triage, target-selection, ChEMBL, and holdout source files.
 
 ## Questions fixed before implementation
 
-### Q1 — Candidate-conditioned audit coverage
+### Q1 - Candidate-conditioned audit coverage
 
 When a scientist explicitly supplies a drug that discovery did not generate,
 can AgentBio return a grounded, source-state-aware audit instead of only
@@ -31,7 +31,7 @@ This is an audit question. The supplied drug must never be inserted into the
 candidate pool, assigned a discovery rank, counted as a rediscovery hit, or
 used to change any candidate score.
 
-### Q2 — Stable target-identity correction
+### Q2 - Stable target-identity correction
 
 How many of the 16 frozen misses have a mechanism target that is already in
 the machine-v2 disease target universe when compared by stable target identity
@@ -41,7 +41,7 @@ labels?
 This is a correction to a post-hoc acceptance measurement. The original 0/16
 artifact remains immutable and reportable under its original contract.
 
-### Q3 — Pharmacological-precedent/mechanism-pool completeness
+### Q3 - Pharmacological-precedent/mechanism-pool completeness
 
 Does a general holdout-safe completeness repair create at least one true pool
 rescue?
@@ -76,17 +76,17 @@ of rank/score mutation. They may not set thresholds or tune target mappings.
 
 Reported separately:
 
-1. `rediscovery_recovery` — unchanged discovery endpoint; audit-only results
+1. `rediscovery_recovery` - unchanged discovery endpoint; audit-only results
    always contribute zero.
-2. `stable_identity_universe_overlap` — target identity appears anywhere in the
+2. `stable_identity_universe_overlap` - target identity appears anywhere in the
    frozen machine-v2 universe.
-3. `production_gate_overlap` — target identity is within the first five target
+3. `production_gate_overlap` - target identity is within the first five target
    rows used by production.
-4. `mechanism_pool_recovery` — the frozen drug's stable molecule identity is
+4. `mechanism_pool_recovery` - the frozen drug's stable molecule identity is
    returned by the general mechanism-only pool for a production-gate target.
-5. `audit_scope_status` — one of `found_by_discovery`,
+5. `audit_scope_status` - one of `found_by_discovery`,
    `auditable_only_because_supplied`, `not_assessable`, or `source_failure`.
-6. Deterministic miss reason — `FOUND`, `NAME_RESOLUTION_GAP`,
+6. Deterministic miss reason - `FOUND`, `NAME_RESOLUTION_GAP`,
    `BIOLOGIC_STRUCTURAL`, `ASSAY_POOL_GAP`, `TARGET_NOT_SELECTED`,
    `NO_MECHANISM_DATA`, `NO_CASE`, or `NO_CANDIDATES`.
 

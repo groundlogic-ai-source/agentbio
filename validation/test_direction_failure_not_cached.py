@@ -2,7 +2,7 @@
 
 Regression cover for the post-benchmark correction of 2026-09-26. Failures were
 cached for a day, so an API outage memoized INSUFFICIENT_INFO and every later
-run that day read the failure back without calling the model — losing the
+run that day read the failure back without calling the model - losing the
 qualified directional bonus for reasons unrelated to the biology.
 """
 

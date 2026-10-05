@@ -1,4 +1,4 @@
-# Frozen audit claim-set v1 — scored results
+# Frozen audit claim-set v1 - scored results
 
 - Label: `audit_claimset_v1` · scored 2026-08-10T20:57:15.778454+00:00
 - Claim set sha256: `32efd7d965f62e2c…`
@@ -11,7 +11,7 @@
 |--------|-------|-----------|-----------|-----|
 | defect_recall | 0.533 (32/60) | CP lower 0.420 | ≥ 0.8, lower ≥ 0.65 | NO |
 | control_false_flag | 0.175 (7/40) | CP upper 0.304 | ≤ 0.15, upper ≤ 0.3 | NO |
-| novel_recall (no threshold) | 0.967 (29/30) | CP lower 0.851 | — | — |
+| novel_recall (no threshold) | 0.967 (29/30) | CP lower 0.851 | - | - |
 
 Fixed-denominator views (abstentions as not-caught): defect 0.533, control false-flag 0.175.
 

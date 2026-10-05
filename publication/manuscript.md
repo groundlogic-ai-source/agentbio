@@ -26,8 +26,8 @@ retrospective rediscovery benchmark (v2): 50 mechanically selected,
 pre-registered cases; a property-based screen admitted 32 funnel-feasible
 cases; disease-side drug identity was redacted at every layer. (2) An
 external audit validation: a frozen set of 100 drug–disease claims with
-independent ground truth — 60 defect claims (half from four novel,
-pre-registered defect classes with no prior defense) and 40 clean controls —
+independent ground truth - 60 defect claims (half from four novel,
+pre-registered defect classes with no prior defense) and 40 clean controls -
 scored exactly once, with exact Clopper–Pearson bounds and pre-registered
 PASS thresholds.
 
@@ -50,14 +50,14 @@ result: 73% of the defect arm (43/59 novel claims) fell into one class via
 the registered shortfall-reallocation rule, all novel claims assert a drug
 attribute against that drug's own regulatory label with the disease field
 inert, and every finding is disclosure-only. On that bounded input-hygiene
-task the fixed layer **passed** all thresholds — defect recall 60/60 = 1.000
+task the fixed layer **passed** all thresholds - defect recall 60/60 = 1.000
 (CP lower 0.951), control false-flag rate 2/40 = 0.050 (CP upper 0.149),
 novel-class recall 59/59 = 1.000. Whether the layer can judge a
 drug–disease *hypothesis* remains untested.
 
 **Conclusions.** Pre-registration plus one-scored-run discipline first
 exposed an audit-layer failure that internal regression suites had masked,
-then verified — under a fresh frozen study — that the registered fixes hold
+then verified - under a fresh frozen study - that the registered fixes hold
 *for the input-hygiene checks that study measures*. The first study's
 failure is reported alongside the pass, never replaced by it, and the
 second study's narrow scope is reported alongside its pass. A composition
@@ -75,7 +75,7 @@ audit; validation; negative results
 
 ## 1. Introduction
 
-Drug repurposing — finding new indications for approved drugs — is especially
+Drug repurposing - finding new indications for approved drugs - is especially
 attractive for rare and neglected diseases, where small patient populations
 make de novo development economically fragile. A growing ecosystem of
 computational prioritization tools exists, from knowledge-graph link
@@ -85,7 +85,7 @@ evaluation problems recur. First, retrospective rediscovery benchmarks leak:
 the confirmed drug's identity is available to disease-side reasoning unless
 explicitly redacted, and "we rediscovered X" claims often cannot be audited
 for that leakage. Second, pipelines increasingly ship with self-audit or
-trust layers, but those layers are evaluated — if at all — on defect classes
+trust layers, but those layers are evaluated - if at all - on defect classes
 the developers already fixed, a circular design that cannot fail.
 
 We built AgentBio, a drug-repurposing research-prioritization and
@@ -94,8 +94,8 @@ a pre-registered, frozen rediscovery benchmark with mechanical case selection
 and full identity holdout, and a pre-registered, frozen *external* audit
 study whose claim set includes defect classes with no prior fix, test, or
 trap in the codebase, with exactly one scored run and published thresholds.
-We report both instruments' results — including the audit study's failure
-and its fixed layer's pre-registered re-validation —
+We report both instruments' results - including the audit study's failure
+and its fixed layer's pre-registered re-validation -
 plus the engineering regression suite, the development history, and every
 freeze control, so that the evidentiary chain is reproducible end to end.
 
@@ -109,7 +109,7 @@ Given a rare or neglected disease, AgentBio: (i) resolves the disease to a
 specific, non-umbrella ontology term and ranks genetically and mechanistically
 supported targets by tractability and unmet need (two separate, never-blended
 scores); (ii) generates approved-drug candidates for a selected target as a
-union over evidence lanes — ChEMBL bioactivity, DrugCentral curated
+union over evidence lanes - ChEMBL bioactivity, DrugCentral curated
 mechanisms (sha256-pinned local snapshot of the official 2023 dump),
 GtoPdb/IUPHAR expert-curated interactions, regulatory-label mechanisms
 (openFDA/DailyMed), and bounded entity-linked literature (PubTator3 → Europe
@@ -119,8 +119,8 @@ explicit, disclosed caps (mechanism-direction incompatibility, confirmed
 withdrawal, unapproved-compound, safety) rather than hidden filtering; and
 (iv) writes an auditable dossier disclosing which caps and caveats applied.
 Pathway-neighbor targets (Reactome) augment the genetically-associated set
-with provenance flags. A separate audit layer answers the inverse question —
-*given a specific drug→disease claim, what is wrong with it?* — using
+with provenance flags. A separate audit layer answers the inverse question -
+*given a specific drug→disease claim, what is wrong with it?* - using
 deterministic detectors over the same evidence chain plus regulatory-label
 and bounded-literature lanes.
 
@@ -170,8 +170,8 @@ indeterminate-on-lookup-failure semantics) admitted 32 of 50 (64%).
 Development-suite cases (n=15) were executed as a clearly labeled development
 subset and are never pooled with the primary endpoint.
 
-**Holdout.** Each case's confirmed drug — names, synonyms, salt forms,
-active-moiety identifiers, source IDs — is redacted from disease-side inputs
+**Holdout.** Each case's confirmed drug - names, synonyms, salt forms,
+active-moiety identifiers, source IDs - is redacted from disease-side inputs
 across every lane; matching occurs only after ranking. Errors and out-of-scope
 cases are classified, never silently counted as misses.
 
@@ -190,11 +190,11 @@ claims from four classes with existing defenses (E1 safety withdrawal, E2
 boxed-warning-not-withdrawal, E3 direction incompatibility, E4
 unresolved-name honesty), 30 from four novel pre-registered classes (N1
 combination-product splitting, N2 biologic modality mis-scope, N3
-preclinical-only evidence, N4 dose/route implausibility — no prior fix, test,
+preclinical-only evidence, N4 dose/route implausibility - no prior fix, test,
 or trap; detectors developed against synthetic fixtures only, real instances
 sealed until the scored run), and 40 clean controls (32 pool-free, 8
 pool-context). N3 closed at zero claims after all externally verifiable
-candidates failed construction verification — a registered limitation; its
+candidates failed construction verification - a registered limitation; its
 shortfall was reallocated by the fixed order in the construction protocol.
 
 **Scoring.** Exactly one scored run, gated on four-source health probes
@@ -206,7 +206,7 @@ with lower bound ≥ 0.65; control false-flag rate ≤ 0.15 with upper bound
 measurement of an unknown quantity). INVALID-DATA if abstention exceeded 10%
 of any group.
 
-A second frozen claim set (v2: 100 claims — 60 defect = 1 existing-fix +
+A second frozen claim set (v2: 100 claims - 60 defect = 1 existing-fix +
 59 novel [N1 8, N2 43, N4 8; N3 0, untested under v2's tightened gates] +
 40 clean controls) was constructed after the v1 failure, under its own
 pre-registration (Amendments 1–4, including registered composition
@@ -217,7 +217,7 @@ one-scored-run discipline, and scoring code.
 **v2's measured scope, stated before its result (Amendment 6).** The
 registered shortfall-reallocation order (N1 → N4 → N2) exhausted N1 and N4
 at quota and routed all 36 shortfall claims into N2, which therefore carries
-43 of 59 novel claims (73%) — mechanical, registered in advance, and
+43 of 59 novel claims (73%) - mechanical, registered in advance, and
 therefore not post-hoc selection, but with the foreseeable effect of loading
 the arm onto the class with the largest universe and the highest v1 recall.
 Substantively, all 59 novel claims assert a *drug attribute* (N2: one
@@ -247,11 +247,11 @@ benchmark v2 primary endpoint is the only such estimate.
 
 ## 4. Results
 
-### 4.1 Benchmark v2 — discovery accuracy
+### 4.1 Benchmark v2 - discovery accuracy
 
 **On funnel-feasible diseases (32 of 50 selected cases passed the screen,
 64%), the pipeline rediscovered the confirmed drug in 6 of 22 in-scope
-primary cases — 27.3% (95% CI 10.7%–50.2%).** All six rediscoveries ranked
+primary cases - 27.3% (95% CI 10.7%–50.2%).** All six rediscoveries ranked
 in the top 10 (ranks 3, 4, 4, 5, 5, 8); 2/6 reached STRONG_MATCH. Ten
 screened cases were out of scope at runtime (umbrella-term guard),
 a screen/runtime disagreement we report as a finding rather than filter
@@ -263,10 +263,10 @@ finding: ultra-rare (<1 per million) 6/9; rare (1–10/M) 0/6; less rare
 (>10/M) 0/6. The genetic-association core works where monogenic biology is
 cleanest and fails elsewhere. The mechanical miss taxonomy assigns all 16
 primary misses: 13 wrong-target (in 8, the true target *was* considered but
-ranked 4th–10th — a ranking failure, not coverage) and 3
+ranked 4th–10th - a ranking failure, not coverage) and 3
 unresolved-no-mechanism (no curated mechanism record exists for the drug).
 The 10 development-subset misses are dominated by biologic modality
-(enzyme replacements, antibodies) — a structural boundary of the
+(enzyme replacements, antibodies) - a structural boundary of the
 small-molecule contract.
 
 The pre-registered mechanical chance baseline saturated (per-case probability
@@ -276,9 +276,9 @@ and identify the baseline construction (pool denominators pre-union) as a
 limitation rather than recomputing post hoc.
 
 Against the terminated v1 partial (1/11 scorable, 9.1%), v2's improvement is
-consistent with the registered changes — multi-source union candidate
+consistent with the registered changes - multi-source union candidate
 generation (which superseded tiered ChEMBL pools; Amendment 3 item 16) and
-pathway-aware target augmentation — but the case sets and denominators
+pathway-aware target augmentation - but the case sets and denominators
 differ, so we report the association, not an attribution. The pre-freeze
 ablation control supports the union design on the development corpus:
 generated+valid 5/13 (ChEMBL only), 8/13 (+GtoPdb), 10/13 (+DrugCentral),
@@ -287,7 +287,7 @@ and mechanistically valid (Top-10 0/5, reported separately) before the
 freeze; the artifact of record is the complete five-fixture run (the results
 file is a living artifact regenerated by the acceptance workflow).
 
-### 4.2 Audit claim-set study — FAIL, reported as measured
+### 4.2 Audit claim-set study - FAIL, reported as measured
 
 The external audit study **failed both thresholded metrics**: defect recall
 32/60 = 0.533 (CP lower 0.420) against ≥0.80/≥0.65; control false-flag rate
@@ -296,10 +296,10 @@ The external audit study **failed both thresholded metrics**: defect recall
 abstained or were excluded; no caught defect carried a contradicted safety
 disclosure.
 
-Per class (Fig. 4): E1 2/2, E3 1/1; **E2 0/19** — every marketed
+Per class (Fig. 4): E1 2/2, E3 1/1; **E2 0/19** - every marketed
 boxed-warning drug carried a wrong "withdrawn from market" badge from
 persisted candidate pools that predate the classifier fix: a *stale-data
-disclosure defect* the audit faithfully surfaced; **E4 0/8** — ChEMBL's
+disclosure defect* the audit faithfully surfaced; **E4 0/8** - ChEMBL's
 synonym index resolved all eight brand names, falsifying the construction
 assumption that they would be unresolvable (a claim-design lesson, not a
 product defect); novel classes N1 8/8, N2 13/13, N4 8/9; N3 untested (zero
@@ -311,11 +311,11 @@ multi-ingredient flags on single-ingredient labels.
 
 The contrast with the engineering suite is the point of running both: the
 trap benchmark passed 12/12 traps with 1/4 control flags (0.25, at its ≤0.25
-boundary) — yet the external study failed. Internal regression suites measure
+boundary) - yet the external study failed. Internal regression suites measure
 whether yesterday's fixes still work; they cannot measure whether the audit
 catches what nobody anticipated.
 
-### 4.3 Audit claim-set v2 — input-hygiene re-validation, PASS on a narrow instrument
+### 4.3 Audit claim-set v2 - input-hygiene re-validation, PASS on a narrow instrument
 
 After the v1 failure, the fixes (pool safety refresh, N3 detector
 precision, and pre-freeze robustness work: evidence-record boundary
@@ -340,12 +340,12 @@ reported alongside this PASS, never replaced by it.
 
 **Three classes are untested rather than passed.** N3 yielded zero claims in
 both studies. E4 = 0 is a finding about an external resource (ChEMBL
-synonyms resolve brand names), not a measurement of the layer. And **E2 —
-the class that produced v1's single largest failure (0/19) — is effectively
+synonyms resolve brand names), not a measurement of the layer. And **E2 -
+the class that produced v1's single largest failure (0/19) - is effectively
 untested at n = 1**: six candidates were excluded at construction as lacking
 a cutoff-eligible boxed-warning label, and re-checking those exclusions
 against raw openFDA (2026-08-11) shows at least two are retrieval artifacts
-rather than absent ground truth — metoprolol (348 labels, ≥4 carrying a
+rather than absent ground truth - metoprolol (348 labels, ≥4 carrying a
 pre-cutoff ischemic-heart-disease boxed warning, missed under a 25-row
 retrieval cap) and levosalbutamol (HTTP 404 under its INN; the USAN name
 levalbuterol returns 19 labels, 3 with pre-cutoff boxed warnings). Four
@@ -380,9 +380,9 @@ exercised for real: a health-gate refusal during a 25+ hour upstream outage
 pre-registered single allowance, and hash-bound results that make the
 published outcome immutable.
 
-The honest reading of the audit FAIL is not that the audit layer is useless —
+The honest reading of the audit FAIL is not that the audit layer is useless -
 novel-class recall of 0.967 on sealed real instances shows the class-level
-defenses generalize — but that its current deployment fails on data freshness
+defenses generalize - but that its current deployment fails on data freshness
 and on one detector's precision. Both are fixable, and both fixes require new
 pre-registered studies, not post-hoc re-scoring of this one.
 
@@ -391,7 +391,7 @@ own study.** v2's post-hoc composition audit (Amendment 6) shows that a
 pre-registration can be followed exactly and still yield a weak instrument.
 The shortfall-reallocation rule (N1 → N4 → N2) was registered before
 construction and executed mechanically, with fail-closed aborts rather than
-padding — procedurally clean by every criterion we set. Its effect was to
+padding - procedurally clean by every criterion we set. Its effect was to
 place 73% of the defect arm in the class with the largest universe and the
 highest prior recall, while the class carrying the previous study's largest
 failure shrank to n = 1 through label-retrieval artifacts at construction.
@@ -399,13 +399,13 @@ Pre-registration protects against choosing favourable analyses after seeing
 results; it does not protect against a rule whose *mechanical* consequence is
 an easier test. The lesson we draw, and would apply to any successor, is that
 reallocation rules should shift a shortfall toward the hardest remaining
-class or shrink the study and report the smaller n — and that class-level
+class or shrink the study and report the smaller n - and that class-level
 composition should be a reported endpoint, not a footnote. We report v2's
 composition audit in full for the same reason we reported v1's failure: the
 instrument's weaknesses are more useful to a reader than its headline.
 
 More broadly, both audit studies test whether the layer notices a false
-assertion *about a drug* — resolvable against that drug's regulatory label.
+assertion *about a drug* - resolvable against that drug's regulatory label.
 Neither tests whether it can judge a drug–*disease* hypothesis, which is the
 question a partner deciding whether to trust a ranked candidate list actually
 asks. That instrument does not exist yet, and building it requires a
@@ -419,7 +419,7 @@ funnel-feasibility selection underrepresenting sparse-data diseases; wide CIs
 at n=22 in-scope; a saturated chance baseline; concentration of hits in
 ultra-rare monogenic disease; biologics outside the scoring contract; a
 first audit study that failed (reported unedited) with its fixed-layer
-successor passing on a **materially narrower instrument** — v2's defect arm
+successor passing on a **materially narrower instrument** - v2's defect arm
 is 73% one class, its novel claims assert drug attributes against the drug's
 own label with the disease field inert, 59/60 defect claims are pool-free,
 and all findings are disclosure-only, so hypothesis judgment is untested;
@@ -427,7 +427,7 @@ N3 untested in both studies, E4 measuring a falsified assumption, and E2
 effectively untested in v2 (≥2 of 6 exclusions were label-retrieval
 artifacts); single-universe disease scope; DrugCentral pinned to the 2023
 release; GtoPdb commercial terms a production dependency; pool coverage
-rather than scoring as the dominant rediscovery bottleneck — in a descriptive
+rather than scoring as the dominant rediscovery bottleneck - in a descriptive
 12-disease pool-rebuild study, every confirmed repurposing that entered a
 rebuilt pool ranked top-15 (4/4), while 18/22 confirmed pairs never entered a
 pool, decomposing into 8 pathogen-directed or purely symptomatic agents
@@ -444,10 +444,10 @@ experimental, or prospective validation is claimed.
 A pre-registered, frozen evaluation of a drug-repurposing prioritization
 pipeline found a functional discovery core on funnel-feasible ultra-rare
 disease (27.3% rediscovery on the funnel-feasible subset admitted by the
-screen — 32/50, 64%; the pre-registered mechanical chance baseline saturated
-and is uninformative, so absolute rates and CIs are the evidence) and — more
-importantly — an audit layer whose first frozen external study **failed**
-(recall 0.533, false-flag 0.175 — a failure internal regression suites had
+screen - 32/50, 64%; the pre-registered mechanical chance baseline saturated
+and is uninformative, so absolute rates and CIs are the evidence) and - more
+importantly - an audit layer whose first frozen external study **failed**
+(recall 0.533, false-flag 0.175 - a failure internal regression suites had
 masked) and whose registered fixes then **passed** a fresh pre-registered
 frozen study on a deliberately bounded task (v2: defect recall 60/60 =
 1.000, control false-flag 2/40 = 0.050, novel-class 59/59 = 1.000). We state
@@ -456,7 +456,7 @@ claims assert drug attributes against regulatory labels rather than
 evaluating drug–disease hypotheses, and its findings are disclosure-only.
 The layer's ability to discriminate between good and poor repurposing
 hypotheses is **not** measured by either study and remains open. We publish
-the full evidentiary chain for both studies — case lists, claim sets, raw
+the full evidentiary chain for both studies - case lists, claim sets, raw
 outputs, freeze manifests, recomputation scripts, and the composition audit
 that narrowed v2's interpretation after it passed. We hope the
 instrument designs (screened funnels, novel-class audit claims, one-scored-run
@@ -473,7 +473,7 @@ inventory with hashes. Every figure and table regenerates from the artifacts
 via `publication/make_figures.py`; the audit metrics re-verify via
 `--recalc-only`.
 
-**Code availability.** [Author decision pending — see publication/README.md
+**Code availability.** [Author decision pending - see publication/README.md
 release checklist: public repository or archived snapshot with DOI.]
 
 **AI use.** LLMs are components of the evaluated system at the enumerated

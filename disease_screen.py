@@ -194,7 +194,7 @@ def screen_disease(disease_name: str) -> dict[str, Any]:
             "Not in the Orphanet / WHO-NTD universe this system covers, so "
             "select_for_disease would raise before any run started.")
         return base
-    except Exception as e:  # noqa: BLE001 — a screen must survive one bad row
+    except Exception as e:  # noqa: BLE001 - a screen must survive one bad row
         base["notes"].append(f"Preflight failed: {type(e).__name__}: {e}")
         return base
 
@@ -236,7 +236,7 @@ def screen_disease(disease_name: str) -> dict[str, Any]:
             alt["approved_drug_count"] = env.get("approved_drug_count")
             alt["systemic_drug_count"] = _count_systemic(
                 env.get("approved_drugs") or [])
-        except Exception:  # noqa: BLE001 — unknown count, never a claim
+        except Exception:  # noqa: BLE001 - unknown count, never a claim
             alt["approved_drug_count"] = None
             alt["systemic_drug_count"] = None
 

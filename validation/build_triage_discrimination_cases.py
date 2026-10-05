@@ -1,11 +1,11 @@
-"""Build the triage-discrimination case set — OFFLINE and deterministic.
+"""Build the triage-discrimination case set - OFFLINE and deterministic.
 
 This builder runs BEFORE any scored case is executed. It consumes only the
 already-enriched repoDB snapshot (`data_prep/output/enriched_dataset.csv`) and
 the development-suite drug list; it makes no live API calls. Determinism is
 the freeze guarantee: same inputs -> byte-identical case set.
 
-Cohorts (unit of analysis in parentheses — see preregistration):
+Cohorts (unit of analysis in parentheses - see preregistration):
 
 * **cohort_a** (distinct drug): confirmed repurposings, i.e. repoDB rows with
   status=Approved, one row per distinct drug. Development-suite drugs are
@@ -17,7 +17,7 @@ Cohorts (unit of analysis in parentheses — see preregistration):
   false claim `claimed_route="oral"`. Detection = N4 flagged.
 
 The enriched CSV columns (molecule_type, oral, xlogp, max_phase) are used ONLY
-for cohort selection and stratified reporting — never as scored evidence.
+for cohort selection and stratified reporting - never as scored evidence.
 Scored evidence comes live from the redacted audit lanes at run time.
 """
 from __future__ import annotations
@@ -160,7 +160,7 @@ def build() -> dict:
             "drug_name": r["drug_name"].strip(),
             "ind_name": r["ind_name"].strip(),
             "ind_id": r["ind_id"].strip(),
-            # selection/stratification metadata only — never scored evidence
+            # selection/stratification metadata only - never scored evidence
             "sel_molecule_type": r["chembl_molecule_type"].strip(),
             "sel_oral": r["chembl_oral"].strip(),
             "sel_xlogp": r["pubchem_xlogp"].strip(),

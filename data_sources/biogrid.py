@@ -3,7 +3,7 @@ BioGRID interaction data (https://webservice.thebiogrid.org).
 
 IMPORTANT SCIENTIFIC CONSTRAINT:
 BioGRID reports *physical and genetic interactions*. These are NOT directional
-mechanism claims — an interaction does NOT mean gene A activates or inhibits gene
+mechanism claims - an interaction does NOT mean gene A activates or inhibits gene
 B. Every record returned by this wrapper is labelled accordingly, and downstream
 code / LLM prompts must not describe these edges as activating/inhibiting unless
 BioGRID's own EXPERIMENTAL_SYSTEM data explicitly says so.
@@ -39,13 +39,13 @@ def get_interactions(gene_symbol: str, tax_id: int = 9606, max_results: int = 20
       }
 
     IMPORTANT: always inspect `query_status` before treating an empty `interactions`
-    list as "no interactions exist" — it may instead mean the query failed.
+    list as "no interactions exist" - it may instead mean the query failed.
 
     query_status values:
-      "ok"           — query succeeded; interactions may be empty (genuinely none found)
-      "no_data"      — query succeeded; API returned 0 records
-      "query_failed" — API call raised an exception or returned HTTP error
-      "no_key"       — BIOGRID_API_KEY environment variable not set
+      "ok"           - query succeeded; interactions may be empty (genuinely none found)
+      "no_data"      - query succeeded; API returned 0 records
+      "query_failed" - API call raised an exception or returned HTTP error
+      "no_key"       - BIOGRID_API_KEY environment variable not set
     """
     api_key = os.environ.get("BIOGRID_API_KEY")
     if not api_key:

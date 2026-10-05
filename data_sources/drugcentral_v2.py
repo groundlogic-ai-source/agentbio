@@ -12,7 +12,7 @@ act_value, act_source, act_comment, moa, tdl, target_class, ...).
 
 Gene fallback: if the accession lookup 500s (server-side accession index
 failure), and a gene symbol is supplied, we retry via
-/act_table_full/gene/{gene}. A gene fallback is only a routing detour — the
+/act_table_full/gene/{gene}. A gene fallback is only a routing detour - the
 Homo-sapiens + established-product restrictions still apply.
 
 "Established product" = DrugCentral structure status in {OFP, OFM} (Official
@@ -49,13 +49,13 @@ def _use_local_lane() -> bool:
     """Amendment 6: serve queries from the committed official 11/01/2023 dump
     snapshot (DRS-identical semantics) whenever it is present. The live App
     Runner endpoint (UNM, no SLA) is only used when no snapshot exists.
-    DRUGCENTRAL_FORCE_LIVE=1 overrides for debugging — set per deployment,
+    DRUGCENTRAL_FORCE_LIVE=1 overrides for debugging - set per deployment,
     never mid-run."""
     if os.environ.get("DRUGCENTRAL_FORCE_LIVE"):
         return False
     return drugcentral_local.available()
 
-# v2: Amendment 6 local-lane snapshot — never mix live-API-derived cache
+# v2: Amendment 6 local-lane snapshot - never mix live-API-derived cache
 # entries with snapshot-derived ones (data provenance differs by source).
 _CACHE_VERSION = "v2"
 _TTL_DAYS = 7
@@ -73,7 +73,7 @@ _HOMO_SAPIENS = "homo sapiens"
 
 
 class _SourceUnavailable(Exception):
-    """Transient/malformed condition — must not be cached."""
+    """Transient/malformed condition - must not be cached."""
 
 
 class _AccessionServerError(Exception):
@@ -95,8 +95,8 @@ def _get_json(path: str, *, accession_route: bool = False) -> Any:
     """GET {BASE_URL}{path}, returning parsed JSON.
 
     Raises:
-      _AccessionServerError  — 500 on the accession route (fallback-eligible).
-      _SourceUnavailable     — other transient HTTP / timeout / connection
+      _AccessionServerError  - 500 on the accession route (fallback-eligible).
+      _SourceUnavailable     - other transient HTTP / timeout / connection
                                error / non-JSON body.
     A 404 returns None (legitimate "no such resource").
     """
@@ -297,10 +297,10 @@ def get_target_interactions(uniprot_id: str,
     Returns the common envelope {source, status, candidates, error, release}.
 
     status:
-      "ok"          — resolved and ≥1 established-product candidate.
-      "empty"       — resolved but nothing survived the Homo-sapiens +
+      "ok"          - resolved and ≥1 established-product candidate.
+      "empty"       - resolved but nothing survived the Homo-sapiens +
                       established-product filter (healthy, cacheable).
-      "unavailable" — transient failure / malformed payload (NOT cached).
+      "unavailable" - transient failure / malformed payload (NOT cached).
     """
     cache_key = make_key(f"drugcentral_get_target_interactions_{_CACHE_VERSION}",
                         uniprot_id, gene)

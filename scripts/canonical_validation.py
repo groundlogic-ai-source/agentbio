@@ -1,5 +1,5 @@
 """
-Canonical validation — all 5 cases, full pipeline.
+Canonical validation - all 5 cases, full pipeline.
 Writes to /tmp/canonical_validation.log and /tmp/canonical_validation.json.
 
 Settings: REPURPOSING_ONLY=True, K=TOP_TARGETS_PER_DISEASE=5,

@@ -53,7 +53,7 @@ def get_druggability_literature(
     """
     Produces an informational druggability context block for the biologist output.
     NEVER affects tractability_score, unmet_need_score, composite_score, or
-    STRONG_MATCH — it is read-only context for human reviewers.
+    STRONG_MATCH - it is read-only context for human reviewers.
 
     Steps:
       1. ChEMBL mechanism lookup (no LLM) → approved_drug_count.
@@ -78,7 +78,7 @@ def get_druggability_literature(
     if cached is not None:
         return cached
 
-    # Part A — ChEMBL approved drugs with known mechanism (no LLM).
+    # Part A - ChEMBL approved drugs with known mechanism (no LLM).
     approved_info: dict[str, Any] = {
         "approved_drugs": [],
         "approved_drug_count": 0,
@@ -102,7 +102,7 @@ def get_druggability_literature(
         cache_set(cache_key, result, ttl_days=1)
         return result
 
-    # Part B — PubMed searches for historical difficulty / undruggability.
+    # Part B - PubMed searches for historical difficulty / undruggability.
     queries = [
         f'"{target_symbol}" undruggable',
         f'"{target_symbol}" drug resistance mechanism',
@@ -120,7 +120,7 @@ def get_druggability_literature(
         cache_set(cache_key, result, ttl_days=7)
         return result
 
-    # YES/NO LLM screening — same constrained pattern as pubmed._llm_relationship.
+    # YES/NO LLM screening - same constrained pattern as pubmed._llm_relationship.
     qualifying: list[tuple[str, str]] = []  # (pmid, abstract)
     for pmid, abstract in all_abstracts.items():
         prompt = (
@@ -136,7 +136,7 @@ def get_druggability_literature(
                     model=SCREENING_MODEL, max_tokens=120,
                     # temperature intentionally omitted, not set to 0: this model/SDK
                     # combination rejects the temperature kwarg outright (see
-                    # data_prep/llm_clients.py's docstring — discovered 2026-09,
+                    # data_prep/llm_clients.py's docstring - discovered 2026-09,
                     # affects claude-sonnet-4-6 too, not just opus). Relying on
                     # default sampling instead; this classifier's binary YES/NO
                     # output is stable enough in practice without an explicit pin.
@@ -155,11 +155,11 @@ def get_druggability_literature(
     result["supporting_pmids"] = [pmid for pmid, _ in qualifying]
 
     if len(qualifying) < 2:
-        # Fewer than 2 qualifying abstracts — record what we have, no LLM summary.
+        # Fewer than 2 qualifying abstracts - record what we have, no LLM summary.
         cache_set(cache_key, result, ttl_days=7)
         return result
 
-    # Part B continued — ONE haiku summarisation call.
+    # Part B continued - ONE haiku summarisation call.
     count = approved_info["approved_drug_count"]
     names = [d["name"] for d in approved_info.get("approved_drugs", [])][:5]
     approved_fact = (
@@ -189,7 +189,7 @@ def get_druggability_literature(
         msg = call_with_backoff(
             lambda: client.messages.create(
                 model=HAIKU_MODEL, max_tokens=512,
-                # temperature omitted — see comment above; this SDK/model
+                # temperature omitted - see comment above; this SDK/model
                 # combination rejects it outright rather than accepting 0.
                 messages=[{"role": "user", "content": summary_prompt}]),
             label="biologist-druggability-summary", provider="anthropic",
@@ -326,7 +326,7 @@ def run_biologist(target: dict[str, Any]) -> dict[str, Any]:
 
     provenance.log_many(prov_entries)
 
-    # Druggability context — informational only; never touches any score.
+    # Druggability context - informational only; never touches any score.
     client = _anthropic_client()
     druggability_context = get_druggability_literature(symbol, uniprot_id, client)
 
@@ -379,7 +379,7 @@ def run_biologist(target: dict[str, Any]) -> dict[str, Any]:
             "affect tractability_score, unmet_need_score, composite_score, "
             "STRONG_MATCH, or any pipeline filter."
         ),
-        # pathway_neighbor_targets is always empty here — the Chemist decides
+        # pathway_neighbor_targets is always empty here - the Chemist decides
         # whether to expand based on the primary target's approved-drug pool
         # size (lazy expansion).  The key is kept for schema compatibility.
         "pathway_neighbor_targets": [],

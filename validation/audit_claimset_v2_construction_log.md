@@ -1,4 +1,4 @@
-# Audit claim-set v2 — construction and exclusion log
+# Audit claim-set v2 - construction and exclusion log
 
 - Constructed: 2026-08-11T01:48:40.247673+00:00
 - Seed: 20260811 · cutoff: 2026-08-10
@@ -11,31 +11,31 @@
 
 v1 instance exclusion set: 114 names
 Pools loaded (reachability only, all safety-v2 stamped): Multiple myeloma n=20, Multiple endocrine neoplasia type 2A n=24, Autosomal recessive hereditary chronic pancreatitis n=29
-E4 unresolved_name_honesty — accepted ONLY if raw ChEMBL search cannot resolve the brand (v1 assumption repaired)
+E4 unresolved_name_honesty - accepted ONLY if raw ChEMBL search cannot resolve the brand (v1 assumption repaired)
   EXCLUDE E4 Toprol-XL: no cutoff-eligible FDA label naming the brand (unverifiable ground truth)
-  EXCLUDE E4 Lopressor: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
-  EXCLUDE E4 Tenormin: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
-  EXCLUDE E4 Hemangeol: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Lopressor: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Tenormin: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Hemangeol: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
   EXCLUDE E4 Inderal: no cutoff-eligible FDA label naming the brand (unverifiable ground truth)
-  EXCLUDE E4 Betapace: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Betapace: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
   EXCLUDE E4 Serevent: no cutoff-eligible FDA label naming the brand (unverifiable ground truth)
   EXCLUDE E4 Rythmol: no cutoff-eligible FDA label naming the brand (unverifiable ground truth)
-  EXCLUDE E4 Levophed: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
-  EXCLUDE E4 Pacerone: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Levophed: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Pacerone: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
   EXCLUDE E4 Cordarone: no cutoff-eligible FDA label naming the brand (unverifiable ground truth)
-  EXCLUDE E4 Votrient: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
-  EXCLUDE E4 Caprelsa: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Votrient: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Caprelsa: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
   EXCLUDE E4 Impavido: no cutoff-eligible FDA label naming the brand (unverifiable ground truth)
-  EXCLUDE E4 Korlym: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
-  EXCLUDE E4 Tykerb: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
-  EXCLUDE E4 Cytomel: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
-  EXCLUDE E4 Xospata: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
-  EXCLUDE E4 Inrebic: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
-  EXCLUDE E4 Cabometyx: raw ChEMBL search RESOLVES the brand — v1's falsified assumption; not a valid unresolvable-name claim
-E1 safety_withdrawal — refreshed-pool safety-flagged drugs verified against ChEMBL withdrawn_flag
-E3 direction_incompatible — MM mechanism-capped drugs verified against ChEMBL action_type on NR3C1
+  EXCLUDE E4 Korlym: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Tykerb: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Cytomel: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Xospata: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Inrebic: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
+  EXCLUDE E4 Cabometyx: raw ChEMBL search RESOLVES the brand - v1's falsified assumption; not a valid unresolvable-name claim
+E1 safety_withdrawal - refreshed-pool safety-flagged drugs verified against ChEMBL withdrawn_flag
+E3 direction_incompatible - MM mechanism-capped drugs verified against ChEMBL action_type on NR3C1
   EXCLUDE E3 FLUTICASONE PROPIONATE: ChEMBL action_type AGONIST is not incompatibility-class for a glucocorticoid-activation indication (ground truth fails)
-E2 boxed_warning_not_withdrawal — refreshed-pool black-box drugs verified against raw FDA labels
+E2 boxed_warning_not_withdrawal - refreshed-pool black-box drugs verified against raw FDA labels
   EXCLUDE E2 ALBUTEROL: no cutoff-eligible FDA label with a boxed warning (ground truth unverifiable)
   EXCLUDE E2 CABOZANTINIB: no cutoff-eligible FDA label with a boxed warning (ground truth unverifiable)
   EXCLUDE E2 LEVOSALBUTAMOL: no cutoff-eligible FDA label with a boxed warning (ground truth unverifiable)
@@ -44,7 +44,7 @@ E2 boxed_warning_not_withdrawal — refreshed-pool black-box drugs verified agai
   EXCLUDE E2 NOREPINEPHRINE: no cutoff-eligible FDA label with a boxed warning (ground truth unverifiable)
   ACCEPT existing_fix/E2_boxed_warning_not_withdrawal: VANDETANIB (citation fda_label e5721cb8-4185-47b9-bbb3-1c587e558a03 dated 2026-04-23)
 E-group total: 1 (E1=0 E2=1 E3=0 E4=0)
-N1 combination-product splitting — fixed combo list verified against raw FDA labels (>=2 active substances)
+N1 combination-product splitting - fixed combo list verified against raw FDA labels (>=2 active substances)
   ACCEPT novel/N1_combination_product_splitting: Amlodipine and benazepril (citation fda_label 27b0c628-820a-48bf-a411-86c0ebd4cc8d dated 2026-06-29)
   ACCEPT novel/N1_combination_product_splitting: Valsartan and hydrochlorothiazide (citation fda_label 167f49f0-2d39-49a2-9f9e-1359a7c7ba3d dated 2026-07-30)
   EXCLUDE N1 Olmesartan and amlodipine: label unverifiable or <2 substances (max substances seen: 0)
@@ -57,7 +57,7 @@ N1 combination-product splitting — fixed combo list verified against raw FDA l
   EXCLUDE N1 Hydrocodone and acetaminophen: label unverifiable or <2 substances (max substances seen: 0)
   ACCEPT novel/N1_combination_product_splitting: Naproxen and esomeprazole (citation fda_label 65b892f2-8385-4bb0-8121-a58b01e8d13d dated 2026-07-23)
   ACCEPT novel/N1_combination_product_splitting: Glecaprevir and pibrentasvir (citation fda_label 7bf99777-0401-9095-8645-16c6e907fcc0 dated 2025-06-25)
-N4 dose/route implausibility — local-only drugs claimed oral/systemic
+N4 dose/route implausibility - local-only drugs claimed oral/systemic
   ACCEPT novel/N4_dose_route_implausibility: Netarsudil (citation fda_label 7d4f0e3a-5b86-4c43-982a-813b22ae7e22 dated 2026-01-20)
   ACCEPT novel/N4_dose_route_implausibility: Loteprednol etabonate (citation fda_label 36cfd5b8-c892-44e1-aaed-fb32d7aeca7c dated 2026-07-13)
   ACCEPT novel/N4_dose_route_implausibility: Nepafenac (citation fda_label 10f411d3-a81e-074a-e063-6294a90ab547 dated 2026-04-01)
@@ -65,15 +65,15 @@ N4 dose/route implausibility — local-only drugs claimed oral/systemic
   ACCEPT novel/N4_dose_route_implausibility: Bepotastine (citation fda_label cd6a061d-8ad7-4ad1-b039-1e3aa3435d32 dated 2024-10-10)
   ACCEPT novel/N4_dose_route_implausibility: Epinastine (citation fda_label 0d4ee45c-e58f-4b7c-b389-898f5c27f54d dated 2025-03-22)
   ACCEPT novel/N4_dose_route_implausibility: Alcaftadine (citation fda_label 22473109-dc9e-45b6-b188-d7d5773f5a14 dated 2024-10-07)
-  EXCLUDE N4 Cromolyn sodium: labeled routes ['intrabronchial', 'nasal', 'ophthalmic', 'oral'] include a systemic route — not a local-only drug (ground truth fails)
+  EXCLUDE N4 Cromolyn sodium: labeled routes ['intrabronchial', 'nasal', 'ophthalmic', 'oral'] include a systemic route - not a local-only drug (ground truth fails)
   ACCEPT novel/N4_dose_route_implausibility: Fluorometholone (citation fda_label c9cbf06e-5413-4c3c-9ded-174c856a4ce1 dated 2026-05-12)
-N3 species/preclinical-only — v1 gates PLUS no cutoff-eligible FDA label (label absence is part of the v2 defect definition)
+N3 species/preclinical-only - v1 gates PLUS no cutoff-eligible FDA label (label absence is part of the v2 defect definition)
   EXCLUDE N3 NVP-AST487: no cutoff-eligible primary paper (citation unverifiable)
   EXCLUDE N3 SPP86: no cutoff-eligible primary paper (citation unverifiable)
   EXCLUDE N3 AL082D06: no cutoff-eligible primary paper (citation unverifiable)
   EXCLUDE N3 CGP 20712A: Europe PMC clinical-trial hits = 2 (human clinical evidence may exist)
   EXCLUDE N3 SR 59230A: no cutoff-eligible primary paper (citation unverifiable)
-N2 biologic modality mis-scope — enriched-dataset non-small-molecule rows verified against raw FDA labels (BLA)
+N2 biologic modality mis-scope - enriched-dataset non-small-molecule rows verified against raw FDA labels (BLA)
   ACCEPT novel/N2_biologic_modality_mis_scope: Becaplermin (citation fda_label 377b3021-13d7-96d5-e063-6394a90a8ca3 dated 2026-05-08)
   ACCEPT novel/N2_biologic_modality_mis_scope: Belatacept (citation fda_label c16ac648-d5d2-9f7d-8637-e2328572754e dated 2021-07-28)
   ACCEPT novel/N2_biologic_modality_mis_scope: Belimumab (citation fda_label 2fa3c528-1777-4628-8a55-a69dae2381a3 dated 2025-06-20)
@@ -119,7 +119,7 @@ N-group before reallocation: 23/59 (N1=8 N2=7 N3=0 N4=8)
   ACCEPT novel/N2_biologic_modality_mis_scope: Ipilimumab (citation fda_label 2265ef30-253e-11df-8a39-0800200c9a66 dated 2026-06-12)
   ACCEPT novel/N2_biologic_modality_mis_scope: Ixekizumab (citation fda_label ac96658a-d7dc-4c7c-8928-2adcdf4318b2 dated 2026-01-22)
   ACCEPT novel/N2_biologic_modality_mis_scope: Laronidase (citation fda_label a80ac249-cae4-41f3-88bb-344088b20e60 dated 2026-07-22)
-Controls (pool-free) — seeded sample of approved single-ingredient oral small molecules; label verifies cleanliness
+Controls (pool-free) - seeded sample of approved single-ingredient oral small molecules; label verifies cleanliness
   ACCEPT control/none: Teriflunomide (citation fda_label 2d2724f6-8812-4a26-b2ec-936b71f868e1 dated 2026-05-06)
   ACCEPT control/none: Perindopril (citation fda_label 87768fbf-7c63-47da-8925-0316f343d6ef dated 2024-03-13)
   ACCEPT control/none: Meloxicam (citation fda_label 385fd779-1be1-49ae-8213-750b96ecc997 dated 2026-07-16)
@@ -153,7 +153,7 @@ Controls (pool-free) — seeded sample of approved single-ingredient oral small 
   ACCEPT control/none: Mexiletine (citation fda_label a61a07f6-0b48-4dcd-ad42-5d90f6e69ab1 dated 2026-05-14)
   ACCEPT control/none: Mecamylamine (citation fda_label 0b149023-f7a8-442d-ac69-295df8e66ed3 dated 2025-02-20)
   pool-free controls: 32/32 (104 attempts)
-Controls (pool-context) — approved drugs absent from the pooled case
+Controls (pool-context) - approved drugs absent from the pooled case
   EXCLUDE control TIOTROPIUM: label unverifiable or not single-ingredient
   EXCLUDE control INDACATEROL: present in pool cddaa8e1
   ACCEPT control/none: GLYCOPYRRONIUM (citation fda_label 5b372650-e56e-47a5-93e2-c0c292017059 dated 2026-05-21)

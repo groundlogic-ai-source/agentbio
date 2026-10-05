@@ -11,7 +11,7 @@ Each report has EXACTLY these five sections, plus a static appendix:
   3. Full source citations (deduplicated PMIDs, ChEMBL activity IDs, NCT numbers)
   4. Composite score breakdown (every term of the Stage 2 formula, with weights)
   5. Limitations (the full standard list)
-  6. How to read this dossier (static reader's guide — format explanation only,
+  6. How to read this dossier (static reader's guide - format explanation only,
      no candidate-specific claims; see _readers_guide_appendix)
 
 Reports are written to output/reports/{disease}_{drug}.md.
@@ -72,7 +72,7 @@ def validate_dossier_inputs(
     """Fail closed when persisted report inputs disagree.
 
     This is intentionally pure and belongs before structure prediction in the
-    graph. A report must never spend on Boltz—or reach human review—when its
+    graph. A report must never spend on Boltz-or reach human review-when its
     authoritative evidence layers cannot be reconciled deterministically.
     """
     errors: list[str] = []
@@ -274,7 +274,7 @@ def _citations(candidate: dict[str, Any],
     # all ChEMBL/PubMed/NCT-shaped, so a candidate that entered through GtoPdb,
     # DrugCentral, BindingDB or a regulatory label rendered "none" on every
     # citation row while the dossier claimed full traceability.  Every provider
-    # record carries its own source id — surface them.
+    # record carries its own source id - surface them.
     ledger_ids: dict[str, set[str]] = {}
     for record in ((candidate.get("_evidence_ledger") or {}).get("records") or []):
         if not isinstance(record, dict):
@@ -282,7 +282,7 @@ def _citations(candidate: dict[str, Any],
         provider = str(record.get("provider") or "").strip().lower()
         pid = _valid_citation_id(record.get("publication_id")) or ""
         if pid:
-            # publication_id is not always a PMID — BindingDB stores a DOI when
+            # publication_id is not always a PMID - BindingDB stores a DOI when
             # no PMID exists. Mislabelling one as the other is a false citation.
             if pid.isdigit():
                 pmids.add(pid)
@@ -298,7 +298,7 @@ def _citations(candidate: dict[str, Any],
                 ledger_ids.setdefault(provider, set()).add(str(value))
                 found_id = True
         if not found_id:
-            # The lane contributed evidence but carried no citable identifier —
+            # The lane contributed evidence but carried no citable identifier -
             # say so rather than dropping the lane from the citation list.
             ledger_ids.setdefault(provider, set()).add(
                 "⚠ record with no citable identifier")
@@ -471,7 +471,7 @@ def _composite_breakdown(candidate: dict[str, Any], formula: dict[str, Any]) -> 
     # + directional bonus → − Lipinski penalty → caps → composite_score.
     coverage = comp.get("evidence_weight_coverage")
     summary = f"Weighted sum of observed terms = {subtotal:.4f}"
-    # The Reviewer ALWAYS divides the numerator by the covered weight — not
+    # The Reviewer ALWAYS divides the numerator by the covered weight - not
     # only when terms were dropped.  With non-unit-sum weight overrides the
     # covered weight differs from 1 even with full observation, so the
     # division must be displayed whenever it is not the identity.
@@ -633,7 +633,7 @@ def _affinity_statistic_label(candidate: dict[str, Any]) -> str:
 def _mutation_specificity_cell(candidate: dict[str, Any]) -> str:
     """
     Render the mutation-specificity DISCLOSURE flag for the evidence table.
-    Disclosure only — this does not assert the repurposing target carries the
+    Disclosure only - this does not assert the repurposing target carries the
     mutation and never affects any score.
     """
     ms = candidate.get("mutation_specificity") or {}
@@ -660,7 +660,7 @@ def _modality_cell(candidate: dict[str, Any]) -> str:
 
 
 def _discovery_method_cell(candidate: dict[str, Any]) -> str:
-    """How the target was surfaced — never guessed, never blank."""
+    """How the target was surfaced - never guessed, never blank."""
     method = str(candidate.get("target_discovery_method") or "").strip()
     if not method:
         return ("⚠ unattributed — the provenance of this target was not "
@@ -871,7 +871,7 @@ def _evidence_table(candidate: dict[str, Any], struct: dict[str, Any]) -> str:
 def _druggability_subsection(biologist_output: Optional[dict[str, Any]]) -> str:
     """
     Render the 'Target druggability context' subsection from the druggability_context
-    field produced by the Biologist agent.  Informational only — no scoring impact.
+    field produced by the Biologist agent.  Informational only - no scoring impact.
     """
     dc = (biologist_output or {}).get("druggability_context") or {}
     if not dc:
@@ -884,7 +884,7 @@ def _druggability_subsection(biologist_output: Optional[dict[str, Any]]) -> str:
     if has_approved:
         names = [d.get("name") for d in dc.get("approved_drugs", []) if d.get("name")]
         # Show the full list when short; otherwise truncate WITH an explicit
-        # "+N more". Printing "9 — A, B, C, D, E" (count larger than the visible
+        # "+N more". Printing "9 - A, B, C, D, E" (count larger than the visible
         # list) reads as an error to a careful reviewer.
         if names and len(names) <= 10:
             name_str = ", ".join(names)
@@ -1518,7 +1518,7 @@ def _readers_guide_appendix() -> str:
     """Static "How to read this dossier" appendix (reader's guide).
 
     Deliberately STATIC text: it explains the dossier's format and vocabulary
-    only. It must never state or imply anything about the specific candidate —
+    only. It must never state or imply anything about the specific candidate -
     keeping it claim-free means it cannot introduce an unverifiable statement
     into an otherwise claim-audited document.
     """
@@ -1672,7 +1672,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     parts = []
     parts.append(f"# Repurposing hypothesis: {drug} → {disease}\n")
 
-    # Unapproved-compound banner — must be the very first thing a reviewer sees.
+    # Unapproved-compound banner - must be the very first thing a reviewer sees.
     if candidate.get("is_approved_drug") is False:
         parts.append(
             "> ⚠ **EXPERIMENTAL COMPOUND — NOT YET APPROVED.**  \n"
@@ -1706,7 +1706,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
 
     parts.append(header_note)
 
-    # Repurposing-only pool disclosure — tells the reviewer the candidate pool
+    # Repurposing-only pool disclosure - tells the reviewer the candidate pool
     # was restricted to approved drugs at collection time.
     if repurposing_only:
         parts.append(
@@ -1728,7 +1728,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
                 "repurposing framing as unsupported for this candidate.\n\n"
             )
 
-    # K-target evaluation summary — visible count of how many of the K targets
+    # K-target evaluation summary - visible count of how many of the K targets
     # were successfully evaluated so a partial failure is not invisible.
     if k_target_summary and k_target_summary.get("k_pursued", 1) > 1:
         k_note = k_target_summary.get("note", "")
@@ -1745,7 +1745,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
                 f"> ℹ **Top-K evaluation: {k_note}**\n\n"
             )
 
-    # Pathway-neighbor disclosure — surfaced when the candidate's target was
+    # Pathway-neighbor disclosure - surfaced when the candidate's target was
     # discovered via Reactome pathway adjacency rather than a direct OT association.
     disc_method = candidate.get("target_discovery_method", "")
     if disc_method == "pathway_neighbor":
@@ -1760,16 +1760,16 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             "only the disease-relevance link is inferred from pathway adjacency.\n\n"
         )
 
-    # Black-box warning advisory — surfaced when ChEMBL records black_box_warning=True
+    # Black-box warning advisory - surfaced when ChEMBL records black_box_warning=True
     # but the drug has NOT been withdrawn from any market.  A boxed warning means
     # serious risks require prescriber attention; it does NOT mean the drug is
     # unavailable.  More than 30% of FDA-approved drugs carry boxed warnings
     # (warfarin, clozapine, SSRIs, fluoroquinolones, thalidomide+REMS, brexanolone…).
-    # This banner is disclosure only — it does NOT affect any score.
+    # This banner is disclosure only - it does NOT affect any score.
     if candidate.get("black_box_advisory"):
         l1 = (candidate.get("safety_layer1") or {})
         l2 = (candidate.get("safety_layer2") or {})
-        # Advisory can come from L1 structured data, the L2 web check, or both —
+        # Advisory can come from L1 structured data, the L2 web check, or both -
         # name the source(s) honestly instead of always attributing to ChEMBL.
         l1_bb = l1.get("black_box_advisory", False)
         l2_bb = l2.get("black_box_advisory", False)
@@ -1834,13 +1834,13 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             "**No score change was applied.**\n\n"
         )
 
-    # DILI-screening target disclosure — surfaced when the candidate's target is
+    # DILI-screening target disclosure - surfaced when the candidate's target is
     # a well-known pharmaceutical safety-profiling target (BSEP/ABCB11, hERG/KCNH2,
     # P-gp/ABCB1, CYP enzymes, etc.).  Activity records for these proteins in ChEMBL
     # commonly originate from DILI / cardiac-safety screening assays (companies test
     # drugs against them to detect liver/heart toxicity risk BEFORE approval), NOT from
     # therapeutic-intent binding studies.  A high pChEMBL against BSEP does NOT mean
-    # the drug is a good treatment for a BSEP-deficiency disease — it may mean the
+    # the drug is a good treatment for a BSEP-deficiency disease - it may mean the
     # drug is a hepatotoxicity risk.  This disclosure does NOT affect scoring.
     _DILI_SCREEN_TARGETS: frozenset[str] = frozenset({
         "ABCB11", "BSEP", "KCNH2", "HERG", "ABCB1", "MDR1",
@@ -1860,11 +1860,11 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"This disclosure does not affect any score.\n\n"
         )
 
-    # High-lipophilicity DISCLOSURE — surfaced when PubChem XLogP >= 5.
+    # High-lipophilicity DISCLOSURE - surfaced when PubChem XLogP >= 5.
     # Threshold of 5 is Lipinski's Rule of Five (Lipinski, Lombardo, Dominy &
     # Feeney, 1997, Adv. Drug Deliv. Rev. 23:3-25): LogP > 5 is one of four
     # criteria historically associated with poor oral absorption/permeability.
-    # This banner is disclosure only — it does NOT affect any score.
+    # This banner is disclosure only - it does NOT affect any score.
     if candidate.get("high_lipophilicity_flag"):
         _xlogp_val = candidate.get("pubchem_xlogp")
         _xlogp_str = f"{_xlogp_val:.2f}" if _xlogp_val is not None else "≥ 5"
@@ -1878,7 +1878,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
             f"**This flag does not affect the composite score.**\n\n"
         )
 
-    # Mutation-specificity DISCLOSURE caveat — surfaced whenever the drug's
+    # Mutation-specificity DISCLOSURE caveat - surfaced whenever the drug's
     # approved indication names a specific mutation, so the reviewer knows the
     # precedent may not transfer to the (possibly unmutated) repurposing disease.
     ms = candidate.get("mutation_specificity") or {}
@@ -1909,7 +1909,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     # different target/context and contradicted the canonical evidence tables.
     # The dossier renders only persisted, typed evidence below.
 
-    # Stage 1 prioritization scores — the SAME two-dimensional scores the ranking
+    # Stage 1 prioritization scores - the SAME two-dimensional scores the ranking
     # sweep computes, shown here whether the target was auto-ranked or hand-picked.
     meta = target_meta or {}
     tract = meta.get("tractability_score")
@@ -2013,7 +2013,7 @@ def build_report_markdown(candidate: dict[str, Any], struct: dict[str, Any],
     parts.append("\n## 5. Limitations\n")
     parts.append(_limitations(candidate, struct, biologist_output) + "\n")
 
-    # 6. Static reader's guide (format explanation only — no candidate claims)
+    # 6. Static reader's guide (format explanation only - no candidate claims)
     parts.append("\n## 6. How to read this dossier\n")
     parts.append(_readers_guide_appendix() + "\n")
 

@@ -890,7 +890,7 @@ class ChemistPassthroughTests(unittest.TestCase):
 
 class GtopdbStructure204Tests(unittest.TestCase):
     """Amendment 4: /ligands/{id}/structure returning HTTP 204 (no deposited
-    structure — approved biologics like olaratumab/tositumomab/efgartigimod)
+    structure - approved biologics like olaratumab/tositumomab/efgartigimod)
     is a data absence, never a source failure.  Other endpoints stay strict.
     """
 

@@ -102,7 +102,7 @@ scale.
 | Broad Drug Repurposing Hub / retiring portals | Research input only until a durable, versioned successor dataset is identified and frozen. |
 | Docking/structure prediction alone | Hypothesis support only. Predicted binding never substitutes for measured pharmacology or human evidence. |
 
-## Common evidence ledger — prerequisite to adding pipelines
+## Common evidence ledger - prerequisite to adding pipelines
 
 Every source must map into one assertion model instead of adding source-specific columns to the
 current ChEMBL-shaped candidate dictionary.

@@ -3,9 +3,9 @@
 Every number the technical report and manuscript quote is computed here from
 the committed frozen artifacts. Running this script regenerates:
 
-  publication/derived_metrics.json   — every headline number, with provenance
-  publication/tables.md              — markdown tables used by the documents
-  publication/figures/fig*.png       — manuscript figures
+  publication/derived_metrics.json   - every headline number, with provenance
+  publication/tables.md              - markdown tables used by the documents
+  publication/figures/fig*.png       - manuscript figures
 
 It also VERIFIES the frozen audit claim-set results by recomputing them from
 the raw output archive and asserting equality with the stored metrics (the
@@ -196,7 +196,7 @@ with open(os.path.join(OUT, "derived_metrics.json"), "w") as fh:
 
 # ------------------------------------------------------------------- figures
 
-# fig1 — case-selection funnel
+# fig1 - case-selection funnel
 labels = [x[0] for x in M["funnel"]][::-1]
 vals = [x[1] for x in M["funnel"]][::-1]
 fig, ax = plt.subplots(figsize=(7, 4.2))
@@ -210,7 +210,7 @@ fig.tight_layout()
 fig.savefig(os.path.join(FIG, "fig1_funnel.png"))
 plt.close(fig)
 
-# fig2 — v2 outcomes by subset and prevalence stratum
+# fig2 - v2 outcomes by subset and prevalence stratum
 prim = M["v2_primary"]
 dev = M["v2_development"]
 fig, axes = plt.subplots(1, 2, figsize=(8.5, 3.6),
@@ -241,7 +241,7 @@ fig.tight_layout()
 fig.savefig(os.path.join(FIG, "fig2_v2_outcomes.png"), bbox_inches="tight")
 plt.close(fig)
 
-# fig3 — source ablation
+# fig3 - source ablation
 ab = M["ablation"]["by_condition"]
 order = ["chembl_only", "chembl_gtopdb", "chembl_drugcentral", "all_three"]
 disp3 = ["ChEMBL\nonly", "ChEMBL\n+GtoPdb", "ChEMBL\n+DrugCentral", "all\nthree"]
@@ -261,7 +261,7 @@ fig.tight_layout()
 fig.savefig(os.path.join(FIG, "fig3_ablation.png"))
 plt.close(fig)
 
-# fig4 — audit claim-set per-class recall vs thresholds
+# fig4 - audit claim-set per-class recall vs thresholds
 pc = M["audit"]["per_class"]
 classes = ["E1_safety_withdrawal", "E2_boxed_warning_not_withdrawal",
            "E3_direction_incompatible", "E4_unresolved_name_honesty",
@@ -309,7 +309,7 @@ fig.tight_layout()
 fig.savefig(os.path.join(FIG, "fig4_audit.png"), bbox_inches="tight")
 plt.close(fig)
 
-# fig5 — rediscovery ranks
+# fig5 - rediscovery ranks
 pr = [c["rank"] for c in cases
       if c["subset"] == "primary" and c["status"] == "hit"]
 dv = [c["rank"] for c in cases

@@ -104,7 +104,7 @@ def get_gene_locus(symbol: str) -> Optional[dict[str, Any]]:
             headers={"Content-Type": "application/json"},
             timeout=_TIMEOUT_SECONDS,
         )
-    except Exception:  # noqa: BLE001 — unknown locus, never a positional claim
+    except Exception:  # noqa: BLE001 - unknown locus, never a positional claim
         return None
 
     if resp.status_code == 404:

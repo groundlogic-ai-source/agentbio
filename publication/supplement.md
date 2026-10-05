@@ -1,4 +1,4 @@
-# Supplement — AgentBio frozen benchmark and external audit validation
+# Supplement - AgentBio frozen benchmark and external audit validation
 
 **[Author Name]**, Independent Researcher · 2026-08-10
 
@@ -20,7 +20,7 @@ repository.
 | Source-ablation control | `validation/v2_source_ablation_results.json` | 52/52 arms, pre-freeze |
 | Engineering acceptance | `validation/engineering_acceptance_results.json` | label `engineering_acceptance` |
 | Audit claim set (frozen) | `validation/audit_claim_set_v1.json` | sha256 `32efd7d965f62e2cd0900578e6ab2f78b0585d65f33095a651faf6be796523c4` |
-| Audit construction protocol + log | `validation/audit_claimset_construction_protocol.md`, `validation/audit_claimset_construction_log.md` | — |
+| Audit construction protocol + log | `validation/audit_claimset_construction_protocol.md`, `validation/audit_claimset_construction_log.md` | - |
 | Audit pre-registration | `validation/audit_claimset_preregistration.md` | freeze record + Amendments 1–3 |
 | Audit freeze manifest | `validation/audit_claimset_freeze_manifest.json` | code commit, harness config, cache policy, results-hash binding |
 | Audit raw outputs | `validation/audit_claimset_raw_outputs.json` | 100/100, archived before scoring |
@@ -32,11 +32,11 @@ repository.
 | Reviewer pilot | `validation/reviewer_pilot_report.md` | development instrument |
 | repoDB development suites | `validation/repodb_results*.md`, `combined_table*.md` | development instruments |
 
-## S2. Benchmark v2 — per-case results (47 executed cases)
+## S2. Benchmark v2 - per-case results (47 executed cases)
 
 <!-- INCLUDE: supplement_cases.md -->
 
-## S3. Audit claim-set — per-claim outcomes (100 claims)
+## S3. Audit claim-set - per-claim outcomes (100 claims)
 
 Ground-truth citations (FDA label revisions, ChEMBL mechanism records,
 Orphanet entries, primary papers) are embedded per claim in
@@ -49,15 +49,15 @@ Orphanet entries, primary papers) are embedded per claim in
 
 | Touchpoint | File | Model | Output can affect score/rank? |
 |---|---|---|---|
-| Mechanism-direction compatibility | `data_sources/mechanism_direction.py` | gpt-5.4 | Yes — INCOMPATIBLE caps composite at 0.400 |
-| Safety web-check step 2 (withdrawal / black-box classification) | `data_sources/safety_check.py` | claude-sonnet-4-6 (+ web search) | Yes — confirmed withdrawal applies the hard safety cap; black-box is advisory-only |
-| Clinical-trial stop-reason classification | `data_sources/clinicaltrials.py` | claude-haiku-4-5-20251001 | Yes — decides whether a stopped trial counts as efficacy failure |
-| PubMed relationship extraction (assertion vs co-mention) | `data_sources/pubmed.py` | claude-sonnet-4-6 | Indirect — YES/NO gates literature-assertion inclusion |
-| Biologist druggability abstract screening | `agents/biologist.py` | claude-sonnet-4-6 | Indirect — selects supporting PMIDs for the druggability signal |
+| Mechanism-direction compatibility | `data_sources/mechanism_direction.py` | gpt-5.4 | Yes - INCOMPATIBLE caps composite at 0.400 |
+| Safety web-check step 2 (withdrawal / black-box classification) | `data_sources/safety_check.py` | claude-sonnet-4-6 (+ web search) | Yes - confirmed withdrawal applies the hard safety cap; black-box is advisory-only |
+| Clinical-trial stop-reason classification | `data_sources/clinicaltrials.py` | claude-haiku-4-5-20251001 | Yes - decides whether a stopped trial counts as efficacy failure |
+| PubMed relationship extraction (assertion vs co-mention) | `data_sources/pubmed.py` | claude-sonnet-4-6 | Indirect - YES/NO gates literature-assertion inclusion |
+| Biologist druggability abstract screening | `agents/biologist.py` | claude-sonnet-4-6 | Indirect - selects supporting PMIDs for the druggability signal |
 | Difficulty summary | `agents/biologist.py` | claude-haiku-4-5-20251001 | No (context only) |
-| Chemist candidate rationale | `agents/chemist.py` | claude-sonnet-4-6 | No — constrained restatement of computed facts |
-| Stage-1 top-5 narration | `agents/target_selection.py` | claude-sonnet-4-6 | No — narrates a fixed numeric table |
-| Audit narration | `api/audit.py` | claude-opus-4-5 | No — and never invoked in scored runs (`narrate=False`) |
+| Chemist candidate rationale | `agents/chemist.py` | claude-sonnet-4-6 | No - constrained restatement of computed facts |
+| Stage-1 top-5 narration | `agents/target_selection.py` | claude-sonnet-4-6 | No - narrates a fixed numeric table |
+| Audit narration | `api/audit.py` | claude-opus-4-5 | No - and never invoked in scored runs (`narrate=False`) |
 
 All benchmark and audit scoring paths run with `narrate=False`: zero
 narration LLM calls in any scored path. During retrospective evaluation,
@@ -110,17 +110,17 @@ commit (unittest-only environment).
 
 ## S8. Reproducibility checklist
 
-1. `python3 publication/make_figures.py` — regenerates every headline number,
+1. `python3 publication/make_figures.py` - regenerates every headline number,
    table, and figure from the committed artifacts; asserts the audit metrics
    recomputed from the raw archive match the stored frozen results.
 2. `python3 -m validation.run_audit_claimset --label audit_claimset_v1
-   --recalc-only` — independent recomputation of the frozen audit metrics
+   --recalc-only` - independent recomputation of the frozen audit metrics
    (read-only; refuses if results drift). Note: citation revalidation queries
    live sources, so this path is health-gated and correctly refuses during
    an outage; `make_figures.py` performs the equivalent offline re-derivation
    through the harness's own scoring path (`score_from_archive`) and asserts
    exact equality of every outcome and metric with the stored results.
-3. `python3 publication/build_pdf.py` — rebuilds this supplement and the
+3. `python3 publication/build_pdf.py` - rebuilds this supplement and the
    manuscript PDFs.
 4. Freeze integrity: claim-set sha256 + code-commit ancestry + `.py` drift +
    harness-config equality are enforced by the harness on every invocation;

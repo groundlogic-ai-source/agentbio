@@ -1,4 +1,4 @@
-# Frozen audit claim-set v2 — scored results
+# Frozen audit claim-set v2 - scored results
 
 - Label: `audit_claimset_v2` · scored 2026-08-11T01:58:11.935914+00:00
 - Claim set sha256: `5013a57aca080e82…`
@@ -11,7 +11,7 @@
 |--------|-------|-----------|-----------|-----|
 | defect_recall | 1.000 (60/60) | CP lower 0.951 | ≥ 0.8, lower ≥ 0.65 | yes |
 | control_false_flag | 0.050 (2/40) | CP upper 0.149 | ≤ 0.15, upper ≤ 0.3 | yes |
-| novel_recall (no threshold) | 1.000 (59/59) | CP lower 0.950 | — | — |
+| novel_recall (no threshold) | 1.000 (59/59) | CP lower 0.950 | - | - |
 
 Fixed-denominator views (abstentions as not-caught): defect 1.000, control false-flag 0.050.
 
@@ -39,5 +39,5 @@ Caught defects whose disclosure contradicts the external artifact: 0
 - Composition is construction-determined: existing_fix is the honest pool-bounded yield of the three refreshed safety-v2 pools; novel fills the remainder of the 60-claim defect total per the registered N1 -> N4 -> N2 reallocation order.
 - The citation cutoff (2026-08-10) is a mechanical artifact-date rule, not a judgment of evidence currency.
 - Pool-context coverage is limited to the two persisted cases referenced by job_id_hint in this claim set (refreshed to safety-v2); novel-lane claims are pool-free by design.
-- N3 (species/preclinical-only) yielded ZERO claims under v2's tightened gates (v1 gates PLUS no cutoff-eligible FDA label and no human-trial signal): all five candidates failed raw ground truth at construction. The N3 defect class is untested in v2 — reported as such, not padded. The novel group's 59 claims are N1=8, N2=43 (reallocation), N4=8.
+- N3 (species/preclinical-only) yielded ZERO claims under v2's tightened gates (v1 gates PLUS no cutoff-eligible FDA label and no human-trial signal): all five candidates failed raw ground truth at construction. The N3 defect class is untested in v2 - reported as such, not padded. The novel group's 59 claims are N1=8, N2=43 (reallocation), N4=8.
 - Freeze #1 was destroyed by an environment restart before any scoring (Amendment 3); this claim set is the registered rebuild under identical rules. Engineering fixes (EvidenceRecord coercion, LLM provider round-robin + 429 backoff, per-claim checkpoint/resume) were applied BEFORE this freeze and are part of the frozen system under test. Both allowances remain unconsumed.

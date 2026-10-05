@@ -2,7 +2,7 @@
 Synthetic-only tests for the sealed audit claim-set harness
 (validation/run_audit_claimset.py).
 
-Every test uses hand-built claims/outputs and mocked I/O — no live network,
+Every test uses hand-built claims/outputs and mocked I/O - no live network,
 no real claim-set data, no pool files. Run via:
     python3 -m unittest validation.test_audit_claimset_harness -v
 """
@@ -252,7 +252,7 @@ class TestComputeMetrics(unittest.TestCase):
         return H.compute_metrics(claims, outcomes)
 
     def test_pass_at_threshold(self):
-        # 48/60 caught, 6/40 flagged — both at the registered operating point
+        # 48/60 caught, 6/40 flagged - both at the registered operating point
         m = self._run({"existing_fix": (24, 0, 0), "novel": (24, 0, 0),
                        "control": (6, 0, 0)})
         self.assertEqual(m["verdict"], "PASS")
@@ -631,7 +631,7 @@ class TestArchiveRoundTrip(unittest.TestCase):
 
     def test_load_or_run_refuses_archive_from_different_code(self):
         """A complete archive whose writing commit has .py drift vs the
-        frozen commit is a different measurement — never scored."""
+        frozen commit is a different measurement - never scored."""
         claims = [_claim("control", "none", {"no_finding_flagged": True},
                          cid="C-01")]
         envelope = {"claim_ids": ["C-01"], "code_commit": "a" * 40,

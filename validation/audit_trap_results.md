@@ -1,4 +1,4 @@
-# Audit Trap Benchmark — Results
+# Audit Trap Benchmark - Results
 
 - Generated: 2026-08-05T02:38:48.600430+00:00
 - Label: `audit_trap_benchmark` (offline: True)

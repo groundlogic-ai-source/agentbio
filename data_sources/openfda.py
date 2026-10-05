@@ -1,5 +1,5 @@
 """
-openFDA drug adverse event data (FAERS) — https://api.fda.gov/drug/event.json.
+openFDA drug adverse event data (FAERS) - https://api.fda.gov/drug/event.json.
 
 Returns the most-frequently reported adverse event terms for a drug. This is a
 real-world safety signal from spontaneous reports; it is NOT a causal or
@@ -64,7 +64,7 @@ def _with_key(params: dict[str, Any]) -> dict[str, Any]:
 # openFDA enforces a per-minute ceiling as well as a daily quota (roughly
 # 240 requests/minute with a key, 40 without). The reviewer's parallel
 # prefetch fan-out clears either in seconds, so an API key alone does not
-# fix rate limiting — requests must also be spaced process-wide.
+# fix rate limiting - requests must also be spaced process-wide.
 _MIN_REQUEST_INTERVAL = float(
     os.environ.get("AGENTBIO_OPENFDA_MIN_INTERVAL_SECONDS", "0.28"))
 _RETRY_BASE_SECONDS = float(
@@ -77,7 +77,7 @@ _last_request_at = 0.0
 def _throttle() -> None:
     """Process-wide minimum spacing between openFDA requests.
 
-    The sleep holds the lock — that is what serializes callers — but it is
+    The sleep holds the lock - that is what serializes callers - but it is
     bounded by _MIN_REQUEST_INTERVAL and never spans a network call.
     """
     global _last_request_at
@@ -643,7 +643,7 @@ def get_adverse_events(drug_name: str, limit: int = 15) -> dict[str, Any]:
     try:
         resp = _request(BASE_URL, params)
         if resp.status_code == 404:
-            # No matching reports — legitimate empty result.
+            # No matching reports - legitimate empty result.
             cache_set(cache_key, result, ttl_days=7)
             return result
         resp.raise_for_status()

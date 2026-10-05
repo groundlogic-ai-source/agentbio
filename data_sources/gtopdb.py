@@ -44,7 +44,7 @@ BASE_URL = "https://www.guidetopharmacology.org/services"
 
 # GtoPdb started requiring a registered API key at some point after this
 # adapter was written and verified against the "public" API (discovered
-# 2026-09-21 — every call was failing with HTTP 401 "API key is missing").
+# 2026-09-21 - every call was failing with HTTP 401 "API key is missing").
 # Not Replit- or migration-specific: this is an upstream provider policy
 # change that would have broken on any host. Free key: register a user
 # account, then request a key via the site's "Contact us" link. Sent as the
@@ -57,7 +57,7 @@ _API_KEY = os.environ.get("GTOPDB_API_KEY")
 _CACHE_VERSION = "v1"
 _TTL_DAYS = 7
 
-# HTTP statuses that mean "the source is temporarily unavailable" — never cache.
+# HTTP statuses that mean "the source is temporarily unavailable" - never cache.
 _TRANSIENT_STATUSES = {429, 500, 502, 503, 504}
 
 
@@ -89,8 +89,8 @@ def _get_json(path: str, params: Optional[dict] = None,
 
     With allow_no_content, HTTP 204 is likewise returned as None: on the
     /ligands/{id}/structure endpoint a 204 means the ligand has NO deposited
-    structure (approved biologics — olaratumab, tositumomab, efgartigimod
-    alfa — have no SMILES), which is a data absence, not a source failure.
+    structure (approved biologics - olaratumab, tositumomab, efgartigimod
+    alfa - have no SMILES), which is a data absence, not a source failure.
     Every other endpoint keeps the strict behavior: a 204 there still raises.
     """
     url = f"{BASE_URL}{path}"
@@ -182,7 +182,7 @@ def _fetch_interactions(target_id: int) -> list[dict[str, Any]]:
 
 
 def _fetch_ligand(ligand_id: int) -> Optional[dict[str, Any]]:
-    """/ligands/{id} — ligand metadata (name, type, approval, withdrawn)."""
+    """/ligands/{id} - ligand metadata (name, type, approval, withdrawn)."""
     data = _get_json(f"/ligands/{ligand_id}")
     if data is None:
         return None
@@ -192,9 +192,9 @@ def _fetch_ligand(ligand_id: int) -> Optional[dict[str, Any]]:
 
 
 def _fetch_structure(ligand_id: int) -> Optional[dict[str, Any]]:
-    """/ligands/{id}/structure — SMILES / InChI / InChIKey.
+    """/ligands/{id}/structure - SMILES / InChI / InChIKey.
 
-    Biologics have no deposited structure — the endpoint answers HTTP 204 —
+    Biologics have no deposited structure - the endpoint answers HTTP 204 -
     so the candidate is kept with structure fields None rather than failing
     the whole target's GtoPdb pull (benchmark v2 Amendment 4).
     """
@@ -207,7 +207,7 @@ def _fetch_structure(ligand_id: int) -> Optional[dict[str, Any]]:
 
 
 def _fetch_database_links(ligand_id: int) -> list[dict[str, Any]]:
-    """/ligands/{id}/databaseLinks — cross-references (ChEMBL, DrugBank, ...)."""
+    """/ligands/{id}/databaseLinks - cross-references (ChEMBL, DrugBank, ...)."""
     data = _get_json(f"/ligands/{ligand_id}/databaseLinks")
     if data is None:
         return []
@@ -328,10 +328,10 @@ def get_target_interactions(uniprot_id: str,
       {source, status, candidates, error, release}
 
     status:
-      "ok"          — target resolved and ≥1 candidate found.
-      "empty"       — target resolved but no approved-drug interactions
+      "ok"          - target resolved and ≥1 candidate found.
+      "empty"       - target resolved but no approved-drug interactions
                       (healthy, cacheable).
-      "unavailable" — transient failure / malformed payload (NOT cached).
+      "unavailable" - transient failure / malformed payload (NOT cached).
     """
     cache_key = make_key(f"gtopdb_get_target_interactions_{_CACHE_VERSION}",
                         uniprot_id, approved_only)
@@ -357,7 +357,7 @@ def get_target_interactions(uniprot_id: str,
 
                 # Resolve per-ligand payloads once, reusing for dedup merges.
                 if ligand_id in by_ligand:
-                    # Same drug on another resolved target — merge evidence.
+                    # Same drug on another resolved target - merge evidence.
                     by_ligand[ligand_id]["evidence"].extend(
                         _normalize_refs_evidence(interaction))
                     continue

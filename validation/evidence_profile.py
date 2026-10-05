@@ -10,8 +10,8 @@ nothing to compare.
 This module defines that object. Three rules govern it:
 
 1. **It measures the shipped instrument.** The profile is derived from
-   `api.triage._verdict()` over a `run_audit()` result — the exact code
-   path the product runs — not a reimplementation. If triage changes, the
+   `api.triage._verdict()` over a `run_audit()` result - the exact code
+   path the product runs - not a reimplementation. If triage changes, the
    profile changes with it, which is the point: the study should score
    what ships.
 2. **No judgment in the scored path.** Every dimension is a mechanical
@@ -182,7 +182,7 @@ def build_profile(drug_name: str, audit: dict[str, Any]) -> dict[str, Any]:
             else (UNRESOLVED if "unresolved" in n3 else HUMAN_PRESENT)),
         # Amendment 2: every emitted N1/N2 status has an explicit mapping.
         # N2 "review" (biologic without a claimed modality) surfaces as
-        # REVIEW — biologics are legitimate repurposings, so it is
+        # REVIEW - biologics are legitimate repurposings, so it is
         # deliberately NOT a caution. N1 (combination product) is a
         # claim-framing fact, not a candidate defect: descriptive only.
         "modality_feasibility": (

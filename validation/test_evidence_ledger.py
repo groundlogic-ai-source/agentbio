@@ -8,7 +8,7 @@ Covers every invariant the module promises:
   * salt/ester forms of one active moiety collapse via the InChIKey block
   * no-structure records fall back to provider id then name (never wrongly)
   * the same assay/publication/label/trial across providers deduplicates by
-    lineage — provider count is never an evidence boost
+    lineage - provider count is never an evidence boost
   * contradictions are preserved on the merged candidate
   * NOT_APPLICABLE is distinct from a real 0.0 quality; efficacy != safety
   * every Chemist output field is preserved through the union
@@ -184,7 +184,7 @@ class NoStructureIdentityTests(unittest.TestCase):
                          "the structural identity must be the one that survives")
 
     def test_two_structural_records_never_merge_on_name(self):
-        """Different structures sharing a name stay apart — the real invariant."""
+        """Different structures sharing a name stay apart - the real invariant."""
         a = rec(molecule_name="Drug X", inchikey=_FREE_BASE)
         b = rec(molecule_name="Drug X", inchikey="ZZZZZZZZZZZZZZ-YYYYYYYYYY-N")
         self.assertEqual(len(merge_candidates([a, b])), 2)
@@ -494,7 +494,7 @@ class DeterminismTests(unittest.TestCase):
 
     def test_confidence_none_when_not_applicable(self):
         # A structure-only record has no efficacy modality contribution?
-        # structure_db IS in efficacy? No — it is not. Confidence -> None.
+        # structure_db IS in efficacy? No - it is not. Confidence -> None.
         r = rec(source_type="structure_db", inchikey=_FREE_BASE, assay_id="A1")
         merged = merge_candidates([r])[0]
         self.assertIsNone(merged["confidence_score"])
@@ -509,7 +509,7 @@ class CorroborationLiftTest(unittest.TestCase):
     lands on exactly 0.70 unless it clears the pChEMBL potency lift.  Large
     pools then collapse onto one identical score and the resulting rank order
     is arbitrary.  Corroboration across genuinely DIFFERENT modalities is what
-    separates them — never repetition of one modality, and never a provider
+    separates them - never repetition of one modality, and never a provider
     re-import (those are already lineage-deduplicated).
     """
 

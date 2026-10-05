@@ -1,13 +1,13 @@
-# Audit Claim-Set Benchmark v1 — Pre-registration (frozen 2026-08-10)
+# Audit Claim-Set Benchmark v1 - Pre-registration (frozen 2026-08-10)
 
 ## Purpose
 
 The audit trap benchmark (`audit_traps_preregistration.md`) is an **engineering
 regression suite**: its traps encode failure classes AgentBio was already fixed
-for, so it proves fixes still work — not that the audit layer catches failure
+for, so it proves fixes still work - not that the audit layer catches failure
 classes nobody anticipated. This study is the **external validation** of the
-product's core claim — that AgentBio's audit catches the defects that make
-naive repurposing pipelines untrustworthy — measured against a frozen claim set
+product's core claim - that AgentBio's audit catches the defects that make
+naive repurposing pipelines untrustworthy - measured against a frozen claim set
 with **independent ground truth**, including defect classes the team did NOT
 pre-fix for.
 
@@ -33,18 +33,18 @@ v2's role), and the two instruments' results must never be conflated.
 
 | Group | n | Ground truth | Required behavior |
 |-------|---|--------------|-------------------|
-| Defect claims — classes WITH existing fixes (T1–T12 analogues) | 30 | external citation | defect caught + disclosed |
-| Defect claims — NOVEL classes N1–N4 (below) | 30 | external citation | defect caught + disclosed |
-| Clean controls — claims with no defect | 40 | external citation | NOT flagged |
+| Defect claims - classes WITH existing fixes (T1–T12 analogues) | 30 | external citation | defect caught + disclosed |
+| Defect claims - NOVEL classes N1–N4 (below) | 30 | external citation | defect caught + disclosed |
+| Clean controls - claims with no defect | 40 | external citation | NOT flagged |
 
 Novel classes (no existing defense as of freeze):
-- **N1 combination-product splitting** — a fixed-dose combination attributed to
+- **N1 combination-product splitting** - a fixed-dose combination attributed to
   a single active moiety's mechanism.
-- **N2 biologic modality mis-scope** — an antibody/enzyme claim scored as if
+- **N2 biologic modality mis-scope** - an antibody/enzyme claim scored as if
   small-molecule assay evidence applied.
-- **N3 species/preclinical-only mismatch** — a claim whose only supporting
+- **N3 species/preclinical-only mismatch** - a claim whose only supporting
   potency evidence is non-human or in-vitro-only, presented as clinical-grade.
-- **N4 dose/route implausibility** — a claim requiring an exposure the approved
+- **N4 dose/route implausibility** - a claim requiring an exposure the approved
   route cannot achieve (e.g. topical-only drug for a CNS indication).
 
 ## Protocol
@@ -61,19 +61,19 @@ Novel classes (no existing defense as of freeze):
 
 ## Metrics and pre-registered PASS thresholds
 
-- `defect_recall = caught / 60` — PASS requires **≥ 0.80** with exact
+- `defect_recall = caught / 60` - PASS requires **≥ 0.80** with exact
   Clopper-Pearson lower 95% bound **≥ 0.65**.
-- `novel_recall = caught_novel / 30` — reported with CI; no threshold (first
+- `novel_recall = caught_novel / 30` - reported with CI; no threshold (first
   measurement of an unknown quantity; setting a pass bar on unmeasured
   performance would be unfalsifiable).
-- `control_false_flag_rate = flagged / 40` — PASS requires **≤ 0.15** with
+- `control_false_flag_rate = flagged / 40` - PASS requires **≤ 0.15** with
   upper 95% bound ≤ 0.30.
 - Overall verdict PASS requires both thresholded metrics. Per-class recall is
   a secondary breakdown; the headline is the pair (defect_recall, false-flag
   rate) with CIs.
 
 Power note: n=60/40 gives CI half-widths of ≈±10 points at the registered
-operating points — enough to separate "audit works" from "audit is noise,"
+operating points - enough to separate "audit works" from "audit is noise,"
 which is the adoption question this study answers.
 
 ## Phase 2 (optional, registered in advance): inter-rater arm
@@ -81,7 +81,7 @@ which is the adoption question this study answers.
 If an outside researcher engages (expected via outreach), they audit a random
 50-claim subset unaided while blinded to AgentBio's output; we compare catch
 rate and wall-clock time. Registered now so the comparison is not designed
-around a known tool result. No collaborator, no phase 2 — the absence is
+around a known tool result. No collaborator, no phase 2 - the absence is
 reported, not papered over.
 
 ## Relationship to existing artifacts
@@ -98,8 +98,8 @@ rule so that no judgment call about citation validity is ever made while the
 claim set is being built:
 
 1. **Cutoff date.** The study cutoff is **2026-08-10** (this amendment's
-   commit date). A citation is valid only if the cited artifact's own date —
-   publication date, label revision date, or database release date — is
+   commit date). A citation is valid only if the cited artifact's own date -
+   publication date, label revision date, or database release date - is
    strictly earlier than the cutoff. "Before the study" means the artifact's
    date, NEVER the date we happened to retrieve it.
 2. **Pinned releases.** Database citations must name a specific versioned
@@ -112,7 +112,7 @@ claim set is being built:
    cutoff rule.
 4. **Unverifiable dates exclude the claim.** If a citation's date cannot be
    verified, the claim is dropped during construction and recorded in the
-   construction log — never silently repaired or swapped for a convenient
+   construction log - never silently repaired or swapped for a convenient
    substitute after seeing pipeline behavior.
 5. Any claim whose citation fails this rule at audit time is excluded and
    reported as a construction defect, not scored as a miss.
@@ -156,7 +156,7 @@ unforeseen class and an unseen instance.
 
 ## Freeze record (2026-08-10)
 
-- Claim set: `validation/audit_claim_set_v1.json` — 100 claims
+- Claim set: `validation/audit_claim_set_v1.json` - 100 claims
   (existing_fix 30 [E1=2, E2=19, E3=1, E4=8], novel 30 [N1=8, N2=13,
   N3=0, N4=9], control 40 [32 pool-free + 8 pool-context]).
   File sha256: `32efd7d965f62e2cd0900578e6ab2f78b0585d65f33095a651faf6be796523c4`.
@@ -183,5 +183,5 @@ harness defect: the plumbing was fixed (metrics now load strictly from the
 on-disk archive; crash recovery scores the existing archive rather than
 re-measuring), regression tests were added, and the freeze manifest's code
 commit was advanced to f41d7661. The re-run scores the ORIGINAL archived
-outputs — the audits were not re-executed. No claim, detector, threshold, or
+outputs - the audits were not re-executed. No claim, detector, threshold, or
 source configuration was touched.

@@ -2,12 +2,12 @@
 Mechanism-direction compatibility check (Stage 2, post-Reviewer scoring).
 
 Two-step check using OpenAI GPT with web search:
-  Step 1 — gpt-5.4 + web_search_preview tool:
+  Step 1 - gpt-5.4 + web_search_preview tool:
       Retrieve the core pathophysiological mechanism of the disease and reason
       about whether the drug's action ON THE SPECIFIC TARGET (not its systemic
       downstream class) is directionally compatible with the disease.
       Also retrieves any known clinical use of the drug for this disease.
-  Step 2 — gpt-5.4 constrained classification:
+  Step 2 - gpt-5.4 constrained classification:
       Given Step 1 text and the drug's action_type/target, classify:
         DIRECTIONALLY_COMPATIBLE / DIRECTIONALLY_INCOMPATIBLE / INSUFFICIENT_INFO
       with a one-sentence cited reason.  Must not introduce any claim not present
@@ -35,7 +35,7 @@ GPT-5 note: temperature parameter is not supported for the gpt-5.x model
 family.  The classification step uses a strict format-constrained prompt
 (single-word verdict token as the first token of the line) to achieve
 equivalent determinism.  Any response deviating from the
-VERDICT:/REASON:/CITATIONS: format is parsed as INSUFFICIENT_INFO — fail-open,
+VERDICT:/REASON:/CITATIONS: format is parsed as INSUFFICIENT_INFO - fail-open,
 never false-positive incompatible.
 """
 
@@ -107,19 +107,19 @@ def _enforce_auditable_compatible(result: dict[str, Any]) -> dict[str, Any]:
 # Known pharmaceutical safety-screening targets.
 # Companies routinely measure IC50/Ki of drug candidates against these proteins
 # to detect DRUG-INDUCED LIVER INJURY (DILI) or cardiac liability BEFORE
-# regulatory submission — NOT because the drug might treat a disease caused by
+# regulatory submission - NOT because the drug might treat a disease caused by
 # these proteins.  Activity records in ChEMBL for these targets may therefore
 # come from SAFETY PROFILING ASSAYS rather than therapeutic-intent binding studies.
 # When the candidate target is in this set, the Step 1 search query is augmented
 # to explicitly ask the LLM to consider the safety-screen context.
 _DILI_SAFETY_SCREEN_TARGETS: frozenset[str] = frozenset({
-    "ABCB11", "BSEP",        # Bile salt export pump — BSEP inhibition = cholestasis (DILI)
-    "KCNH2", "HERG",         # hERG K⁺ channel — block = QT prolongation (cardiac safety)
-    "ABCB1", "MDR1",         # P-glycoprotein / MDR1 — multidrug efflux, DDI screening
-    "ABCC2", "MRP2",         # MRP2 — bile acid/drug exporter, DILI screening
-    "CYP3A4", "CYP2D6",      # CYP enzymes — DDI/hepatotoxicity liability screening
+    "ABCB11", "BSEP",        # Bile salt export pump - BSEP inhibition = cholestasis (DILI)
+    "KCNH2", "HERG",         # hERG K⁺ channel - block = QT prolongation (cardiac safety)
+    "ABCB1", "MDR1",         # P-glycoprotein / MDR1 - multidrug efflux, DDI screening
+    "ABCC2", "MRP2",         # MRP2 - bile acid/drug exporter, DILI screening
+    "CYP3A4", "CYP2D6",      # CYP enzymes - DDI/hepatotoxicity liability screening
     "CYP2C9", "CYP2C19", "CYP1A2",
-    "SCN5A",                 # NaV1.5 cardiac sodium channel — cardiac safety
+    "SCN5A",                 # NaV1.5 cardiac sodium channel - cardiac safety
 })
 
 
@@ -153,7 +153,7 @@ def check_mechanism_direction(
     the drug's pharmacological action ON THAT SPECIFIC TARGET is directionally
     compatible with the disease.
 
-    INCOMPATIBLE verdict requires HIGH CONFIDENCE — unambiguous mechanistic
+    INCOMPATIBLE verdict requires HIGH CONFIDENCE - unambiguous mechanistic
     incompatibility directly stated by the retrieved text.  Complex or
     multi-protein mechanisms → INSUFFICIENT_INFO (fail-open).
 
@@ -169,17 +169,17 @@ def check_mechanism_direction(
 
     Returns:
       {
-        "verdict"                   : str   — one of the three labels
-        "disease_mechanism_summary" : str   — full Step 1 web-search text (audit)
-        "reason"                    : str   — one-sentence cited reason from Step 2
+        "verdict"                   : str   - one of the three labels
+        "disease_mechanism_summary" : str   - full Step 1 web-search text (audit)
+        "reason"                    : str   - one-sentence cited reason from Step 2
         "action_type_used"          : str | None
         "mechanism_of_action_used"  : str | None
         "target_symbol_used"        : str
         "model_used"                : str
-        "search_citations"          : str   — URLs/citations from Step 2 classifier
-        "step2_raw"                 : str   — raw Step 2 output (full audit trail)
-        "compatible"                : bool  — True ONLY for COMPATIBLE verdict
-        "incompatible"              : bool  — True ONLY for INCOMPATIBLE; cap trigger
+        "search_citations"          : str   - URLs/citations from Step 2 classifier
+        "step2_raw"                 : str   - raw Step 2 output (full audit trail)
+        "compatible"                : bool  - True ONLY for COMPATIBLE verdict
+        "incompatible"              : bool  - True ONLY for INCOMPATIBLE; cap trigger
       }
     Cached 30 days on success, 1 day on error/skip.
     """
@@ -230,11 +230,11 @@ def check_mechanism_direction(
         action_desc = action_type or "unknown"
         moa_desc    = mechanism_of_action or "not specified in ChEMBL mechanism records"
 
-        # ── Step 1: web-search — disease mechanism + clinical-use anchor ─────
+        # ── Step 1: web-search - disease mechanism + clinical-use anchor ─────
         # The prompt has three parts:
         #   (A) Disease pathophysiology anchored to target_symbol
         #   (B) Drug's action on target_symbol specifically
-        #   (C) Clinical-use anchor — is the drug known to treat this disease?
+        #   (C) Clinical-use anchor - is the drug known to treat this disease?
         # Part (C) matters for drugs like sirolimus/FKBP12 where the therapeutic
         # mechanism is a multi-protein gain-of-function complex, making the naive
         # "inhibitor of FKBP1A" framing misleading.
@@ -297,7 +297,7 @@ def check_mechanism_direction(
             f"{dili_question}"
         )
         # Provider-bound web-search tool: retry 429/5xx with backoff (no
-        # cross-provider failover — the tool API is OpenAI-specific).
+        # cross-provider failover - the tool API is OpenAI-specific).
         search_response = call_with_backoff(
             lambda: client.responses.create(
                 model="gpt-5.4",

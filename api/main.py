@@ -1,9 +1,9 @@
 """
-AgentBio — Stage 4 FastAPI backend.
+AgentBio - Stage 4 FastAPI backend.
 
 Exposes the existing Stage 1-3 LangGraph pipeline over HTTP. This layer ONLY
 imports from the pipeline (main_graph.build_graph) and reuses resume_review's
-resume_run() — it never reimplements pipeline or resume logic.
+resume_run() - it never reimplements pipeline or resume logic.
 
 Single-user hobby project: no auth, no accounts, no external task queue. Each run
 executes on a plain Python background thread and reports real per-node progress
@@ -387,7 +387,7 @@ def _promoted_candidates(
     target's failure fails every candidate, while an exploratory
     pathway-neighbor failure is meant to fail only the candidates discovered on
     that neighbor (`main_graph.py` sets `coverage_required=False` for them).
-    The reviewer already honours that scoping — an incompletely covered
+    The reviewer already honours that scoping - an incompletely covered
     candidate carries `candidate_source_coverage_incomplete` in its
     `exclusion_reasons` and is barred from `paid_validation_eligible` /
     `headline_eligible` / `externally_prioritizable`.
@@ -397,7 +397,7 @@ def _promoted_candidates(
     contributing a handful of the pool's candidates discarded an entire run
     after full LLM and structure spend, even when the promoted candidate sat on
     the direct target and was fully covered. Checking only promoted candidates
-    restores the documented intent while keeping the invariant that matters —
+    restores the documented intent while keeping the invariant that matters -
     nothing the report advances may rest on incomplete evidence.
     """
     return [
@@ -660,7 +660,7 @@ def _auto_start_sweep() -> None:
     """
     On every server startup, launch the Stage 1 sweep in the background if
     top_candidates.json is missing. Uses sweep_manager so the same process
-    reference is shared with main_graph — only one sweep ever runs at a time.
+    reference is shared with main_graph - only one sweep ever runs at a time.
     """
     pid = sweep_manager.ensure_running()
     if pid is not None:
@@ -1071,7 +1071,7 @@ def start_batch(request: Request, req: BatchRequest) -> dict[str, Any]:
     )
 
     # Pre-create all N jobs so their IDs are known before the background thread
-    # starts — the caller can begin polling immediately.
+    # starts - the caller can begin polling immediately.
     job_rows = [
         jobs_db.create_job(
             disease_name=disease_names[index] if disease_names else None
@@ -1118,7 +1118,7 @@ def get_batch(batch_id: str) -> dict[str, Any]:
 def archive_run(job_id: str) -> dict[str, Any]:
     """
     Soft-archive a case. The record, report, and explored_targets rows are
-    preserved — archiving only hides the case from the default list view.
+    preserved - archiving only hides the case from the default list view.
     """
     job = jobs_db.get_job(job_id)
     if job is None:
@@ -1375,7 +1375,7 @@ def audit_drug(req: AuditRequest) -> dict[str, Any]:
     for a given disease.
 
     If a finished case with a persisted candidate pool already exists for the
-    disease—including a case that ended with no eligible candidate—reuses its
+    disease-including a case that ended with no eligible candidate-reuses its
     already-computed pool and does NOT re-run the pipeline. If no such case
     exists, returns {"status": "no_case"} so the client can submit a new run.
 
@@ -1405,7 +1405,7 @@ def triage_candidate_list(req: TriageRequest) -> dict[str, Any]:
     Adversarially audit a caller-supplied candidate list (up to 25 drugs)
     against the persisted reviewed-candidates pool of one finished case.
 
-    Reuses run_audit per drug with narration disabled — no pipeline re-run, no
+    Reuses run_audit per drug with narration disabled - no pipeline re-run, no
     extra LLM calls, deterministic verdicts. The run is persisted to Postgres
     and retrievable by run id (GET /api/audit/triage/{run_id}).
     """
@@ -1538,7 +1538,7 @@ def _benchmark_summary(artifact: dict[str, Any], label: str) -> dict[str, Any]:
 
 
 def _audit_trap_summary(artifact: dict[str, Any]) -> dict[str, Any]:
-    """Summary card for the audit trap benchmark — a different shape from the
+    """Summary card for the audit trap benchmark - a different shape from the
     rediscovery artifacts (detection metrics, not Top-N ranks)."""
     m = artifact.get("metrics") or {}
     return {
@@ -1562,7 +1562,7 @@ def _audit_trap_summary(artifact: dict[str, Any]) -> dict[str, Any]:
 
 # Allow-listed frozen validation reports, served read-only for in-app reading
 # from the Research tab's benchmark cards. Entries must point at committed,
-# frozen artifacts only — this endpoint never writes, regenerates, or serves
+# frozen artifacts only - this endpoint never writes, regenerates, or serves
 # mutable content. Adding a report means adding a line here, nothing else.
 _BENCHMARK_REPORTS = {
     "benchmark-v2": ("Benchmark v2 — pre-registered protocol",
@@ -1605,7 +1605,7 @@ def get_benchmark_report(report_id: str) -> dict[str, str]:
 @app.get("/api/research/benchmarks")
 def get_research_benchmarks() -> dict[str, Any]:
     """Expose existing validation artifacts with their provenance and limits."""
-    # report_id must be a key of _BENCHMARK_REPORTS — the frontend renders the
+    # report_id must be a key of _BENCHMARK_REPORTS - the frontend renders the
     # "Read full report" button from it, so it must stay stable even if the
     # display label copy changes.
     artifacts = [
@@ -1655,7 +1655,7 @@ _STRUCTURES_DIR = os.path.join(
 @app.get("/api/structures/{filename}")
 def get_structure(filename: str) -> FileResponse:
     """Serve a locally-cached Boltz CIF structure file."""
-    # Restrict to simple filenames — no path traversal.
+    # Restrict to simple filenames - no path traversal.
     if "/" in filename or ".." in filename:
         raise HTTPException(status_code=400, detail="invalid filename")
     path = os.path.join(_STRUCTURES_DIR, filename)
@@ -1670,14 +1670,14 @@ def get_structure(filename: str) -> FileResponse:
 
 
 # --------------------------------------------------------------------------- #
-# Internal sweep trigger (development / admin only — no auth)
+# Internal sweep trigger (development / admin only - no auth)
 # --------------------------------------------------------------------------- #
 
 @app.post("/internal/run-sweep")
 def trigger_sweep() -> dict:
     """
     Start the Stage 1 sweep as a background process. Delegates to sweep_manager
-    so the same subprocess is shared with the graph — only one sweep runs at a time.
+    so the same subprocess is shared with the graph - only one sweep runs at a time.
     """
     pid = sweep_manager.ensure_running()
     if pid is None:
@@ -1695,7 +1695,7 @@ def sweep_status() -> dict:
 
 
 # --------------------------------------------------------------------------- #
-# Dataset enrichment (MEGA 2 — PubChem + ChEMBL free-API batch)
+# Dataset enrichment (MEGA 2 - PubChem + ChEMBL free-API batch)
 # --------------------------------------------------------------------------- #
 
 _ENRICH_LOG = "/tmp/enrich_log.txt"
@@ -1959,7 +1959,7 @@ def studyb_status() -> dict:
                 _SNAP_SHA_CACHE["mtime"] = mtime
                 _SNAP_SHA_CACHE["sha256"] = _snap.sha256()
             status["pubchem_snapshot_sha256"] = _SNAP_SHA_CACHE.get("sha256")
-    except Exception:  # noqa: BLE001 — status endpoint must stay read-only-safe
+    except Exception:  # noqa: BLE001 - status endpoint must stay read-only-safe
         status["pubchem_snapshot_sha256"] = None
     if os.path.exists(_STUDYB_DONE):
         try:

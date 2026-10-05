@@ -2,7 +2,7 @@
 holdout redaction actually block indication leakage through the AUDIT lanes?
 
 The discovery benchmark's holdout (``data_sources/holdout.py``) seals
-disease-side evidence on the DISCOVERY side — Open Targets approved-drug
+disease-side evidence on the DISCOVERY side - Open Targets approved-drug
 name lists, the ChEMBL ``drug_indication`` EFO fallback, and the
 ``has_approved``/unmet-need signal they feed.  The audit layer is a
 different code path with different sources.  Before any discrimination
@@ -38,7 +38,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from data_sources import holdout as holdout_mod  # noqa: E402
 
 # Confirmed drug→disease pairs. Every one is an approved indication, so the
-# ground truth of "this drug treats this disease" is not in question — the
+# ground truth of "this drug treats this disease" is not in question - the
 # only question is whether the audit envelope states it.
 #
 # ``aliases`` are additional surface forms a label may use for the same

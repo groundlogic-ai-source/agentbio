@@ -9,11 +9,11 @@ pipeline runs.
 
 Schema: triage_runs
   id             VARCHAR PRIMARY KEY
-  disease_name   VARCHAR NOT NULL     — canonical disease of the audited case
-  job_id         VARCHAR              — case job the pool came from
-  drugs_json     TEXT NOT NULL        — JSON list of submitted drug names
-  results_json   TEXT NOT NULL        — JSON per-drug verdict rows
-  summary_json   TEXT NOT NULL        — JSON portfolio summary counts
+  disease_name   VARCHAR NOT NULL     - canonical disease of the audited case
+  job_id         VARCHAR              - case job the pool came from
+  drugs_json     TEXT NOT NULL        - JSON list of submitted drug names
+  results_json   TEXT NOT NULL        - JSON per-drug verdict rows
+  summary_json   TEXT NOT NULL        - JSON portfolio summary counts
   created_at     TIMESTAMP WITH TIME ZONE NOT NULL
 
 CREATE TABLE IF NOT EXISTS runs once at API startup (same pattern as

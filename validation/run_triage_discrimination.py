@@ -123,7 +123,7 @@ def _audit_case(case: dict, claim: dict) -> dict:
     chembl_id = None
     try:
         chembl_id = _find_molecule_chembl_id(drug)
-    except Exception:  # noqa: BLE001 — unresolved is an honest outcome
+    except Exception:  # noqa: BLE001 - unresolved is an honest outcome
         chembl_id = None
     mechanism_symbol = ""
     if chembl_id:

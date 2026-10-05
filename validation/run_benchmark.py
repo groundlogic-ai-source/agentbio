@@ -7,7 +7,7 @@ below solely to preserve the exact code path that produced the frozen result.
 Protocol enforcement (validation/benchmark_case_selection_criteria.md §8):
   - REFUSES TO START if the pipeline code (agents/, data_sources/, cache/)
     differs from the benchmark-freeze-v1 tag.
-  - REFUSES TO START / HALTS MID-RUN when ChEMBL is unhealthy — cases must
+  - REFUSES TO START / HALTS MID-RUN when ChEMBL is unhealthy - cases must
     never be competed against a degraded API. A halt preserves all completed
     cases; restarting the script RESUMES the same single run (completed cases
     are never re-executed, whatever their outcome).
@@ -63,7 +63,7 @@ CHEMBL_PROBES = (
 def _check_freeze_integrity() -> None:
     """The one v2 run executes AT the freeze: tagged-commit integrity in a git
     checkout; deployment-attestation integrity where git is absent (Amendment
-    5 — published apps ship without a .git directory)."""
+    5 - published apps ship without a .git directory)."""
     from validation import run_v2_preflight as pf
     if not pf._git_available():
         _check_attestation_integrity(pf)
@@ -189,7 +189,7 @@ def _all_cases() -> list[dict[str, str]]:
     return primary + dev
 
 
-# ── Persistence (fingerprinted resume — continuation of the ONE run) ─────────
+# ── Persistence (fingerprinted resume - continuation of the ONE run) ─────────
 
 def _key(drug: str, disease: str) -> tuple:
     return (_norm_name(drug), _norm_name(disease), _holdout_fp([drug]))
@@ -223,7 +223,7 @@ def _flush(cases: list[dict[str, Any]]) -> None:
 def _attach_pool_sizes(case: dict[str, Any]) -> None:
     """Per-target eligible-pool size = molecules in the exact pool the chemist
     drew from (same call, same default filter). Cached from the run, so cheap.
-    Measurement only — does not affect any pipeline behavior."""
+    Measurement only - does not affect any pipeline behavior."""
     total_pool, per = 0, {}
     for t in case.get("per_target_results", []):
         uid = t.get("uniprot_id")

@@ -1,5 +1,5 @@
 """
-Retrospective validation — small-molecule-only cases from enriched_dataset.csv.
+Retrospective validation - small-molecule-only cases from enriched_dataset.csv.
 
 Selection rule:
   - status == "Approved" AND chembl_molecule_type == "Small molecule"
@@ -9,11 +9,11 @@ Selection rule:
   - TSC/everolimus is INCLUDED (row 5095) as the canonical confirmed-repurpose
     case; note the current top-1 target (FKBP1A) comes from the
     pharmacological_precedent path, which itself knows everolimus/sirolimus
-    are approved for TSC — treat target discovery here as partially circular
+    are approved for TSC - treat target discovery here as partially circular
   - pre-verified via select_for_disease() against cached Orphanet list
 
 Run: python -m validation.run_repodb_cases_smallmol
-Out: validation/repodb_results_smallmol.json  (incremental — safe to interrupt and resume)
+Out: validation/repodb_results_smallmol.json  (incremental - safe to interrupt and resume)
      validation/repodb_results_smallmol.md
      validation/combined_table_smallmol.md
 """
@@ -40,9 +40,9 @@ from api import audit as _audit
 from validation import miss_classifier
 
 # BENCHMARK MODE: every case runs under a per-case holdout (data_sources/holdout.py).
-# The confirmed drug is redacted from all discovery-side inputs — OT approved-drug
+# The confirmed drug is redacted from all discovery-side inputs - OT approved-drug
 # lists (specific + parent-umbrella EFO), the ChEMBL drug_indication fallback, and
-# the has_approved/unmet-need signal — so the pipeline must find the target without
+# the has_approved/unmet-need signal - so the pipeline must find the target without
 # precedent leakage. The bioactivity candidate pool is deliberately NOT redacted:
 # the drug surfacing in an honestly-selected target's pool is the discovery moment
 # being measured. Resume keys include the holdout fingerprint, so pre-holdout
@@ -73,7 +73,7 @@ TARGET_CASES: list[tuple[int, str, str, str]] = [
     (2074, "Imatinib",        "Idiopathic Hypereosinophilic Syndrome",          "Idiopathic Hypereosinophilic Syndrome"),
     (2071, "Imatinib",        "Chronic eosinophilic leukemia",                  "Chronic eosinophilic leukemia"),
     (1747, "Pyridostigmine",  "Myasthenia Gravis",                              "Myasthenia Gravis"),
-    # CA2 has thousands of ChEMBL inhibitors — run last so others complete first
+    # CA2 has thousands of ChEMBL inhibitors - run last so others complete first
     (249,  "Lorazepam",       "Lennox-Gastaut syndrome",                        "Lennox-Gastaut syndrome"),
     # Canonical confirmed repurpose (EXIST-1 → FDA 2010); added 2026-07-31
     (5095, "Everolimus",      "Tuberous sclerosis complex",                     "Tuberous Sclerosis"),

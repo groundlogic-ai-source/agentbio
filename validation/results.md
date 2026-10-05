@@ -1,4 +1,4 @@
-# AgentBio — Retrospective Validation Results
+# AgentBio - Retrospective Validation Results
 
 _Generated: 2026-07-27 19:51:12_
 
@@ -8,9 +8,9 @@ For each confirmed real-world drug-repurposing success, we ran the existing Biol
 
 ## Honest limitation (read first)
 
-> This harness tests the SCORING AND RANKING LOGIC on TODAY's live data, not the historical data available at the time of each discovery. The confirmed drug is intentionally NOT removed from ChEMBL/PubChem results — reconstructing pre-approval data availability is infeasible with current public APIs. A 'hit' means the existing scoring logic ranks the correct compound highly among real candidates for the disease's top target; it does NOT claim the pipeline would have made the discovery blind to history. The pipeline also pursues only the single top OT-associated target per disease (exactly as the live graph does), so a confirmed drug whose molecular target is not that top target cannot be surfaced — this is a real, reported limitation, not a scoring failure.
+> This harness tests the SCORING AND RANKING LOGIC on TODAY's live data, not the historical data available at the time of each discovery. The confirmed drug is intentionally NOT removed from ChEMBL/PubChem results - reconstructing pre-approval data availability is infeasible with current public APIs. A 'hit' means the existing scoring logic ranks the correct compound highly among real candidates for the disease's top target; it does NOT claim the pipeline would have made the discovery blind to history. The pipeline also pursues only the single top OT-associated target per disease (exactly as the live graph does), so a confirmed drug whose molecular target is not that top target cannot be surfaced - this is a real, reported limitation, not a scoring failure.
 
-> **On LLM usage:** the recorded metrics (rank, composite_score, strong_match) are produced by fully deterministic numeric scoring — the Chemist ranks by (is_approved_drug, pchembl_value, tanimoto) and the Reviewer by a fixed weighted composite; neither uses an LLM. The pipeline's only LLM calls write prose rationale text, which this harness does not record. Rationale generation was therefore disabled for the harness run (via environment, with no code change) so the deterministic scoring path runs faster. Enabling it would not change a single number below.
+> **On LLM usage:** the recorded metrics (rank, composite_score, strong_match) are produced by fully deterministic numeric scoring - the Chemist ranks by (is_approved_drug, pchembl_value, tanimoto) and the Reviewer by a fixed weighted composite; neither uses an LLM. The pipeline's only LLM calls write prose rationale text, which this harness does not record. Rationale generation was therefore disabled for the harness run (via environment, with no code change) so the deterministic scoring path runs faster. Enabling it would not change a single number below.
 
 ## Overall summary
 
@@ -25,69 +25,69 @@ For each confirmed real-world drug-repurposing success, we ran the existing Biol
 | Drug | Disease | Confirmed | Status | Top target pursued | Rank | Composite | Top 10 | STRONG_MATCH |
 |---|---|---|---|---|---|---|---|---|
 | Sildenafil | Idiopathic pulmonary arterial hypertension | 2005 | hit | PDE5A | 3 | 0.7402 | ✓ | ✓ |
-| Thalidomide | multiple myeloma | 2006 | miss | FKBP1A | — | — | — | — |
-| Metformin | Polycystic ovary syndrome | 1994 | out_of_scope | — | — | — | — | — |
-| Everolimus | tuberous sclerosis complex | 2010 | miss | FKBP1A | — | — | — | — |
-| Propranolol | Airway infantile hemangioma | 2014 | error | — | — | — | — | — |
-| Sildenafil | pulmonary arterial hypertension | 2005 | out_of_scope | — | — | — | — | — |
-| Propranolol | infantile hemangioma | 2014 | out_of_scope | — | — | — | — | — |
+| Thalidomide | multiple myeloma | 2006 | miss | FKBP1A | - | - | - | - |
+| Metformin | Polycystic ovary syndrome | 1994 | out_of_scope | - | - | - | - | - |
+| Everolimus | tuberous sclerosis complex | 2010 | miss | FKBP1A | - | - | - | - |
+| Propranolol | Airway infantile hemangioma | 2014 | error | - | - | - | - | - |
+| Sildenafil | pulmonary arterial hypertension | 2005 | out_of_scope | - | - | - | - | - |
+| Propranolol | infantile hemangioma | 2014 | out_of_scope | - | - | - | - | - |
 
 ## Per-case detail
 
-### Sildenafil — Idiopathic pulmonary arterial hypertension (confirmed 2005)
+### Sildenafil - Idiopathic pulmonary arterial hypertension (confirmed 2005)
 
 - **Status:** hit
-- **Known target (context only):** Acts on PDE5 (PDE5A) — a phosphodiesterase, not the typical top OT-associated target for PAH.
+- **Known target (context only):** Acts on PDE5 (PDE5A) - a phosphodiesterase, not the typical top OT-associated target for PAH.
 - **Top target pursued:** PDE5A (O76074), OT association 0.9
 - **All targets considered for the disease:** PDE5A (0.9), PTGIR (0.5106), EIF2AK4 (0.4783), BMPR2 (0.6809), INHBA (0.9), SMAD9 (0.4679), PPARGC1A (0.3046)
 - **Candidate pool:** 32 chemist candidates -> 32 reviewed.
-- **Found at rank 3** — composite_score 0.7402, STRONG_MATCH=True, is_approved_drug=True, matched by inchikey/chembl_id.
-- **Interpretation:** HIT — Sildenafil appears at rank 3/32 (composite_score=0.7402, within top 10, reached STRONG_MATCH) against target PDE5A, matched by inchikey/chembl_id.
+- **Found at rank 3** - composite_score 0.7402, STRONG_MATCH=True, is_approved_drug=True, matched by inchikey/chembl_id.
+- **Interpretation:** HIT - Sildenafil appears at rank 3/32 (composite_score=0.7402, within top 10, reached STRONG_MATCH) against target PDE5A, matched by inchikey/chembl_id.
 
-### Thalidomide — multiple myeloma (confirmed 2006)
+### Thalidomide - multiple myeloma (confirmed 2006)
 
 - **Status:** miss
 - **Known target (context only):** Binds CRBN (cereblon); also anti-angiogenic / anti-TNF. Molecular target only elucidated years after clinical use.
 - **Top target pursued:** FKBP1A (P62942), OT association 0.9
 - **All targets considered for the disease:** FKBP1A (0.9), CD38 (0.9), FDPS (0.9), TOP2A (0.9), GSR (0.9), NR3C1 (0.9), CRBN (0.6846), CXCR4 (0.6588), NRAS (0.642), TNFSF11 (0.9), XPO1 (0.6416), SLAMF7 (0.9), GPRC5D (0.9), TNFRSF17 (0.6801)
 - **Candidate pool:** 29 chemist candidates -> 29 reviewed.
-- **Reason:** 'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
-- **Interpretation:** MISS — Thalidomide was not surfaced. 'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
+- **Reason:** 'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool - or it lacks qualifying high-confidence bioactivity records there.
+- **Interpretation:** MISS - Thalidomide was not surfaced. 'Thalidomide' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool - or it lacks qualifying high-confidence bioactivity records there.
 
-### Metformin — Polycystic ovary syndrome (confirmed 1994)
+### Metformin - Polycystic ovary syndrome (confirmed 1994)
 
 - **Status:** out_of_scope
 - **Known target (context only):** Insulin-sensitizer (AMPK / mitochondrial complex I); no single clean protein target. Used OFF-LABEL for PCOS.
 - **Reason:** 'Polycystic ovary syndrome' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). AgentBio is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.
-- **Interpretation:** 'Polycystic ovary syndrome' is outside AgentBio's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure — the harness correctly refuses to auto-pick an unrelated disease.
+- **Interpretation:** 'Polycystic ovary syndrome' is outside AgentBio's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure - the harness correctly refuses to auto-pick an unrelated disease.
 
-### Everolimus — tuberous sclerosis complex (confirmed 2010)
+### Everolimus - tuberous sclerosis complex (confirmed 2010)
 
 - **Status:** miss
 - **Known target (context only):** mTOR inhibitor (MTOR); TSC1/TSC2 loss drives mTOR hyperactivation, so MTOR is a strong disease-mechanistic target.
 - **Top target pursued:** FKBP1A (P62942), OT association 0.5679
 - **All targets considered for the disease:** FKBP1A (0.5679), VHL (0.3483), TSC2 (0.8867), TSC1 (0.8682), IFNG (0.4031)
 - **Candidate pool:** 29 chemist candidates -> 29 reviewed.
-- **Reason:** 'Everolimus' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
-- **Interpretation:** MISS — Everolimus was not surfaced. 'Everolimus' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool — or it lacks qualifying high-confidence bioactivity records there.
+- **Reason:** 'Everolimus' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool - or it lacks qualifying high-confidence bioactivity records there.
+- **Interpretation:** MISS - Everolimus was not surfaced. 'Everolimus' did not appear among the 29 ChEMBL candidate compound(s) for the selected top target FKBP1A (P62942). The Chemist only admits compounds with Homo sapiens IC50/Ki bioactivity at assay confidence >= 8 against THIS target. The most likely reason is that the confirmed drug's molecular target is not FKBP1A (the top OT-associated target for this disease), so it is out of the pursued target's candidate pool - or it lacks qualifying high-confidence bioactivity records there.
 
-### Propranolol — Airway infantile hemangioma (confirmed 2014)
+### Propranolol - Airway infantile hemangioma (confirmed 2014)
 
 - **Status:** error
 - **Known target (context only):** Non-selective beta-blocker (ADRB1/ADRB2). Effect on hemangioma discovered serendipitously.
-- **Reason:** target_selection failed: 'Airway infantile hemangioma' is in the rare/NTD universe but could not be matched to an Open Targets EFO ID (tried official name, prefix-stripped name, and original query 'Airway infantile hemangioma'). Try an alternate common name for this disease — for example, use 'polycystic ovary syndrome' rather than the Orphanet administrative name that may include prefixes like 'NON RARE IN EUROPE:'.
+- **Reason:** target_selection failed: 'Airway infantile hemangioma' is in the rare/NTD universe but could not be matched to an Open Targets EFO ID (tried official name, prefix-stripped name, and original query 'Airway infantile hemangioma'). Try an alternate common name for this disease - for example, use 'polycystic ovary syndrome' rather than the Orphanet administrative name that may include prefixes like 'NON RARE IN EUROPE:'.
 - **Interpretation:** The disease is in-universe but target selection raised an error (e.g. no Open Targets EFO mapping or no associated targets), so no candidates could be scored.
 
-### Sildenafil — pulmonary arterial hypertension (confirmed 2005)
+### Sildenafil - pulmonary arterial hypertension (confirmed 2005)
 
 - **Status:** out_of_scope
-- **Known target (context only):** Acts on PDE5 (PDE5A) — a phosphodiesterase, not the typical top OT-associated target for PAH.
-- **Reason:** 'pulmonary arterial hypertension' is an Orphanet 'Group of disorders' umbrella term, not a single scorable disease — it aggregates several distinct disorders. AgentBio scores one (disease, target) pair at a time, so please pick a specific constituent disease within this group (e.g. a named subtype) rather than the umbrella category.
-- **Interpretation:** 'pulmonary arterial hypertension' is outside AgentBio's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure — the harness correctly refuses to auto-pick an unrelated disease.
+- **Known target (context only):** Acts on PDE5 (PDE5A) - a phosphodiesterase, not the typical top OT-associated target for PAH.
+- **Reason:** 'pulmonary arterial hypertension' is an Orphanet 'Group of disorders' umbrella term, not a single scorable disease - it aggregates several distinct disorders. AgentBio scores one (disease, target) pair at a time, so please pick a specific constituent disease within this group (e.g. a named subtype) rather than the umbrella category.
+- **Interpretation:** 'pulmonary arterial hypertension' is outside AgentBio's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure - the harness correctly refuses to auto-pick an unrelated disease.
 
-### Propranolol — infantile hemangioma (confirmed 2014)
+### Propranolol - infantile hemangioma (confirmed 2014)
 
 - **Status:** out_of_scope
 - **Known target (context only):** Non-selective beta-blocker (ADRB1/ADRB2). Effect on hemangioma discovered serendipitously.
 - **Reason:** 'infantile hemangioma' was not found in the rare-disease / neglected-tropical-disease universe this system covers (Orphanet rare diseases + WHO NTDs). AgentBio is scoped to rare and neglected diseases. Check the spelling, try the disease's Orphanet name, or leave the field blank to auto-explore the ranked candidate list.
-- **Interpretation:** 'infantile hemangioma' is outside AgentBio's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure — the harness correctly refuses to auto-pick an unrelated disease.
+- **Interpretation:** 'infantile hemangioma' is outside AgentBio's rare-disease / neglected-tropical-disease scope, so the pipeline never evaluates it. This is a scope boundary, not a scoring failure - the harness correctly refuses to auto-pick an unrelated disease.

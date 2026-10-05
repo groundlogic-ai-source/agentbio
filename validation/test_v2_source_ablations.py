@@ -2,7 +2,7 @@
 
 Run with stdlib only:  python3 -m unittest validation.test_v2_source_ablations -v
 
-These tests are non-network: they exercise the harness's pure logic — protocol
+These tests are non-network: they exercise the harness's pure logic - protocol
 label / refusal gate, source conditions, drug grouping, fingerprints, holdout
 self-audit, and incremental-vs-baseline aggregation. The expensive live harness
 is NOT run here.
@@ -484,7 +484,7 @@ class CaseMajorExecutionTest(unittest.TestCase):
 
     def test_execution_is_case_major(self):
         # With two cases, the freeze/run order must be case1(all arms),
-        # then case2(all arms) — NOT arm-major.
+        # then case2(all arms) - NOT arm-major.
         import tempfile
         tmp = os.path.join(tempfile.mkdtemp(), "r.json")
         two_cases = [(1, "Dapsone", "Leprosy", "Leprosy"),
@@ -535,7 +535,7 @@ class CaseMajorExecutionTest(unittest.TestCase):
         self.assertEqual(len(freeze_spy1.calls), 1)
 
         # Second pass (resume, all 4 conditions): freeze MUST NOT be called
-        # again — the snapshot is reused from persisted state.
+        # again - the snapshot is reused from persisted state.
         freeze_spy2 = _FreezeSpy(rows_selected)
         pair_spy2 = _PairSpy()
         with patch.object(A, "TARGET_CASES", self._single_case()), \

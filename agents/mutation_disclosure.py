@@ -2,7 +2,7 @@
 Mutation-specificity DISCLOSURE flag (Stage 2/3).
 
 PURPOSE (read this before touching the regexes):
-This module answers ONE narrow question — "does the approved / known indication
+This module answers ONE narrow question - "does the approved / known indication
 text for this drug explicitly NAME a specific genetic mutation?" (e.g.
 "KRAS G12C-mutated NSCLC", "EGFR exon 19 deletions", "BRAF V600E").
 
@@ -80,7 +80,7 @@ def detect_mutation_specificity(indications_text: str,
       }
 
     A negative result (empty text or no mutation named) returns
-    is_mutation_specific=False with empty matches — this is a disclosure flag, so
+    is_mutation_specific=False with empty matches - this is a disclosure flag, so
     "not detected" must never be read as "confirmed mutation-agnostic".
     """
     parts = [indications_text or ""]

@@ -1,4 +1,4 @@
-# Benchmark v2 — Pre-Registration (committed BEFORE any v2 code or run)
+# Benchmark v2 - Pre-Registration (committed BEFORE any v2 code or run)
 
 Date: 2026-08-01. This document is committed to git before the upgrade package is
 implemented and before any v2 case executes. It exists so that v2's design cannot be
@@ -9,15 +9,15 @@ accused of being tuned to v2's own outcomes.
 v1 was terminated at 13/50 because its genuine misses showed two structural defects
 with perfect consistency, plus a confirmed leakage gap:
 
-- D1: candidate pools too strict (human IC50/Ki, confidence ≥ 8 only) — confirmed drugs
+- D1: candidate pools too strict (human IC50/Ki, confidence ≥ 8 only) - confirmed drugs
   absent from pools even when the correct target was selected.
-- D2: Stage 1 target ranking uses Open Targets genetic association only — misses drugs
+- D2: Stage 1 target ranking uses Open Targets genetic association only - misses drugs
   acting on pathway/metabolic targets rather than genetic drivers.
 - D3: coverage errors (EFO mismatch; OT-zero-genetic-target infections) counted as
   errors instead of being classified.
 - D4: PubMed literature search not sealed against the held-out drug (inflation channel).
 
-## Planned v2 changes (complete list — anything beyond this requires amending this doc)
+## Planned v2 changes (complete list - anything beyond this requires amending this doc)
 
 1. **Tiered evidence pools** (addresses D1). Tier 1 unchanged: human IC50/Ki, conf ≥ 8.
    Tier 2: human EC50/Kd/Potency, conf ≥ 8. Tier 3: any human functional assay,
@@ -43,31 +43,31 @@ with perfect consistency, plus a confirmed leakage gap:
   health/freeze/holdout gates and the same 50-case list (`benchmark-cases-v1`).
 - **One v2 run. No re-rolls.** If v2 produces a poor number, it is published as-is.
 - v1-partial and v2 results are published side-by-side with this document. v2's
-  improvement (if any) is attributed to the four changes above — no silent extras.
+  improvement (if any) is attributed to the four changes above - no silent extras.
 - Chance-rate baseline + exact Poisson-binomial p-values recomputed mechanically,
   same method as v1.
 - The threshold-adjacent sensitivity audit (LLM cap-gate bias) runs on v2 results.
 
-## Amendment 1 (2026-08-01, committed before any v2 code) — case list, framing, dry-run, post-cutoff stratum
+## Amendment 1 (2026-08-01, committed before any v2 code) - case list, framing, dry-run, post-cutoff stratum
 
 5. **Screened case list, target n=35–40** (replaces "same 50-case list"). Inclusion
    criteria are disease/target properties checkable OFFLINE without running the
    pipeline: (a) disease resolves to a specific, non-umbrella EFO/MONDO term;
    (b) ≥1 Open Targets genetically-associated target exists; (c) ≥1 considered target
    has a non-empty ChEMBL pool under the v2 tier definitions. Cases are NEVER selected
-   or excluded based on v1 outcomes — the criteria are property-based and would have
+   or excluded based on v1 outcomes - the criteria are property-based and would have
    excluded v1's error cases regardless of what v1 did. The screen's pass rate on the
    original 50 (and on the wider repoDB universe) is computed and disclosed.
 6. **Headline framing commitment.** The v2 headline number answers "how good is the
    ranking core on funnel-feasible diseases," NOT "how likely is a random new disease
    submission to yield a candidate." Both the screened hit rate AND the funnel-feasibility
-   (screen pass) rate are reported in the same sentence as the headline — not as a
+   (screen pass) rate are reported in the same sentence as the headline - not as a
    footnote. A screened list systematically underrepresents sparse-data, genuinely
    neglected diseases; that scope limitation is stated plainly.
 7. **Pool-forced diagnostic redefined as a v2-funnel dry-run.** The sensitivity
    experiment on v1's archived misses is executed THROUGH the actual registered v2
    code paths (tiered pools with the −0.05/−0.10 penalties, pathway-neighbor
-   augmentation, unchanged deterministic scoring and caps) — not through hand-built
+   augmentation, unchanged deterministic scoring and caps) - not through hand-built
    "best possible" injections. It therefore tests whether the registered v2 design
    converts v1's misses into hits before the real v2 run is spent. It runs offline on
    archived cases, is published as a design-validation sensitivity analysis, and is
@@ -79,7 +79,7 @@ with perfect consistency, plus a confirmed leakage gap:
    and lagged; if too few verifiable cases exist, the attempt and its failure are
    disclosed rather than silently dropped.
 
-## Amendment 2 (2026-08-02, before v2 implementation) — broad evidence architecture, anti-overfit rules
+## Amendment 2 (2026-08-02, before v2 implementation) - broad evidence architecture, anti-overfit rules
 
 The five archived genuine misses are regression fixtures, not the design population. The
 three-source set that recovers them is explicitly a **minimum recovery set for those five**, not
@@ -136,14 +136,14 @@ are reported separately and are not tuned to 5/5. Any change prompted by a fixtu
 expressed as a general rule, receive positive and negative non-fixture controls, and pass broader
 drug-grouped ablation before the fixture is rerun.
 
-## Amendment 3 (2026-08-05, committed before any v2 case executes) — operationalization + supersessions
+## Amendment 3 (2026-08-05, committed before any v2 case executes) - operationalization + supersessions
 
 Registered after the five-miss engineering acceptance passed 5/5 generated / 5/5 mechanistically
 valid (label `engineering_acceptance`, 2026-08-05) and BEFORE the screened list exists, the freeze
 tag exists, or any v2 case runs.
 
 16. **Item 1 (tiered ChEMBL pools) is SUPERSEDED, not silently dropped.** The Amendment-2 union
-    architecture (items 9–12) widened candidate generation beyond ChEMBL IC50/Ki conf ≥ 8 — the
+    architecture (items 9–12) widened candidate generation beyond ChEMBL IC50/Ki conf ≥ 8 - the
     acceptance fixtures generated through drugcentral/europepmc/gtopdb lanes with the ChEMBL
     approved pool at zero. Tiered ChEMBL pools with the −0.05/−0.10 penalties were never
     implemented; D1 is addressed by the union lanes instead. v2's improvement attribution must
@@ -156,7 +156,7 @@ tag exists, or any v2 case runs.
     (c) = non-empty PRODUCTION union pool (`collect_target_candidates`,
     `repurposing_only=True`, default source set) for at least one of the first ≤ 10 gated
     targets. A lookup failure marks a case INDETERMINATE and the screen exits without writing a
-    list — unavailable data is never read as biological absence (item 14). Because the OT helpers
+    list - unavailable data is never read as biological absence (item 14). Because the OT helpers
     return None/[] on transport failure, absence verdicts (unresolved EFO, zero targets, empty
     pool) are accepted ONLY when the source probes healthy at that moment and every contacted
     union provider reports status ok / empty / disabled; anything else is INDETERMINATE (exit 3).
@@ -164,7 +164,7 @@ tag exists, or any v2 case runs.
     (EFO-mismatch, OT-zero-genetic infections); any residual in-run errors are still classified,
     never counted as genuine misses.
 19. **Results separation.** v2 writes `validation/benchmark_results_v2.json`/`.md`; the v1
-    leftover rows in `benchmark_results.json` are never merged — the runner refuses cross-freeze
+    leftover rows in `benchmark_results.json` are never merged - the runner refuses cross-freeze
     resume with exit 2.
 20. **Preflight automation.** `validation/run_v2_preflight.py` chains, idempotently: source
     health probes → the source-ablation control (must complete BEFORE the freeze tag; the
@@ -172,7 +172,7 @@ tag exists, or any v2 case runs.
     `benchmark-freeze-v2` at a clean HEAD. The benchmark-run workflow invokes preflight before
     every (re)start, so the one v2 run cannot begin on degraded sources or an untagged tree.
 
-## Amendment 4 (2026-08-07, committed before the freeze tag exists) — GtoPdb structure-204 tolerance + blessed fingerprint transition
+## Amendment 4 (2026-08-07, committed before the freeze tag exists) - GtoPdb structure-204 tolerance + blessed fingerprint transition
 
 Registered while the source-ablation control was mid-run (38/52 arms persisted), BEFORE the freeze
 tag exists or any v2 case executes.
@@ -180,7 +180,7 @@ tag exists or any v2 case executes.
 21. **GtoPdb ligand-structure HTTP 204 is a data absence, not a source failure.** The
     /ligands/{id}/structure endpoint returns 204 No Content for approved biologics with no
     deposited small-molecule structure (observed: olaratumab 9172, tositumomab 6781,
-    efgartigimod alfa 9777 — none of them a benchmark confirmed drug). Previously a single such
+    efgartigimod alfa 9777 - none of them a benchmark confirmed drug). Previously a single such
     204 raised source-unavailable for the whole target, deterministically poisoning any arm whose
     frozen snapshot contained MS4A1, PDGFRA, or FCGRT (8 of 52 arms could never validate under
     the strict final validation). `data_sources/gtopdb.py` now tolerates 204 on the structure
@@ -194,7 +194,7 @@ tag exists or any v2 case executes.
     new behavior. `run_v2_preflight.py` blesses exactly one fingerprint transition
     (e65a5374477e…), row- AND snapshot-verified again at runtime (a failed, out-of-universe,
     or invalid snapshot is never transitioned); unrecognized drift still discards.
-    Rationale: preserving 38 verified rows (~5 h of healthy compute) without mixing semantics —
+    Rationale: preserving 38 verified rows (~5 h of healthy compute) without mixing semantics -
     a full re-run would produce equivalent rows for all completed arms.
 23. **Stall watchdog (operational, not analytical).** The control was found wedged >1 h in
     row finalization (the post-target reviewer/matching phase), which the per-target 15-minute
@@ -202,7 +202,7 @@ tag exists or any v2 case executes.
     silence and exits 3; the supervisor retries and the harness resumes from its last per-arm
     flush. This changes no data semantics.
 
-## Amendment 5 (2026-08-07, after control+screen completion, before any v2 case executes) — deployment freeze attestation
+## Amendment 5 (2026-08-07, after control+screen completion, before any v2 case executes) - deployment freeze attestation
 
 Registered after the control completed (52/52 arms, 33 hits) and the screen wrote the case list,
 BEFORE the freeze is sealed or any v2 case executes.
@@ -211,7 +211,7 @@ BEFORE the freeze is sealed or any v2 case executes.
     repository, so `git tag benchmark-freeze-v2` cannot be created or verified there. In a
     deployment, the freeze is sealed by `validation/benchmark_freeze_v2_attestation.json`,
     which pins: the pipeline source fingerprint (the same fingerprint the control resume-guard
-    uses — any byte change to fingerprinted pipeline code is drift), the SHA-256 of the
+    uses - any byte change to fingerprinted pipeline code is drift), the SHA-256 of the
     completed control artifact, and the SHA-256 of the screened case list. A published
     deployment is immutable per publish, so redeploying different code necessarily fails the
     attestation check. In a git checkout (dev), the tag path is unchanged and remains
@@ -224,17 +224,17 @@ BEFORE the freeze is sealed or any v2 case executes.
     attestation (fingerprint + both artifact hashes) when git is unavailable, with identical
     refusal semantics (exit 2) to the tag path.
 
-## Amendment 6 (2026-08-08, after control completion, before the production screen/freeze or any v2 case executes) — DrugCentral local-lane snapshot
+## Amendment 6 (2026-08-08, after control completion, before the production screen/freeze or any v2 case executes) - DrugCentral local-lane snapshot
 
 Registered after the control completed (52/52 arms, 33 hits) and BEFORE the production screen
 writes the case list or any v2 case executes. Trigger: a 25+ h full backend outage of the
-DrugCentral DRS API (UNM's own AWS App Runner deployment — app server responsive while its
+DrugCentral DRS API (UNM's own AWS App Runner deployment - app server responsive while its
 backing database hung; the public Postgres instance unmtid-dbs.net:5433 simultaneously
 unreachable). The pre-registered health gate correctly refused to start (exit 4) throughout:
 no case ran, no partial results exist, nothing was contaminated.
 
 27. **Access mode: live API → versioned local snapshot.** Per the standing source-portfolio
-    policy ("Prefer the versioned dump/official API over brittle undocumented endpoints" —
+    policy ("Prefer the versioned dump/official API over brittle undocumented endpoints" -
     production_evidence_source_portfolio.md, DrugCentral row), `data_sources/drugcentral_v2.py`
     now serves every query from `data_sources/drugcentral_2023_snapshot.sqlite`
     (6,115,328 bytes): a two-table extract (`act_table_full` 20,978 rows; `structures`
@@ -245,19 +245,19 @@ no case ran, no partial results exist, nothing was contaminated.
     validation/drugcentral_snapshot_build.json; builder scripts/build_drugcentral_snapshot.py.
 28. **Version identity.** The DRS API queries the public DrugCentral Postgres instance
     (its own source: github.com/unmtransinfo/CFDE_IDG_DRS, app/database.py →
-    postgresql://unmtid-dbs.net:5433/drugcentral) — i.e. the same 2023 release the dump
+    postgresql://unmtid-dbs.net:5433/drugcentral) - i.e. the same 2023 release the dump
     snapshots, and DrugCentral 2023 is the current release per drugcentral.org/download.
     The snapshot is therefore content-identical to what the live API served during the
     control. This is a change of ACCESS MODE, not of data version. Dump integrity is
     pinned three ways: (i) downloader and builder both refuse bytes whose SHA-256 differs
     from the recorded pin; (ii) the parser is fail-closed (COPY field-arity check,
-    required retained columns, strict UTF-8 — no substituted NULLs, no mojibake);
+    required retained columns, strict UTF-8 - no substituted NULLs, no mojibake);
     (iii) content was independently cross-validated: the conformance replay reproduced
     every recorded live-API per-target status (0 mismatches), and a fail-closed rebuild
     produced byte-content-identical tables to the shipped snapshot.
 29. **Query-semantics equivalence.** The local lane (data_sources/drugcentral_local.py)
-    reproduces the API's exact filters — trim(accession)/trim(gene) case-insensitive
-    substring (ILIKE '%x%'), structures.id exact match, empty result → 404 → None —
+    reproduces the API's exact filters - trim(accession)/trim(gene) case-insensitive
+    substring (ILIKE '%x%'), structures.id exact match, empty result → 404 → None -
     verified against the API source and pinned by validation/test_drugcentral_local_lane.py.
     One intentional difference: the live API's intermittent accession-route 500 (a
     server-side bug worked around via the gene fallback) cannot occur locally, so the
@@ -265,8 +265,8 @@ no case ran, no partial results exist, nothing was contaminated.
     snapshot-derived entries never mix.
 30. **Blessed fingerprint transition (one-time).** The change touches fingerprinted pipeline
     code, so the stale-resume guard would otherwise force a full 52-arm re-run. Evidence for
-    blessing instead: (a) the control is COMPLETE (52/52) — no partial row resumes under the
-    new code; (b) conformance replay — every DrugCentral-enabled control target reproduces
+    blessing instead: (a) the control is COMPLETE (52/52) - no partial row resumes under the
+    new code; (b) conformance replay - every DrugCentral-enabled control target reproduces
     its recorded ok/empty per-target source status exactly through the local lane
     (ControlConformanceTest, 0 mismatches); (c) the Amendment-4 runtime row+snapshot
     re-verification executed and passed ("complete and error-free", 52 rows + 13 snapshots).
@@ -275,4 +275,4 @@ no case ran, no partial results exist, nothing was contaminated.
 31. **Data pinning + escape hatch.** The snapshot file and the local-lane module are added
     to the pipeline fingerprint source list, so the freeze attestation pins the dataset
     bytes alongside the code. DRUGCENTRAL_FORCE_LIVE=1 restores live-API mode as a
-    deployment-fixed debugging escape hatch — never to be toggled mid-run.
+    deployment-fixed debugging escape hatch - never to be toggled mid-run.

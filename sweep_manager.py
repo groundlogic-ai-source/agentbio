@@ -91,7 +91,7 @@ def wait_for_candidates(
             except (ValueError, OSError):
                 pass  # file partially written; keep waiting
 
-        # Check if the sweep exited with an error — fail fast rather than timing out.
+        # Check if the sweep exited with an error - fail fast rather than timing out.
         with _lock:
             rc = _proc.poll() if _proc is not None else None
         if rc is not None and rc != 0:

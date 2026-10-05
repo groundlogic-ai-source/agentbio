@@ -6,10 +6,10 @@ chemist mechanism-only pool supplement), how many of v1's 15 absent/unresolved
 confirmed positives would now be reachable?
 
 Two rescue tests per missed positive:
-  universe_rescued  — the drug's ChEMBL mechanism target now appears in the
+  universe_rescued  - the drug's ChEMBL mechanism target now appears in the
                       disease's select_for_disease universe (Path D), with
                       its rank and discovery method recorded
-  pool_rescued      — for biologics: the drug's mechanism target is among the
+  pool_rescued      - for biologics: the drug's mechanism target is among the
                       disease's top-5 selected rows AND the mechanism-only
                       lane returns the drug for that target's UniProt ID
 
@@ -39,7 +39,7 @@ OUT = ROOT / "validation" / "machine_v2_acceptance.json"
 
 K_PRODUCTION = 5  # main_graph TOP_K_TARGETS default
 
-# Bump whenever Path D lane semantics change — stale per-disease rows are
+# Bump whenever Path D lane semantics change - stale per-disease rows are
 # discarded rather than silently compared across machine versions.
 _CACHE_CONFIG = {"lanes": "v2", "sources": "genetic+literature",
                  "max_added": 10}

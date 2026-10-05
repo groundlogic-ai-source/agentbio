@@ -3,7 +3,7 @@ Retrospective validation harness for AgentBio.
 
 Tests whether the EXISTING Biologist -> Chemist -> Reviewer scoring/ranking
 pipeline would surface drug-disease pairs that are ALREADY confirmed real-world
-repurposing successes — run as if the answer were unknown.
+repurposing successes - run as if the answer were unknown.
 
 READ-ONLY: this module imports and drives the live agents unchanged. It does NOT
 modify chemist.py, reviewer.py, target_selection.py, or any scoring logic. If the
@@ -13,7 +13,7 @@ For each ground-truth (drug, disease) entry:
   1. Resolve the disease exactly as a normal manual case does
      (target_selection.select_for_disease), with NO knowledge of the drug.
   2. Run the SAME Biologist -> Chemist -> Reviewer pipeline on the top target
-     (rows[0]) — precisely what the live graph pursues for a manual/blank case.
+     (rows[0]) - precisely what the live graph pursues for a manual/blank case.
   3. The confirmed drug is NOT excluded from ChEMBL/PubChem results.
   4. Record whether the confirmed drug appears in the Reviewer's ranked list, at
      what rank, its composite_score, and whether it reached STRONG_MATCH.
@@ -77,7 +77,7 @@ def _norm_name(s: Any) -> str:
 
 
 def _inchikey_block(ik: Optional[str]) -> Optional[str]:
-    """First (connectivity) block of an InChIKey — matches salts/forms."""
+    """First (connectivity) block of an InChIKey - matches salts/forms."""
     if not ik:
         return None
     return str(ik).split("-")[0]
@@ -182,7 +182,7 @@ def run_case(entry: dict[str, Any]) -> dict[str, Any]:
         "interpretation": None,
     }
 
-    # 1. Target selection (manual mode) — no knowledge of the confirmed drug.
+    # 1. Target selection (manual mode) - no knowledge of the confirmed drug.
     try:
         rows = select_for_disease(disease)
     except DiseaseNotInUniverse as e:

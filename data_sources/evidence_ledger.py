@@ -106,7 +106,7 @@ class ContradictionStatus(str, Enum):
     CONTRADICTS = "contradicts"      # this record disagrees with another
 
 
-# Sentinel for "quality does not apply to this modality" — distinct from 0.0.
+# Sentinel for "quality does not apply to this modality" - distinct from 0.0.
 class _NotApplicable:
     _instance: Optional["_NotApplicable"] = None
 
@@ -126,7 +126,7 @@ NOT_APPLICABLE = _NotApplicable()
 
 
 # ---------------------------------------------------------------------------
-# Wire contract (TypedDict) — what an adapter emits
+# Wire contract (TypedDict) - what an adapter emits
 # ---------------------------------------------------------------------------
 
 class EvidenceRecordDict(TypedDict, total=False):
@@ -297,7 +297,7 @@ class EvidenceRecord:
         # crashed on ``.value`` of a non-enum object in ``source_type`` and
         # on an unhashable dict in a str field).  Coerce once here so that
         # lineage keys, serialization, and set membership downstream can
-        # never crash on malformed adapter output.  (Frozen dataclass — all
+        # never crash on malformed adapter output.  (Frozen dataclass - all
         # assignments go through object.__setattr__.)
         _set = object.__setattr__
         _set(self, "source_type", _coerce_enum(
@@ -324,7 +324,7 @@ class EvidenceRecord:
             if value is None:
                 _set(self, field_name, "")
             elif not isinstance(value, str):
-                # Containers (dict/list/set) are adapter junk — drop them
+                # Containers (dict/list/set) are adapter junk - drop them
                 # rather than stringifying garbage into lineage keys.
                 _set(self, field_name,
                      "" if isinstance(value, (dict, list, set))
@@ -350,10 +350,10 @@ class EvidenceRecord:
         collapses to a single piece of evidence.  Priority order:
 
           1. Explicit ``lineage_id`` (adapter told us).
-          2. Trial id (NCT) — a trial is a trial regardless of who indexed it.
-          3. Label id — a regulatory label is one artifact.
-          4. Assay id (+ target + measurement) — one assay is one datum.
-          5. Publication id (+ target) — one paper's claim about a target.
+          2. Trial id (NCT) - a trial is a trial regardless of who indexed it.
+          3. Label id - a regulatory label is one artifact.
+          4. Assay id (+ target + measurement) - one assay is one datum.
+          5. Publication id (+ target) - one paper's claim about a target.
           6. Fallback: a structural/semantic tuple of the record so that two
              genuinely identical facts still merge, but distinct facts do not.
         """
@@ -602,8 +602,8 @@ def _corroboration_factor(records: list[EvidenceRecord], modalities: set) -> flo
 def _dimension_quality(records: Iterable[EvidenceRecord], modalities: set):
     """Calibrated quality for one dimension, or NOT_APPLICABLE.
 
-    The base is the BEST single calibrated record — one weak record can never
-    drag down a strong one — lifted toward, but never past, 1.0 by independent
+    The base is the BEST single calibrated record - one weak record can never
+    drag down a strong one - lifted toward, but never past, 1.0 by independent
     corroboration across distinct modalities.
 
     Returns NOT_APPLICABLE (distinct from 0.0) when no record contributes to
@@ -655,7 +655,7 @@ def efficacy_confidence(records: Iterable[EvidenceRecord]):
 def safety_confidence(records: Iterable[EvidenceRecord]):
     """Safety-only calibrated confidence (0..1) or NOT_APPLICABLE.
 
-    Kept explicitly SEPARATE from efficacy — the two are never averaged.
+    Kept explicitly SEPARATE from efficacy - the two are never averaged.
     """
     return _dimension_quality(records, _SAFETY_MODALITIES)
 

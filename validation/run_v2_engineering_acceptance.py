@@ -1,5 +1,5 @@
 """
-V2 engineering acceptance runner — the five archived v1 genuine-miss fixtures.
+V2 engineering acceptance runner - the five archived v1 genuine-miss fixtures.
 
 This is a STRICT ENGINEERING HARNESS, not a benchmark and not a production
 ranking.  It exercises the upgraded runtime end-to-end on the five archived v1
@@ -11,7 +11,7 @@ time and unit-tested in validation/test_v2_acceptance.py):
 
   * The run is ALWAYS labelled ``engineering_acceptance``.  It is NEVER
     ``benchmark_v2`` / ``benchmark-freeze-v2``.  Being invoked under the
-    benchmark label — or while a ``benchmark-freeze-v2`` git tag exists — is a
+    benchmark label - or while a ``benchmark-freeze-v2`` git tag exists - is a
     HARD REFUSAL (the acceptance test predates, and must never masquerade as,
     the frozen v2 benchmark).  This module NEVER creates a freeze/tag.
 
@@ -25,7 +25,7 @@ time and unit-tested in validation/test_v2_acceptance.py):
   * Holdout scope (see data_sources/holdout.py):
       - SEALED:   the drug's disease-indication precedent leakage
                   (approved-drug name lists, has_approved / unmet-need signal).
-      - RETAINED: generic target pharmacology — the target's ChEMBL bioactivity
+      - RETAINED: generic target pharmacology - the target's ChEMBL bioactivity
                   pool.  A drug surfacing in an honestly-selected target's
                   IC50/Ki pool is the REDISCOVERY moment this harness measures.
 
@@ -41,7 +41,7 @@ time and unit-tested in validation/test_v2_acceptance.py):
       source providers/lineages, target that generated it, holdout audit /
       unresolved, and per-lane source health.  ``mechanistically_valid`` is
       decided ONLY on the qualified evidence ledger (efficacy / target /
-      mechanism evidence + action-direction compatibility) — NEVER on a bare
+      mechanism evidence + action-direction compatibility) - NEVER on a bare
       name co-mention.
 
 Incremental output: results are flushed to JSON + Markdown after every fixture
@@ -108,7 +108,7 @@ RANK_CONTEXT_LIMIT = 20
 
 # The five archived v1 genuine-miss fixtures (from benchmark_v1_partial_report.md
 # and v2_upgrade_readiness_audit.md).  These are regression fixtures, exactly as
-# archived — never the design population, never tuned against.
+# archived - never the design population, never tuned against.
 #   (drug_name, disease_name)
 FIXTURE_CASES: list[tuple[str, str]] = [
     ("Phenobarbital", "Lennox-Gastaut syndrome"),
@@ -284,7 +284,7 @@ def match_active_moiety(
     reviewed: list[dict[str, Any]],
     confirmed_block: Optional[str],
 ) -> tuple[Optional[int], Optional[dict[str, Any]], Optional[str]]:
-    """Match the confirmed drug into the pipeline output — POST-RUN only.
+    """Match the confirmed drug into the pipeline output - POST-RUN only.
 
     InChIKey connectivity block FIRST (collapses salt/ester/hydrate forms),
     then a conservative name fallback.  Chemist candidates carry the structural
@@ -620,7 +620,7 @@ def run_fixture(drug_name: str, disease_name: str, cap: int) -> dict[str, Any]:
     """Run one fixture: disease-driven pipeline over up to `cap` target rows.
 
     The confirmed `drug_name` is used ONLY (a) to seal holdout (by the caller)
-    and (b) for post-run active-moiety matching here — never in source
+    and (b) for post-run active-moiety matching here - never in source
     collection.
     """
     result: dict[str, Any] = {
@@ -906,7 +906,7 @@ def _strip_case(case: dict[str, Any]) -> dict[str, Any]:
 def _flush(cases: list[dict[str, Any]], fingerprint: str, cap: int,
            generated_at: str, results_json: Optional[str] = None,
            only: Optional[str] = None) -> None:
-    # Resolved at CALL time — see _load_existing.
+    # Resolved at CALL time - see _load_existing.
     results_json = results_json or RESULTS_JSON
     payload = {
         "label": LABEL,

@@ -2,7 +2,7 @@
 Guard tests for the inter-rater scoring harness's output-path isolation.
 
 Sheet fields are untrusted: a crafted participant_id/arm/list_id must never
-let a study artifact escape validation/interrater_results/ — that is the
+let a study artifact escape validation/interrater_results/ - that is the
 protocol's "study results never merge with engineering artifacts" rule,
 enforced at write time. Regression suite for the code-review finding.
 """

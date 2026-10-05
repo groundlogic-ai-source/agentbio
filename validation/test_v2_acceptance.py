@@ -7,7 +7,7 @@ declared in validation/run_v2_engineering_acceptance.py and the pre-registration
 docs:
 
   * The confirmed drug name is NEVER passed to disease-side target selection or
-    to any source-collection call — only to holdout sealing and post-run
+    to any source-collection call - only to holdout sealing and post-run
     matching.
   * `mechanistically_valid` is decided ONLY on qualified efficacy/target/
     mechanism evidence + direction compatibility, never on a name co-mention.
@@ -367,7 +367,7 @@ class DrugNameNeverLeakedTest(unittest.TestCase):
 
     We mock the pipeline and record every argument passed to
     select_for_disease / run_biologist / run_chemist / run_reviewer.  The
-    normalized drug name must not appear in ANY of those arguments — the drug is
+    normalized drug name must not appear in ANY of those arguments - the drug is
     only allowed to reach holdout activation and the post-run PubChem/name match.
     """
 
@@ -420,7 +420,7 @@ class DrugNameNeverLeakedTest(unittest.TestCase):
         norm_drug = R._norm_name(drug)
 
         # select_for_disease (target selection) must be driven by the DISEASE,
-        # never the drug — the single most important leakage seal.
+        # never the drug - the single most important leakage seal.
         self.assertEqual(len(select_spy.calls), 1)
         self.assertNotIn(norm_drug,
                          R._norm_name("".join(select_spy.all_arg_strings())))
@@ -439,7 +439,7 @@ class DrugNameNeverLeakedTest(unittest.TestCase):
             )
 
         # Chemist / reviewer receive the PREVIOUS STAGE'S OUTPUT (which may
-        # legitimately contain the drug as a pool member — that IS the
+        # legitimately contain the drug as a pool member - that IS the
         # rediscovery). The harness must pass those through verbatim and never
         # add the drug name itself as an extra collection argument. So: the only
         # place the drug may appear in chem/rev call args is inside the piped

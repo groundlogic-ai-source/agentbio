@@ -3,7 +3,7 @@
 Rebuilds the candidate pools for the 12 in-scope primary benchmark diseases
 using the production graph semantics (Amendment 2): biologist -> chemist per
 top-K target, `merge_chemist_candidates` union across targets, then ONE
-pooled reviewer pass — the same shape `run_v2_engineering_acceptance.py`
+pooled reviewer pass - the same shape `run_v2_engineering_acceptance.py`
 uses (`pooled_across_k_targets=True`). The v1 draft ran the reviewer per
 target and deduplicated by best composite, which does not reproduce
 production ranks; that code never produced results and was replaced before
@@ -18,7 +18,7 @@ Pre-registered boundaries (triage_discrimination_preregistration.md):
 * **Non-confirmed candidates are never scored as errors.** Absence of
   approval is not evidence of a wrong hypothesis; they are context rows only.
 * **Fail-closed.** Existing results are never regenerated; a disease whose
-  targets did not ALL complete is never profiled from a partial pool —
+  targets did not ALL complete is never profiled from a partial pool -
   it is left for resume.
 * **Freeze-verified.** The Study B freeze manifest (rule fingerprint, v2
   benchmark hash) is checked before any case runs.
@@ -66,7 +66,7 @@ TRIAL_COVERAGE_MIN = float(
 #: Maximum share of openFDA lookups that may fail during a pool build. A
 #: throttled openFDA yields no safety/label evidence for the affected
 #: candidates, which downstream is indistinguishable from a drug that
-#: genuinely has none — the same silent degradation the trial gate blocks.
+#: genuinely has none - the same silent degradation the trial gate blocks.
 SOURCE_ERROR_MAX = float(
     os.environ.get("AGENTBIO_STUDYB_SOURCE_ERROR_MAX", "0.05"))
 
@@ -263,7 +263,7 @@ def _build_pool(disease: str, drugs: list[str], targets_done: dict) -> dict | No
     # Trial-evidence coverage gate. When ClinicalTrials.gov rate-limits, each
     # failed query drops the trial term from that candidate's composite as a
     # coverage gap. The pool still builds and still looks complete, but its
-    # ranks are no longer comparable — not to other diseases' pools, and not
+    # ranks are no longer comparable - not to other diseases' pools, and not
     # even within the pool, where some candidates carry trial evidence and
     # others silently do not. Refuse to finalize; the supervisor retries when
     # the source recovers. (Observed 2026-08-14: two pools finalized at 32%
@@ -287,7 +287,7 @@ def _build_pool(disease: str, drugs: list[str], targets_done: dict) -> dict | No
 
 def _profile_drug(disease: str, drug: str, pool: list[dict],
                   total: int) -> dict:
-    """Profile one drug against one pool — the same fields run_audit emits."""
+    """Profile one drug against one pool - the same fields run_audit emits."""
     deadline = time.monotonic() + 30.0
     chembl_id = None
     try:
@@ -324,7 +324,7 @@ def _acquire_run_lease():
     """Exclusive same-host lease on the runner itself (not just the
     supervisor). Workflow restarts can leave the old process alive; without
     this, two runners load the same checkpoint and double-spend LLM calls.
-    Returns the open fd — the lock is held for the process lifetime."""
+    Returns the open fd - the lock is held for the process lifetime."""
     import fcntl
     fh = open(_LOCK_PATH, "w")
     try:
@@ -336,7 +336,7 @@ def _acquire_run_lease():
 
 
 def main() -> None:
-    _lease = _acquire_run_lease()  # noqa: F841 — held until process exit
+    _lease = _acquire_run_lease()  # noqa: F841 - held until process exit
     if RESULTS_PATH.exists():
         raise SystemExit("[studyb] REFUSED: results exist. Amend, never "
                          "regenerate.")

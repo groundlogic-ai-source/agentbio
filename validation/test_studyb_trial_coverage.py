@@ -1,6 +1,6 @@
 """Study B trial-evidence coverage gate.
 
-A ClinicalTrials.gov 429 storm does not fail a pool build — it silently
+A ClinicalTrials.gov 429 storm does not fail a pool build - it silently
 drops the trial term from individual candidates' composites as a coverage
 gap. The resulting pool looks complete but its ranks are not comparable,
 either across diseases or within the pool itself. These tests pin the

@@ -1,4 +1,4 @@
-# Inter-Rater Study Protocol — AgentBio Audit Mode (v1, frozen 2026-08-04)
+# Inter-Rater Study Protocol - AgentBio Audit Mode (v1, frozen 2026-08-04)
 
 ## Objective
 
@@ -33,8 +33,8 @@ Frozen in `validation/interrater_lists.json` before the first participant:
   2 clean controls, 4 fillers.
 - Ground truth is derived at freeze time by running
   `POST /api/audit/triage` for each list and storing the full response in
-  the list's `ground_truth` block. The frozen responses — not the live
-  pool — are the scoring reference for the entire study.
+  the list's `ground_truth` block. The frozen responses - not the live
+  pool - are the scoring reference for the entire study.
 
 ## Participants
 
@@ -46,11 +46,11 @@ scope of this document.
 
 Per participant per list, via `validation/run_interrater_scoring.py`:
 
-- **Primary: seeded-trap recall** — fraction of seeded deception items the
+- **Primary: seeded-trap recall** - fraction of seeded deception items the
   participant correctly flags (assisted arm is expected to approach the
   trap-benchmark recall; unassisted arm is the honest baseline).
-- **Secondary: false-flag rate** — flags raised on clean controls.
-- **Secondary: time-to-verdict** — minutes per list.
+- **Secondary: false-flag rate** - flags raised on clean controls.
+- **Secondary: time-to-verdict** - minutes per list.
 
 ## Analysis and reporting rules
 

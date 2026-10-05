@@ -1,8 +1,8 @@
-"""Build the EXPANDED negative-control case set — OFFLINE and deterministic.
+"""Build the EXPANDED negative-control case set - OFFLINE and deterministic.
 
 Companion to build_triage_discrimination_cases.py (the frozen v2 set). The
 v2 controls (15+15) passed, but at n≈15 the Wilson lower bound on the
-detection rate is ~0.74 — too weak to reassure a reviewer. This expansion
+detection rate is ~0.74 - too weak to reassure a reviewer. This expansion
 draws up to 60+60 fresh controls from the same enriched repoDB snapshot
 under identical selection rules, EXCLUDING every drug already used anywhere
 in the v2 case set, so the two generations pool into one larger independent
@@ -11,7 +11,7 @@ runner asserts that before pooling).
 
 Discipline: same offline determinism as v2 (same seed, same enriched CSV,
 same dev-suite/QC exclusions). Never rebuilds: once scored expansion
-results exist, this builder refuses — frozen artifacts are amended, never
+results exist, this builder refuses - frozen artifacts are amended, never
 regenerated.
 """
 from __future__ import annotations
@@ -93,7 +93,7 @@ def build() -> dict:
             "drug_name": r["drug_name"].strip(),
             "ind_name": r["ind_name"].strip(),
             "ind_id": r["ind_id"].strip(),
-            # selection/stratification metadata only — never scored evidence
+            # selection/stratification metadata only - never scored evidence
             "sel_molecule_type": r["chembl_molecule_type"].strip(),
             "sel_oral": r["chembl_oral"].strip(),
             "sel_xlogp": r["pubchem_xlogp"].strip(),

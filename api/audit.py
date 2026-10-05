@@ -3,8 +3,8 @@ Candidate audit: look up where a specific drug stands in AgentBio's
 reviewed_candidates pool for a given disease.
 
 Used by:
-  • Part A — the user-facing /api/audit endpoint
-  • Part B — the validation script (imports run_audit() directly, same code path)
+  • Part A - the user-facing /api/audit endpoint
+  • Part B - the validation script (imports run_audit() directly, same code path)
 
 Design: purely functional. No second explanation path that can drift from the
 live reports. Cap fields are the exact same fields the writer reads.
@@ -384,7 +384,7 @@ def _modality_payload(drug_name: str) -> dict[str, Any]:
     """Modality fields for a drug, via the cached ChEMBL lookup.
 
     Applies to the DRUG, not the indication, so it is attached on every audit
-    path — including early returns where no case or candidate pool exists.
+    path - including early returns where no case or candidate pool exists.
     Unresolved lookups are stated, never silently "clear".
     """
     mol = get_molecule_data(drug_name)
@@ -436,13 +436,13 @@ def run_audit(
     """
     Core audit function. Returns a structured dict. Status values:
 
-      "found"         — drug present in pool; full breakdown included
-      "absent"        — drug absent; target-mismatch explanation included
-      "unresolved"    — drug name could not be resolved to any ChEMBL molecule
-                        (typo / brand name / unindexed) — NOT evidence of absence
-      "no_case"       — no finished job with a reusable candidate pool for this
+      "found"         - drug present in pool; full breakdown included
+      "absent"        - drug absent; target-mismatch explanation included
+      "unresolved"    - drug name could not be resolved to any ChEMBL molecule
+                        (typo / brand name / unindexed) - NOT evidence of absence
+      "no_case"       - no finished job with a reusable candidate pool for this
                         disease
-      "no_candidates" — job exists but candidates file unavailable (pre-persistence)
+      "no_candidates" - job exists but candidates file unavailable (pre-persistence)
     """
     if source_deadline_monotonic is None:
         source_deadline_monotonic = time.monotonic() + 30.0
@@ -532,7 +532,7 @@ def run_audit(
 
     elif chembl_id is None:
         # The queried name could not be resolved to any ChEMBL molecule. This
-        # is NOT evidence of absence — likely a typo, brand name, or compound
+        # is NOT evidence of absence - likely a typo, brand name, or compound
         # ChEMBL doesn't index. Returning "absent" here would be a false
         # authoritative claim, so it gets its own honest status.
         result = {
@@ -548,7 +548,7 @@ def run_audit(
         }
 
     else:
-        # Drug absent — compare its stable mechanism identity with every target
+        # Drug absent - compare its stable mechanism identity with every target
         # represented in the persisted pool. This is supplied-drug evidence
         # review only: it cannot insert the drug or assign a score/rank.
         selected_target = top.get("target_symbol") if top else None
@@ -598,7 +598,7 @@ def run_audit(
             **diagnostics,
         }
 
-    # 5. Narrate with Opus 4.8 — strictly the computed numbers, no new claims.
+    # 5. Narrate with Opus 4.8 - strictly the computed numbers, no new claims.
     # Unresolved queries skip the LLM: there are no facts to narrate, and a
     # generated paragraph would only risk implying the name was evaluated.
     if result["status"] == "unresolved":

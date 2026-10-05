@@ -1,4 +1,4 @@
-# Audit Claim-Set v1 — Construction Protocol (locked before claim selection)
+# Audit Claim-Set v1 - Construction Protocol (locked before claim selection)
 
 **Status:** LOCKED 2026-08-10, before any claim is selected or any real claim is
 run through the audit path.
@@ -56,15 +56,15 @@ that will detect the defect:
   ground truth.
 - **N1** candidates: a fixed list of ten well-known FDA-approved fixed-dose
   combinations declared in the construction script. *(Amendment A, 2026-08-10,
-  before any claim was constructed: the originally declared enumeration source —
-  repoDB rows whose drug name contains `+` — is empty in the committed dataset,
+  before any claim was constructed: the originally declared enumeration source -
+  repoDB rows whose drug name contains `+` - is empty in the committed dataset,
   so it cannot enumerate anything. The substitute list is enumerated from domain
   knowledge, NOT from the openFDA audit lane; each candidate's combination
   status is then verified against the raw FDA label artifact per §4, and any
   candidate that fails verification is excluded and logged.)*
 - **N2** candidates: enriched-dataset rows with non-small-molecule
-  `chembl_molecule_type` (antibody/protein/enzyme — excluded from the discovery
-  benchmark by criterion E1 — reused here).
+  `chembl_molecule_type` (antibody/protein/enzyme - excluded from the discovery
+  benchmark by criterion E1 - reused here).
 - **N3** candidates: preclinical tool compounds (no INN/USAN approval) with
   literature evidence against the pool targets NR3C1 / RET / ADRB2, verified
   absent from repoDB and from the pinned DrugCentral 2023 snapshot.
@@ -83,14 +83,14 @@ artifact, never against AgentBio's parsed envelopes:
 - **chembl_mechanism / chembl_molecule:** live ChEMBL records, citing the live
   release. *(Amendment B, 2026-08-10, before any claim was constructed: the
   release date is read mechanically from ChEMBL's own `status.json`
-  (`chembl_release_date`), which is part of the release artifact itself — no
+  (`chembl_release_date`), which is part of the release artifact itself - no
   hand-maintained date map. The citation is valid iff that self-reported date
   is strictly before the cutoff; at the freeze the live release is ChEMBL_37,
   released 2026-05-01.)*
 - **europe_pmc:** publication metadata (publication date, publication type).
   Valid only if dated strictly before the cutoff and not a review/editorial.
 - **drugcentral_2023 / repodb:** committed, dated, hash-pinned offline
-  datasets — valid by construction.
+  datasets - valid by construction.
 
 A claim whose citation cannot be verified at construction is EXCLUDED and
 recorded in the construction log with the reason. No claim is substituted
@@ -124,8 +124,8 @@ abstention counts. Source failure states (`degraded`, `parse_failed`,
 `unavailable`) on a claim's relevant lane make the claim an ABSTENTION:
 not counted as caught, not counted as a miss; reported per class. (The
 registered denominators assume no abstentions; both eligible-denominator
-metrics and the conservative fixed-denominator view — abstentions counted as
-not-caught — are reported. PASS is judged on the registered rule
+metrics and the conservative fixed-denominator view - abstentions counted as
+not-caught - are reported. PASS is judged on the registered rule
 `caught/eligible` for recall ≥ 0.80 with Clopper–Pearson lower 95% ≥ 0.65 and
 false-flag ≤ 0.15 with upper 95% ≤ 0.30; if abstentions exceed 10% of a group
 the study reports INVALID-DATA rather than PASS/FAIL.)

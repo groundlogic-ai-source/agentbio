@@ -1,5 +1,5 @@
 """
-Target Selection Agent — Stage 1 of the drug-repurposing pipeline.
+Target Selection Agent - Stage 1 of the drug-repurposing pipeline.
 
 Scoring is purely numeric (no LLM). A single LLM call is made at the end
 to narrate the top 5 candidates using only numbers already in the table.
@@ -49,12 +49,12 @@ TOP_TARGETS_PER_DISEASE = 5
 # --- Machine-v2 pathway-neighbor universe lane (2026-08-20) -----------------
 # Study C v1 miss autopsy: 11/22 confirmed positives were unscoreable because
 # the known drug's mechanism target never entered the disease's candidate
-# target UNIVERSE (rescued_at_k = 0 even at K=25 — the wall is upstream of the
+# target UNIVERSE (rescued_at_k = 0 even at K=25 - the wall is upstream of the
 # top-K gate). Path D expands the universe with Reactome pathway neighbors of
 # the leading drug-FREE targets (genetic + literature lanes only; expanding
 # from pharmacological-precedent targets would make the lane drug-derived).
-# Neighbors carry a fixed association score of 0.05 — half the 0.1 genetic
-# gate — so they rank below direct targets of comparable tractability. Rank
+# Neighbors carry a fixed association score of 0.05 - half the 0.1 genetic
+# gate - so they rank below direct targets of comparable tractability. Rank
 # stays score-governed: a highly tractable neighbor MAY outrank a weakly
 # tractable direct target; that is intended, the lane handicaps, it does not
 # subordinate. Disease-blind: only protein co-participation is used, never
@@ -93,7 +93,7 @@ def _load_weight_overrides(env_var: str, defaults: dict,
     warning is printed: non-default weights make scores incomparable to the
     frozen benchmark, and the override is stamped into the reviewer payload
     (scoring_config_overridden) so every dossier discloses it.
-    Import-time parsing must NEVER raise — a bad value must not take down
+    Import-time parsing must NEVER raise - a bad value must not take down
     API startup.
     """
     raw = os.environ.get(env_var)
@@ -196,7 +196,7 @@ def compute_unmet_need_score(
     prevalence: Optional[float],
 ) -> float:
     """
-    unmet_need_score — graceful degradation formula:
+    unmet_need_score - graceful degradation formula:
 
       treatment_component:
         True  (approved treatment exists) → 0.0  (already served, low unmet need)
@@ -205,7 +205,7 @@ def compute_unmet_need_score(
 
       prevalence_component (secondary, 0–1, log-scaled per million):
         Only added when real prevalence data is available. Its absence does NOT
-        collapse the score to a constant — the treatment signal is used alone.
+        collapse the score to a constant - the treatment signal is used alone.
 
       Weighting:
         - Both signals present:  score = 0.7 * treatment + 0.3 * prevalence
@@ -220,13 +220,13 @@ def compute_unmet_need_score(
     elif has_approved_treatment is False:
         treatment_component = 1.0
     else:
-        treatment_component = 0.5  # unknown — flag for manual review
+        treatment_component = 0.5  # unknown - flag for manual review
 
     if prevalence and prevalence > 0:
         prevalence_component = min(1.0, math.log1p(prevalence) / math.log1p(1_000_000))
         score = 0.7 * treatment_component + 0.3 * prevalence_component
     else:
-        # No prevalence data — rely entirely on the treatment signal
+        # No prevalence data - rely entirely on the treatment signal
         score = treatment_component
 
     return round(score, 4)
@@ -476,8 +476,8 @@ def _efo_name_overlap(queried: str, efo_id: str) -> Optional[float]:
     Compute the token overlap between the queried disease name and OT's own
     canonical name for the resolved EFO node.
 
-    Returns a float in [0, 1] — the fraction of meaningful query tokens that
-    appear in the OT canonical name — or None if the OT name is unavailable
+    Returns a float in [0, 1] - the fraction of meaningful query tokens that
+    appear in the OT canonical name - or None if the OT name is unavailable
     (API failure or unknown EFO).
 
     Cached indirectly: get_ot_canonical_disease_name has a 30-day cache so
@@ -509,7 +509,7 @@ def _efo_xref_confirms_orphanet(efo_id: str, orpha_code: Any) -> bool:
 
     The name-overlap hard stop below is a string heuristic. It cannot separate
     "the EFO lookup landed on a different disease" from "the same disease is
-    named differently in the two ontologies" — the latter being routine in rare
+    named differently in the two ontologies" - the latter being routine in rare
     disease nomenclature, where Orphanet often carries a descriptive name and
     EFO/MONDO an eponym or classification name. ORPHA:88660 is the worked
     example: Orphanet calls it "Hypertension due to gain-of-function mutations
@@ -530,7 +530,7 @@ def _efo_xref_confirms_orphanet(efo_id: str, orpha_code: Any) -> bool:
     rejected, so in production it is purely permissive. But "admits more" is
     still a behaviour change, and the frozen v1 benchmark contains two rows
     (Trichinellosis/Prednisone and Trichinellosis/Triamcinolone) that were
-    recorded as `status="error"` precisely because this hard stop fired —
+    recorded as `status="error"` precisely because this hard stop fired -
     Orphanet's "Trichinellosis" against OT's "trichinosis", the same
     zero-shared-token synonym problem. Letting the xref admit those pairs would
     make the frozen artifacts non-reproducible from current code. So frozen and
@@ -545,7 +545,7 @@ def _efo_xref_confirms_orphanet(efo_id: str, orpha_code: Any) -> bool:
         return False
     try:
         xref = get_disease_orphanet_code(efo_id)
-    except Exception:  # noqa: BLE001 — a lookup failure must never open the gate
+    except Exception:  # noqa: BLE001 - a lookup failure must never open the gate
         return False
     return bool(xref) and str(xref).strip() == str(orpha_code).strip()
 
@@ -556,8 +556,8 @@ def _efo_name_mismatch_warning(queried: str, efo_id: str) -> Optional[str]:
     when the overlap is in the partial-mismatch band (0 < overlap < 0.5).
 
     Returns None when:
-      - overlap >= 0.5      (names sufficiently aligned — no warning needed)
-      - overlap == 0.0      (hard mismatch — caller must raise / skip, not warn)
+      - overlap >= 0.5      (names sufficiently aligned - no warning needed)
+      - overlap == 0.0      (hard mismatch - caller must raise / skip, not warn)
       - OT name unavailable (can't evaluate)
 
     The split between hard-stop (0%) and warn (0–50%) is intentional:
@@ -572,7 +572,7 @@ def _efo_name_mismatch_warning(queried: str, efo_id: str) -> Optional[str]:
     overlap = _efo_name_overlap(queried, efo_id)
     if overlap is None or overlap >= _EFO_WARN_THRESHOLD or overlap <= _EFO_HARD_STOP_THRESHOLD:
         return None
-    ot_name = get_ot_canonical_disease_name(efo_id)  # cached — free second call
+    ot_name = get_ot_canonical_disease_name(efo_id)  # cached - free second call
     msg = (
         f"**EFO RESOLUTION MISMATCH — verify disease mapping independently.** "
         f"The queried disease '{queried}' was resolved to EFO/MONDO ID `{efo_id}`, "
@@ -657,7 +657,7 @@ def _match_disease(query: str, candidates: list[dict[str, Any]]) -> Optional[dic
             if _norm(d.get(key)) == q:
                 return d
 
-    # 3. unique substring on name — exclude OBSOLETE entries (high false-positive risk)
+    # 3. unique substring on name - exclude OBSOLETE entries (high false-positive risk)
     substring_hits = [
         d for name_key, d in by_name.items()
         if q in name_key and not name_key.startswith("obsolete")
@@ -670,7 +670,7 @@ def _match_disease(query: str, candidates: list[dict[str, Any]]) -> Optional[dic
 
 def _v2_lanes_disabled() -> bool:
     """Kill switch restoring machine-v1 semantics (mirrors the helper in
-    agents/chemist.py — keep both reading the same env var)."""
+    agents/chemist.py - keep both reading the same env var)."""
     return os.environ.get("AGENTBIO_DISABLE_V2_LANES", "").strip() == "1"
 
 
@@ -683,7 +683,7 @@ def _expand_pathway_neighbors(
     Expands from the first PATHWAY_NEIGHBOR_MAX_SOURCES targets discovered by
     drug-FREE lanes (PATHWAY_NEIGHBOR_SOURCE_METHODS: genetic association and
     literature mechanism class), skipping the broad_metabolic tier
-    (shared-substrate groupings are not mechanism evidence — see
+    (shared-substrate groupings are not mechanism evidence - see
     data_sources/reactome.py calibration). Neighbors are deduped by UniProt,
     capped at PATHWAY_NEIGHBOR_MAX_ADDED, and tagged
     target_discovery_method="pathway_neighbor" with provenance metadata.
@@ -831,7 +831,7 @@ def preflight_for_disease(query: str) -> list[dict[str, Any]]:
         for row in rows:
             symbol = str(row.get("target_symbol") or "").upper()
             row["positional_association_risk"] = risk.get(symbol, {})
-    except Exception as e:  # noqa: BLE001 — disclosure must never break preflight
+    except Exception as e:  # noqa: BLE001 - disclosure must never break preflight
         print(f"[target_selection] WARNING: positional-association check "
               f"failed: {e}")
         for row in rows:
@@ -855,8 +855,8 @@ def select_for_disease(
     forces a 15-60 min re-sweep on the next blank run.
 
     Raises:
-        DiseaseNotInUniverse — the query is not a rare/neglected disease we cover.
-        RuntimeError         — the disease is in-universe but has no Open Targets
+        DiseaseNotInUniverse - the query is not a rare/neglected disease we cover.
+        RuntimeError         - the disease is in-universe but has no Open Targets
                                EFO mapping or no associated targets to score.
     """
     chembl_enabled = (
@@ -935,13 +935,13 @@ def select_for_disease(
 
     # Hard-stop check: if OT's own canonical name for the resolved EFO shares
     # zero tokens with the Orphanet official name (disease_name), the EFO lookup
-    # landed on the wrong disease entirely.  A Limitations bullet is not enough —
+    # landed on the wrong disease entirely.  A Limitations bullet is not enough -
     # proceeding would produce a report about a different disease.
     #
     # WHY disease_name, not query: the Orphanet official name is what was actually
     # sent to OT's search API.  User queries are aliases (e.g. "Pompe disease"),
     # and their common names often differ from OT's canonical name even when the
-    # disease is correct — zero token overlap between an alias and the OT name is
+    # disease is correct - zero token overlap between an alias and the OT name is
     # expected and is NOT a mismatch.  Comparing the Orphanet official name
     # against the OT canonical name is the right fidelity check.
     #
@@ -976,7 +976,7 @@ def select_for_disease(
             f"it cannot be processed by this pipeline."
         )
 
-    # FIX 1 — real approved-treatment status from OT knownDrugs
+    # FIX 1 - real approved-treatment status from OT knownDrugs
     drug_info = get_disease_known_drugs(efo_id)
     has_approved: Optional[bool] = drug_info.get("has_approved_treatment")
     approved_drug_names: list = drug_info.get("approved_drug_names", [])
@@ -984,7 +984,7 @@ def select_for_disease(
     # BENCHMARK HOLDOUT: redact the held-out drug from the approved-names list
     # before it feeds precedent target discovery OR unmet-need scoring. If the
     # held-out drug was the only approved treatment, the blind world has no
-    # approved therapy — flip has_approved accordingly.
+    # approved therapy - flip has_approved accordingly.
     if _holdout.is_active() and approved_drug_names:
         approved_drug_names = redact_holdout_names(approved_drug_names)
         if not approved_drug_names and has_approved is True:
@@ -1006,7 +1006,7 @@ def select_for_disease(
     # new targets found are tagged "pharmacological_precedent_via_parent_umbrella"
     # so they are auditable and distinguishable from a direct subtype-level match.
     #
-    # The umbrella-scoring guard (above) is untouched — umbrella terms still cannot
+    # The umbrella-scoring guard (above) is untouched - umbrella terms still cannot
     # be selected as the disease for genetic-association ranking.  This supplement is
     # for drug-indication lookup only.
     umbrella_approved_drug_names: list = []
@@ -1018,7 +1018,7 @@ def select_for_disease(
             continue
         # Breadth filter: skip parents that aggregate too many descendant diseases
         # to yield disease-specific pharmacological signals.  Fail-closed on API
-        # error (None) — skip the supplement rather than allow an unverified
+        # error (None) - skip the supplement rather than allow an unverified
         # parent to contribute false-positive targets.
         _desc_count = get_disease_descendant_count(_parent_efo)
         if _desc_count is None or _desc_count > PARENT_MAX_DESCENDANTS:
@@ -1034,7 +1034,7 @@ def select_for_disease(
             continue
         _parent_drugs = get_disease_known_drugs(_parent_efo)
         _parent_names = _parent_drugs.get("approved_drug_names", [])
-        # Benchmark holdout applies to parent-umbrella names too — the held-out
+        # Benchmark holdout applies to parent-umbrella names too - the held-out
         # drug must not re-enter via an umbrella EFO's approval list.
         if _holdout.is_active() and _parent_names:
             _parent_names = redact_holdout_names(_parent_names)
@@ -1067,7 +1067,7 @@ def select_for_disease(
 
     # ot_treatment_unconfirmed: True when has_approved is still False after both
     # the specific-EFO and parent-umbrella checks, AND the disease name carries a
-    # legacy numbered or DYT-style designation — a common signal that OT may be
+    # legacy numbered or DYT-style designation - a common signal that OT may be
     # using a different/newer name and the drug link is simply absent from its data.
     ot_treatment_unconfirmed = (
         has_approved is False
@@ -1082,7 +1082,7 @@ def select_for_disease(
             f"verify treatment status independently."
         )
 
-    # FIX 3 — best-effort prevalence from Orphadata epidemiology
+    # FIX 3 - best-effort prevalence from Orphadata epidemiology
     orpha_code = disease.get("orpha_code")
     prevalence: Optional[float] = None
     if orpha_code:
@@ -1090,13 +1090,13 @@ def select_for_disease(
 
     targets = get_target_disease_score(efo_id)
 
-    # Path A — genetic associations from Open Targets (gate: association_score >= 0.1)
+    # Path A - genetic associations from Open Targets (gate: association_score >= 0.1)
     genetic_targets = [
         {**t, "target_discovery_method": "genetic_association"}
         for t in targets if t.get("association_score", 0.0) >= 0.1
     ][:TOP_TARGETS_PER_DISEASE]
 
-    # Path B — pharmacological precedent: approved-drug MOA targets from ChEMBL.
+    # Path B - pharmacological precedent: approved-drug MOA targets from ChEMBL.
     # Uses approved_drug_names already fetched from OT (avoids EFO/MONDO format issues).
     # Only adds targets not already covered by the OT genetic pool (dedup by UniProt ID).
     pharm_targets = (
@@ -1111,7 +1111,7 @@ def select_for_disease(
         if t.get("uniprot_id") and t.get("uniprot_id") not in seen_uniprots
     ]
 
-    # Path B-ext — pharmacological precedent via parent umbrella EFO.
+    # Path B-ext - pharmacological precedent via parent umbrella EFO.
     # Only runs when the specific subtype had no approved-drug links and a parent
     # umbrella EFO did (umbrella_approved_drug_names populated above).
     if umbrella_approved_drug_names:
@@ -1137,7 +1137,7 @@ def select_for_disease(
 
     top_targets = genetic_targets + new_pharm
 
-    # Path C — disease-process / mechanism-class targets from Europe PMC.
+    # Path C - disease-process / mechanism-class targets from Europe PMC.
     # This lane is disease-only, holdout-aware, and never queries a drug name.
     # It widens the mechanism object beyond single causal proteins (e.g.
     # channel families, mitotic spindle, nucleotide metabolism).
@@ -1204,7 +1204,7 @@ def select_for_disease(
         )
     top_targets = top_targets + process_targets
 
-    # Path D — pathway-neighbor universe expansion (machine v2). Appended
+    # Path D - pathway-neighbor universe expansion (machine v2). Appended
     # after the literature mechanism-class lane so neighbors are scored and
     # ranked by the same _score_pair formula as every direct target.
     top_targets = _expand_pathway_neighbors(top_targets, log=_log)
@@ -1280,7 +1280,7 @@ def _enrich_approved_via_parents(
     parent-umbrella supplement so the two paths stay consistent.
 
     Called by both the sweep (run()) and manual-mode (select_for_disease) paths
-    to ensure has_approved_treatment — and therefore unmet_need_score — reflects
+    to ensure has_approved_treatment - and therefore unmet_need_score - reflects
     parent-level drug-indication data, not just the specific-subtype EFO.
 
     Returns:
@@ -1333,7 +1333,7 @@ def _score_pair(
     """
     Compute all raw numbers and both scores for one (disease, target) pair.
 
-    FIX 4 — tractability_score is multiplied by the OT association_score (0–1)
+    FIX 4 - tractability_score is multiplied by the OT association_score (0–1)
     so targets with weak disease-specificity (e.g. broad oncology targets that
     appear in a rare-disease association list with score 0.2) are discounted
     relative to targets with strong, disease-specific evidence.
@@ -1474,8 +1474,8 @@ def select_source_diverse_targets(
     return [row for row in ranked if id(row) in selected_ids][:cap]
 
 
-# ── F2 — precedent calibration (pre-registered constants; see
-# validation/f2_precedent_calibration_justification.md — do not tune per case) ──
+# ── F2 - precedent calibration (pre-registered constants; see
+# validation/f2_precedent_calibration_justification.md - do not tune per case) ──
 
 #: A precedent-only target may not outrank the best genetic target whose OT
 #: association meets this threshold (Open Targets' moderate-association boundary).
@@ -1493,7 +1493,7 @@ def _tag_umbrella_precedent(t: dict[str, Any]) -> dict[str, Any]:
 
     The umbrella import is indication-adjacent (approval for a parent disease
     concept), a strictly weaker claim than a direct disease-specific approval
-    link — so it scores PHARM_PRECEDENT_UMBRELLA_ASSOC_SCORE (0.70), not the
+    link - so it scores PHARM_PRECEDENT_UMBRELLA_ASSOC_SCORE (0.70), not the
     direct-precedent 0.90 stamped by the ChEMBL lookup.
     """
     return {
@@ -1515,7 +1515,7 @@ def _apply_mechanistic_convergence_cap(
     flagged ``precedent_capped=True`` for dossier disclosure, keep their
     relative order, and are inserted immediately after the best qualifying
     genetic row. When no qualifying genetic target exists (non-monogenic or
-    genetically unmapped indications), precedent still decides — rows are
+    genetically unmapped indications), precedent still decides - rows are
     returned untouched. ``rows`` must be pre-sorted best-first.
     """
     best_genetic_idx = next(
@@ -1594,7 +1594,7 @@ def _narrate_top5(top5: list[dict[str, Any]]) -> str:
         message = call_with_backoff(
             lambda: client.messages.create(
                 model="claude-sonnet-4-6", max_tokens=512,
-                # temperature omitted — this SDK/model combination rejects the
+                # temperature omitted - this SDK/model combination rejects the
                 # kwarg outright, even at 0. See data_prep/llm_clients.py.
                 messages=[{"role": "user", "content": prompt}]),
             label="target-selection-narration", provider="anthropic",
@@ -1671,7 +1671,7 @@ def run() -> None:
 
         # Post-resolution EFO name sanity check (sweep mode).
         # Compute overlap once; skip the entire disease on a 0% hard mismatch
-        # (wrong OT node — scoring would reflect the wrong biology).
+        # (wrong OT node - scoring would reflect the wrong biology).
         # Attach a Limitations warning for partial mismatches (0 < overlap < 0.5).
         _sweep_overlap = _efo_name_overlap(disease_name, efo_id)
         if (
@@ -1688,7 +1688,7 @@ def run() -> None:
             continue
         _sweep_mismatch_warn = _efo_name_mismatch_warning(disease_name, efo_id)
 
-        # FIX 1 — real approved-treatment status from OT knownDrugs
+        # FIX 1 - real approved-treatment status from OT knownDrugs
         drug_info = get_disease_known_drugs(efo_id)
         has_approved: Optional[bool] = drug_info.get("has_approved_treatment")
         approved_drug_names: list = drug_info.get("approved_drug_names", [])
@@ -1720,7 +1720,7 @@ def run() -> None:
                 f"legacy numbered classification; verify treatment status independently."
             )
 
-        # FIX 3 — best-effort prevalence from Orphadata epidemiology
+        # FIX 3 - best-effort prevalence from Orphadata epidemiology
         orpha_code = disease.get("orpha_code")
         prevalence: Optional[float] = None
         if orpha_code:
@@ -1728,7 +1728,7 @@ def run() -> None:
 
         targets = get_target_disease_score(efo_id)
 
-        # FIX 4 — gate: drop targets with association_score < 0.1
+        # FIX 4 - gate: drop targets with association_score < 0.1
         top_targets = [
             t for t in targets if t.get("association_score", 0.0) >= 0.1
         ][:TOP_TARGETS_PER_DISEASE]
@@ -1765,7 +1765,7 @@ def run() -> None:
 
     scored_pairs.sort(key=lambda x: (x["tractability_score"] + x["unmet_need_score"]), reverse=True)
     # F2 mechanistic-convergence cap. The sweep scores genetic targets only, so
-    # this is currently a no-op here — applied in both paths per the F2 document
+    # this is currently a no-op here - applied in both paths per the F2 document
     # so any future precedent rows in the sweep are capped consistently.
     scored_pairs = _apply_mechanistic_convergence_cap(scored_pairs, log=_log)
     top30 = scored_pairs[:TOP_N]

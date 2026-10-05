@@ -13,7 +13,7 @@
 |---|---|---|---|
 | Defect recall | 32/60 = 0.533 (95% CI 0.400–0.663), CP lower 0.420 | ≥ 0.80, lower ≥ 0.65 | NO |
 | Control false-flag | 7/40 = 0.175 (95% CI 0.073–0.328), CP upper 0.304 | ≤ 0.15, upper ≤ 0.30 | NO |
-| Novel-class recall | 29/30 = 0.967 (95% CI 0.828–0.999) | none (registered) | — |
+| Novel-class recall | 29/30 = 0.967 (95% CI 0.828–0.999) | none (registered) | - |
 
 ## Source ablation (pre-freeze control, 13 development cases × 4 conditions)
 

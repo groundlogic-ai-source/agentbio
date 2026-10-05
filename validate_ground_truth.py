@@ -11,7 +11,7 @@ Checks five canonical drug-repurposing cases against the live pipeline:
     - metformin  / PCOS              (off-label; no FDA approval for PCOS)
     - propranolol / infantile hemangioma  (disease outside Orphanet/NTD universe)
 
-Settings (frozen — code is not changed by this script):
+Settings (frozen - code is not changed by this script):
   REPURPOSING_ONLY = True
   TOP_K_TARGETS    = 5   (PATHWAY_NEIGHBOR_MIN_APPROVED=3 via env/default)
   TOP_K_FRACTION   = 0.0 (disabled)
@@ -155,9 +155,9 @@ def run_scored_case(disease_query: str,
     primary target (with lazy expansion), and classify the result.
 
     Classification:
-      HIT                      — expected_drug found in the approved pool
-      MISS_MECHANISM_CLASS_MATCH — drug not found but mechanism-class siblings are
-      MISS                     — neither specific drug nor class found
+      HIT                      - expected_drug found in the approved pool
+      MISS_MECHANISM_CLASS_MATCH - drug not found but mechanism-class siblings are
+      MISS                     - neither specific drug nor class found
     """
     print(f"\n{'='*72}")
     print(f"  SCORED CASE: {expected_drug} / {disease_query}")

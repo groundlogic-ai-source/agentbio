@@ -1,5 +1,5 @@
 """
-Inter-rater study scoring harness — scores one participant's verdict sheet
+Inter-rater study scoring harness - scores one participant's verdict sheet
 against the frozen ground truth in validation/interrater_lists.json.
 
 Pre-registered in validation/interrater_study_protocol.md (v1, 2026-08-04).

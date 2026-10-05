@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# export_public_repo.sh — build the sanitized public mirror of this repo.
+# export_public_repo.sh - build the sanitized public mirror of this repo.
 #
 # Strips internal-only paths and oversized raw archives from ALL history while
 # preserving commit dates, messages, authors, and tags. File contents are

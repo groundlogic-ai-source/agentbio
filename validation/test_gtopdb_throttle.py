@@ -3,7 +3,7 @@
 A reviewer pass over a large candidate pool fans out to GtoPdb once per
 (candidate, target). Unthrottled that draws sustained HTTP 429s, and because
 those land in candidate_source_coverage.failures they block report persistence
-for the entire run — observed live on 2026-09-24, where a 210-candidate
+for the entire run - observed live on 2026-09-24, where a 210-candidate
 NR3C2 pool left 94 candidates with incomplete coverage and no dossier.
 """
 from __future__ import annotations

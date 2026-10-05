@@ -143,7 +143,7 @@ def _ctgov_count(params: dict[str, str]) -> Optional[int]:
         resp = provider_request_policy.request(
             "clinicaltrials", requests.get, CTGOV_URL,
             params=query, timeout=_TIMEOUT_SECONDS)
-    except Exception:  # noqa: BLE001 — unknown count, never a zero
+    except Exception:  # noqa: BLE001 - unknown count, never a zero
         return None
     if getattr(resp, "status_code", None) != 200:
         return None

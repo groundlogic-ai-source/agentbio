@@ -1,5 +1,5 @@
 """
-ClinicalTrials.gov API v2 — trial history lookup.
+ClinicalTrials.gov API v2 - trial history lookup.
 
 v2 change (vs original):
   has_negative_repurposing_result is now set ONLY when at least one stopped
@@ -7,7 +7,7 @@ v2 change (vs original):
   the trial's whyStopped text.
 
   Old behaviour: ANY terminated/withdrawn/suspended status → negative signal
-  regardless of why (administrative stops counted as failures — wrong).
+  regardless of why (administrative stops counted as failures - wrong).
 
   New behaviour:
     - whyStopped present + LLM says EFFICACY_FAILURE → TRUE negative signal
@@ -46,7 +46,7 @@ VALID_CLASSIFICATIONS = {"EFFICACY_FAILURE", "ADMINISTRATIVE", "UNCLEAR"}
 # x N workers at this endpoint; unthrottled that reliably triggers sustained
 # 429s. Each failure drops the trial term from a candidate's composite as a
 # coverage gap, so a 429 storm silently thins the evidence a pool is scored
-# on — a data-quality problem, not merely a slowness problem.
+# on - a data-quality problem, not merely a slowness problem.
 _RATE_LIMIT_ATTEMPTS = 4
 _RETRY_BASE_SECONDS = 2.0
 _MIN_REQUEST_INTERVAL = float(
@@ -60,7 +60,7 @@ def _throttle() -> None:
 
     The lock IS held across a sleep, deliberately: that is what serializes
     callers into a global rate limit. It is safe because the wait is bounded
-    by _MIN_REQUEST_INTERVAL and never spans a network call — unlike the
+    by _MIN_REQUEST_INTERVAL and never spans a network call - unlike the
     timeout-less lock that once wedged every prefetch lane at once.
     """
     global _last_request_at
@@ -103,14 +103,14 @@ def _classify_why_stopped(why_stopped: str, client: anthropic.Anthropic) -> str:
     whyStopped text.
 
     Returns one of:
-      EFFICACY_FAILURE  — trial stopped because treatment did not work or
+      EFFICACY_FAILURE  - trial stopped because treatment did not work or
                           caused harm (lack of efficacy, safety concern,
                           adverse events, futility, DSMB recommendation).
-      ADMINISTRATIVE    — trial stopped for a non-clinical reason: funding,
+      ADMINISTRATIVE    - trial stopped for a non-clinical reason: funding,
                           business/sponsor decision, low enrollment, post-
                           marketing commitment fulfilled, protocol design
                           change, regulatory action unrelated to outcome.
-      UNCLEAR           — text is ambiguous; cannot determine reason.
+      UNCLEAR           - text is ambiguous; cannot determine reason.
     """
     prompt = (
         "A clinical trial was stopped before completion.\n\n"
@@ -139,7 +139,7 @@ def _classify_why_stopped(why_stopped: str, client: anthropic.Anthropic) -> str:
 def _search_trials(drug_name: str, disease_name: str) -> tuple[list[dict], bool]:
     """
     Returns (studies, query_failed).
-    query_failed=True means the API was unreachable — callers must NOT treat
+    query_failed=True means the API was unreachable - callers must NOT treat
     this as "no trials exist" (fail-open). Callers should conservatively
     withhold the no-failed-trial scoring credit when query_failed=True.
     """
@@ -189,7 +189,7 @@ def check_prior_trials(
         do NOT count as negative signals.
       - trial_count: total trials found
 
-    Cache key v2 — bumped from the original because the negative-signal
+    Cache key v2 - bumped from the original because the negative-signal
     classification logic changed. Old v1 entries are silently ignored.
     """
     # Retrospective holdout: a drug+disease trial lookup is direct indication
@@ -240,7 +240,7 @@ def check_prior_trials(
 
         if status.upper() in NEGATIVE_STATUSES:
             if not why_stopped:
-                # No reason text available — do not assume failure.
+                # No reason text available - do not assume failure.
                 classification = "NO_REASON_GIVEN"
             elif client is not None:
                 classification = _classify_why_stopped(why_stopped, client)
@@ -264,13 +264,13 @@ def check_prior_trials(
         "trials": trials,
         "has_negative_repurposing_result": has_negative,
         "trial_count": len(trials),
-        # True when the API was unreachable — distinguishes "queried successfully,
+        # True when the API was unreachable - distinguishes "queried successfully,
         # found nothing" from "query failed".  Callers must not award
         # no-failed-trial scoring credit when this flag is set.
         "query_failed": query_failed,
         "holdout_redacted": False,
     }
-    # Do not cache a failed query result — retry next time.
+    # Do not cache a failed query result - retry next time.
     if not query_failed:
         cache_set(cache_key, result, ttl_days=3)
     return result

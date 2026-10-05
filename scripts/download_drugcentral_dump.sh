@@ -4,7 +4,7 @@
 # The raw dump stays in /tmp (never committed); a later step derives the small
 # two-table snapshot that IS committed.
 #
-# Wayback honors HTTP Range (verified 206), so resume is safe — but ONLY with
+# Wayback honors HTTP Range (verified 206), so resume is safe - but ONLY with
 # a single writer. Exactly one instance of this script must run at a time.
 set -u
 # Env overrides exist ONLY so the pin gate is unit-testable; the defaults

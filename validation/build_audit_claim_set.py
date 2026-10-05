@@ -1,4 +1,4 @@
-"""Build the frozen audit claim set v1 — implements
+"""Build the frozen audit claim set v1 - implements
 validation/audit_claimset_construction_protocol.md exactly.
 
 INDEPENDENCE BOUNDARY (protocol §4, Amendment 2):
@@ -9,11 +9,11 @@ INDEPENDENCE BOUNDARY (protocol §4, Amendment 2):
     and committed offline datasets (repoDB enriched CSV, DrugCentral 2023
     snapshot). Pipeline parse behavior is never inspected here.
   * Persisted candidate pools are read ONLY for reachability (is the drug
-    auditable against a real case) — pool flags are never claim ground truth.
+    auditable against a real case) - pool flags are never claim ground truth.
 
 Deterministic: fixed candidate lists, fixed sampling seed, fixed quotas.
 Aborts entirely if any live source is unhealthy at construction time (never
-build a claim set during an outage — see harness-outage-poisoning lesson).
+build a claim set during an outage - see harness-outage-poisoning lesson).
 
 Usage:
     python3 -m validation.build_audit_claim_set
@@ -91,7 +91,7 @@ N4_CANDIDATES = [
 ]
 
 N3_CANDIDATES = [
-    # (drug, pool target, pool job) — preclinical-only tool compounds with no
+    # (drug, pool target, pool job) - preclinical-only tool compounds with no
     # regulatory approval, selected from domain knowledge; verified below
     # against offline approval datasets + Europe PMC metadata.
     ("CORT108297", "NR3C1", "2de0698b458b4be28218830a3dad4710"),
@@ -104,7 +104,7 @@ N3_CANDIDATES = [
 ]
 
 E4_BRANDS = [
-    # (brand, generic, pool job) — generic must be a pool member not claimed
+    # (brand, generic, pool job) - generic must be a pool member not claimed
     # in any other class; ground truth = FDA label brand↔generic mapping.
     ("Elavil", "AMITRIPTYLINE", "61f542324d214a869b324fe41060bebb"),
     ("Pamelor", "NORTRIPTYLINE", "61f542324d214a869b324fe41060bebb"),
@@ -114,7 +114,7 @@ E4_BRANDS = [
     ("Coreg", "CARVEDILOL", "cddaa8e1fbe84309854e7dc6cdd8a71a"),
     ("Enablex", "DARIFENACIN", "cddaa8e1fbe84309854e7dc6cdd8a71a"),
     ("Visken", "PINDOLOL", "cddaa8e1fbe84309854e7dc6cdd8a71a"),
-    # spares (used only on shortfall, in order) — generics are pool members
+    # spares (used only on shortfall, in order) - generics are pool members
     # not claimed in any other class
     ("Sprycel", "DASATINIB", "61f542324d214a869b324fe41060bebb"),
     ("Tarceva", "ERLOTINIB", "61f542324d214a869b324fe41060bebb"),
@@ -134,7 +134,7 @@ POOL_CONTEXT_CONTROLS = [
     ("PRALSETINIB", "61f542324d214a869b324fe41060bebb"),
     ("TERBUTALINE", "cddaa8e1fbe84309854e7dc6cdd8a71a"),
     ("OLODATEROL", "cddaa8e1fbe84309854e7dc6cdd8a71a"),
-    # spares (used only on shortfall, in order) — non-oral single-ingredient
+    # spares (used only on shortfall, in order) - non-oral single-ingredient
     # drugs absent from every pool, so no collision with the oral pool-free
     # control sample
     ("CICLESONIDE", "2de0698b458b4be28218830a3dad4710"),
@@ -176,7 +176,7 @@ def _get_json(url: str, params: Optional[dict] = None,
 
 
 # --------------------------------------------------------------------------- #
-# Health precheck — abort construction entirely during any outage.
+# Health precheck - abort construction entirely during any outage.
 # --------------------------------------------------------------------------- #
 
 def health_precheck() -> None:
@@ -374,7 +374,7 @@ def repodb_has_drug(rows: list[dict], name: str) -> bool:
 
 
 # --------------------------------------------------------------------------- #
-# Pools (reachability only — never ground truth)
+# Pools (reachability only - never ground truth)
 # --------------------------------------------------------------------------- #
 
 def load_pools() -> dict[str, dict]:
@@ -532,7 +532,7 @@ def build_e_class(pools: dict) -> None:
         log(f"  SHORTFALL E3: {e3_added}/{_QUOTAS['E3']} — remainder "
             f"reallocates to E2 per protocol §2")
 
-    # --- E2: boxed warning, NOT withdrawn — takes the E-group remainder -----
+    # --- E2: boxed warning, NOT withdrawn - takes the E-group remainder -----
     e2_target = GROUP_TOTALS["existing_fix"] - e1_added - e3_added - e4_added
     log(f"E2 boxed_warning_not_withdrawal — quota {e2_target} "
         f"(30 minus E1 {e1_added} + E3 {e3_added} + E4 {e4_added})")

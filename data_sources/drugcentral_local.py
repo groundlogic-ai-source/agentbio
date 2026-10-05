@@ -44,7 +44,7 @@ _STRUCT_RE = re.compile(r"^/structures/id/([^/]+)$")
 
 
 class SnapshotCorrupt(Exception):
-    """Snapshot file missing/unreadable mid-run — explicit failure, never a
+    """Snapshot file missing/unreadable mid-run - explicit failure, never a
     silent fallback to the live API (which would mix data provenance)."""
 
 

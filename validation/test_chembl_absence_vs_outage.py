@@ -3,7 +3,7 @@
 Regression cover for the post-benchmark correction of 2026-09-27.
 
 An empty ChEMBL result was treated as `unavailable` everywhere, because a
-genuine absence and a degraded HTTP 200 look identical in isolation — the
+genuine absence and a degraded HTTP 200 look identical in isolation - the
 MTOR/TSC incident of 2026-07. But a failed target fails the whole run, and
 ChEMBL does not track most proteins, so any disease whose target list included
 one was unrunnable. An Acrodysostosis case died this way with its real target,

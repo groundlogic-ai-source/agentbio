@@ -76,14 +76,14 @@ class TestRedactedToEmpty(HoldoutTestBase):
             metas={"CHEMBL1901": {"parent_chembl_id": "CHEMBL1901"}},
         )
         holdout.activate(["Everolimus"])
-        # _get_json raises AssertionError on any unexpected call — if the
+        # _get_json raises AssertionError on any unexpected call - if the
         # drug_indication fallback runs, this test fails.
         out = chembl.get_pharmacological_targets_for_disease(
             "MONDO_0008612", approved_drug_names=["EVEROLIMUS"])
         self.assertEqual(out, [])
 
     def test_none_names_under_holdout_never_falls_back(self):
-        # Call-site coerces redacted-to-empty to None (`or None`) — the
+        # Call-site coerces redacted-to-empty to None (`or None`) - the
         # sentinel short-circuit must catch None too.
         self._stub_resolution({"EVEROLIMUS": "CHEMBL1901"})
         holdout.activate(["Everolimus"])

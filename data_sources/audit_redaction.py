@@ -9,7 +9,7 @@ and neither audit source module consults holdout at all.
 That gap is not theoretical.  Probing the production audit context for
 five confirmed repurposings with the drug held out
 (``validation/audit_lane_holdout_probe.py``) recovered the drug's own
-approved indication in 5/5 cases — and every hit landed in exactly one
+approved indication in 5/5 cases - and every hit landed in exactly one
 surface, the free-text label quote:
 
     lane                    leaking quotes / total
@@ -20,8 +20,8 @@ surface, the free-text label quote:
     description                       0 / 188
 
 The structured regulatory fields the deterministic detectors actually
-consume — routes, dosage forms, product modality, combination status,
-active ingredients — leaked nothing.  So the audit layer can be made
+consume - routes, dosage forms, product modality, combination status,
+active ingredients - leaked nothing.  So the audit layer can be made
 disease-blind by dropping the narrative surfaces while keeping the
 structured ones, at a bounded and disclosed cost.
 
@@ -151,7 +151,7 @@ def redact_audit_lanes(
     regulatory: dict[str, Any],
     literature: dict[str, Any],
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    """Apply disease-blind redaction when — and only when — holdout is active.
+    """Apply disease-blind redaction when - and only when - holdout is active.
 
     Returns the two lane payloads plus a disclosure record describing
     whether redaction ran, suitable for embedding in the audit context so

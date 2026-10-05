@@ -7,7 +7,7 @@ catch field-dropout bugs (like the uniprot_id/target_discovery_method pattern)
 at the handoff boundary rather than discovering them in a downstream report.
 
 Background: three confirmed field-dropout bugs were found before this module
-existed — all caused by a reviewed.append() / chemist output dict that did not
+existed - all caused by a reviewed.append() / chemist output dict that did not
 explicitly include the field.  This module converts "found by accident, three
 times" into "caught automatically, always."
 
@@ -240,7 +240,7 @@ def validate_handoff(
     Args:
         candidates: the list of candidate dicts to check
         stage: human-readable label for the stage (e.g. "chemist→reviewer")
-        field_specs: list of (field_name, severity) tuples — PRESENCE only
+        field_specs: list of (field_name, severity) tuples - PRESENCE only
         value_specs: list of (field_name, severity) tuples whose VALUE must be
             non-blank.  Presence-only checking passes an empty string, so a
             field that is carried through blank (an empty
@@ -283,7 +283,7 @@ def validate_handoff(
 def _is_blank(value: Any) -> bool:
     """True when a value is present but carries no information.
 
-    ``None`` counts as blank ONLY for fields listed in a value spec — those are
+    ``None`` counts as blank ONLY for fields listed in a value spec - those are
     fields where a null is a real dropout, not a legitimate "unmeasured".
     """
     if value is None:

@@ -61,7 +61,7 @@ RERUN_CONSUMED_JSON = os.path.join(
     _HERE, "audit_claimset_rerun_allowance_consumed.json")
 
 # Pre-registered thresholds (audit_claimset_preregistration.md +
-# construction protocol §6). Never move these after a scored run — a failure
+# construction protocol §6). Never move these after a scored run - a failure
 # is a product defect, not a threshold problem.
 PASS_MIN_DEFECT_RECALL = 0.80
 PASS_MIN_RECALL_CP_LOWER = 0.65
@@ -75,7 +75,7 @@ DEFECT_GROUPS = ("existing_fix", "novel")
 
 # Limitations prose recorded verbatim into the results artifact. These are
 # v1's; a later study's wrapper (e.g. run_audit_claimset_v2) overrides this
-# module constant before calling main() — it is module state, resolved at
+# module constant before calling main() - it is module state, resolved at
 # results-write time.
 RESULTS_LIMITATIONS = [
     "N3 (species/preclinical-only) has ZERO claims: all externally "
@@ -236,7 +236,7 @@ def verify_freeze() -> dict:
 
 
 # --------------------------------------------------------------------------- #
-# Audit execution — claims pass ONLY input fields to the production path
+# Audit execution - claims pass ONLY input fields to the production path
 # --------------------------------------------------------------------------- #
 
 def run_one_claim(claim: dict) -> dict:
@@ -270,7 +270,7 @@ def run_all_claims(claims: list[dict]) -> dict:
 
     Resume semantics (2026-08-11, after an environment restart destroyed a
     75-claim in-flight run): a leftover ``.partial`` archive is reused ONLY
-    when it was written by the same code commit — mixing code versions in
+    when it was written by the same code commit - mixing code versions in
     one archive would be two different measurements.  Completed claims are
     kept; claims whose recorded output is a harness exception (a crash, not
     a verdict) are re-run; missing claims are run.  The study is still one
@@ -295,7 +295,7 @@ def run_all_claims(claims: list[dict]) -> dict:
                 print("[harness] ignoring partial archive from a different "
                       "code commit (one archive = one code version)",
                       flush=True)
-        except Exception as exc:  # corrupt partial — start clean
+        except Exception as exc:  # corrupt partial - start clean
             print(f"[harness] ignoring unreadable partial archive ({exc})",
                   flush=True)
 
@@ -359,7 +359,7 @@ def load_or_run_archive(claims: list[dict], manifest: dict) -> dict:
     """Crash recovery: if a COMPLETE raw archive exists but no results were
     ever written (a harness crash between archiving and scoring), score the
     archived outputs instead of re-running the audits. The archive is the
-    frozen-code observation — and is admitted ONLY when the commit that
+    frozen-code observation - and is admitted ONLY when the commit that
     wrote it is code-equivalent to the freeze manifest's code_commit;
     re-running would be a second measurement, and scoring a foreign-code
     archive would be a different measurement."""
@@ -428,7 +428,7 @@ def revalidate_citation(citation: dict) -> str:
 
 
 # --------------------------------------------------------------------------- #
-# Mechanical scoring (construction protocol §6) — pure functions, no I/O
+# Mechanical scoring (construction protocol §6) - pure functions, no I/O
 # --------------------------------------------------------------------------- #
 
 def _findings(output: dict) -> list[dict]:
@@ -531,7 +531,7 @@ def annotate_disclosure(claim: dict, output: dict, outcome: str) -> dict:
 
 
 # --------------------------------------------------------------------------- #
-# Metrics — exact Clopper-Pearson one-sided 95% bounds
+# Metrics - exact Clopper-Pearson one-sided 95% bounds
 # --------------------------------------------------------------------------- #
 
 def cp_lower_95(k: int, n: int) -> float:

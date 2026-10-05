@@ -1,4 +1,4 @@
-# Step 1 gate — does disease-side holdout reach the audit layer?
+# Step 1 gate - does disease-side holdout reach the audit layer?
 
 **Question.** The triage discrimination benchmark asks whether the audit
 layer can tell a confirmed repurposing apart from the pipeline's own top
@@ -43,7 +43,7 @@ over different sources, for a different purpose.
 Five confirmed drug→disease repurposings were probed through the
 production audit-context builder with the drug held out. Leakage is
 detected by mechanical token matching against the disease name and its
-registered aliases — never by judgment.
+registered aliases - never by judgment.
 
 | Drug | Disease | Indication leaked |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ Every one of the 202 hits landed on the same path,
 
 Two measurements make the fix possible:
 
-* **Structured regulatory fields leaked nothing** — 0 hits across routes,
+* **Structured regulatory fields leaked nothing** - 0 hits across routes,
   dosage forms, product modality, combination status, and active
   ingredients. These are exactly the fields the deterministic detectors
   consume.
@@ -115,7 +115,7 @@ product ships. Verified in `validation/test_audit_holdout_redaction.py`:
   so its verdict logic is **unaffected**.
 * **One real loss:** the N4 *dose* comparison reads
   `dosage_and_administration` quotes. Under redaction it degrades from
-  `review` to `unresolved` — an explicit "not measured", never a silent
+  `review` to `unresolved` - an explicit "not measured", never a silent
   pass. The discrimination profile does not consume dose, so this does
   not bias the study, but it must not be reported as a clean instrument.
 
@@ -126,7 +126,7 @@ product ships. Verified in `validation/test_audit_holdout_redaction.py`:
   blindness holds against the deterministic profile (which never fetches
   them) but would *not* hold against a narrating LLM given tool access.
   The benchmark must therefore run with `narrate=False`.
-* **Drug identity is retained** — brand and generic names, ingredients,
+* **Drug identity is retained** - brand and generic names, ingredients,
   application numbers. A reader who recognises the drug may infer its
   indication. This is irreducible: the study is *about* the drug, so the
   drug cannot be hidden. Blindness here means the pipeline is not *handed*
@@ -138,7 +138,7 @@ product ships. Verified in `validation/test_audit_holdout_redaction.py`:
 ## 7. Bearing on earlier work
 
 No retroactive impact on audit claim-set v1 or v2. Those studies scored
-claim verification against labels with **no holdout active** — disease
+claim verification against labels with **no holdout active** - disease
 blindness was never part of their design or their claims. The gap
 mattered only once a study proposed to hold a disease out and still use
 the audit lanes, which is what this benchmark does.

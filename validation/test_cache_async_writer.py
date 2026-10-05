@@ -41,7 +41,7 @@ class TestAsyncCacheWriter(unittest.TestCase):
         # 8 threads x 100 writes must never wedge: in the healthy case the
         # inline write path serializes them on a bounded lock; under a stuck
         # holder they fall back to the queue after 2s. The bound is generous
-        # (30s) — the assertion targets wedging, not micro-performance.
+        # (30s) - the assertion targets wedging, not micro-performance.
         def work(base: int):
             for i in range(100):
                 cache.set(f"test-async-conc-{base}-{i}", i, ttl_days=1)

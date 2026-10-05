@@ -2,9 +2,9 @@
 Top-K retrospective: original 3 small-molecule cases (IPAH, MM, TSC).
 
 This is the key demonstration of the top-K harness:
-  - O1: Sildenafil / IPAH       — expected HIT at top-1 (PDE5A)
-  - O2: Thalidomide / MM        — CRBN at OT rank 6; needs K≥6 to recover
-  - O3: Everolimus / TSC        — MTOR absent from OT; remains miss
+  - O1: Sildenafil / IPAH       - expected HIT at top-1 (PDE5A)
+  - O2: Thalidomide / MM        - CRBN at OT rank 6; needs K≥6 to recover
+  - O3: Everolimus / TSC        - MTOR absent from OT; remains miss
 
 Run:  python -m validation.run_topk_original
 Out:  validation/repodb_results_topk_original.json

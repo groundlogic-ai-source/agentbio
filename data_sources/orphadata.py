@@ -86,7 +86,7 @@ def get_rare_disease_list() -> list[dict[str, Any]]:
 
     except Exception as e:
         print(f"[orphadata] WARNING: API call failed ({e}). Returning empty rare disease list.")
-        # Do NOT cache the empty universe after a failure — a cached [] would
+        # Do NOT cache the empty universe after a failure - a cached [] would
         # silently zero the entire sweep for 7 days.
         return diseases
 
@@ -99,7 +99,7 @@ def get_disorder_metadata() -> list[dict[str, Any]]:
     Fetch the Orphanet cross-referencing XML product (en_product1.xml) and return
     one record per ORPHAcode: {orpha_code, name, disorder_group}.
 
-    `disorder_group` is Orphanet's DisorderGroup classification — one of
+    `disorder_group` is Orphanet's DisorderGroup classification - one of
     "Disorder", "Subtype of disorder", or "Group of disorders". The last marks
     an umbrella term (e.g. "RASopathy") that aggregates several distinct
     diseases; the candidate-universe filter uses it to drop umbrella entries.
@@ -147,7 +147,7 @@ def get_disease_xrefs(orpha_code: str) -> dict[str, Any]:
     Cached per code. Returns {icd10, omim, mesh, umls} (each may be None).
 
     This is a per-code lookup, intended to enrich only the diseases that reach
-    the ranked output table — not all ~11k diseases at universe-build time.
+    the ranked output table - not all ~11k diseases at universe-build time.
     """
     cache_key = make_key("get_disease_xrefs", orpha_code)
     cached = get(cache_key)

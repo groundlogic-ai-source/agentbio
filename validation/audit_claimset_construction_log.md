@@ -1,4 +1,4 @@
-# Audit claim-set v1 — construction and exclusion log
+# Audit claim-set v1 - construction and exclusion log
 
 - Constructed: 2026-08-10T20:32:37.257633+00:00
 - Seed: 20260810 · cutoff: 2026-08-10
@@ -9,7 +9,7 @@
 ## Construction events (every acceptance AND exclusion)
 
 Pools loaded (reachability only): Multiple myeloma n=20, Multiple endocrine neoplasia type 2A n=24, Autosomal recessive hereditary chronic pancreatitis n=29
-E4 unresolved_name_honesty — candidates from fixed brand map
+E4 unresolved_name_honesty - candidates from fixed brand map
   EXCLUDE E4 Elavil: no cutoff-eligible FDA label naming the brand (unverifiable ground truth)
   ACCEPT existing_fix/E4_unresolved_name_honesty: Pamelor (citation fda_label e17dc299-f52d-414d-ab6e-e809bd6f8acb dated 2024-12-04)
   EXCLUDE E4 Flexeril: no cutoff-eligible FDA label naming the brand (unverifiable ground truth)
@@ -23,17 +23,17 @@ E4 unresolved_name_honesty — candidates from fixed brand map
   ACCEPT existing_fix/E4_unresolved_name_honesty: Nexavar (citation fda_label b50667e4-5ebc-4968-a646-d605058dbef0 dated 2023-08-28)
   ACCEPT existing_fix/E4_unresolved_name_honesty: Alecensa (citation fda_label 42c49deb-713b-427a-9670-08af08adcffb dated 2026-06-18)
   ACCEPT existing_fix/E4_unresolved_name_honesty: Ibrance (citation fda_label 89a142d5-7e61-48bf-9e77-e2cd124c4792 dated 2026-07-06)
-E1 safety_withdrawal — pool safety/blackbox-flagged drugs verified against ChEMBL withdrawn_flag
+E1 safety_withdrawal - pool safety/blackbox-flagged drugs verified against ChEMBL withdrawn_flag
   ACCEPT existing_fix/E1_safety_withdrawal: ERGOTAMINE (citation chembl_molecule CHEMBL442 dated 2026-05-01)
   ACCEPT existing_fix/E1_safety_withdrawal: FENOTEROL (citation chembl_molecule CHEMBL32800 dated 2026-05-01)
-  SHORTFALL E1: 2/4 — remainder reallocates to E2 per protocol §2
-E3 direction_incompatible — MM mechanism-capped drugs verified against ChEMBL action_type on NR3C1
+  SHORTFALL E1: 2/4 - remainder reallocates to E2 per protocol §2
+E3 direction_incompatible - MM mechanism-capped drugs verified against ChEMBL action_type on NR3C1
   EXCLUDE E3 FLUTICASONE PROPIONATE: ChEMBL action_type AGONIST is not incompatibility-class for a glucocorticoid-activation indication (ground truth fails)
   EXCLUDE E3 MEDROXYPROGESTERONE ACETATE: no ChEMBL mechanism record on NR3C1
   ACCEPT existing_fix/E3_direction_incompatible: MIFEPRISTONE (citation chembl_mechanism CHEMBL1276308|CHEMBL2034|821 dated 2026-05-01)
   EXCLUDE E3 PROGESTERONE: no ChEMBL mechanism record on NR3C1
-  SHORTFALL E3: 1/4 — remainder reallocates to E2 per protocol §2
-E2 boxed_warning_not_withdrawal — quota 19 (30 minus E1 2 + E3 1 + E4 8)
+  SHORTFALL E3: 1/4 - remainder reallocates to E2 per protocol §2
+E2 boxed_warning_not_withdrawal - quota 19 (30 minus E1 2 + E3 1 + E4 8)
   EXCLUDE E2 ALBUTEROL: no cutoff-eligible FDA label with a boxed warning (ground truth unverifiable)
   ACCEPT existing_fix/E2_boxed_warning_not_withdrawal: AMIODARONE (citation fda_label 4c149392-a4f0-4e2d-a13f-2b94810005de dated 2026-08-05)
   ACCEPT existing_fix/E2_boxed_warning_not_withdrawal: AMITRIPTYLINE (citation fda_label 35aa7ab3-321a-97f7-e063-6294a90a91e2 dated 2026-06-30)
@@ -60,7 +60,7 @@ E2 boxed_warning_not_withdrawal — quota 19 (30 minus E1 2 + E3 1 + E4 8)
   ACCEPT existing_fix/E2_boxed_warning_not_withdrawal: SOTALOL (citation fda_label 4614480b-b36e-4dbd-9fc0-d083890d297d dated 2026-05-20)
   ACCEPT existing_fix/E2_boxed_warning_not_withdrawal: SUNITINIB (citation fda_label 7579e3d0-2de6-4239-a7a8-118ed92075f5 dated 2026-07-08)
 E-group total: 30/30
-N1 combination-product splitting — fixed combo list verified against raw FDA labels (>=2 active substances)
+N1 combination-product splitting - fixed combo list verified against raw FDA labels (>=2 active substances)
   ACCEPT novel/N1_combination_product_splitting: Sulfamethoxazole and trimethoprim (citation fda_label 08500fcb-dbec-4ac2-91c3-189d27907ec0 dated 2026-07-17)
   EXCLUDE N1 Amoxicillin and clavulanic acid: label unverifiable or <2 substances (max substances seen: 0)
   ACCEPT novel/N1_combination_product_splitting: Ledipasvir and sofosbuvir (citation fda_label 46f4a73b-0cd6-4902-9092-3ac79e882c1a dated 2025-01-10)
@@ -70,10 +70,10 @@ N1 combination-product splitting — fixed combo list verified against raw FDA l
   ACCEPT novel/N1_combination_product_splitting: Ezetimibe and simvastatin (citation fda_label 2ce219a2-1eeb-4ece-bb87-3810e593ca51 dated 2026-02-06)
   ACCEPT novel/N1_combination_product_splitting: Abacavir and lamivudine (citation fda_label d12e80eb-906c-4932-bb03-b4060ba1d31c dated 2026-01-12)
   ACCEPT novel/N1_combination_product_splitting: Emtricitabine and tenofovir disoproxil fumarate (citation fda_label 41bd03ea-b92e-459c-968b-c9095ae90aef dated 2026-08-05)
-N4 dose/route implausibility — local-only drugs claimed oral/systemic
+N4 dose/route implausibility - local-only drugs claimed oral/systemic
   ACCEPT novel/N4_dose_route_implausibility: Latanoprost (citation fda_label be74d517-7f73-a74c-e053-2a95a90a3819 dated 2026-03-02)
-  EXCLUDE N4 Bimatoprost: labeled routes ['intracameral', 'ophthalmic'] include a systemic route — not a local-only drug (ground truth fails)
-  EXCLUDE N4 Travoprost: labeled routes ['intracameral', 'ophthalmic'] include a systemic route — not a local-only drug (ground truth fails)
+  EXCLUDE N4 Bimatoprost: labeled routes ['intracameral', 'ophthalmic'] include a systemic route - not a local-only drug (ground truth fails)
+  EXCLUDE N4 Travoprost: labeled routes ['intracameral', 'ophthalmic'] include a systemic route - not a local-only drug (ground truth fails)
   ACCEPT novel/N4_dose_route_implausibility: Tafluprost (citation fda_label db529b54-2ac7-4020-9791-7333bbe6c90f dated 2026-04-23)
   ACCEPT novel/N4_dose_route_implausibility: Dorzolamide (citation fda_label 8417d162-65a1-4266-bca7-707af1193bf3 dated 2026-06-29)
   ACCEPT novel/N4_dose_route_implausibility: Brinzolamide (citation fda_label fb7229d4-522e-4cb2-b513-9d34f3ded591 dated 2026-04-20)
@@ -81,7 +81,7 @@ N4 dose/route implausibility — local-only drugs claimed oral/systemic
   ACCEPT novel/N4_dose_route_implausibility: Oxymetazoline (citation fda_label 21cfa71c-7a8f-4100-a42e-9190260653d1 dated 2026-06-09)
   ACCEPT novel/N4_dose_route_implausibility: Lifitegrast (citation fda_label 8589d376-ac10-4ddb-9c53-2e0c8d5675c4 dated 2025-08-18)
   ACCEPT novel/N4_dose_route_implausibility: Olopatadine (citation fda_label 04c7b08c-52c1-427c-8b8f-fe67444fbca4 dated 2026-04-22)
-N2 biologic modality mis-scope — enriched-dataset non-small-molecule rows verified against raw FDA labels (BLA application number)
+N2 biologic modality mis-scope - enriched-dataset non-small-molecule rows verified against raw FDA labels (BLA application number)
   ACCEPT novel/N2_biologic_modality_mis_scope: Abatacept (citation fda_label 0836c6ac-ee37-5640-2fed-a3185a0b16eb dated 2025-11-13)
   ACCEPT novel/N2_biologic_modality_mis_scope: Adalimumab (citation fda_label 526d626f-8c9f-496c-b838-00a73bb36383 dated 2026-07-15)
   ACCEPT novel/N2_biologic_modality_mis_scope: Aflibercept (citation fda_label 7d69a7b0-9511-c030-3b85-13b23f9d2980 dated 2026-07-28)
@@ -89,7 +89,7 @@ N2 biologic modality mis-scope — enriched-dataset non-small-molecule rows veri
   ACCEPT novel/N2_biologic_modality_mis_scope: Alemtuzumab (citation fda_label 4f5f7255-7abc-4328-bd1a-ceaf139ef3e0 dated 2025-11-05)
   ACCEPT novel/N2_biologic_modality_mis_scope: Alglucosidase alfa (citation fda_label d6bfbc45-2d34-439e-8aad-59ee2d53d4df dated 2025-01-10)
   ACCEPT novel/N2_biologic_modality_mis_scope: Alirocumab (citation fda_label 7bcfbac2-e8ac-4569-8edc-bcde3b1fd172 dated 2026-07-16)
-N3 species/preclinical-only — tool compounds vs pool targets, verified absent from approval datasets + Europe PMC primary paper
+N3 species/preclinical-only - tool compounds vs pool targets, verified absent from approval datasets + Europe PMC primary paper
   EXCLUDE N3 CORT108297: no cutoff-eligible primary paper (citation unverifiable)
   EXCLUDE N3 CORT113176: no cutoff-eligible primary paper (citation unverifiable)
   EXCLUDE N3 AD80: no cutoff-eligible primary paper (citation unverifiable)
@@ -106,7 +106,7 @@ N-group before reallocation: 23/30 (N1=8 N2=7 N3=0 N4=8)
   ACCEPT novel/N2_biologic_modality_mis_scope: Asparaginase (citation fda_label 857e53aa-1098-4dad-b654-0276cdd43e03 dated 2025-07-01)
   ACCEPT novel/N2_biologic_modality_mis_scope: Atezolizumab (citation fda_label 6fa682c9-a312-4932-9831-f286908660ee dated 2026-05-20)
   ACCEPT novel/N2_biologic_modality_mis_scope: Basiliximab (citation fda_label 1af01887-b69d-444b-91ed-ebfe12784440 dated 2025-12-12)
-Controls (pool-free) — seeded sample of approved single-ingredient oral small molecules; label verifies cleanliness
+Controls (pool-free) - seeded sample of approved single-ingredient oral small molecules; label verifies cleanliness
   ACCEPT control/none: Phenoxybenzamine (citation fda_label 48a047c0-f409-420b-990a-2cab953a96cd dated 2026-07-09)
   ACCEPT control/none: Clarithromycin (citation fda_label 0cb2ee04-8581-46c8-a781-7be170ab5c86 dated 2026-07-16)
   ACCEPT control/none: Perphenazine (citation fda_label 9588d223-41e4-4bb2-9306-f082498404c5 dated 2026-07-21)
@@ -140,7 +140,7 @@ Controls (pool-free) — seeded sample of approved single-ingredient oral small 
   ACCEPT control/none: Dicyclomine (citation fda_label 141d3818-7a87-aaa0-e063-6294a90a4866 dated 2026-06-23)
   ACCEPT control/none: Amyl Nitrite (citation fda_label 6a103131-036a-7173-e053-2991aa0a4e87 dated 2024-05-03)
   pool-free controls: 32/32 (107 attempts)
-Controls (pool-context) — approved drugs absent from the pooled case
+Controls (pool-context) - approved drugs absent from the pooled case
   EXCLUDE control BUDESONIDE: label unverifiable or not single-ingredient
   ACCEPT control/none: PREDNISONE (citation fda_label 1349a022-639b-4494-99a2-1594c7c0f0e9 dated 2026-07-21)
   EXCLUDE control HYDROCORTISONE: label unverifiable or not single-ingredient

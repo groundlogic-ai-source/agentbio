@@ -30,7 +30,7 @@ from rdkit import Chem, DataStructs
 from rdkit.Chem import Crippen, Descriptors, Lipinski, rdMolDescriptors
 from rdkit.Chem.SaltRemover import SaltRemover
 
-# Singleton salt remover shared with chemist.py logic — used here to deduplicate
+# Singleton salt remover shared with chemist.py logic - used here to deduplicate
 # the direction-check candidate shortlist so salt-form duplicates (e.g. VARDENAFIL
 # and VARDENAFIL HCl) don't occupy two of the MAX_MECHANISM_DIRECTION_CANDIDATES
 # slots, displacing a genuinely distinct third compound from review.
@@ -98,13 +98,13 @@ _DEFAULT_COMPOSITE_WEIGHTS: dict[str, float] = {
     # evidence ledger this is reconstructed as 0.6*pChEMBL + 0.4*assay
     # confidence, preserving the old 0.30 + 0.20 contribution exactly.
     "efficacy_evidence": 0.50,
-    "ot_association": 0.20,   # ot_association_score direct [0, 1] — no pool normalization
+    "ot_association": 0.20,   # ot_association_score direct [0, 1] - no pool normalization
     # DISCLOSURE-ONLY in production since 2026-09-27; this weight is applied
     # only under a frozen/holdout study, where the original semantics must be
     # reproducible. See the call in run_reviewer and the post-benchmark note in
     # docs/HOW_AGENTBIO_WORKS.md. Tanimoto is still computed and reported in
     # the evidence table; it no longer moves the composite.
-    "tanimoto": 0.15,         # tanimoto_score direct [0, 1] — no pool normalization
+    "tanimoto": 0.15,         # tanimoto_score direct [0, 1] - no pool normalization
     "no_failed_trial": 0.15,  # 1 = looked and found none; 0 = looked and found one;
                               # None = never observed -> term dropped entirely
 }
@@ -136,7 +136,7 @@ def _load_composite_weight_overrides() -> tuple:
             raise ValueError("at least one weight must be positive")
         # efficacy_evidence is the ONLY always-observed term.  If its weight is
         # zero and every optional observation is unavailable, covered weight is
-        # zero and _coverage_aware_composite divides by zero — so a zero here
+        # zero and _coverage_aware_composite divides by zero - so a zero here
         # is an invalid configuration, not a policy choice.
         if weights["efficacy_evidence"] <= 0:
             raise ValueError("efficacy_evidence must be positive — it is the "
@@ -157,7 +157,7 @@ COMPOSITE_WEIGHTS, COMPOSITE_WEIGHTS_OVERRIDDEN = _load_composite_weight_overrid
 # whose normalized evidence otherwise lands on the same floor; it is not a
 # substitute for target or disease evidence.
 QUALIFIED_DIRECTIONAL_BONUS = 0.05
-LIPINSKI_PENALTY = 0.25       # flat, soft — subtracted if Lipinski violations > 1
+LIPINSKI_PENALTY = 0.25       # flat, soft - subtracted if Lipinski violations > 1
 STRONG_MATCH_THRESHOLD = 0.70
 # Safety gate: withdrawn / black-box-warning compounds are capped at the same
 # ceiling as unapproved compounds so they cannot reach STRONG_MATCH.
@@ -176,7 +176,7 @@ MECHANISM_DIRECTION_CAP = SAFETY_CAP
 # the primary gate for the class of errors where a target is shared between
 # two diseases that LOOK related but operate via completely unrelated mechanisms.
 #
-# KNOWN ARCHETYPE — recorded 2026-07 for future reference:
+# KNOWN ARCHETYPE - recorded 2026-07 for future reference:
 #   GSD1c (glucose-6-phosphate transport, SLC37A4 in ER) scored with GAA as
 #   primary target (OT gave a non-zero association score).  Chemist found MIGLITOL
 #   (intestinal alpha-glucosidase inhibitor) via ChEMBL GAA activity records.
@@ -244,10 +244,10 @@ PCHEMBL_NORM_MIN = 3.0
 PCHEMBL_NORM_MAX = 10.0
 
 # Tanimoto similarity (Morgan fingerprint vs approved drugs): already bounded
-# [0, 1] by definition — used directly, never pool-normalized.
+# [0, 1] by definition - used directly, never pool-normalized.
 
 # Open Targets association score: already bounded [0, 1] by OT's own
-# aggregation — used directly, never pool-normalized.
+# aggregation - used directly, never pool-normalized.
 
 
 def _norm_pchembl(value: Optional[float]) -> float:
@@ -337,7 +337,7 @@ _PREFETCH_LANES = ("openfda-adverse", "clinicaltrials", "pubchem",
 
 #: Seconds with zero lane progress after which the process self-terminates
 #: (0 = never).  Env-overridable; the prod Study B supervisor sets this so
-#: a wedged prefetch kills the run and the supervisor restarts it — resume
+#: a wedged prefetch kills the run and the supervisor restarts it - resume
 #: is cheap because every completed lane call is cached.  MUST stay 0 for
 #: the API server: the stall handler is os._exit and would kill request
 #: serving.
@@ -350,7 +350,7 @@ class _PrefetchLiveness:
 
     ``executor.map`` yields results in INPUT order, so a yield-based
     progress print stays silent when the first pending item is the slow
-    one — the exact failure mode this exists to expose.  Lane workers
+    one - the exact failure mode this exists to expose.  Lane workers
     complete out of order, so wrapping the lane callables keeps the
     counters moving as long as ANY call finishes; a wedged lane shows up
     as a frozen counter in the next beat.  Observational only: scoring is
@@ -548,7 +548,7 @@ def _trial_evidence_term(trials: dict[str, Any]) -> Optional[bool]:
       * trials exist, none negative      -> True  (credit earned: the pair has
         been taken into humans and did not fail there)
       * trials exist, one is negative    -> False (adverse evidence, genuinely
-        penalised — this term stays in the denominator)
+        penalised - this term stays in the denominator)
       * NO trial exists                  -> None  (nothing was tried, so there
         is no trial outcome to credit or penalise)
       * NOT OBSERVED (API failure or holdout redaction) -> None
@@ -565,7 +565,7 @@ def _trial_evidence_term(trials: dict[str, Any]) -> Optional[bool]:
 
     An empty registry is the same kind of gap (added 2026-09-27). A successful
     query returning zero trials records that nobody has run one, which is not
-    the observation "it was taken into humans and did not fail" — yet both
+    the observation "it was taken into humans and did not fail" - yet both
     used to score a flat 1.0. That paid novelty twice: a never-attempted pair
     earned the term for free, and dropping an unscorable Tanimoto then
     renormalized still more weight onto it. Capivasertib/AKT2 reached 0.9539
@@ -690,7 +690,7 @@ def _measured_ot_association(candidate: dict[str, Any]) -> Optional[float]:
     (0.90 direct, 0.70 parent-umbrella) purely so those rows can be ranked
     during selection.  Feeding that constant into a 0.20-weighted scoring
     term hands every candidate in a precedent lane a flat advantage over
-    candidates entering through a genuinely measured genetic association —
+    candidates entering through a genuinely measured genetic association -
     an advantage that has nothing to do with the candidate drug itself, and
     which systematically buries drugs that arrive via the true causal gene.
     Treat a stamped constant as a coverage gap, not as evidence.
@@ -734,7 +734,7 @@ def _coverage_aware_composite(
       * ``no_failed_trial`` None -> the trial lookup failed or was
         holdout-redacted.  Previously this was forced to 0 while staying in
         the denominator, making "we never looked" cost exactly as much as
-        "we looked and found a failed trial" — a fixed 0.15 penalty imposed
+        "we looked and found a failed trial" - a fixed 0.15 penalty imposed
         on precisely the candidates the pipeline could not see.  A measured
         failed trial is still False and still penalised.
 
@@ -973,7 +973,7 @@ def run_reviewer(
         if penalty_applied:
             composite -= LIPINSKI_PENALTY
 
-        # Pre-cap composite — preserved BEFORE any cap (unapproved / mechanism /
+        # Pre-cap composite - preserved BEFORE any cap (unapproved / mechanism /
         # DILI / safety) is applied.  All caps land tied candidates on the same
         # floor value; without this secondary sort key, a strong-but-capped
         # candidate is numerically indistinguishable from a weak one at the
@@ -984,7 +984,7 @@ def run_reviewer(
         # Hard gate: unapproved/experimental compounds are capped below STRONG_MATCH.
         # Drug repurposing requires an established human safety profile from prior
         # regulatory approval. A research compound that merely binds the target is a
-        # fundamentally different and weaker finding — it is NOT a repurposing candidate.
+        # fundamentally different and weaker finding - it is NOT a repurposing candidate.
         # Cap is set at 0.40, 0.30 below the 0.70 STRONG_MATCH_THRESHOLD, so no
         # combination of other scores can push an unapproved compound past the gate.
         unapproved_cap_applied = False
@@ -1027,7 +1027,7 @@ def run_reviewer(
         # Threshold of 5 is Lipinski's Rule of Five (Lipinski et al., 1997,
         # Adv. Drug Deliv. Rev. 23:3-25): LogP > 5 is one of four criteria
         # historically associated with poor oral absorption/permeability.
-        # Disclosure only — does NOT affect scoring.
+        # Disclosure only - does NOT affect scoring.
         HIGH_XLOGP_THRESHOLD = 5.0
         _pc = context["pubchem"]
         _pubchem_xlogp: Optional[float] = _pc.get("xlogp")
@@ -1036,7 +1036,7 @@ def run_reviewer(
         )
 
         # Molecule identity (ChEMBL molecule_type + oral route, cached lookup).
-        # No longer paired with a modality caution flag — the caution was
+        # No longer paired with a modality caution flag - the caution was
         # specifically the removed research module's registry finding
         # run-704c0cb4-H05 (a claim the app can no longer independently
         # re-verify now that the registry is gone), not an independent
@@ -1068,7 +1068,7 @@ def run_reviewer(
             ),
             # High-lipophilicity disclosure (XLogP >= 5), per Lipinski's Rule of
             # Five (Lipinski et al., 1997, Adv. Drug Deliv. Rev. 23:3-25).
-            # Disclosure only — does NOT affect any score.
+            # Disclosure only - does NOT affect any score.
             "pubchem_xlogp": _pubchem_xlogp,
             "high_lipophilicity_flag": _high_lipophilicity_flag,
             "chembl_molecule_type": _molecule_type,
@@ -1134,7 +1134,7 @@ def run_reviewer(
             "trials_holdout_redacted": bool(
                 trials.get("holdout_redacted")
             ),
-            # DISCLOSURE flag only — passed straight through from the Chemist,
+            # DISCLOSURE flag only - passed straight through from the Chemist,
             # never used in the composite. Tells the reviewer the drug's approved
             # indication names a specific mutation (see mutation_disclosure.py).
             "mutation_specificity": c.get("mutation_specificity"),
@@ -1151,7 +1151,7 @@ def run_reviewer(
             "exploratory_rank_demoted": False,
             "causal_anchor": None,
             # How approval was positively established for this candidate
-            # ("unknown" means it was NOT established — see the approval gate).
+            # ("unknown" means it was NOT established - see the approval gate).
             "approval_basis": c.get("approval_basis"),
             "approval_evidence_providers": c.get("approval_evidence_providers", []),
             "mechanism_class": c.get("mechanism_class"),
@@ -1162,7 +1162,7 @@ def run_reviewer(
             # Carry the candidate's UniProt accession through to structure_validation_node
             # so Boltz always folds the correct protein.  Without this field, the node
             # falls back to the PRIMARY target's UniProt for ALL pathway_neighbor
-            # candidates — silently folding the wrong protein for every pathway hit.
+            # candidates - silently folding the wrong protein for every pathway hit.
             "uniprot_id": c.get("uniprot_id"),
             # status_badge, safety_cap_applied, safety_layer1, safety_layer2 are
             # all set in the post-sort safety-disclosure pass below, after both
@@ -1283,15 +1283,15 @@ def run_reviewer(
     # may come from safety screens, and the direction-check N-at-a-time window
     # cannot cover all of them.
     #
-    # ICH S7A/S7B panel — inhibition is a toxicity signal, not a therapeutic
+    # ICH S7A/S7B panel - inhibition is a toxicity signal, not a therapeutic
     # action, when the ChEMBL record carries source=any_mechanism:
-    #   • ABCB11/BSEP  — inhibition → cholestatic liver injury (DILI)
-    #   • KCNH2/hERG   — blockade   → QT prolongation / torsades de pointes
-    #   • SCN5A        — blockade   → Brugada-pattern / cardiac arrest
-    #   • ABCB1/MDR1   — inhibition → multidrug-efflux DDI screening artifact
-    #   • ABCC2/MRP2   — inhibition → bile-acid/drug-exporter DILI artifact
+    #   • ABCB11/BSEP  - inhibition → cholestatic liver injury (DILI)
+    #   • KCNH2/hERG   - blockade   → QT prolongation / torsades de pointes
+    #   • SCN5A        - blockade   → Brugada-pattern / cardiac arrest
+    #   • ABCB1/MDR1   - inhibition → multidrug-efflux DDI screening artifact
+    #   • ABCC2/MRP2   - inhibition → bile-acid/drug-exporter DILI artifact
     #   • CYP3A4, CYP2D6, CYP2C9, CYP2C19, CYP1A2
-    #                  — inhibition → DDI / hepatotoxicity liability artifact
+    #                  - inhibition → DDI / hepatotoxicity liability artifact
     #
     # Drugs that GENUINELY target any of these proteins carry
     # source="target_specific" or similar and are passed through unchanged.
@@ -1307,7 +1307,7 @@ def run_reviewer(
             continue  # already checked (shouldn't happen at this stage, but guard)
         _at_pre = get_drug_action_type(_cand["drug_name"], _ts) or {}
         if _at_pre.get("source") != "any_mechanism":
-            continue  # has a target-specific mechanism record — let LLM decide
+            continue  # has a target-specific mechanism record - let LLM decide
         # Apply automatic INCOMPATIBLE cap (no LLM call)
         _cand["mechanism_direction"] = {
             "verdict": "DIRECTIONALLY_INCOMPATIBLE",
@@ -1391,7 +1391,7 @@ def run_reviewer(
     # ── Post-cap direction-check pass ─────────────────────────────────────────
     # Problem: if the initial top-K candidates ALL get capped (e.g. three
     # BSEP-inhibitor drugs in a BRIC2 run), the list re-sorts and previously
-    # lower-ranked candidates rise to the top — but they were never direction-
+    # lower-ranked candidates rise to the top - but they were never direction-
     # checked.  Those newly promoted candidates may also be DIRECTIONALLY_
     # INCOMPATIBLE (e.g. calcium-channel blockers that are also BSEP safety-
     # screen compounds) and would reach STRONG_MATCH without any gate.
@@ -1429,8 +1429,8 @@ def run_reviewer(
     # every cap re-sorts the list. A pool whose entire head is directionally
     # incompatible therefore exhausts the budget capping it and leaves the lead
     # to a candidate no pass ever reached: the NR3C2 run capped six steroid
-    # agonists — progesterone, dexamethasone, prednisolone, spironolactone and
-    # both desoxycorticosterone esters — and then promoted a seventh compound
+    # agonists - progesterone, dexamethasone, prednisolone, spironolactone and
+    # both desoxycorticosterone esters - and then promoted a seventh compound
     # that was never direction-checked at all. The hole opens precisely because
     # the gate is working, and it opens onto the one candidate that matters.
     #
@@ -1466,7 +1466,7 @@ def run_reviewer(
     # ── Safety-disclosure pass (Layer 1 + Layer 2) ────────────────────────────
     # Top-K selection for Layer 2 is done BEFORE either layer applies any cap,
     # so both layers evaluate the same pre-cap shortlist independently.
-    # Layer 1 (ChEMBL structured) runs on every candidate — cheap, 30-day cache.
+    # Layer 1 (ChEMBL structured) runs on every candidate - cheap, 30-day cache.
     # Layer 2 (Anthropic web search) is selected from the pre-cap shortlist,
     # with a hard total call budget so source outages cannot multiply cost.
     top_k_names: set[str] = set()
@@ -1482,13 +1482,13 @@ def run_reviewer(
         drug = r["drug_name"]
         mid = r.get("molecule_chembl_id")
 
-        # Layer 1 — ChEMBL structured withdrawal / black-box check
+        # Layer 1 - ChEMBL structured withdrawal / black-box check
         layer1 = r.pop("_prefetched_safety_layer1")
         r["safety_layer1"] = layer1
 
-        # Layer 2 — web-search check:
+        # Layer 2 - web-search check:
         #   (a) Budget path: drug is in the pre-cap top-K strong-match shortlist.
-        #   (b) Redundancy path: Layer 1 had an API error and cannot be trusted —
+        #   (b) Redundancy path: Layer 1 had an API error and cannot be trusted -
         #       Layer 2 always runs in this case regardless of the budget cap,
         #       so an L1 outage can never silently skip safety screening.
         #   (c) Black-box advisory path: Layer 1 found a boxed warning but did NOT
@@ -2209,13 +2209,13 @@ def _finish_safety_reconciliation(
 # ── Causal-anchor tier (pre-registered; rank-only, mirrors the F2 target-level
 # mechanistic-convergence cap in agents/target_selection.py) ──────────────────
 #
-# A target reached by pathway expansion — or one whose discovery method never
-# got attributed — is an EXPLORATORY lead, not a disease-causal anchor.  The
+# A target reached by pathway expansion - or one whose discovery method never
+# got attributed - is an EXPLORATORY lead, not a disease-causal anchor.  The
 # pathway expander is documented as "handicaps, does not subordinate", so an
 # exploratory target could outrank a directly disease-linked one and become the
 # dossier headline with no visible signal that the causal gene was never the
 # subject.  This restores the hierarchy at the CANDIDATE level (the F2 cap acts
-# on targets only) as a rank demotion with disclosure — scores are untouched
+# on targets only) as a rank demotion with disclosure - scores are untouched
 # and STRONG_MATCH gating is unaffected.
 
 #: Discovery methods that carry a direct disease-target link.
@@ -2438,13 +2438,13 @@ def _availability_gate(layer1: dict[str, Any],
     # Scope-verified, uncontradicted market exit in a *named* (non-global)
     # jurisdiction: the confirmed_global branch above requires "global"/
     # "worldwide" wording, which a single-jurisdiction market exit will never
-    # have — this is what let panobinostat's 2022 FDA market withdrawal pass
+    # have - this is what let panobinostat's 2022 FDA market withdrawal pass
     # through disclosure-only (REGIONAL_OR_PRODUCT_DISCLOSURE, below) even
     # though the search found no alternative-supply evidence for it. It must
     # not swallow the Cantu/glibenclamide case, where "other manufacturers
     # continue to supply generic glibenclamide" is exactly the kind of
     # contradiction this checks for, so this branch requires positive
-    # scope-verification AND an explicit absence of any such contradiction —
+    # scope-verification AND an explicit absence of any such contradiction -
     # silence about alternative supply is not evidence it exists.
     _NO_ALT_SUPPLY_SIGNALS = {
         "generics remain available", "generic alternatives available",
@@ -2582,7 +2582,7 @@ def _direction_check_candidate(
     # Detect when the mechanism record is for a DIFFERENT protein than the
     # candidate target being evaluated.  get_drug_action_type returns
     # source="any_mechanism" when it could not find a mechanism record that
-    # mentions target_symbol — meaning the returned action_type reflects the
+    # mentions target_symbol - meaning the returned action_type reflects the
     # drug's PRIMARY pharmacology (e.g. verapamil → "BLOCKER / Voltage-gated
     # L-type calcium channel blocker" for CACNA1C, not ABCB11/BSEP).
     # In that case, passing the wrong action_type to the direction check
@@ -2677,7 +2677,7 @@ def _apply_causal_tier_demotion(reviewed: list[dict[str, Any]]) -> None:
 
     ``reviewed`` must already be sorted best-first; it is reordered in place.
     When the pool contains NO anchored candidate (every lead is exploratory),
-    nothing is demoted — the ordering is left alone and each row keeps its
+    nothing is demoted - the ordering is left alone and each row keeps its
     exploratory tier for disclosure.
     """
     for r in reviewed:
@@ -2867,7 +2867,7 @@ def main() -> None:
             "pchembl_norm_min": PCHEMBL_NORM_MIN,
             "pchembl_norm_max": PCHEMBL_NORM_MAX,
             "tractability_weights": TRACTABILITY_WEIGHTS,
-            # True when the operator overrode any scoring weight via env —
+            # True when the operator overrode any scoring weight via env -
             # dossiers must disclose that scores are not benchmark-comparable.
             "scoring_config_overridden": bool(
                 TRACTABILITY_WEIGHTS_OVERRIDDEN or COMPOSITE_WEIGHTS_OVERRIDDEN),

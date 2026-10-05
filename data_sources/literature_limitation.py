@@ -861,7 +861,7 @@ def aggregate_findings(
         # candidate's use. An unscoped search flags nearly every such record,
         # exactly the false-positive pattern _support_quote_has_candidate_
         # negative_language was already built to avoid for the APPLICABLE_
-        # SUPPORT path — reused here for the same reason.
+        # SUPPORT path - reused here for the same reason.
         source_has_negative_language = _support_quote_has_candidate_negative_language(
             record.get("abstract"),
             drug_name=drug_name,

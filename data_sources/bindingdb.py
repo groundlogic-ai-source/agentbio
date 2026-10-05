@@ -7,7 +7,7 @@ https://www.bindingdb.org/rwd/bind/BindingDBRESTfulAPI.jsp):
   GET https://bindingdb.org/rest/getLigandsByUniprots
       ?uniprot={ACCESSION}&cutoff={N_NM}&response=application/json
 
-  200 body shape (note the provider's "Linds" typo in the response key — both
+  200 body shape (note the provider's "Linds" typo in the response key - both
   spellings are accepted so a silent upstream fix never breaks us):
 
     {"getLindsByUniprotsResponse": {"affinities": [
@@ -20,7 +20,7 @@ https://www.bindingdb.org/rwd/bind/BindingDBRESTfulAPI.jsp):
          "doi": "10.7270/Q2ZG6VCP"}, ...]}}
 
   A UniProt accession with no BindingDB rows returns 200 with an EMPTY
-  affinities list (verified) — a genuine "no data", distinct from an outage.
+  affinities list (verified) - a genuine "no data", distinct from an outage.
 
 This adapter is TARGET-FIRST: it only ever queries by UniProt accession, never
 by drug name, so held-out benchmark drugs cannot leak in through the back door
@@ -35,15 +35,15 @@ monomer+affinity-type+publication so exact re-imports collapse.
 Repurposing filter: the REST response has no approval field, so when
 ``repurposing_only`` is set each binder's SMILES is reduced to an
 active-moiety key (RDKit fragment-parent + neutralize + canonical isomeric
-SMILES — this RDKit build has no InChI support) and checked against the
+SMILES - this RDKit build has no InChI support) and checked against the
 committed DrugCentral 2023 snapshot's established-product set, normalized the
 same way (drugcentral_local).  Rows that cannot be verified as an approved
-active moiety are EXCLUDED, never passed through on faith — the same posture
+active moiety are EXCLUDED, never passed through on faith - the same posture
 as GtoPdb's approved_only filter.  Rows that pass borrow the snapshot's real
 InChIKey (so the merged candidate unions with ChEMBL/DrugCentral records by
 structural identity), its preferred name, and its ``approved_struct_id`` (so
 the multisource converter can emit the approval record under the DrugCentral
-lane's own lineage anchor — approval evidence is counted once, never twice).
+lane's own lineage anchor - approval evidence is counted once, never twice).
 
 Cache discipline (mirrors gtopdb.py / drugcentral_v2.py):
   - Only HEALTHY responses are cached ("ok" or post-filter "empty").
@@ -91,7 +91,7 @@ _TRANSIENT_STATUSES = {429, 500, 502, 503, 504}
 
 # Affinity types we know how to interpret quantitatively (all reported in nM
 # by this endpoint).  Anything else (kon/koff, percent inhibition, ...) is
-# skipped — never coerced into a fake number.
+# skipped - never coerced into a fake number.
 _AFFINITY_TYPE_MAP = {"KI": "Ki", "KD": "Kd", "IC50": "IC50", "EC50": "EC50"}
 
 # "<1.000", ">=50", "2.10" -> (relation, value).  BindingDB embeds the relation
@@ -162,7 +162,7 @@ def _fetch_affinities(uniprot_id: str, cutoff_nm: int) -> list[dict[str, Any]]:
         )
     except _SourceUnavailable:
         raise
-    except Exception as e:  # noqa: BLE001 — policy exhaustion is unavailability
+    except Exception as e:  # noqa: BLE001 - policy exhaustion is unavailability
         raise _SourceUnavailable(f"request to {url} failed: {e}") from e
 
     if resp.status_code in _TRANSIENT_STATUSES:
@@ -197,7 +197,7 @@ def _fetch_affinities(uniprot_id: str, cutoff_nm: int) -> list[dict[str, Any]]:
             "getLigandsByUniprots contract")
     rows = inner["affinities"]
     # A NON-EMPTY list in which NO row matches the verified row contract is a
-    # malformed payload, not a genuine "no binders" — failing closed here is
+    # malformed payload, not a genuine "no binders" - failing closed here is
     # what keeps a contract change from being cached as a healthy empty.
     if rows and not any(_row_shape_ok(r) for r in rows):
         raise _SourceUnavailable(
@@ -271,7 +271,7 @@ def _moiety_key(smiles: str) -> str:
     DrugCentral snapshot's structures, it collapses salt/ionization variants
     (sodium acetate == acetic acid) while keeping esters and stereo distinct.
     Returns '' ONLY for SMILES that won't parse (the row is skipped, never
-    coerced).  A missing RDKit — or any standardization failure — is an
+    coerced).  A missing RDKit - or any standardization failure - is an
     environment failure and must degrade the whole lane VISIBLY (unavailable,
     never cached), never silently skip every row.
     """

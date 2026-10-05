@@ -10,25 +10,25 @@ Three checks:
      Old early-break picks the first (lower-scoring) 0-desc candidate.
      New global-best picks the second (higher-scoring) 0-desc candidate.
 
-  B. GSD type 1c replay using real observed scores/desc — selection unchanged.
+  B. GSD type 1c replay using real observed scores/desc - selection unchanged.
      MONDO_0009294 is both first-encountered AND highest-scoring among the
      four 0-desc candidates, so both algorithms agree.
 
-  C. Overlap threshold classification — using the Orphanet official name
+  C. Overlap threshold classification - using the Orphanet official name
      (disease_name), NOT the user's query, as the design requires:
 
-     Hard stop  — "Split cord malformation type II" vs "Feingold syndrome type 1"
+     Hard stop  - "Split cord malformation type II" vs "Feingold syndrome type 1"
                   Orphanet official vs OT canonical: 0 shared tokens → hard-stop.
-     Warn       — "Glycogen storage disease type Ic" vs "glycogen storage disease VI"
+     Warn       - "Glycogen storage disease type Ic" vs "glycogen storage disease VI"
                   Orphanet official (GSD 1c ORPHA:79260) vs OT for MONDO_0009294:
                   shared category tokens (glycogen, storage) give ~33% overlap → warn.
-     Pass       — "Glycogen storage disease due to acid maltase deficiency" vs same
+     Pass       - "Glycogen storage disease due to acid maltase deficiency" vs same
                   (Orphanet official for Pompe, ORPHA:365, vs OT canonical) → ~100%.
 
   Note on the Pompe / "Pompe disease" alias case:
     A user querying "Pompe disease" finds ORPHA:365 in Orphanet.
     The OFFICIAL Orphanet name is "Glycogen storage disease due to acid maltase
-    deficiency".  The hard-stop check uses THAT name, not the alias — so 100%
+    deficiency".  The hard-stop check uses THAT name, not the alias - so 100%
     overlap, no hard stop.  The alias "Pompe disease" is never sent to OT.
 """
 
@@ -127,7 +127,7 @@ def _warning_str(name_a, name_b, ov):
 
 
 # ===========================================================================
-# CHECK A — Genuine counterexample: non-monotone hits within the 70% floor.
+# CHECK A - Genuine counterexample: non-monotone hits within the 70% floor.
 #
 #   rank-0  MONDO_WIDE  score=1500  desc=10   (floor anchor; floor = 1050)
 #   rank-1  MONDO_A     score=1100  desc=0    ← first 0-desc, LOWER score
@@ -165,12 +165,12 @@ print()
 
 
 # ===========================================================================
-# CHECK B — GSD type 1c using real observed OT scores and descendant counts.
+# CHECK B - GSD type 1c using real observed OT scores and descendant counts.
 #
 # Hits in score-descending order (as OT actually returns them).
 # Both algorithms agree: MONDO_0009294 is first-encountered AND highest-scoring
 # among the four 0-desc candidates (0009294=1370, 0012693=1244, 0018485=1225,
-# 0017694=1199). Fix leaves this unchanged — the wrong EFO selection was not
+# 0017694=1199). Fix leaves this unchanged - the wrong EFO selection was not
 # caused by the tie-breaking rule; it was caused by GSD type 1c having no
 # accurate OT node at all. The name-overlap warning handles it downstream.
 # ===========================================================================
@@ -204,7 +204,7 @@ print()
 
 
 # ===========================================================================
-# CHECK C — Overlap threshold classification.
+# CHECK C - Overlap threshold classification.
 #
 # The check uses disease_name (Orphanet official name), NOT the user's query.
 # This is the design: user aliases like "Pompe disease" never reach OT; the
@@ -222,7 +222,7 @@ cases = [
         "hard_stop",
         "completely unrelated disease (no shared tokens)",
     ),
-    # Warn: partial mismatch — category + enzyme tokens differ; only class tokens shared.
+    # Warn: partial mismatch - category + enzyme tokens differ; only class tokens shared.
     # Orphanet ORPHA:79260 (GSD type 1c / SLC37A4 deficiency) official name is
     # "Glycogen storage disease due to glucose-6-phosphate translocase deficiency".
     # OT MONDO_0009294 canonical name is "glycogen storage disease VI".
@@ -283,7 +283,7 @@ for orphanet_name, ot_name, (lo, hi), expected, note in cases:
 
 
 # ===========================================================================
-# CHECK D — Confirm "Pompe disease" alias does NOT trigger hard stop.
+# CHECK D - Confirm "Pompe disease" alias does NOT trigger hard stop.
 #   The user queries "Pompe disease" → Orphanet finds ORPHA:365 → official name
 #   is "Glycogen storage disease due to acid maltase deficiency" → OT canonical
 #   for the resolved EFO is the same string → 100% overlap → no hard stop.
@@ -293,8 +293,8 @@ pompe_alias   = "Pompe disease"
 pompe_orphanet = "Glycogen storage disease due to acid maltase deficiency"
 pompe_ot_name  = "glycogen storage disease due to acid maltase deficiency"
 
-ov_alias   = _overlap(pompe_alias,   pompe_ot_name)   # alias vs OT — NOT what we check
-ov_official = _overlap(pompe_orphanet, pompe_ot_name)  # official vs OT — what we check
+ov_alias   = _overlap(pompe_alias,   pompe_ot_name)   # alias vs OT - NOT what we check
+ov_official = _overlap(pompe_orphanet, pompe_ot_name)  # official vs OT - what we check
 
 official_ok = (_classify(ov_official) == "pass")
 results.append(official_ok)

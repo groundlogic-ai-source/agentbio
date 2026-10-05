@@ -5,7 +5,7 @@ Takes the Biologist's output and builds a ranked list of candidate compounds:
   - ChEMBL candidate compounds for the target (confidence >= 8, species-matched)
   - PubChem InChIKey cross-reference to confirm approved/known-drug status
   - RDKit Tanimoto similarity (Morgan fingerprints, radius 2) of each candidate to
-    every OTHER approved drug in the working set — this is the bisociation step and
+    every OTHER approved drug in the working set - this is the bisociation step and
     is a real computed number, not an LLM guess
   - ONE constrained LLM call per candidate that is GIVEN the affinity, the Tanimoto
     score + nearest drug, and the BioGRID network context, and asked only to write
@@ -54,7 +54,7 @@ MODEL = "claude-sonnet-4-6"
 FP_RADIUS = 2
 FP_BITS = 2048
 
-# Singleton salt remover — strips counterions/solvents so two salt forms of the
+# Singleton salt remover - strips counterions/solvents so two salt forms of the
 # same active moiety produce identical desalted fingerprints.
 _SALT_REMOVER = SaltRemover()
 
@@ -130,7 +130,7 @@ def _is_max_phase_approved(max_phase: Any) -> bool:
 
 def _v2_lanes_disabled() -> bool:
     """Kill switch restoring machine-v1 pool semantics (mirrors the helper in
-    agents/target_selection.py — keep both reading the same env var)."""
+    agents/target_selection.py - keep both reading the same env var)."""
     return os.environ.get("AGENTBIO_DISABLE_V2_LANES", "").strip() == "1"
 
 
@@ -204,7 +204,7 @@ def _llm_rationale(client: Optional[anthropic.Anthropic], c: dict[str, Any],
         msg = call_with_backoff(
             lambda: client.messages.create(
                 model=MODEL, max_tokens=256,
-                # temperature omitted — this SDK/model combination rejects the
+                # temperature omitted - this SDK/model combination rejects the
                 # kwarg outright, even at 0. See data_prep/llm_clients.py.
                 messages=[{"role": "user", "content": prompt}]),
             label="chemist-rationale", provider="anthropic", model=MODEL,
@@ -220,8 +220,8 @@ def _llm_rationale(client: Optional[anthropic.Anthropic], c: dict[str, Any],
 # _llm_rationale is one API call per candidate and pools run into the
 # thousands, which made rationale prose the dominant LLM cost of the entire
 # pipeline (Study B: 54,105 calls for 21 targets). The rationale is
-# disclosure-only prose — no score, rank, cap, or reviewer verdict consumes
-# it — so deep-pool candidates now get the deterministic template instead.
+# disclosure-only prose - no score, rank, cap, or reviewer verdict consumes
+# it - so deep-pool candidates now get the deterministic template instead.
 # Budget: the top AGENTBIO_MAX_LLM_RATIONALES candidates per target pool by a
 # deterministic quality proxy (approved first, then pChEMBL, then assay
 # confidence). 0 disables LLM rationales entirely; a negative value restores
@@ -261,7 +261,7 @@ def _mutation_disclosure_for(drug_name: str, molecule_chembl_id: str) -> dict[st
     """
     Build the mutation-specificity DISCLOSURE record for one drug by scanning its
     FDA-label indications (primary) plus ChEMBL indication terms (secondary).
-    Disclosure only — never affects scoring; see agents/mutation_disclosure.py.
+    Disclosure only - never affects scoring; see agents/mutation_disclosure.py.
     """
     label = get_label_indications(drug_name) if drug_name else {}
     chembl_terms = get_drug_indications(molecule_chembl_id) if molecule_chembl_id else []
@@ -404,7 +404,7 @@ def _enrich_compounds(
              # primary target's UniProt; for pathway_neighbor compounds this is the
              # NEIGHBOR's UniProt (nbr_uid), not the primary target's.
              # Without this stamp, line 345 below falls back to the outer scope's
-             # `uniprot` (the primary target) for EVERY compound — causing Boltz
+             # `uniprot` (the primary target) for EVERY compound - causing Boltz
              # to fold the wrong protein for all pathway_neighbor candidates.
              "uniprot_id": uniprot}
         e["is_approved_drug"] = _is_approved(e)
@@ -530,7 +530,7 @@ def run_chemist(biologist_output: dict[str, Any],
 
     # Lazy pathway-neighbor expansion.
     # Count approved drugs (max_phase >= 4) in the PRIMARY target's pool.
-    # Expansion is skipped when the primary pool is already healthy — i.e.,
+    # Expansion is skipped when the primary pool is already healthy - i.e.,
     # it already has PATHWAY_NEIGHBOR_MIN_APPROVED or more approved compounds.
     # This avoids ~45 extra Reactome + ChEMBL API calls for well-drugged targets.
     n_primary_approved = sum(

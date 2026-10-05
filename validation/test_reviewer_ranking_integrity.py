@@ -89,7 +89,7 @@ class PrecedentStampedAssociationTest(unittest.TestCase):
 
         If a new precedent-only discovery method is added there without being
         added here, its stamped constant would silently be scored as a real
-        measured association again — the exact flat lane-wide advantage this
+        measured association again - the exact flat lane-wide advantage this
         exclusion exists to remove.  Fail loudly instead of drifting.
         """
         from agents.target_selection import _PRECEDENT_ONLY_METHODS

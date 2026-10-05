@@ -1,10 +1,10 @@
-# Audit Trap Benchmark — Pre-registration (v1, frozen 2026-08-03)
+# Audit Trap Benchmark - Pre-registration (v1, frozen 2026-08-03)
 
 ## Purpose
 
 AgentBio's rediscovery benchmarks measure **discovery** (can it find a known
 drug?). This benchmark measures the claim the product is actually positioned
-on: **audit** — can it catch the failure classes that make naive repurposing
+on: **audit** - can it catch the failure classes that make naive repurposing
 pipelines untrustworthy, and can it do so without false-flagging clean cases?
 
 This artifact is an engineering acceptance instrument. It is **not** benchmark
@@ -24,7 +24,7 @@ other label.
   `run_audit_traps.py`. Changing a case after the first scored run
   invalidates comparability with prior artifacts.
 
-## Trap classes (10) — ground truth: must be caught
+## Trap classes (10) - ground truth: must be caught
 
 | # | Class | What a naive tool does | Required behavior |
 |---|-------|------------------------|-------------------|
@@ -33,26 +33,26 @@ other label.
 | T3 | direction_incompatible | ranks an antagonist for an agonist disease | mechanism-direction cap + disclosure |
 | T4 | label_artifact_screen | publishes admin-exclude association as signal | LABEL_ARTIFACT_SUSPECT verdict |
 | T5 | confirmation_discipline | reports discovery-significant as confirmed | NOT confirmed when holdout fails/absent |
-| T6 | unresolvable_name_honesty | reports "absent" for a typo/brand name | UNRESOLVED — not evidence of absence |
+| T6 | unresolvable_name_honesty | reports "absent" for a typo/brand name | UNRESOLVED - not evidence of absence |
 | T7 | salt_form_dedup | counts salt + parent as two candidates | active-moiety identity dedup |
 | T8 | degraded_source_honesty | silent zero coverage on source failure | provider health preserved verbatim |
 | T9 | unobserved_not_zero | imputes 0 for unmeasured terms | drop from numerator AND denominator |
 | T10 | xlogp_unresolved_disclosure | treats PubChem failure as low lipophilicity | XLogP UNRESOLVED disclosure |
 
-## Controls (4) — ground truth: must NOT be flagged
+## Controls (4) - ground truth: must NOT be flagged
 
 | # | Control | Required behavior |
 |---|---------|-------------------|
 | C1 | clean approved candidate, full coverage, XLogP 2.1 | zero flags |
 | C2 | hypothesis passing discovery+confirmation, all confounds survived | VERIFIED |
-| C3 | measured tanimoto 0.0 (adverse but measured) | stays in scoring — not dropped as "unobserved" |
+| C3 | measured tanimoto 0.0 (adverse but measured) | stays in scoring - not dropped as "unobserved" |
 | C4 | resolvable drug genuinely absent from pool | ABSENT (not UNRESOLVED) |
 
 ## Metrics and pre-registered pass thresholds
 
-- `trap_recall = caught / 10` — **PASS requires ≥ 0.90**
-- `control_false_flag_rate = flagged / 4` — **PASS requires ≤ 0.25**
-- `precision = caught / (caught + flagged_controls)` — reported
+- `trap_recall = caught / 10` - **PASS requires ≥ 0.90**
+- `control_false_flag_rate = flagged / 4` - **PASS requires ≤ 0.25**
+- `precision = caught / (caught + flagged_controls)` - reported
 - Overall verdict PASS requires both thresholds.
 
 Thresholds are set before the first scored run. A failure is a product defect
@@ -60,7 +60,7 @@ to fix, not a threshold to move.
 
 ---
 
-## Addendum v1.1 (2026-08-04) — two trap classes added
+## Addendum v1.1 (2026-08-04) - two trap classes added
 
 Registered BEFORE the cases were implemented, per protocol. Thresholds are
 unchanged (trap recall ≥ 0.90, control false-flag rate ≤ 0.25); the recall

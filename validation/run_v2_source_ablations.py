@@ -1,5 +1,5 @@
 """
-V2 source-ablation control harness — provider-level contribution measurement.
+V2 source-ablation control harness - provider-level contribution measurement.
 
 This is a CONTROL HARNESS, not a benchmark and not a production ranking.  It
 runs the SAME 13 confirmed small-molecule repurposing cases as
@@ -30,7 +30,7 @@ Protocol seals (each unit-tested in validation/test_v2_source_ablations.py):
 
   * The suite label is ALWAYS ``source_ablation_control``.  It is NEVER
     ``benchmark_v2`` / ``benchmark-freeze-v2``.  Being invoked under a benchmark
-    label — or while a ``benchmark-freeze-v2`` git tag exists — is a HARD
+    label - or while a ``benchmark-freeze-v2`` git tag exists - is a HARD
     REFUSAL.  This harness NEVER creates a freeze/tag.
   * Per-condition source/config/code FINGERPRINT: a resume is refused when the
     condition set, config, or pipeline source bytes changed (unless --fresh).
@@ -291,8 +291,8 @@ def target_input_hash(disease_name: str, cap: int,
     """Deterministic hash of the frozen selection input shared by all arms.
 
     Covers the disease, the cap, and the full frozen selected target rows
-    (including process metadata / status). Any change to the selected rows —
-    e.g. because target selection was recomputed OUTSIDE the correct holdout —
+    (including process metadata / status). Any change to the selected rows -
+    e.g. because target selection was recomputed OUTSIDE the correct holdout -
     yields a different hash, which the resume guard refuses.
     """
     payload = {
@@ -370,7 +370,7 @@ def validate_snapshot(snapshot: dict[str, Any], cap: int) -> None:
     """Validate a persisted frozen snapshot; raise RuntimeError if unusable.
 
     A resume must refuse when the required frozen input is missing/malformed or
-    when its recomputed stored hash does not match the persisted one — a stored
+    when its recomputed stored hash does not match the persisted one - a stored
     snapshot can never be silently trusted.
     """
     if not isinstance(snapshot, dict):
@@ -518,11 +518,11 @@ def run_pair_condition(drug_name: str, disease_name: str, condition: str,
     """Run one (drug, disease) pair under one source condition.
 
     Uses the full upgraded production semantics.  Target selection is NOT
-    performed here — the caller passes the case's FROZEN ``snapshot`` (produced
+    performed here - the caller passes the case's FROZEN ``snapshot`` (produced
     once, under the case's active holdout, by :func:`freeze_case_targets`) and
     this function reuses those exact rows for every arm.  The confirmed
     ``drug_name`` is used ONLY (a) to seal holdout (by the caller) and (b) for
-    post-run active-moiety matching here — never in source collection.  Disease-
+    post-run active-moiety matching here - never in source collection.  Disease-
     only semantics are preserved: the drug never reaches selection or collection.
 
     This function may assume its input was selected under the active holdout.
@@ -736,7 +736,7 @@ def summarize_condition(rows: list[dict[str, Any]]) -> dict[str, Any]:
                        and (r.get("holdout_audit") or {}).get("ok") is False)
 
     # Unique-drug grouping: a drug counts as generated/valid if ANY of its
-    # pairs generated/valid — so a drug with two diseases (Imatinib) counts once.
+    # pairs generated/valid - so a drug with two diseases (Imatinib) counts once.
     by_drug: dict[str, list[dict[str, Any]]] = {}
     for r in scored:
         by_drug.setdefault(r["drug_key"], []).append(r)
@@ -807,7 +807,7 @@ def _load_existing(
 
     Returns ``(done_rows, snapshots)``. Refuses (RuntimeError) when the
     fingerprint drifted, or when any persisted frozen snapshot is missing /
-    malformed / fails its recomputed-hash check — a resume must never silently
+    malformed / fails its recomputed-hash check - a resume must never silently
     trust a stored snapshot or recompute selection for an incomplete arm.
     """
     if not os.path.exists(RESULTS_JSON):

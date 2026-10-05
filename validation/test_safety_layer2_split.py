@@ -3,7 +3,7 @@
 Regression guard: the v1 classifier asked ONE conflated question ("market
 withdrawal or black-box warning?").  A drug carrying a boxed warning but
 still marketed (e.g. lamotrigine) rendered YES and inherited the hard safety
-cap — silently undoing the Layer 1 fix that made black-box disclosure-only.
+cap - silently undoing the Layer 1 fix that made black-box disclosure-only.
 v2 asks WITHDRAWAL and BLACK_BOX separately; only WITHDRAWAL: YES may cap.
 """
 
@@ -35,7 +35,7 @@ def _run_check(classify_text: str, search_text: str | None = None) -> dict:
         safety_check.anthropic, "Anthropic"
     ) as constructor, patch.object(
         # Step 2 classification moved to the provider round-robin helper in
-        # Amendment 3 (5f0a55e) — mock it where safety_check looks it up.
+        # Amendment 3 (5f0a55e) - mock it where safety_check looks it up.
         safety_check, "chat_text", return_value=(classify_text, "mock")
     ), patch.object(
         safety_check, "_fetch_regulator_source", return_value={
@@ -121,7 +121,7 @@ class PreCapTieBreakTest(unittest.TestCase):
 class OldRowBackwardCompatTest(unittest.TestCase):
     """Rows persisted before this change lack pre_cap_score / black_box fields.
     They must sort without crashing and produce only WARN-level handoff
-    complaints — never error-severity failures."""
+    complaints - never error-severity failures."""
 
     _OLD_STYLE_ROW = {
         "drug_name": "LegacyDrug",

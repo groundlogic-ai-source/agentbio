@@ -1,21 +1,21 @@
 """
-Claim-verification status derivation — extracted verbatim from the removed
+Claim-verification status derivation - extracted verbatim from the removed
 api/dossier.py (the beta research/hypothesis-generation module's claim-ledger
-UI) on 2026-09-21, because validation/run_audit_traps.py — a core, frozen
-benchmark harness — depends on these two pure functions to verify its own
+UI) on 2026-09-21, because validation/run_audit_traps.py - a core, frozen
+benchmark harness - depends on these two pure functions to verify its own
 label-artifact and confirmation-discipline traps (T4, T5). They have no
 dependency on the removed hypothesis registry: both operate purely on
 parameters passed in by the caller. Preserved byte-identical to keep the
 frozen audit_trap_results.json reproducible.
 
 Status precedence (worst wins):
-  label_artifact_suspect  — association lives in the administrative-exclude class
-  confound_fail           — a computable confound adjustment killed the effect
-  not_confirmed           — discovery passed but holdout confirmation did not
-  verified_with_gaps      — passed both, but >=1 named confound was not testable
-  verified                — passed discovery+confirmation, all computable
+  label_artifact_suspect  - association lives in the administrative-exclude class
+  confound_fail           - a computable confound adjustment killed the effect
+  not_confirmed           - discovery passed but holdout confirmation did not
+  verified_with_gaps      - passed both, but >=1 named confound was not testable
+  verified                - passed discovery+confirmation, all computable
                             confounds survived
-  not_tested              — never reached a tested state
+  not_tested              - never reached a tested state
 """
 from __future__ import annotations
 
@@ -73,7 +73,7 @@ def _confound_entries(confound_check: Optional[dict]) -> list[dict[str, Any]]:
             computable = adj is not None
         survives = c.get("survives_adjustment")
         if survives is None and isinstance(adj, dict):
-            # Explicit key checks — an `or` chain would silently drop a real
+            # Explicit key checks - an `or` chain would silently drop a real
             # False ("effect did NOT survive adjustment") and mislabel the
             # dossier as verified.
             if "survives" in adj:

@@ -15,20 +15,20 @@ audit run, 2026-08-11):
 
 Design:
 
-  * :func:`chat_text` — for TEXT-ONLY calls (classification, YES/NO gates,
+  * :func:`chat_text` - for TEXT-ONLY calls (classification, YES/NO gates,
     extraction).  Round-robins the starting provider across calls so load
     is spread roughly evenly between Anthropic and OpenAI, and on a
     transient error (429 / 5xx / timeout / overload) backs off and fails
     over to the other provider.  Deterministic decoding (temperature=0
     where the provider supports it) is preserved.
 
-  * :func:`call_with_backoff` — for PROVIDER-BOUND calls (web-search tool
+  * :func:`call_with_backoff` - for PROVIDER-BOUND calls (web-search tool
     calls whose tool API exists on only one provider).  Retries with
     exponential backoff + jitter on transient errors; never switches
     providers, so tool semantics are unchanged.
 
 Nothing here retries deterministic validation errors (4xx other than 429)
-or changes prompt/parse logic — call-site behavior is unchanged except for
+or changes prompt/parse logic - call-site behavior is unchanged except for
 resilience.
 """
 from __future__ import annotations
@@ -218,7 +218,7 @@ def _emit_telemetry(*, provider: Optional[str], model: Optional[str],
 
 def _available_providers() -> list[str]:
     # base_url is an optional override (e.g. for a proxy); its absence no longer
-    # disqualifies a provider — the SDK falls back to the official endpoint.
+    # disqualifies a provider - the SDK falls back to the official endpoint.
     providers: list[str] = []
     if os.environ.get("ANTHROPIC_API_KEY"):
         providers.append("anthropic")
@@ -252,7 +252,7 @@ def _get_client(provider: str) -> Any:
 
 
 def _is_transient(exc: Exception) -> bool:
-    """429 / 5xx / overload / timeout — worth retrying; 4xx validation is not."""
+    """429 / 5xx / overload / timeout - worth retrying; 4xx validation is not."""
     name = type(exc).__name__.lower()
     msg = str(exc).lower()
     if "ratelimit" in name or "rate limit" in msg or "429" in msg:
@@ -307,7 +307,7 @@ def _anthropic_text(prompt: str, system: Optional[str], max_tokens: int,
     kwargs: dict[str, Any] = {
         "model": model,
         "max_tokens": max_tokens,
-        # temperature omitted — this SDK/model combination rejects the kwarg
+        # temperature omitted - this SDK/model combination rejects the kwarg
         # outright, even at 0 (TypeError, not a 400). Discovered 2026-09-21
         # deploying off Replit; likely masked there by an older pinned SDK
         # version. Relying on default sampling instead.
@@ -388,7 +388,7 @@ def chat_text(prompt: str, *, system: Optional[str] = None,
                 latency_seconds=time.monotonic() - started, success=True,
                 response=response)
             return text, provider
-        except Exception as exc:  # noqa: BLE001 — orchestrated retry
+        except Exception as exc:  # noqa: BLE001 - orchestrated retry
             last_exc = exc
             _emit_telemetry(
                 provider=provider, model=model,
@@ -446,7 +446,7 @@ def call_with_backoff(fn: Callable[[], Any], *, max_attempts: int = 5,
                 attempt=attempt + 1, latency_seconds=time.monotonic() - started,
                 success=True, response=response)
             return response
-        except Exception as exc:  # noqa: BLE001 — orchestrated retry
+        except Exception as exc:  # noqa: BLE001 - orchestrated retry
             _emit_telemetry(
                 provider=provider, model=model, operation=label,
                 attempt=attempt + 1, latency_seconds=time.monotonic() - started,

@@ -43,7 +43,7 @@ def get_structure_confidence(uniprot_id: str) -> dict[str, Any]:
     try:
         predictions = _fetch_prediction(uniprot_id)
         if not predictions:
-            # Ambiguous empty (genuine no-structure vs degraded payload) —
+            # Ambiguous empty (genuine no-structure vs degraded payload) -
             # not cached; refetch next run.
             return result
 

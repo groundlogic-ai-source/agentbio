@@ -1,8 +1,8 @@
 """Unit tests for the chemist LLM-rationale budget gate.
 
 The gate caps _llm_rationale calls (one API call per candidate) to a
-deterministic top-K per target pool. Rationales are disclosure-only prose —
-no score, rank, cap, or reviewer verdict consumes them — so the gate must be
+deterministic top-K per target pool. Rationales are disclosure-only prose -
+no score, rank, cap, or reviewer verdict consumes them - so the gate must be
 deterministic and must never alter candidate content, only which candidates
 get LLM prose vs the templated fallback.
 """

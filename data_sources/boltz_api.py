@@ -1,5 +1,5 @@
 """
-Boltz API integration (https://api.boltz.bio) — Stage 3.
+Boltz API integration (https://api.boltz.bio) - Stage 3.
 
 Two wrappers over the official `boltz-api` Python SDK:
 
@@ -18,8 +18,8 @@ Design notes
   repeat run NEVER re-spends. Unavailable results (no key / failure) are NOT cached.
 - COST: every predict_complex call prints an estimated cost so spend is auditable.
 - GRACEFUL DEGRADATION: if BOLTZ_API_KEY (or the SDK) is missing, the wrappers
-  return a structured {available: False, ...} object with all metrics None — they
-  never raise — so the rest of the pipeline can still run and the report can note
+  return a structured {available: False, ...} object with all metrics None - they
+  never raise - so the rest of the pipeline can still run and the report can note
   the gap.
 
 What the numbers mean (carried into the Writer's Limitations section)
@@ -27,10 +27,10 @@ What the numbers mean (carried into the Writer's Limitations section)
 Boltz-2 reports CONFIDENCE / PROBABILITY / relative optimization scores, all on a
 0-1 scale, NOT an absolute Kd/IC50:
   - structure_confidence      : confidence in the predicted 3D structure (0-1)
-  - binding_pose_confidence   : Boltz `binding_confidence` — confidence that binding
+  - binding_pose_confidence   : Boltz `binding_confidence` - confidence that binding
                                 occurs, combining affinity probability with
                                 structural quality (0.7+ = high confidence)
-  - predicted_affinity        : Boltz `optimization_score` — a RELATIVE binding
+  - predicted_affinity        : Boltz `optimization_score` - a RELATIVE binding
                                 strength ranking for lead optimisation (0-1),
                                 NOT a measured affinity.
 """
@@ -49,7 +49,7 @@ STRUCTURE_MODEL = "boltz-2.1"
 ADME_MODEL = "adme-v1"
 
 # Boltz docs: a prediction costs "as little as $0.025"; larger complexes / more
-# samples cost more. Used only for the printed *estimate* — the real charge is
+# samples cost more. Used only for the printed *estimate* - the real charge is
 # metered by Boltz.
 EST_COST_PER_SAMPLE_USD = 0.025
 

@@ -139,7 +139,7 @@ def search_literature(drug_name: Optional[str], target_name: str,
     only abstracts whose relationship is LLM-confirmed.
 
     `drug_name` may be None (e.g. at the biologist stage, before any compound is
-    chosen) — in that case the search/relationship is target<->disease.
+    chosen) - in that case the search/relationship is target<->disease.
 
     Returns:
       {

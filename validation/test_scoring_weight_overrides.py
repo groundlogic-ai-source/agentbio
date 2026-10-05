@@ -90,7 +90,7 @@ class TestTractabilityWeightOverrides(unittest.TestCase):
         self.assertEqual(weights, _DEFAULT_TRACTABILITY_WEIGHTS)
 
     def test_nan_falls_back(self):
-        # json.loads accepts bare NaN tokens — these must not reach scoring.
+        # json.loads accepts bare NaN tokens - these must not reach scoring.
         weights, overridden = _load_tract(
             '{"chembl_log_count": NaN, "afdb_plddt": 0.35, "trial_penalty": 0.25}')
         self.assertFalse(overridden)
@@ -227,7 +227,7 @@ class TestWriterBreakdownDisclosure(unittest.TestCase):
 
 class TestBlankModeCacheInvalidation(unittest.TestCase):
     """Blank-mode runs must not silently reuse a Stage-1 ranking produced
-    under an unknown or mismatched tractability configuration — the override
+    under an unknown or mismatched tractability configuration - the override
     knob would be ineffective and the dossier banner misleading.  The ranking
     carries a fingerprint sidecar (top_candidates.config.json) that must
     match the active weights."""

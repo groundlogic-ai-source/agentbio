@@ -125,7 +125,7 @@ class PipelineState(TypedDict, total=False):
     enabled_sources: list[str]
     requested_disease: str
     flagship_use_case: dict[str, Any]
-    # Primary (top-ranked) target — kept for backwards compat with nodes that
+    # Primary (top-ranked) target - kept for backwards compat with nodes that
     # only need a single target (structure_validation uses its uniprot_id for
     # AFDB; the marker/invalidation logic uses disease_name + target_symbol).
     target: dict[str, Any]
@@ -167,7 +167,7 @@ def _write_json(name: str, data: Any) -> None:
 
 # Stage 2/3 artifacts whose contents are specific to the SELECTED target. They are
 # reused across runs keyed only on file existence, so they MUST be cleared whenever
-# the selected target changes — otherwise a new target reuses the previous target's
+# the selected target changes - otherwise a new target reuses the previous target's
 # biologist/chemist/reviewer/structure output and the report describes the wrong pair.
 _DOWNSTREAM_ARTIFACTS = (
     "biologist_output.json",
@@ -305,8 +305,8 @@ def _blank_mode_rows() -> Any:
 
     The ranking's scoring-config fingerprint sidecar
     (output/top_candidates.config.json, written by every sweep) must match the
-    currently active tractability weights.  A mismatch — or an active
-    AGENTBIO_TRACTABILITY_WEIGHTS override against a pre-fingerprint artifact —
+    currently active tractability weights.  A mismatch - or an active
+    AGENTBIO_TRACTABILITY_WEIGHTS override against a pre-fingerprint artifact -
     fails fast with explicit guidance, because silently reusing such a ranking
     would make the override ineffective while every dossier still carried the
     non-comparability banner.  Note: STAGE3_FORCE_RECOMPUTE does NOT rebuild
@@ -398,7 +398,7 @@ def target_selection_node(state: PipelineState) -> dict[str, Any]:
 
     # Build target dicts for all K rows.
     targets = [_target_from_row(r) for r in top_rows]
-    target = targets[0]   # primary — used by downstream nodes that take one target
+    target = targets[0]   # primary - used by downstream nodes that take one target
 
     # Clear stale downstream artifacts BEFORE recording the new selection marker.
     # We use the primary target for the invalidation marker (K-pursuit stays on
@@ -431,7 +431,7 @@ def target_selection_node(state: PipelineState) -> dict[str, Any]:
 
 def biologist_node(state: PipelineState) -> dict[str, Any]:
     # Live API jobs always carry a job_id; never reuse shared output files across
-    # different jobs — two concurrent runs write to the same paths and would
+    # different jobs - two concurrent runs write to the same paths and would
     # silently cross-contaminate. File-cache reuse is retained only for the
     # CLI standalone path (no job_id) where a single sequential user controls it.
     fresh = FORCE_RECOMPUTE or bool(state.get("job_id"))
@@ -1291,7 +1291,7 @@ def writer_node(state: PipelineState) -> dict[str, Any]:
         by_sym = bio_map.get(sym) if sym else None
         by_uid = bio_map_uid.get(uid) if uid else None
         if by_sym is not None and by_uid is not None and by_sym is not by_uid:
-            # Symbol and UniProt disagree — trust the stable identifier and
+            # Symbol and UniProt disagree - trust the stable identifier and
             # make the disagreement visible rather than silently picking one.
             print(f"[graph] writer WARNING: biologist-output conflict for "
                   f"candidate {sym}/{uid} — using UniProt match")

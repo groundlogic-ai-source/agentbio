@@ -1,4 +1,4 @@
-# Study B — Triage Discrimination: Pool Rebuild Results (descriptive)
+# Study B - Triage Discrimination: Pool Rebuild Results (descriptive)
 
 **Contract:** `triage-discrimination-studyb-v2`  
 **Descriptive only:** True  
@@ -16,24 +16,24 @@
 | Disease | Pool size | Confirmed found | Confirmed absent | Best confirmed rank |
 |---|---|---|---|---|
 | Acute Promyelocytic Leukemia | 5850 | 1 | 3 | 13 |
-| Aspergillosis | 4869 | 0 | 1 | — |
-| Brucellosis | 5613 | 0 | 1 | — |
-| Dermatomyositis | 5444 | 0 | 1 | — |
-| Gaucher Disease | 3071 | 0 | 1 | — |
-| Kaposi Sarcoma | 15452 | 0 | 1 | — |
-| Lennox-Gastaut syndrome | n/a | 0 | 4 | — |
-| Listeriosis | n/a | 0 | 1 | — |
-| Malaria | n/a | 0 | 1 | — |
+| Aspergillosis | 4869 | 0 | 1 | - |
+| Brucellosis | 5613 | 0 | 1 | - |
+| Dermatomyositis | 5444 | 0 | 1 | - |
+| Gaucher Disease | 3071 | 0 | 1 | - |
+| Kaposi Sarcoma | 15452 | 0 | 1 | - |
+| Lennox-Gastaut syndrome | n/a | 0 | 4 | - |
+| Listeriosis | n/a | 0 | 1 | - |
+| Malaria | n/a | 0 | 1 | - |
 | Rhabdomyosarcoma | n/a | 1 | 0 | 15 |
 | Zollinger-Ellison syndrome | n/a | 2 | 2 | 3 |
-| liposarcoma | n/a | 0 | 2 | — |
+| liposarcoma | n/a | 0 | 2 | - |
 
 ## Confirmed repurposings found in-pool (4/22)
 
-- **Omeprazole** (Zollinger-Ellison syndrome) — rank 3
-- **Lansoprazole** (Zollinger-Ellison syndrome) — rank 7
-- **Mercaptopurine** (Acute Promyelocytic Leukemia) — rank 13
-- **Vincristine** (Rhabdomyosarcoma) — rank 15
+- **Omeprazole** (Zollinger-Ellison syndrome) - rank 3
+- **Lansoprazole** (Zollinger-Ellison syndrome) - rank 7
+- **Mercaptopurine** (Acute Promyelocytic Leukemia) - rank 13
+- **Vincristine** (Rhabdomyosarcoma) - rank 15
 
 ## Confirmed repurposings absent from pool (18/22)
 
@@ -61,16 +61,16 @@
 Of the 18 pool-absent confirmed pairs:
 
 - **8/18** act on the pathogen or on symptoms, not on disease-linked human
-  genes (4 anti-infectives; 4 anticonvulsants for a syndromic epilepsy) —
+  genes (4 anti-infectives; 4 anticonvulsants for a syndromic epilepsy) -
   structurally outside a host-target pool. Disclosure matter, not a defect.
 - **5/18** are broad cytotoxics whose targets are not disease-linked (e.g.
   TOP2A is not among APL's pool targets IDH1/PNP/RARA; Kaposi's pool targets
-  JAK1/PNP/TOP2A contain no tubulin) — explained at the target level; all are
+  JAK1/PNP/TOP2A contain no tubulin) - explained at the target level; all are
   direct standard-of-care approvals, not repurposing opportunities.
 - **4/18** are redundant, noisy, or data-sparse (esomeprazole = isomer of the
   rank-3 found omeprazole; benzoic acid = dataset noise; roxatidine =
   Japan-only sparse data; voglibose = off the pool's mechanism set).
-- **1/18** is a genuine in-scope defect: **tretinoin/APL** — RARA is a pool
+- **1/18** is a genuine in-scope defect: **tretinoin/APL** - RARA is a pool
   target yet the drug is absent, the ChEMBL IC50/Ki assay-strictness class
   already tracked as an open task (Sapropterin/Pyridostigmine recovery).
 
@@ -86,6 +86,6 @@ inside these classes is expected and is not evidence against the drug.
 ## Read of the result (descriptive, no inference)
 
 - When a confirmed repurposing is in the rebuilt pool, it ranks well: all 4 found rank in the top 15 (best 3, worst 15). Scoring is not the bottleneck.
-- The dominant miss mode is pool absence (18/22): the confirmed drug never entered the candidate pool, so no score could ever surface it. Profiles for absent rows show disposition=SUPPORTED with the ABSENT_FROM_POOL flag — the evidence lanes support the drug; pool construction never proposed it.
+- The dominant miss mode is pool absence (18/22): the confirmed drug never entered the candidate pool, so no score could ever surface it. Profiles for absent rows show disposition=SUPPORTED with the ABSENT_FROM_POOL flag - the evidence lanes support the drug; pool construction never proposed it.
 - Context top-candidate rows (the pipeline's own top picks): 118 rows; dispositions 73 QUALIFIED / 35 SUPPORTED / 10 DISQUALIFIED.
 

@@ -1,4 +1,4 @@
-"""Study C: POWERED triage discrimination — confirmed repurposings vs
+"""Study C: POWERED triage discrimination - confirmed repurposings vs
 genuine-failure negatives against rebuilt pools.
 
 Same production pool semantics as Study B (biologist -> chemist per top-K
@@ -8,8 +8,8 @@ triage-discrimination-studyc-cases-v1) carries 27 diseases each anchored by
 >=1 genuine-failure negative AND >=1 confirmed positive, so a per-disease
 ranking contrast is always defined.
 
-The discrimination metric: per-disease rank AUC — P(a confirmed positive
-ranks ahead of a genuine-failure negative) over pool-present drugs — plus
+The discrimination metric: per-disease rank AUC - P(a confirmed positive
+ranks ahead of a genuine-failure negative) over pool-present drugs - plus
 pool-presence rates per class (a negative that never enters the pool is
 already discrimination evidence; absence is reported, never scored as a
 rank). Significance thresholds belong to the report layer, not this runner.
@@ -31,7 +31,7 @@ Discipline (same as Study B):
 * **Disclosed exclusion.** A disease with no genetically-associated targets
   AND no approved-drug MOA targets (deterministically unscorable) is
   recorded as a hash-bound disease_excluded checkpoint record and disclosed
-  in results under diseases_excluded — never retried, never crash-looped.
+  in results under diseases_excluded - never retried, never crash-looped.
 
 This run makes LLM calls (the pipeline agents). Approved 2026-08-12 as the
 powered follow-up to Study B.
@@ -75,7 +75,7 @@ _UNSCORABLE_MARKER = "nothing to score"
 class DiseaseUnscorable(Exception):
     """select_for_disease proved there is nothing to score: no genetically-
     associated targets AND no approved-drug MOA targets. For a resolved
-    disease this is deterministic — retrying can never succeed — so the
+    disease this is deterministic - retrying can never succeed - so the
     runner records a permanent, disclosed exclusion instead of crash-looping.
     The marker requires BOTH lanes empty, so a single-API blip (e.g. an
     Open Targets degraded-200) cannot trigger a false exclusion while
@@ -120,7 +120,7 @@ def _load_checkpoint() -> dict:
 
     The checkpoint grows past 1GB over the run (pool records embed full
     ranked pools). The previous implementation did
-    ``read_text().splitlines()`` — transiently tripling the file in RAM
+    ``read_text().splitlines()`` - transiently tripling the file in RAM
     (file string + line list + parsed records) on a small reserved VM; the
     suspected OOM behind the 2026-08-17 prod restart that wiped an
     unfinalized pool. Stream line-by-line instead, and drop target records
@@ -185,7 +185,7 @@ def _acquire_run_lease():
 
 
 def _build_pool(disease: str, targets_done: dict) -> dict | None:
-    """One disease's pool build — identical semantics to Study B. Returns
+    """One disease's pool build - identical semantics to Study B. Returns
     None (nothing finalized) if any target or the reviewer pass failed."""
     try:
         rows = select_for_disease(disease)
@@ -193,7 +193,7 @@ def _build_pool(disease: str, targets_done: dict) -> dict | None:
         # Not a transient failure: a case outside the rare-disease/NTD
         # universe can NEVER finalize. Returning None would strand it in
         # `skipped` on every resume, and results are never written while
-        # `skipped` is non-empty — a terminal wedge for the whole study
+        # `skipped` is non-empty - a terminal wedge for the whole study
         # (observed 2026-08-18: 'Urinary Incontinence'). Record it as a
         # permanent, disclosed exclusion, same path as unscorable cases.
         print(f"[studyc] {disease}: OUT OF UNIVERSE ({exc}) — recording "
@@ -316,7 +316,7 @@ def main() -> None:
         print(json.dumps(manifest, indent=2))
         return
 
-    _lease = _acquire_run_lease()  # noqa: F841 — held until process exit
+    _lease = _acquire_run_lease()  # noqa: F841 - held until process exit
     if RESULTS_PATH.exists():
         raise SystemExit("[studyc] REFUSED: results exist. Amend, never "
                          "regenerate.")

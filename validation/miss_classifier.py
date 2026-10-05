@@ -6,30 +6,30 @@ run_repodb_cases_smallmol.py and computes a machine-checkable miss class for
 every case, so the breakdown stays true as results change (no hand-written
 verdicts). Classes:
 
-  hit                        — confirmed drug recovered in the reviewed list
-  right_target_pool_gap      — the pipeline tried a target the drug is known to
+  hit                        - confirmed drug recovered in the reviewed list
+  right_target_pool_gap      - the pipeline tried a target the drug is known to
                                act on (ChEMBL mechanism endpoint), but the drug
                                has NO qualifying Homo sapiens IC50/Ki assay at
                                confidence >= 8 → invisible to the activity pool
-  pool_truncation            — drug HAS qualifying assays vs a tried target but
+  pool_truncation            - drug HAS qualifying assays vs a tried target but
                                was absent from the returned pool (unexpected
                                given the approved-drug append rule; flagged)
-  wrong_target               — none of the drug's ChEMBL mechanism targets was
+  wrong_target               - none of the drug's ChEMBL mechanism targets was
                                among the tried targets
-  biologic_not_addressable   — drug is not a small molecule; the ChEMBL
+  biologic_not_addressable   - drug is not a small molecule; the ChEMBL
                                IC50/Ki activity pool can never contain it
-  unresolved_no_mechanism    — drug has no ChEMBL mechanism records at all, so
+  unresolved_no_mechanism    - drug has no ChEMBL mechanism records at all, so
                                target correctness cannot be checked from ChEMBL
-  unverified_lookup_failure  — a ChEMBL lookup failed transiently during
+  unverified_lookup_failure  - a ChEMBL lookup failed transiently during
                                classification; recoverability flags are NEVER
                                set from failed lookups and the case is NOT
                                version-stamped (retried on the next run)
 
 Recoverability flags (used for the projected ceiling):
-  recoverable_by_pool_fix       — right_target_pool_gap cases where the
+  recoverable_by_pool_fix       - right_target_pool_gap cases where the
                                   qualifying-assay check SUCCEEDED and found no
                                   qualifying assay
-  recoverable_by_target_fix     — wrong_target cases where the drug's true
+  recoverable_by_target_fix     - wrong_target cases where the drug's true
                                   mechanism target appears ANYWHERE in
                                   candidate_targets_considered (better ranking
                                   / larger K would have tried it)
@@ -39,11 +39,11 @@ cached (30d). Any API exception raises _TransientLookupError and is NOT cached.
 Cache-key versions are bumped whenever lookup semantics change.
 
 Entry points:
-  classify_cases(cases)  — enrich a list of case dicts in place (used by both
+  classify_cases(cases)  - enrich a list of case dicts in place (used by both
                            harness main()s before flush/markdown); skips misses
                            already classified at the current CLASSIFIER_VERSION
-  breakdown_lines(cases) — markdown lines for the per-file breakdown section
-  python -m validation.miss_classifier — force re-classify both results JSONs
+  breakdown_lines(cases) - markdown lines for the per-file breakdown section
+  python -m validation.miss_classifier - force re-classify both results JSONs
                            on disk and write validation/rediscovery_summary.md
 """
 
@@ -220,13 +220,13 @@ def _drug_molecule_ids(drug_name: str) -> set[str]:
 def _has_qualifying_assay(drug_name: str, target_chembl_id: str) -> bool:
     """
     True if the drug (or its parent form) has a Homo sapiens IC50/Ki activity
-    at assay confidence >= 8 against this ChEMBL target — i.e. whether the
+    at assay confidence >= 8 against this ChEMBL target - i.e. whether the
     activity pool COULD have contained it. Raises _TransientLookupError on any
-    lookup failure — callers must never treat failure as a negative result.
+    lookup failure - callers must never treat failure as a negative result.
     """
     mol_ids = _drug_molecule_ids(drug_name)
     if not mol_ids:
-        # Drug unresolvable to any ChEMBL molecule: cannot verify — fail loudly.
+        # Drug unresolvable to any ChEMBL molecule: cannot verify - fail loudly.
         raise _TransientLookupError(f"no ChEMBL molecule ids for '{drug_name}'")
     try:
         acts, _raw_seen = _chembl._fetch_activities_full(target_chembl_id)
@@ -268,7 +268,7 @@ def classify_case(case: dict[str, Any]) -> dict[str, Any]:
                   if c.get("target_symbol")]
 
     try:
-        # Biologic check first — the small-molecule activity pool can never
+        # Biologic check first - the small-molecule activity pool can never
         # contain these, so assay lookups would be wasted work.
         mtype = (_molecule_type(drug) or "").strip()
         if mtype and mtype.lower() != "small molecule":

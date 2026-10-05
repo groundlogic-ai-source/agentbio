@@ -5,13 +5,13 @@ Why this exists
 PubChem PUG REST is a hard dependency of both the audit lane (XLogP drives
 the lipophilicity dimension) and pool enrichment, and it degrades under load
 with `PUGREST.ServerBusy` 503s. An outage mid-study either wedges the run or,
-worse, stamps a constant "unresolved" across a cohort — which silently drops
+worse, stamps a constant "unresolved" across a cohort - which silently drops
 a scoring term rather than failing loudly.
 
 The scientifically load-bearing entity set is bounded and small: the distinct
 drugs in the repoDB dataset (~1.5k). Their physicochemical properties are
 static facts, so they belong in a pinned local snapshot rather than a live
-API call — the same pattern already used for DrugCentral.
+API call - the same pattern already used for DrugCentral.
 
 Contract (mirrors the DrugCentral snapshot precedent)
 -----------------------------------------------------

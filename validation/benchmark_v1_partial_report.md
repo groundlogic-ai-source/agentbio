@@ -1,17 +1,17 @@
-# Benchmark v1 — Partial Results Report (terminated at 14/50 by protocol decision)
+# Benchmark v1 - Partial Results Report (terminated at 14/50 by protocol decision)
 
 **Freeze tag:** `benchmark-freeze-v1` · **Case list:** `benchmark-cases-v1` (50 cases) ·
 **Terminated:** 2026-08-01, after 14 cases, by explicit protocol decision (structural
-defects diagnosed with 5/5 consistency in the genuine-miss reasons — not a results-based re-roll).
+defects diagnosed with 5/5 consistency in the genuine-miss reasons - not a results-based re-roll).
 
 ## Tally at termination
 
 | Outcome | n | Detail |
 |---|---|---|
-| Hit | 1 | Tretinoin / Acute Promyelocytic Leukemia — rank 2, matched by InChIKey/ChEMBL ID |
+| Hit | 1 | Tretinoin / Acute Promyelocytic Leukemia - rank 2, matched by InChIKey/ChEMBL ID |
 | Genuine miss | 5 | All five share one signature (see Diagnosis) |
 | Error | 5 | EFO resolution mismatch ×2 (Trichinellosis), OT zero genetic targets ×2 (infections), 1 other (see archive) |
-| Admin exclusion | 3 | Umbrella disease terms etc. — correct behavior |
+| Admin exclusion | 3 | Umbrella disease terms etc. - correct behavior |
 
 ## Diagnosis (the reason for termination)
 

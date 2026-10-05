@@ -19,7 +19,7 @@ _INITIALIZED_PATHS: set[str] = set()
 # Root cause of the 2026-08-12 prefetch wedges: a worker held the old
 # process-wide write lock while stuck inside sqlite conn.close() (no timeout
 # covers a threading.Lock wait), freezing every network lane at once. The
-# cache is best-effort — a dropped write only costs a refetch — so workers
+# cache is best-effort - a dropped write only costs a refetch - so workers
 # must NEVER block on SQLite without a timeout. A stuck lock-holder now just
 # pushes everyone else onto the queue after 2s; a stuck queue writer fills
 # the queue and writes get dropped while lanes keep flowing.
@@ -41,7 +41,7 @@ def _drop_thread_conn(db_path: str) -> None:
     if conn is not None:
         try:
             conn.close()
-        except Exception:  # noqa: BLE001 — best-effort cache
+        except Exception:  # noqa: BLE001 - best-effort cache
             pass
 
 
@@ -116,7 +116,7 @@ def get(key: str) -> Optional[Any]:
 def _writer_loop() -> None:
     """Single daemon writer thread: drains the write queue on ONE persistent
     connection (opened lazily, used only by this thread). If SQLite ever
-    hangs (commit/close), only THIS thread is lost — workers never block;
+    hangs (commit/close), only THIS thread is lost - workers never block;
     the queue fills and writes are dropped, which for a best-effort cache
     only costs a refetch."""
     while True:
@@ -135,7 +135,7 @@ def _writer_loop() -> None:
                     (item[1], item[2], item[3]),
                 )
             conn.commit()
-        except Exception:  # noqa: BLE001 — best-effort cache, reconnect next write
+        except Exception:  # noqa: BLE001 - best-effort cache, reconnect next write
             _drop_thread_conn(os.path.abspath(DB_PATH))
         finally:
             _WRITE_QUEUE.task_done()
@@ -170,8 +170,8 @@ def set(key: str, value: Any, ttl_days: float = 7) -> None:
     """Cache a value. Overwrites any existing entry for the same key.
 
     Inline synchronous write under a BOUNDED lock acquire (read-your-writes
-    holds in the healthy case); if the lock cannot be acquired within 2s —
-    e.g. a holder wedged inside SQLite — the write falls back to the async
+    holds in the healthy case); if the lock cannot be acquired within 2s -
+    e.g. a holder wedged inside SQLite - the write falls back to the async
     writer queue so callers never block on SQLite beyond the timeout.
     """
     expires_at = time.time() + ttl_days * 86400

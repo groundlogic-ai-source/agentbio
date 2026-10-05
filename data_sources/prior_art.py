@@ -213,7 +213,7 @@ def disease_synonyms(disease_name: str) -> list[str]:
             '{disease(efoId:"%s"){name synonyms{relation terms}}}'
             % str(hits[0].get("id") or "")
         ).get("data") or {}).get("disease") or {}
-    except Exception:  # noqa: BLE001 — unknown synonyms, never a claim
+    except Exception:  # noqa: BLE001 - unknown synonyms, never a claim
         return []
 
     names: list[str] = []

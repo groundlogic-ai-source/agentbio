@@ -1,4 +1,4 @@
-# v2 Benchmark Program — Historical Progress Snapshot (2026-08-05)
+# v2 Benchmark Program - Historical Progress Snapshot (2026-08-05)
 
 > **Superseded on 2026-08-09.** Benchmark v2 subsequently completed as the
 > single pre-registered run: 32 screened primary rows plus 15 development rows.
@@ -19,7 +19,7 @@
 
 - **13 small-molecule development cases** where the correct drug is known (e.g. Dapsone/Leprosy,
   Anagrelide/Essential thrombocythemia). These are development cases, disjoint from the 50
-  benchmark cases — no leakage.
+  benchmark cases - no leakage.
 - For each case, the true drug's identity is **sealed (holdout)**: its name, synonyms, salts, and
   disease-side evidence are redacted before the pipeline runs.
 - Target selection runs **once per case** and is **frozen** (up to 10 targets), so all source
@@ -34,7 +34,7 @@
 - A per-target **15-minute hard timeout** turns stalls into explicit errors, never synthetic
   misses. Preflight re-validates the full 52-row artifact before anything downstream proceeds.
 
-**Purpose:** the v1 failure mode was candidate-*generation* — the true drug never entered the
+**Purpose:** the v1 failure mode was candidate-*generation* - the true drug never entered the
 pool. v2's central claim is that union sourcing fixes that. The control measures whether each
 added source actually recovers drugs ChEMBL alone misses (the paper's mechanism evidence), and it
 rehearses the full pipeline before the one-shot frozen benchmark.
@@ -49,7 +49,7 @@ rehearses the full pipeline before the one-shot frozen benchmark.
 | Dapsone | all three | miss | 56 |
 | Anagrelide | ChEMBL only | miss | 146 |
 
-## Prediction: expected, not alarming — yet
+## Prediction: expected, not alarming - yet
 
 The weak start matches the prior miss forensics almost exactly:
 
@@ -59,7 +59,7 @@ The weak start matches the prior miss forensics almost exactly:
   scope) rather than revealing a new one.
 - **Anagrelide** was classified `right_target_pool_gap`: mechanism-endpoint sources link it to
   PDE3A/PDE3B, but no qualifying human IC50/Ki assay exists in ChEMBL. This is *precisely* the
-  case the union architecture was built to rescue — and its three source-expanded arms have not
+  case the union architecture was built to rescue - and its three source-expanded arms have not
   run yet.
 
 So the first five arms tested the two hardest, already-diagnosed cases. The earlier projection
@@ -76,11 +76,11 @@ arm as anecdote and the case-level delta table as the result.
 
 1. Strict validation of the 52-row control artifact (any degraded row → discard, bounded retries).
 2. **Amendment-1 screen** of candidate benchmark cases (OT re-resolution, umbrella guard, gated
-   target list, non-empty union pool; indeterminate on lookup failure — never read as absence).
-3. Preflight creates `benchmark-freeze-v2` at a clean HEAD — only now.
+   target list, non-empty union pool; indeterminate on lookup failure - never read as absence).
+3. Preflight creates `benchmark-freeze-v2` at a clean HEAD - only now.
 4. The **single v2 run**: 50 held-out cases, holdout redaction, ChEMBL health gates mid-run,
    resume-only on halt (completed cases never re-executed).
-5. Outputs: `benchmark_results_v2.json/.md`, reported against the pre-registered thresholds —
+5. Outputs: `benchmark_results_v2.json/.md`, reported against the pre-registered thresholds -
    with v1 confined to a short motivation paragraph, not a results section.
 
 Realistic calendar: control likely 3–8 more hours of healthy-source time (longer while

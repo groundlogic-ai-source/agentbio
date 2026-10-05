@@ -1,4 +1,4 @@
-# Audit claim-set v2 — pre-registration
+# Audit claim-set v2 - pre-registration
 
 **Study label:** `audit_claimset_v2` (the sealed harness runs ONLY under this
 label; this artifact must never be reported as benchmark v2, engineering
@@ -17,7 +17,7 @@ and control false-flag rate 7/40 = 0.175 (bar ≤ 0.15). Failure analysis
 deficit to three root causes, each addressed by a committed fix BEFORE this
 registration (main @ 44a298a):
 
-1. **E2 (19/19 missed) — stale persisted pools.** The three persisted
+1. **E2 (19/19 missed) - stale persisted pools.** The three persisted
    candidate pools predated the black-box/withdrawal classifier fix and
    wrongly badged marketed boxed-warning drugs as WITHDRAWN (composite
    pinned at the 0.40 safety cap).
@@ -36,7 +36,7 @@ registration (main @ 44a298a):
    `audit-context-v2`): when cutoff-eligible marketed FDA-label evidence
    exists, N3 reports UNRESOLVED (a disclosure), never FLAGGED. Genuinely
    label-less preclinical-only drugs still flag.
-3. **E4 (8/8 invalid claims) — falsified construction assumption.** v1
+3. **E4 (8/8 invalid claims) - falsified construction assumption.** v1
    assumed brand names do not resolve in ChEMBL; the ChEMBL synonym tables
    resolve all 8 accepted brands, so v1's "must read UNRESOLVED" ground
    truth was wrong for every E4 claim.
@@ -72,7 +72,7 @@ Total claims **100** = **60 defect** + **40 control**, unchanged.
   of the pool boxed-warning universe after exclusions. **If total E yield
   is < 6, construction aborts** and the composition rule must be amended
   here (dated) before any retry. Expected yield ≈ 6–16, including a
-  possible E4 yield of 0 — a
+  possible E4 yield of 0 - a
   near-zero E4 yield is itself a reported finding (brand-name resolution is
   near-universal), not a construction failure.
 - **novel (N) group = 60 − E yield.** Initial quotas N1 8 / N2 7 / N3 7 /
@@ -91,17 +91,17 @@ Total claims **100** = **60 defect** + **40 control**, unchanged.
   endpoints the pipeline reads.
 - **N3:** v1 gates (absent from repoDB/DrugCentral, zero Europe PMC
   clinical-trial hits, cutoff-eligible primary paper) **plus no
-  cutoff-eligible FDA label products** — label absence is part of the
+  cutoff-eligible FDA label products** - label absence is part of the
   defect's definition under the v2 detector, verified against raw openFDA
   responses, not pipeline code.
 
 ## 3. Metrics and PASS thresholds (identical to v1)
 
-- `defect_recall = caught / 60` — PASS requires **≥ 0.80**, exact
+- `defect_recall = caught / 60` - PASS requires **≥ 0.80**, exact
   Clopper–Pearson lower 95% bound **≥ 0.65**.
-- `control_false_flag_rate = flagged / 40` — PASS requires **≤ 0.15**,
+- `control_false_flag_rate = flagged / 40` - PASS requires **≤ 0.15**,
   upper 95% bound **≤ 0.30**.
-- `novel_recall` — reported with CI, no threshold (first adequate
+- `novel_recall` - reported with CI, no threshold (first adequate
   measurement; v1's novel arm had N3 = 0 claims).
 - Max group abstention fraction 0.10. Invalid citations are excluded and
   reported as construction defects; lane failures abstain.
@@ -137,7 +137,7 @@ pipeline, and v2 claims are eligible material for it.
    the results report must restate this paragraph.
 2. **The pool refresh fixed stale DATA, not a too-strict STANDARD.** v1's
    E2 misses came from outdated persisted snapshots wrongly badging
-   marketed drugs as withdrawn — the safety logic itself was unchanged and
+   marketed drugs as withdrawn - the safety logic itself was unchanged and
    the conservative direction (cap retained whenever a withdrawal flag is
    unrefuted) was preserved end-to-end. Every v2-facing writeup (results
    report, technical appendix, outreach letters) must frame this as "our
@@ -154,7 +154,7 @@ refreshed-pool withdrawal-flagged drugs are all v1-named and therefore
 excluded by instance disjointness); the E3 candidate (fluticasone
 propionate) failed its raw ground-truth check (ChEMBL action_type AGONIST
 is not incompatibility-class for a glucocorticoid-activation indication);
-E4 yielded zero — the pre-registered finding that brand-name resolution is
+E4 yielded zero - the pre-registered finding that brand-name resolution is
 near-universal.
 
 1. **The E floor is amended from 6 to 1.** Rationale: the floor exists to
@@ -170,7 +170,7 @@ near-universal.
 3. **Reporting:** the v2 results report and any derived writeup must state
    the E-group yield and its per-class causes (this amendment) before the
    score, and must not describe the composition change as relaxed
-   methodology — the abort-and-amend path itself is the registered
+   methodology - the abort-and-amend path itself is the registered
    mechanism working as intended.
 
 ## Amendment 3 (2026-08-11, before any scored result exists): freeze #1
@@ -195,19 +195,19 @@ stopped at 75/100 claims executed.
    AI-integration providers were returning sustained HTTP 429s.
 2. **Engineering fixes applied BEFORE the new freeze** (i.e., they are
    part of the frozen system under test, not a post-hoc patch):
-   (a) `data_sources/evidence_ledger.py` — `EvidenceRecord.__post_init__`
+   (a) `data_sources/evidence_ledger.py` - `EvidenceRecord.__post_init__`
        coerces enum/string fields at construction so malformed adapter
        output can never crash `.value` access or set membership (the
        observed crash class; affected claims would otherwise have been
        scored as abstentions);
-   (b) `data_sources/llm_failover.py` (new) — text-only LLM calls
+   (b) `data_sources/llm_failover.py` (new) - text-only LLM calls
        round-robin across both AI-integration providers with
        cross-provider failover and exponential backoff on 429/5xx;
        provider-bound web-search tool calls retry with backoff on the
        same provider (tool semantics unchanged). Call sites rewired:
        pubmed relevance gate, clinicaltrials stop-reason classifier,
        mechanism-direction Step-2 classifier, safety Layer-2 classifier;
-   (c) `validation/run_audit_claimset.py` — per-claim atomic checkpointing
+   (c) `validation/run_audit_claimset.py` - per-claim atomic checkpointing
        (was every-5-claims) with commit-bound resume: a partial archive is
        reused only if written by the same code commit, completed claims
        are kept, and crashed/missing claims are re-run. One archive still
@@ -289,7 +289,7 @@ Findings, all re-derived mechanically from the frozen artifacts:
 1. **One defect class carries the arm.** N2 = 43 of 59 novel claims (73%),
    43 of 60 defect claims (72%). The registered shortfall-reallocation order
    (N1 → N4 → N2) exhausted N1 and N4 at their quotas and sent the entire
-   36-claim shortfall to N2 — the class with the largest available universe
+   36-claim shortfall to N2 - the class with the largest available universe
    and the highest v1 recall (13/13). The rule was registered in advance and
    executed mechanically, so this is **not** post-hoc selection; but its
    foreseeable effect was to concentrate the defect arm in the easiest
@@ -317,10 +317,10 @@ Findings, all re-derived mechanically from the frozen artifacts:
    fixed.** Six E2 candidates were excluded as "no cutoff-eligible FDA label
    with a boxed warning (ground truth unverifiable)". Re-checked against raw
    openFDA on 2026-08-11: **METOPROLOL** has 348 labels, of which at least 4
-   carry a pre-cutoff "WARNING: ISCHEMIC HEART DISEASE" boxed warning —
+   carry a pre-cutoff "WARNING: ISCHEMIC HEART DISEASE" boxed warning -
    missed because `ofda_label_rows()` caps retrieval at 25 rows;
    **LEVOSALBUTAMOL** returns HTTP 404 under its INN, while the US generic
-   name (levalbuterol) returns 19 labels with 3 pre-cutoff boxed warnings —
+   name (levalbuterol) returns 19 labels with 3 pre-cutoff boxed warnings -
    an INN/USAN name-form miss. The other four exclusions were correct
    (MILTEFOSINE's only boxed-warning label is dated after the cutoff;
    CABOZANTINIB and NOREPINEPHRINE have none; ALBUTEROL's two
@@ -328,7 +328,7 @@ Findings, all re-derived mechanically from the frozen artifacts:
    2 of 6 E2 exclusions were construction-side retrieval failures**; E2
    should have carried roughly 3 claims rather than 1. The class that
    produced v1's largest failure (0/19) is therefore effectively untested in
-   v2, and the reason is a measurement limitation — not a demonstration that
+   v2, and the reason is a measurement limitation - not a demonstration that
    the defect was resolved.
 
 5. **Findings are disclosure-only.** Every N1–N4 finding carries
@@ -355,10 +355,10 @@ amendment. Allowances are unchanged: the single scored run is spent, the
 one-fix-one-rerun allowance remains unconsumed.
 
 ## Amendment 7 (2026-08-11, AFTER the scored run; freeze-binding breach and
-## repair — no re-measurement)
+## repair - no re-measurement)
 
 **Incident.** The `build-audit-claimset-v2` workflow was re-run at
-2026-08-11T02:41:10Z — after the freeze (01:48:40Z) and after the single
+2026-08-11T02:41:10Z - after the freeze (01:48:40Z) and after the single
 scored run (results written 01:58Z). The builder writes its output
 unconditionally, so it overwrote `validation/audit_claim_set_v2.json` and
 `validation/audit_claimset_v2_construction_log.md` in place. This broke the
@@ -366,7 +366,7 @@ freeze binding: the manifest records
 `claim_set_file_sha256 = 5013a57a…`, while the regenerated file hashed to
 `e2e8c4af…`. Detected on 2026-08-11 during Amendment 6 verification.
 
-**Scope of the breach — substantively nil, procedurally real.** The
+**Scope of the breach - substantively nil, procedurally real.** The
 regenerated artifacts were compared field-by-field against the frozen
 versions recovered from the freeze commit (`0cce837`):
 
@@ -378,7 +378,7 @@ versions recovered from the freeze commit (`0cce837`):
 - The only differences are `created_at` (a fresh wall-clock timestamp) and
   the derived self-recorded `claim_set_sha256` that includes it. The
   construction log differs by exactly one line, its `Constructed:`
-  timestamp — every acceptance and exclusion event, including the six E2
+  timestamp - every acceptance and exclusion event, including the six E2
   exclusions cited in Amendment 6, is identical.
 
 The construction is therefore deterministic given its inputs, and the
@@ -403,7 +403,7 @@ Verified: re-running the workflow now exits 1 with the claim-set sha
 unchanged.
 
 **Generalised lesson, recorded because it will recur.** A frozen study whose
-builder remains wired to a live workflow is not actually frozen — the
+builder remains wired to a live workflow is not actually frozen - the
 freeze lives in a manifest, but the workflow can still fire. Any study
 artifact bound by a hash manifest must have its generator fail closed once
 the study is scored, and the binding must be re-verified whenever the study

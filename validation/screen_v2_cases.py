@@ -1,8 +1,8 @@
 """
-Benchmark v2 — Amendment-1 property-based case screen.
+Benchmark v2 - Amendment-1 property-based case screen.
 
 Reduces the v1 50-case list to the screened v2 list (target band n=35-40)
-using ONLY disease/target properties — never v1 outcomes:
+using ONLY disease/target properties - never v1 outcomes:
 
   (a) disease resolves to a specific, non-umbrella EFO/MONDO term;
   (b) >= 1 Open Targets associated target passes the pipeline's Stage-1 gate;
@@ -48,7 +48,7 @@ SCREEN_VERSION = "v2-screen-1"
 SOURCE_LIST = os.path.join(_DIR, "benchmark_case_list.json")
 OUT_JSON = os.path.join(_DIR, "benchmark_case_list_v2.json")
 
-# Pre-committed screen parameters (Amendment 3, 2026-08-05 — frozen BEFORE the
+# Pre-committed screen parameters (Amendment 3, 2026-08-05 - frozen BEFORE the
 # screen ever ran; changing them after a written list invalidates the run).
 DESCENDANT_CAP = 50          # above => umbrella "group of disorders" term
 ASSOC_GATE = 0.1             # mirrors the pipeline Stage-1 OT gate (Path A)
@@ -58,12 +58,12 @@ TARGET_BAND = (35, 40)       # Amendment-1 target band (disclosed, not enforced)
 
 
 class ScreenDataUnavailable(Exception):
-    """A source lookup failed transiently — NEVER interpreted as absence."""
+    """A source lookup failed transiently - NEVER interpreted as absence."""
 
 
 # Provider statuses that mean the lane answered honestly (empty IS a genuine
-# answer; disabled is an explicit ablation choice). Anything else —
-# unavailable, degraded, parse_failed — is a transient failure, not absence.
+# answer; disabled is an explicit ablation choice). Anything else -
+# unavailable, degraded, parse_failed - is a transient failure, not absence.
 OK_PROVIDER_STATUSES = {"ok", "empty", "disabled"}
 
 

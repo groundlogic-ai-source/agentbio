@@ -1,18 +1,18 @@
 """
-Benchmark v2 preflight — everything that must be true BEFORE the one v2 run
+Benchmark v2 preflight - everything that must be true BEFORE the one v2 run
 starts (Amendment 3, item 20). Idempotent; safe to invoke on every retry.
 
 Chain, in order:
-  1. Source health probes (ChEMBL + Open Targets) — exit 4 so the workflow
+  1. Source health probes (ChEMBL + Open Targets) - exit 4 so the workflow
      retries instead of competing cases against a degraded API.
   2. Source-ablation control results exist. The ablation harness HARD-REFUSES
      to run once `benchmark-freeze-v2` exists, so this MUST complete before
      step 4. Runs the harness (one-time) if results are missing.
   3. Amendment-1 screened case list exists (runs screen_v2_cases if missing;
      its exit 3/2 propagate).
-  4. `benchmark-freeze-v2` tag exists — created at HEAD only after steps 1-3
+  4. `benchmark-freeze-v2` tag exists - created at HEAD only after steps 1-3
      pass and the pipeline dirs are clean.  In a published deployment (no
-     .git), a freeze ATTESTATION replaces the tag (Amendment 5) — identical
+     .git), a freeze ATTESTATION replaces the tag (Amendment 5) - identical
      refusal semantics.
 
 Usage:
@@ -122,11 +122,11 @@ def _clear_discards() -> None:
 # Stall watchdog for child modules.  A wedged child can stall indefinitely on
 # an external call without a timeout in ROW FINALIZATION (observed 2026-08-07:
 # the control froze at 38/52 for over an hour inside one arm with the
-# supervisor still alive — the per-target process bound does not cover the
+# supervisor still alive - the per-target process bound does not cover the
 # post-target reviewer/matching phase).  Healthy modules emit output at least
 # every per-target bound (~15 min), so 30 min of silence is definitively
 # wedged: kill the whole process group and return 3 so the supervisor
-# retries — the harness resumes from its last per-arm flush, losing at most
+# retries - the harness resumes from its last per-arm flush, losing at most
 # the wedged in-flight arm.
 _SILENCE_LIMIT_SECONDS = 30 * 60
 _WATCHDOG_POLL_SECONDS = 30
@@ -165,7 +165,7 @@ def _run_argv(argv) -> int:
                 last_change = time.monotonic()
             elif time.monotonic() - last_change > _SILENCE_LIMIT_SECONDS:
                 if proc.poll() is not None:
-                    break  # exited during the sleep — report its real code
+                    break  # exited during the sleep - report its real code
                 try:
                     os.killpg(proc.pid, signal.SIGKILL)
                 except (ProcessLookupError, PermissionError, OSError):
@@ -176,7 +176,7 @@ def _run_argv(argv) -> int:
                 proc.wait()
                 if (proc.returncode or 0) >= 0:
                     # Exited on its own in the silence window before the kill
-                    # landed — that is a completion, not a stall.
+                    # landed - that is a completion, not a stall.
                     break
                 _log(f"{' '.join(map(str, argv))} produced no output for "
                      f"{_SILENCE_LIMIT_SECONDS // 60} min — killed wedged "
@@ -196,7 +196,7 @@ def _run_argv(argv) -> int:
 
 def _git_available() -> bool:
     """Published deployments ship without a .git directory (and git itself may
-    be absent) — freeze operations need a no-git path there (Amendment 5)."""
+    be absent) - freeze operations need a no-git path there (Amendment 5)."""
     try:
         return subprocess.run(["git", "rev-parse", "HEAD"],
                               capture_output=True).returncode == 0
@@ -222,7 +222,7 @@ def _current_fingerprint() -> str:
 
 
 def _freeze_marker_exists() -> bool:
-    """True once the freeze is sealed — git tag (checkout) or attestation
+    """True once the freeze is sealed - git tag (checkout) or attestation
     (deployment).  Post-freeze, the control and the screen must never re-run:
     they are pre-freeze-only artifacts."""
     if os.path.exists(FREEZE_ATTESTATION):
@@ -422,7 +422,7 @@ def _valid_ablation_results(path: str = ABLATION_RESULTS) -> tuple[bool, str]:
 def _row_defect(row, snapshot, enabled):
     """Row-level replica of the per-row checks in _valid_ablation_results().
 
-    A defect means the row must be re-run — not that the whole control is
+    A defect means the row must be re-run - not that the whole control is
     unusable.  Kept deliberately separate from the validator so the strict
     first-failure reasons (pinned by tests) stay byte-identical.
     """
@@ -463,7 +463,7 @@ def _defective_row_keys(payload, check_fingerprint=True):
     """Full scan: keys of every row that would fail _valid_ablation_results().
 
     Returns None when the artifact's failure is STRUCTURAL (label, fingerprint,
-    condition mapping, snapshots) — then nothing row-level can be salvaged and
+    condition mapping, snapshots) - then nothing row-level can be salvaged and
     the caller must discard the whole file.  Otherwise returns a (possibly
     empty) list of ((condition, case_key), defect) pairs.
 
@@ -568,15 +568,15 @@ def _quarantine_defective_rows():
 
 
 # Amendment 4 (2026-08-07): data_sources/gtopdb.py now tolerates HTTP 204 on
-# /ligands/{id}/structure (approved biologics — olaratumab, tositumomab,
-# efgartigimod alfa — have no deposited small-molecule structure, so the 204
+# /ligands/{id}/structure (approved biologics - olaratumab, tositumomab,
+# efgartigimod alfa - have no deposited small-molecule structure, so the 204
 # is a data absence, not a source failure).  The code fix changes the control
 # fingerprint, which the stale-resume guard would (correctly) treat as a new
 # run, forcing a full 52-arm re-run.  Before blessing, every completed row of
 # this checkpoint was re-verified defect-free under the row-level checks
 # (zero degraded/error source stamps): the fix is behavior-identical for all
 # completed rows, and only re-run arms observe the new behavior.  Blessing is
-# a loud, one-time, row-verified fingerprint transition — NOT a weakening of
+# a loud, one-time, row-verified fingerprint transition - NOT a weakening of
 # the guard for unknown drift.
 _BLESSED_FINGERPRINT_TRANSITIONS = {
     # Amendment 4: GtoPdb structure-204 fix (row-verified benign).
@@ -619,7 +619,7 @@ def _bless_fingerprint_transition() -> None:
              "NOT blessing; strict discard path preserved")
         return
     # Snapshot-level checks mirror _valid_ablation_results (minus the
-    # completeness requirement — a mid-run checkpoint is the intended bless
+    # completeness requirement - a mid-run checkpoint is the intended bless
     # target).  A failed/out-of-universe/invalid snapshot must never be
     # transitioned even when every row happens to match its hash.
     for snapshot in payload.get("target_snapshots") or []:
@@ -707,7 +707,7 @@ def main() -> int:
         )
         return 2
 
-    # 1. Health gate — never compete cases against degraded sources.
+    # 1. Health gate - never compete cases against degraded sources.
     if not _healthy():
         _log("ChEMBL/OT/ablation sources unhealthy — exit 4 (workflow retries)")
         return 4
@@ -732,7 +732,7 @@ def main() -> int:
                 "incomplete or unexpected target snapshots",
                 # Valid-but-row-incomplete is also a resume point: this is the
                 # state a quarantine leaves behind after stripping degraded
-                # rows — resume re-runs only the missing arms.
+                # rows - resume re-runs only the missing arms.
                 "incomplete or unexpected control rows",
             }:
                 _log("source-ablation checkpoint incomplete — resuming the "
@@ -794,7 +794,7 @@ def main() -> int:
         if rc != 0:
             return 2 if rc == 2 else 3
 
-    # 4. Freeze — git tag at a clean HEAD in a checkout; a deployment
+    # 4. Freeze - git tag at a clean HEAD in a checkout; a deployment
     #    attestation when the published app has no git (Amendment 5).
     if not _git_available():
         rc = _ensure_freeze_attestation()

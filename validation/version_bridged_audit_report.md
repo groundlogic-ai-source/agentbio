@@ -18,12 +18,12 @@ Audit coverage is not discovery recall. Stable-identity overlap is not a redisco
 
 ## Controls
 
-- PASS — found-by-discovery: Prednisone / Lupus Erythematosus, Systemic: found state remains distinct from supplied-only audit
-- PASS — found-by-discovery: Lenalidomide / Multiple Myeloma: found state remains distinct from supplied-only audit
-- PASS — unrelated supplied-only: Infliximab / Giant Cell Arteritis: remains absent, unranked, unscored, and outside target coverage
-- PASS — unrelated supplied-only: Mycophenolate mofetil / Interstitial Cystitis: remains absent, unranked, unscored, and outside target coverage
-- PASS — unresolved synthetic drug name: unresolved identity is not treated as biological absence
-- PASS — degraded mechanism source: transport failure does not become NO_MECHANISM_DATA
+- PASS - found-by-discovery: Prednisone / Lupus Erythematosus, Systemic: found state remains distinct from supplied-only audit
+- PASS - found-by-discovery: Lenalidomide / Multiple Myeloma: found state remains distinct from supplied-only audit
+- PASS - unrelated supplied-only: Infliximab / Giant Cell Arteritis: remains absent, unranked, unscored, and outside target coverage
+- PASS - unrelated supplied-only: Mycophenolate mofetil / Interstitial Cystitis: remains absent, unranked, unscored, and outside target coverage
+- PASS - unresolved synthetic drug name: unresolved identity is not treated as biological absence
+- PASS - degraded mechanism source: transport failure does not become NO_MECHANISM_DATA
 
 ## Run bounds and provenance
 

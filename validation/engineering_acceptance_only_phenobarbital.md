@@ -1,4 +1,4 @@
-# V2 Engineering Acceptance — Five Archived v1 Genuine Misses
+# V2 Engineering Acceptance - Five Archived v1 Genuine Misses
 
 _Label: **engineering_acceptance** (NOT benchmark v2). Generated: 2026-08-03T18:12:18._
 
@@ -14,13 +14,13 @@ Disease-input pipeline only (`select_for_disease` -> biologist -> chemist -> poo
 
 | # | Drug | Disease | Generated | Mech-valid | Rank | Top10 | Strong | By target | Match | Providers |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Phenobarbital | Lennox-Gastaut syndrome | ✓ | ✓ | 215 | — | — | GABRA1 | inchikey_block | drugcentral, europepmc |
+| 1 | Phenobarbital | Lennox-Gastaut syndrome | ✓ | ✓ | 215 | - | - | GABRA1 | inchikey_block | drugcentral, europepmc |
 
 ## Holdout audit & source health
 
 ### Phenobarbital / Lennox-Gastaut syndrome
 - holdout active: True · drugs: ['Phenobarbital']
-- holdout unresolved: —
+- holdout unresolved: -
 - validity: 15 qualified record(s); efficacy_confidence=0.8063; direction compatible
 - source lineages: 16
 - source health: {'gtopdb': True, 'drugcentral': True, 'chembl': True, 'europepmc': True}

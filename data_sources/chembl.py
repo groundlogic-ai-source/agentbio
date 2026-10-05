@@ -25,11 +25,11 @@ UNIPROT_REST = "https://rest.uniprot.org/uniprotkb"
 # facts (target_symbol, uniprot_id, ensembl_id) and this constant is
 # applied as a decoration step after the cache is read.
 PHARM_PRECEDENT_ASSOC_SCORE: float = 0.90
-# F2 — parent-umbrella precedent (approval link imported via an EFO-hierarchy
+# F2 - parent-umbrella precedent (approval link imported via an EFO-hierarchy
 # parent, i.e. indication-adjacent rather than disease-specific) is a strictly
 # weaker claim than a direct disease-specific approval and scores 0.70, the
 # midpoint of the strong-genetic-association band (0.5–0.8). Pre-registered in
-# validation/f2_precedent_calibration_justification.md — do not tune per case;
+# validation/f2_precedent_calibration_justification.md - do not tune per case;
 # changes require a written amendment before any case-level inspection.
 PHARM_PRECEDENT_UMBRELLA_ASSOC_SCORE: float = 0.70
 
@@ -172,7 +172,7 @@ def chembl_is_serving_data() -> bool:
 
     An empty result for one accession is ambiguous on its own: ChEMBL may
     genuinely not track that protein, or it may be serving degraded HTTP 200s
-    with empty bodies — the MTOR/TSC incident of 2026-07, which is why empty
+    with empty bodies - the MTOR/TSC incident of 2026-07, which is why empty
     was treated as ``unavailable`` everywhere.
 
     That ambiguity is resolvable. Probing an accession known to be dense
@@ -182,7 +182,7 @@ def chembl_is_serving_data() -> bool:
     fail-closed still applies.
 
     Treating every genuine absence as an outage is not free. ChEMBL does not
-    track most proteins — FAM20A and DEPDC1B return zero target records — so
+    track most proteins - FAM20A and DEPDC1B return zero target records - so
     any disease whose target list includes one failed that target, and a
     failed target fails the run. An Acrodysostosis case died this way with its
     real target, PDE4D, fully resolved and carrying 9,541 activities.
@@ -391,7 +391,7 @@ def get_target_bioactivity_count(uniprot_id: str) -> dict[str, Any]:
         target_ids = _resolve_target_chembl_id(uniprot_id)
         if not target_ids:
             # Empty resolution is ambiguous (genuine no-match vs degraded
-            # 200-with-empty-payload) — do NOT cache; refetch next run.
+            # 200-with-empty-payload) - do NOT cache; refetch next run.
             return result
 
         result["target_chembl_ids"] = target_ids
@@ -438,7 +438,7 @@ def _fetch_activities_full(target_chembl_id: str) -> tuple[list[dict[str, Any]],
     whose assay confidence_score >= 8 and tags each kept record with `_confidence`.
 
     Returns (kept, raw_seen). raw_seen is True when the upstream payload
-    contained ANY activity rows (pre-filter) — the signal callers need to
+    contained ANY activity rows (pre-filter) - the signal callers need to
     distinguish a genuine post-filter empty (cacheable) from an ambiguous
     empty payload (degraded 200 vs no data; never cached).
     Cache v2 stores {kept, raw_seen}; v1 rows (bare lists) are superseded.
@@ -463,7 +463,7 @@ def _fetch_activities_full(target_chembl_id: str) -> tuple[list[dict[str, Any]],
     activities = _fetch_activity_pages(url, params, target_chembl_id)
     if not activities:
         # Empty payload is ambiguous: genuine "no IC50/Ki/EC50 assays" vs a degraded
-        # 200-with-empty-body during a ChEMBL outage. Do NOT cache — a cached
+        # 200-with-empty-body during a ChEMBL outage. Do NOT cache - a cached
         # empty zeroes the target's candidate pool for 7 days (MTOR/TSC 2026-07).
         return [], False
 
@@ -477,7 +477,7 @@ def _fetch_activities_full(target_chembl_id: str) -> tuple[list[dict[str, Any]],
             a["_confidence"] = c
             kept.append(a)
 
-    # kept may be [] here (all rows below confidence) — that IS a genuine
+    # kept may be [] here (all rows below confidence) - that IS a genuine
     # post-filter empty and is cacheable, flagged by raw_seen=True.
     cache_set(cache_key,
               {"kept": kept, "raw_seen": True,
@@ -806,7 +806,7 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
         live API jobs, which only ever want repurposing candidates (drugs with
         an existing human safety profile).
 
-    Mirrors get_target_bioactivity_count's strict filtering — this is the
+    Mirrors get_target_bioactivity_count's strict filtering - this is the
     compound-level counterpart of that count.
     """
     # v3: preserve parent/child molecule identity so salt forms cannot survive
@@ -841,7 +841,7 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
         if not target_ids:
             # Empty is only ambiguous while ChEMBL's health is unknown. A live
             # control turns it into an observation: this protein is not a
-            # ChEMBL target. Not cached either way — a genuine absence is cheap
+            # ChEMBL target. Not cached either way - a genuine absence is cheap
             # to re-derive, and caching a degraded answer is what caused the
             # MTOR/TSC incident.
             if chembl_is_serving_data():
@@ -975,7 +975,7 @@ def get_target_candidate_compounds(uniprot_id: str, max_compounds: int = 25,
         # for 7 days as an empty candidate pool.
         return result
 
-    # An empty pool is only cacheable when it is empty AFTER FILTERING — i.e.
+    # An empty pool is only cacheable when it is empty AFTER FILTERING - i.e.
     # at least one activity payload was actually seen. If every fetch returned
     # an empty payload, the emptiness is indistinguishable from a degraded 200
     # (ChEMBL outage), and caching it would zero the pool for 7 days
@@ -1009,7 +1009,7 @@ def get_drug_indications(molecule_chembl_id: str, limit: int = 200) -> list[str]
 
     NOTE: ChEMBL normalizes these to mutation-STRIPPED disease terms (e.g.
     "non-small cell lung carcinoma", never "KRAS G12C-mutated NSCLC"), so they
-    are only a secondary input to the mutation-specificity DISCLOSURE scan — the
+    are only a secondary input to the mutation-specificity DISCLOSURE scan - the
     FDA label indications text is the primary source.
 
     Trial-phase indication rows (max_phase_for_ind < 4) are EXCLUDED: their MeSH
@@ -1059,24 +1059,24 @@ def _find_molecule_chembl_id(drug_name: str) -> str | None:
     (exact match first, then highest string-overlap ratio) rather than blindly
     returning mols[0] which may be an unrelated compound that shares a synonym.
 
-    Returns the exact mol ID matched — do NOT resolve to parent, because
+    Returns the exact mol ID matched - do NOT resolve to parent, because
     ChEMBL stores mechanism-of-action records on the specific form
     (often the salt, e.g. CHEMBL1737 = sildenafil citrate) rather than
     on the free-base parent (CHEMBL192).
     Returns None if not found.
     """
-    # Path 1: pref_name exact match — 1:1 in ChEMBL; if found, always correct.
+    # Path 1: pref_name exact match - 1:1 in ChEMBL; if found, always correct.
     data = _get_json(f"{BASE_URL}/molecule.json",
                      {"pref_name__iexact": drug_name, "limit": 5})
     mols = data.get("molecules", [])
     if mols:
         return mols[0].get("molecule_chembl_id")
 
-    # Path 2: synonym match — may return multiple molecules that share this
+    # Path 2: synonym match - may return multiple molecules that share this
     # synonym (e.g. salt forms, polymorphs). Pick best-not-first:
     #   (a) exact pref_name match (case-insensitive)
     #   (b) highest character overlap ratio between pref_name and query
-    # NOTE: the synonym filter field is `molecule_synonym` — the old
+    # NOTE: the synonym filter field is `molecule_synonym` - the old
     # `synonym_value` variant returns HTTP 400 for every query (fixed 2026-07-31).
     data = _get_json(f"{BASE_URL}/molecule.json",
                      {"molecule_synonyms__molecule_synonym__iexact": drug_name, "limit": 20})
@@ -1109,9 +1109,9 @@ def _fetch_molecule_safety(molecule_chembl_id: str) -> dict[str, Any]:
     Fetch withdrawal and safety flags for a single ChEMBL molecule.
 
     Fields checked:
-      withdrawn_flag     — True if the drug has been withdrawn from any market
-      black_box_warning  — True (non-zero) if a black-box / boxed warning exists
-      availability_type  — -2=withdrawn from market, -1=discontinued by manufacturer,
+      withdrawn_flag     - True if the drug has been withdrawn from any market
+      black_box_warning  - True (non-zero) if a black-box / boxed warning exists
+      availability_type  - -2=withdrawn from market, -1=discontinued by manufacturer,
                            0=unknown, 1=available
 
     Cached for 30 days; regulatory status changes rarely.
@@ -1141,7 +1141,7 @@ def _fetch_molecule_safety(molecule_chembl_id: str) -> dict[str, Any]:
               f"'{molecule_chembl_id}': {e}")
         # Do NOT cache safe defaults after a failure: a transient error would
         # otherwise be frozen for 30 days as "not withdrawn / no black-box
-        # warning" — a safety-critical false negative.
+        # warning" - a safety-critical false negative.
         return result
 
     cache_set(cache_key, result, ttl_days=30)
@@ -1167,11 +1167,11 @@ def get_molecule_safety_flags(
 
     Returns:
         {
-          "confirmed"          : bool — True ONLY for market-withdrawn drugs
+          "confirmed"          : bool - True ONLY for market-withdrawn drugs
                                         (withdrawn_flag=True).  A black-box warning
                                         alone does NOT set confirmed=True; use the
                                         "black_box_advisory" field for disclosure.
-          "black_box_advisory" : bool — True when black_box_warning=True but the
+          "black_box_advisory" : bool - True when black_box_warning=True but the
                                         drug is NOT market-withdrawn.  Triggers a
                                         prominent disclosure note in the report but
                                         does NOT apply a hard scoring cap (black-box
@@ -1284,7 +1284,7 @@ def _ensure_holdout_resolved() -> None:
         return
     for name in holdout.drugs():
         # _find_molecule_chembl_id raises on HTTP/network errors (raise_for_status)
-        # and returns None only when ChEMBL genuinely has no match — so an
+        # and returns None only when ChEMBL genuinely has no match - so an
         # exception means the redaction would silently degrade if we continued.
         # Retry briefly, then FAIL LOUD: an under-redacted benchmark run is
         # worse than no run.
@@ -1391,8 +1391,8 @@ def get_pharmacological_targets_for_disease(
     Returns [] gracefully on any API or format error.
     """
     # Benchmark holdout: redact held-out drug(s) from the precedent input.
-    # Under an active holdout, an empty names list — redacted-to-empty OR no
-    # OT names at all (the `or None` call-site coerces both to None) — must
+    # Under an active holdout, an empty names list - redacted-to-empty OR no
+    # OT names at all (the `or None` call-site coerces both to None) - must
     # NEVER fall through to the drug_indication EFO fallback: that path can
     # re-discover the held-out drug, and it shares its empty-names_key cache
     # entry with non-holdout runs (poisoning). Conservative under-discovery
@@ -1409,7 +1409,7 @@ def get_pharmacological_targets_for_disease(
     # Cache key v3: stores ONLY raw mechanism-lookup facts (target_symbol,
     # uniprot_id, ensembl_id). association_score and target_discovery_method
     # are injected fresh from the current code constants at return time.
-    # Bumped from v2 which baked association_score into the cache payload —
+    # Bumped from v2 which baked association_score into the cache payload -
     # changing the constant then required a manual cache flush to take effect.
     cache_key = make_key("get_pharmacological_targets_for_disease_v3", disease_efo_id, names_key)
     cached = get(cache_key)
@@ -1464,7 +1464,7 @@ def get_pharmacological_targets_for_disease(
 
         if not mol_ids:
             # Ambiguous empty (genuine no-indication vs degraded 200 payload)
-            # — not cached; refetch next run.
+            # - not cached; refetch next run.
             return results
 
         # Get MOA target IDs for each approved drug molecule
@@ -1480,7 +1480,7 @@ def get_pharmacological_targets_for_disease(
                     target_chembl_ids.add(tid)
 
         if not target_chembl_ids:
-            # Ambiguous empty — not cached.
+            # Ambiguous empty - not cached.
             return results
 
         # Resolve target_chembl_ids -> UniProt (Homo sapiens SINGLE PROTEIN only)
@@ -1495,7 +1495,7 @@ def get_pharmacological_targets_for_disease(
         for tgt in tgt_data.get("targets", []):
             if tgt.get("tax_id") != 9606 and "Homo sapiens" not in (tgt.get("organism") or ""):
                 continue
-            # Use target_components[].accession — the primary UniProt ChEMBL activity
+            # Use target_components[].accession - the primary UniProt ChEMBL activity
             # data is indexed under (distinct from target_component_xrefs which may
             # list many isoform accessions, most of which have 0 ChEMBL bioactivity).
             uniprot_id = None
@@ -1513,7 +1513,7 @@ def get_pharmacological_targets_for_disease(
                 gene_sym = _get_gene_symbol(uniprot_id)
                 # Store only raw source facts in the cache payload.
                 # association_score and target_discovery_method are NOT stored
-                # here — they are applied after the cache is read so that
+                # here - they are applied after the cache is read so that
                 # changing PHARM_PRECEDENT_ASSOC_SCORE (or the method label)
                 # takes effect immediately without requiring a cache flush.
                 results.append({
@@ -1527,7 +1527,7 @@ def get_pharmacological_targets_for_disease(
     except Exception as e:
         print(f"[chembl] WARNING: pharmacological target lookup failed "
               f"for '{disease_efo_id}': {e}")
-        # Do NOT cache partial/empty results after a failure — a cached empty
+        # Do NOT cache partial/empty results after a failure - a cached empty
         # silently disables the precedent path for 7 days.
         return results
 
@@ -1537,8 +1537,8 @@ def get_pharmacological_targets_for_disease(
     # A target reached via an FDA max_phase >= 4 approved drug's confirmed
     # mechanism of action for this exact disease receives
     # PHARM_PRECEDENT_ASSOC_SCORE = 0.90. This reflects direct regulatory and
-    # clinical confirmation — the highest level of evidence that a target is
-    # relevant to a given disease — and is treated as at least as strong as
+    # clinical confirmation - the highest level of evidence that a target is
+    # relevant to a given disease - and is treated as at least as strong as
     # the maximum plausible genetic-association score Open Targets could return.
     # Do not adjust based on individual validation case outcomes; any revision
     # must be a separate, disclosed methodology decision.
@@ -1561,7 +1561,7 @@ def get_drug_action_type(
     Resolution order:
       1. Resolve drug_name → molecule_chembl_id via pref_name / synonym.
       2. Fetch mechanism records for that mol_id directly.
-      3. If empty, try parent_molecule_chembl_id fallback — ChEMBL stores some
+      3. If empty, try parent_molecule_chembl_id fallback - ChEMBL stores some
          mechanism records on salt forms (e.g. sildenafil citrate CHEMBL1737)
          rather than the free-base parent (CHEMBL192), so querying by
          parent_molecule_chembl_id catches them.
@@ -1604,7 +1604,7 @@ def get_drug_action_type(
                          {"molecule_chembl_id": mol_id, "limit": 100})
         mechs = data.get("mechanisms", [])
 
-        # Step 2b: fallback — query by parent_molecule_chembl_id.
+        # Step 2b: fallback - query by parent_molecule_chembl_id.
         # This catches cases where ChEMBL only records mechanism on a
         # salt/specific form while our mol_id lookup returned the free-base
         # parent (e.g. sildenafil CHEMBL192 → citrate CHEMBL1737 has the MoA).
@@ -1886,7 +1886,7 @@ def get_mechanism_only_approved_drugs(
         return []  # not cached
     if not target_ids:
         # No ChEMBL target for this UniProt: ambiguous between "genuinely
-        # unmapped" and a degraded search response — do NOT cache (empty
+        # unmapped" and a degraded search response - do NOT cache (empty
         # payload = failure convention).
         return []
 
@@ -1921,7 +1921,7 @@ def get_mechanism_only_approved_drugs(
                 saw_mechanism_rows = True
             else:
                 # An empty endpoint is ambiguous (ChEMBL's degraded-200
-                # outage mode) — even if other endpoints returned rows, the
+                # outage mode) - even if other endpoints returned rows, the
                 # aggregate may be missing this endpoint's drugs.
                 saw_empty_endpoint = True
             for m in mechs:
@@ -2001,8 +2001,8 @@ def get_mechanism_only_approved_drugs(
     if (results or saw_mechanism_rows) and not saw_empty_endpoint:
         # Cache only when every resolved target endpoint returned a
         # non-ambiguous payload. Any empty endpoint is outage-suspect
-        # (degraded-200 mode) and must not freeze a partial aggregate —
-        # or a baseless "no mechanism drugs" — for 30 days.
+        # (degraded-200 mode) and must not freeze a partial aggregate -
+        # or a baseless "no mechanism drugs" - for 30 days.
         cache_set(cache_key, results, ttl_days=30)
     if results:
         print(f"[chembl] mechanism-only lane: {len(results)} approved "

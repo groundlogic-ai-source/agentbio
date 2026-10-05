@@ -1,5 +1,5 @@
 """
-Audit trap benchmark — measures AgentBio's detection of known failure classes
+Audit trap benchmark - measures AgentBio's detection of known failure classes
 as an AUDIT tool (not discovery accuracy).
 
 Pre-registered in validation/audit_traps_preregistration.md (v1, frozen
@@ -8,7 +8,7 @@ Pre-registered in validation/audit_traps_preregistration.md (v1, frozen
 data_sources.multisource_candidates) against stubbed inputs. No live
 ChEMBL/PubChem/LLM calls.
 # NOTE 2026-09-21: api.claim_verification was extracted from the removed
-# api.dossier module (see api/claim_verification.py's docstring) — the trap
+# api.dossier module (see api/claim_verification.py's docstring) - the trap
 # logic and expected results are unchanged, only the import path moved.
 
 LABEL GUARD: runs ONLY under --label audit_trap_benchmark. This artifact must
@@ -41,13 +41,13 @@ RESULTS_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 RESULTS_MD = RESULTS_JSON.replace(".json", ".md")
 
 # Pre-registered thresholds (audit_traps_preregistration.md). Do not move
-# these after a scored run — a failure is a product defect, not a threshold.
+# these after a scored run - a failure is a product defect, not a threshold.
 PASS_MIN_TRAP_RECALL = 0.90
 PASS_MAX_CONTROL_FALSE_FLAG_RATE = 0.25
 
 
 # --------------------------------------------------------------------------- #
-# Trap and control cases — frozen literals. Changing these after the first
+# Trap and control cases - frozen literals. Changing these after the first
 # scored run invalidates comparability with prior artifacts.
 # --------------------------------------------------------------------------- #
 
@@ -219,7 +219,7 @@ def _t7_salt_form_dedup() -> bool:
 
 
 def _t8_degraded_source_honesty() -> bool:
-    """Provider health must be preserved verbatim — failure never becomes ok."""
+    """Provider health must be preserved verbatim - failure never becomes ok."""
     from data_sources.multisource_candidates import _source_status
 
     degraded = _source_status({
@@ -305,7 +305,7 @@ def _c2_verified_hypothesis() -> bool:
 
 
 def _c3_measured_zero_counts() -> bool:
-    """A MEASURED tanimoto 0.0 stays in scoring — opposite of 'unobserved'."""
+    """A MEASURED tanimoto 0.0 stays in scoring - opposite of 'unobserved'."""
     from agents.reviewer import COMPOSITE_WEIGHTS, _coverage_aware_composite
 
     with_zero, cov_zero = _coverage_aware_composite(0.8, None, 0.0, None)
@@ -354,7 +354,7 @@ def _t11_degraded_200_empty_pool_not_cached() -> bool:
 
 def _t12_holdout_name_no_api_leak() -> bool:
     """Under an active benchmark holdout, the precedent-target path must not
-    leak the held-out drug — by exact name, by salt/ester shared parent, or
+    leak the held-out drug - by exact name, by salt/ester shared parent, or
     via the ChEMBL drug_indication EFO fallback rediscovering it after
     redaction empties the list. A naive tool falls through to the fallback
     and re-discovers the drug it was supposed to hide.
@@ -379,7 +379,7 @@ def _t12_holdout_name_no_api_leak() -> bool:
 
     def _cache_set_spy(key, value, **kw):
         # make_key() hashes its arguments, so the sentinel name is NOT
-        # string-matchable in the key — assert by VALUE: the sentinel path
+        # string-matchable in the key - assert by VALUE: the sentinel path
         # is the only cache_set in this function that writes an empty list.
         if value == []:
             sentinel_writes.append((key, value))
@@ -447,7 +447,7 @@ def run() -> dict[str, Any]:
         try:
             caught = bool(fn())
             error = None
-        except Exception as exc:  # noqa: BLE001 — an exception is a MISS, recorded
+        except Exception as exc:  # noqa: BLE001 - an exception is a MISS, recorded
             caught, error = False, f"{type(exc).__name__}: {exc}"
         trap_rows.append({"id": tid, "class": cls, "caught": caught, "error": error})
         print(f"[trap {tid:>4}] {cls:<34} {'CAUGHT' if caught else 'MISSED'}"
@@ -458,7 +458,7 @@ def run() -> dict[str, Any]:
         try:
             clean = bool(fn())
             error = None
-        except Exception as exc:  # noqa: BLE001 — an exception is a FALSE FLAG
+        except Exception as exc:  # noqa: BLE001 - an exception is a FALSE FLAG
             clean, error = False, f"{type(exc).__name__}: {exc}"
         control_rows.append({"id": cid, "class": cls, "clean": clean, "error": error})
         print(f"[ctrl {cid:>4}] {cls:<34} {'CLEAN' if clean else 'FALSE-FLAGGED'}"

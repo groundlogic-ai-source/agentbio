@@ -103,7 +103,7 @@ class TestRepurposingGate(unittest.TestCase):
 
     def test_provider_approval_makes_is_approved_drug_true(self):
         # The ledger derives is_approved_drug from max_phase alone, so approval
-        # evidenced only by a provider record must be reconciled — otherwise the
+        # evidenced only by a provider record must be reconciled - otherwise the
         # gate and the downstream unapproved cap disagree.
         cand = _candidate(_evidence_ledger={"records": [_approval_record()]})
         eligible, _ = filter_repurposing_eligible([cand], enforce=True)

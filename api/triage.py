@@ -3,12 +3,12 @@ Candidate-list triage: adversarially audit a caller-supplied list of drugs
 against the persisted reviewed-candidates pool of one finished case.
 
 This is the "bring your own list" entry of Audit mode. It reuses run_audit()
-verbatim — the same resolution, the same cap fields, the same honest statuses —
+verbatim - the same resolution, the same cap fields, the same honest statuses -
 with LLM narration disabled so a 25-drug list costs no extra model calls and
 every verdict is deterministic given the pool.
 
 Every triage run is persisted to Postgres (api/triage_db.py) so the verdict a
-caller saw can be retrieved later by run id — the audit trail is the product.
+caller saw can be retrieved later by run id - the audit trail is the product.
 """
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from api.audit import run_audit
 MAX_TRIAGE_DRUGS = 25
 
 # Coded flags surfaced per verdict row. These are deliberately mechanical
-# mappings of the same candidate fields the dossier writer reads — no new
+# mappings of the same candidate fields the dossier writer reads - no new
 # judgment layer that could drift from the case dossier.
 F_SAFETY_CAP = "SAFETY_CAP"
 F_MECHANISM_CAP = "MECHANISM_CAP"
@@ -192,7 +192,7 @@ def run_triage(
                              claimed_modality=str(claim.get("modality") or ""),
                              claimed_context=str(claim.get("context") or ""),
                              source_deadline_monotonic=source_deadline)
-        except Exception as exc:  # noqa: BLE001 — per-drug failure must not sink the batch
+        except Exception as exc:  # noqa: BLE001 - per-drug failure must not sink the batch
             return {"status": "error", "drug_name": name, "error": str(exc)[:200]}
 
     # Small bounded fan-out: each audit is one ChEMBL name resolution plus a

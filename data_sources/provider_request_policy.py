@@ -39,7 +39,7 @@ POLICIES = {
     # GtoPdb is a small academic service and rate-limits harder than its size
     # suggests. A reviewer pass over a large candidate pool fans out to it once
     # per (candidate, target), which was enough to draw sustained HTTP 429s and
-    # — because those land in candidate_source_coverage.failures — to block
+    # - because those land in candidate_source_coverage.failures - to block
     # report persistence for the whole run. One in-flight request at a time
     # with a half-second floor keeps a 200-candidate pass inside what the
     # service tolerates; the shared retry path honours Retry-After when it is

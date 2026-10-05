@@ -4,7 +4,7 @@ Unit tests build a synthetic snapshot and pin the DRS API's exact query
 semantics (trim + case-insensitive substring for accession/gene, exact int
 match for structures/id, 404 → None). The conformance test replays every
 DrugCentral-enabled control target through the local lane and requires the
-recorded ok/empty status to reproduce exactly — this is the evidence cited by
+recorded ok/empty status to reproduce exactly - this is the evidence cited by
 Amendment 6 for blessing the fingerprint transition instead of re-running
 the control.
 

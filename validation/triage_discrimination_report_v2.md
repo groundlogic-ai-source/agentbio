@@ -1,4 +1,4 @@
-# Triage Discrimination Study — Study A Report (v2, result of record)
+# Triage Discrimination Study - Study A Report (v2, result of record)
 
 Frozen results: `validation/triage_discrimination_results_v2.json`.
 Freeze manifest: `validation/triage_discrimination_freeze_manifest_v2.json`
@@ -17,7 +17,7 @@ Amendments 1–2. v1's directional findings hold under the corrected design.
 ## Claim boundary (unchanged)
 
 This study measures **reliance-safety** of the audit layer on confirmed
-repurposings — resolution, spurious-disqualification guard-rail, and planted
+repurposings - resolution, spurious-disqualification guard-rail, and planted
 false-assertion detection. It does **not** measure hypothesis discrimination;
 the disease-dependent dimensions needed for that come from pools that are not
 disease-blind and are reported descriptively in Study B only.
@@ -39,10 +39,10 @@ excluded at drug level)
   fire is PRECLINICAL_ONLY, and the marketed-label guard makes that
   near-impossible for label-resolved approved drugs. E2 is a guard-rail
   regression check, not discrimination evidence. No confirmed repurposing was
-  disqualified — there are none to name.
+  disqualified - there are none to name.
 - **E1 = 80.5%** is the partner-relevant capability number. The 39 unresolved
   are drugs without a cutoff-eligible US openFDA label (`label_status=empty`
-  or unresolved) — a source-coverage limit, not a judgment. Non-US-approved
+  or unresolved) - a source-coverage limit, not a judgment. Non-US-approved
   and older/withdrawn-label drugs dominate the residue.
 - **E3 = 0** is a property of the claim-free, pool-free configuration
   (lipophilicity and route-claim surfaces need a pool or a claim), not a claim
@@ -55,7 +55,7 @@ excluded at drug level)
 ## Amendment log
 
 - **Amendment 1 (during v1 analysis):** N4 `flagged` fell through to CLEAR in
-  the profile surface — the detectors fired on all valid NC2 controls but the
+  the profile surface - the detectors fired on all valid NC2 controls but the
   study surface showed 0. Fixed (`route_feasibility=FLAGGED` + soft caution);
   fingerprint `cf9bb3b9…` → `c600f834…`; unreachable under claim-free cohort A.
   Runner NC pass booleans corrected to the pre-registered ≥80%-of-valid rate.

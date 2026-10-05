@@ -1,13 +1,13 @@
-# Study C — completion (v1) and v2 plan
+# Study C - completion (v1) and v2 plan
 
 Status as of 2026-08-19. Decided with the user: finish v1 (Path 3), then run a
 universe-verified v2 (Path 2). AgentBio is the product name; "Silver Bullet"
 appears only in legacy strings.
 
-## Path 3 — v1 finalization (this publish)
+## Path 3 - v1 finalization (this publish)
 
 The frozen 27-case set contained 20 diseases outside the rare-disease/NTD
-universe — they were never scorable by a rare-disease tool and stranded in
+universe - they were never scorable by a rare-disease tool and stranded in
 `skipped` forever, which blocked results from being written at all.
 
 Resolution (amendment #3, RULE_FINGERPRINT unchanged): out-of-universe cases
@@ -18,7 +18,7 @@ Final v1 scope: **6 scored diseases + 21 disclosed exclusions.**
 
 To eliminate the risk of yet another prod-side defect, finalization runs in
 dev against the checkpoint snapshot pulled from prod
-(`validation/run_studyc_local_finalize.py` — identical code path; only the
+(`validation/run_studyc_local_finalize.py` - identical code path; only the
 git commit-pin check is made to fail open, exactly as it does in the prod
 snapshot which ships without git). No LLM calls on this path: all six pools
 are checkpoint-finalized, exclusions raise before any agent call, and drug
@@ -47,7 +47,7 @@ the documented miss classes:
   activity-data pool;
 - the known drug's target was not among the disease's top-3 selected targets
   (bortezomib/cyclophosphamide in Multiple Myeloma; hydroxychloroquine in
-  Lupus) — the target-not-considered class;
+  Lupus) - the target-not-considered class;
 - ChEMBL assay-strictness pool gaps (existing task: recover Sapropterin-like
   drugs).
 
@@ -58,19 +58,19 @@ separation claim to make.
 
 **Honest framing for adoption:** v1's result is "pool coverage is the binding
 constraint; ranking conditional on coverage looks strong in 6 anecdotes." That
-is a coverage finding, not a discrimination finding — and it independently
+is a coverage finding, not a discrimination finding - and it independently
 motivates the already-tracked pool-recovery work.
 
 v1 is reported as a **pilot** with this outcome disclosed; 6 diseases could
 never have anchored the adoption claim alone, and as completed they anchor a
 coverage claim instead.
 
-## Path 2 — Study C v2 (universe-verified case set)
+## Path 2 - Study C v2 (universe-verified case set)
 
-## Path 2 — Study C v2 (universe-verified case set)
+## Path 2 - Study C v2 (universe-verified case set)
 
 Goal: n = 15–20 scored rare diseases. At n = 16, an observed 80%
-discrimination recall carries a 95% Wilson CI of roughly 55–93% — wide but
+discrimination recall carries a 95% Wilson CI of roughly 55–93% - wide but
 defensible; v1's n = 6 interval (36–99%) is not.
 
 Design rules, each traceable to a v1 failure:
@@ -98,8 +98,8 @@ Design rules, each traceable to a v1 failure:
    the discrimination claim.
 
 Sequencing: v1 results ship first (this publish, $0 remaining). v2 case-set
-construction and freeze can start immediately after — it is cheap and
-offline-first — with the run itself greenlit once sources are healthy.
+construction and freeze can start immediately after - it is cheap and
+offline-first - with the run itself greenlit once sources are healthy.
 
 ## Miss autopsy + rescue analysis (2026-08-20)
 
@@ -121,12 +121,12 @@ scripts re-runnable, cached, no pipeline stage re-run):
 target_not_selected positives, the drug's mechanism target does not appear
 ANYWHERE in the disease's ranked candidate-target list (lists of 5–20
 targets): rescued_at_k = 0 for K = 3, 5, 10, 25. The wall is upstream of the
-top-K gate — it is the target UNIVERSE construction (OpenTargets genetic
+top-K gate - it is the target UNIVERSE construction (OpenTargets genetic
 associations + approved-drug MOA targets). Bortezomib's PSMB5 is not among
 myeloma's 20 candidate targets; triamcinolone's NR3C1 is not among GCA's 5.
 
 Notably, the ChEMBL assay-strictness class (the Sapropterin/Pyridostigmine
-pool-recovery task) occurred ZERO times in this case set — that upgrade would
+pool-recovery task) occurred ZERO times in this case set - that upgrade would
 not have moved v1 coverage. Caveat: ChEMBL mechanism coverage is itself
 incomplete (e.g. hydroxychloroquine's immunomodulation), so "target not in
 universe" partly reflects mechanism-knowledge gaps, not only selection.
@@ -134,7 +134,7 @@ universe" partly reflects mechanism-knowledge gaps, not only selection.
 **Upgrade ranking by expected coverage gain:**
 
 1. **Target-universe expansion** (rescues the 50% class): pathway/PPI
-   neighbor lanes — the Reactome pathway-neighbor prototype already exists
+   neighbor lanes - the Reactome pathway-neighbor prototype already exists
    (MTOR confirmed neighbor of TSC1). This is disease-blind (uses no answer
    drugs), so benchmark integrity is preserved. Tradeoff to decide: loosens
    the genetics anchor that is part of AgentBio's precision story.
@@ -151,17 +151,17 @@ as the labeled sensitivity cohort for the before/after claim.
 
 Shipped two coverage lanes, both kill-switched by `AGENTBIO_DISABLE_V2_LANES=1`:
 
-1. **Path D — pathway-neighbor universe expansion** (`select_for_disease`):
+1. **Path D - pathway-neighbor universe expansion** (`select_for_disease`):
    Reactome neighbors of drug-FREE seed targets only (genetic + literature
    lanes; pharmacological-precedent rows cannot seed), broad_metabolic tier
    excluded, ≤10 per disease, fixed association score 0.05 (half the genetic
-   gate — handicapped, score-governed, not strictly subordinated).
+   gate - handicapped, score-governed, not strictly subordinated).
 2. **Mechanism-only pool supplement** (`run_chemist` +
    `chembl.get_mechanism_only_approved_drugs`): approved drugs with a ChEMBL
    mechanism row but no qualifying IC50/Ki (biologics structurally; the
    Sapropterin assay-strictness class). Rows carry pool_origin/mechanism/
    action through the chemist projection and normalize to a ledger MECHANISM
-   record — never a null-pChEMBL bioactivity record. Cache discipline: any
+   record - never a null-pChEMBL bioactivity record. Cache discipline: any
    empty mechanism endpoint across all resolved target IDs = not cached;
    key namespaced `mechanism_only_approved_v2`.
 
@@ -175,7 +175,7 @@ The 4 UC biologics stay out one gate later: TNF/ITGA4 enter no top-5
 selection, so the mechanism lane never fires for them.
 
 **What this means:** pathway expansion and biologic lanes are live, safe, and
-improve sparse-universe diseases and evidence honesty — but they do NOT move
+improve sparse-universe diseases and evidence honesty - but they do NOT move
 the v1 cohort. The measured ceiling is mechanistic novelty: drugs whose
 working target has no genetic/literature/precedent link to the disease are
 unreachable by ANY target-anchored lane. v2 case-set design should therefore

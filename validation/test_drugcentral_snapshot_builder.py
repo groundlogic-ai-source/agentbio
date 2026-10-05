@@ -3,7 +3,7 @@
 The builder converts the official 1.4 GB pg_dump into the committed two-table
 sqlite. These tests pin the code-review hardening: malformed COPY rows,
 headers missing retained columns, invalid UTF-8, and unpinned dump bytes must
-all FAIL LOUDLY — never silently substitute NULLs or build from unverified
+all FAIL LOUDLY - never silently substitute NULLs or build from unverified
 input.
 
 unittest-only (no pytest in this env): run via
@@ -161,7 +161,7 @@ class UnwantedBlockIsolationTest(unittest.TestCase):
     def test_copy_like_data_and_binary_garbage_inside_unwanted_block(self):
         events = self._parse([
             b"COPY public.lincs_signature (x) FROM stdin;\n",
-            # A data line byte-identical to a WANTED-table header — must not
+            # A data line byte-identical to a WANTED-table header - must not
             # hijack the parser:
             b"COPY public.act_table_full (act_id) FROM stdin;\n",
             b"\xff\xfe binary garbage that must never be decoded\n",

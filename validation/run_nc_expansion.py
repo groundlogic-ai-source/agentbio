@@ -1,6 +1,6 @@
 """Scored run for the EXPANDED negative controls (NC1/NC2 expansion).
 
-Mirrors validation/run_triage_discrimination.py's NC path exactly — same
+Mirrors validation/run_triage_discrimination.py's NC path exactly - same
 _audit_case execution, same health gate, same holdout-blindness assertion,
 same Wilson math, same checkpoint/fail-closed discipline. No LLM calls are
 made anywhere in this run: the audit context is built with the deterministic

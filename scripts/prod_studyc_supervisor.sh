@@ -70,7 +70,7 @@ while true; do
     echo "complete" > "$DONE"
     break
   fi
-  # Freeze violation is a hard stop — never auto-retry a frozen-study breach.
+  # Freeze violation is a hard stop - never auto-retry a frozen-study breach.
   if tail -n 50 "$LOG" | grep -q "FREEZE VIOLATION"; then
     echo "FREEZE VIOLATION — manual intervention required" >> "$LOG"
     echo "freeze_violation" > "$DONE"

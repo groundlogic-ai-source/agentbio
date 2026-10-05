@@ -419,7 +419,7 @@ def check_tissue_exposure(
         cache_set(cache_key, result, ttl_days=_TTL_DAYS)
         return result
 
-    except Exception as e:  # noqa: BLE001 — fail-open by design
+    except Exception as e:  # noqa: BLE001 - fail-open by design
         print(f"[tissue_exposure] WARNING: check failed for "
               f"'{drug_name}'/'{disease_name}': {e}")
         return _envelope(

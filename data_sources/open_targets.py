@@ -39,7 +39,7 @@ def search_disease_efo(disease_name: str) -> Optional[str]:
       break ties (same descendant count) by the *highest* OT relevance score.
       This is strictly better than the old first-encountered rule, which
       relied on OT returning hits in strict score order and broke early on the
-      first 0-descendant node — missing a higher-scoring sibling if OT's order
+      first 0-descendant node - missing a higher-scoring sibling if OT's order
       was not perfectly monotone or if two 0-descendant candidates existed.
 
     Logs an auditable override line when the chosen EFO differs from rank-0.
@@ -77,7 +77,7 @@ def search_disease_efo(disease_name: str) -> Optional[str]:
         top_score = disease_hits[0].get("score") or 0.0
         score_floor = top_score * 0.70
 
-        # Phase 1 — collect all within-floor candidates that have a verified
+        # Phase 1 - collect all within-floor candidates that have a verified
         # descendant count.  We iterate in the order OT returns hits (typically
         # descending score) and break on the first below-floor entry, but we do
         # NOT break early on the first 0-descendant hit.  Collecting all allows
@@ -93,7 +93,7 @@ def search_disease_efo(disease_name: str) -> Optional[str]:
                 break  # OT returns hits roughly score-descending; safe to break
             desc = get_disease_descendant_count(h["id"])
             if desc is None:
-                continue  # breadth unverifiable — exclude from selection
+                continue  # breadth unverifiable - exclude from selection
             candidates.append((desc, c_score, i))
 
         if not candidates:
@@ -174,7 +174,7 @@ def get_target_disease_score(disease_efo_id: str) -> list[dict[str, Any]]:
         results.sort(key=lambda x: x["association_score"], reverse=True)
     except Exception as e:
         print(f"[open_targets] WARNING: association query failed for '{disease_efo_id}': {e}")
-        # Do NOT cache an empty association list after a failure — a cached []
+        # Do NOT cache an empty association list after a failure - a cached []
         # silently removes all genetic targets for 7 days and lets the
         # pharmacological-precedent path win by default.
         return results
@@ -194,9 +194,9 @@ def get_disease_known_drugs(disease_efo_id: str) -> dict[str, Any]:
         }
 
     has_approved_treatment is:
-      True  — at least one drug with isApproved=True or maximumClinicalTrialPhase>=4
-      False — drugs are in trials for this disease, but none are approved
-      None  — the API call itself failed (unknown; treated as missing data)
+      True  - at least one drug with isApproved=True or maximumClinicalTrialPhase>=4
+      False - drugs are in trials for this disease, but none are approved
+      None  - the API call itself failed (unknown; treated as missing data)
 
     Cache key includes "v1" so stale None-entries from before this function
     existed are not confused with "API returned no drugs".
@@ -249,7 +249,7 @@ def get_disease_known_drugs(disease_efo_id: str) -> dict[str, Any]:
             result["approved_drug_names"] = approved_names
     except Exception as e:
         print(f"[open_targets] WARNING: drugAndClinicalCandidates query failed for '{disease_efo_id}': {e}")
-        # has_approved_treatment stays None — caller will treat as unknown
+        # has_approved_treatment stays None - caller will treat as unknown
 
     # Only cache when the query actually succeeded: caching the None "unknown"
     # result after a transient GraphQL failure would poison 7 days of lookups.
@@ -267,7 +267,7 @@ def get_disease_parents(efo_id: str) -> list[dict[str, Any]]:
     when the subtype's own EFO has no linked approved-drug indications in OT.
     Canonical example: sildenafil/Revatio is linked to the umbrella
     "pulmonary arterial hypertension" EFO, not to "idiopathic pulmonary
-    arterial hypertension" — so the parent walk is needed to surface PDE5A
+    arterial hypertension" - so the parent walk is needed to surface PDE5A
     via the pharmacological-precedent path.
 
     Returns [{id, name}] for each parent, or [] if none or on API error.
@@ -316,7 +316,7 @@ def get_disease_descendant_count(efo_id: str) -> Optional[int]:
     Used as a breadth filter in the parent-umbrella drug supplement:
     parents that aggregate hundreds or thousands of distinct disorders are too
     non-specific to yield useful pharmacological-precedent signals.  N=100 is
-    the calibrated threshold — calibrated from real descendant counts:
+    the calibrated threshold - calibrated from real descendant counts:
       largest known-good parent  (acute myeloid leukemia)      = 87
       smallest known-bad parent  (inborn error of immunity)    = 228
 
@@ -384,7 +384,7 @@ def get_ot_canonical_disease_name(efo_id: str) -> Optional[str]:
     except Exception as e:
         print(f"[open_targets] WARNING: canonical name lookup failed for '{efo_id}': {e}")
 
-    # Cache only on success — a failure must not be frozen as the "" sentinel
+    # Cache only on success - a failure must not be frozen as the "" sentinel
     # (indistinguishable from "OT has no name for this ID").
     if ok:
         cache_set(cache_key, name if name is not None else "", ttl_days=30)
@@ -424,7 +424,7 @@ def get_disease_orphanet_code(efo_id: str) -> Optional[str]:
     except Exception as e:
         print(f"[open_targets] WARNING: dbXRefs lookup failed for '{efo_id}': {e}")
 
-    # Cache only on success — a failure must not be frozen as the "" sentinel.
+    # Cache only on success - a failure must not be frozen as the "" sentinel.
     if ok:
         cache_set(cache_key, orpha_code if orpha_code is not None else "", ttl_days=7)
     return orpha_code

@@ -34,7 +34,7 @@ PATHWAY SPECIFICITY CALIBRATION (measured 2026-07 from real Reactome API data):
     R-HSA-70221   "Glycogen breakdown (glycogenolysis)"
                   15 UniProt participants: GAA, phosphorylases, phosphoglucomutase, etc.
                   → "broad_metabolic" tier (enzymes share substrate, not complex;
-                    GAA operates in lysosomes, SLC37A4 in ER — unrelated mechanisms)
+                    GAA operates in lysosomes, SLC37A4 in ER - unrelated mechanisms)
 
 Key finding: participant count alone does NOT separate good from bad cases
 (valid TSC1→MTOR has 29 participants; at-risk glycogenolysis has 15).
@@ -43,12 +43,12 @@ PROCESS (enzymes grouped by shared substrate, different compartments) vs. a
 SIGNALING or REGULATORY PATHWAY (proteins in the same complex or cascade).
 
 Specificity tiers applied per neighbor:
-  "direct"         — ≤ PATHWAY_TIER_DIRECT (5) participants in any shared
+  "direct"         - ≤ PATHWAY_TIER_DIRECT (5) participants in any shared
                      non-metabolic pathway.  Near-certain direct reaction partner.
-  "broad_metabolic"— ALL shared examined pathways have metabolic-process keywords
+  "broad_metabolic"- ALL shared examined pathways have metabolic-process keywords
                      in their display name.  Reviewer must verify compartment and
                      mechanism compatibility independently.
-  "moderate"       — everything else (valid signaling module; human judgment applies).
+  "moderate"       - everything else (valid signaling module; human judgment applies).
 """
 
 import time
@@ -79,7 +79,7 @@ PATHWAY_TIER_DIRECT = 5
 # Calibrated against R-HSA-165181 (TSC1/AKT direct pathway, 5 participants).
 
 _BROAD_PATHWAY_KEYWORDS: frozenset[str] = frozenset({
-    # Metabolic process terms — pathways that group enzymes by shared substrate
+    # Metabolic process terms - pathways that group enzymes by shared substrate
     # rather than direct molecular interaction.  Calibrated against R-HSA-70221
     # "Glycogen breakdown (glycogenolysis)" to ensure it is flagged, while
     # R-HSA-380972 "Energy dependent regulation of mTOR by LKB1-AMPK" is NOT
@@ -151,7 +151,7 @@ def get_pathway_neighbors(
         print(f"[reactome] ignoring malformed/stale neighbor cache for {uniprot_id}")
 
     # Step 1: fetch all pathways the protein participates in.
-    # _get returns None on failure — distinguish failure from a genuine empty
+    # _get returns None on failure - distinguish failure from a genuine empty
     # pathway list: only the genuine empty may be cached.
     pathways = _get(f"{BASE_URL}/data/mapping/UniProt/{uniprot_id}/pathways")
     if pathways is None:

@@ -40,7 +40,7 @@ def load_provenance() -> dict[str, Any]:
 
 
 def reset() -> None:
-    """Clear the log — call once at the start of a fresh Stage 2 run."""
+    """Clear the log - call once at the start of a fresh Stage 2 run."""
     _save_raw({"entries": []})
 
 

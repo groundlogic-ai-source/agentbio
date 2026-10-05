@@ -63,7 +63,7 @@ class TestConvergenceCap(unittest.TestCase):
         self.assertEqual([r["target_symbol"] for r in out], ["PDGFRA", "IL5"])
         self.assertTrue(out[1]["precedent_capped"])
         self.assertNotIn("precedent_capped", out[0])
-        # Scores unchanged — demotion is rank-only.
+        # Scores unchanged - demotion is rank-only.
         self.assertEqual(out[1]["tractability_score"], 0.80)
 
     def test_umbrella_precedent_also_capped(self):
@@ -79,7 +79,7 @@ class TestConvergenceCap(unittest.TestCase):
         precedent = _row("PDE5A", "pharmacological_precedent", 0.90, 0.70, 0.10)
         rows = [precedent, weak_genetic]
         out = _apply_mechanistic_convergence_cap(rows)
-        self.assertEqual(out, rows)  # precedent still wins — sildenafil pattern
+        self.assertEqual(out, rows)  # precedent still wins - sildenafil pattern
         self.assertNotIn("precedent_capped", out[0])
 
     def test_noop_when_precedent_already_below(self):

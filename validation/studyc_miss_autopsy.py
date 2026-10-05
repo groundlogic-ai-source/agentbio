@@ -1,4 +1,4 @@
-"""Study C v1 miss autopsy — WHY is each absent/unresolved drug not in its pool?
+"""Study C v1 miss autopsy - WHY is each absent/unresolved drug not in its pool?
 
 Post-hoc forensic analysis over the completed, frozen v1 artifacts. Runs no
 pipeline stages and touches no frozen file: it reads the results rows and the
@@ -7,7 +7,7 @@ live-but-cached ChEMBL lookups:
 
   name_resolution_gap   ChEMBL cannot resolve the drug name (even with a
                         curated alternate)
-  biologic_structural   molecule_type is a biologic class — activity-data
+  biologic_structural   molecule_type is a biologic class - activity-data
                         pools structurally exclude it
   assay_pool_gap        drug HAS a ChEMBL mechanism against one of the
                         disease's selected top-3 targets, but no qualifying

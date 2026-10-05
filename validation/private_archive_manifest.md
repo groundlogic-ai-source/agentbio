@@ -1,4 +1,4 @@
-# Private-archive manifest — oversized raw artifacts omitted from the public mirror
+# Private-archive manifest - oversized raw artifacts omitted from the public mirror
 
 The public GitHub mirror omits a small number of oversized raw archives (large
 LLM checkpoint/output dumps and historical runtime databases). These remain in
@@ -16,6 +16,6 @@ Also omitted: historical snapshots of `cache/cache.db` and `checkpoints.db`
 (runtime-local SQLite state with no evidentiary content), and the repository's
 Git LFS configuration (all LFS-tracked paths are among the omissions above).
 
-All *scored results of record* — the artifacts the freeze manifests pin by
+All *scored results of record* - the artifacts the freeze manifests pin by
 SHA-256 (e.g. `benchmark_results_v2.json`, the audit claim-set and results
-files) — **are** present in the public mirror, byte-identical.
+files) - **are** present in the public mirror, byte-identical.

@@ -13,7 +13,7 @@ This study measures **reliance-safety** of the audit/triage evidence layer:
    operation? (guard-rail)
 3. Does it detect planted, mechanically false assertions? (detection)
 
-It does **not** measure hypothesis discrimination — whether the layer can tell
+It does **not** measure hypothesis discrimination - whether the layer can tell
 a good drug–disease hypothesis from a plausible-but-unapproved one. The
 disease-dependent dimensions (rank, mechanism direction, safety caps) are
 computed from a pool that is **not disease-blind** (agents/reviewer.py derives
@@ -33,7 +33,7 @@ scored claims below.
   dev-suite drugs excluded at drug level (E3); nc1 n=15 biologics with planted
   `claimed_modality="small molecule"`; nc2 n=15 non-oral drugs with planted
   `claimed_route="oral"`.
-- **Instrument under test:** the shipped code path — `build_audit_context`
+- **Instrument under test:** the shipped code path - `build_audit_context`
   (with holdout redaction active, verified per case) + `detect_audit_findings`
   + `validation/evidence_profile.build_profile` (rule fingerprint
   `cf9bb3b9…f40d9f`). The pool-free `no_case` path is used deliberately:
@@ -50,35 +50,35 @@ scored claims below.
 Scored exactly once on the eligible subsets defined below. Wilson score 95%
 intervals throughout.
 
-**E1 — Resolution rate (cohort A).** Fraction of the 200 drugs whose openFDA
+**E1 - Resolution rate (cohort A).** Fraction of the 200 drugs whose openFDA
 label lane returns status `ok` (not unavailable/parse_failed/degraded).
-Report with CI. No pass threshold — this is a capability measurement a partner
+Report with CI. No pass threshold - this is a capability measurement a partner
 needs verbatim. (Pre-registered expectation, not a gate: ≥70%.)
 
-**E2 — Guard-rail spurious-disqualification rate (cohort A, eligible subset).**
+**E2 - Guard-rail spurious-disqualification rate (cohort A, eligible subset).**
 Fraction of E1-eligible drugs whose `primary_disposition == DISQUALIFIED`.
 PASS if the Wilson 95% upper bound ≤ 5%. Disclosed limitation: under claim-free
 operation the only disease-independent hard disqualifier that can fire is
 PRECLINICAL_ONLY, and the marketed-label guard makes that near-impossible for
-label-resolved approved drugs — so E2 is expected to be near-zero **by
+label-resolved approved drugs - so E2 is expected to be near-zero **by
 construction**. It is reported as a guard-rail regression check, not as
 evidence of discrimination.
 
-**E3 — Soft-caution rate (cohort A, eligible subset).** Fraction with
+**E3 - Soft-caution rate (cohort A, eligible subset).** Fraction with
 `primary_disposition == QUALIFIED`. Descriptive; reported per dimension. The
 known direction of the XLogP signal (confirmed positive repurposing signal,
 currently surfaced as caution-only) is disclosed.
 
-**E4 — NC1 detection rate.** A control is *valid* if its label lane resolved
+**E4 - NC1 detection rate.** A control is *valid* if its label lane resolved
 AND at least one cutoff-eligible product has `product_modality` in
 {biologic, vaccine}. Detection = N2 `flagged` among valid controls.
 PASS if ≥ 12/15 (80%) of valid controls are detected.
 
-**E5 — NC2 detection rate.** A control is *valid* if its label lane resolved
+**E5 - NC2 detection rate.** A control is *valid* if its label lane resolved
 AND its approved routes are non-empty AND exclude oral. Detection = N4
 `flagged` among valid controls. PASS if ≥ 12/15 (80%) of valid controls are
 detected. Controls that turn out to have an oral label route are mislabeled
-ground truth — disclosed and excluded from the denominator.
+ground truth - disclosed and excluded from the denominator.
 
 ## Operational rules
 
@@ -111,7 +111,7 @@ as computed on non-disease-blind pools. No threshold, no pass/fail.
 **What happened.** ClinicalTrials.gov rate-limited the pool builds
 (thousands of 429s; the client had no backoff). A failed trial query is
 handled by dropping the trial term from that candidate's composite as a
-coverage gap — correct per-candidate behaviour, but it means a pool builds
+coverage gap - correct per-candidate behaviour, but it means a pool builds
 to completion while an arbitrary subset of its candidates is scored on
 thinner evidence than the rest. Measured coverage of the five pools built
 before the gate existed:

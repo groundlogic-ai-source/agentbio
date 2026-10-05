@@ -4,7 +4,7 @@ Disease-process mechanism discovery via the Europe PMC REST API.
 VERIFIED public endpoint:
   https://www.ebi.ac.uk/europepmc/webservices/rest/search
 
-DESIGN — this lane is a *disease-process* discovery source, NOT a drug lookup.
+DESIGN - this lane is a *disease-process* discovery source, NOT a drug lookup.
 It never queries by drug name. Given a disease it asks the literature which
 broad, disease-agnostic mechanism CLASSES are asserted for that disease's
 process, and returns the canonical human TARGET(s) implicated by each admitted
@@ -60,15 +60,15 @@ from data_sources import holdout
 
 BASE_URL = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
 
-# Cache key version — bump when the ontology or the admission gate changes so
+# Cache key version - bump when the ontology or the admission gate changes so
 # rows produced under an older contract can never be served.
 _ONTOLOGY_VERSION = "v6"
 _TTL_DAYS = 7
 
-# HTTP statuses that mean "temporarily unavailable" — never cached.
+# HTTP statuses that mean "temporarily unavailable" - never cached.
 _TRANSIENT_STATUSES = {429, 500, 502, 503, 504}
 
-# Bounded page size for the Europe PMC search — we only need enough records to
+# Bounded page size for the Europe PMC search - we only need enough records to
 # clear a small support threshold, and an unbounded page wastes the provider.
 _PAGE_SIZE = 100
 
@@ -166,7 +166,7 @@ MECHANISM_ONTOLOGY: list[dict[str, Any]] = [
     },
     {
         "mechanism_class": "dopamine_receptor_symptomatic_modulation",
-        # Symptomatic, not disease-modifying — see module docstring / spec.
+        # Symptomatic, not disease-modifying - see module docstring / spec.
         "therapeutic_role": "symptom_treatment",
         "evidence_policy": "symptom_therapeutic",
         "targets": [
@@ -310,7 +310,7 @@ def _disease_only_used_as_model(text_spaced: str,
 
 
 def _holdout_fingerprint() -> list[str]:
-    """Sorted, normalized held-out drug names — the cache-key discriminator."""
+    """Sorted, normalized held-out drug names - the cache-key discriminator."""
     return sorted({_norm(d) for d in holdout.drugs() if _norm(d)})
 
 
@@ -426,7 +426,7 @@ def _admit_class(cls: dict[str, Any], records: list[dict[str, Any]],
         combined = f"{title}. {abstract}"
         text_norm = _norm(combined)          # for held-out containment
 
-        # (1) holdout redaction — discard before it can count as evidence.
+        # (1) holdout redaction - discard before it can count as evidence.
         if _record_is_held_out(text_norm):
             continue
 
@@ -554,11 +554,11 @@ def discover_disease_process_targets(disease_name: str,
       {source, status, targets, error, release}
 
     status:
-      "ok"           — at least one class admitted.
-      "empty"        — reachable, healthy, but no class cleared the gate
-                       (cacheable — a genuine negative for this disease).
-      "unavailable"  — transient HTTP / timeout / connection error (NOT cached).
-      "parse_failed" — payload reachable but malformed (NOT cached).
+      "ok"           - at least one class admitted.
+      "empty"        - reachable, healthy, but no class cleared the gate
+                       (cacheable - a genuine negative for this disease).
+      "unavailable"  - transient HTTP / timeout / connection error (NOT cached).
+      "parse_failed" - payload reachable but malformed (NOT cached).
     """
     disease_name = (disease_name or "").strip()
     disease_tokens = _norm_tokens(disease_name)
@@ -574,7 +574,7 @@ def discover_disease_process_targets(disease_name: str,
         return cached
 
     if not disease_tokens:
-        # No disease to query — a healthy empty (nothing to cache poison here).
+        # No disease to query - a healthy empty (nothing to cache poison here).
         result = _envelope("empty", [], None, None)
         cache_set(cache_key, result, ttl_days=_TTL_DAYS)
         return result
@@ -590,7 +590,7 @@ def discover_disease_process_targets(disease_name: str,
             if admitted:
                 all_targets.extend(admitted["targets"])
     except _SourceUnavailable as e:
-        # Transient — never cache; a cached empty would look like "no mechanism"
+        # Transient - never cache; a cached empty would look like "no mechanism"
         # for the whole TTL.
         print(f"[europepmc] WARNING: source unavailable for "
               f"'{disease_name}': {e}")

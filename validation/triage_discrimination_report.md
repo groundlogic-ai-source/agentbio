@@ -1,4 +1,4 @@
-# Triage Discrimination Study — Study A Report (v1 — SUPERSEDED)
+# Triage Discrimination Study - Study A Report (v1 - SUPERSEDED)
 
 > **Superseded by `triage_discrimination_report_v2.md` (result of record).**
 > v1's cohort admitted ~10% original-approval drugs, its control validity
@@ -19,7 +19,7 @@ It measures **reliance-safety** of the audit layer: does it resolve real
 confirmed repurposing drugs, does it avoid spuriously disqualifying them under
 default operation, and does it catch planted mechanically-false assertions.
 It does **not** measure hypothesis discrimination (telling a good hypothesis
-from a plausible unapproved one) — the disease-dependent dimensions needed for
+from a plausible unapproved one) - the disease-dependent dimensions needed for
 that come from pools that are not disease-blind, and are reported descriptively
 in Study B only.
 
@@ -37,32 +37,32 @@ in Study B only.
   disease-independent hard disqualifier that can fire is PRECLINICAL_ONLY, and
   the marketed-label guard makes that near-impossible for label-resolved
   approved drugs. E2 is a guard-rail regression check, not discrimination
-  evidence. No confirmed repurposing was disqualified — there are none to name.
+  evidence. No confirmed repurposing was disqualified - there are none to name.
 - **E1 is the partner-relevant capability number:** the layer produced
   resolved label evidence for 74% of real confirmed repurposing drugs. The 52
   unresolved are predominantly drugs without a US openFDA label record
-  (`label_status=empty`) — a coverage limit of the source, not a judgment.
+  (`label_status=empty`) - a coverage limit of the source, not a judgment.
 - **E3 = 0:** under the pool-free claim-free configuration, no live
   soft-caution surface fired (lipophilicity and route claims require a pool
   or a claim). Reported honestly as a property of the configuration.
 
 ## Negative-control validity attrition (pre-registered handling)
 
-- NC1: 4/15 invalid — 2 labels unresolved (Daclizumab, Lepirudin), 2 whose
+- NC1: 4/15 invalid - 2 labels unresolved (Daclizumab, Lepirudin), 2 whose
   label did not confirm biologic modality under the detector's vocabulary
   (Bacitracin, Carfilzomib). Detection computed on the 11 valid.
-- NC2: 8/15 invalid — label unresolved or label routes did not exclude oral.
+- NC2: 8/15 invalid - label unresolved or label routes did not exclude oral.
   Detection computed on the 7 valid.
 
-## Amendment 1 (2026-08-11) — scoring-surface defect found by the controls
+## Amendment 1 (2026-08-11) - scoring-surface defect found by the controls
 
 The frozen run's NC2 endpoint initially read `0/7 detected`. Forensics on the
 frozen records showed the audit **detector fired correctly on all 7** valid
-controls (planted `oral` claim vs. labels listing only non-oral routes —
+controls (planted `oral` claim vs. labels listing only non-oral routes -
 persisted `approved_routes` proves it), but `evidence_profile.py`'s
 `route_feasibility` dimension had no mapping for N4 `flagged` and let it fall
 through to `CLEAR`. The defect was in the study's scoring surface, not the
-audit layer — and catching it is exactly what the negative controls are for.
+audit layer - and catching it is exactly what the negative controls are for.
 
 Disposition, per frozen-study convention:
 - `evidence_profile.py` fixed: N4 `flagged` → `route_feasibility=FLAGGED`,
@@ -83,7 +83,7 @@ Disposition, per frozen-study convention:
 
 Under default operation the audit layer resolved three quarters of real
 confirmed repurposing drugs, never disqualified one (upper bound 2.5%), and
-detected every valid planted false assertion (11/11 modality, 7/7 route) —
+detected every valid planted false assertion (11/11 modality, 7/7 route) -
 after the controls exposed and we fixed a dropout in the study's own scoring
 surface. Whether the layer can rank a good hypothesis above a plausible
 unapproved one is **not** established by this study; Study B's descriptive

@@ -53,14 +53,14 @@ assertion. Source/provider counts never become a score.
 
 The shared deterministic detector contract is `audit-context-v1`.
 
-- **N1 — combination-product splitting:** flag a dated label with two or more
+- **N1 - combination-product splitting:** flag a dated label with two or more
   distinct active ingredients.
-- **N2 — biologic modality mis-scope:** flag a direct claimed-modality conflict;
+- **N2 - biologic modality mis-scope:** flag a direct claimed-modality conflict;
   otherwise require explicit scope review for a resolved biologic/vaccine.
-- **N3 — species/preclinical-only mismatch:** flag when every admitted
+- **N3 - species/preclinical-only mismatch:** flag when every admitted
   entity-linked assertion is animal, in vitro, or unresolved; source failures
   and no-admission outcomes remain unresolved rather than clear.
-- **N4 — dose/route implausibility:** flag a direct claimed-route mismatch and
+- **N4 - dose/route implausibility:** flag a direct claimed-route mismatch and
   require review when locally labeled routes are paired with a systemic claim
   context. Route alone never proves that exposure is impossible. Dose,
   formulation, pharmacokinetics, and tissue distribution remain human-review

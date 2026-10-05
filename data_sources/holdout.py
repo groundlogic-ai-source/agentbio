@@ -118,7 +118,7 @@ def matches_name(name: str) -> bool:
     """Exact normalized-name match (catches OT's uppercase INN spellings).
 
     Salt/ester variants (e.g. 'SILDENAFIL CITRATE' vs holdout 'sildenafil')
-    intentionally do NOT match here — those are caught at the molecule layer
+    intentionally do NOT match here - those are caught at the molecule layer
     via shared parent ChEMBL ID.
     """
     n = _norm(name)

@@ -123,7 +123,7 @@ class TestReadersGuideAppendix(unittest.TestCase):
         self.assertIn("outside what this pipeline measures", md)
 
     def test_reader_guide_says_applicability_is_not_scored(self):
-        """Applicability is still not a SCORE term — but it is now gated.
+        """Applicability is still not a SCORE term - but it is now gated.
 
         The guide used to claim the limitation "introduces no tissue-specific
         score, cap, or gate". That became false when the compartment-exposure
@@ -148,7 +148,7 @@ class TestReadersGuideAppendix(unittest.TestCase):
 
     def test_capped_report_shows_pre_cap_score_as_guide_claims(self):
         # The guide tells readers that Section 4 shows the uncapped score
-        # (pre_cap_score) when a cap fired — so the breakdown must render it.
+        # (pre_cap_score) when a cap fired - so the breakdown must render it.
         cand = _minimal_candidate()
         cand["composite_score"] = 0.40
         cand["pre_cap_score"] = 0.75

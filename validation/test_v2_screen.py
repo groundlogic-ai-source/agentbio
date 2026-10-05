@@ -94,7 +94,7 @@ class ScreenCaseTest(unittest.TestCase):
 
 class ScreenOutageDisciplineTest(unittest.TestCase):
     """OT helpers swallow transport errors and return None/[]; the screen must
-    treat those as unavailable — not absence — whenever OT probes unhealthy."""
+    treat those as unavailable - not absence - whenever OT probes unhealthy."""
 
     def test_unresolved_during_outage_is_unavailable(self):
         with _patch_ot(search=None, healthy=False):
@@ -504,7 +504,7 @@ class AblationControlIntegrityTest(unittest.TestCase):
     def test_preflight_resumes_incomplete_checkpoint_without_discarding(self):
         # The control harness flushes after every completed arm.  That
         # checkpoint is invalid for final freeze validation, but it is the
-        # correct resume point—not a degraded artifact to delete.
+        # correct resume point-not a degraded artifact to delete.
         with tempfile.TemporaryDirectory() as td:
             path = os.path.join(td, "control.json")
             with open(path, "w") as f:
@@ -797,7 +797,7 @@ class BenchmarkAttestationIntegrityTest(unittest.TestCase):
                     mock.patch.object(pf, "FREEZE_ATTESTATION", att), \
                     mock.patch.object(pf, "_git_available", return_value=False):
                 self.assertEqual(pf._ensure_freeze_attestation(), 0)
-                rb._check_freeze_integrity()  # passes — no SystemExit
+                rb._check_freeze_integrity()  # passes - no SystemExit
                 with open(control, "w") as f:
                     json.dump({"rows": ["tampered"]}, f)
                 with self.assertRaises(SystemExit) as ctx:
@@ -818,7 +818,7 @@ class RunModuleWatchdogTest(unittest.TestCase):
 
     def test_exit_during_silence_window_reports_child_code_not_stall(self):
         # The child goes silent past the limit but exits during the
-        # watchdog's sleep — its real code must win over the stall verdict.
+        # watchdog's sleep - its real code must win over the stall verdict.
         with mock.patch.object(pf, "_SILENCE_LIMIT_SECONDS", 0.15), \
                 mock.patch.object(pf, "_WATCHDOG_POLL_SECONDS", 0.6):
             rc = pf._run_argv([sys.executable, "-c",

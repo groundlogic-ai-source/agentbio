@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Benchmark v2 provenance verifier — regenerates the raw evidence behind the
+"""Benchmark v2 provenance verifier - regenerates the raw evidence behind the
 dossier's provenance caveat. READ-ONLY: writes nothing, calls no network.
 
 Checks:

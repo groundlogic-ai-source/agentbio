@@ -1,4 +1,4 @@
-"""Build the frozen audit claim set v2 — the re-validation study registered
+"""Build the frozen audit claim set v2 - the re-validation study registered
 in validation/audit_claimset_v2_preregistration.md.
 
 Relationship to v1 (build_audit_claim_set.py): v1 FAILED its pre-registered
@@ -8,17 +8,17 @@ reuses v1's stateless raw-source helpers (same public endpoints, same
 citation rules) but is a separate construction with three registered
 differences:
 
-  * Instance disjointness — every drug named in any v1 claim (and every v1
+  * Instance disjointness - every drug named in any v1 claim (and every v1
     E4 generic) is excluded from every v2 class. v2 never re-tests v1 items.
-  * E4 repair — a brand is accepted ONLY if the RAW ChEMBL name/synonym
+  * E4 repair - a brand is accepted ONLY if the RAW ChEMBL name/synonym
     search cannot resolve it (v1's construction assumption was falsified by
     ChEMBL's synonym tables; resolvability is now verified at construction
-    time against the same public ChEMBL endpoints the pipeline reads — the
+    time against the same public ChEMBL endpoints the pipeline reads - the
     pipeline's own resolution code is never imported).
-  * N3 — v1's gates PLUS "no cutoff-eligible FDA label products": label
+  * N3 - v1's gates PLUS "no cutoff-eligible FDA label products": label
     absence is part of the defect definition under the audit-context-v2
     detector and is verified against raw openFDA responses.
-  * Composition — existing_fix takes the honest pool-bounded yield (floor
+  * Composition - existing_fix takes the honest pool-bounded yield (floor
     E_FLOOR, else construction aborts); novel fills DEFECT_TOTAL - E via
     the fixed order N1 -> N4 -> N2.
 
@@ -60,7 +60,7 @@ E_FLOOR = 1                            # registered minimum E-group yield (Amend
 
 # E4 candidates: (brand, generic, pool job). Generics are members of the
 # refreshed pools not named in any v1 claim. Expected yield is near zero:
-# v1 proved ChEMBL synonym resolution covers major brands — that is the
+# v1 proved ChEMBL synonym resolution covers major brands - that is the
 # finding, and the resolution probe below enforces it honestly.
 E4_BRANDS_V2 = [
     ("Toprol-XL", "METOPROLOL", "cddaa8e1fbe84309854e7dc6cdd8a71a"),
@@ -85,7 +85,7 @@ E4_BRANDS_V2 = [
     ("Cabometyx", "CABOZANTINIB", "61f542324d214a869b324fe41060bebb"),
 ]
 
-# N3 candidates: (drug, pool target, pool job) — preclinical tool compounds
+# N3 candidates: (drug, pool target, pool job) - preclinical tool compounds
 # with primary literature, selected from domain knowledge; verified below
 # against offline approval datasets, Europe PMC trial metadata, and raw
 # openFDA label absence.
@@ -192,7 +192,7 @@ def chembl_resolves(name: str) -> bool:
     """Raw ChEMBL resolution probe for the repaired E4 gate: any molecule
     returned by the public name/synonym full-text search counts as
     resolvable. Conservative (fuzzy false-positives exclude a brand), which
-    only ever shrinks E4 — never invents an invalid claim.
+    only ever shrinks E4 - never invents an invalid claim.
 
     Fail-closed: retries 3x against transient ChEMBL flapping (observed
     2026-08-10: status.json oscillating 200/500 with HTML error pages on
@@ -325,7 +325,7 @@ def build_e_class(pools: dict) -> int:
             f"glucocorticoid-agonist indication is directionally incompatible.")
         e3_added += 1
 
-    # --- E2: boxed warning, NOT withdrawn — the pool-bounded remainder ----
+    # --- E2: boxed warning, NOT withdrawn - the pool-bounded remainder ----
     log("E2 boxed_warning_not_withdrawal — refreshed-pool black-box drugs "
         "verified against raw FDA labels")
     e2_added = 0

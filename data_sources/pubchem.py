@@ -1,5 +1,5 @@
 """
-PubChem PUG REST API — chemical structure lookup.
+PubChem PUG REST API - chemical structure lookup.
 Always resolves via InChIKey first, never matches purely on name string downstream.
 """
 
@@ -220,7 +220,7 @@ def get_drug_classification(inchikey: str) -> dict[str, Any]:
     """
     Determine whether a compound is an approved/known drug using PubChem's
     classification fields. Resolves the InChIKey to a CID, then queries PUG-View
-    for the "ATC Code" heading — a WHO ATC code is assigned only to recognised
+    for the "ATC Code" heading - a WHO ATC code is assigned only to recognised
     drugs, so its presence is a reliable known-drug signal.
 
     Returns:
@@ -253,7 +253,7 @@ def get_drug_classification(inchikey: str) -> dict[str, Any]:
         cid = _inchikey_to_cid(inchikey)
         if cid is None:
             result["error"] = "no CID for InChIKey"
-            return result  # not cached — could be a transient failure
+            return result  # not cached - could be a transient failure
         result["cid"] = cid
 
         url = f"{PUG_VIEW_URL}/{cid}/JSON?heading=ATC+Code"

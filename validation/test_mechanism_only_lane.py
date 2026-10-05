@@ -188,7 +188,7 @@ class MechanismLaneCacheTest(unittest.TestCase):
     def test_partial_degraded_multi_target_response_is_not_cached(self):
         # UniProt maps to TWO ChEMBL target IDs: one returns rows, the other
         # an ambiguous empty (degraded-200 mode). The aggregate must not be
-        # cached — a later run must retry the degraded endpoint.
+        # cached - a later run must retry the degraded endpoint.
         def side_effect(url, params=None):
             tid = (params or {}).get("target_chembl_id", "")
             if tid == "CHEMBL2056":

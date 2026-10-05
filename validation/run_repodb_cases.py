@@ -1,5 +1,5 @@
 """
-Retrospective validation — 10 repoDB "Approved" cases from the enriched dataset.
+Retrospective validation - 10 repoDB "Approved" cases from the enriched dataset.
 
 Selection rule:
   - status == "Approved" in enriched_dataset.csv
@@ -12,7 +12,7 @@ The 10 cases below were pre-verified via _build_candidate_universe() against the
 cached Orphanet list (11,645 diseases, 7-day TTL) + WHO NTDs.
 
 Run: python -m validation.run_repodb_cases
-Out: validation/repodb_results_topk.json  (incremental — safe to interrupt and resume)
+Out: validation/repodb_results_topk.json  (incremental - safe to interrupt and resume)
      validation/repodb_results_topk.md
 """
 

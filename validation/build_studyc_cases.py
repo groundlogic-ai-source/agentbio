@@ -1,4 +1,4 @@
-"""Build the Study C case set — powered triage discrimination — OFFLINE and
+"""Build the Study C case set - powered triage discrimination - OFFLINE and
 deterministic.
 
 Study C extends Study B's design (confirmed repurposings vs the pipeline's
@@ -14,19 +14,19 @@ Frame (greenlit 2026-08-12, reproduced by this builder):
   anchors every disease to carry both a positive and a negative, so the
   per-disease ranking contrast is always defined.
 * **Positives (140).** ALL distinct repurposed-success drugs per anchored
-  disease — no per-disease cap: Study C's LLM cost scales with diseases
+  disease - no per-disease cap: Study C's LLM cost scales with diseases
   (pool rebuilds), not with positives, so capping would only weaken power.
 * **Negatives (45 rows / 37 drugs).** ALL distinct genuine-failure drugs per
   anchored disease. `administrative-exclude` rows are NEVER used as failures
   (known label artifact: broad framing mixes 1,290 administrative rows into
-  "failure" — see the broad-framing memory note).
+  "failure" - see the broad-framing memory note).
 
 Exclusions (project conventions): development-suite drugs at DRUG level,
 QC-quarantined names. Within a disease, a drug appearing as BOTH success
-and genuine-failure is scored as negative only — conservative: the
+and genuine-failure is scored as negative only - conservative: the
 discrimination metric must never be rewarded for ranking an ambiguous drug.
 
-Never rebuilds: once scored Study C results exist, this builder refuses —
+Never rebuilds: once scored Study C results exist, this builder refuses -
 frozen artifacts are amended, never regenerated.
 """
 from __future__ import annotations

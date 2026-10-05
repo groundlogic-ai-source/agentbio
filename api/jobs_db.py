@@ -12,7 +12,7 @@ tables were originally created by external database tooling that introspected de
 and production and applied the delta, so the application never owned the schema.
 That tooling is gone; `db/schema/001_core_tables.sql` and
 `api/migrations/20260820_job_artifacts.sql` reconstruct the DDL for a fresh
-deployment. Startup DDL is still deliberately absent — production schema is not the
+deployment. Startup DDL is still deliberately absent - production schema is not the
 application's responsibility. It DOES perform a one-time, idempotent DATA seed of
 historical jobs (see `_seed_if_empty`) so that a brand-new/empty database is
 populated from the committed snapshot in `api/seed_jobs.json`.
@@ -78,7 +78,7 @@ VALID_STAGES = (
 
 # Serialize writes from the background graph thread and the request threads within
 # a single process. Cross-instance safety (multiple Cloud Run instances) is
-# provided by PostgreSQL constraints — see claim_next_unexplored / record_explored,
+# provided by PostgreSQL constraints - see claim_next_unexplored / record_explored,
 # which rely on the explored_targets primary key + ON CONFLICT for atomicity.
 _LOCK = threading.Lock()
 
@@ -768,7 +768,7 @@ def list_jobs(include_archived: bool = False) -> list[dict[str, Any]]:
 def archive_job(job_id: str) -> Optional[dict[str, Any]]:
     """
     Soft-archive a job (sets archived=1). The job record, its report, and any
-    explored_targets rows are left completely intact — archiving never removes
+    explored_targets rows are left completely intact - archiving never removes
     data and never prevents auto-explore from correctly skipping already-tried
     (disease, target) pairs.
     """

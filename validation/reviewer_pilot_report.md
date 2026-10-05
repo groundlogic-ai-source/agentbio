@@ -1,4 +1,4 @@
-# AgentBio reviewer pilot — compact retrospective rediscovery
+# AgentBio reviewer pilot - compact retrospective rediscovery
 
 _Source results generated: 2026-08-03T21:02:42_
 _Report built: 2026-08-03 21:07:34_

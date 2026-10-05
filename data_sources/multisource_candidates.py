@@ -12,7 +12,7 @@ Design rules (each exercised by validation/test_multisource_candidates.py):
 
   1. TARGET-FIRST ONLY.  We call every adapter's target-first entry point with a
      UniProt accession (and, for DrugCentral, a gene fallback symbol).  We NEVER
-     query any source by drug name — a name lookup would let a held-out
+     query any source by drug name - a name lookup would let a held-out
      benchmark drug leak in through the back door.
 
    2. NORMALIZE, DON'T RE-SCORE.  Each adapter row and each of its per-row
@@ -35,11 +35,11 @@ Design rules (each exercised by validation/test_multisource_candidates.py):
      "source was unavailable".
 
 Public surface:
-  * :func:`collect_target_candidates` — fan-out + normalize + merge.
-  * :func:`normalize_chembl_enriched` — fold legacy ChEMBL enriched dicts into
+  * :func:`collect_target_candidates` - fan-out + normalize + merge.
+  * :func:`normalize_chembl_enriched` - fold legacy ChEMBL enriched dicts into
     the same ledger as separate pChEMBL and assay-confidence records.
   * :func:`records_from_gtopdb_envelope` / :func:`records_from_drugcentral_envelope`
-    — the per-adapter converters (exposed for unit testing).
+    - the per-adapter converters (exposed for unit testing).
 """
 
 from __future__ import annotations
@@ -171,7 +171,7 @@ def approval_basis(candidate: dict[str, Any]) -> tuple[bool, str, list[str]]:
 
     Returns ``(is_approved, basis, providers)``.  ``basis`` is
     ``APPROVAL_BASIS_UNKNOWN`` whenever no qualified regulatory-approval record
-    and no ``max_phase >= 4`` is present — an explicitly UNRESOLVED status that
+    and no ``max_phase >= 4`` is present - an explicitly UNRESOLVED status that
     the caller must treat as *not* approved rather than as "probably fine".
     """
     ledger = candidate.get("_evidence_ledger") or {}
@@ -404,7 +404,7 @@ def merge_chemist_candidates(
     merged = _overlay_passthrough_fields(merge_candidates(records), rows)
     # Re-merging rebuilds is_approved_drug from max_phase alone, which would
     # silently drop approval established by a provider approval record. Re-stamp
-    # (never filter here — the enforcing gate belongs to the Chemist).
+    # (never filter here - the enforcing gate belongs to the Chemist).
     merged, _ = filter_repurposing_eligible(merged, enforce=False)
     return merged
 
@@ -667,7 +667,7 @@ def records_from_bindingdb_envelope(
         counting twice.
 
     The BindingDB REST response carries no organism field, so
-    ``target_species`` is left blank rather than asserted human — the UniProt
+    ``target_species`` is left blank rather than asserted human - the UniProt
     accession identifies the queried protein, not every assay's species.
     """
     if not isinstance(envelope, dict):
@@ -758,7 +758,7 @@ def normalize_chembl_enriched(
     Machine-v2 exception: rows from the mechanism-only coverage lane
     (``pool_origin == "mechanism_only"``) carry a curated ChEMBL
     mechanism_of_action entry but NO qualifying activity measurement. They
-    get a MECHANISM efficacy record anchored on the mechanism row — never a
+    get a MECHANISM efficacy record anchored on the mechanism row - never a
     BIOACTIVITY_ASSAY record with a null pChEMBL, which would mischaracterize
     the evidence basis to the reviewer and writer.
     """
@@ -818,7 +818,7 @@ def normalize_chembl_enriched(
 
         if c.get("pool_origin") == "mechanism_only":
             # Machine-v2 mechanism-only lane: curated mechanism row, no
-            # qualifying activity measurement — emit the true evidence type.
+            # qualifying activity measurement - emit the true evidence type.
             records.append(EvidenceRecord(
                 source_type=SourceType.MECHANISM,
                 evidence_role=EvidenceRole.EFFICACY,
@@ -843,7 +843,7 @@ def normalize_chembl_enriched(
                 **base,
             ))
 
-        # SEPARATE assay-confidence record (0-9 curator scale) — kept distinct
+        # SEPARATE assay-confidence record (0-9 curator scale) - kept distinct
         # from the pChEMBL potency record so both survive the union.
         if confidence is not None:
             records.append(EvidenceRecord(
@@ -1051,13 +1051,13 @@ def collect_target_candidates(
     """Target-first multi-source candidate collection.
 
     Calls the GtoPdb, DrugCentral and BindingDB target-first adapters (by
-    UniProt accession, with a gene fallback for DrugCentral — NEVER by drug
+    UniProt accession, with a gene fallback for DrugCentral - NEVER by drug
     name),
     converts every returned candidate/evidence blob into normalized
     EvidenceRecord objects, adds explicit regulatory-approval records, folds in
     the legacy ChEMBL enriched candidates when supplied, and merges the whole
     pool via :func:`evidence_ledger.merge_candidates` (union by active moiety,
-    dedup by lineage — never a provider-count bonus).
+    dedup by lineage - never a provider-count bonus).
 
     Returns::
 
@@ -1074,7 +1074,7 @@ def collect_target_candidates(
     the historical behavior. Supported values are ``chembl``, ``gtopdb``,
     ``drugcentral`` and ``bindingdb``. A DISABLED provider's target-first
     adapter is NEVER called and surfaces in ``source_status`` with
-    ``status == "disabled"`` — which is an explicit ablation choice, NOT a
+    ``status == "disabled"`` - which is an explicit ablation choice, NOT a
     source failure and NOT the same as "unavailable".
     """
     enabled = normalize_enabled_sources(enabled_sources)

@@ -4,7 +4,7 @@ This is a thin wrapper over the v1 sealed harness
 (validation/run_audit_claimset.py): it overrides the module-level artifact
 paths, label, group totals, and results limitations, then runs the SAME
 execution, freeze-verification, idempotency, scoring, and threshold code.
-The v1 study's seal is untouched — its label guard, paths, and recorded
+The v1 study's seal is untouched - its label guard, paths, and recorded
 results are unaffected, and v1's one-fix-one-rerun allowance remains
 consumed forever.
 
@@ -17,7 +17,7 @@ v2 discipline (validation/audit_claimset_v2_preregistration.md):
     health requirements; any .py drift under api/agents/data_sources/
     cache/validation between freeze and run refuses the run;
   * this artifact must never be reported as benchmark v2, engineering
-    acceptance, or discovery accuracy — and v1's FAIL result is reported
+    acceptance, or discovery accuracy - and v1's FAIL result is reported
     alongside v2, never replaced by it.
 
 Usage:

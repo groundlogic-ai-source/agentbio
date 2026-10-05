@@ -1,4 +1,4 @@
-# Benchmark v2 Upgrade — Readiness Audit and Five-Miss Acceptance Protocol
+# Benchmark v2 Upgrade - Readiness Audit and Five-Miss Acceptance Protocol
 
 **Audit date:** 2026-08-02  
 **Decision:** **NOT READY FOR V2.** The upgrade architecture is pre-registered and source
@@ -145,14 +145,14 @@ not sufficient evidence of general accuracy. V2 may begin only after the five-ca
 test, broader held-out development/negative controls, holdout audit, source-health checks, and a
 new `benchmark-freeze-v2` tag all pass.
 
-## Addendum (2026-08-05) — readiness update
+## Addendum (2026-08-05) - readiness update
 
 The five-miss engineering acceptance **PASSED** on 2026-08-05: 5/5 generated, 5/5
 mechanistically valid (label `engineering_acceptance`; rank / Top-10 / STRONG_MATCH reported
-separately in `engineering_acceptance_results.md` and not tuned to 5/5 — Top-10 was 0/5, which
+separately in `engineering_acceptance_results.md` and not tuned to 5/5 - Top-10 was 0/5, which
 carries into the v2 accuracy forecast). Holdout audit and per-case source health are included in
 that report. Decision upgraded from NOT READY to **READY-PENDING-PREFLIGHT**: the remaining
-pre-freeze items are automated and idempotent in `validation/run_v2_preflight.py` — the
+pre-freeze items are automated and idempotent in `validation/run_v2_preflight.py` - the
 source-ablation control (13 small-molecule development cases × 4 source conditions, label
 `source_ablation_control`; these are the broader held-out development/negative controls, run
 BEFORE the tag because the harness refuses post-tag), the Amendment-1 screen, and creation of
