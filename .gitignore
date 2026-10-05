@@ -80,3 +80,7 @@ outreach/
 # never commit either. See docker-compose.yml and env.template.
 .env
 /data/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
