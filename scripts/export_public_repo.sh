@@ -40,6 +40,7 @@ git filter-repo --force \
   --path validation/engineering_acceptance_only_phenobarbital.json \
   --path validation/canonical_validation_2026-07-11.json \
   --path publication/submission \
+  --path migration_export \
   --path replit.md --path .replit --path .replitignore \
   --path MIGRATION_NOTES.md \
   --path-glob 'artifacts/*/.replit-artifact/*' \
@@ -86,9 +87,19 @@ echo "replit config paths remaining: $(git rev-list --objects --all | grep -cE '
 # the studyb one was already stripped and the others were not, which was just
 # an oversight.
 echo "orphaned validation blobs remaining: $(git rev-list --objects --all | grep -cE ' validation/(engineering_acceptance_only_phenobarbital\.json|canonical_validation_2026-07-11\.json|triage_discrimination_checkpoint.*\.jsonl)$' || true)"
-echo "LFS pointers remaining in all refs: $(git lfs ls-files --all 2>/dev/null | wc -l)"
+# Must be ZERO. Every LFS-tracked path is stripped above, and .gitattributes
+# with it, so a surviving pointer means the public repo references an LFS
+# object that will never be pushed with it -- a checkout then fails or yields
+# a 130-byte text stub instead of the file. migration_export/runtime_state.zip
+# was exactly that: history-only, invisible at HEAD, and the one pointer left
+# standing after the previous export.
+echo "LFS pointers remaining in all refs (must be 0): $(git lfs ls-files --all 2>/dev/null | wc -l)"
 echo "blobs >20MB remaining: $(git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectsize)' 2>/dev/null | awk '$1=="blob" && $2>20000000' | wc -l)"
+# This script names the search terms itself, so it matches its own source and
+# the check could never read zero. Exclude it, and exclude the manuscript's
+# bibliography: citing a related platform by name is what a paper's reference
+# list is for, and is not the internal strategy this check exists to catch.
 for term in REMEDi4ALL "Rare Beacon" REPO4EU "Every Cure"; do
-  n=$(git log --all --oneline -S"$term" -- . 2>/dev/null | wc -l)
-  echo "pickaxe '$term' anywhere in exported history: $n"
+  n=$(git log --all --oneline -S"$term" -- .         ':(exclude)scripts/export_public_repo.sh'         ':(exclude)publication/manuscript.md' 2>/dev/null | wc -l)
+  echo "pickaxe '$term' outside script+bibliography: $n"
 done
