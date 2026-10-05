@@ -41,6 +41,7 @@ git filter-repo --force \
   --path validation/canonical_validation_2026-07-11.json \
   --path publication/submission \
   --path migration_export \
+  --path CLAUDE.md \
   --path replit.md --path .replit --path .replitignore \
   --path MIGRATION_NOTES.md \
   --path-glob 'artifacts/*/.replit-artifact/*' \
@@ -77,6 +78,14 @@ echo "output/ paths remaining in history: $(git rev-list --objects --all | grep 
 # checklist and reviewer-response template. That is submission strategy, not
 # the machine, and the repo is meant to carry the machine and its evidence.
 echo "publication/submission paths remaining: $(git rev-list --objects --all | grep -cE ' publication/submission(/|$)' || true)"
+# CLAUDE.md is guidance for an agent working in the PRIVATE repo. Published,
+# it contradicted itself on its first line ("This is the private/authoritative
+# AgentBio repository"), carried commit and file counts that were wrong in
+# both directions, instructed the reader never to add a public remote while
+# sitting in the public one, and enumerated the internal paths and the
+# presigned-URL credentials this export exists to strip. Its technical content
+# is already in README.md and docs/HOW_AGENTBIO_WORKS.md.
+echo "CLAUDE.md objects remaining: $(git rev-list --objects --all | grep -cE ' CLAUDE\.md$' || true)"
 # Dead Replit config: the migration finished, nothing imports these, and a
 # stale replit.md duplicated the README while documenting AI_INTEGRATIONS_*
 # environment variables that no longer exist anywhere in the codebase --
