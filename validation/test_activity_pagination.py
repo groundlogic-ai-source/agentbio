@@ -23,6 +23,7 @@ The helper keeps the two-tuple signatures of ``_fetch_activities`` and
 positionally; truncation is reported through ``activity_fetch_coverage``.
 """
 
+import inspect
 import unittest
 from unittest import mock
 
@@ -120,16 +121,40 @@ class CacheInvalidationTest(unittest.TestCase):
     """
 
     def test_activity_cache_key_is_versioned_for_pagination(self):
-        import inspect
+        self.assertTrue(
+            chembl.ACTIVITIES_FULL_CACHE_KEY.endswith("_paged"),
+            "the activity ledger key must record that it is paginated")
         source = inspect.getsource(chembl)
-        self.assertIn("_fetch_activities_full_v4_paged", source)
         self.assertNotIn('make_key("_fetch_activities_full_v3_ec50"', source)
 
     def test_downstream_keys_moved_too(self):
-        import inspect
+        """The three keys exist, differ, and are read from the constants.
+
+        This asserted the literal string "get_target_candidate_compounds_v7_paged".
+        The key was later bumped to v8 when route flags joined the cached
+        payload -- a correct change, exactly what this test exists to
+        encourage -- and the test failed for doing its job properly. Worse,
+        it failed for retyping a version string, which CLAUDE.md names as the
+        specific mistake that has twice shipped a fix inert.
+
+        A test of cache-key discipline must not itself hardcode the version.
+        What matters is that all three keys are distinct constants that
+        downstream code references, not what number they currently carry.
+        """
+        keys = [chembl.ACTIVITIES_FULL_CACHE_KEY,
+                chembl.BIOACTIVITY_COUNT_CACHE_KEY,
+                chembl.CANDIDATE_POOL_CACHE_KEY]
+        self.assertEqual(len(set(keys)), 3,
+                         "the three activity-derived keys must be distinct")
+        for key in keys:
+            self.assertTrue(key.strip(), "a cache key must not be empty")
         source = inspect.getsource(chembl)
-        self.assertIn("get_target_bioactivity_count_v3_paged", source)
-        self.assertIn("get_target_candidate_compounds_v7_paged", source)
+        for name in ("ACTIVITIES_FULL_CACHE_KEY", "BIOACTIVITY_COUNT_CACHE_KEY",
+                     "CANDIDATE_POOL_CACHE_KEY"):
+            self.assertGreaterEqual(
+                source.count(name), 2,
+                f"{name} is declared but never referenced; a retyped literal "
+                "somewhere is how these drift apart")
 
     def test_no_fetch_path_still_hardcodes_a_single_page(self):
         import inspect

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Build the committed two-table DrugCentral snapshot from the official dump.
 
-Input : /tmp/drugcentral_dump_11012023.sql.gz — the official DrugCentral
+Input : /tmp/drugcentral_dump_11012023.sql.gz - the official DrugCentral
         11/01/2023 PostgreSQL dump, fetched from the Internet Archive Wayback
         Machine snapshot of unmtid-dbs.net (origin host down since
         2026-08-07). See benchmark_v2_preregistration.md, Amendment 6.
-Output: data_sources/drugcentral_2023_snapshot.sqlite — committed, rides the
+Output: data_sources/drugcentral_2023_snapshot.sqlite - committed, rides the
         publish snapshot into prod, and is pinned in the pipeline fingerprint.
 
 Only the columns the pipeline actually reads are kept (molfile/molimg blobs
@@ -134,12 +134,12 @@ def _sha256_file(path: str) -> str:
 
 
 def _extract_copy_blocks(fh, wanted: dict):
-    """Yield (table, cols, row_dict) for COPY blocks of wanted tables.
+    r"""Yield (table, cols, row_dict) for COPY blocks of wanted tables.
 
     Fail-closed (code-review hardening, round 2): block state is tracked in
     raw bytes. Between blocks, only COPY-header lines are inspected and an
     unparseable one raises. UNWANTED blocks are skipped byte-for-byte until
-    the exact `\.` terminator — their data is never decoded, so non-UTF-8
+    the exact `\.` terminator - their data is never decoded, so non-UTF-8
     payloads or data lines that merely look like COPY headers can neither
     crash the build nor inject spurious rows. Inside a WANTED block, a
     field-count mismatch, a header missing retained columns, or invalid
@@ -155,7 +155,7 @@ def _extract_copy_blocks(fh, wanted: dict):
     for bline in fh:
         lineno += 1
         if table == IN_UNWANTED and table is not None:
-            # Raw skip: never decode, never pattern-match — only the exact
+            # Raw skip: never decode, never pattern-match - only the exact
             # terminator line ends the block.
             if bline.rstrip(b"\n") == b"\\.":
                 table = None
@@ -271,7 +271,7 @@ def main() -> int:
     conn.close()
 
     # Fixed expectations for the 11/01/2023 release (verified by direct census
-    # of the dump's COPY blocks): act_table_full is a *curated* table —
+    # of the dump's COPY blocks): act_table_full is a *curated* table -
     # 20,978 rows; structures: 4,995 rows, of which 1,503 are OFP/OFM
     # established products (1,090 OFP + 413 OFM).
     assert n_act == counts["act_table_full"] and n_act > _MIN_ACT_ROWS, n_act
