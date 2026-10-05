@@ -456,6 +456,12 @@ if __name__ == "__main__":
     if not names:
         print("usage: python disease_screen.py 'Disease A' 'Disease B' ...")
         print("       python disease_screen.py --universe N [OFFSET]")
+        print("       python disease_screen.py --from-file PATH")
+        print()
+        print("--from-file reads one disease per line, taking the first tab-")
+        print("separated field, so a screen output can be piped back in. "
+              "Blank")
+        print("lines and '#' comments are skipped.")
         raise SystemExit(2)
     screened = screen_many(names)
     print(format_table(screened))
