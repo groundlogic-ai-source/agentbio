@@ -75,6 +75,7 @@ class PlacedShape:
     fits: bool           # does it fit, under the scene's rotation setting
     cells: frozenset     # where it sits on the grid (absolute coordinates)
     color: str
+    measure: int         # difficulty: slack if it fits, cells-from-fitting if not
 
 
 @dataclass
@@ -83,6 +84,7 @@ class Scene:
     seed: int
     container: Container
     container_color: str
+    background_color: str
     placed: list
     answer: int
     config: Config = field(default_factory=lambda: DEFAULT, repr=False)
@@ -101,6 +103,11 @@ class Scene:
             "allow_reflections": self.config.allow_reflections,
             "grid": {"width": self.config.grid_width,
                      "height": self.config.grid_height},
+            "background_color": self.background_color,
+            "difficulty_band": {
+                "slack_band": list(self.config.slack_band),
+                "near_miss_band": list(self.config.near_miss_band),
+            },
             "container": {
                 "left": self.container.left,
                 "top": self.container.top,
@@ -118,6 +125,11 @@ class Scene:
                     "label": p.label,
                     "fits": p.fits,
                     "color": p.color,
+                    "difficulty_measure": p.measure,
+                    "difficulty_measure_kind": (
+                        "cells_from_fitting" if p.label == fit.TOO_BIG
+                        else "bounding_box_slack"
+                    ),
                     "cells": sorted(map(list, p.cells)),
                 }
                 for p in self.placed
@@ -193,6 +205,32 @@ def shape_mix_for_answer(answer, cfg):
     }
 
 
+def pick_shape(pool, rng, cfg):
+    """Choose one shape from a category's pool.
+
+    The pool is lopsided: there are many more large shapes than small ones, so
+    picking uniformly would fill every scene with the biggest pieces. Instead,
+    pick a size first and then a shape of that size, which spreads the sizes
+    out. Circles are picked separately at a set rate, because stratifying them
+    by cell count would make the large ones far too common.
+    """
+    circles = [item for item in pool if item[0].kind == "circle"]
+    polys = [item for item in pool if item[0].kind != "circle"]
+
+    if circles and (not polys or rng.random() < cfg.circle_probability):
+        return rng.choice(circles)
+    if not polys:
+        return rng.choice(circles)
+    if not cfg.stratify_by_cell_count:
+        return rng.choice(polys)
+
+    by_size = {}
+    for item in polys:
+        by_size.setdefault(item[0].n_cells, []).append(item)
+    size = rng.choice(sorted(by_size))
+    return rng.choice(by_size[size])
+
+
 def build_scene(index, answer, cfg=DEFAULT, master_seed=None):
     """Build one scene whose computed answer is `answer`.
 
@@ -203,25 +241,26 @@ def build_scene(index, answer, cfg=DEFAULT, master_seed=None):
     seed = master_seed * 1_000_003 + index
     rng = random.Random(seed)
 
-    region_template = fit.rectangle_region(cfg.interior_width,
-                                           cfg.interior_height)
-    buckets = shapes.label_library(region_template, cfg.allow_rotation,
-                                   cfg.allow_reflections)
+    buckets = shapes.banded_library(cfg)
     mix = shape_mix_for_answer(answer, cfg)
 
     # Pick the shapes. Repeats within a scene are allowed, which keeps scenes
-    # varied even though the library of "too big" shapes is small.
+    # varied even though some categories hold few shapes.
     chosen = []
     for label, count in mix.items():
         pool = buckets[label]
         if count and not pool:
-            raise ValueError(f"no shapes available in category {label}")
-        chosen.extend(rng.choice(pool) for _ in range(count))
+            raise ValueError(
+                f"no shapes available in category {label} inside the "
+                f"difficulty band; widen slack_band or near_miss_band"
+            )
+        chosen.extend(pick_shape(pool, rng, cfg) for _ in range(count))
     rng.shuffle(chosen)   # so category never correlates with drawing order
 
     # Colours, picked with no reference to the answer.
     container_color = rng.choice(cfg.container_palette)
     scene_loose_color = rng.choice(cfg.loose_palette)
+    background_color = rng.choice(cfg.background_palette)
 
     # Place the container, keeping it one cell clear of the grid edges.
     probe = Container(0, 0, cfg.interior_width, cfg.interior_height,
@@ -238,7 +277,7 @@ def build_scene(index, answer, cfg=DEFAULT, master_seed=None):
     )
 
     placed = []
-    for shape in chosen:
+    for shape, measure in chosen:
         cells = _place_shape(shape, blocked, rng, cfg)
         if cells is None:
             return None     # this layout did not work out; caller retries
@@ -250,12 +289,12 @@ def build_scene(index, answer, cfg=DEFAULT, master_seed=None):
                  else scene_loose_color)
         placed.append(PlacedShape(
             name=shape.name, kind=shape.kind, label=label,
-            fits=fits, cells=cells, color=color,
+            fits=fits, cells=cells, color=color, measure=measure,
         ))
         blocked |= _neighbourhood(cells, cfg.min_gap)
 
     computed = fit.count_fitting(
-        [p_shape.cells for p_shape in chosen], container.interior,
+        [shape.cells for shape, _ in chosen], container.interior,
         cfg.allow_rotation, cfg.allow_reflections,
     )
     # A safety net: if the recipe and the fit function ever disagree, that is a
@@ -265,7 +304,8 @@ def build_scene(index, answer, cfg=DEFAULT, master_seed=None):
     )
 
     return Scene(index=index, seed=seed, container=container,
-                 container_color=container_color, placed=placed,
+                 container_color=container_color,
+                 background_color=background_color, placed=placed,
                  answer=computed, config=cfg)
 
 

@@ -38,14 +38,36 @@ def _draw_grid(draw, cfg, width_px, height_px):
         draw.line([(0, y), (width_px, y)], fill=cfg.grid_line_color, width=1)
 
 
-def _draw_cells(draw, cells, color, cfg):
-    """Fill in a set of grid cells, with a thin outline around each."""
+def _draw_cells(draw, cells, color, cfg, outline_width=1):
+    """Fill in a set of grid cells, with an outline around each."""
     px = cfg.cell_pixels
     for c, r in sorted(cells):
         draw.rectangle(
             [c * px, r * px, c * px + px, r * px + px],
-            fill=color, outline=cfg.outline_color, width=1,
+            fill=color, outline=cfg.outline_color, width=outline_width,
         )
+
+
+def _draw_container(draw, cells, color, cfg):
+    """Draw the container, then trace its outside edge more heavily.
+
+    The heavier edge is drawn only where the container meets empty space, so
+    the U reads as one object rather than a row of separate squares.
+    """
+    px = cfg.cell_pixels
+    _draw_cells(draw, cells, color, cfg)
+    width = max(1, cfg.container_outline_width)
+    for c, r in sorted(cells):
+        x0, y0 = c * px, r * px
+        x1, y1 = x0 + px, y0 + px
+        if (c, r - 1) not in cells:
+            draw.line([(x0, y0), (x1, y0)], fill=cfg.outline_color, width=width)
+        if (c, r + 1) not in cells:
+            draw.line([(x0, y1), (x1, y1)], fill=cfg.outline_color, width=width)
+        if (c - 1, r) not in cells:
+            draw.line([(x0, y0), (x0, y1)], fill=cfg.outline_color, width=width)
+        if (c + 1, r) not in cells:
+            draw.line([(x1, y0), (x1, y1)], fill=cfg.outline_color, width=width)
 
 
 def _draw_circle(draw, cells, color, cfg):
@@ -66,12 +88,13 @@ def render_scene(scene, cfg=None):
     width_px = cfg.grid_width * px
     height_px = cfg.grid_height * px
 
-    image = Image.new("RGB", (width_px + 1, height_px + 1),
-                      cfg.background_color)
+    background = getattr(scene, "background_color", None) or \
+        cfg.background_color
+    image = Image.new("RGB", (width_px + 1, height_px + 1), background)
     draw = ImageDraw.Draw(image)
 
     _draw_grid(draw, cfg, width_px, height_px)
-    _draw_cells(draw, scene.container.cells, scene.container_color, cfg)
+    _draw_container(draw, scene.container.cells, scene.container_color, cfg)
 
     for placed in scene.placed:
         if placed.kind == "circle":

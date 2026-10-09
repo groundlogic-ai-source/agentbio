@@ -10,8 +10,24 @@ The interior used almost everywhere is 3 cells wide and 2 cells tall:
 import unittest
 
 from stimuli import fit, shapes
+from stimuli.config import DEFAULT
 
+# A small interior used throughout, chosen so every case can be drawn by hand.
+# It is deliberately NOT read from the config: these tests check the fit
+# function itself, and should not change when the puzzle settings change.
 INTERIOR_3x2 = fit.rectangle_region(3, 2)
+
+# Shapes written out by hand, for the same reason.
+TEE = [(0, 0), (1, 0), (2, 0), (1, 1)]          # 3 wide, 2 tall
+BAR4_LYING = [(0, 0), (1, 0), (2, 0), (3, 0)]   # 4 wide, 1 tall
+BAR4_STANDING = [(0, 0), (0, 1), (0, 2), (0, 3)]
+BAR3_STANDING = [(0, 0), (0, 1), (0, 2)]
+ESS = [(1, 0), (2, 0), (0, 1), (1, 1)]          # the S piece
+
+
+def circle(width):
+    """A circle `width` cells across, as the square of cells it covers."""
+    return fit.rectangle_region(width, width)
 
 
 class TestGeometryHelpers(unittest.TestCase):
@@ -73,10 +89,9 @@ class TestTouchingTheWalls(unittest.TestCase):
 
     def test_tee_spans_the_interior_in_both_directions(self):
         # The T is 3 wide and 2 tall, so it touches both arms and the base.
-        tee = shapes.BY_NAME["tee_h"]
-        self.assertEqual(tee.size, (3, 2))
+        self.assertEqual(fit.size_of(TEE), (3, 2))
         self.assertEqual(
-            fit.label_shape(tee.cells, INTERIOR_3x2), fit.FITS_AS_DRAWN
+            fit.label_shape(TEE, INTERIOR_3x2), fit.FITS_AS_DRAWN
         )
 
     def test_one_cell_wider_than_the_interior_does_not_fit(self):
@@ -107,25 +122,27 @@ class TestFitsOnlyWithRotation(unittest.TestCase):
             standing, INTERIOR_3x2, allow_rotation=False
         ))
 
-    def test_every_library_rotation_shape_needs_turning(self):
-        buckets = shapes.label_library(INTERIOR_3x2)
-        rotation_shapes = buckets[fit.FITS_ROTATED]
-        self.assertTrue(rotation_shapes, "expected some rotation-only shapes")
-        for shape in rotation_shapes:
+    def test_every_rotation_shape_in_the_real_library_needs_turning(self):
+        # This one uses the live library and the configured interior, so it
+        # catches a settings change that empties the category.
+        region = fit.rectangle_region(DEFAULT.interior_width,
+                                      DEFAULT.interior_height)
+        rotation_shapes = shapes.banded_library(DEFAULT)[fit.FITS_ROTATED]
+        self.assertTrue(rotation_shapes, "no rotation-only shapes available")
+        for shape, _ in rotation_shapes:
             with self.subTest(shape=shape.name):
                 # Does not fit as drawn...
-                self.assertFalse(fit.placement_fits(shape.cells, INTERIOR_3x2))
+                self.assertFalse(fit.placement_fits(shape.cells, region))
                 # ...but does fit once turned.
-                self.assertTrue(fit.fits_in_region(shape.cells, INTERIOR_3x2))
+                self.assertTrue(fit.fits_in_region(shape.cells, region))
 
 
 class TestTooBig(unittest.TestCase):
     def test_bar_of_four_never_fits_either_way_round(self):
-        for name in ("bar4_h", "bar4_v"):
+        for name, cells in (("lying", BAR4_LYING), ("standing", BAR4_STANDING)):
             with self.subTest(shape=name):
-                shape = shapes.BY_NAME[name]
                 self.assertEqual(
-                    fit.label_shape(shape.cells, INTERIOR_3x2), fit.TOO_BIG
+                    fit.label_shape(cells, INTERIOR_3x2), fit.TOO_BIG
                 )
 
 
@@ -133,37 +150,32 @@ class TestCircles(unittest.TestCase):
     """A circle is judged as the square box it sits in."""
 
     def test_circle_is_stored_as_its_bounding_square(self):
-        self.assertEqual(shapes.BY_NAME["circle3"].size, (3, 3))
-        self.assertEqual(len(shapes.BY_NAME["circle3"].cells), 9)
+        self.assertEqual(fit.size_of(circle(3)), (3, 3))
+        self.assertEqual(len(circle(3)), 9)
 
     def test_small_circles_fit(self):
-        self.assertEqual(
-            fit.label_shape(shapes.BY_NAME["circle1"].cells, INTERIOR_3x2),
-            fit.FITS_AS_DRAWN,
-        )
-        self.assertEqual(
-            fit.label_shape(shapes.BY_NAME["circle2"].cells, INTERIOR_3x2),
-            fit.FITS_AS_DRAWN,
-        )
+        for width in (1, 2):
+            with self.subTest(width=width):
+                self.assertEqual(
+                    fit.label_shape(circle(width), INTERIOR_3x2),
+                    fit.FITS_AS_DRAWN,
+                )
 
     def test_circle_three_wide_needs_a_three_by_three_space(self):
-        # The interior is only 2 tall, so a 3-wide circle cannot go in, and
-        # turning a circle changes nothing.
+        # The interior here is only 2 tall, so a 3-wide circle cannot go in,
+        # and turning a circle changes nothing.
         self.assertEqual(
-            fit.label_shape(shapes.BY_NAME["circle3"].cells, INTERIOR_3x2),
-            fit.TOO_BIG,
+            fit.label_shape(circle(3), INTERIOR_3x2), fit.TOO_BIG
         )
-        self.assertTrue(fit.fits_in_region(
-            shapes.BY_NAME["circle3"].cells, fit.rectangle_region(3, 3)
-        ))
+        self.assertTrue(
+            fit.fits_in_region(circle(3), fit.rectangle_region(3, 3))
+        )
 
     def test_a_circle_can_never_be_a_rotation_only_shape(self):
         # Its box is square, so it has a single orientation.
-        for name in ("circle1", "circle2", "circle3", "circle4"):
-            with self.subTest(shape=name):
-                self.assertEqual(
-                    len(fit.orientations(shapes.BY_NAME[name].cells)), 1
-                )
+        for width in (1, 2, 3, 4):
+            with self.subTest(width=width):
+                self.assertEqual(len(fit.orientations(circle(width))), 1)
 
 
 class TestReflections(unittest.TestCase):
@@ -174,15 +186,13 @@ class TestReflections(unittest.TestCase):
     Z_HOLE = frozenset([(0, 0), (1, 0), (1, 1), (2, 1)])
 
     def test_mirror_image_does_not_fit_by_default(self):
-        ess = shapes.BY_NAME["ess_h"]
         self.assertFalse(fit.fits_in_region(
-            ess.cells, self.Z_HOLE, allow_reflections=False
+            ESS, self.Z_HOLE, allow_reflections=False
         ))
 
     def test_mirror_image_fits_when_reflections_are_allowed(self):
-        ess = shapes.BY_NAME["ess_h"]
         self.assertTrue(fit.fits_in_region(
-            ess.cells, self.Z_HOLE, allow_reflections=True
+            ESS, self.Z_HOLE, allow_reflections=True
         ))
 
 
@@ -195,30 +205,24 @@ class TestCountingTheAnswer(unittest.TestCase):
             fit.count_fitting([square, square, square], INTERIOR_3x2), 3
         )
 
+    HAND = [
+        [(0, 0)],                                # fits
+        [(0, 0), (1, 0), (0, 1), (1, 1)],        # fits
+        BAR3_STANDING,                           # fits once turned
+        BAR4_LYING,                              # too big
+        circle(3),                               # too big
+    ]
+
     def test_mixed_scene_counts_only_the_shapes_that_fit(self):
-        hand = [
-            shapes.BY_NAME["single"].cells,    # fits
-            shapes.BY_NAME["square4"].cells,   # fits
-            shapes.BY_NAME["bar3_v"].cells,    # fits once turned
-            shapes.BY_NAME["bar4_h"].cells,    # too big
-            shapes.BY_NAME["circle3"].cells,   # too big
-        ]
-        self.assertEqual(fit.count_fitting(hand, INTERIOR_3x2), 3)
+        self.assertEqual(fit.count_fitting(self.HAND, INTERIOR_3x2), 3)
 
     def test_same_hand_with_rotation_switched_off_counts_one_fewer(self):
-        hand = [
-            shapes.BY_NAME["single"].cells,
-            shapes.BY_NAME["square4"].cells,
-            shapes.BY_NAME["bar3_v"].cells,
-            shapes.BY_NAME["bar4_h"].cells,
-            shapes.BY_NAME["circle3"].cells,
-        ]
         self.assertEqual(
-            fit.count_fitting(hand, INTERIOR_3x2, allow_rotation=False), 2
+            fit.count_fitting(self.HAND, INTERIOR_3x2, allow_rotation=False), 2
         )
 
     def test_the_answer_is_the_same_every_time_it_is_computed(self):
-        hand = [s.cells for s in shapes.LIBRARY]
+        hand = [s.cells for s in shapes.full_library(5, 4)]
         answers = {fit.count_fitting(hand, INTERIOR_3x2) for _ in range(20)}
         self.assertEqual(len(answers), 1)
 

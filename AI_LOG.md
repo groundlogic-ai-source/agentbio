@@ -80,3 +80,76 @@ A running record of what was decided and what changed in each working session.
 
 Puzzle 2 (unstable objects) and the staircase session runner. Specs still to
 come.
+
+---
+
+## 2026-10-09 (later) - Reworked after reading the ISEF research plan
+
+### Decided
+
+* **Colour decoys are on.** `per_shape_colors` is now true, and the background
+  varies per scene as well, which is what the research plan asks for when it
+  says surface appearance should stay decorrelated from the rule. The decoy
+  report's colour rule now measures something real (87% distinguishable)
+  instead of being a restatement of "count every shape".
+* **Bigger container: interior 4 wide by 3 tall, on a 20x14 grid.**
+* **Shapes now go up to 6 cells.** This was not a free choice. Interior size
+  and shape size are locked together: with a 4x3 interior and shapes of 4
+  cells or fewer there are ZERO too-big shapes and only one that needs
+  turning, so every answer would be 5 and the puzzle would be dead. Measured
+  counts for 4x3 with 6-cell shapes: 193 fit as drawn, 81 need a turn, 38 too
+  big.
+* **Interior stays a plain rectangle,** chosen over a stepped interior. Noted
+  as a known limit: fit therefore reduces to a bounding-box comparison, and a
+  solver can get every answer right without reasoning about placement.
+* **Staircase starts at K=4,** not the K=2 written in the research plan. The
+  plan text needs changing before submission.
+* **Shapes are picked by size first, then by shape.** The pool is lopsided
+  (114 of the fitting shapes have 6 cells, 2 have one cell), so uniform
+  picking produced scenes of five near-identical blobs.
+* **Container and loose palettes are now disjoint hue families** (cool versus
+  warm), and the container is drawn with a heavier outside edge. With 6-cell
+  shapes a loose shape can itself be U-shaped, and in the first render pass
+  several scenes had a container the same colour as the loose shapes, which
+  made it genuinely ambiguous which object was the container.
+
+### Correction to the research plan
+
+The plan scores distractors that fit by "the amount of leftover empty space
+after the tightest valid placement". In a rectangular interior that quantity
+cannot vary: every valid placement leaves exactly (interior area - shape area)
+cells empty, so there is no tightest placement and the measure only restates
+the shape's cell count. Verified across 3x2, 4x2 and 4x3 interiors.
+Implemented instead as **bounding-box slack**: spare width plus spare height
+at the snuggest fitting orientation, which ranges 0 to 5 here and does vary.
+The plan's second measure (fewest cells to remove before it would fit) works
+as written and is implemented unchanged.
+
+### Built
+
+* `stimuli/difficulty.py` - bounding-box slack, near-miss distance with a
+  connectedness requirement, the circle equivalent, and the band filter.
+* `stimuli/shapes.py` rewritten to enumerate polyominoes programmatically
+  rather than listing them by hand, since 6-cell shapes alone have 216
+  orientations. Generated counts match the known fixed-polyomino sequence
+  (1, 2, 6, 19, 63, 216), which is checked by a test.
+* Difficulty measures are now recorded per shape in each answer key.
+
+### Checked
+
+* 75 tests pass (was 50).
+* 60 scenes generated, verified independently: 0 mismatches.
+* Reproducibility from a seed still holds.
+* Contact sheets reviewed twice; the first revealed the container/loose colour
+  ambiguity, which the palette split fixed.
+
+### Still to do
+
+* The web app (agreed: generator first, then the app).
+* The staircase runner, reliability check and composite scoring.
+* Puzzle 2, physical stability.
+
+### Open items for Evan
+
+* Research plan says K=2; the code will use K=4. Change the plan text.
+* Research plan's first difficulty measure needs rewording as above.

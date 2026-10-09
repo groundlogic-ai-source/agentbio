@@ -11,16 +11,41 @@ from dataclasses import dataclass, field, asdict
 @dataclass
 class Config:
     # ---- The grid the scene is drawn on (in cells) ----
-    grid_width: int = 14
-    grid_height: int = 10
+    grid_width: int = 20
+    grid_height: int = 14
 
     # ---- The container's interior (the empty space inside the U) ----
     # This is the space a loose shape has to fit into. It must NOT be square,
     # otherwise "fits only when rotated" can never happen: in a square space,
     # anything that fits turned also fits unturned.
-    interior_width: int = 3
-    interior_height: int = 2
+    interior_width: int = 4
+    interior_height: int = 3
     wall_thickness: int = 1   # how many cells thick each arm and the base are
+
+    # ---- The pool of shapes to draw from ----
+    # Interior size and shape size are locked together. Enlarging the
+    # interior without enlarging the shapes breaks the puzzle: in a 4x3
+    # interior every shape of 4 cells or fewer fits, so there would be no
+    # too-big shapes at all and almost nothing would need turning.
+    max_shape_cells: int = 6
+    max_circle_width: int = 5
+
+    # ---- The difficulty band (see difficulty.py) ----
+    # Shapes that fit are scored by bounding-box slack: spare width plus spare
+    # height at the snuggest orientation. 0 is an exactly-filling fit, and the
+    # largest possible here is (4-1) + (3-1) = 5 for a single cell.
+    slack_band: tuple = (0, 3)
+    # Shapes that do not fit are scored by how many cells would have to come
+    # off before they would. 1 is a near miss; larger is obviously too big.
+    near_miss_band: tuple = (1, 2)
+
+    # The pool is dominated by the largest shapes (there are far more 6-cell
+    # pieces than 3-cell ones), so shapes are picked by first choosing a size
+    # and then a shape of that size. Without this, almost every loose shape in
+    # every scene would be a 6-cell blob.
+    stratify_by_cell_count: bool = True
+    # How often a loose shape is a circle rather than a polyomino.
+    circle_probability: float = 0.2
 
     # ---- How the fit question is decided ----
     allow_rotation: bool = True        # 90-degree turns allowed when judging fit
@@ -43,26 +68,43 @@ class Config:
 
     # ---- Colour ----
     # Colours are picked independently of the answer, so colour is never a clue.
+    # The two palettes are kept in separate hue families, cool for the
+    # container and warm for the loose shapes. Colour still varies freely and
+    # is still independent of the answer, but the container can never be
+    # mistaken for a loose shape - which matters now that a 6-cell loose shape
+    # can itself be U-shaped.
     container_palette: tuple = (
-        "#3B6EA5",  # blue
-        "#7A5C9E",  # purple
-        "#2E7D62",  # green
+        "#2F5C8F",  # deep blue
+        "#6A4A8C",  # deep purple
+        "#27694F",  # deep green
     )
     loose_palette: tuple = (
         "#C25E4A",  # terracotta
         "#D4A23C",  # amber
-        "#5A7D9A",  # slate
+        "#B5567A",  # rose
     )
     # False: every loose shape in a scene shares one colour (your choice).
     # True:  each loose shape gets its own colour from the palette, which makes
     #        the "number of shapes of one colour" decoy rule meaningful.
-    per_shape_colors: bool = False
+    per_shape_colors: bool = True
 
     # ---- Drawing ----
-    cell_pixels: int = 28
+    # Backgrounds vary per scene too, so surface appearance stays
+    # decorrelated from the rule, as the research plan requires.
+    background_palette: tuple = (
+        "#FFFFFF",  # white
+        "#FAF7F2",  # warm off-white
+        "#F4F6F8",  # cool off-white
+        "#F7F4FA",  # faint lilac
+    )
+
+    cell_pixels: int = 22
     grid_line_color: str = "#D8D8D8"
     background_color: str = "#FFFFFF"
     outline_color: str = "#2B2B2B"   # thin outline around filled cells
+    # The container is drawn with a heavier outline, a second cue that it is
+    # the container and not one more loose shape.
+    container_outline_width: int = 3
 
     # ---- Reproducibility ----
     seed: int = 20261009
