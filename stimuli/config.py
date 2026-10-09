@@ -65,7 +65,7 @@ class Config:
     outline_color: str = "#2B2B2B"   # thin outline around filled cells
 
     # ---- Reproducibility ----
-    seed: int = 20251009
+    seed: int = 20261009
 
     def to_dict(self):
         return asdict(self)
